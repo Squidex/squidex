@@ -1,0 +1,20 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "NodaTime": "2.0.0-alpha20160729",
+    "NETStandard.Library": "1.6.0"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      }
+    }
+  },
+  "tooling": {
+    "defaultNamespace": "PinkParrot.Infrastructure"
+  }
+}
