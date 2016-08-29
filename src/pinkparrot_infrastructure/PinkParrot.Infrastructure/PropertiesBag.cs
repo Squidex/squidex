@@ -8,10 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 
 namespace PinkParrot.Infrastructure
 {
-    public class PropertiesBag
+    public class PropertiesBag : DynamicObject
     {
         private readonly Dictionary<string, PropertyValue> internalDictionary = new Dictionary<string, PropertyValue>(StringComparer.OrdinalIgnoreCase);
         
@@ -40,11 +41,35 @@ namespace PinkParrot.Infrastructure
             }
         }
 
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return internalDictionary.Keys;
+        }
+        
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            return internalDictionary.TryGetValueAsObject(binder.Name, out result);
+        }
+
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            internalDictionary[binder.Name] = new PropertyValue(value);
+
+            return true;
+        }
+
         public bool Contains(string propertyName)
         {
             Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
             return internalDictionary.ContainsKey(propertyName);
+        }
+
+        public bool Remove(string propertyName)
+        {
+            Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
+
+            return internalDictionary.Remove(propertyName);
         }
 
         public PropertiesBag Set(string propertyName, object value)
@@ -54,13 +79,6 @@ namespace PinkParrot.Infrastructure
             internalDictionary[propertyName] = new PropertyValue(value);
 
             return this;
-        }
-
-        public bool Remove(string propertyName)
-        {
-            Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
-
-            return internalDictionary.Remove(propertyName);
         }
 
         public bool Rename(string oldPropertyName, string newPropertyName)

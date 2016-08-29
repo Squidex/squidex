@@ -8,35 +8,37 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
 
 namespace PinkParrot.Infrastructure
 {
-    public sealed class PropertyValue
+    public sealed class PropertyValue : DynamicObject
     {
         private readonly object rawValue;
 
-        private static readonly HashSet<Type> AllowedTypes = new HashSet<Type>
-        {
-            typeof(string),
-            typeof(bool),
-            typeof(bool?),
-            typeof(float),
-            typeof(float?),
-            typeof(double),
-            typeof(double?),
-            typeof(int),
-            typeof(int?),
-            typeof(long),
-            typeof(long?),
-            typeof(Instant),
-            typeof(Instant?),
-            typeof(Guid),
-            typeof(Guid?)
-        };
-        
+        private static readonly Dictionary<Type, Func<PropertyValue, CultureInfo, object>> Parsers =
+            new Dictionary<Type, Func<PropertyValue, CultureInfo, object>>
+            {
+                { typeof(string),   (p, c) => p.ToString() },
+                { typeof(bool),     (p, c) => p.ToBoolean(c) },
+                { typeof(bool?),    (p, c) => p.ToNullableBoolean(c) },
+                { typeof(float),    (p, c) => p.ToSingle(c) },
+                { typeof(float?),   (p, c) => p.ToNullableSingle(c) },
+                { typeof(double),   (p, c) => p.ToDouble(c) },
+                { typeof(double?),  (p, c) => p.ToNullableDouble(c) },
+                { typeof(int),      (p, c) => p.ToInt32(c) },
+                { typeof(int?),     (p, c) => p.ToNullableInt32(c) },
+                { typeof(long),     (p, c) => p.ToInt64(c) },
+                { typeof(long?),    (p, c) => p.ToNullableInt64(c) },
+                { typeof(Instant),  (p, c) => p.ToInstant(c) },
+                { typeof(Instant?), (p, c) => p.ToNullableInstant(c) },
+                { typeof(Guid),     (p, c) => p.ToGuid(c) },
+                { typeof(Guid?),    (p, c) => p.ToNullableGuid(c) },
+            };
+
         public object RawValue
         {
             get { return rawValue; }
@@ -44,14 +46,35 @@ namespace PinkParrot.Infrastructure
 
         internal PropertyValue(object rawValue)
         {
-            if (rawValue != null && !AllowedTypes.Contains(rawValue.GetType()))
+            if (rawValue != null && !Parsers.ContainsKey(rawValue.GetType()))
             {
-                throw new ArgumentException("The type is not supported.", nameof(rawValue));
+                throw new InvalidOperationException($"The type '{rawValue.GetType()}' is not supported.");
             }
 
             this.rawValue = rawValue;
         }
-        
+
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            result = null;
+
+            if (binder.Type == typeof(object))
+            {
+                result = rawValue;
+            }
+
+            Func<PropertyValue, CultureInfo, object> parser;
+
+            if (!Parsers.TryGetValue(binder.Type, out parser))
+            {
+                return false;
+            }
+
+            result = parser(this, CultureInfo.InvariantCulture);
+
+            return true;
+        }
+                
         public override string ToString()
         {
             return rawValue?.ToString();
@@ -59,12 +82,12 @@ namespace PinkParrot.Infrastructure
         
         public bool ToBoolean(CultureInfo culture)
         {
-            return ToOrParseValue(culture, bool.Parse);
+            return ToOrParseValue(culture, ParseBoolean);
         }
         
         public bool? ToNullableBoolean(CultureInfo culture)
         {
-            return ToNullableOrParseValue(culture, bool.Parse);
+            return ToNullableOrParseValue(culture, ParseBoolean);
         }
         
         public float ToSingle(CultureInfo culture)
@@ -205,6 +228,19 @@ namespace PinkParrot.Infrastructure
                 string message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
 
                 throw new InvalidCastException(message, e);
+            }
+        }
+
+        private static bool ParseBoolean(string value)
+        {
+            switch (value)
+            {
+                case "1":
+                    return true;
+                case "0":
+                    return false;
+                default:
+                    return bool.Parse(value);
             }
         }
     }

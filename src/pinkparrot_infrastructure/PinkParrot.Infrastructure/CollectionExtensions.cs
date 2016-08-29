@@ -106,5 +106,16 @@ namespace PinkParrot.Infrastructure
 
             return result;
         }
+
+        public static bool TryGetValueAsObject<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, out object value)
+        {
+            TValue result;
+
+            var isFound = dictionary.TryGetValue(key, out result);
+
+            value = result;
+
+            return isFound;
+        }
     }
 }

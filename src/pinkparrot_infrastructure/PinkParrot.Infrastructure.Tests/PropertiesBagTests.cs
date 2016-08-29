@@ -21,6 +21,12 @@ namespace PinkParrot.Infrastructure
     {
         private readonly CultureInfo c = CultureInfo.InvariantCulture;
         private readonly PropertiesBag bag = new PropertiesBag();
+        private readonly dynamic dynamicBag;
+
+        public PropertiesBagTest()
+        {
+            dynamicBag = bag;
+        }
 
         [Fact]
         public void Should_return_false_when_renaming_unknown_property()
@@ -63,8 +69,8 @@ namespace PinkParrot.Infrastructure
             bag.Set("Key2", 1);
 
             Assert.Equal(2, bag.Count);
-            Assert.Equal(new[] { "Key1", "Key2" }, bag.PropertyNames.ToArray());
-            Assert.Equal(new[] { "Key1", "Key2" }, bag.Properties.Keys.ToArray());
+            Assert.Equal(new[] {"Key1", "Key2"}, bag.PropertyNames.ToArray());
+            Assert.Equal(new[] {"Key1", "Key2"}, bag.Properties.Keys.ToArray());
         }
 
         [Fact]
@@ -94,9 +100,23 @@ namespace PinkParrot.Infrastructure
         }
 
         [Fact]
+        public void Should_set_value_as_dynamic()
+        {
+            dynamicBag.Key = 456;
+
+            Assert.Equal(456, (int)dynamicBag.Key);
+        }
+
+        [Fact]
+        public void Should_throw_when_setting_value_with_invalid_type_dynamically()
+        {
+            Assert.Throws<InvalidOperationException>(() => dynamicBag.Key = (byte)123);
+        }
+
+        [Fact]
         public void Should_throw_when_setting_value_with_invalid_type()
         {
-            Assert.Throws<ArgumentException>(() => bag.Set("Key", (byte)1));
+            Assert.Throws<InvalidOperationException>(() => bag.Set("Key", (byte)1));
         }
 
         [Fact]
@@ -168,7 +188,7 @@ namespace PinkParrot.Infrastructure
         [Fact]
         public void Should_convert_from_instant_string()
         {
-            var time = SystemClock.Instance.GetCurrentInstant();
+            var time = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
             bag.Set("Key", time.ToString());
 
@@ -200,7 +220,7 @@ namespace PinkParrot.Infrastructure
         {
             bag.Set("Key", true);
 
-            AssertBoolean();
+            AssertBoolean(true);
         }
 
         [Fact]
@@ -208,7 +228,7 @@ namespace PinkParrot.Infrastructure
         {
             bag.Set("Key", "true");
 
-            AssertBoolean();
+            AssertBoolean(true);
         }
 
         [Fact]
@@ -216,7 +236,23 @@ namespace PinkParrot.Infrastructure
         {
             bag.Set("Key", 1);
 
-            AssertBoolean();
+            AssertBoolean(true);
+        }
+
+        [Fact]
+        public void Should_convert_boolean_to_truthy_number_string()
+        {
+            bag.Set("Key", "1");
+
+            AssertBoolean(true);
+        }
+
+        [Fact]
+        public void Should_convert_boolean_to_falsy_number_string()
+        {
+            bag.Set("Key", "0");
+
+            AssertBoolean(false);
         }
 
         [Fact]
@@ -227,55 +263,82 @@ namespace PinkParrot.Infrastructure
             Assert.Throws<InvalidCastException>(() => bag["Key"].ToGuid(CultureInfo.InvariantCulture));
         }
 
-        [Fact]
-        public void Should_return_default_when_property_value_is_null()
+        private void AssertNumber()
         {
-            bag.Set("Key", null);
-
-            Assert.Equal(null, bag["Key"].ToString());
-
-            Assert.Equal(0f, bag["Key"].ToSingle(CultureInfo.CurrentCulture));
-            Assert.Equal(0d, bag["Key"].ToDouble(CultureInfo.CurrentCulture));
-            Assert.Equal(0L, bag["Key"].ToInt64(CultureInfo.CurrentCulture));
-            Assert.Equal(0,  bag["Key"].ToInt32(CultureInfo.CurrentCulture));
-
-            Assert.Equal(false, bag["Key"].ToBoolean(CultureInfo.CurrentCulture));
-
-            Assert.Equal(new Guid(), bag["Key"].ToGuid(CultureInfo.CurrentCulture));
-
-            Assert.Equal(new Instant(), bag["Key"].ToInstant(CultureInfo.CurrentCulture));
+            AssertInt32(123);
+            AssertInt64(123);
+            AssertSingle(123);
+            AssertDouble(123);
         }
 
-        private void AssertBoolean()
+        private void AssertString(string expected)
         {
-            Assert.True(bag["Key"].ToBoolean(c));
-            Assert.True(bag["Key"].ToNullableBoolean(c));
+            Assert.Equal(expected, bag["Key"].ToString());
+
+            Assert.Equal(expected, (string)dynamicBag.Key);
+        }
+
+        private void AssertBoolean(bool expected)
+        {
+            Assert.Equal(expected, bag["Key"].ToBoolean(c));
+            Assert.Equal(expected, bag["Key"].ToNullableBoolean(c));
+
+            Assert.Equal(expected, (bool)dynamicBag.Key);
+            Assert.Equal(expected, (bool?)dynamicBag.Key);
         }
 
         private void AssertInstant(Instant expected)
         {
-            Assert.Equal(expected.ToUnixTimeSeconds(), bag["Key"].ToInstant(c).ToUnixTimeSeconds());
-            Assert.Equal(expected.ToUnixTimeSeconds(), bag["Key"].ToNullableInstant(c).Value.ToUnixTimeSeconds());
+            Assert.Equal(expected, bag["Key"].ToInstant(c));
+            Assert.Equal(expected, bag["Key"].ToNullableInstant(c).Value);
+
+            Assert.Equal(expected, (Instant)dynamicBag.Key);
+            Assert.Equal(expected, (Instant?)dynamicBag.Key);
         }
 
         private void AssertGuid(Guid expected)
         {
             Assert.Equal(expected, bag["Key"].ToGuid(c));
             Assert.Equal(expected, bag["Key"].ToNullableGuid(c));
+
+            Assert.Equal(expected, (Guid)dynamicBag.Key);
+            Assert.Equal(expected, (Guid?)dynamicBag.Key);
         }
 
-        private void AssertNumber()
+        private void AssertDouble(double expected)
         {
-            Assert.Equal(123, bag["Key"].ToInt32(c));
-            Assert.Equal(123, bag["Key"].ToNullableInt32(c));
-            Assert.Equal(123L, bag["Key"].ToInt64(c));
-            Assert.Equal(123L, bag["Key"].ToNullableInt64(c));
-            Assert.Equal(123f, bag["Key"].ToSingle(c));
-            Assert.Equal(123f, bag["Key"].ToNullableSingle(c));
-            Assert.Equal(123d, bag["Key"].ToDouble(c));
-            Assert.Equal(123d, bag["Key"].ToNullableDouble(c));
+            Assert.Equal(expected, bag["Key"].ToDouble(c));
+            Assert.Equal(expected, bag["Key"].ToNullableDouble(c));
 
-            Assert.True(bag["Key"].ToBoolean(c));
+            Assert.Equal(expected, (double)dynamicBag.Key);
+            Assert.Equal(expected, (double?)dynamicBag.Key);
+        }
+
+        private void AssertSingle(float expected)
+        {
+            Assert.Equal(expected, bag["Key"].ToSingle(c));
+            Assert.Equal(expected, bag["Key"].ToNullableSingle(c));
+
+            Assert.Equal(expected, (float)dynamicBag.Key);
+            Assert.Equal(expected, (float?)dynamicBag.Key);
+        }
+
+        private void AssertInt64(long expected)
+        {
+            Assert.Equal(expected, bag["Key"].ToInt64(c));
+            Assert.Equal(expected, bag["Key"].ToNullableInt64(c));
+
+            Assert.Equal(expected, (long)dynamicBag.Key);
+            Assert.Equal(expected, (long?)dynamicBag.Key);
+        }
+
+        private void AssertInt32(int expected)
+        {
+            Assert.Equal(expected, bag["Key"].ToInt32(c));
+            Assert.Equal(expected, bag["Key"].ToNullableInt32(c));
+
+            Assert.Equal(expected, (int)dynamicBag.Key);
+            Assert.Equal(expected, (int?)dynamicBag.Key);
         }
     }
 }
