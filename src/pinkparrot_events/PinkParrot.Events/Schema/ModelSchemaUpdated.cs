@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schema
 {

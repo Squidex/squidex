@@ -8,6 +8,7 @@
 
 using System;
 using NodaTime;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Infrastructure.CQRS
 {

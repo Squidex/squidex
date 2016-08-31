@@ -6,9 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.Tasks;
@@ -19,7 +17,7 @@ namespace PinkParrot.Core.Schema
 {
     public abstract class ModelField
     {
-        private readonly Guid id;
+        private readonly long id;
         private string name;
         private string hint;
         private string displayName;
@@ -27,7 +25,7 @@ namespace PinkParrot.Core.Schema
         private bool isDisabled;
         private bool isHidden;
 
-        public Guid Id
+        public long Id
         {
             get { return id; }
         }
@@ -62,9 +60,9 @@ namespace PinkParrot.Core.Schema
             get { return isDisabled; }
         }
 
-        protected ModelField(Guid id, string name)
+        protected ModelField(long id, string name)
         {
-            Guard.NotEmpty(id, nameof(id));
+            Guard.GreaterThan(id, 0, nameof(id));
             Guard.ValidSlug(name, nameof(name));
 
             this.id = id;
@@ -72,13 +70,13 @@ namespace PinkParrot.Core.Schema
             this.name = name;
         }
 
-        public ModelField Configure(PropertiesBag settings, ICollection<string> errors)
+        public ModelField Configure(dynamic settings, ICollection<string> errors)
         {
             var clone = Clone();
 
             if (settings.Contains("Name"))
             {
-                clone.name = settings["Name"].ToString();
+                clone.name = settings.Name;
 
                 if (!clone.name.IsSlug())
                 {
@@ -86,26 +84,19 @@ namespace PinkParrot.Core.Schema
                 }
             }
 
-            if (settings.Contains("Hint"))
+            if (settings.Contains("hint"))
             {
-                clone.hint = settings["Hint"].ToString()?.Trim() ?? string.Empty;
+                clone.hint = settings.Hint?.Trim();
             }
 
-            if (settings.Contains("DisplayName"))
+            if (settings.Contains("displayName"))
             {
-                clone.displayName = settings["DisplayName"].ToString()?.Trim() ?? string.Empty;
+                clone.displayName = settings.DisplayName?.Trim();
             }
 
             if (settings.Contains("IsRequired"))
             {
-                try
-                {
-                    clone.isRequired = settings["IsRequired"].ToBoolean(CultureInfo.InvariantCulture);
-                }
-                catch (InvalidCastException)
-                {
-                    errors.Add("IsRequired is not a valid boolean");
-                }
+                clone.isRequired = settings.IsRequired;
             }
 
             clone.ConfigureCore(settings, errors);
@@ -113,7 +104,7 @@ namespace PinkParrot.Core.Schema
             return clone;
         }
 
-        protected virtual void ConfigureCore(PropertiesBag settings, ICollection<string> errors)
+        protected virtual void ConfigureCore(dynamic settings, ICollection<string> errors)
         {
         }
 

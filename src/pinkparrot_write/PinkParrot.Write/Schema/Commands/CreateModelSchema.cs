@@ -6,14 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class CreateModelSchema
+    public class CreateModelSchema : AggregateCommand
     {
-        public Guid AggregateId;
-
         public string Name;
     }
 }

@@ -10,6 +10,8 @@ using System;
 using PinkParrot.Core.Schema;
 using PinkParrot.Events.Schema;
 using PinkParrot.Infrastructure.CQRS;
+using PinkParrot.Infrastructure.CQRS.Events;
+using PinkParrot.Infrastructure.Dispatching;
 using PinkParrot.Write.Schema.Commands;
 
 namespace PinkParrot.Write.Schema
@@ -18,13 +20,8 @@ namespace PinkParrot.Write.Schema
     {
         private readonly ModelFieldFactory fieldFactory;
         private bool isDeleted;
+        private long totalFields;
         private ModelSchema schema;
-
-        public ModelSchemaDomainObject(Guid id, int version, ModelFieldFactory fieldFactory)
-            : base(id, version)
-        {
-            this.fieldFactory = fieldFactory;
-        }
 
         public ModelSchema Schema
         {
@@ -36,14 +33,22 @@ namespace PinkParrot.Write.Schema
             get { return isDeleted; }
         }
 
-        protected void Apply(ModelSchemaCreated @event)
+        public ModelSchemaDomainObject(Guid id, int version, ModelFieldFactory fieldFactory)
+            : base(id, version)
         {
-            schema = ModelSchema.Create(@event.Name);
+            this.fieldFactory = fieldFactory;
         }
 
         protected void Apply(ModelFieldAdded @event)
         {
             schema = schema.AddField(@event.FieldId, @event.FieldType, @event.FieldName, fieldFactory);
+
+            totalFields++;
+        }
+
+        protected void Apply(ModelSchemaCreated @event)
+        {
+            schema = ModelSchema.Create(@event.Name);
         }
 
         protected void Apply(ModelFieldUpdated @event)
@@ -86,23 +91,24 @@ namespace PinkParrot.Write.Schema
             isDeleted = false;
         }
 
+        public void AddField(AddModelField command)
+        {
+            VerifyCreatedAndNotDeleted();
+
+            var id = ++totalFields;
+
+            schema = schema.AddField(id, command.FieldType, command.FieldName, fieldFactory);
+
+            RaiseEvent(new ModelFieldAdded { FieldId = id, FieldType = command.FieldType, FieldName = command.FieldName }, true);
+        }
+
         public void Create(CreateModelSchema command)
         {
             VerifyNotCreated();
 
             schema = ModelSchema.Create(command.Name);
 
-            RaiseEvent(new ModelSchemaCreated {Name = command.Name}, true);
-        }
-
-        public void AddField(Guid id, AddModelField command)
-        {
-            VerifyCreatedAndNotDeleted();
-
-            schema = schema.AddField(id, command.FieldType, command.FieldName, fieldFactory);
-
-            RaiseEvent(
-                new ModelFieldAdded {FieldId = id, FieldType = command.FieldType, FieldName = command.FieldName}, true);
+            RaiseEvent(new ModelSchemaCreated { Name = command.Name }, true);
         }
 
         public void Update(UpdateModelSchema command)
@@ -111,7 +117,7 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.Update(schema.Metadata.Configure(command.NewName, command.Settings));
 
-            RaiseEvent(new ModelSchemaUpdated {NewName = command.NewName, Settings = command.Settings}, true);
+            RaiseEvent(new ModelSchemaUpdated { NewName = command.NewName, Settings = command.Settings }, true);
         }
 
         public void UpdateField(UpdateModelField command)
@@ -120,7 +126,7 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.SetField(command.FieldId, command.Settings);
 
-            RaiseEvent(new ModelFieldUpdated {FieldId = command.FieldId, Settings = command.Settings}, true);
+            RaiseEvent(new ModelFieldUpdated { FieldId = command.FieldId, Settings = command.Settings }, true);
         }
 
         public void HideField(HideModelField command)
@@ -129,16 +135,16 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.HideField(command.FieldId);
 
-            RaiseEvent(new ModelFieldHidden {FieldId = command.FieldId}, true);
+            RaiseEvent(new ModelFieldHidden { FieldId = command.FieldId }, true);
         }
 
-        public void ShowField(HideModelField command)
+        public void ShowField(ShowModelField command)
         {
             VerifyCreatedAndNotDeleted();
 
             schema = schema.ShowField(command.FieldId);
 
-            RaiseEvent(new ModelFieldShown {FieldId = command.FieldId}, true);
+            RaiseEvent(new ModelFieldShown { FieldId = command.FieldId }, true);
         }
 
         public void DisableField(DisableModelField command)
@@ -147,7 +153,7 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.DisableField(command.FieldId);
 
-            RaiseEvent(new ModelFieldDisabled {FieldId = command.FieldId}, true);
+            RaiseEvent(new ModelFieldDisabled { FieldId = command.FieldId }, true);
         }
 
         public void EnableField(EnableModelField command)
@@ -156,7 +162,7 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.EnableField(command.FieldId);
 
-            RaiseEvent(new ModelFieldEnabled {FieldId = command.FieldId}, true);
+            RaiseEvent(new ModelFieldEnabled { FieldId = command.FieldId }, true);
         }
 
         public void Delete(DeleteModelSchema command)
@@ -174,7 +180,7 @@ namespace PinkParrot.Write.Schema
 
             schema = schema.DeleteField(command.FieldId);
 
-            RaiseEvent(new ModelFieldDeleted {FieldId = command.FieldId}, true);
+            RaiseEvent(new ModelFieldDeleted { FieldId = command.FieldId }, true);
         }
 
         private void VerifyNotCreated()
@@ -191,6 +197,11 @@ namespace PinkParrot.Write.Schema
             {
                 throw new InvalidOperationException("Schema has already been deleted or not created yet.");
             }
+        }
+
+        protected override void ApplyEvent(IEvent @event)
+        {
+            this.DispatchAction(@event);
         }
     }
 }

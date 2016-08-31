@@ -6,15 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schema
 {
     public class ModelFieldUpdated : IEvent
     {
-        public Guid FieldId { get; set; }
+        public long FieldId;
 
         public PropertiesBag Settings { get; set; }
     }

@@ -14,6 +14,7 @@ namespace PinkParrot.Infrastructure
 {
     public class PropertiesBag : DynamicObject
     {
+        private static readonly PropertyValue FallbackValue = new PropertyValue(null);
         private readonly Dictionary<string, PropertyValue> internalDictionary = new Dictionary<string, PropertyValue>(StringComparer.OrdinalIgnoreCase);
         
         public int Count
@@ -37,7 +38,7 @@ namespace PinkParrot.Infrastructure
             {
                 Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
-                return internalDictionary[propertyName];
+                return internalDictionary.GetOrDefault(propertyName) ?? FallbackValue;
             }
         }
 
@@ -48,7 +49,9 @@ namespace PinkParrot.Infrastructure
         
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            return internalDictionary.TryGetValueAsObject(binder.Name, out result);
+            result = this[binder.Name];
+
+            return true;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)

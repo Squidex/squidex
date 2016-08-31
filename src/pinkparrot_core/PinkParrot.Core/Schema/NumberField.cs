@@ -30,37 +30,20 @@ namespace PinkParrot.Core.Schema
             get { return minValue; }
         }
 
-        public NumberField(Guid id, string name) 
+        public NumberField(long id, string name) 
             : base(id, name)
         {
         }
 
-        protected override void ConfigureCore(PropertiesBag settings, ICollection<string> errors)
+        protected override void ConfigureCore(dynamic settings, ICollection<string> errors)
         {
-            maxValue = ParseNumber("MaxValue", settings, errors);
-            minValue = ParseNumber("MinValue", settings, errors);
+            maxValue = settings.MaxValue;
+            minValue = settings.MinValue;
 
             if (maxValue.HasValue && minValue.HasValue && minValue.Value > maxValue.Value)
             {
                 errors.Add("MinValue cannot be larger than max value");
             }
-        }
-
-        private static double? ParseNumber(string key, PropertiesBag settings, ICollection<string> errors)
-        {
-            try
-            {
-                if (settings.Contains(key))
-                {
-                    return settings[key].ToNullableDouble(CultureInfo.InvariantCulture);
-                }
-            }
-            catch (InvalidCastException)
-            {
-                errors.Add($"'{key}' is not a valid number");
-            }
-
-            return null;
         }
 
         protected override Task ValidateCoreAsync(PropertyValue property, ICollection<string> errors)

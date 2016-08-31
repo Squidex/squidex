@@ -6,13 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using PinkParrot.Infrastructure.CQRS;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schema
 {
     public class ModelFieldShown : IEvent
     {
-        public Guid FieldId;
+        public long FieldId;
     }
 }

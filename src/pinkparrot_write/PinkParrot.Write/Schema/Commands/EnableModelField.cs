@@ -6,14 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class EnableModelField
+    public class EnableModelField : AggregateCommand
     {
-        public Guid AggregateId;
-
-        public Guid FieldId;
+        public long FieldId;
     }
 }

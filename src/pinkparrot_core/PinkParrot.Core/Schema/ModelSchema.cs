@@ -18,10 +18,10 @@ namespace PinkParrot.Core.Schema
     public sealed class ModelSchema
     {
         private readonly ModelSchemaMetadata metadata;
-        private readonly ImmutableDictionary<Guid, ModelField> fields;
+        private readonly ImmutableDictionary<long, ModelField> fields;
         private readonly Dictionary<string, ModelField> fieldsByName;
 
-        public ModelSchema(ModelSchemaMetadata metadata, ImmutableDictionary<Guid, ModelField> fields)
+        public ModelSchema(ModelSchemaMetadata metadata, ImmutableDictionary<long, ModelField> fields)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(metadata, nameof(metadata));
@@ -40,10 +40,10 @@ namespace PinkParrot.Core.Schema
                 throw new DomainValidationException("Cannot create the schema.", $"'{name}' is not a valid slug.");
             }
 
-            return new ModelSchema(new ModelSchemaMetadata(name), ImmutableDictionary<Guid, ModelField>.Empty);
+            return new ModelSchema(new ModelSchemaMetadata(name), ImmutableDictionary<long, ModelField>.Empty);
         }
 
-        public IReadOnlyDictionary<Guid, ModelField> Fields
+        public IReadOnlyDictionary<long, ModelField> Fields
         {
             get { return fields; }
         }
@@ -60,14 +60,14 @@ namespace PinkParrot.Core.Schema
             return new ModelSchema(newMetadata, fields);
         }
 
-        public ModelSchema AddField(Guid id, string type, string fieldName, ModelFieldFactory factory)
+        public ModelSchema AddField(long id, string type, string fieldName, ModelFieldFactory factory)
         {
             var field = factory.CreateField(id, type, fieldName);
 
             return SetField(field);
         }
 
-        public ModelSchema SetField(Guid fieldId, PropertiesBag settings)
+        public ModelSchema SetField(long fieldId, PropertiesBag settings)
         {
             Guard.NotNull(settings, nameof(settings));
 
@@ -86,22 +86,22 @@ namespace PinkParrot.Core.Schema
             });
         }
 
-        public ModelSchema DisableField(Guid fieldId)
+        public ModelSchema DisableField(long fieldId)
         {
             return UpdateField(fieldId, field => field.Disable());
         }
 
-        public ModelSchema EnableField(Guid fieldId)
+        public ModelSchema EnableField(long fieldId)
         {
             return UpdateField(fieldId, field => field.Enable());
         }
 
-        public ModelSchema HideField(Guid fieldId)
+        public ModelSchema HideField(long fieldId)
         {
             return UpdateField(fieldId, field => field.Show());
         }
 
-        public ModelSchema ShowField(Guid fieldId)
+        public ModelSchema ShowField(long fieldId)
         {
             return UpdateField(fieldId, field => field.Show());
         }
@@ -118,10 +118,8 @@ namespace PinkParrot.Core.Schema
             return new ModelSchema(metadata, fields.SetItem(field.Id, field));
         }
 
-        public ModelSchema DeleteField(Guid fieldId)
+        public ModelSchema DeleteField(long fieldId)
         {
-            Guard.NotEmpty(fieldId, nameof(fieldId));
-
             if (!fields.ContainsKey(fieldId))
             {
                 throw new DomainValidationException($"A field with id {fieldId} does not exist.");
@@ -130,7 +128,7 @@ namespace PinkParrot.Core.Schema
             return new ModelSchema(metadata, fields.Remove(fieldId));
         }
 
-        private ModelSchema UpdateField(Guid fieldId, Func<ModelField, ModelField> updater)
+        private ModelSchema UpdateField(long fieldId, Func<ModelField, ModelField> updater)
         {
             ModelField field;
 

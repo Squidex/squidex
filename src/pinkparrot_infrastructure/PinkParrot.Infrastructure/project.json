@@ -1,8 +1,11 @@
-﻿{
+{
   "version": "1.0.0-*",
   "dependencies": {
     "NodaTime": "2.0.0-alpha20160729",
-    "NETStandard.Library": "1.6.0"
+    "NETStandard.Library": "1.6.0",
+    "System.Reflection.TypeExtensions": "4.1.0",
+    "System.Linq": "4.1.0",
+    "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
     "netcoreapp1.0": {

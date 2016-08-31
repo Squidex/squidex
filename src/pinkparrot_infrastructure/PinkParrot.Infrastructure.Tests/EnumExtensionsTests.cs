@@ -11,7 +11,7 @@ using Xunit;
 
 namespace PinkParrot.Infrastructure
 {
-    public sealed class EnumExtensionsTest
+    public sealed class EnumExtensionsTests
     {
         [Fact]
         public void Should_return_true_if_enum_is_valid()

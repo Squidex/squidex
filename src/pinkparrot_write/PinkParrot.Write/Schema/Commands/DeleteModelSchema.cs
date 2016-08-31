@@ -6,12 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class DeleteModelSchema
+    public class DeleteModelSchema : AggregateCommand
     {
-        public Guid AggregateId;
     }
 }

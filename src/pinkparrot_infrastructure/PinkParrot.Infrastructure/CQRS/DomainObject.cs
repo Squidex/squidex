@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Infrastructure.CQRS
 {
@@ -37,6 +38,8 @@ namespace PinkParrot.Infrastructure.CQRS
             this.version = version;
         }
 
+        protected abstract void ApplyEvent(IEvent @event);
+
         protected void RaiseEvent<TEvent>(Envelope<TEvent> envelope, bool disableApply = false) where TEvent : class, IEvent
         {
             Guard.NotNull(envelope, nameof(envelope));
@@ -61,20 +64,9 @@ namespace PinkParrot.Infrastructure.CQRS
             }
         }
 
-        protected void Apply(object @event)
-        {
-        }
-
-        private void ApplyEvent(dynamic @event)
-        {
-            Apply(@event);
-            version++;
-        }
-
         void IAggregate.ApplyEvent(IEvent @event)
         {
-            Apply(@event as dynamic);
-            version++;
+            ApplyEvent(@event); version++;
         }
 
         void IAggregate.ClearUncommittedEvents()

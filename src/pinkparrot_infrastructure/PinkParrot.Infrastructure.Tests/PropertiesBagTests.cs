@@ -9,7 +9,9 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Newtonsoft.Json;
 using NodaTime;
+using PinkParrot.Infrastructure.Json;
 using Xunit;
 
 // ReSharper disable PossibleInvalidOperationException
@@ -26,6 +28,32 @@ namespace PinkParrot.Infrastructure
         public PropertiesBagTest()
         {
             dynamicBag = bag;
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var time = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
+
+            bag.Set("Key1", time);
+            bag.Set("Key2", "MyString");
+            bag.Set("Key3", 123L);
+            bag.Set("Key4", true);
+            bag.Set("Key5", Guid.NewGuid());
+
+            var serializerSettings = new JsonSerializerSettings();
+
+            serializerSettings.Converters.Add(new PropertiesBagConverter());
+
+            var content = JsonConvert.SerializeObject(bag, serializerSettings);
+            var response = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
+
+            foreach (var kvp in response.Properties.Take(4))
+            {
+                Assert.Equal(kvp.Value.RawValue, bag[kvp.Key].RawValue);
+            }
+
+            Assert.Equal(bag["Key5"].ToGuid(c), response["Key5"].ToGuid(c));
         }
 
         [Fact]
@@ -117,6 +145,18 @@ namespace PinkParrot.Infrastructure
         public void Should_throw_when_setting_value_with_invalid_type()
         {
             Assert.Throws<InvalidOperationException>(() => bag.Set("Key", (byte)1));
+        }
+
+        [Fact]
+        public void Should_return_false_when_making_contains_check()
+        {
+            Assert.False(dynamicBag.Contains("Key"));
+        }
+
+        [Fact]
+        public void Should_provide_default_value_if_not_exists()
+        {
+            Assert.Equal(0, (int)dynamicBag.Key);
         }
 
         [Fact]

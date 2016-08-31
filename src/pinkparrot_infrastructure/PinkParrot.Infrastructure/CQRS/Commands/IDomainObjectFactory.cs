@@ -1,13 +1,17 @@
 ﻿// ==========================================================================
-//  IEvent.cs
+//  IDomainObjectFactory.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS
+
+using System;
+
+namespace PinkParrot.Infrastructure.CQRS.Commands
 {
-    public interface IEvent
+    public interface IDomainObjectFactory
     {
+        IAggregate CreateNew(Type type, Guid id);
     }
 }

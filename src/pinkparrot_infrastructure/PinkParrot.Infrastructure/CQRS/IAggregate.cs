@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Infrastructure.CQRS
 {

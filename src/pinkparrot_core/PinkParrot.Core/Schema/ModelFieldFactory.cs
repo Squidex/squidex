@@ -6,13 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace PinkParrot.Core.Schema
 {
     public class ModelFieldFactory
     {
-        public virtual ModelField CreateField(Guid id, string type, string fieldName)
+        public virtual ModelField CreateField(long id, string type, string fieldName)
         {
             return new NumberField(id, fieldName);
         }
