@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CollectionExtensionsTest.cs
+//  CollectionExtensionsTests.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group

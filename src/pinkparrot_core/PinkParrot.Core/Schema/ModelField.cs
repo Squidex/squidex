@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PinkParrot.Infrastructure;
@@ -18,10 +19,6 @@ namespace PinkParrot.Core.Schema
     public abstract class ModelField
     {
         private readonly long id;
-        private string name;
-        private string hint;
-        private string displayName;
-        private bool isRequired;
         private bool isDisabled;
         private bool isHidden;
 
@@ -30,25 +27,15 @@ namespace PinkParrot.Core.Schema
             get { return id; }
         }
 
-        public string Name
-        {
-            get { return name; }
-        }
+        public abstract ModelFieldProperties RawProperties { get; }
 
-        public string Hint
-        {
-            get { return hint; }
-        }
+        public abstract string Name { get; }
 
-        public string DisplayName
-        {
-            get { return displayName; }
-        }
+        public abstract string Label { get; }
 
-        public bool IsRequired
-        {
-            get { return isRequired; }
-        }
+        public abstract string Hints { get; }
+
+        public abstract bool IsRequired { get; }
 
         public bool IsHidden
         {
@@ -60,61 +47,22 @@ namespace PinkParrot.Core.Schema
             get { return isDisabled; }
         }
 
-        protected ModelField(long id, string name)
+        protected ModelField(long id)
         {
             Guard.GreaterThan(id, 0, nameof(id));
-            Guard.ValidSlug(name, nameof(name));
 
             this.id = id;
-
-            this.name = name;
         }
 
-        public ModelField Configure(dynamic settings, ICollection<string> errors)
-        {
-            var clone = Clone();
-
-            if (settings.Contains("Name"))
-            {
-                clone.name = settings.Name;
-
-                if (!clone.name.IsSlug())
-                {
-                    errors.Add("Field name must be a slug");
-                }
-            }
-
-            if (settings.Contains("hint"))
-            {
-                clone.hint = settings.Hint?.Trim();
-            }
-
-            if (settings.Contains("displayName"))
-            {
-                clone.displayName = settings.DisplayName?.Trim();
-            }
-
-            if (settings.Contains("IsRequired"))
-            {
-                clone.isRequired = settings.IsRequired;
-            }
-
-            clone.ConfigureCore(settings, errors);
-
-            return clone;
-        }
-
-        protected virtual void ConfigureCore(dynamic settings, ICollection<string> errors)
-        {
-        }
+        public abstract ModelField Configure(ModelFieldProperties newProperties, IList<ValidationError> errors);
 
         public Task ValidateAsync(PropertyValue property, ICollection<string> errors)
         {
             Guard.NotNull(property, nameof(property));
             
-            if (isRequired && property.RawValue == null)
+            if (IsRequired && property.RawValue == null)
             {
-                errors.Add("<Field> is required");
+                errors.Add("Field is required");
             }
 
             if (property.RawValue == null)
@@ -134,54 +82,47 @@ namespace PinkParrot.Core.Schema
         {
             if (isHidden)
             {
-                throw new ValidationException($"The field '{name} is already hidden.");
+                throw new DomainException($"The field '{Name} is already hidden.");
             }
 
-            var clone = Clone();
-
-            clone.isHidden = true;
-
-            return Clone();
+            return Update<ModelField>(clone => clone.isHidden = true);
         }
 
         public ModelField Show()
         {
             if (!isHidden)
             {
-                throw new ValidationException($"The field '{name} is already visible.");
+                throw new DomainException($"The field '{Name} is already visible.");
             }
 
-            var clone = Clone();
-
-            clone.isHidden = false;
-
-            return Clone();
+            return Update<ModelField>(clone => clone.isHidden = false);
         }
 
         public ModelField Disable()
         {
             if (isDisabled)
             {
-                throw new ValidationException($"The field '{name} is already disabled.");
+                throw new DomainException($"The field '{Name} is already disabled.");
             }
 
-            var clone = Clone();
-
-            clone.isDisabled = true;
-
-            return clone;
+            return Update<ModelField>(clone => clone.isDisabled = true);
         }
 
         public ModelField Enable()
         {
             if (!isDisabled)
             {
-                throw new ValidationException($"The field '{name} is already enabled.");
+                throw new DomainException($"The field '{Name} is already enabled.");
             }
+            
+            return Update<ModelField>(clone => clone.isDisabled = false);
+        }
 
-            var clone = Clone();
+        protected T Update<T>(Action<T> updater) where T : ModelField
+        {
+            var clone = (T)Clone();
 
-            clone.isDisabled = false;
+            updater(clone);
 
             return clone;
         }

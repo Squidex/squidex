@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
@@ -15,6 +15,6 @@ namespace PinkParrot.Write.Schema.Commands
     {
         public long FieldId;
 
-        public PropertiesBag Settings;
+        public ModelFieldProperties Properties;
     }
 }

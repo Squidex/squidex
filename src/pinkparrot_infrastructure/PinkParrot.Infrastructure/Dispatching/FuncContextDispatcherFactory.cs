@@ -1,5 +1,5 @@
 // ==========================================================================
-//  HandlerFactory.cs
+//  FuncContextDispatcherFactory.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group

@@ -6,15 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
     public class UpdateModelSchema : AggregateCommand
     {
-        public string NewName;
-
-        public PropertiesBag Settings { get; set; }
+        public ModelSchemaProperties Properties;
     }
 }

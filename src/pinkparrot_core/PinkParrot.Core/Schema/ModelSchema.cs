@@ -17,30 +17,34 @@ namespace PinkParrot.Core.Schema
 {
     public sealed class ModelSchema
     {
-        private readonly ModelSchemaMetadata metadata;
+        private readonly ModelSchemaProperties properties;
         private readonly ImmutableDictionary<long, ModelField> fields;
         private readonly Dictionary<string, ModelField> fieldsByName;
 
-        public ModelSchema(ModelSchemaMetadata metadata, ImmutableDictionary<long, ModelField> fields)
+        public ModelSchema(ModelSchemaProperties properties, ImmutableDictionary<long, ModelField> fields)
         {
             Guard.NotNull(fields, nameof(fields));
-            Guard.NotNull(metadata, nameof(metadata));
+            Guard.NotNull(properties, nameof(properties));
 
             this.fields = fields;
 
-            this.metadata = metadata;
+            this.properties = properties;
 
             fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static ModelSchema Create(string name)
+        public static ModelSchema Create(ModelSchemaProperties metadata)
         {
-            if (!name.IsSlug())
+            var errors = new List<ValidationError>();
+
+            metadata.Validate(errors);
+
+            if (errors.Any())
             {
-                throw new ValidationException("Cannot create the schema.", $"'{name}' is not a valid slug.");
+                throw new ValidationException("Failed to create a new model schema.", errors);
             }
 
-            return new ModelSchema(new ModelSchemaMetadata(name), ImmutableDictionary<long, ModelField>.Empty);
+            return new ModelSchema(metadata, ImmutableDictionary<long, ModelField>.Empty);
         }
 
         public IReadOnlyDictionary<long, ModelField> Fields
@@ -48,34 +52,34 @@ namespace PinkParrot.Core.Schema
             get { return fields; }
         }
 
-        public ModelSchemaMetadata Metadata
+        public ModelSchemaProperties Properties
         {
-            get { return metadata; }
+            get { return properties; }
         }
 
-        public ModelSchema Update(ModelSchemaMetadata newMetadata)
+        public ModelSchema Update(ModelSchemaProperties newMetadata)
         {
             Guard.NotNull(newMetadata, nameof(newMetadata));
 
             return new ModelSchema(newMetadata, fields);
         }
 
-        public ModelSchema AddField(long id, string type, string fieldName, ModelFieldFactory factory)
+        public ModelSchema AddField(long id, ModelFieldProperties properties, ModelFieldFactory factory)
         {
-            var field = factory.CreateField(id, type, fieldName);
+            var field = factory.CreateField(id, properties);
 
             return SetField(field);
         }
 
-        public ModelSchema SetField(long fieldId, PropertiesBag settings)
+        public ModelSchema SetField(long fieldId, ModelFieldProperties properties)
         {
-            Guard.NotNull(settings, nameof(settings));
+            Guard.NotNull(properties, nameof(properties));
 
             return UpdateField(fieldId, field =>
             {
-                var errors = new List<string>();
+                var errors = new List<ValidationError>();
 
-                var newField = field.Configure(settings, errors);
+                var newField = field.Configure(properties, errors);
 
                 if (errors.Any())
                 {
@@ -115,7 +119,7 @@ namespace PinkParrot.Core.Schema
                 throw new ValidationException($"A field with name '{field.Name}' already exists.");
             }
 
-            return new ModelSchema(metadata, fields.SetItem(field.Id, field));
+            return new ModelSchema(properties, fields.SetItem(field.Id, field));
         }
 
         public ModelSchema DeleteField(long fieldId)
@@ -125,7 +129,7 @@ namespace PinkParrot.Core.Schema
                 throw new ValidationException($"A field with id {fieldId} does not exist.");
             }
 
-            return new ModelSchema(metadata, fields.Remove(fieldId));
+            return new ModelSchema(properties, fields.Remove(fieldId));
         }
 
         private ModelSchema UpdateField(long fieldId, Func<ModelField, ModelField> updater)
@@ -134,7 +138,8 @@ namespace PinkParrot.Core.Schema
 
             if (!fields.TryGetValue(fieldId, out field))
             {
-                throw new ValidationException($"Cannot update field with id '{fieldId}'.", "Field does not exist.");
+                throw new ValidationException($"Cannot update field with id '{fieldId}'.", 
+                    new ValidationError("Field does not exist.", "fieldId"));
             }
 
             var newField = updater(field);
@@ -146,10 +151,12 @@ namespace PinkParrot.Core.Schema
         {
             Guard.NotNull(data, nameof(data));
 
-            var errors = new List<string>();
+            var errors = new List<ValidationError>();
 
             foreach (var kvp in data.Properties)
             {
+                var fieldErrors = new List<string>();
+
                 ModelField field;
 
                 if (fieldsByName.TryGetValue(kvp.Key, out field))
@@ -157,13 +164,13 @@ namespace PinkParrot.Core.Schema
                     var newErrors = new List<string>();
 
                     await field.ValidateAsync(kvp.Value, newErrors);
-
-                    errors.AddRange(newErrors.Select(e => e.Replace("<Field>", "'" + field.Name + "'")));
                 }
                 else
                 {
-                    errors.Add($"'{kvp.Key}' is not a known field");
+                    fieldErrors.Add($"'{kvp.Key}' is not a known field");
                 }
+
+                errors.AddRange(fieldErrors.Select(x => new ValidationError(x, kvp.Key)));
             }
 
             if (errors.Any())

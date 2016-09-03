@@ -14,35 +14,36 @@ namespace PinkParrot.Infrastructure
 {
     public class ValidationException : Exception
     {
-        private readonly IReadOnlyList<string> errors;
+        private static readonly List<ValidationError> FallbackErrors = new List<ValidationError>();
+        private readonly IReadOnlyList<ValidationError> errors;
 
-        public IReadOnlyList<string> Errors
+        public IReadOnlyList<ValidationError> Errors
         {
             get { return errors; }
         }
 
-        public ValidationException(string message, params string[] errors)
+        public ValidationException(string message, params ValidationError[] errors)
             : base(message)
         {
-            this.errors = errors != null ? errors.ToList() : new List<string>();
+            this.errors = errors != null ? errors.ToList() : FallbackErrors;
         }
 
-        public ValidationException(string message, IReadOnlyList<string> errors)
+        public ValidationException(string message, IReadOnlyList<ValidationError> errors)
             : base(message)
         {
-            this.errors = errors ?? new List<string>();
+            this.errors = errors ?? FallbackErrors;
         }
 
-        public ValidationException(string message, Exception inner, params string[] errors) 
+        public ValidationException(string message, Exception inner, params ValidationError[] errors) 
             : base(message, inner)
         {
-            this.errors = errors != null ? errors.ToList() : new List<string>();
+            this.errors = errors != null ? errors.ToList() : FallbackErrors;
         }
 
-        public ValidationException(string message, Exception inner, IReadOnlyList<string> errors)
+        public ValidationException(string message, Exception inner, IReadOnlyList<ValidationError> errors)
             : base(message, inner)
         {
-            this.errors = errors ?? new List<string>();
+            this.errors = errors ?? FallbackErrors;
         }
     }
 }

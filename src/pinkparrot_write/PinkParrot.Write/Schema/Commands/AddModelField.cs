@@ -6,14 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
+using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
     public class AddModelField : AggregateCommand
     {
-        public string FieldType;
-
-        public string FieldName;
+        public ModelFieldProperties Properties;
     }
 }

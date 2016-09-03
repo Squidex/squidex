@@ -15,35 +15,21 @@ using PinkParrot.Infrastructure.Tasks;
 
 namespace PinkParrot.Core.Schema
 {
-    public sealed class NumberField : ModelField
+    public sealed class NumberField : ModelField<NumberFieldProperties>
     {
-        private double? maxValue;
-        private double? minValue;
-
         public double? MaxValue
         {
-            get { return maxValue; }
+            get { return Properties.MaxValue; }
         }
 
         public double? MinValue
         {
-            get { return minValue; }
+            get { return Properties.MinValue; }
         }
 
-        public NumberField(long id, string name) 
-            : base(id, name)
+        public NumberField(long id) 
+            : base(id)
         {
-        }
-
-        protected override void ConfigureCore(dynamic settings, ICollection<string> errors)
-        {
-            maxValue = settings.MaxValue;
-            minValue = settings.MinValue;
-
-            if (maxValue.HasValue && minValue.HasValue && minValue.Value > maxValue.Value)
-            {
-                errors.Add("MinValue cannot be larger than max value");
-            }
         }
 
         protected override Task ValidateCoreAsync(PropertyValue property, ICollection<string> errors)
@@ -54,17 +40,17 @@ namespace PinkParrot.Core.Schema
 
                 if (MinValue.HasValue && value < MinValue.Value)
                 {
-                    errors.Add($"<Field> must be greater than {MinValue}");
+                    errors.Add($"Must be greater than {MinValue}");
                 }
 
                 if (MaxValue.HasValue && value > MaxValue.Value)
                 {
-                    errors.Add($"<Field> must be less than {MaxValue}");
+                    errors.Add($"Must be less than {MaxValue}");
                 }
             }
             catch (InvalidCastException)
             {
-                errors.Add("<Field> is not a valid number");
+                errors.Add("Value is not a valid number");
             }
 
             return TaskHelper.Done;

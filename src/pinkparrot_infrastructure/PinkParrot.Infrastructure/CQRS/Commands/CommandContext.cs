@@ -1,9 +1,9 @@
 ﻿// ==========================================================================
-// CommandContext.cs
-// Green Parrot Framework
+//  CommandContext.cs
+//  PinkParrot Headless CMS
 // ==========================================================================
-// Copyright (c) Sebastian Stehle
-// All rights reserved.
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
 // ==========================================================================
 
 using System;

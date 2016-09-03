@@ -6,14 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using PinkParrot.Core.Schema;
 
 namespace PinkParrot.Events.Schema
 {
     public class ModelSchemaUpdated : TenantEvent
     {
-        public string NewName;
-
-        public PropertiesBag Settings { get; set; }
+        public ModelSchemaProperties Properties;
     }
 }

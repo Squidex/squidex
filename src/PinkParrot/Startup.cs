@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
+
 // ReSharper disable AccessToModifiedClosure
 
 namespace PinkParrot

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnumExtensionsTest.cs
+//  EnumExtensionsTests.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group

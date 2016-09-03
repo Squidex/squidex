@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  JsonPropertiesBagConverter.cs
+//  PropertiesBagConverter.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group

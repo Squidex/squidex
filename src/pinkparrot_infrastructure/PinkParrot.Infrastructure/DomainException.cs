@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ISchemaIdProvider.cs
+//  DomainException.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,12 +7,19 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 
-namespace PinkParrot.Write.Schema
+namespace PinkParrot.Infrastructure
 {
-    public interface ISchemaIdProvider
+    public class DomainException : Exception
     {
-        Task<Guid> FindSchemaId(string name);
+        public DomainException(string message) 
+            : base(message)
+        {
+        }
+
+        public DomainException(string message, Exception inner) 
+            : base(message, inner)
+        {
+        }
     }
 }

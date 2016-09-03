@@ -41,19 +41,19 @@ namespace PinkParrot.Write.Schema
 
         protected void Apply(ModelFieldAdded @event)
         {
-            schema = schema.AddField(@event.FieldId, @event.FieldType, @event.FieldName, fieldFactory);
+            schema = schema.AddField(@event.FieldId, @event.Properties, fieldFactory);
 
             totalFields++;
         }
 
         protected void Apply(ModelSchemaCreated @event)
         {
-            schema = ModelSchema.Create(@event.Name);
+            schema = ModelSchema.Create(@event.Properties);
         }
 
         protected void Apply(ModelFieldUpdated @event)
         {
-            schema = schema.SetField(@event.FieldId, @event.Settings);
+            schema = schema.SetField(@event.FieldId, @event.Properties);
         }
 
         public void Apply(ModelFieldHidden @event)
@@ -78,7 +78,7 @@ namespace PinkParrot.Write.Schema
 
         protected void Apply(ModelSchemaUpdated @event)
         {
-            schema = schema.Update(schema.Metadata.Configure(@event.NewName, @event.Settings));
+            schema = schema.Update(@event.Properties);
         }
 
         protected void Apply(ModelFieldDeleted @event)
@@ -97,36 +97,36 @@ namespace PinkParrot.Write.Schema
 
             var id = ++totalFields;
 
-            schema = schema.AddField(id, command.FieldType, command.FieldName, fieldFactory);
+            schema = schema.AddField(id, command.Properties, fieldFactory);
 
-            RaiseEvent(new ModelFieldAdded { FieldId = id, FieldType = command.FieldType, FieldName = command.FieldName }, true);
+            RaiseEvent(new ModelFieldAdded { FieldId = id, Properties = command.Properties }, true);
         }
 
         public void Create(CreateModelSchema command)
         {
             VerifyNotCreated();
 
-            schema = ModelSchema.Create(command.Name);
+            schema = ModelSchema.Create(command.Properties);
 
-            RaiseEvent(new ModelSchemaCreated { Name = command.Name }, true);
+            RaiseEvent(new ModelSchemaCreated { Properties = command.Properties }, true);
         }
 
         public void Update(UpdateModelSchema command)
         {
             VerifyCreatedAndNotDeleted();
 
-            schema = schema.Update(schema.Metadata.Configure(command.NewName, command.Settings));
+            schema = schema.Update(command.Properties);
 
-            RaiseEvent(new ModelSchemaUpdated { NewName = command.NewName, Settings = command.Settings }, true);
+            RaiseEvent(new ModelSchemaUpdated { Properties = command.Properties }, true);
         }
 
         public void UpdateField(UpdateModelField command)
         {
             VerifyCreatedAndNotDeleted();
 
-            schema = schema.SetField(command.FieldId, command.Settings);
+            schema = schema.SetField(command.FieldId, command.Properties);
 
-            RaiseEvent(new ModelFieldUpdated { FieldId = command.FieldId, Settings = command.Settings }, true);
+            RaiseEvent(new ModelFieldUpdated { FieldId = command.FieldId, Properties = command.Properties }, true);
         }
 
         public void HideField(HideModelField command)

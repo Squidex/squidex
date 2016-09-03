@@ -1,19 +1,23 @@
 ﻿// ==========================================================================
-//  ModelFieldUpdated.cs
+//  TypeNameAttribute.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
+using System;
 
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Infrastructure
 {
-    public class ModelFieldUpdated : TenantEvent
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class TypeNameAttribute : Attribute
     {
-        public long FieldId;
+        public string TypeName { get; }
 
-        public ModelFieldProperties Properties;
+        public TypeNameAttribute(string typeName)
+        {
+            TypeName = typeName;
+        }
     }
 }

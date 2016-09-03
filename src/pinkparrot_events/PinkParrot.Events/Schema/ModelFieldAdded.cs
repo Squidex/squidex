@@ -6,14 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using PinkParrot.Core.Schema;
+
 namespace PinkParrot.Events.Schema
 {
     public class ModelFieldAdded : TenantEvent
     {
         public long FieldId;
 
-        public string FieldType;
-
-        public string FieldName;
+        public ModelFieldProperties Properties;
     }
 }

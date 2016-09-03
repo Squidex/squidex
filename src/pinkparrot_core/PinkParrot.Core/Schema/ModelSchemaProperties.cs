@@ -1,17 +1,20 @@
 // ==========================================================================
-//  ModelSchemaCreated.cs
+//  ModelSchemaMetadata.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using PinkParrot.Core.Schema;
-
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Core.Schema
 {
-    public class ModelSchemaCreated : TenantEvent
+    public sealed class ModelSchemaProperties : NamedElementProperties
     {
-        public ModelSchemaProperties Properties;
+        public ModelSchemaProperties(
+            string name, 
+            string label, 
+            string hints)
+            : base(name, label, hints)
+        {
+        }
     }
 }
