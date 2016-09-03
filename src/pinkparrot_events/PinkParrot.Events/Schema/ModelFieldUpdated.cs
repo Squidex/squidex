@@ -7,11 +7,10 @@
 // ==========================================================================
 
 using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schema
 {
-    public class ModelFieldUpdated : IEvent
+    public class ModelFieldUpdated : TenantEvent
     {
         public long FieldId;
 

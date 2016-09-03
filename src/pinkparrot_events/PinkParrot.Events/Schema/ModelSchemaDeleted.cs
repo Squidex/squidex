@@ -6,11 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure.CQRS.Events;
-
 namespace PinkParrot.Events.Schema
 {
-    public class ModelSchemaDeleted : IEvent
+    public class ModelSchemaDeleted : TenantEvent
     {
     }
 }

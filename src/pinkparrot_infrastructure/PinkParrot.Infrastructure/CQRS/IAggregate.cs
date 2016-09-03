@@ -18,7 +18,7 @@ namespace PinkParrot.Infrastructure.CQRS
 
         int Version { get; }
 
-        void ApplyEvent(IEvent @event);
+        void ApplyEvent(Envelope<IEvent> @event);
 
         void ClearUncommittedEvents();
 

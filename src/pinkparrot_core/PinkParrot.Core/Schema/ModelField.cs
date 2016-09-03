@@ -134,7 +134,7 @@ namespace PinkParrot.Core.Schema
         {
             if (isHidden)
             {
-                throw new DomainValidationException($"The field '{name} is already hidden.");
+                throw new ValidationException($"The field '{name} is already hidden.");
             }
 
             var clone = Clone();
@@ -148,7 +148,7 @@ namespace PinkParrot.Core.Schema
         {
             if (!isHidden)
             {
-                throw new DomainValidationException($"The field '{name} is already visible.");
+                throw new ValidationException($"The field '{name} is already visible.");
             }
 
             var clone = Clone();
@@ -162,7 +162,7 @@ namespace PinkParrot.Core.Schema
         {
             if (isDisabled)
             {
-                throw new DomainValidationException($"The field '{name} is already disabled.");
+                throw new ValidationException($"The field '{name} is already disabled.");
             }
 
             var clone = Clone();
@@ -176,7 +176,7 @@ namespace PinkParrot.Core.Schema
         {
             if (!isDisabled)
             {
-                throw new DomainValidationException($"The field '{name} is already enabled.");
+                throw new ValidationException($"The field '{name} is already enabled.");
             }
 
             var clone = Clone();

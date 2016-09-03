@@ -1,15 +1,18 @@
-// ==========================================================================
-//  ModelSchemaCreated.cs
+﻿// ==========================================================================
+//  TenantEvent.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace PinkParrot.Events.Schema
+using System;
+using PinkParrot.Infrastructure.CQRS.Events;
+
+namespace PinkParrot.Events
 {
-    public class ModelSchemaCreated : TenantEvent
+    public class TenantEvent : IEvent
     {
-        public string Name;
+        public Guid TenantId;
     }
 }

@@ -14,9 +14,9 @@ namespace PinkParrot.Infrastructure.CQRS
 {
     public static class EnvelopeExtensions
     {
-        public static int EventNumber<T>(this Envelope<T> envelope) where T : class
+        public static int EventNumber(this EnvelopeHeaders headers)
         {
-            return envelope.Headers[CommonHeaders.EventNumber].ToInt32(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.EventNumber].ToInt32(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetEventNumber<T>(this Envelope<T> envelope, int value) where T : class
@@ -26,9 +26,9 @@ namespace PinkParrot.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Guid CommitId<T>(this Envelope<T> envelope) where T : class
+        public static Guid CommitId(this EnvelopeHeaders headers)
         {
-            return envelope.Headers[CommonHeaders.CommitId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.CommitId].ToGuid(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -38,9 +38,9 @@ namespace PinkParrot.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Guid AggregateId<T>(this Envelope<T> envelope) where T : class
+        public static Guid AggregateId(this EnvelopeHeaders headers)
         {
-            return envelope.Headers[CommonHeaders.AggregateId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.AggregateId].ToGuid(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -50,9 +50,9 @@ namespace PinkParrot.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Guid EventId<T>(this Envelope<T> envelope) where T : class
+        public static Guid EventId(this EnvelopeHeaders headers)
         {
-            return envelope.Headers[CommonHeaders.EventId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.EventId].ToGuid(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -62,9 +62,9 @@ namespace PinkParrot.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Instant Timestamp<T>(this Envelope<T> envelope) where T : class
+        public static Instant Timestamp(this EnvelopeHeaders headers)
         {
-            return envelope.Headers[CommonHeaders.Timestamp].ToInstant(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.Timestamp].ToInstant(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class

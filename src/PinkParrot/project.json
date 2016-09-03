@@ -1,5 +1,7 @@
 ﻿{
   "dependencies": {
+    "Autofac": "4.1.0",
+    "Autofac.Extensions.DependencyInjection": "4.0.0",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.0",
     "Microsoft.AspNetCore.Razor.Tools": {
@@ -19,10 +21,14 @@
       "version": "1.0.0",
       "type": "platform"
     },
+    "MongoDB.Driver": "2.3.0-rc1",
     "PinkParrot.Core": "1.0.0-*",
     "PinkParrot.Events": "1.0.0-*",
     "PinkParrot.Infrastructure": "1.0.0-*",
-    "PinkParrot.Write": "1.0.0-*"
+    "PinkParrot.Read": "1.0.0-*",
+    "PinkParrot.Write": "1.0.0-*",
+    "Swashbuckle.SwaggerGen": "6.0.0-beta901",
+    "Swashbuckle.SwaggerUi": "6.0.0-beta901"
   },
 
   "tools": {

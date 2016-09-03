@@ -6,11 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure.CQRS.Events;
-
 namespace PinkParrot.Events.Schema
 {
-    public class ModelFieldEnabled : IEvent
+    public class ModelFieldEnabled : TenantEvent
     {
         public long FieldId;
     }

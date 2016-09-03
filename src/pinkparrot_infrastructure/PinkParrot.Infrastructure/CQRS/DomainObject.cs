@@ -38,17 +38,19 @@ namespace PinkParrot.Infrastructure.CQRS
             this.version = version;
         }
 
-        protected abstract void ApplyEvent(IEvent @event);
+        protected abstract void ApplyEvent(Envelope<IEvent> @event);
 
         protected void RaiseEvent<TEvent>(Envelope<TEvent> envelope, bool disableApply = false) where TEvent : class, IEvent
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            uncomittedEvents.Add(envelope.To<IEvent>());
+            var envelopeToAdd = envelope.To<IEvent>();
+
+            uncomittedEvents.Add(envelopeToAdd);
 
             if (!disableApply)
             {
-                ApplyEvent(envelope.Payload);
+                ApplyEvent(envelopeToAdd);
             }
         }
 
@@ -56,15 +58,17 @@ namespace PinkParrot.Infrastructure.CQRS
         {
             Guard.NotNull(@event, nameof(@event));
 
-            uncomittedEvents.Add(EnvelopeFactory.ForEvent(@event, id));
+            var envelopeToAdd = EnvelopeFactory.ForEvent(@event, id);
+
+            uncomittedEvents.Add(envelopeToAdd);
 
             if (!disableApply)
             {
-                ApplyEvent(@event);
+                ApplyEvent(envelopeToAdd);
             }
         }
 
-        void IAggregate.ApplyEvent(IEvent @event)
+        void IAggregate.ApplyEvent(Envelope<IEvent> @event)
         {
             ApplyEvent(@event); version++;
         }

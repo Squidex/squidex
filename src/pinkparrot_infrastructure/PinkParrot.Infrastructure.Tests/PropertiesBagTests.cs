@@ -296,6 +296,14 @@ namespace PinkParrot.Infrastructure
         }
 
         [Fact]
+        public void Should_provide_value_as_string()
+        {
+            bag.Set("Key", "Foo");
+
+            AssertString("Foo");
+        }
+
+        [Fact]
         public void Should_throw_when_converting_instant_to_number()
         {
             bag.Set("Key", SystemClock.Instance.GetCurrentInstant());

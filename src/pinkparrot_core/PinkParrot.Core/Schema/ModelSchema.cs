@@ -37,7 +37,7 @@ namespace PinkParrot.Core.Schema
         {
             if (!name.IsSlug())
             {
-                throw new DomainValidationException("Cannot create the schema.", $"'{name}' is not a valid slug.");
+                throw new ValidationException("Cannot create the schema.", $"'{name}' is not a valid slug.");
             }
 
             return new ModelSchema(new ModelSchemaMetadata(name), ImmutableDictionary<long, ModelField>.Empty);
@@ -79,7 +79,7 @@ namespace PinkParrot.Core.Schema
 
                 if (errors.Any())
                 {
-                    throw new DomainValidationException($"Cannot update field with id '{fieldId}', becase the settings are invalid.", errors);
+                    throw new ValidationException($"Cannot update field with id '{fieldId}', becase the settings are invalid.", errors);
                 }
 
                 return newField;
@@ -112,7 +112,7 @@ namespace PinkParrot.Core.Schema
 
             if (fields.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
             {
-                throw new DomainValidationException($"A field with name '{field.Name}' already exists.");
+                throw new ValidationException($"A field with name '{field.Name}' already exists.");
             }
 
             return new ModelSchema(metadata, fields.SetItem(field.Id, field));
@@ -122,7 +122,7 @@ namespace PinkParrot.Core.Schema
         {
             if (!fields.ContainsKey(fieldId))
             {
-                throw new DomainValidationException($"A field with id {fieldId} does not exist.");
+                throw new ValidationException($"A field with id {fieldId} does not exist.");
             }
 
             return new ModelSchema(metadata, fields.Remove(fieldId));
@@ -134,7 +134,7 @@ namespace PinkParrot.Core.Schema
 
             if (!fields.TryGetValue(fieldId, out field))
             {
-                throw new DomainValidationException($"Cannot update field with id '{fieldId}'.", "Field does not exist.");
+                throw new ValidationException($"Cannot update field with id '{fieldId}'.", "Field does not exist.");
             }
 
             var newField = updater(field);
@@ -168,7 +168,7 @@ namespace PinkParrot.Core.Schema
 
             if (errors.Any())
             {
-                throw new DomainValidationException("The data is not valid.", errors);
+                throw new ValidationException("The data is not valid.", errors);
             }
         }
     }

@@ -7,11 +7,10 @@
 // ==========================================================================
 
 using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schema
 {
-    public class ModelSchemaUpdated : IEvent
+    public class ModelSchemaUpdated : TenantEvent
     {
         public string NewName;
 

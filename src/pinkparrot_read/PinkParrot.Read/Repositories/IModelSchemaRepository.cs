@@ -1,15 +1,19 @@
 ﻿// ==========================================================================
-//  ModelFieldShown.cs
+//  IModelSchemaRepository.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace PinkParrot.Events.Schema
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using PinkParrot.Read.Models;
+
+namespace PinkParrot.Read.Repositories
 {
-    public class ModelFieldShown : TenantEvent
+    public interface IModelSchemaRepository
     {
-        public long FieldId;
+        Task<List<ModelSchemaRM>> QueryAllAsync();
     }
 }

@@ -1,15 +1,18 @@
 ﻿// ==========================================================================
-//  ModelFieldShown.cs
+//  ISchemaIdProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace PinkParrot.Events.Schema
+using System;
+using System.Threading.Tasks;
+
+namespace PinkParrot.Write.Schema
 {
-    public class ModelFieldShown : TenantEvent
+    public interface ISchemaIdProvider
     {
-        public long FieldId;
+        Task<Guid> FindSchemaId(string name);
     }
 }

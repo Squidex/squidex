@@ -54,7 +54,7 @@ namespace PinkParrot.Core.Schema
             {
                 if (!newName.IsSlug())
                 {
-                    throw new DomainValidationException("Cannot update the schema.", $"'{newName}' is not a valid slug.");
+                    throw new ValidationException("Cannot update the schema.", $"'{newName}' is not a valid slug.");
                 }
 
                 clone.name = newName;

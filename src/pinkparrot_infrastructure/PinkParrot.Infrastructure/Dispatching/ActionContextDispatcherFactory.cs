@@ -27,6 +27,7 @@ namespace PinkParrot.Infrastructure.Dispatching
             return new Tuple<Type, Action<TTarget, object, TContext>>(inputType, (Action<TTarget, object, TContext>)handler);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private static Action<TTarget, object, TContext> Factory<TTarget, TIn, TContext>(MethodInfo methodInfo)
         {
             var type = typeof(Action<TTarget, TIn, TContext>);

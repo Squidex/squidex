@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DomainValidationException.cs
+//  ValidationException.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace PinkParrot.Infrastructure
 {
-    public class DomainValidationException : Exception
+    public class ValidationException : Exception
     {
         private readonly IReadOnlyList<string> errors;
 
@@ -21,25 +21,25 @@ namespace PinkParrot.Infrastructure
             get { return errors; }
         }
 
-        public DomainValidationException(string message, params string[] errors)
+        public ValidationException(string message, params string[] errors)
             : base(message)
         {
             this.errors = errors != null ? errors.ToList() : new List<string>();
         }
 
-        public DomainValidationException(string message, IReadOnlyList<string> errors)
+        public ValidationException(string message, IReadOnlyList<string> errors)
             : base(message)
         {
             this.errors = errors ?? new List<string>();
         }
 
-        public DomainValidationException(string message, Exception inner, params string[] errors) 
+        public ValidationException(string message, Exception inner, params string[] errors) 
             : base(message, inner)
         {
             this.errors = errors != null ? errors.ToList() : new List<string>();
         }
 
-        public DomainValidationException(string message, Exception inner, IReadOnlyList<string> errors)
+        public ValidationException(string message, Exception inner, IReadOnlyList<string> errors)
             : base(message, inner)
         {
             this.errors = errors ?? new List<string>();

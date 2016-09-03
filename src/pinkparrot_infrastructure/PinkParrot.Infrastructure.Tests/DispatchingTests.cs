@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using PinkParrot.Infrastructure.Dispatching;
 using PinkParrot.Infrastructure.Tasks;
 using Xunit;
+// ReSharper disable UnusedMethodReturnValue.Local
+// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Local
 
 namespace PinkParrot.Infrastructure
 {
