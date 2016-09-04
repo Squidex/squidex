@@ -11,6 +11,8 @@ using Autofac;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using MongoDB.Driver;
 using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
@@ -19,7 +21,7 @@ using PinkParrot.Read.Services.Implementations;
 
 namespace PinkParrot.Configurations
 {
-    public class InfrastructureDependencies : Module
+    public class InfrastructureModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
@@ -36,9 +38,17 @@ namespace PinkParrot.Configurations
             var mongoDatabase = mongoDbClient.GetDatabase("PinkParrot");
 
             eventStore.ConnectAsync().Wait();
-
+            
             builder.RegisterInstance(new UserCredentials("admin", "changeit"))
                 .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<HttpContextAccessor>()
+                .As<IHttpContextAccessor>()
+                .SingleInstance();
+
+            builder.RegisterType<ActionContextAccessor>()
+                .As<IActionContextAccessor>()
                 .SingleInstance();
 
             builder.RegisterInstance(mongoDatabase)

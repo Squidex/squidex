@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  BaseMongoDbRepository.cs
+//  MongoRepositoryBase.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -12,7 +12,7 @@ using MongoDB.Driver;
 
 namespace PinkParrot.Infrastructure.MongoDb
 {
-    public abstract class BaseMongoDbRepository<TEntity>
+    public abstract class MongoRepositoryBase<TEntity>
     {
         private const string CollectionFormat = "{0}Set";
         private readonly IMongoCollection<TEntity> mongoCollection;
@@ -83,7 +83,7 @@ namespace PinkParrot.Infrastructure.MongoDb
             }
         }
 
-        protected BaseMongoDbRepository(IMongoDatabase database)
+        protected MongoRepositoryBase(IMongoDatabase database)
         {
             Guard.NotNull(database, nameof(database));
 

@@ -17,13 +17,11 @@ using Swashbuckle.SwaggerGen.Annotations;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
-    public class SchemasFieldsController : Controller
+    public class SchemasFieldsController : BaseController
     {
-        private readonly ICommandBus commandBus;
-
         public SchemasFieldsController(ICommandBus commandBus)
+            : base(commandBus)
         {
-            this.commandBus = commandBus;
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace PinkParrot.Modules.Api.Schemas
         {
             var command = new AddModelField { Properties = field };
 
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
         /// <summary>
@@ -52,7 +50,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Update(string name, long fieldId, [FromBody] UpdateModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
         /// <summary>
@@ -65,7 +63,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Hide(string name, long fieldId, HideModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
         /// <summary>
@@ -78,7 +76,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Show(string name, long fieldId, ShowModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Enable(string name, long fieldId, EnableModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
         /// <summary>
@@ -104,7 +102,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Disable(string name, long fieldId, DisableModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
 
 
@@ -118,7 +116,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [SwaggerOperation(Tags = new[] { "Schemas" })]
         public Task Delete(string name, long fieldId, DeleteModelField command)
         {
-            return commandBus.PublishAsync(command);
+            return CommandBus.PublishAsync(command);
         }
     }
 }

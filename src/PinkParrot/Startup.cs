@@ -30,9 +30,9 @@ namespace PinkParrot
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterModule<WriteDependencies>();
-            builder.RegisterModule<InfrastructureDependencies>();
-            builder.RegisterModule<ReadDependencies>();
+            builder.RegisterModule<InfrastructureModule>();
+            builder.RegisterModule<ReadModule>();
+            builder.RegisterModule<WriteModule>();
 
             return new AutofacServiceProvider(builder.Build());
         }

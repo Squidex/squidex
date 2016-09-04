@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IModelSchemaRepository.cs
+//  IEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,14 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PinkParrot.Read.Models;
 
-namespace PinkParrot.Read.Repositories
+namespace PinkParrot.Read.Models
 {
-    public interface IModelSchemaRepository
+    public interface IEntity
     {
-        Task<List<ModelSchemaListRM>> QueryAllAsync(Guid tenantId);
+        Guid Id { get; set; }
+
+        DateTime Created { get; set; }
+
+        DateTime LastModified { get; set; }
     }
 }

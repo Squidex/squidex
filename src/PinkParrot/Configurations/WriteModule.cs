@@ -13,7 +13,7 @@ using PinkParrot.Write.Schema;
 
 namespace PinkParrot.Configurations
 {
-    public class WriteDependencies : Module
+    public class WriteModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

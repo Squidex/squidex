@@ -15,7 +15,7 @@ using PinkParrot.Read.Services.Implementations;
 
 namespace PinkParrot.Configurations
 {
-    public sealed class ReadDependencies : Module
+    public sealed class ReadModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
@@ -27,7 +27,7 @@ namespace PinkParrot.Configurations
                 .As<IModelSchemaProvider>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoModelSchemaRepository>()
+            builder.RegisterType<MongoModelSchemaListRepository>()
                 .As<IModelSchemaRepository>()
                 .As<ICatchEventConsumer>()
                 .SingleInstance();

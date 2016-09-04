@@ -1,20 +1,16 @@
 ﻿// ==========================================================================
-//  IModelSchemaRepository.cs
+//  IPropertyAccessor.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PinkParrot.Read.Models;
-
-namespace PinkParrot.Read.Repositories
+namespace PinkParrot.Infrastructure.Reflection
 {
-    public interface IModelSchemaRepository
+    public interface IPropertyAccessor
     {
-        Task<List<ModelSchemaListRM>> QueryAllAsync(Guid tenantId);
+        object Get(object target);
+        
+        void Set(object target, object value);
     }
 }

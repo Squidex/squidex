@@ -8,11 +8,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Read.Models;
+using PinkParrot.Infrastructure.Reflection;
+using PinkParrot.Read.Repositories;
+using PinkParrot.Read.Services;
 using PinkParrot.Write.Schema.Commands;
 using Swashbuckle.SwaggerGen.Annotations;
 
@@ -20,13 +23,17 @@ using Swashbuckle.SwaggerGen.Annotations;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
-    public class SchemasController : Controller
+    public class SchemasController : BaseController
     {
-        private readonly ICommandBus commandBus;
+        private readonly IModelSchemaRepository modelSchemaRepository;
+        private readonly ITenantProvider tenantProvider;
 
-        public SchemasController(ICommandBus commandBus)
+        public SchemasController(ICommandBus commandBus, ITenantProvider tenantProvider, IModelSchemaRepository modelSchemaRepository) 
+            : base(commandBus)
         {
-            this.commandBus = commandBus;
+            this.modelSchemaRepository = modelSchemaRepository;
+
+            this.tenantProvider = tenantProvider;
         }
 
         /// <summary>
@@ -35,9 +42,12 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpGet]
         [Route("schemas/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task<List<ModelSchemaRM>> Query()
+        public async Task<List<SchemaListModel>> Query()
         {
-            return null;
+            var tenantId = await tenantProvider.ProvideTenantIdByDomainAsync(Request.Host.ToString());
+            var schemes = await modelSchemaRepository.QueryAllAsync(tenantId);
+
+            return schemes.Select(s => SimpleMapper.Map(s, new SchemaListModel())).ToList();
         }
 
         /// <summary>
@@ -52,12 +62,12 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpPost]
         [Route("schemas/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
-        [ProducesResponseType(typeof(EntityCreated), 204)]
+        [ProducesResponseType(typeof(EntityCreated), 201)]
         public async Task<ActionResult> Create([FromBody] ModelSchemaProperties schema)
         {
             var command = new CreateModelSchema { AggregateId = Guid.NewGuid(), Properties = schema };
 
-            await commandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
 
             return CreatedAtAction("Query", new EntityCreated { Id = command.AggregateId });
         }
@@ -73,11 +83,12 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpPut]
         [Route("schemas/{name}/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
+        [ProducesResponseType(typeof(void), 204)]
         public async Task<ActionResult> Update(string name, [FromBody] ModelSchemaProperties schema)
         {
             var command = new UpdateModelSchema { Properties = schema };
 
-            await commandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
 
             return NoContent();
         }
@@ -92,9 +103,10 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpDelete]
         [Route("schemas/{name}/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
+        [ProducesResponseType(typeof(void), 204)]
         public async Task<ActionResult> Delete(string name)
         {
-            await commandBus.PublishAsync(new DeleteModelSchema());
+            await CommandBus.PublishAsync(new DeleteModelSchema());
 
             return NoContent();
         }

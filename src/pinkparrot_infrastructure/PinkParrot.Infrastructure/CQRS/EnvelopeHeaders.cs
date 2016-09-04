@@ -22,7 +22,7 @@ namespace PinkParrot.Infrastructure.CQRS
 
             foreach (var property in bag.Properties)
             {
-                Set(property.Key, property.Value);
+                Set(property.Key, property.Value.RawValue);
             }
         }
 

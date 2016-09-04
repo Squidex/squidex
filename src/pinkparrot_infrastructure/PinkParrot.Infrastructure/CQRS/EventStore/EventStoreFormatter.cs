@@ -10,6 +10,7 @@ using System;
 using System.Text;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
+using NodaTime;
 using PinkParrot.Infrastructure.CQRS.Events;
 
 // ReSharper disable InconsistentNaming
@@ -27,14 +28,14 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 
         public Envelope<IEvent> Parse(ResolvedEvent @event)
         {
-            var headers = ReadJson<EnvelopeHeaders>(@event.Event.Metadata);
+            var headers = ReadJson<PropertiesBag>(@event.Event.Metadata);
 
             var eventType = Type.GetType(headers.Properties[CommonHeaders.EventType].ToString());
             var eventData = ReadJson<IEvent>(@event.Event.Data, eventType);
 
             var envelope = new Envelope<IEvent>(eventData, headers);
 
-            envelope.Headers.Set(CommonHeaders.Timestamp, DateTime.SpecifyKind(@event.Event.Created, DateTimeKind.Utc));
+            envelope.Headers.Set(CommonHeaders.Timestamp, Instant.FromDateTimeUtc(DateTime.SpecifyKind(@event.Event.Created, DateTimeKind.Utc)));
             envelope.Headers.Set(CommonHeaders.EventNumber, @event.OriginalEventNumber);
 
             return envelope;

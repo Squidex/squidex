@@ -8,16 +8,15 @@
 
 using EventStore.ClientAPI;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Infrastructure.MongoDb;
-using IFindFluentExtensions = MongoDB.Driver.IFindFluentExtensions;
-using IMongoDatabase = MongoDB.Driver.IMongoDatabase;
 
 //// ReSharper disable once ConvertIfStatementToNullCoalescingExpression
 
 namespace PinkParrot.Read.Services.Implementations
 {
-    public sealed class MongoStreamPositionsStorage : BaseMongoDbRepository<MongoPosition>, IStreamPositionStorage
+    public sealed class MongoStreamPositionsStorage : MongoRepositoryBase<MongoPosition>, IStreamPositionStorage
     {
         private static readonly ObjectId Id = new ObjectId("507f1f77bcf86cd799439011");
 
@@ -28,14 +27,14 @@ namespace PinkParrot.Read.Services.Implementations
 
         public Position? ReadPosition()
         {
-            var document = IFindFluentExtensions.FirstOrDefault<MongoPosition, MongoPosition>(Collection.Find(t => t.Id == Id));
+            var document = Collection.Find(t => t.Id == Id).FirstOrDefault<MongoPosition, MongoPosition>();
 
             return document != null ? new Position(document.CommitPosition, document.PreparePosition) : Position.Start;
         }
 
         public void WritePosition(Position position)
         {
-            var document = IFindFluentExtensions.FirstOrDefault<MongoPosition, MongoPosition>(Collection.Find(t => t.Id == Id));
+            var document = Collection.Find(t => t.Id == Id).FirstOrDefault<MongoPosition, MongoPosition>();
 
             var isFound = document != null;
 
