@@ -16,9 +16,10 @@ using PinkParrot.Write.Schema.Commands;
 
 namespace PinkParrot.Write.Schema
 {
-    public class ModelSchemaDomainObject : DomainObject
+    public class ModelSchemaDomainObject : DomainObject, IAggregate
     {
         private readonly ModelFieldFactory fieldFactory;
+        private Guid tenantId;
         private bool isDeleted;
         private long totalFields;
         private ModelSchema schema;
@@ -26,6 +27,11 @@ namespace PinkParrot.Write.Schema
         public ModelSchema Schema
         {
             get { return schema; }
+        }
+
+        public Guid TenantId
+        {
+            get { return tenantId; }
         }
 
         public bool IsDeleted
@@ -48,6 +54,8 @@ namespace PinkParrot.Write.Schema
 
         protected void Apply(ModelSchemaCreated @event)
         {
+            tenantId = @event.TenantId;
+
             schema = ModelSchema.Create(@event.Properties);
         }
 
@@ -105,6 +113,8 @@ namespace PinkParrot.Write.Schema
         public void Create(CreateModelSchema command)
         {
             VerifyNotCreated();
+
+            tenantId = command.TenantId;
 
             schema = ModelSchema.Create(command.Properties);
 

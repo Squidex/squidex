@@ -1,16 +1,21 @@
 ﻿// ==========================================================================
-//  DeleteModelSchema.cs
+//  TenantProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
+using System.Threading.Tasks;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Read.Services.Implementations
 {
-    public class DeleteModelSchema : AggregateCommand
+    public sealed class TenantProvider : ITenantProvider
     {
+        public Task<Guid> ProvideTenantIdByDomainAsync(string domain)
+        {
+            return Task.FromResult(Guid.Empty);
+        }
     }
 }

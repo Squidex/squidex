@@ -1,21 +1,13 @@
 ﻿// ==========================================================================
-//  SchemaProvider.cs
+//  ILiveEventConsumer.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using System;
-using System.Threading.Tasks;
-
-namespace PinkParrot.Read.Services.Implementations
+namespace PinkParrot.Infrastructure.CQRS.Events
 {
-    public class SchemaProvider : ISchemaProvider
+    public interface ILiveEventConsumer : IEventConsumer
     {
-        public Task<Guid> FindSchemaIdByNameAsync(string name)
-        {
-            return Task.FromResult(Guid.Empty);
-        }
     }
 }

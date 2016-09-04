@@ -25,7 +25,7 @@ namespace PinkParrot.Infrastructure.Dispatching
                     .Where(Helper.HasRightName)
                     .Where(Helper.HasRightParameters<TIn, TContext>)
                     .Select(ActionContextDispatcherFactory.CreateActionHandler<TTarget, TContext>)
-                    .ToDictionary(h => h.Item1, h => h.Item2);
+                    .ToDictionary<Tuple<Type, Action<TTarget, object, TContext>>, Type, Action<TTarget, object, TContext>>(h => h.Item1, h => h.Item2);
         }
 
         public static bool Dispatch(TTarget target, TIn input, TContext context)

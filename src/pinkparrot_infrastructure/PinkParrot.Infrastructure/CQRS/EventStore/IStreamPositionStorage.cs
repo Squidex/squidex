@@ -1,17 +1,19 @@
 // ==========================================================================
-//  CreateModelSchema.cs
+//  IStreamPositionStorage.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
+using EventStore.ClientAPI;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure.CQRS.EventStore
 {
-    public class CreateModelSchema : TenantCommand
+    public interface IStreamPositionStorage
     {
-        public ModelSchemaProperties Properties { get; set; }
+        Position? ReadPosition();
+
+        void WritePosition(Position position);
     }
 }

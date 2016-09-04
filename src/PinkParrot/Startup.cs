@@ -44,6 +44,7 @@ namespace PinkParrot
             app.UseMvc();
             app.UseStaticFiles();
             app.UseAppSwagger();
+            app.UseAppEventBus();
 
             if (env.IsDevelopment())
             {

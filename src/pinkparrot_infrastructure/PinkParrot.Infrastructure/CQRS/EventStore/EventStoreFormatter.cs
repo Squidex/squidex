@@ -16,11 +16,11 @@ using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Infrastructure.CQRS.EventStore
 {
-    public class EventStoreParser
+    public class EventStoreFormatter
     {
         private readonly JsonSerializerSettings serializerSettings;
 
-        public EventStoreParser(JsonSerializerSettings serializerSettings = null)
+        public EventStoreFormatter(JsonSerializerSettings serializerSettings = null)
         {
             this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
         }

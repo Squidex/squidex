@@ -58,7 +58,7 @@ namespace PinkParrot.Infrastructure.CQRS
         {
             Guard.NotNull(@event, nameof(@event));
 
-            var envelopeToAdd = EnvelopeFactory.ForEvent(@event, id);
+            var envelopeToAdd = EnvelopeFactory.ForEvent(@event, this);
 
             uncomittedEvents.Add(envelopeToAdd);
 

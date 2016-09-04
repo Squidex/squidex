@@ -1,16 +1,13 @@
 ﻿// ==========================================================================
-//  DeleteModelSchema.cs
+//  ICatchEventConsumer.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using PinkParrot.Infrastructure.CQRS.Commands;
-
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure.CQRS.Events
 {
-    public class DeleteModelSchema : AggregateCommand
+    public interface ICatchEventConsumer : IEventConsumer
     {
     }
 }

@@ -5,7 +5,6 @@
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
 namespace PinkParrot.Infrastructure.CQRS
 {
     public class Envelope<TPayload> where TPayload : class

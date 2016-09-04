@@ -6,7 +6,8 @@
     "NodaTime": "2.0.0-alpha20160729",
     "PinkParrot.Core": "1.0.0-*",
     "PinkParrot.Events": "1.0.0-*",
-    "PinkParrot.Infrastructure": "1.0.0-*"
+    "PinkParrot.Infrastructure": "1.0.0-*",
+    "PinkParrot.Read": "1.0.0-*"
   },
 
   "frameworks": {

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  GetEventStoreDomainObjectRepository.cs
+//  EventStoreDomainObjectRepository.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using PinkParrot.Infrastructure.CQRS.Commands;
-// ReSharper disable RedundantAssignment
 
+// ReSharper disable RedundantAssignment
 // ReSharper disable ConvertIfStatementToSwitchStatement
 // ReSharper disable TooWideLocalVariableScope
 
@@ -29,14 +29,14 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
         private readonly IStreamNameResolver nameResolver;
         private readonly IDomainObjectFactory factory;
         private readonly UserCredentials credentials;
-        private readonly EventStoreParser formatter;
+        private readonly EventStoreFormatter formatter;
 
         public EventStoreDomainObjectRepository(
             IDomainObjectFactory factory, 
             IStreamNameResolver nameResolver,
             IEventStoreConnection connection,
             UserCredentials credentials,
-            EventStoreParser formatter)
+            EventStoreFormatter formatter)
         {
             Guard.NotNull(factory, nameof(factory));
             Guard.NotNull(formatter, nameof(formatter));
@@ -106,28 +106,28 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 
             var newEvents = domainObject.GetUncomittedEvents();
 
-            var currVersion = domainObject.Version;
-            var prevVersion = currVersion - newEvents.Count;
-            var exptVersion = prevVersion == 0 ? ExpectedVersion.NoStream : prevVersion - 1;
+            var versionCurrent = domainObject.Version;
+            var versionPrevious = versionCurrent - newEvents.Count;
+            var versionExpected = versionPrevious == 0 ? ExpectedVersion.NoStream : versionPrevious - 1;
 
             var eventsToSave = newEvents.Select(x => formatter.ToEventData(x, commitId)).ToList();
 
-            await InsertEventsAsync(streamName, exptVersion, eventsToSave);
+            await InsertEventsAsync(streamName, versionExpected, eventsToSave);
 
             domainObject.ClearUncommittedEvents();
         }
 
-        private async Task InsertEventsAsync(string streamName, int exptVersion, IReadOnlyCollection<EventData> eventsToSave)
+        private async Task InsertEventsAsync(string streamName, int expectedVersion, IReadOnlyCollection<EventData> eventsToSave)
         {
             if (eventsToSave.Count > 0)
             {
                 if (eventsToSave.Count < WritePageSize)
                 {
-                    await connection.AppendToStreamAsync(streamName, exptVersion, eventsToSave, credentials);
+                    await connection.AppendToStreamAsync(streamName, expectedVersion, eventsToSave, credentials);
                 }
                 else
                 {
-                    var transaction = await connection.StartTransactionAsync(streamName, exptVersion, credentials);
+                    var transaction = await connection.StartTransactionAsync(streamName, expectedVersion, credentials);
 
                     try
                     {
@@ -146,7 +146,7 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
             }
             else
             {
-                Debug.WriteLine(string.Format("No events to insert for: {0}", streamName), "GetEventStoreRepository");
+                Debug.WriteLine($"No events to insert for: {streamName}", "GetEventStoreRepository");
             }
         }
     }

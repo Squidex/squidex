@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ISchemaProvider.cs
+//  ITenantCommand.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
-namespace PinkParrot.Read.Services
+namespace PinkParrot.Write
 {
-    public interface ISchemaProvider
+    public interface ITenantCommand : ICommand
     {
-        Task<Guid> FindSchemaIdByNameAsync(string name);
+        Guid TenantId { get; set; }
     }
 }

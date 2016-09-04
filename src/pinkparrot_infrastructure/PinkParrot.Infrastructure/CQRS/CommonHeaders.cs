@@ -12,6 +12,7 @@ namespace PinkParrot.Infrastructure.CQRS
         public const string AggregateId = "AggregateId";
         public const string CommitId = "CommitId";
         public const string Timestamp = "Timestamp";
+        public const string TenantId = "TenantId";
         public const string EventId = "EventId";
         public const string EventType = "EventType";
         public const string EventNumber = "EventNumber";

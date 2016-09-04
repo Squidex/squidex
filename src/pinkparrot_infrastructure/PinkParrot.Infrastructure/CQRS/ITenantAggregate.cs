@@ -1,16 +1,17 @@
 ﻿// ==========================================================================
-//  DeleteModelSchema.cs
+//  ITenantAggregate.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure.CQRS
 {
-    public class DeleteModelSchema : AggregateCommand
+    public interface ITenantAggregate : IAggregate
     {
+        Guid TenantId { get; }
     }
 }

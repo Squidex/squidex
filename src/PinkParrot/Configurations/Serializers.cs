@@ -7,12 +7,15 @@
 // ==========================================================================
 
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Infrastructure.Json;
+using IMvcBuilder = Microsoft.Extensions.DependencyInjection.IMvcBuilder;
+using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using MvcJsonMvcBuilderExtensions = Microsoft.Extensions.DependencyInjection.MvcJsonMvcBuilderExtensions;
+using ServiceCollectionServiceExtensions = Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions;
 
 namespace PinkParrot.Configurations
 {
@@ -41,14 +44,14 @@ namespace PinkParrot.Configurations
                 new ModelFieldFactory()
                     .AddFactory<NumberFieldProperties>(id => new NumberField(id));
 
-            services.AddSingleton(t => CreateSettings());
-            services.AddSingleton(fieldFactory);
-            services.AddSingleton<EventStoreParser>();
+            ServiceCollectionServiceExtensions.AddSingleton(services, t => CreateSettings());
+            ServiceCollectionServiceExtensions.AddSingleton(services, fieldFactory);
+            ServiceCollectionServiceExtensions.AddSingleton<EventStoreFormatter>(services);
         }
 
         public static void AddAppSerializers(this IMvcBuilder mvc)
         {
-            mvc.AddJsonOptions(options =>
+            MvcJsonMvcBuilderExtensions.AddJsonOptions(mvc, options =>
             {
                 ConfigureJson(options.SerializerSettings);
             });

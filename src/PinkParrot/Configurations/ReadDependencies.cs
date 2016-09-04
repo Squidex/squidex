@@ -7,6 +7,9 @@
 // ==========================================================================
 
 using Autofac;
+using PinkParrot.Infrastructure.CQRS.Events;
+using PinkParrot.Read.Repositories;
+using PinkParrot.Read.Repositories.Implementations;
 using PinkParrot.Read.Services;
 using PinkParrot.Read.Services.Implementations;
 
@@ -16,8 +19,17 @@ namespace PinkParrot.Configurations
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<SchemaProvider>()
-                .As<ISchemaProvider>()
+            builder.RegisterType<TenantProvider>()
+                .As<ITenantProvider>()
+                .SingleInstance();
+
+            builder.RegisterType<ModelSchemaProvider>()
+                .As<IModelSchemaProvider>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoModelSchemaRepository>()
+                .As<IModelSchemaRepository>()
+                .As<ICatchEventConsumer>()
                 .SingleInstance();
         }
     }
