@@ -64,22 +64,22 @@ namespace PinkParrot.Core.Schema
             return new ModelSchema(newMetadata, fields);
         }
 
-        public ModelSchema AddField(long id, ModelFieldProperties properties, ModelFieldFactory factory)
+        public ModelSchema AddField(long id, ModelFieldProperties fieldProperties, ModelFieldFactory factory)
         {
-            var field = factory.CreateField(id, properties);
+            var field = factory.CreateField(id, fieldProperties);
 
             return SetField(field);
         }
 
-        public ModelSchema SetField(long fieldId, ModelFieldProperties properties)
+        public ModelSchema SetField(long fieldId, ModelFieldProperties fieldProperties)
         {
-            Guard.NotNull(properties, nameof(properties));
+            Guard.NotNull(fieldProperties, nameof(fieldProperties));
 
             return UpdateField(fieldId, field =>
             {
                 var errors = new List<ValidationError>();
 
-                var newField = field.Configure(properties, errors);
+                var newField = field.Configure(fieldProperties, errors);
 
                 if (errors.Any())
                 {

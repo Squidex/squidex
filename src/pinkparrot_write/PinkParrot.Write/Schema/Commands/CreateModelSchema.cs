@@ -13,6 +13,6 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class CreateModelSchema : AggregateCommand
     {
-        public ModelSchemaProperties Properties;
+        public ModelSchemaProperties Properties { get; set; }
     }
 }

@@ -1,13 +1,18 @@
 ﻿// ==========================================================================
-//  GetEventStoreDomainObjectRepository.cs
+//  ISchemaProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS.GetEventStore
+
+using System;
+using System.Threading.Tasks;
+
+namespace PinkParrot.Read.Services
 {
-    public class GetEventStoreDomainObjectRepository
+    public interface ISchemaProvider
     {
+        Task<Guid> FindSchemaIdByNameAsync(string name);
     }
 }

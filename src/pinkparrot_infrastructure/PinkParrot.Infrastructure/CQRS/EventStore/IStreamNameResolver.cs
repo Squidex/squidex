@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  UpdateModelSchema.cs
+//  IStreamNameResolver.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure.CQRS.EventStore
 {
-    public class UpdateModelSchema : AggregateCommand
+    public interface IStreamNameResolver
     {
-        public ModelSchemaProperties Properties { get; set; }
+        string GetStreamName(Type aggregateType, Guid id);
     }
 }

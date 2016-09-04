@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Reflection;
 using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Extensions;
@@ -17,7 +18,7 @@ namespace PinkParrot.Infrastructure.Json
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(PropertiesBag);
+            return typeof(PropertiesBag).IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

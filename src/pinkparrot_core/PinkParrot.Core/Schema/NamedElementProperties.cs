@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schema
@@ -17,6 +18,7 @@ namespace PinkParrot.Core.Schema
         private readonly string label;
         private readonly string hints;
 
+        [Required]
         public string Name
         {
             get { return name; }

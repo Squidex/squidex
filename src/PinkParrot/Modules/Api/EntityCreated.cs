@@ -1,18 +1,19 @@
 ﻿// ==========================================================================
-//  UpdateModelSchema.cs
+//  EntityCreated.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Modules.Api
 {
-    public class UpdateModelSchema : AggregateCommand
+    public class EntityCreated
     {
-        public ModelSchemaProperties Properties { get; set; }
+        [Required]
+        public Guid Id { get; set; }
     }
 }

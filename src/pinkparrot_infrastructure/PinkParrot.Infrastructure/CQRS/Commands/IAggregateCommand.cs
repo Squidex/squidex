@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  UpdateModelSchema.cs
+//  IAggregateCommand.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure.CQRS.Commands
 {
-    public class UpdateModelSchema : AggregateCommand
+    public interface IAggregateCommand : ICommand
     {
-        public ModelSchemaProperties Properties { get; set; }
+        Guid AggregateId { get; set; }
     }
 }

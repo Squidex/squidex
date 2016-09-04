@@ -26,19 +26,14 @@ namespace PinkParrot.Infrastructure.Dispatching
                     .Where(Helper.HasRightParameters<TIn, TContext>)
                     .Where(Helper.HasRightReturnType<TOut>)
                     .Select(FuncContextDispatcherFactory.CreateFuncHandler<TTarget, TContext, TOut >)
-                    .ToDictionary<Tuple<Type, Func<TTarget, object, TContext, TOut>>, Type, Func<TTarget, object, TContext, TOut>>(h => h.Item1, h => h.Item2);
+                    .ToDictionary(h => h.Item1, h => h.Item2);
         }
 
         public static TOut Dispatch(TTarget target, TIn item, TContext context)
         {
             Func<TTarget, object, TContext, TOut > handler;
 
-            if (Handlers.TryGetValue(item.GetType(), out handler))
-            {
-                return handler(target, item, context);
-            }
-
-            return default(TOut);
+            return Handlers.TryGetValue(item.GetType(), out handler) ? handler(target, item, context) : default(TOut);
         }
     }
 }

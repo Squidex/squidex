@@ -36,7 +36,7 @@ namespace PinkParrot.Infrastructure
                 { typeof(Instant),  (p, c) => p.ToInstant(c) },
                 { typeof(Instant?), (p, c) => p.ToNullableInstant(c) },
                 { typeof(Guid),     (p, c) => p.ToGuid(c) },
-                { typeof(Guid?),    (p, c) => p.ToNullableGuid(c) },
+                { typeof(Guid?),    (p, c) => p.ToNullableGuid(c) }
             };
 
         public object RawValue

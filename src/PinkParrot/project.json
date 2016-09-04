@@ -1,4 +1,4 @@
-﻿{
+{
   "dependencies": {
     "Autofac": "4.1.0",
     "Autofac.Extensions.DependencyInjection": "4.0.0",
@@ -27,8 +27,7 @@
     "PinkParrot.Infrastructure": "1.0.0-*",
     "PinkParrot.Read": "1.0.0-*",
     "PinkParrot.Write": "1.0.0-*",
-    "Swashbuckle.SwaggerGen": "6.0.0-beta901",
-    "Swashbuckle.SwaggerUi": "6.0.0-beta901"
+    "Swashbuckle": "6.0.0-beta902"
   },
 
   "tools": {
@@ -46,7 +45,9 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
+    "xmlDoc": true,
+    "nowarn": [ "1591", "1573", "1572" ]
   },
 
   "runtimeOptions": {

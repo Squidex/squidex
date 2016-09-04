@@ -10,7 +10,7 @@ using System;
 
 namespace PinkParrot.Infrastructure.CQRS.Commands
 {
-    public class AggregateCommand : ICommand
+    public class AggregateCommand : IAggregateCommand
     {
         public Guid AggregateId { get; set; }
     }

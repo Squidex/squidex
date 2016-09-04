@@ -14,18 +14,18 @@ namespace PinkParrot.Infrastructure.CQRS.Autofac
 {
     public sealed class AutofacDomainObjectFactory : IDomainObjectFactory
     {
-        private readonly IContainer container;
+        private readonly ILifetimeScope lifetimeScope;
 
-        public AutofacDomainObjectFactory(IContainer container)
+        public AutofacDomainObjectFactory(ILifetimeScope lifetimeScope)
         {
-            Guard.NotNull(container, nameof(container));
+            Guard.NotNull(lifetimeScope, nameof(lifetimeScope));
 
-            this.container = container;
+            this.lifetimeScope = lifetimeScope;
         }
 
         public IAggregate CreateNew(Type type, Guid id)
         {
-            return (IAggregate)container.Resolve(type, 
+            return (IAggregate)lifetimeScope.Resolve(type, 
                 new NamedParameter("id", id),
                 new NamedParameter("version", 0));
         }

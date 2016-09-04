@@ -5,6 +5,7 @@
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace PinkParrot.Infrastructure.CQRS
 {
     public class Envelope<TPayload> where TPayload : class
@@ -28,15 +29,6 @@ namespace PinkParrot.Infrastructure.CQRS
             }
         }
 
-        public Envelope(TPayload payload)
-        {
-            Guard.NotNull(payload, nameof(payload));
-
-            this.payload = payload;
-
-            headers = new EnvelopeHeaders();
-        }
-
         public Envelope(TPayload payload, EnvelopeHeaders headers)
         {
             Guard.NotNull(payload, nameof(payload));
@@ -44,6 +36,16 @@ namespace PinkParrot.Infrastructure.CQRS
 
             this.payload = payload;
             this.headers = headers;
+        }
+
+        public Envelope(TPayload payload)
+            : this(payload, new EnvelopeHeaders())
+        {
+        }
+
+        public Envelope(TPayload payload, PropertiesBag bag)
+            : this(payload, new EnvelopeHeaders(bag))
+        {
         }
 
         public Envelope<TOther> To<TOther>() where TOther : class

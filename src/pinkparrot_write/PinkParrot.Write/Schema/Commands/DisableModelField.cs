@@ -12,6 +12,6 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class DisableModelField : AggregateCommand
     {
-        public long FieldId;
+        public long FieldId { get; set; }
     }
 }

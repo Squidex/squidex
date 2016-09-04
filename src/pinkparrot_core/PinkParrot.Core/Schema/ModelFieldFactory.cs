@@ -21,11 +21,13 @@ namespace PinkParrot.Core.Schema
             AddFactory<NumberFieldProperties>(id => new NumberField(id));
         }
 
-        public void AddFactory<T>(Func<long, ModelField> factory) where T : ModelFieldProperties
+        public ModelFieldFactory AddFactory<T>(Func<long, ModelField> factory) where T : ModelFieldProperties
         {
             Guard.NotNull(factory, nameof(factory));
 
             factories[typeof(T)] = factory;
+
+            return this;
         }
 
         public virtual ModelField CreateField(long id, ModelFieldProperties properties)

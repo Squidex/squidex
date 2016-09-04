@@ -1,18 +1,21 @@
 ﻿// ==========================================================================
-//  UpdateModelSchema.cs
+//  SchemaProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
+using System.Threading.Tasks;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Read.Services.Implementations
 {
-    public class UpdateModelSchema : AggregateCommand
+    public class SchemaProvider : ISchemaProvider
     {
-        public ModelSchemaProperties Properties { get; set; }
+        public Task<Guid> FindSchemaIdByNameAsync(string name)
+        {
+            return Task.FromResult(Guid.Empty);
+        }
     }
 }

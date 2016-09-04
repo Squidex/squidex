@@ -13,8 +13,8 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class UpdateModelField : AggregateCommand
     {
-        public long FieldId;
+        public long FieldId { get; set; }
 
-        public ModelFieldProperties Properties;
+        public ModelFieldProperties Properties { get; set; }
     }
 }

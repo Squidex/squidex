@@ -1,17 +1,17 @@
 // ==========================================================================
-//  DeleteModelField.cs
+//  HideAttribute.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Infrastructure
 {
-    public class DeleteModelField : AggregateCommand
+    [AttributeUsage(AttributeTargets.Property)]
+    public class HideAttribute : Attribute
     {
-        public long FieldId { get; set; }
     }
 }

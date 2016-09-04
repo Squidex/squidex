@@ -1,5 +1,5 @@
 // ==========================================================================
-//  ModelSchemaMetadata.cs
+//  ModelSchemaProperties.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
