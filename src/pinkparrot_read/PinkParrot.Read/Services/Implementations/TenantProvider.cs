@@ -13,9 +13,9 @@ namespace PinkParrot.Read.Services.Implementations
 {
     public sealed class TenantProvider : ITenantProvider
     {
-        public Task<Guid> ProvideTenantIdByDomainAsync(string domain)
+        public Task<Guid?> ProvideTenantIdByDomainAsync(string domain)
         {
-            return Task.FromResult(Guid.Empty);
+            return Task.FromResult<Guid?>(Guid.Empty);
         }
     }
 }

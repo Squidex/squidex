@@ -10,7 +10,7 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class EnableModelField : AggregateCommand
+    public class EnableModelField : TenantCommand
     {
         public long FieldId { get; set; }
     }

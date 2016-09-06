@@ -1,18 +1,21 @@
 ﻿// ==========================================================================
-//  AddModelField.cs
+//  IEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Read.Repositories
 {
-    public class AddModelField : TenantCommand
+    public interface IEntity
     {
-        public ModelFieldProperties Properties { get; set; }
+        Guid Id { get; set; }
+
+        DateTime Created { get; set; }
+
+        DateTime LastModified { get; set; }
     }
 }

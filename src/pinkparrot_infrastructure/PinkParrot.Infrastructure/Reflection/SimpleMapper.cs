@@ -111,11 +111,11 @@ namespace PinkParrot.Infrastructure.Reflection
                 var dstType = typeof(TDestination);
                 var srcType = typeof(TSource);
 
-                var destinationProperties = dstType.GetProperties();
+                var destinationProperties = dstType.GetPublicProperties();
 
                 var newMappers = new List<PropertyMapper>();
 
-                foreach (var srcProperty in srcType.GetProperties().Where(x => x.CanRead))
+                foreach (var srcProperty in srcType.GetPublicProperties().Where(x => x.CanRead))
                 {
                     var dstProperty = destinationProperties.FirstOrDefault(x => x.Name == srcProperty.Name);
 

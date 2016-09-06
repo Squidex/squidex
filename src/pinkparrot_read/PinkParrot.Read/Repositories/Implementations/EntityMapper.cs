@@ -8,10 +8,11 @@
 
 using System;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.MongoDb;
-using PinkParrot.Read.Models;
 
 namespace PinkParrot.Read.Repositories.Implementations
 {
@@ -31,6 +32,20 @@ namespace PinkParrot.Read.Repositories.Implementations
             }
             
             return Update(entity, headers);
+        }
+
+        public static BsonDocument ToJsonBsonDocument<T>(this T value, JsonSerializerSettings settings)
+        {
+            var json = JsonConvert.SerializeObject(value, settings).Replace("$type", "§type");
+
+            return BsonDocument.Parse(json);
+        }
+
+        public static T ToJsonObject<T>(this BsonDocument document, JsonSerializerSettings settings)
+        {
+            var json = document.ToJson().Replace("§type", "$type");
+
+            return JsonConvert.DeserializeObject<T>(json, settings);
         }
 
         public static T Update<T>(T entity, EnvelopeHeaders headers) where T : IEntity
@@ -64,7 +79,7 @@ namespace PinkParrot.Read.Repositories.Implementations
 
             updater(entity);
 
-            await collection.ReplaceOneAsync(t => t.Id == entity.Id, entity);
+            var result = await collection.ReplaceOneAsync(t => t.Id == entity.Id, entity);
         }
     }
 }

@@ -6,13 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using EventStore.ClientAPI;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Infrastructure.MongoDb;
 
-//// ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+// ReSharper disable InvertIf
 
 namespace PinkParrot.Read.Services.Implementations
 {
@@ -25,35 +24,23 @@ namespace PinkParrot.Read.Services.Implementations
         {
         }
 
-        public Position? ReadPosition()
+        public int? ReadPosition()
         {
             var document = Collection.Find(t => t.Id == Id).FirstOrDefault<MongoPosition, MongoPosition>();
-
-            return document != null ? new Position(document.CommitPosition, document.PreparePosition) : Position.Start;
-        }
-
-        public void WritePosition(Position position)
-        {
-            var document = Collection.Find(t => t.Id == Id).FirstOrDefault<MongoPosition, MongoPosition>();
-
-            var isFound = document != null;
 
             if (document == null)
             {
                 document = new MongoPosition { Id = Id };
-            }
 
-            document.CommitPosition = position.CommitPosition;
-            document.PreparePosition = position.PreparePosition;
-
-            if (isFound)
-            {
-                Collection.ReplaceOne(t => t.Id == Id, document);
-            }
-            else
-            {
                 Collection.InsertOne(document);
             }
+
+            return document.Position;
+        }
+
+        public void WritePosition(int position)
+        {
+            Collection.UpdateOne(t => t.Id == Id, Update.Set(t => t.Position, position));
         }
     }
 }

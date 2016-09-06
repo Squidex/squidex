@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  InfrastructureDependencies.cs
+//  InfrastructureModule.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -13,10 +13,12 @@ using EventStore.ClientAPI.SystemData;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.CQRS.EventStore;
+using PinkParrot.Pipeline;
 using PinkParrot.Read.Services.Implementations;
 
 namespace PinkParrot.Configurations
@@ -63,7 +65,7 @@ namespace PinkParrot.Configurations
                 .As<IDomainObjectFactory>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultNameResolver>()
+            builder.RegisterInstance(new DefaultNameResolver("pinkparrot"))
                 .As<IStreamNameResolver>()
                 .SingleInstance();
 
@@ -89,7 +91,12 @@ namespace PinkParrot.Configurations
     {
         public static void UseAppEventBus(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService(typeof(EventStoreBus));
+            app.ApplicationServices.GetService<EventStoreBus>().Subscribe("pinkparrot");
+        }
+
+        public static void UseAppTenants(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<TenantMiddleware>();
         }
     }
 }

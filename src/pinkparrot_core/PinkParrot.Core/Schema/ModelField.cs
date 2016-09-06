@@ -80,41 +80,21 @@ namespace PinkParrot.Core.Schema
 
         public ModelField Hide()
         {
-            if (isHidden)
-            {
-                throw new DomainException($"The field '{Name} is already hidden.");
-            }
-
             return Update<ModelField>(clone => clone.isHidden = true);
         }
 
         public ModelField Show()
         {
-            if (!isHidden)
-            {
-                throw new DomainException($"The field '{Name} is already visible.");
-            }
-
             return Update<ModelField>(clone => clone.isHidden = false);
         }
 
         public ModelField Disable()
         {
-            if (isDisabled)
-            {
-                throw new DomainException($"The field '{Name} is already disabled.");
-            }
-
             return Update<ModelField>(clone => clone.isDisabled = true);
         }
 
         public ModelField Enable()
         {
-            if (!isDisabled)
-            {
-                throw new DomainException($"The field '{Name} is already enabled.");
-            }
-            
             return Update<ModelField>(clone => clone.isDisabled = false);
         }
 

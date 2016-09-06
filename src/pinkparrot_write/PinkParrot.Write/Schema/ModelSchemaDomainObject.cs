@@ -9,6 +9,7 @@
 using System;
 using PinkParrot.Core.Schema;
 using PinkParrot.Events.Schema;
+using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.Dispatching;
@@ -45,56 +46,56 @@ namespace PinkParrot.Write.Schema
             this.fieldFactory = fieldFactory;
         }
 
-        protected void Apply(ModelFieldAdded @event)
+        public void On(ModelFieldAdded @event)
         {
             schema = schema.AddField(@event.FieldId, @event.Properties, fieldFactory);
 
             totalFields++;
         }
 
-        protected void Apply(ModelSchemaCreated @event)
+        public void On(ModelSchemaCreated @event)
         {
             tenantId = @event.TenantId;
 
             schema = ModelSchema.Create(@event.Properties);
         }
 
-        protected void Apply(ModelFieldUpdated @event)
+        public void On(ModelFieldUpdated @event)
         {
             schema = schema.SetField(@event.FieldId, @event.Properties);
         }
 
-        public void Apply(ModelFieldHidden @event)
+        public void On(ModelFieldHidden @event)
         {
             schema = schema.HideField(@event.FieldId);
         }
 
-        public void Apply(ModelFieldShown @event)
+        public void On(ModelFieldShown @event)
         {
             schema = schema.ShowField(@event.FieldId);
         }
 
-        public void Apply(ModelFieldDisabled @event)
+        public void On(ModelFieldDisabled @event)
         {
             schema = schema.DisableField(@event.FieldId);
         }
 
-        public void Apply(ModelFieldEnabled @event)
+        public void On(ModelFieldEnabled @event)
         {
             schema = schema.EnableField(@event.FieldId);
         }
 
-        protected void Apply(ModelSchemaUpdated @event)
+        public void On(ModelSchemaUpdated @event)
         {
             schema = schema.Update(@event.Properties);
         }
 
-        protected void Apply(ModelFieldDeleted @event)
+        public void On(ModelFieldDeleted @event)
         {
             schema = schema.DeleteField(@event.FieldId);
         }
 
-        protected void Apply(ModelSchemaDeleted @event)
+        public void On(ModelSchemaDeleted @event)
         {
             isDeleted = false;
         }
@@ -197,7 +198,7 @@ namespace PinkParrot.Write.Schema
         {
             if (schema != null)
             {
-                throw new InvalidOperationException("Schema has already been created.");
+                throw new DomainException("Schema has already been created.");
             }
         }
 
@@ -205,7 +206,7 @@ namespace PinkParrot.Write.Schema
         {
             if (isDeleted || schema == null)
             {
-                throw new InvalidOperationException("Schema has already been deleted or not created yet.");
+                throw new DomainException("Schema has already been deleted or not created yet.");
             }
         }
 

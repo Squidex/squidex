@@ -17,7 +17,7 @@ using Swashbuckle.SwaggerGen.Annotations;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
-    public class SchemasFieldsController : BaseController
+    public class SchemasFieldsController : ControllerBase
     {
         public SchemasFieldsController(ICommandBus commandBus)
             : base(commandBus)

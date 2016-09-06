@@ -13,6 +13,6 @@ namespace PinkParrot.Read.Services
 {
     public interface ITenantProvider
     {
-        Task<Guid> ProvideTenantIdByDomainAsync(string domain);
+        Task<Guid?> ProvideTenantIdByDomainAsync(string domain);
     }
 }

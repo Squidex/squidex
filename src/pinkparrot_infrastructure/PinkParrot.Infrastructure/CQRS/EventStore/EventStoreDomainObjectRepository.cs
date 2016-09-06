@@ -51,7 +51,7 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
             this.nameResolver = nameResolver;
         }
 
-        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = 0) where TDomainObject : class, IAggregate
+        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = int.MaxValue) where TDomainObject : class, IAggregate
         {
             Guard.GreaterThan(version, 0, nameof(version));
 

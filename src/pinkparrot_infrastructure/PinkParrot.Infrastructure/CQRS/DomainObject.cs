@@ -52,20 +52,15 @@ namespace PinkParrot.Infrastructure.CQRS
             {
                 ApplyEvent(envelopeToAdd);
             }
+            else
+            {
+                version++;
+            }
         }
 
         protected void RaiseEvent(IEvent @event, bool disableApply = false)
         {
-            Guard.NotNull(@event, nameof(@event));
-
-            var envelopeToAdd = EnvelopeFactory.ForEvent(@event, this);
-
-            uncomittedEvents.Add(envelopeToAdd);
-
-            if (!disableApply)
-            {
-                ApplyEvent(envelopeToAdd);
-            }
+            RaiseEvent(EnvelopeFactory.ForEvent(@event, this), disableApply);
         }
 
         void IAggregate.ApplyEvent(Envelope<IEvent> @event)

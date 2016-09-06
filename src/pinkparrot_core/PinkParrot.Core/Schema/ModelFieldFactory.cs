@@ -14,14 +14,15 @@ namespace PinkParrot.Core.Schema
 {
     public class ModelFieldFactory
     {
-        private readonly Dictionary<Type, Func<long, ModelField>> factories = new Dictionary<Type, Func<long, ModelField>>();
+        private readonly Dictionary<Type, Func<long, ModelFieldProperties, ModelField>> factories 
+            = new Dictionary<Type, Func<long, ModelFieldProperties, ModelField>>();
 
         public ModelFieldFactory()
         {
-            AddFactory<NumberFieldProperties>(id => new NumberField(id));
+            AddFactory<NumberFieldProperties>((id, p) => new NumberField(id, (NumberFieldProperties)p));
         }
 
-        public ModelFieldFactory AddFactory<T>(Func<long, ModelField> factory) where T : ModelFieldProperties
+        public ModelFieldFactory AddFactory<T>(Func<long, ModelFieldProperties, ModelField> factory) where T : ModelFieldProperties
         {
             Guard.NotNull(factory, nameof(factory));
 
@@ -41,7 +42,7 @@ namespace PinkParrot.Core.Schema
                 throw new InvalidOperationException("Field type is not supported.");
             }
 
-            return factory(id);
+            return factory(id, properties);
         }
     }
 }

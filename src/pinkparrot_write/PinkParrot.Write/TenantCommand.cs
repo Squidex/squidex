@@ -11,7 +11,7 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write
 {
-    public abstract class TenantCommand : AggregateCommand
+    public abstract class TenantCommand : AggregateCommand, ITenantCommand
     {
         public Guid TenantId { get; set; }
     }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ModelSchemaRM.cs
+//  MongoModelSchemaEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -9,11 +9,10 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using PinkParrot.Infrastructure;
 
-namespace PinkParrot.Read.Models
+namespace PinkParrot.Read.Repositories.Implementations
 {
-    public sealed class ModelSchemaListRM : IEntity, ITenantEntity
+    public sealed class MongoModelSchemaEntity : IModelSchemaEntity
     {
         [BsonId]
         [BsonElement]
@@ -39,5 +38,9 @@ namespace PinkParrot.Read.Models
         [BsonRequired]
         [BsonElement]
         public bool IsDeleted { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public BsonDocument Schema { get; set; }
     }
 }

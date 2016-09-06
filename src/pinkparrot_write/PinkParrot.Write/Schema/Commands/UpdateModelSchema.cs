@@ -11,7 +11,7 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class UpdateModelSchema : AggregateCommand
+    public class UpdateModelSchema : TenantCommand
     {
         public ModelSchemaProperties Properties { get; set; }
     }

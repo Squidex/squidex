@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AddModelField.cs
+//  EntityWithSchema.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,12 +7,20 @@
 // ==========================================================================
 
 using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
 
-namespace PinkParrot.Write.Schema.Commands
+namespace PinkParrot.Read.Repositories
 {
-    public class AddModelField : TenantCommand
+    public sealed class EntityWithSchema
     {
-        public ModelFieldProperties Properties { get; set; }
+        public IModelSchemaEntity Entity { get; }
+
+        public ModelSchema Schema { get; }
+
+        internal EntityWithSchema(IModelSchemaEntity entity, ModelSchema schema)
+        {
+            Entity = entity;
+
+            Schema = schema;
+        }
     }
 }

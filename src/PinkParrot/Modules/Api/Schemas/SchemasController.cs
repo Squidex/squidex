@@ -12,10 +12,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Core.Schema;
+using PinkParrot.Core.Schema.Json;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Read.Repositories;
-using PinkParrot.Read.Services;
 using PinkParrot.Write.Schema.Commands;
 using Swashbuckle.SwaggerGen.Annotations;
 
@@ -23,17 +23,14 @@ using Swashbuckle.SwaggerGen.Annotations;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
-    public class SchemasController : BaseController
+    public class SchemasController : ControllerBase
     {
         private readonly IModelSchemaRepository modelSchemaRepository;
-        private readonly ITenantProvider tenantProvider;
-
-        public SchemasController(ICommandBus commandBus, ITenantProvider tenantProvider, IModelSchemaRepository modelSchemaRepository) 
+        
+        public SchemasController(ICommandBus commandBus, IModelSchemaRepository modelSchemaRepository)
             : base(commandBus)
         {
             this.modelSchemaRepository = modelSchemaRepository;
-
-            this.tenantProvider = tenantProvider;
         }
 
         /// <summary>
@@ -42,12 +39,34 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpGet]
         [Route("schemas/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public async Task<List<SchemaListModel>> Query()
+        [ProducesResponseType(typeof(List<SchemasDto>), 200)]
+        public async Task<List<SchemasDto>> Query()
         {
-            var tenantId = await tenantProvider.ProvideTenantIdByDomainAsync(Request.Host.ToString());
-            var schemes = await modelSchemaRepository.QueryAllAsync(tenantId);
+            var schemas = await modelSchemaRepository.QueryAllAsync(TenantId);
 
-            return schemes.Select(s => SimpleMapper.Map(s, new SchemaListModel())).ToList();
+            return schemas.Select(s => SimpleMapper.Map(s, new SchemasDto())).ToList();
+        }
+
+        /// <summary>
+        /// Gets the schema with the specified name.
+        /// </summary>
+        /// <param name="name">The name of the schema.</param>
+        /// <response code="200">Schema returned</response>
+        /// <response code="404">Schema not found</response>
+        [HttpGet]
+        [Route("schemas/{name}/")]
+        [SwaggerOperation(Tags = new[] { "Schemas" })]
+        [ProducesResponseType(typeof(SchemaDto), 200)]
+        public async Task<ActionResult> Get(string name)
+        {
+            var entity = await modelSchemaRepository.FindSchemaAsync(TenantId, name);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(SchemaDto.Create(entity.Schema));
         }
 
         /// <summary>

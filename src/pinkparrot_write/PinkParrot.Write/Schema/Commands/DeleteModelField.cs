@@ -10,7 +10,7 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class DeleteModelField : AggregateCommand
+    public class DeleteModelField : TenantCommand
     {
         public long FieldId { get; set; }
     }

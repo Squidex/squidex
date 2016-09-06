@@ -10,7 +10,7 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {
-    public class HideModelField : AggregateCommand
+    public class HideModelField : TenantCommand
     {
         public long FieldId { get; set; }
     }

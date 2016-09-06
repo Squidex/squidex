@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IEntity.cs
+//  ITenantFeature.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -8,14 +8,10 @@
 
 using System;
 
-namespace PinkParrot.Read.Models
+namespace PinkParrot.Pipeline
 {
-    public interface IEntity
+    public interface ITenantFeature
     {
-        Guid Id { get; set; }
-
-        DateTime Created { get; set; }
-
-        DateTime LastModified { get; set; }
+        Guid TenantId { get; }
     }
 }

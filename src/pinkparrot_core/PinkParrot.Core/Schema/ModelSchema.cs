@@ -18,38 +18,39 @@ namespace PinkParrot.Core.Schema
     public sealed class ModelSchema
     {
         private readonly ModelSchemaProperties properties;
-        private readonly ImmutableDictionary<long, ModelField> fields;
+        private readonly ImmutableDictionary<long, ModelField> fieldsById;
         private readonly Dictionary<string, ModelField> fieldsByName;
 
         public ModelSchema(ModelSchemaProperties properties, ImmutableDictionary<long, ModelField> fields)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
-
-            this.fields = fields;
-
+            
             this.properties = properties;
 
+            fieldsById = fields;
             fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static ModelSchema Create(ModelSchemaProperties metadata)
+        public static ModelSchema Create(ModelSchemaProperties properties)
         {
+            Guard.NotNull(properties, nameof(properties));
+
             var errors = new List<ValidationError>();
 
-            metadata.Validate(errors);
+            properties.Validate(errors);
 
             if (errors.Any())
             {
                 throw new ValidationException("Failed to create a new model schema.", errors);
             }
 
-            return new ModelSchema(metadata, ImmutableDictionary<long, ModelField>.Empty);
+            return new ModelSchema(properties, ImmutableDictionary<long, ModelField>.Empty);
         }
 
-        public IReadOnlyDictionary<long, ModelField> Fields
+        public ImmutableDictionary<long, ModelField> Fields
         {
-            get { return fields; }
+            get { return fieldsById; }
         }
 
         public ModelSchemaProperties Properties
@@ -61,14 +62,14 @@ namespace PinkParrot.Core.Schema
         {
             Guard.NotNull(newMetadata, nameof(newMetadata));
 
-            return new ModelSchema(newMetadata, fields);
+            return new ModelSchema(newMetadata, fieldsById);
         }
 
         public ModelSchema AddField(long id, ModelFieldProperties fieldProperties, ModelFieldFactory factory)
         {
             var field = factory.CreateField(id, fieldProperties);
 
-            return SetField(field);
+            return ReplaceOrAddField(field);
         }
 
         public ModelSchema SetField(long fieldId, ModelFieldProperties fieldProperties)
@@ -110,41 +111,35 @@ namespace PinkParrot.Core.Schema
             return UpdateField(fieldId, field => field.Show());
         }
 
-        public ModelSchema SetField(ModelField field)
-        {
-            Guard.NotNull(field, nameof(field));
-
-            if (fields.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
-            {
-                throw new ValidationException($"A field with name '{field.Name}' already exists.");
-            }
-
-            return new ModelSchema(properties, fields.SetItem(field.Id, field));
-        }
-
         public ModelSchema DeleteField(long fieldId)
         {
-            if (!fields.ContainsKey(fieldId))
-            {
-                throw new ValidationException($"A field with id {fieldId} does not exist.");
-            }
-
-            return new ModelSchema(properties, fields.Remove(fieldId));
+            return new ModelSchema(properties, fieldsById.Remove(fieldId));
         }
 
         private ModelSchema UpdateField(long fieldId, Func<ModelField, ModelField> updater)
         {
             ModelField field;
 
-            if (!fields.TryGetValue(fieldId, out field))
+            if (!fieldsById.TryGetValue(fieldId, out field))
             {
-                throw new ValidationException($"Cannot update field with id '{fieldId}'.", 
-                    new ValidationError("Field does not exist.", "fieldId"));
+                throw new DomainObjectNotFoundException(fieldId.ToString(), typeof(ModelField));
             }
 
             var newField = updater(field);
 
-            return SetField(newField);
+            return ReplaceOrAddField(newField);
+        }
+
+        private ModelSchema ReplaceOrAddField(ModelField field)
+        {
+            Guard.NotNull(field, nameof(field));
+
+            if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
+            {
+                throw new ValidationException($"A field with name '{field.Name}' already exists.");
+            }
+
+            return new ModelSchema(properties, fieldsById.SetItem(field.Id, field));
         }
 
         public async Task ValidateAsync(PropertiesBag data)

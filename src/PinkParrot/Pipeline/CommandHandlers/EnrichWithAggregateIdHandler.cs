@@ -9,8 +9,11 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Read.Services;
+using PinkParrot.Write;
+using PinkParrot.Write.Schema;
 
 // ReSharper disable InvertIf
 
@@ -32,16 +35,32 @@ namespace PinkParrot.Pipeline.CommandHandlers
         {
             var aggregateCommand = context.Command as IAggregateCommand;
 
-            if (aggregateCommand != null && aggregateCommand.AggregateId == Guid.Empty)
+            if (aggregateCommand == null || aggregateCommand.AggregateId != Guid.Empty)
             {
-                var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
+                return false;
+            }
+            
+            var tenantCommand = context.Command as ITenantCommand;
 
-                if (routeValues.ContainsKey("name"))
+            if (tenantCommand == null)
+            {
+                return false;
+            }
+
+            var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
+
+            if (routeValues.ContainsKey("name"))
+            {
+                var schemaName = routeValues["name"].ToString();
+
+                var id = await modelSchemaProvider.FindSchemaIdByNameAsync(tenantCommand.TenantId, schemaName);
+
+                if (!id.HasValue)
                 {
-                    var schemeName = routeValues["name"];
-
-                    aggregateCommand.AggregateId = await modelSchemaProvider.FindSchemaIdByNameAsync(schemeName.ToString());
+                    throw new DomainObjectNotFoundException(schemaName, typeof(ModelSchemaDomainObject));
                 }
+
+                aggregateCommand.AggregateId = id.Value;
             }
 
             return false;

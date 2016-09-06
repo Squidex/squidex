@@ -13,7 +13,7 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
 {
     public interface IDomainObjectRepository
     {
-        Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = 0) where TDomainObject : class, IAggregate;
+        Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = int.MaxValue) where TDomainObject : class, IAggregate;
 
         Task SaveAsync(IAggregate domainObject, Guid commitId);
     }

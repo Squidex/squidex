@@ -8,8 +8,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Microsoft.Extensions.Logging;
@@ -26,7 +26,8 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
         private readonly IEnumerable<ICatchEventConsumer> catchConsumers;
         private readonly ILogger<EventStoreBus> logger;
         private readonly IStreamPositionStorage positions;
-        private EventStoreAllCatchUpSubscription catchSubscription;
+        private EventStoreCatchUpSubscription catchSubscription;
+        private bool isLive;
 
         public EventStoreBus(
             ILogger<EventStoreBus> logger,
@@ -52,16 +53,19 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
             this.credentials = credentials;
             this.liveConsumers = liveConsumers;
             this.catchConsumers = catchConsumers;
-
-            Subscribe();
         }
 
-        private void Subscribe()
+        public void Subscribe(string streamName = "$all")
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
+            if (catchSubscription != null)
+            {
+                return;
+            }
+
             var position = positions.ReadPosition();
-
-            var now = DateTime.UtcNow;
-
+            
             logger.LogInformation($"Subscribing from: {0}", position);
 
             var settings =
@@ -70,58 +74,63 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
                     true,
                     true);
 
-            catchSubscription = connection.SubscribeToAllFrom(position, settings, (s, resolvedEvent) =>
-            {
-                var requireUpdate = false;
-
-                Debug.WriteLine($"Last Position: {catchSubscription.LastProcessedPosition}");
-                try
-                {
-                    if (resolvedEvent.OriginalEvent.EventStreamId.StartsWith("$", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return;
-                    }
-
-                    if (liveConsumers.Any() || catchConsumers.Any())
-                    {
-                        requireUpdate = true;
-
-                        var @event = formatter.Parse(resolvedEvent);
-
-                        if (resolvedEvent.Event.Created > now)
-                        {
-                            Dispatch(liveConsumers, @event);
-                        }
-
-                        Dispatch(catchConsumers, @event);
-                    }
-
-                    requireUpdate = requireUpdate || catchSubscription.LastProcessedPosition.CommitPosition % 2 == 0;
-                }
-                finally
-                {
-                    if (requireUpdate)
-                    {
-                        positions.WritePosition(catchSubscription.LastProcessedPosition);
-                    }
-                }
-            }, userCredentials: credentials);
+            catchSubscription = 
+                connection.SubscribeToStreamFrom(streamName, position, settings,
+                    OnEvent, 
+                    OnLiveProcessingStarted, 
+                    userCredentials: credentials);
         }
 
-        private void Dispatch(IEnumerable<IEventConsumer> consumers, Envelope<IEvent> @event)
+        private void OnEvent(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
         {
-            foreach (var consumer in consumers)
+            try
             {
-                try
+                if (resolvedEvent.OriginalEvent.EventStreamId.StartsWith("$", StringComparison.OrdinalIgnoreCase))
                 {
-                    consumer.On(@event);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    var eventId = new EventId(10001, "EventConsumeFailed");
 
-                    logger.LogError(eventId, ex, "'{0}' failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
+                if (!liveConsumers.Any() && !catchConsumers.Any())
+                {
+                    return;
                 }
+
+                var @event = formatter.Parse(resolvedEvent);
+
+                if (isLive)
+                {
+                    DispatchConsumers(liveConsumers, @event).Wait();
+                }
+
+                DispatchConsumers(catchConsumers, @event).Wait();
+            }
+            finally
+            {
+                positions.WritePosition(resolvedEvent.OriginalEventNumber);
+            }
+        }
+
+        private void OnLiveProcessingStarted(EventStoreCatchUpSubscription subscription)
+        {
+            isLive = true;
+        }
+
+        private Task DispatchConsumers(IEnumerable<IEventConsumer> consumers, Envelope<IEvent> @event)
+        {
+            return Task.WhenAll(consumers.Select(c => DispatchConsumer(@event, c)).ToList());
+        }
+
+        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer consumer)
+        {
+            try
+            {
+                await consumer.On(@event);
+            }
+            catch (Exception ex)
+            {
+                var eventId = new EventId(10001, "EventConsumeFailed");
+
+                logger.LogError(eventId, ex, "'{0}' failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
             }
         }
     }

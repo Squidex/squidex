@@ -54,6 +54,11 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
                     context.MarkFailed(e);
                 }
             }
+
+            if (context.Exception != null)
+            {
+                throw context.Exception;
+            }
         }
     }
 }

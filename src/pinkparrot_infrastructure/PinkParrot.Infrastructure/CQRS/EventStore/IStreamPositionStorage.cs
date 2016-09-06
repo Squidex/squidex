@@ -6,14 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using EventStore.ClientAPI;
-
 namespace PinkParrot.Infrastructure.CQRS.EventStore
 {
     public interface IStreamPositionStorage
     {
-        Position? ReadPosition();
+        int? ReadPosition();
 
-        void WritePosition(Position position);
+        void WritePosition(int position);
     }
 }

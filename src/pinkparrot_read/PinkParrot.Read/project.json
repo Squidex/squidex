@@ -2,6 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
+    "Microsoft.Extensions.Caching.Memory": "1.0.0",
     "MongoDB.Driver": "2.3.0-rc1",
     "NETStandard.Library": "1.6.0",
     "NodaTime": "2.0.0-alpha20160729",

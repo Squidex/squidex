@@ -46,9 +46,12 @@ namespace PinkParrot.Core.Schema
             get { return properties; }
         }
 
-        protected ModelField(long id) 
+        protected ModelField(long id, T properties) 
             : base(id)
         {
+            Guard.NotNull(properties, nameof(properties));
+
+            this.properties = properties;
         }
 
         public override ModelField Configure(ModelFieldProperties newProperties, IList<ValidationError> errors)

@@ -25,9 +25,10 @@ namespace PinkParrot.Configurations
 
             builder.RegisterType<ModelSchemaProvider>()
                 .As<IModelSchemaProvider>()
+                .As<ILiveEventConsumer>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoModelSchemaListRepository>()
+            builder.RegisterType<MongoModelSchemaRepository>()
                 .As<IModelSchemaRepository>()
                 .As<ICatchEventConsumer>()
                 .SingleInstance();

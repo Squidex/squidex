@@ -1,17 +1,14 @@
 ﻿// ==========================================================================
-//  ITenantEntity.cs
+//  IModelSchemaEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using System;
-
-namespace PinkParrot.Read.Models
+namespace PinkParrot.Read.Repositories
 {
-    public interface ITenantEntity
+    public interface IModelSchemaEntity : ITenantEntity
     {
-        Guid TenantId { get; set; }
+        string Name { get; }
     }
 }

@@ -19,9 +19,6 @@ namespace PinkParrot.Read.Services.Implementations
         public ObjectId Id { get; set; }
 
         [BsonElement]
-        public long CommitPosition { get; set; }
-
-        [BsonElement]
-        public long PreparePosition { get; set; }
+        public int? Position { get; set; }
     }
 }

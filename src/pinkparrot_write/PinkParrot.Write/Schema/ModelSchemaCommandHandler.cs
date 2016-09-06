@@ -18,7 +18,7 @@ namespace PinkParrot.Write.Schema
     {
         public Task<bool> HandleAsync(CommandContext context)
         {
-            return this.DispatchActionAsync(context.Command, context);
+            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
         }
 
         public Task On(AddModelField command, CommandContext context)

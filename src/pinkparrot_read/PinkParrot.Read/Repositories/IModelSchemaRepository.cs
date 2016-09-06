@@ -9,12 +9,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PinkParrot.Read.Models;
 
 namespace PinkParrot.Read.Repositories
 {
     public interface IModelSchemaRepository
     {
-        Task<List<ModelSchemaListRM>> QueryAllAsync(Guid tenantId);
+        Task<List<IModelSchemaEntity>> QueryAllAsync(Guid tenantId);
+
+        Task<Guid?> FindSchemaIdAsync(Guid tenantId, string name);
+
+        Task<EntityWithSchema> FindSchemaAsync(Guid tenantId, string name);
+
+        Task<EntityWithSchema> FindSchemaAsync(Guid schemaId);
     }
 }

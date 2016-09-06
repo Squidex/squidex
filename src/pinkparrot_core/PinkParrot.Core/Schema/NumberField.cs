@@ -27,8 +27,8 @@ namespace PinkParrot.Core.Schema
             get { return Properties.MinValue; }
         }
 
-        public NumberField(long id) 
-            : base(id)
+        public NumberField(long id, NumberFieldProperties properties) 
+            : base(id, properties)
         {
         }
 
