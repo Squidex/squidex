@@ -18,10 +18,10 @@ namespace PinkParrot.Core.Schema.Json
     public class SchemaDto
     {
         private readonly ModelSchemaProperties properties;
-        private readonly ImmutableDictionary<long, ModelFieldProperties> fields;
+        private readonly ImmutableList<FieldDto> fields;
 
         [Required]
-        public ImmutableDictionary<long, ModelFieldProperties> Fields
+        public ImmutableList<FieldDto> Fields
         {
             get { return fields; }
         }
@@ -32,7 +32,7 @@ namespace PinkParrot.Core.Schema.Json
             get { return properties; }
         }
 
-        public SchemaDto(ModelSchemaProperties properties, ImmutableDictionary<long, ModelFieldProperties> fields)
+        public SchemaDto(ModelSchemaProperties properties, ImmutableList<FieldDto> fields)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
@@ -46,7 +46,7 @@ namespace PinkParrot.Core.Schema.Json
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var fields = schema.Fields.ToDictionary(t => t.Key, t => t.Value.RawProperties).ToImmutableDictionary();
+            var fields = schema.Fields.Select(kvp => new FieldDto(kvp.Key, kvp.Value.RawProperties)).ToImmutableList();
 
             return new SchemaDto(schema.Properties, fields);
         }
@@ -59,7 +59,7 @@ namespace PinkParrot.Core.Schema.Json
 
             foreach (var field in fields)
             {
-                schema = schema.AddField(field.Key, field.Value, factory);
+                schema = schema.AddField(field.Id, field.Properties, factory);
             }
 
             return schema;

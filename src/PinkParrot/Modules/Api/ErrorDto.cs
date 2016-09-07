@@ -1,19 +1,22 @@
 ﻿// ==========================================================================
-//  EntityCreated.cs
+//  ErrorDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace PinkParrot.Modules.Api
 {
-    public class EntityCreated
+    public sealed class ErrorDto
     {
         [Required]
-        public Guid Id { get; set; }
+        public string Message { get; set; }
+
+        public string[] Details { get; set; }
+
+        public int? StatusCode { get; set; }
     }
 }

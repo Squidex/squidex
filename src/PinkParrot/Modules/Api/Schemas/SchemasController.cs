@@ -51,7 +51,6 @@ namespace PinkParrot.Modules.Api.Schemas
         /// Gets the schema with the specified name.
         /// </summary>
         /// <param name="name">The name of the schema.</param>
-        /// <response code="200">Schema returned</response>
         /// <response code="404">Schema not found</response>
         [HttpGet]
         [Route("schemas/{name}/")]
@@ -81,14 +80,14 @@ namespace PinkParrot.Modules.Api.Schemas
         [HttpPost]
         [Route("schemas/")]
         [SwaggerOperation(Tags = new[] { "Schemas" })]
-        [ProducesResponseType(typeof(EntityCreated), 201)]
+        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         public async Task<ActionResult> Create([FromBody] ModelSchemaProperties schema)
         {
             var command = new CreateModelSchema { AggregateId = Guid.NewGuid(), Properties = schema };
 
             await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction("Query", new EntityCreated { Id = command.AggregateId });
+            return CreatedAtAction("Query", new EntityCreatedDto { Id = command.AggregateId });
         }
 
         /// <summary>
