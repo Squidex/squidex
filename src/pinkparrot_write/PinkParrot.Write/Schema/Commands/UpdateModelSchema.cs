@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Schema.Commands
 {

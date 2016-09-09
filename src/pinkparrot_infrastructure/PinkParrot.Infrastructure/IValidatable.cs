@@ -1,24 +1,17 @@
 ﻿// ==========================================================================
-//  FieldDto.cs
+//  IValidatable.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace PinkParrot.Core.Schema.Json
+using System.Collections.Generic;
+
+namespace PinkParrot.Infrastructure
 {
-    public class FieldDto
+    public interface IValidatable
     {
-        public long Id { get; }
-
-        public ModelFieldProperties Properties { get; }
-
-        public FieldDto(long id, ModelFieldProperties properties)
-        {
-            Id = id;
-
-            Properties = properties;
-        }
+        void Validate(IList<ValidationError> errors);
     }
 }

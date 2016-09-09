@@ -48,17 +48,19 @@ namespace PinkParrot.Core.Schema
                 errors.Add(new ValidationError("MinValue cannot be larger than max value", "MinValue", "MaxValue"));
             }
 
-            if (DefaultValue.HasValue)
+            if (!DefaultValue.HasValue)
             {
-                if (MinValue.HasValue && DefaultValue.Value < MinValue.Value)
-                {
-                    errors.Add(new ValidationError("DefaultValue must be larger than the min value.", "DefaultValue"));
-                }
+                return;
+            }
 
-                if (MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
-                {
-                    errors.Add(new ValidationError("DefaultValue must be smaller than the max value.", "DefaultValue"));
-                }
+            if (MinValue.HasValue && DefaultValue.Value < MinValue.Value)
+            {
+                errors.Add(new ValidationError("DefaultValue must be larger than the min value.", "DefaultValue"));
+            }
+
+            if (MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
+            {
+                errors.Add(new ValidationError("DefaultValue must be smaller than the max value.", "DefaultValue"));
             }
         }
     }

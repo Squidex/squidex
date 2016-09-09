@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schema
@@ -28,7 +27,7 @@ namespace PinkParrot.Core.Schema
 
         public override string Label
         {
-            get { return properties.Label; }
+            get { return properties.Label ?? properties.Name; }
         }
 
         public override string Hints
@@ -54,10 +53,9 @@ namespace PinkParrot.Core.Schema
             this.properties = properties;
         }
 
-        public override ModelField Configure(ModelFieldProperties newProperties, IList<ValidationError> errors)
+        public override ModelField Configure(ModelFieldProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
-            Guard.NotNull(errors, nameof(errors));
 
             var typedProperties = newProperties as T;
 
@@ -65,8 +63,6 @@ namespace PinkParrot.Core.Schema
             {
                 throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
             }
-
-            newProperties.Validate(errors);
 
             return Update<ModelField<T>>(clone => clone.properties = typedProperties);
         }

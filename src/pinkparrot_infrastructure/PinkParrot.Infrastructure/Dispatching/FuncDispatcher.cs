@@ -26,7 +26,7 @@ namespace PinkParrot.Infrastructure.Dispatching
                     .Where(Helper.HasRightParameters<TIn>)
                     .Where(Helper.HasRightReturnType<TOut>)
                     .Select(FuncDispatcherFactory.CreateFuncHandler<TTarget, TOut>)
-                    .ToDictionary<Tuple<Type, Func<TTarget, object, TOut>>, Type, Func<TTarget, object, TOut>>(h => h.Item1, h => h.Item2);
+                    .ToDictionary(h => h.Item1, h => h.Item2);
         }
 
         public static TOut Dispatch(TTarget target, TIn item)

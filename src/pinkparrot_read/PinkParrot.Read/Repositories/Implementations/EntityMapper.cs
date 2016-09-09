@@ -76,10 +76,9 @@ namespace PinkParrot.Read.Repositories.Implementations
             }
 
             Update(entity, headers);
-
             updater(entity);
 
-            var result = await collection.ReplaceOneAsync(t => t.Id == entity.Id, entity);
+            await collection.ReplaceOneAsync(t => t.Id == entity.Id, entity);
         }
     }
 }

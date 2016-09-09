@@ -54,7 +54,7 @@ namespace PinkParrot.Core.Schema
             this.id = id;
         }
 
-        public abstract ModelField Configure(ModelFieldProperties newProperties, IList<ValidationError> errors);
+        public abstract ModelField Configure(ModelFieldProperties newProperties);
 
         public Task ValidateAsync(PropertyValue property, ICollection<string> errors)
         {

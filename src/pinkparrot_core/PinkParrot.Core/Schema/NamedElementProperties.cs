@@ -7,18 +7,16 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schema
 {
-    public abstract class NamedElementProperties
+    public abstract class NamedElementProperties : IValidatable
     {
         private readonly string name;
         private readonly string label;
         private readonly string hints;
-
-        [Required]
+        
         public string Name
         {
             get { return name; }
@@ -26,7 +24,7 @@ namespace PinkParrot.Core.Schema
 
         public string Label
         {
-            get { return string.IsNullOrWhiteSpace(label) ? name : label; }
+            get { return label; }
         }
 
         public string Hints

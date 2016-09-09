@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using PinkParrot.Core.Schema;
@@ -21,24 +20,23 @@ using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.Dispatching;
 using PinkParrot.Infrastructure.MongoDb;
-using PinkParrot.Infrastructure.Tasks;
 
 namespace PinkParrot.Read.Repositories.Implementations
 {
     public sealed class MongoModelSchemaRepository : MongoRepositoryBase<MongoModelSchemaEntity>, IModelSchemaRepository, ICatchEventConsumer
     {
         private readonly JsonSerializerSettings serializerSettings;
-        private readonly ModelFieldFactory fieldFactory;
+        private readonly ModelFieldFactory factory;
 
-        public MongoModelSchemaRepository(IMongoDatabase database, JsonSerializerSettings serializerSettings, ModelFieldFactory fieldFactory)
+        public MongoModelSchemaRepository(IMongoDatabase database, JsonSerializerSettings serializerSettings, ModelFieldFactory factory)
             : base(database)
         {
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
-            Guard.NotNull(fieldFactory, nameof(fieldFactory));
+            Guard.NotNull(factory, nameof(factory));
 
             this.serializerSettings = serializerSettings;
 
-            this.fieldFactory = fieldFactory;
+            this.factory = factory;
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoModelSchemaEntity> collection)
@@ -87,7 +85,7 @@ namespace PinkParrot.Read.Repositories.Implementations
 
         public Task On(ModelFieldAdded @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.AddField(@event.FieldId, @event.Properties, fieldFactory));
+            return UpdateSchema(headers, s => s.AddField(@event.FieldId, @event.Properties, factory));
         }
 
         public Task On(ModelFieldDeleted @event, EnvelopeHeaders headers)
@@ -124,7 +122,10 @@ namespace PinkParrot.Read.Repositories.Implementations
         {
             return Collection.UpdateAsync(headers, e =>
             {
-                e.Name = @event.Properties.Name;
+                if (!string.IsNullOrWhiteSpace(@event.Properties.Name))
+                {
+                    e.Name = @event.Properties.Name;
+                }
 
                 UpdateSchema(e, s => s.Update(@event.Properties));
             });
@@ -166,7 +167,7 @@ namespace PinkParrot.Read.Repositories.Implementations
 
         private ModelSchema Deserialize(MongoModelSchemaEntity entity)
         {
-            return entity?.Schema.ToJsonObject<SchemaDto>(serializerSettings).ToModelSchema(fieldFactory);
+            return entity?.Schema.ToJsonObject<SchemaDto>(serializerSettings).ToModelSchema(factory);
         }
     }
 }

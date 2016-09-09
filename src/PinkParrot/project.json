@@ -26,8 +26,7 @@
     "PinkParrot.Events": "1.0.0-*",
     "PinkParrot.Infrastructure": "1.0.0-*",
     "PinkParrot.Read": "1.0.0-*",
-    "PinkParrot.Write": "1.0.0-*",
-    "Swashbuckle": "6.0.0-beta902"
+    "PinkParrot.Write": "1.0.0-*"
   },
 
   "tools": {

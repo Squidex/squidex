@@ -26,7 +26,7 @@ namespace PinkParrot.Read.Services.Implementations
 
         public int? ReadPosition()
         {
-            var document = Collection.Find(t => t.Id == Id).FirstOrDefault<MongoPosition, MongoPosition>();
+            var document = Collection.Find(t => t.Id == Id).FirstOrDefault();
 
             if (document == null)
             {

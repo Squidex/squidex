@@ -26,7 +26,6 @@ namespace PinkParrot
             services.AddMvc().AddAppSerializers();
             services.AddRouting();
             services.AddMemoryCache();
-            services.AddAppSwagger();
             services.AddEventFormatter();
 
             var builder = new ContainerBuilder();
@@ -42,16 +41,15 @@ namespace PinkParrot
         {
             loggerFactory.AddConsole();
 
-            app.UseAppTenants();
-            app.UseMvc();
-            app.UseStaticFiles();
-            app.UseAppSwagger();
-            app.UseAppEventBus();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAppTenants();
+            app.UseMvc();
+            app.UseStaticFiles();
+            app.UseAppEventBus();
         }
     }
 }

@@ -7,8 +7,6 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using PinkParrot.Infrastructure;
 
 // ReSharper disable LoopCanBeConvertedToQuery
@@ -18,21 +16,19 @@ namespace PinkParrot.Core.Schema.Json
     public class SchemaDto
     {
         private readonly ModelSchemaProperties properties;
-        private readonly ImmutableList<FieldDto> fields;
-
-        [Required]
-        public ImmutableList<FieldDto> Fields
+        private readonly ImmutableDictionary<long, ModelFieldProperties> fields;
+        
+        public ImmutableDictionary<long, ModelFieldProperties> Fields
         {
             get { return fields; }
         }
 
-        [Required]
         public ModelSchemaProperties Properties
         {
             get { return properties; }
         }
 
-        public SchemaDto(ModelSchemaProperties properties, ImmutableList<FieldDto> fields)
+        public SchemaDto(ModelSchemaProperties properties, ImmutableDictionary<long, ModelFieldProperties> fields)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
@@ -46,7 +42,7 @@ namespace PinkParrot.Core.Schema.Json
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var fields = schema.Fields.Select(kvp => new FieldDto(kvp.Key, kvp.Value.RawProperties)).ToImmutableList();
+            var fields = schema.Fields.ToImmutableDictionary(x => x.Key, x => x.Value.RawProperties);
 
             return new SchemaDto(schema.Properties, fields);
         }
@@ -59,7 +55,7 @@ namespace PinkParrot.Core.Schema.Json
 
             foreach (var field in fields)
             {
-                schema = schema.AddField(field.Id, field.Properties, factory);
+                schema = schema.AddField(field.Key, field.Value, factory);
             }
 
             return schema;

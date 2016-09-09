@@ -32,22 +32,6 @@ namespace PinkParrot.Core.Schema
             fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static ModelSchema Create(ModelSchemaProperties properties)
-        {
-            Guard.NotNull(properties, nameof(properties));
-
-            var errors = new List<ValidationError>();
-
-            properties.Validate(errors);
-
-            if (errors.Any())
-            {
-                throw new ValidationException("Failed to create a new model schema.", errors);
-            }
-
-            return new ModelSchema(properties, ImmutableDictionary<long, ModelField>.Empty);
-        }
-
         public ImmutableDictionary<long, ModelField> Fields
         {
             get { return fieldsById; }
@@ -58,11 +42,22 @@ namespace PinkParrot.Core.Schema
             get { return properties; }
         }
 
-        public ModelSchema Update(ModelSchemaProperties newMetadata)
+        public static ModelSchema Create(ModelSchemaProperties newProperties)
         {
-            Guard.NotNull(newMetadata, nameof(newMetadata));
+            Guard.NotNull(newProperties, nameof(newProperties));
 
-            return new ModelSchema(newMetadata, fieldsById);
+            newProperties.Validate(() => "Failed to create a new model schema.");
+
+            return new ModelSchema(newProperties, ImmutableDictionary<long, ModelField>.Empty);
+        }
+
+        public ModelSchema Update(ModelSchemaProperties newProperties)
+        {
+            Guard.NotNull(newProperties, nameof(newProperties));
+
+            newProperties.Validate(() => "Failed to update the model schema.");
+
+            return new ModelSchema(newProperties, fieldsById);
         }
 
         public ModelSchema AddField(long id, ModelFieldProperties fieldProperties, ModelFieldFactory factory)
@@ -78,14 +73,9 @@ namespace PinkParrot.Core.Schema
 
             return UpdateField(fieldId, field =>
             {
-                var errors = new List<ValidationError>();
+                fieldProperties.Validate(() => $"Cannot update field with id '{fieldId}', becase the settings are invalid.");
 
-                var newField = field.Configure(fieldProperties, errors);
-
-                if (errors.Any())
-                {
-                    throw new ValidationException($"Cannot update field with id '{fieldId}', becase the settings are invalid.", errors);
-                }
+                var newField = field.Configure(fieldProperties);
 
                 return newField;
             });
@@ -142,11 +132,10 @@ namespace PinkParrot.Core.Schema
             return new ModelSchema(properties, fieldsById.SetItem(field.Id, field));
         }
 
-        public async Task ValidateAsync(PropertiesBag data)
+        public async Task ValidateAsync(PropertiesBag data, IList<ValidationError> errors)
         {
             Guard.NotNull(data, nameof(data));
-
-            var errors = new List<ValidationError>();
+            Guard.NotNull(errors, nameof(errors));
 
             foreach (var kvp in data.Properties)
             {
@@ -156,21 +145,14 @@ namespace PinkParrot.Core.Schema
 
                 if (fieldsByName.TryGetValue(kvp.Key, out field))
                 {
-                    var newErrors = new List<string>();
-
-                    await field.ValidateAsync(kvp.Value, newErrors);
+                    await field.ValidateAsync(kvp.Value, fieldErrors);
                 }
                 else
                 {
                     fieldErrors.Add($"'{kvp.Key}' is not a known field");
                 }
 
-                errors.AddRange(fieldErrors.Select(x => new ValidationError(x, kvp.Key)));
-            }
-
-            if (errors.Any())
-            {
-                throw new ValidationException("The data is not valid.", errors);
+                fieldErrors.ForEach(error => errors.Add(new ValidationError(error, kvp.Key)));
             }
         }
     }

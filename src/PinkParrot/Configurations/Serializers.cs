@@ -23,6 +23,7 @@ namespace PinkParrot.Configurations
             settings.Binder = new TypeNameSerializationBinder().Map(typeof(ModelSchema).GetTypeInfo().Assembly);
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Converters.Add(new PropertiesBagConverter());
+            settings.NullValueHandling = NullValueHandling.Ignore;
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             settings.DateParseHandling = DateParseHandling.DateTime;
             settings.TypeNameHandling = TypeNameHandling.Auto;

@@ -11,9 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Write.Schema.Commands;
-using Swashbuckle.SwaggerGen.Annotations;
-
-#pragma warning disable 1584,1711,1572,1573,1581,1580
 
 namespace PinkParrot.Modules.Api.Schemas
 {
@@ -23,15 +20,9 @@ namespace PinkParrot.Modules.Api.Schemas
             : base(commandBus)
         {
         }
-
-        /// <summary>
-        /// Adds a new field to the schema with the specified name.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="command">The field properties</param>
+        
         [HttpPost]
-        [Route("schemas/{name}/fields/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
+        [Route("api/schemas/{name}/fields/")]
         public Task Add(string name, [FromBody] ModelFieldProperties field)
         {
             var command = new AddModelField { Properties = field };
@@ -39,83 +30,57 @@ namespace PinkParrot.Modules.Api.Schemas
             return CommandBus.PublishAsync(command);
         }
 
-        /// <summary>
-        /// Uüdates the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
-        /// <param name="command">The field properties</param>
         [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Update(string name, long fieldId, [FromBody] UpdateModelField command)
+        [Route("api/schemas/{name}/fields/{fieldId:long}/")]
+        public Task Update(string name, long fieldId, [FromBody] ModelFieldProperties properties)
         {
+            var command = new UpdateModelField { FieldId = fieldId, Properties = properties };
+
             return CommandBus.PublishAsync(command);
         }
 
-        /// <summary>
-        /// Hides the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
         [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/hide/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Hide(string name, long fieldId, HideModelField command)
+        [Route("api/schemas/{name}/fields/{fieldId:long}/hide/")]
+        public Task Hide(string name, long fieldId)
         {
+            var command = new HideModelField { FieldId = fieldId };
+
             return CommandBus.PublishAsync(command);
         }
 
-        /// <summary>
-        /// Sows the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
         [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/show/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Show(string name, long fieldId, ShowModelField command)
+        [Route("api/schemas/{name}/fields/{fieldId:long}/show/")]
+        public Task Show(string name, long fieldId)
         {
+            var command = new ShowModelField { FieldId = fieldId };
+
+            return CommandBus.PublishAsync(command);
+        }
+        
+        [HttpPut]
+        [Route("api/schemas/{name}/fields/{fieldId:long}/enable/")]
+        public Task Enable(string name, long fieldId)
+        {
+            var command = new EnableModelField { FieldId = fieldId };
+
+            return CommandBus.PublishAsync(command);
+        }
+        
+        [HttpPut]
+        [Route("api/schemas/{name}/fields/{fieldId:long}/disable/")]
+        public Task Disable(string name, long fieldId)
+        {
+            var command = new DisableModelField { FieldId = fieldId };
+
             return CommandBus.PublishAsync(command);
         }
 
-        /// <summary>
-        /// Enables the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
-        [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/enable/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Enable(string name, long fieldId, EnableModelField command)
-        {
-            return CommandBus.PublishAsync(command);
-        }
-
-        /// <summary>
-        /// Disables the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
-        [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/disable/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Disable(string name, long fieldId, DisableModelField command)
-        {
-            return CommandBus.PublishAsync(command);
-        }
-
-
-        /// <summary>
-        /// Deletes the field with the specified schema name and field id.
-        /// </summary>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="fieldId">The id of the field.</param>
         [HttpDelete]
-        [Route("schemas/{name}/fields/{fieldId:long}/")]
-        [SwaggerOperation(Tags = new[] { "Schemas" })]
-        public Task Delete(string name, long fieldId, DeleteModelField command)
+        [Route("api/schemas/{name}/fields/{fieldId:long}/")]
+        public Task Delete(string name, long fieldId)
         {
+            var command = new DeleteModelField { FieldId = fieldId };
+
             return CommandBus.PublishAsync(command);
         }
     }
