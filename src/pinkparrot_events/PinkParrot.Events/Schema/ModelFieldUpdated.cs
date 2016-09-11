@@ -7,13 +7,15 @@
 // ==========================================================================
 
 using PinkParrot.Core.Schema;
+using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Events.Schema
 {
+    [TypeName("ModelFieldUpdatedEvent")]
     public class ModelFieldUpdated : TenantEvent
     {
         public long FieldId;
 
-        public ModelFieldProperties Properties;
+        public IModelFieldProperties Properties;
     }
 }

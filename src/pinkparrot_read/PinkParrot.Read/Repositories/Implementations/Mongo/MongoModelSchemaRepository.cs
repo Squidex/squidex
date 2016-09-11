@@ -13,30 +13,29 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using PinkParrot.Core.Schema;
-using PinkParrot.Core.Schema.Json;
 using PinkParrot.Events.Schema;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.Dispatching;
 using PinkParrot.Infrastructure.MongoDb;
+using PinkParrot.Read.Models;
 
-namespace PinkParrot.Read.Repositories.Implementations
+namespace PinkParrot.Read.Repositories.Implementations.Mongo
 {
     public sealed class MongoModelSchemaRepository : MongoRepositoryBase<MongoModelSchemaEntity>, IModelSchemaRepository, ICatchEventConsumer
     {
         private readonly JsonSerializerSettings serializerSettings;
-        private readonly ModelFieldFactory factory;
+        private readonly ModelFieldRegistry fieldRegistry;
 
-        public MongoModelSchemaRepository(IMongoDatabase database, JsonSerializerSettings serializerSettings, ModelFieldFactory factory)
+        public MongoModelSchemaRepository(IMongoDatabase database, JsonSerializerSettings serializerSettings, ModelFieldRegistry fieldRegistry)
             : base(database)
         {
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
 
             this.serializerSettings = serializerSettings;
-
-            this.factory = factory;
+            this.fieldRegistry = fieldRegistry;
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoModelSchemaEntity> collection)
@@ -83,11 +82,6 @@ namespace PinkParrot.Read.Repositories.Implementations
             return Collection.UpdateAsync(headers, e => e.IsDeleted = true);
         }
 
-        public Task On(ModelFieldAdded @event, EnvelopeHeaders headers)
-        {
-            return UpdateSchema(headers, s => s.AddField(@event.FieldId, @event.Properties, factory));
-        }
-
         public Task On(ModelFieldDeleted @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.DeleteField(@event.FieldId));
@@ -115,29 +109,28 @@ namespace PinkParrot.Read.Repositories.Implementations
 
         public Task On(ModelFieldUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.SetField(@event.FieldId, @event.Properties));
+            return UpdateSchema(headers, s => s.UpdateField(@event.FieldId, @event.Properties));
         }
 
         public Task On(ModelSchemaUpdated @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, e =>
-            {
-                if (!string.IsNullOrWhiteSpace(@event.Properties.Name))
-                {
-                    e.Name = @event.Properties.Name;
-                }
+            return UpdateSchema(headers, s => s.Update(@event.Properties));
+        }
 
-                UpdateSchema(e, s => s.Update(@event.Properties));
-            });
+        public Task On(ModelFieldAdded @event, EnvelopeHeaders headers)
+        {
+            var field = fieldRegistry.CreateField(@event.FieldId, @event.Name, @event.Properties);
+
+            return UpdateSchema(headers, s => s.AddOrUpdateField(field));
         }
 
         public Task On(ModelSchemaCreated @event, EnvelopeHeaders headers)
         {
             return Collection.CreateAsync(headers, e =>
             {
-                e.Name = @event.Properties.Name;
+                e.Name = @event.Name;
 
-                Serialize(e, ModelSchema.Create(@event.Properties));
+                Serialize(e, ModelSchema.Create(@event.Name, @event.Properties));
             });
         }
 
@@ -162,12 +155,16 @@ namespace PinkParrot.Read.Repositories.Implementations
 
         private void Serialize(MongoModelSchemaEntity entity, ModelSchema schema)
         {
-            entity.Schema = SchemaDto.Create(schema).ToJsonBsonDocument(serializerSettings);
+            var dto = ModelSchemaDto.Create(schema);
+
+            entity.Schema = dto.ToJsonBsonDocument(serializerSettings);
         }
 
         private ModelSchema Deserialize(MongoModelSchemaEntity entity)
         {
-            return entity?.Schema.ToJsonObject<SchemaDto>(serializerSettings).ToModelSchema(factory);
+            var dto = entity?.Schema.ToJsonObject<ModelSchemaDto>(serializerSettings);
+
+            return dto?.ToSchema(fieldRegistry);
         }
     }
 }

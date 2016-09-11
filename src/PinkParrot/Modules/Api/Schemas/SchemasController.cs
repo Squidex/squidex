@@ -50,7 +50,7 @@ namespace PinkParrot.Modules.Api.Schemas
                 return NotFound();
             }
 
-            return Ok(SchemaDto.Create(entity.Schema));
+            return Ok(ModelSchemaDto.Create(entity.Schema));
         }
 
         [HttpPost]

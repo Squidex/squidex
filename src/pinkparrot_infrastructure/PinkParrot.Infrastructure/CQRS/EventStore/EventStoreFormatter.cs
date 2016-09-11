@@ -30,7 +30,7 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
         {
             var headers = ReadJson<PropertiesBag>(@event.Event.Metadata);
 
-            var eventType = Type.GetType(headers.Properties[CommonHeaders.EventType].ToString());
+            var eventType = TypeNameRegistry.GetType(@event.Event.EventType);
             var eventData = ReadJson<IEvent>(@event.Event.Data, eventType);
 
             var envelope = new Envelope<IEvent>(eventData, headers);
@@ -43,15 +43,14 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 
         public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId)
         {
-            var eventType = envelope.Payload.GetType();
+            var eventType = TypeNameRegistry.GetName(envelope.Payload.GetType());
 
             envelope.Headers.Set(CommonHeaders.CommitId, commitId);
-            envelope.Headers.Set(CommonHeaders.EventType, eventType.AssemblyQualifiedName);
 
             var headers = WriteJson(envelope.Headers);
             var content = WriteJson(envelope.Payload);
 
-            return new EventData(envelope.Headers.EventId(), eventType.Name, true, content, headers);
+            return new EventData(envelope.Headers.EventId(), eventType, true, content, headers);
         }
 
         private T ReadJson<T>(byte[] data, Type type = null)

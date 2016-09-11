@@ -10,6 +10,6 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class ShowModelField : TenantCommand
     {
-        public long FieldId { get; set; }
+        public long FieldId;
     }
 }

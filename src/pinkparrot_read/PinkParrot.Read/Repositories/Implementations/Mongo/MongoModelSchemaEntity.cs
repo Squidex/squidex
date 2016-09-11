@@ -10,7 +10,7 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace PinkParrot.Read.Repositories.Implementations
+namespace PinkParrot.Read.Repositories.Implementations.Mongo
 {
     public sealed class MongoModelSchemaEntity : IModelSchemaEntity
     {

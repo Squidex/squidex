@@ -13,7 +13,7 @@ using PinkParrot.Infrastructure.MongoDb;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Read.Services.Implementations
+namespace PinkParrot.Read.Repositories.Implementations.Mongo
 {
     public sealed class MongoStreamPositionsStorage : MongoRepositoryBase<MongoPosition>, IStreamPositionStorage
     {

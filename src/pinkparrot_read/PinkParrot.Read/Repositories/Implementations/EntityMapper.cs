@@ -36,14 +36,14 @@ namespace PinkParrot.Read.Repositories.Implementations
 
         public static BsonDocument ToJsonBsonDocument<T>(this T value, JsonSerializerSettings settings)
         {
-            var json = JsonConvert.SerializeObject(value, settings).Replace("$type", "§type");
+            var json = JsonConvert.SerializeObject(value, settings);
 
             return BsonDocument.Parse(json);
         }
 
         public static T ToJsonObject<T>(this BsonDocument document, JsonSerializerSettings settings)
         {
-            var json = document.ToJson().Replace("§type", "$type");
+            var json = document.ToJson();
 
             return JsonConvert.DeserializeObject<T>(json, settings);
         }

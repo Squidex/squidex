@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PinkParrot.Core.Schema;
+using PinkParrot.Core.Schema.Json;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Infrastructure.Json;
 
@@ -38,10 +39,8 @@ namespace PinkParrot.Configurations
 
         public static void AddEventFormatter(this IServiceCollection services)
         {
-            var fieldFactory = new ModelFieldFactory();
-
             services.AddSingleton(t => CreateSettings());
-            services.AddSingleton(fieldFactory);
+            services.AddSingleton<SerializationService>();
             services.AddSingleton<EventStoreFormatter>();
         }
 

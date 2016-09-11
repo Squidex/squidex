@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ModelFieldDisabled.cs
+//  IModelFieldProperties.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -8,11 +8,9 @@
 
 using PinkParrot.Infrastructure;
 
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Core.Schema
 {
-    [TypeName("ModelFieldDisabledEvent")]
-    public class ModelFieldDisabled : TenantEvent
+    public interface IModelFieldProperties : IValidatable
     {
-        public long FieldId;
     }
 }

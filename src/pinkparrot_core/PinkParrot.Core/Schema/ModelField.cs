@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.Tasks;
 
+// ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 
 namespace PinkParrot.Core.Schema
@@ -19,6 +20,7 @@ namespace PinkParrot.Core.Schema
     public abstract class ModelField
     {
         private readonly long id;
+        private string name;
         private bool isDisabled;
         private bool isHidden;
 
@@ -27,15 +29,10 @@ namespace PinkParrot.Core.Schema
             get { return id; }
         }
 
-        public abstract ModelFieldProperties RawProperties { get; }
-
-        public abstract string Name { get; }
-
-        public abstract string Label { get; }
-
-        public abstract string Hints { get; }
-
-        public abstract bool IsRequired { get; }
+        public string Name
+        {
+            get { return name; }
+        }
 
         public bool IsHidden
         {
@@ -47,14 +44,25 @@ namespace PinkParrot.Core.Schema
             get { return isDisabled; }
         }
 
-        protected ModelField(long id)
+        public abstract IModelFieldProperties RawProperties { get; }
+        
+        public abstract string Label { get; }
+
+        public abstract string Hints { get; }
+
+        public abstract bool IsRequired { get; }
+
+        protected ModelField(long id, string name)
         {
             Guard.GreaterThan(id, 0, nameof(id));
+            Guard.ValidSlug(name, nameof(name));
 
             this.id = id;
+
+            this.name = name;
         }
 
-        public abstract ModelField Configure(ModelFieldProperties newProperties);
+        public abstract ModelField Update(IModelFieldProperties newProperties);
 
         public Task ValidateAsync(PropertyValue property, ICollection<string> errors)
         {
@@ -96,6 +104,18 @@ namespace PinkParrot.Core.Schema
         public ModelField Enable()
         {
             return Update<ModelField>(clone => clone.isDisabled = false);
+        }
+
+        public ModelField Rename(string newName)
+        {
+            if (!newName.IsSlug())
+            {
+                var error = new ValidationError("Name must be a valid slug", "Name");
+
+                throw new ValidationException($"Cannot rename the field '{name}' ({id})", error);
+            }
+
+            return Update<ModelField>(clone => clone.name = newName);
         }
 
         protected T Update<T>(Action<T> updater) where T : ModelField

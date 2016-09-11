@@ -17,10 +17,10 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
         private readonly ICommand command;
         private Exception exception;
         private bool isSucceeded;
-
-        public ICommand Command
+        
+        public IDomainObjectRepository Repository
         {
-            get { return command; }
+            get { return repository; }
         }
 
         public IDomainObjectFactory Factory
@@ -28,9 +28,9 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
             get { return factory; }
         }
 
-        public IDomainObjectRepository Repository
+        public ICommand Command
         {
-            get { return repository; }
+            get { return command; }
         }
 
         public bool IsHandled

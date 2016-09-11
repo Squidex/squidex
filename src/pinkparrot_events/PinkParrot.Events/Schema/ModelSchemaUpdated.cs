@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using PinkParrot.Core.Schema;
+using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Events.Schema
 {
+    [TypeName("ModelSchemaUpdated")]
     public class ModelSchemaUpdated : TenantEvent
     {
         public ModelSchemaProperties Properties;

@@ -7,46 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Newtonsoft.Json.Serialization;
 
 namespace PinkParrot.Infrastructure.Json
 {
     public class TypeNameSerializationBinder : DefaultSerializationBinder
     {
-        private readonly Dictionary<Type, string> namesByType = new Dictionary<Type, string>();
-        private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-
-        public TypeNameSerializationBinder Map(Type type, string name)
-        {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(name, nameof(name));
-
-            namesByType.Add(type, name);
-            typesByName.Add(name, type);
-
-            return this;
-        }
-
-        public TypeNameSerializationBinder Map(Assembly assembly)
-        {
-            foreach (var type in assembly.GetTypes())
-            {
-                var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
-
-                if (!string.IsNullOrWhiteSpace(typeNameAttribute?.TypeName))
-                {
-                    Map(type, typeNameAttribute.TypeName);
-                }
-            }
-
-            return this;
-        }
-
         public override Type BindToType(string assemblyName, string typeName)
         {
-            var type = typesByName.GetOrDefault(typeName);
+            var type = TypeNameRegistry.GetType(typeName);
 
             return type ?? base.BindToType(assemblyName, typeName);
         }
@@ -55,7 +24,7 @@ namespace PinkParrot.Infrastructure.Json
         {
             assemblyName = null;
 
-            var name = namesByType.GetOrDefault(serializedType);
+            var name = TypeNameRegistry.GetName(serializedType);
 
             if (name != null)
             {

@@ -11,24 +11,18 @@ using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schema
 {
-    public abstract class ModelFieldProperties : NamedElementProperties
+    public abstract class ModelFieldProperties : NamedElementProperties, IModelFieldProperties
     {
         public bool IsRequired { get; }
 
-        protected ModelFieldProperties(
-            bool isRequired, 
-            string name, 
-            string label, 
-            string hints)
-            : base(name, label, hints)
+        protected ModelFieldProperties(string label,  string hints, bool isRequired)
+            : base(label, hints)
         {
             IsRequired = isRequired;
         }
 
-        public override void Validate(IList<ValidationError> errors)
-        {       
-            base.Validate(errors);
-
+        public void Validate(IList<ValidationError> errors)
+        {
             ValidateCore(errors);
         }
 

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.Tasks;
@@ -27,8 +28,13 @@ namespace PinkParrot.Core.Schema
             get { return Properties.MinValue; }
         }
 
-        public NumberField(long id, NumberFieldProperties properties) 
-            : base(id, properties)
+        public double[] AllowedValues
+        {
+            get { return Properties.AllowedValues; }
+        }
+
+        public NumberField(long id, string name, NumberFieldProperties properties) 
+            : base(id, name, properties)
         {
         }
 
@@ -46,6 +52,11 @@ namespace PinkParrot.Core.Schema
                 if (MaxValue.HasValue && value > MaxValue.Value)
                 {
                     errors.Add($"Must be less than {MaxValue}");
+                }
+
+                if (AllowedValues != null && !AllowedValues.Contains(value))
+                {
+                    errors.Add($"Can only be one of the following value: {string.Join(", ", AllowedValues)}");
                 }
             }
             catch (InvalidCastException)

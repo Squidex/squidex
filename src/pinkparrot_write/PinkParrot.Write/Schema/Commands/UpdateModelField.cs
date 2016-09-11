@@ -6,14 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
+using Newtonsoft.Json.Linq;
 
 namespace PinkParrot.Write.Schema.Commands
 {
     public class UpdateModelField : TenantCommand
     {
-        public long FieldId { get; set; }
+        public long FieldId;
 
-        public ModelFieldProperties Properties { get; set; }
+        public JToken Properties { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace PinkParrot.Read.Services.Implementations
+namespace PinkParrot.Read.Repositories.Implementations.Mongo
 {
     [DataContract]
     public class MongoPosition

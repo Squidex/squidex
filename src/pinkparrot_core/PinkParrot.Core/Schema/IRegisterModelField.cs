@@ -1,18 +1,19 @@
 ﻿// ==========================================================================
-//  ModelFieldDisabled.cs
+//  IRegisterModelField.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using System;
 
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Core.Schema
 {
-    [TypeName("ModelFieldDisabledEvent")]
-    public class ModelFieldDisabled : TenantEvent
+    public interface IRegisterModelField
     {
-        public long FieldId;
+        Type PropertiesType { get; }
+
+        ModelField CreateField(long id, string name, IModelFieldProperties properties);
     }
 }

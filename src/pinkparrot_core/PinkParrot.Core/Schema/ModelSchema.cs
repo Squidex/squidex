@@ -12,24 +12,20 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using PinkParrot.Infrastructure;
+// ReSharper disable InvertIf
 
 namespace PinkParrot.Core.Schema
 {
     public sealed class ModelSchema
     {
+        private readonly string name;
         private readonly ModelSchemaProperties properties;
         private readonly ImmutableDictionary<long, ModelField> fieldsById;
         private readonly Dictionary<string, ModelField> fieldsByName;
 
-        public ModelSchema(ModelSchemaProperties properties, ImmutableDictionary<long, ModelField> fields)
+        public string Name
         {
-            Guard.NotNull(fields, nameof(fields));
-            Guard.NotNull(properties, nameof(properties));
-            
-            this.properties = properties;
-
-            fieldsById = fields;
-            fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+            get { return name; }
         }
 
         public ImmutableDictionary<long, ModelField> Fields
@@ -42,43 +38,56 @@ namespace PinkParrot.Core.Schema
             get { return properties; }
         }
 
-        public static ModelSchema Create(ModelSchemaProperties newProperties)
+        public ModelSchema(string name, ModelSchemaProperties properties, ImmutableDictionary<long, ModelField> fields)
+        {
+            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(properties, nameof(properties));
+            Guard.ValidSlug(name, nameof(name));
+
+            this.name = name;
+
+            this.properties = properties;
+
+            fieldsById = fields;
+            fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public static ModelSchema Create(string name, ModelSchemaProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
 
-            newProperties.Validate(() => "Failed to create a new model schema.");
+            if (!name.IsSlug())
+            {
+                var error = new ValidationError("Name must be a valid slug", "Name");
 
-            return new ModelSchema(newProperties, ImmutableDictionary<long, ModelField>.Empty);
+                throw new ValidationException($"Cannot rename the schema '{name}'", error);
+            }
+
+            return new ModelSchema(name, newProperties, ImmutableDictionary<long, ModelField>.Empty);
         }
 
         public ModelSchema Update(ModelSchemaProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
 
-            newProperties.Validate(() => "Failed to update the model schema.");
-
-            return new ModelSchema(newProperties, fieldsById);
+            return new ModelSchema(name, newProperties, fieldsById);
         }
 
-        public ModelSchema AddField(long id, ModelFieldProperties fieldProperties, ModelFieldFactory factory)
+        public ModelSchema AddOrUpdateField(ModelField field)
         {
-            var field = factory.CreateField(id, fieldProperties);
+            Guard.NotNull(field, nameof(field));
 
-            return ReplaceOrAddField(field);
-        }
-
-        public ModelSchema SetField(long fieldId, ModelFieldProperties fieldProperties)
-        {
-            Guard.NotNull(fieldProperties, nameof(fieldProperties));
-
-            return UpdateField(fieldId, field =>
+            if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
             {
-                fieldProperties.Validate(() => $"Cannot update field with id '{fieldId}', becase the settings are invalid.");
+                throw new ValidationException($"A field with name '{field.Name}' already exists.");
+            }
 
-                var newField = field.Configure(fieldProperties);
+            return new ModelSchema(name, properties, fieldsById.SetItem(field.Id, field));
+        }
 
-                return newField;
-            });
+        public ModelSchema UpdateField(long fieldId, IModelFieldProperties newProperties)
+        {
+            return UpdateField(fieldId, field => field.Update(newProperties));
         }
 
         public ModelSchema DisableField(long fieldId)
@@ -101,13 +110,20 @@ namespace PinkParrot.Core.Schema
             return UpdateField(fieldId, field => field.Show());
         }
 
-        public ModelSchema DeleteField(long fieldId)
+        public ModelSchema RenameField(long fieldId, string newName)
         {
-            return new ModelSchema(properties, fieldsById.Remove(fieldId));
+            return UpdateField(fieldId, field => field.Rename(newName));
         }
 
-        private ModelSchema UpdateField(long fieldId, Func<ModelField, ModelField> updater)
+        public ModelSchema DeleteField(long fieldId)
         {
+            return new ModelSchema(name, properties, fieldsById.Remove(fieldId));
+        }
+
+        public ModelSchema UpdateField(long fieldId, Func<ModelField, ModelField> updater)
+        {
+            Guard.NotNull(updater, nameof(updater));
+
             ModelField field;
 
             if (!fieldsById.TryGetValue(fieldId, out field))
@@ -117,19 +133,7 @@ namespace PinkParrot.Core.Schema
 
             var newField = updater(field);
 
-            return ReplaceOrAddField(newField);
-        }
-
-        private ModelSchema ReplaceOrAddField(ModelField field)
-        {
-            Guard.NotNull(field, nameof(field));
-
-            if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
-            {
-                throw new ValidationException($"A field with name '{field.Name}' already exists.");
-            }
-
-            return new ModelSchema(properties, fieldsById.SetItem(field.Id, field));
+            return AddOrUpdateField(newField);
         }
 
         public async Task ValidateAsync(PropertiesBag data, IList<ValidationError> errors)
