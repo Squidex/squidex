@@ -12,7 +12,7 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class UpdateModelField : TenantCommand
     {
-        public long FieldId;
+        public long FieldId { get; set; }
 
         public JToken Properties { get; set; }
     }

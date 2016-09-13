@@ -1,18 +1,19 @@
 ﻿// ==========================================================================
-//  ModelFieldDisabled.cs
+//  UpdateFieldDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json.Linq;
 
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Modules.Api.Schemas
 {
-    [TypeName("ModelFieldDisabledEvent")]
-    public class ModelFieldDisabled : TenantEvent
+    public class UpdateFieldDto
     {
-        public long FieldId { get; set; }
+        [Required]
+        public JToken Properties { get; set; }
     }
 }

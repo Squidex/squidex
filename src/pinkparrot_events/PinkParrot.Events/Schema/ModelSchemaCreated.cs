@@ -14,8 +14,8 @@ namespace PinkParrot.Events.Schema
     [TypeName("ModelSchemaCreatedEvent")]
     public class ModelSchemaCreated : TenantEvent
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public ModelSchemaProperties Properties;
+        public ModelSchemaProperties Properties { get; set; }
     }
 }

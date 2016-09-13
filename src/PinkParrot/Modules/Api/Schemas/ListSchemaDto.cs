@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
-    public class SchemasDto
+    public class ListSchemaDto
     {
         [Required]
         public Guid Id { get; set; }

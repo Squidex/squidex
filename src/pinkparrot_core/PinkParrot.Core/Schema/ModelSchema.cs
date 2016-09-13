@@ -54,13 +54,13 @@ namespace PinkParrot.Core.Schema
 
         public static ModelSchema Create(string name, ModelSchemaProperties newProperties)
         {
-            Guard.NotNull(newProperties, nameof(newProperties));
+            newProperties = newProperties ?? new ModelSchemaProperties(null, null);
 
             if (!name.IsSlug())
             {
                 var error = new ValidationError("Name must be a valid slug", "Name");
 
-                throw new ValidationException($"Cannot rename the schema '{name}'", error);
+                throw new ValidationException($"Cannot create a new schema", error);
             }
 
             return new ModelSchema(name, newProperties, ImmutableDictionary<long, ModelField>.Empty);

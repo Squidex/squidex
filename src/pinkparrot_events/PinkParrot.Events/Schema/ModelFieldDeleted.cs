@@ -13,6 +13,6 @@ namespace PinkParrot.Events.Schema
     [TypeName("ModelFieldDeletedEvent")]
     public class ModelFieldDeleted : TenantEvent
     {
-        public long FieldId;
+        public long FieldId { get; set; }
     }
 }

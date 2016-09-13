@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.Commands;
@@ -17,77 +18,79 @@ using PinkParrot.Write.Schema.Commands;
 
 namespace PinkParrot.Write.Schema
 {
-    public class ModelSchemaCommandHandler : ICommandHandler
+    public class ModelSchemaCommandHandler : CommandHandler<ModelSchemaDomainObject>
     {
         private readonly ModelFieldRegistry registry;
         private readonly JsonSerializer serializer;
 
-        public ModelSchemaCommandHandler(ModelFieldRegistry registry, JsonSerializer serializer)
+        public ModelSchemaCommandHandler(
+            ModelFieldRegistry registry,
+            IDomainObjectFactory domainObjectFactory,
+            IDomainObjectRepository domainObjectRepository,
+            JsonSerializer serializer)
+            : base(domainObjectFactory, domainObjectRepository)
         {
             this.registry = registry;
+
             this.serializer = serializer;
         }
 
-        public Task<bool> HandleAsync(CommandContext context)
+        public override Task<bool> HandleAsync(CommandContext context)
         {
-            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
+            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command);
         }
 
-        public Task On(CreateModelSchema command, CommandContext context)
+        public Task On(CreateModelSchema command)
         {
-            var schema = context.Factory.CreateNew<ModelSchemaDomainObject>(command.AggregateId);
-
-            schema.Create(command.TenantId, command.Name, command.Properties);
-
-            return context.Repository.SaveAsync(schema, command.AggregateId);
+            return CreateAsync(command, s => s.Create(command.TenantId, command.Name, command.Properties));
         }
 
-        public Task On(DeleteModelSchema command, CommandContext context)
+        public Task On(DeleteModelSchema command)
         {
-            return UpdateAsync(command, context, s => s.Delete());
+            return UpdateAsync(command, s => s.Delete());
         }
 
-        public Task On(DeleteModelField command, CommandContext context)
+        public Task On(DeleteModelField command)
         {
-            return UpdateAsync(command, context, s => s.DeleteField(command.FieldId));
+            return UpdateAsync(command, s => s.DeleteField(command.FieldId));
         }
 
-        public Task On(DisableModelField command, CommandContext context)
+        public Task On(DisableModelField command)
         {
-            return UpdateAsync(command, context, s => s.DisableField(command.FieldId));
+            return UpdateAsync(command, s => s.DisableField(command.FieldId));
         }
 
-        public Task On(EnableModelField command, CommandContext context)
+        public Task On(EnableModelField command)
         {
-            return UpdateAsync(command, context, s => s.EnableField(command.FieldId));
+            return UpdateAsync(command, s => s.EnableField(command.FieldId));
         }
 
-        public Task On(HideModelField command, CommandContext context)
+        public Task On(HideModelField command)
         {
-            return UpdateAsync(command, context, s => s.HideField(command.FieldId));
+            return UpdateAsync(command, s => s.HideField(command.FieldId));
         }
 
-        public Task On(ShowModelField command, CommandContext context)
+        public Task On(ShowModelField command)
         {
-            return UpdateAsync(command, context, s => s.ShowField(command.FieldId));
+            return UpdateAsync(command, s => s.ShowField(command.FieldId));
         }
 
-        public Task On(UpdateModelSchema command, CommandContext context)
+        public Task On(UpdateModelSchema command)
         {
-            return UpdateAsync(command, context, s => s.Update(command.Properties));
+            return UpdateAsync(command, s => s.Update(command.Properties));
         }
 
-        public Task On(AddModelField command, CommandContext context)
+        public Task On(AddModelField command)
         {
             var propertiesType = registry.FindByTypeName(command.Type).PropertiesType;
-            var propertiesValue = (IModelFieldProperties)command.Properties.ToObject(propertiesType, serializer);
+            var propertiesValue = CreateProperties(command.Properties, propertiesType);
 
-            return UpdateAsync(command, context, s => s.AddField(command.Name, propertiesValue));
+            return UpdateAsync(command, s => s.AddField(command.Name, propertiesValue));
         }
 
-        public Task On(UpdateModelField command, CommandContext context)
+        public Task On(UpdateModelField command)
         {
-            return UpdateAsync(command, context, s =>
+            return UpdateAsync(command, s =>
             {
                 var field = s.Schema.Fields.GetOrDefault(command.FieldId);
 
@@ -97,19 +100,15 @@ namespace PinkParrot.Write.Schema
                 }
 
                 var propertiesType = registry.FindByPropertiesType(field.RawProperties.GetType()).PropertiesType;
-                var propertiesValue = (IModelFieldProperties)command.Properties.ToObject(propertiesType, serializer);
+                var propertiesValue = CreateProperties(command.Properties, propertiesType);
 
                 s.UpdateField(command.FieldId, propertiesValue);
             });
         }
 
-        private static async Task UpdateAsync(IAggregateCommand command, CommandContext context, Action<ModelSchemaDomainObject> updater)
+        private IModelFieldProperties CreateProperties(JToken token, Type type)
         {
-            var schema = await context.Repository.GetByIdAsync<ModelSchemaDomainObject>(command.AggregateId);
-
-            updater(schema);
-
-            await context.Repository.SaveAsync(schema, Guid.NewGuid());
+            return (IModelFieldProperties)token.ToObject(type, serializer);
         }
     }
 }

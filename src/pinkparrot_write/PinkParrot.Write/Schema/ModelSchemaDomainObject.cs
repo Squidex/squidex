@@ -104,95 +104,71 @@ namespace PinkParrot.Write.Schema
         public void AddField(string name, IModelFieldProperties properties)
         {
             VerifyCreatedAndNotDeleted();
-
-            var id = ++totalFields;
-
-            schema = schema.AddOrUpdateField(registry.CreateField(id, name, properties));
-
-            RaiseEvent(new ModelFieldAdded { FieldId = id, Properties = properties }, true);
+            
+            RaiseEvent(new ModelFieldAdded { FieldId = ++totalFields, Name = name, Properties = properties });
         }
 
         public void Create(Guid newTenantId, string name, ModelSchemaProperties properties)
         {
             VerifyNotCreated();
-
-            tenantId = newTenantId;
-
-            schema = ModelSchema.Create(name, properties);
-
-            RaiseEvent(new ModelSchemaCreated { Properties = properties }, true);
+            
+            RaiseEvent(new ModelSchemaCreated { TenantId = newTenantId, Name = name, Properties = properties });
         }
 
         public void Update(ModelSchemaProperties properties)
         {
             VerifyCreatedAndNotDeleted();
-
-            schema = schema.Update(properties);
-
-            RaiseEvent(new ModelSchemaUpdated { Properties = properties }, true);
+            
+            RaiseEvent(new ModelSchemaUpdated { Properties = properties });
         }
 
         public void UpdateField(long fieldId, IModelFieldProperties properties)
         {
             VerifyCreatedAndNotDeleted();
 
-            schema = schema.UpdateField(fieldId, properties);
-
-            RaiseEvent(new ModelFieldUpdated { FieldId = fieldId, Properties = properties }, true);
+            RaiseEvent(new ModelFieldUpdated { FieldId = fieldId, Properties = properties });
         }
 
         public void HideField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
-
-            schema = schema.HideField(fieldId);
-
-            RaiseEvent(new ModelFieldHidden { FieldId = fieldId }, true);
+            
+            RaiseEvent(new ModelFieldHidden { FieldId = fieldId });
         }
 
         public void ShowField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
-
-            schema = schema.ShowField(fieldId);
-
-            RaiseEvent(new ModelFieldShown { FieldId = fieldId }, true);
+            
+            RaiseEvent(new ModelFieldShown { FieldId = fieldId });
         }
 
         public void DisableField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
 
-            schema = schema.DisableField(fieldId);
-
-            RaiseEvent(new ModelFieldDisabled { FieldId = fieldId }, true);
+            RaiseEvent(new ModelFieldDisabled { FieldId = fieldId });
         }
 
         public void EnableField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
-
-            schema = schema.EnableField(fieldId);
-
-            RaiseEvent(new ModelFieldEnabled { FieldId = fieldId }, true);
+            
+            RaiseEvent(new ModelFieldEnabled { FieldId = fieldId });
         }
 
         public void DeleteField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
-
-            schema = schema.DeleteField(fieldId);
-
-            RaiseEvent(new ModelFieldDeleted { FieldId = fieldId }, true);
+            
+            RaiseEvent(new ModelFieldDeleted { FieldId = fieldId });
         }
 
         public void Delete()
         {
             VerifyCreatedAndNotDeleted();
-
-            isDeleted = true;
-
-            RaiseEvent(new ModelSchemaDeleted(), true);
+            
+            RaiseEvent(new ModelSchemaDeleted());
         }
 
         private void VerifyNotCreated()

@@ -15,11 +15,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Pipeline;
-using PinkParrot.Read.Services.Implementations;
+using PinkParrot.Read.Repositories.Implementations.Mongo;
 
 namespace PinkParrot.Configurations
 {
@@ -82,6 +83,10 @@ namespace PinkParrot.Configurations
                 .SingleInstance();
 
             builder.RegisterType<EventStoreBus>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<ModelFieldRegistry>()
                 .AsSelf()
                 .SingleInstance();
         }

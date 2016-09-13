@@ -40,7 +40,7 @@ namespace PinkParrot.Infrastructure.CQRS
 
         protected abstract void ApplyEvent(Envelope<IEvent> @event);
 
-        protected void RaiseEvent<TEvent>(Envelope<TEvent> envelope, bool disableApply = false) where TEvent : class, IEvent
+        protected void RaiseEvent<TEvent>(Envelope<TEvent> envelope) where TEvent : class, IEvent
         {
             Guard.NotNull(envelope, nameof(envelope));
 
@@ -48,19 +48,12 @@ namespace PinkParrot.Infrastructure.CQRS
 
             uncomittedEvents.Add(envelopeToAdd);
 
-            if (!disableApply)
-            {
-                ApplyEvent(envelopeToAdd);
-            }
-            else
-            {
-                version++;
-            }
+            ApplyEvent(envelopeToAdd);
         }
 
-        protected void RaiseEvent(IEvent @event, bool disableApply = false)
+        protected void RaiseEvent(IEvent @event)
         {
-            RaiseEvent(EnvelopeFactory.ForEvent(@event, this), disableApply);
+            RaiseEvent(EnvelopeFactory.ForEvent(@event, this));
         }
 
         void IAggregate.ApplyEvent(Envelope<IEvent> @event)

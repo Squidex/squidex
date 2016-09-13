@@ -12,22 +12,10 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
 {
     public sealed class CommandContext
     {
-        private readonly IDomainObjectFactory factory;
-        private readonly IDomainObjectRepository repository;
         private readonly ICommand command;
         private Exception exception;
         private bool isSucceeded;
         
-        public IDomainObjectRepository Repository
-        {
-            get { return repository; }
-        }
-
-        public IDomainObjectFactory Factory
-        {
-            get { return factory; }
-        }
-
         public ICommand Command
         {
             get { return command; }
@@ -48,15 +36,11 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
             get { return exception; }
         }
 
-        public CommandContext(IDomainObjectFactory factory, IDomainObjectRepository repository, ICommand command)
+        public CommandContext(ICommand command)
         {
             Guard.NotNull(command, nameof(command));
-            Guard.NotNull(factory, nameof(factory));
-            Guard.NotNull(repository, nameof(repository));
 
             this.command = command;
-            this.factory = factory;
-            this.repository = repository;
         }
 
         public void MarkSucceeded()

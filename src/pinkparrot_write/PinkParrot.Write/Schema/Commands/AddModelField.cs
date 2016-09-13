@@ -12,10 +12,10 @@ namespace PinkParrot.Write.Schema.Commands
 {
     public class AddModelField : TenantCommand
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public string Type;
+        public string Type { get; set; }
 
-        public JToken Properties;
+        public JToken Properties { get; set; }
     }
 }

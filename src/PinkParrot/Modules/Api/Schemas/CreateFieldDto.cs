@@ -1,23 +1,25 @@
 ﻿// ==========================================================================
-//  ModelFieldAdded.cs
+//  CreateFieldDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
-using PinkParrot.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json.Linq;
 
-namespace PinkParrot.Events.Schema
+namespace PinkParrot.Modules.Api.Schemas
 {
-    [TypeName("ModelFieldAddedEvent")]
-    public class ModelFieldAdded : TenantEvent
+    public class CreateFieldDto
     {
-        public long FieldId { get; set; }
-
+        [Required]
         public string Name { get; set; }
 
-        public IModelFieldProperties Properties { get; set; }
+        [Required]
+        public string Type { get; set; }
+
+        [Required]
+        public JToken Properties { get; set; }
     }
 }

@@ -9,7 +9,7 @@
 using Autofac;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Read.Repositories;
-using PinkParrot.Read.Repositories.Implementations;
+using PinkParrot.Read.Repositories.Implementations.Mongo;
 using PinkParrot.Read.Services;
 using PinkParrot.Read.Services.Implementations;
 

@@ -11,7 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PinkParrot.Core.Schema;
-using PinkParrot.Core.Schema.Json;
+using PinkParrot.Events.Schema;
+using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Infrastructure.Json;
 
@@ -21,7 +22,7 @@ namespace PinkParrot.Configurations
     {
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings)
         {
-            settings.Binder = new TypeNameSerializationBinder().Map(typeof(ModelSchema).GetTypeInfo().Assembly);
+            settings.Binder = new TypeNameSerializationBinder();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Converters.Add(new PropertiesBagConverter());
             settings.NullValueHandling = NullValueHandling.Ignore;
@@ -37,10 +38,18 @@ namespace PinkParrot.Configurations
             return ConfigureJson(new JsonSerializerSettings());
         }
 
+        private static JsonSerializer CreateSerializer(JsonSerializerSettings settings)
+        {
+            return JsonSerializer.Create(settings);
+        }
+
         public static void AddEventFormatter(this IServiceCollection services)
         {
+            TypeNameRegistry.Map(typeof(ModelSchema).GetTypeInfo().Assembly);
+            TypeNameRegistry.Map(typeof(ModelSchemaCreated).GetTypeInfo().Assembly);
+
             services.AddSingleton(t => CreateSettings());
-            services.AddSingleton<SerializationService>();
+            services.AddSingleton(t => CreateSerializer(t.GetRequiredService<JsonSerializerSettings>()));
             services.AddSingleton<EventStoreFormatter>();
         }
 

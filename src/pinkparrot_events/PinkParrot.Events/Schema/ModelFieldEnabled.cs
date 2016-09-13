@@ -13,6 +13,6 @@ namespace PinkParrot.Events.Schema
     [TypeName("ModelFieldEnabledEvent")]
     public class ModelFieldEnabled : TenantEvent
     {
-        public long FieldId;
+        public long FieldId { get; set; }
     }
 }

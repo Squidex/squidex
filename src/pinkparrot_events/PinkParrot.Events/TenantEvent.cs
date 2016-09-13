@@ -13,6 +13,6 @@ namespace PinkParrot.Events
 {
     public class TenantEvent : IEvent
     {
-        public Guid TenantId;
+        public Guid TenantId { get; set; }
     }
 }

@@ -8,8 +8,8 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Core.Schema;
 using PinkParrot.Infrastructure.CQRS.Commands;
+using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Write.Schema.Commands;
 
 namespace PinkParrot.Modules.Api.Schemas
@@ -23,18 +23,18 @@ namespace PinkParrot.Modules.Api.Schemas
         
         [HttpPost]
         [Route("api/schemas/{name}/fields/")]
-        public Task Add(string name, [FromBody] ModelFieldProperties field)
+        public Task Add(string name, [FromBody] CreateFieldDto model)
         {
-            var command = new AddModelField { Properties = field };
+            var command = SimpleMapper.Map(model, new AddModelField());
 
             return CommandBus.PublishAsync(command);
         }
 
         [HttpPut]
         [Route("api/schemas/{name}/fields/{fieldId:long}/")]
-        public Task Update(string name, long fieldId, [FromBody] ModelFieldProperties properties)
+        public Task Update(string name, long fieldId, [FromBody] UpdateFieldDto model)
         {
-            var command = new UpdateModelField { FieldId = fieldId, Properties = properties };
+            var command = new UpdateModelField { FieldId = fieldId, Properties = model.Properties };
 
             return CommandBus.PublishAsync(command);
         }

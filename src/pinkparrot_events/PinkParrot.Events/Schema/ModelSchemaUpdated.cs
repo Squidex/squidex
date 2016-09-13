@@ -14,6 +14,6 @@ namespace PinkParrot.Events.Schema
     [TypeName("ModelSchemaUpdated")]
     public class ModelSchemaUpdated : TenantEvent
     {
-        public ModelSchemaProperties Properties;
+        public ModelSchemaProperties Properties { get; set; }
     }
 }

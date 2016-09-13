@@ -12,9 +12,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Core.Schema;
-using PinkParrot.Core.Schema.Json;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
+using PinkParrot.Read.Models;
 using PinkParrot.Read.Repositories;
 using PinkParrot.Write.Schema.Commands;
 
@@ -32,11 +32,11 @@ namespace PinkParrot.Modules.Api.Schemas
 
         [HttpGet]
         [Route("api/schemas/")]
-        public async Task<List<SchemasDto>> Query()
+        public async Task<List<ListSchemaDto>> Query()
         {
             var schemas = await modelSchemaRepository.QueryAllAsync(TenantId);
 
-            return schemas.Select(s => SimpleMapper.Map(s, new SchemasDto())).ToList();
+            return schemas.Select(s => SimpleMapper.Map(s, new ListSchemaDto())).ToList();
         }
 
         [HttpGet]
@@ -55,9 +55,9 @@ namespace PinkParrot.Modules.Api.Schemas
 
         [HttpPost]
         [Route("api/schemas/")]
-        public async Task<ActionResult> Create([FromBody] ModelSchemaProperties schema)
+        public async Task<ActionResult> Create([FromBody] CreateSchemaDto model)
         {
-            var command = new CreateModelSchema { AggregateId = Guid.NewGuid(), Properties = schema };
+            var command = SimpleMapper.Map(model, new CreateModelSchema { AggregateId = Guid.NewGuid() });
 
             await CommandBus.PublishAsync(command);
 
