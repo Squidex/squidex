@@ -49,9 +49,9 @@ namespace PinkParrot.Write.Schema
 
         public void On(ModelFieldAdded @event)
         {
-            schema = schema.AddOrUpdateField(registry.CreateField(@event.FieldId, @event.Name, @event.Properties));
-
             totalFields++;
+
+            schema = schema.AddOrUpdateField(registry.CreateField(@event.FieldId, @event.Name, @event.Properties));
         }
 
         public void On(ModelSchemaCreated @event)
