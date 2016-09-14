@@ -1,22 +1,14 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  ISchemaEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
-
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Read.Repositories
 {
-    public class CreateSchemaDto
+    public interface ISchemaEntity : ITenantEntity
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
+        string Name { get; }
     }
 }

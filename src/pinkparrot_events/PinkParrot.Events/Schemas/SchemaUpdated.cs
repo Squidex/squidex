@@ -1,22 +1,19 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  SchemaUpdated.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using PinkParrot.Core.Schemas;
+using PinkParrot.Infrastructure;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Events.Schemas
 {
-    public class CreateSchemaDto
+    [TypeName("SchemaUpdated")]
+    public class SchemaUpdated : TenantEvent
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
+        public SchemaProperties Properties { get; set; }
     }
 }

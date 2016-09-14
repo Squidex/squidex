@@ -13,7 +13,7 @@ using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Read.Services;
 using PinkParrot.Write;
-using PinkParrot.Write.Schema;
+using PinkParrot.Write.Schemas;
 
 // ReSharper disable InvertIf
 
@@ -21,12 +21,12 @@ namespace PinkParrot.Pipeline.CommandHandlers
 {
     public sealed class EnrichWithAggregateIdHandler : ICommandHandler
     {
-        private readonly IModelSchemaProvider modelSchemaProvider;
+        private readonly ISchemaProvider schemaProvider;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithAggregateIdHandler(IModelSchemaProvider modelSchemaProvider, IActionContextAccessor actionContextAccessor)
+        public EnrichWithAggregateIdHandler(ISchemaProvider schemaProvider, IActionContextAccessor actionContextAccessor)
         {
-            this.modelSchemaProvider = modelSchemaProvider;
+            this.schemaProvider = schemaProvider;
 
             this.actionContextAccessor = actionContextAccessor;
         }
@@ -53,11 +53,11 @@ namespace PinkParrot.Pipeline.CommandHandlers
             {
                 var schemaName = routeValues["name"].ToString();
 
-                var id = await modelSchemaProvider.FindSchemaIdByNameAsync(tenantCommand.TenantId, schemaName);
+                var id = await schemaProvider.FindSchemaIdByNameAsync(tenantCommand.TenantId, schemaName);
 
                 if (!id.HasValue)
                 {
-                    throw new DomainObjectNotFoundException(schemaName, typeof(ModelSchemaDomainObject));
+                    throw new DomainObjectNotFoundException(schemaName, typeof(SchemaDomainObject));
                 }
 
                 aggregateCommand.AggregateId = id.Value;

@@ -1,16 +1,19 @@
 // ==========================================================================
-//  IStreamPositionStorage.cs
+//  SchemaProperties.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace PinkParrot.Core.Schemas
 {
-    public interface IStreamPositionStorage
+    public sealed class SchemaProperties : NamedElementProperties
     {
-        int? ReadPosition();
-
-        void WritePosition(int position);
+        public SchemaProperties(
+            string label, 
+            string hints)
+            : base(label, hints)
+        {
+        }
     }
 }

@@ -1,22 +1,17 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  SchemaDeleted.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
+using PinkParrot.Infrastructure;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Events.Schemas
 {
-    public class CreateSchemaDto
+    [TypeName("SchemaDeleted")]
+    public class SchemaDeleted : TenantEvent
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
     }
 }

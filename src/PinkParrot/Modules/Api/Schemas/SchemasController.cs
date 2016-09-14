@@ -11,30 +11,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Core.Schema;
+using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Read.Models;
 using PinkParrot.Read.Repositories;
-using PinkParrot.Write.Schema.Commands;
+using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
     public class SchemasController : ControllerBase
     {
-        private readonly IModelSchemaRepository modelSchemaRepository;
+        private readonly ISchemaRepository schemaRepository;
         
-        public SchemasController(ICommandBus commandBus, IModelSchemaRepository modelSchemaRepository)
+        public SchemasController(ICommandBus commandBus, ISchemaRepository schemaRepository)
             : base(commandBus)
         {
-            this.modelSchemaRepository = modelSchemaRepository;
+            this.schemaRepository = schemaRepository;
         }
 
         [HttpGet]
         [Route("api/schemas/")]
         public async Task<List<ListSchemaDto>> Query()
         {
-            var schemas = await modelSchemaRepository.QueryAllAsync(TenantId);
+            var schemas = await schemaRepository.QueryAllAsync(TenantId);
 
             return schemas.Select(s => SimpleMapper.Map(s, new ListSchemaDto())).ToList();
         }
@@ -43,21 +43,21 @@ namespace PinkParrot.Modules.Api.Schemas
         [Route("api/schemas/{name}/")]
         public async Task<ActionResult> Get(string name)
         {
-            var entity = await modelSchemaRepository.FindSchemaAsync(TenantId, name);
+            var entity = await schemaRepository.FindSchemaAsync(TenantId, name);
 
             if (entity == null)
             {
                 return NotFound();
             }
 
-            return Ok(ModelSchemaDto.Create(entity.Schema));
+            return Ok(SchemaDto.Create(entity.Schema));
         }
 
         [HttpPost]
         [Route("api/schemas/")]
         public async Task<ActionResult> Create([FromBody] CreateSchemaDto model)
         {
-            var command = SimpleMapper.Map(model, new CreateModelSchema { AggregateId = Guid.NewGuid() });
+            var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
 
             await CommandBus.PublishAsync(command);
 
@@ -66,9 +66,9 @@ namespace PinkParrot.Modules.Api.Schemas
 
         [HttpPut]
         [Route("api/schemas/{name}/")]
-        public async Task<ActionResult> Update(string name, [FromBody] ModelSchemaProperties schema)
+        public async Task<ActionResult> Update(string name, [FromBody] SchemaProperties schema)
         {
-            var command = new UpdateModelSchema { Properties = schema };
+            var command = new UpdateSchema { Properties = schema };
 
             await CommandBus.PublishAsync(command);
 
@@ -79,7 +79,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [Route("api/schemas/{name}/")]
         public async Task<ActionResult> Delete(string name)
         {
-            await CommandBus.PublishAsync(new DeleteModelSchema());
+            await CommandBus.PublishAsync(new DeleteSchema());
 
             return NoContent();
         }

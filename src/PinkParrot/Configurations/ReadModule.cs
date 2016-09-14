@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ReadDependencies.cs
+//  ReadModule.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -23,13 +23,13 @@ namespace PinkParrot.Configurations
                 .As<ITenantProvider>()
                 .SingleInstance();
 
-            builder.RegisterType<ModelSchemaProvider>()
-                .As<IModelSchemaProvider>()
+            builder.RegisterType<CachingSchemaProvider>()
+                .As<ISchemaProvider>()
                 .As<ILiveEventConsumer>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoModelSchemaRepository>()
-                .As<IModelSchemaRepository>()
+            builder.RegisterType<MongoSchemaRepository>()
+                .As<ISchemaRepository>()
                 .As<ICatchEventConsumer>()
                 .SingleInstance();
         }

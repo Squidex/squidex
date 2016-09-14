@@ -6,17 +6,17 @@
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schema;
+using PinkParrot.Core.Schemas;
 
 namespace PinkParrot.Read.Repositories
 {
     public sealed class EntityWithSchema
     {
-        public IModelSchemaEntity Entity { get; }
+        public ISchemaEntity Entity { get; }
 
-        public ModelSchema Schema { get; }
+        public Schema Schema { get; }
 
-        internal EntityWithSchema(IModelSchemaEntity entity, ModelSchema schema)
+        internal EntityWithSchema(ISchemaEntity entity, Schema schema)
         {
             Entity = entity;
 

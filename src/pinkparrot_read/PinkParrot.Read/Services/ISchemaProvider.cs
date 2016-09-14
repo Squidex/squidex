@@ -1,22 +1,18 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  ISchemaProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
+using System;
+using System.Threading.Tasks;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Read.Services
 {
-    public class CreateSchemaDto
+    public interface ISchemaProvider
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
+        Task<Guid?> FindSchemaIdByNameAsync(Guid tenantId, string name);
     }
 }

@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using PinkParrot.Core.Schema;
+using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.CQRS.EventStore;
@@ -58,7 +58,7 @@ namespace PinkParrot.Configurations
                 .As<IMongoDatabase>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoStreamPositionsStorage>()
+            builder.RegisterType<MongoPositionStorage>()
                 .As<IStreamPositionStorage>()
                 .SingleInstance();
 
@@ -86,7 +86,7 @@ namespace PinkParrot.Configurations
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<ModelFieldRegistry>()
+            builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();
         }

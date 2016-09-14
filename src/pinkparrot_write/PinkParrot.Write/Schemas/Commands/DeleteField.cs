@@ -1,16 +1,14 @@
 // ==========================================================================
-//  IStreamPositionStorage.cs
+//  DeleteField.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace PinkParrot.Write.Schemas.Commands
 {
-    public interface IStreamPositionStorage
+    public class DeleteField : TenantCommand
     {
-        int? ReadPosition();
-
-        void WritePosition(int position);
+        public long FieldId { get; set; }
     }
 }

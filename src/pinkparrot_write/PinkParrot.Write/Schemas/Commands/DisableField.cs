@@ -1,22 +1,14 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  DisableField.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
-
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
-
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Write.Schemas.Commands
 {
-    public class CreateSchemaDto
+    public class DisableField : TenantCommand
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
+        public long FieldId { get; set; }
     }
 }

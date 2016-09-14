@@ -1,22 +1,19 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  IRegisteredField.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
+using System;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Core.Schemas
 {
-    public class CreateSchemaDto
+    public interface IRegisteredField
     {
-        [Required]
-        public string Name { get; set; }
+        Type PropertiesType { get; }
 
-        [Required]
-        public FieldProperties Properties { get; set; }
+        Field CreateField(long id, string name, IFieldProperties properties);
     }
 }

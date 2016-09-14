@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EntityCreated.cs
+//  EntityCreatedDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group

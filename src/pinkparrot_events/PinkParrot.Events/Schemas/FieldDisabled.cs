@@ -1,22 +1,18 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  FieldDisabled.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
+using PinkParrot.Infrastructure;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Events.Schemas
 {
-    public class CreateSchemaDto
+    [TypeName("FieldDisabledEvent")]
+    public class FieldDisabled : TenantEvent
     {
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public FieldProperties Properties { get; set; }
+        public long FieldId { get; set; }
     }
 }

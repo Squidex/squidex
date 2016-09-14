@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WriteDependencies.cs
+//  WriteModule.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -9,7 +9,7 @@
 using Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Pipeline.CommandHandlers;
-using PinkParrot.Write.Schema;
+using PinkParrot.Write.Schemas;
 
 namespace PinkParrot.Configurations
 {
@@ -25,11 +25,11 @@ namespace PinkParrot.Configurations
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<ModelSchemaCommandHandler>()
+            builder.RegisterType<SchemaCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<ModelSchemaDomainObject>()
+            builder.RegisterType<SchemaDomainObject>()
                 .AsSelf()
                 .InstancePerDependency();
         }
