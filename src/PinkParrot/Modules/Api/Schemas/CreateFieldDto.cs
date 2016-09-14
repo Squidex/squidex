@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace PinkParrot.Modules.Api.Schemas
@@ -14,6 +15,7 @@ namespace PinkParrot.Modules.Api.Schemas
     public class CreateFieldDto
     {
         [Required]
+        [JsonProperty("$type")]
         public string Name { get; set; }
 
         [Required]

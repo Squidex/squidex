@@ -187,7 +187,7 @@ namespace PinkParrot.Write.Schema
             }
         }
 
-        protected override void ApplyEvent(Envelope<IEvent> @event)
+        protected override void DispatchEvent(Envelope<IEvent> @event)
         {
             this.DispatchAction(@event.Payload);
         }

@@ -38,27 +38,32 @@ namespace PinkParrot.Infrastructure.CQRS
             this.version = version;
         }
 
-        protected abstract void ApplyEvent(Envelope<IEvent> @event);
-
-        protected void RaiseEvent<TEvent>(Envelope<TEvent> envelope) where TEvent : class, IEvent
-        {
-            Guard.NotNull(envelope, nameof(envelope));
-
-            var envelopeToAdd = envelope.To<IEvent>();
-
-            uncomittedEvents.Add(envelopeToAdd);
-
-            ApplyEvent(envelopeToAdd);
-        }
+        protected abstract void DispatchEvent(Envelope<IEvent> @event);
 
         protected void RaiseEvent(IEvent @event)
         {
             RaiseEvent(EnvelopeFactory.ForEvent(@event, this));
         }
 
+        private void ApplyEventCore(Envelope<IEvent> @event)
+        {
+            DispatchEvent(@event); version++;
+        }
+
+        protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
+        {
+            Guard.NotNull(@event, nameof(@event));
+
+            var envelopeToAdd = @event.To<IEvent>();
+
+            uncomittedEvents.Add(envelopeToAdd);
+
+            ApplyEventCore(envelopeToAdd);
+        }
+
         void IAggregate.ApplyEvent(Envelope<IEvent> @event)
         {
-            ApplyEvent(@event); version++;
+            ApplyEventCore(@event);
         }
 
         void IAggregate.ClearUncommittedEvents()

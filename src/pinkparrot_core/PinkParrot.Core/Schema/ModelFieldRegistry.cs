@@ -49,6 +49,11 @@ namespace PinkParrot.Core.Schema
             }
         }
 
+        public ModelFieldRegistry()
+        {
+            Add<NumberFieldProperties>((id, name, properties) => new NumberField(id, name, (NumberFieldProperties)properties));
+        }
+
         public void Add<TFieldProperties>(FactoryFunction fieldFactory)
         {
             Guard.NotNull(fieldFactory, nameof(fieldFactory));
