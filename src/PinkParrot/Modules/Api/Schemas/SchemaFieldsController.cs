@@ -8,12 +8,16 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
+using PinkParrot.Modules.Api.Schemas.Models;
+using PinkParrot.Pipeline;
 using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
+    [ApiExceptionFilter]
     public class SchemasFieldsController : ControllerBase
     {
         public SchemasFieldsController(ICommandBus commandBus)
@@ -26,6 +30,8 @@ namespace PinkParrot.Modules.Api.Schemas
         public Task Add(string name, [FromBody] CreateFieldDto model)
         {
             var command = SimpleMapper.Map(model, new AddField());
+
+            command.Properties = command.Properties ?? new JObject();
 
             return CommandBus.PublishAsync(command);
         }

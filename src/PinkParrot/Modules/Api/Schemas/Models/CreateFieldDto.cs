@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  CreateFieldDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,16 +7,20 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using PinkParrot.Core.Schemas;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Modules.Api.Schemas.Models
 {
-    public class CreateSchemaDto
+    public class CreateFieldDto
     {
         [Required]
-        public string Name { get; set; }
+        [JsonProperty("$type")]
+        public string Type { get; set; }
 
         [Required]
-        public FieldProperties Properties { get; set; }
+        public string Name { get; set; }
+        
+        public JObject Properties { get; set; }
     }
 }

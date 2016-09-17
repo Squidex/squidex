@@ -12,7 +12,7 @@ using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schemas
 {
-    public delegate Field FactoryFunction(long id, string name, IFieldProperties properties);
+    public delegate Field FactoryFunction(long id, string name, FieldProperties properties);
 
     public sealed class FieldRegistry
     {
@@ -43,7 +43,7 @@ namespace PinkParrot.Core.Schemas
                 this.propertiesType = propertiesType;
             }
 
-            Field IRegisteredField.CreateField(long id, string name, IFieldProperties properties)
+            Field IRegisteredField.CreateField(long id, string name, FieldProperties properties)
             {
                 return fieldFactory(id, name, properties);
             }
@@ -64,7 +64,7 @@ namespace PinkParrot.Core.Schemas
             fieldsByPropertyType[registered.PropertiesType] = registered;
         }
 
-        public Field CreateField(long id, string name, IFieldProperties properties)
+        public Field CreateField(long id, string name, FieldProperties properties)
         {
             var registered = fieldsByPropertyType[properties.GetType()];
 

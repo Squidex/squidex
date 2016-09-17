@@ -1,16 +1,21 @@
 ﻿// ==========================================================================
-//  IFieldProperties.cs
+//  CreateSchemaDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using PinkParrot.Core.Schemas;
 
-namespace PinkParrot.Core.Schemas
+namespace PinkParrot.Modules.Api.Schemas.Models
 {
-    public interface IFieldProperties : IValidatable
+    public class CreateSchemaDto
     {
+        [Required]
+        public string Name { get; set; }
+        
+        public FieldProperties Properties { get; set; }
     }
 }

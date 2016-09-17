@@ -14,12 +14,15 @@ using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
+using PinkParrot.Modules.Api.Schemas.Models;
+using PinkParrot.Pipeline;
 using PinkParrot.Read.Models;
 using PinkParrot.Read.Repositories;
 using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Modules.Api.Schemas
 {
+    [ApiExceptionFilter]
     public class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
@@ -59,6 +62,8 @@ namespace PinkParrot.Modules.Api.Schemas
         {
             var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
 
+            command.Properties = command.Properties ?? new SchemaProperties(null, null);
+
             await CommandBus.PublishAsync(command);
 
             return CreatedAtAction("Query", new EntityCreatedDto { Id = command.AggregateId });
@@ -66,9 +71,9 @@ namespace PinkParrot.Modules.Api.Schemas
 
         [HttpPut]
         [Route("api/schemas/{name}/")]
-        public async Task<ActionResult> Update(string name, [FromBody] SchemaProperties schema)
+        public async Task<ActionResult> Update(string name, [FromBody] UpdateSchemaDto model)
         {
-            var command = new UpdateSchema { Properties = schema };
+            var command = SimpleMapper.Map(model, new UpdateSchema());
 
             await CommandBus.PublishAsync(command);
 

@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure;
 
@@ -19,13 +18,10 @@ namespace PinkParrot.Read.Models
 {
     public sealed class SchemaDto
     {
-        [JsonProperty]
         public string Name { get; set; }
-
-        [JsonProperty]
+        
         public Dictionary<long, FieldDto> Fields { get; set; }
-
-        [JsonProperty]
+        
         public SchemaProperties Properties { get; set; }
 
         public static SchemaDto Create(Schema schema)
@@ -54,7 +50,7 @@ namespace PinkParrot.Read.Models
                 {
                     var field = kvp.Value;
 
-                    schema = schema.AddOrUpdateField(registry.CreateField(kvp.Key, field.Name, field.Properties));
+                    schema = schema.AddOrUpdateField(field.ToField(kvp.Key, registry));
                 }
             }
 

@@ -11,7 +11,7 @@ using PinkParrot.Infrastructure;
 
 namespace PinkParrot.Core.Schemas
 {
-    public abstract class FieldProperties : NamedElementProperties, IFieldProperties
+    public abstract class FieldProperties : NamedElementProperties, IValidatable
     {
         public bool IsRequired { get; }
 

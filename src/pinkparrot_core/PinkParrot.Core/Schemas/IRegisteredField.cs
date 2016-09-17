@@ -14,6 +14,6 @@ namespace PinkParrot.Core.Schemas
     {
         Type PropertiesType { get; }
 
-        Field CreateField(long id, string name, IFieldProperties properties);
+        Field CreateField(long id, string name, FieldProperties properties);
     }
 }

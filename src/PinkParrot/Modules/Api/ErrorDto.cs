@@ -17,6 +17,6 @@ namespace PinkParrot.Modules.Api
 
         public string[] Details { get; set; }
 
-        public int? StatusCode { get; set; }
+        public int? StatusCode { get; set; } = 400;
     }
 }

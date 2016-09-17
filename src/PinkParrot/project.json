@@ -22,11 +22,13 @@
       "type": "platform"
     },
     "MongoDB.Driver": "2.3.0-rc1",
+    "OpenCover": "4.6.519",
     "PinkParrot.Core": "1.0.0-*",
     "PinkParrot.Events": "1.0.0-*",
     "PinkParrot.Infrastructure": "1.0.0-*",
     "PinkParrot.Read": "1.0.0-*",
-    "PinkParrot.Write": "1.0.0-*"
+    "PinkParrot.Write": "1.0.0-*",
+    "ReportGenerator": "2.4.5"
   },
 
   "tools": {

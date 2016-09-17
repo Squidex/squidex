@@ -55,8 +55,6 @@ namespace PinkParrot.Core.Schemas
 
         public static Schema Create(string name, SchemaProperties newProperties)
         {
-            newProperties = newProperties ?? new SchemaProperties(null, null);
-
             if (!name.IsSlug())
             {
                 var error = new ValidationError("Name must be a valid slug", "Name");
@@ -86,7 +84,7 @@ namespace PinkParrot.Core.Schemas
             return new Schema(name, properties, fieldsById.SetItem(field.Id, field));
         }
 
-        public Schema UpdateField(long fieldId, IFieldProperties newProperties)
+        public Schema UpdateField(long fieldId, FieldProperties newProperties)
         {
             return UpdateField(fieldId, field => field.Update(newProperties));
         }

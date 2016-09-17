@@ -15,24 +15,9 @@ namespace PinkParrot.Core.Schemas
     {
         private T properties;
 
-        public override IFieldProperties RawProperties
+        public override FieldProperties RawProperties
         {
             get { return properties; }
-        }
-
-        public override string Label
-        {
-            get { return properties.Label ?? Name; }
-        }
-
-        public override string Hints
-        {
-            get { return properties.Hints; }
-        }
-
-        public override bool IsRequired
-        {
-            get { return properties.IsRequired; }
         }
 
         public T Properties
@@ -48,7 +33,7 @@ namespace PinkParrot.Core.Schemas
             this.properties = properties;
         }
 
-        public override Field Update(IFieldProperties newProperties)
+        public override Field Update(FieldProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
             

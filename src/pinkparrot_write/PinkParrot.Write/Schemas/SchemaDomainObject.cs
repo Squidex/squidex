@@ -101,7 +101,7 @@ namespace PinkParrot.Write.Schemas
             isDeleted = false;
         }
 
-        public void AddField(string name, IFieldProperties properties)
+        public void AddField(string name, FieldProperties properties)
         {
             VerifyCreatedAndNotDeleted();
             
@@ -122,7 +122,7 @@ namespace PinkParrot.Write.Schemas
             RaiseEvent(new SchemaUpdated { Properties = properties });
         }
 
-        public void UpdateField(long fieldId, IFieldProperties properties)
+        public void UpdateField(long fieldId, FieldProperties properties)
         {
             VerifyCreatedAndNotDeleted();
 

@@ -24,9 +24,27 @@ namespace PinkParrot.Infrastructure
 
             lock (namesByType)
             {
-                namesByType.Add(type, name);
+                try
+                {
+                    namesByType.Add(type, name);
+                }
+                catch (ArgumentException)
+                {
+                    var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
 
-                typesByName.Add(name, type);
+                    throw new ArgumentException(message, nameof(type));
+                }
+
+                try
+                {
+                    typesByName.Add(name, type);
+                }
+                catch (ArgumentException)
+                {
+                    var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+
+                    throw new ArgumentException(message, nameof(type));
+                }
             }
         }
 

@@ -14,6 +14,7 @@ using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Dispatching;
+using PinkParrot.Read.Services;
 using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Write.Schemas
@@ -21,18 +22,20 @@ namespace PinkParrot.Write.Schemas
     public class SchemaCommandHandler : CommandHandler<SchemaDomainObject>
     {
         private readonly FieldRegistry registry;
+        private readonly ISchemaProvider schemaProvider;
         private readonly JsonSerializer serializer;
 
         public SchemaCommandHandler(
             FieldRegistry registry,
+            ISchemaProvider schemaProvider,
             IDomainObjectFactory domainObjectFactory,
             IDomainObjectRepository domainObjectRepository,
             JsonSerializer serializer)
             : base(domainObjectFactory, domainObjectRepository)
         {
             this.registry = registry;
-
             this.serializer = serializer;
+            this.schemaProvider = schemaProvider;
         }
 
         public override Task<bool> HandleAsync(CommandContext context)
@@ -40,9 +43,15 @@ namespace PinkParrot.Write.Schemas
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command);
         }
 
-        public Task On(CreateSchema command)
+        public async Task On(CreateSchema command)
         {
-            return CreateAsync(command, s => s.Create(command.TenantId, command.Name, command.Properties));
+            if (await schemaProvider.FindSchemaIdByNameAsync(command.TenantId, command.Name) != null)
+            {
+                var error = new ValidationError($"A schema with name '{command.Name}' already exists", "Name");
+
+                throw new ValidationException("Cannot create a new schema", error);
+            }
+            await CreateAsync(command, s => s.Create(command.TenantId, command.Name, command.Properties));
         }
 
         public Task On(DeleteSchema command)
@@ -106,9 +115,9 @@ namespace PinkParrot.Write.Schemas
             });
         }
 
-        private IFieldProperties CreateProperties(JToken token, Type type)
+        private FieldProperties CreateProperties(JToken token, Type type)
         {
-            return (IFieldProperties)token.ToObject(type, serializer);
+            return (FieldProperties)token.ToObject(type, serializer);
         }
     }
 }

@@ -1,19 +1,28 @@
 ﻿// ==========================================================================
-//  UpdateFieldDto.cs
+//  ListSchemaDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace PinkParrot.Modules.Api.Schemas.Models
 {
-    public class UpdateFieldDto
+    public class ListSchemaDto
     {
         [Required]
-        public JToken Properties { get; set; }
+        public Guid Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public DateTime Created { get; set; }
+
+        [Required]
+        public DateTime LastModified { get; set; }
     }
 }

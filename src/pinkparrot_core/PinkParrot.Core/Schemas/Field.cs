@@ -34,6 +34,16 @@ namespace PinkParrot.Core.Schemas
             get { return name; }
         }
 
+        public string Hints
+        {
+            get { return RawProperties.Hints; }
+        }
+
+        public string Label
+        {
+            get { return RawProperties.Label; }
+        }
+
         public bool IsHidden
         {
             get { return isHidden; }
@@ -44,13 +54,12 @@ namespace PinkParrot.Core.Schemas
             get { return isDisabled; }
         }
 
-        public abstract IFieldProperties RawProperties { get; }
-        
-        public abstract string Label { get; }
+        public bool IsRequired
+        {
+            get { return RawProperties.IsRequired; }
+        }
 
-        public abstract string Hints { get; }
-
-        public abstract bool IsRequired { get; }
+        public abstract FieldProperties RawProperties { get; }
 
         protected Field(long id, string name)
         {
@@ -62,7 +71,7 @@ namespace PinkParrot.Core.Schemas
             this.name = name;
         }
 
-        public abstract Field Update(IFieldProperties newProperties);
+        public abstract Field Update(FieldProperties newProperties);
 
         public Task ValidateAsync(PropertyValue property, ICollection<string> errors)
         {

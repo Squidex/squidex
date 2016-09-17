@@ -113,6 +113,14 @@ namespace PinkParrot.Infrastructure
         }
 
         [Fact]
+        public void SequentialHashCode_should_ignore_null_values()
+        {
+            var collection = new string[] { null, null };
+
+            Assert.Equal(17, collection.SequentialHashCode());
+        }
+
+        [Fact]
         public void SequentialHashCode_should_return_same_hash_codes_for_list_with_same_order()
         {
             var collection1 = new[] { 3, 5, 6 };
@@ -164,6 +172,56 @@ namespace PinkParrot.Infrastructure
             var collection2 = new[] { 6, 5, 3 };
 
             Assert.Equal(collection2.OrderedHashCode(), collection1.OrderedHashCode());
+        }
+
+        [Fact]
+        public void EqualsDictionary_should_return_true_for_equal_dictionaries()
+        {
+            var lhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+            var rhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+
+            Assert.True(lhs.EqualsDictionary(rhs));
+        }
+
+        [Fact]
+        public void EqualsDictionary_should_return_false_for_different_sizes()
+        {
+            var lhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+            var rhs = new Dictionary<int, int>
+            {
+                [1] = 1
+            };
+
+            Assert.False(lhs.EqualsDictionary(rhs));
+        }
+
+        [Fact]
+        public void EqualsDictionary_should_return_false_for_different_values()
+        {
+            var lhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+            var rhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [3] = 3
+            };
+
+            Assert.False(lhs.EqualsDictionary(rhs));
         }
     }
 }

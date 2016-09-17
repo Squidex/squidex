@@ -16,6 +16,6 @@ namespace PinkParrot.Events.Schemas
     {
         public long FieldId { get; set; }
 
-        public IFieldProperties Properties { get; set; }
+        public FieldProperties Properties { get; set; }
     }
 }
