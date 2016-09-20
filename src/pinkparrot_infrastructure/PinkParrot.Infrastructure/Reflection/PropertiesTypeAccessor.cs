@@ -32,7 +32,7 @@ namespace PinkParrot.Infrastructure.Reflection
         {
             var allProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-            foreach (var property in allProperties.Where(property => property.CanRead && property.CanWrite))
+            foreach (var property in allProperties)
             {
                 accessors[property.Name] = new PropertyAccessor(type, property);
 

@@ -22,6 +22,10 @@ namespace PinkParrot.Infrastructure.Reflection
             public long MappedNumber { get; set; }
 
             public Guid MappedGuid { get; set; }
+
+            public long WrongType1 { get; set; }
+
+            public long WrongType2 { get; set; }
         }
 
         public class Class1 : Class1Base
@@ -46,6 +50,10 @@ namespace PinkParrot.Infrastructure.Reflection
             {
                 get { return "Value"; }
             }
+
+            public DateTime WrongType1 { get; set; }
+
+            public TimeSpan WrongType2 { get; set; }
         }
 
         [Fact]
@@ -77,6 +85,8 @@ namespace PinkParrot.Infrastructure.Reflection
             Assert.Equal(class1.MappedString, class2.MappedString);
             Assert.Equal(class1.MappedNumber, class2.MappedNumber);
             Assert.Equal(class1.MappedGuid.ToString(), class2.MappedGuid);
+            Assert.Equal(class1.WrongType1, 0L);
+            Assert.Equal(class1.WrongType2, 0L);
             Assert.NotEqual(class1.UnmappedString, class2.UnmappedString);
         }
     }
