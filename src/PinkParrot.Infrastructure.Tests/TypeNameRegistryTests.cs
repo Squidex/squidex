@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// ==========================================================================
+//  TypeNameRegistryTests.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace PinkParrot.Infrastructure
