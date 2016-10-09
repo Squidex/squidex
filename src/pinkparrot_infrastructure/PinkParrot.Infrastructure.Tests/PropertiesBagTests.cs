@@ -31,6 +31,19 @@ namespace PinkParrot.Infrastructure
         }
 
         [Fact]
+        public void Should_serialize_and_deserialize_empty()
+        {
+            var serializerSettings = new JsonSerializerSettings();
+
+            serializerSettings.Converters.Add(new PropertiesBagConverter());
+
+            var content = JsonConvert.SerializeObject(bag, serializerSettings);
+            var response = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
+            
+            Assert.Equal(bag.Count, response.Count);
+        }
+
+        [Fact]
         public void Should_serialize_and_deserialize()
         {
             var time = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
@@ -313,6 +326,14 @@ namespace PinkParrot.Infrastructure
         }
 
         [Fact]
+        public void Should_provide_null()
+        {
+            bag.Set("Key", null);
+
+            AssertNull();
+        }
+
+        [Fact]
         public void Should_throw_when_converting_instant_to_number()
         {
             bag.Set("Key", SystemClock.Instance.GetCurrentInstant());
@@ -333,6 +354,12 @@ namespace PinkParrot.Infrastructure
             Assert.Equal(expected, bag["Key"].ToString());
 
             Assert.Equal(expected, (string)dynamicBag.Key);
+        }
+
+        private void AssertNull()
+        {
+            Assert.Null(bag["Key"].ToString());
+            Assert.Null(bag["Key"].RawValue);
         }
 
         private void AssertBoolean(bool expected)
