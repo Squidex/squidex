@@ -20,7 +20,7 @@ using PinkParrot.Infrastructure.CQRS.Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Pipeline;
-using PinkParrot.Read.Repositories.Implementations.Mongo;
+using PinkParrot.Store.MongoDb.Infrastructure;
 
 namespace PinkParrot.Configurations
 {

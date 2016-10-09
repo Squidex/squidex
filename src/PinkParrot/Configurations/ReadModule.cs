@@ -8,10 +8,12 @@
 
 using Autofac;
 using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Read.Repositories;
-using PinkParrot.Read.Repositories.Implementations.Mongo;
-using PinkParrot.Read.Services;
-using PinkParrot.Read.Services.Implementations;
+using PinkParrot.Read.Infrastructure.Services;
+using PinkParrot.Read.Infrastructure.Services.Implementations;
+using PinkParrot.Read.Schemas.Repositories;
+using PinkParrot.Read.Schemas.Services;
+using PinkParrot.Read.Schemas.Services.Implementations;
+using PinkParrot.Store.MongoDb.Schemas;
 
 namespace PinkParrot.Configurations
 {

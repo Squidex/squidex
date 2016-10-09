@@ -16,8 +16,8 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Modules.Api.Schemas.Models;
 using PinkParrot.Pipeline;
-using PinkParrot.Read.Models;
-using PinkParrot.Read.Repositories;
+using PinkParrot.Read.Schemas.Repositories;
+using PinkParrot.Store.MongoDb.Schemas.Models;
 using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Modules.Api.Schemas

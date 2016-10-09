@@ -22,7 +22,7 @@ namespace PinkParrot.Configurations
     {
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings)
         {
-            settings.Binder = new TypeNameSerializationBinder();
+            settings.SerializationBinder = new TypeNameSerializationBinder();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Converters.Add(new PropertiesBagConverter());
             settings.NullValueHandling = NullValueHandling.Ignore;

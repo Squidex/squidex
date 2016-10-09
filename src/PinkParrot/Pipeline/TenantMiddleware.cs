@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using PinkParrot.Read.Services;
+using PinkParrot.Read.Infrastructure.Services;
 
 namespace PinkParrot.Pipeline
 {

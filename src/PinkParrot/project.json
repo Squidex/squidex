@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "Autofac": "4.1.0",
+    "Autofac": "4.1.1",
     "Autofac.Extensions.DependencyInjection": "4.0.0",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
-    "Microsoft.AspNetCore.Mvc": "1.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Razor.Tools": {
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
     "Microsoft.Extensions.Configuration.Json": "1.0.0",
@@ -18,17 +18,18 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.NETCore.App": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "platform"
     },
-    "MongoDB.Driver": "2.3.0-rc1",
+    "MongoDB.Driver": "2.4.0-beta1",
     "OpenCover": "4.6.519",
     "PinkParrot.Core": "1.0.0-*",
     "PinkParrot.Events": "1.0.0-*",
     "PinkParrot.Infrastructure": "1.0.0-*",
     "PinkParrot.Read": "1.0.0-*",
+    "PinkParrot.Store.MongoDb": "1.0.0-*",
     "PinkParrot.Write": "1.0.0-*",
-    "ReportGenerator": "2.4.5"
+    "ReportGenerator": "2.5.0-beta1"
   },
 
   "tools": {

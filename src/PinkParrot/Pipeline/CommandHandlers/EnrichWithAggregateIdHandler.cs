@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Read.Services;
+using PinkParrot.Read.Schemas.Services;
 using PinkParrot.Write;
 using PinkParrot.Write.Schemas;
 
