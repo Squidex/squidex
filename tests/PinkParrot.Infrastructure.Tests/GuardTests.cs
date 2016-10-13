@@ -321,19 +321,19 @@ namespace PinkParrot.Infrastructure
         [Fact]
         public void Valid_should_throw_if_null()
         {
-            Assert.Throws<ArgumentNullException>(() => Guard.Valid(null, "Parameter", "Message"));
+            Assert.Throws<ArgumentNullException>(() => Guard.Valid(null, "Parameter", () => "Message"));
         }
 
         [Fact]
         public void Valid_should_throw_if_invalid()
         {
-            Assert.Throws<ValidationException>(() => Guard.Valid(new ValidatableInvalid(), "Parameter", "Message"));
+            Assert.Throws<ValidationException>(() => Guard.Valid(new ValidatableInvalid(), "Parameter", () => "Message"));
         }
 
         [Fact]
         public void Valid_should_do_nothing_if_valid()
         {
-            Guard.Valid(new ValidatableValid(), "Parameter", "Message");
+            Guard.Valid(new ValidatableValid(), "Parameter", () => "Message");
         }
     }
 }

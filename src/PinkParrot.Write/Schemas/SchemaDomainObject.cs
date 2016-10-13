@@ -13,6 +13,8 @@ using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.Dispatching;
+using PinkParrot.Infrastructure.Reflection;
+using PinkParrot.Write.Schemas.Commands;
 
 namespace PinkParrot.Write.Schemas
 {
@@ -101,32 +103,42 @@ namespace PinkParrot.Write.Schemas
             isDeleted = false;
         }
 
-        public void AddField(string name, FieldProperties properties)
+        public void AddField(AddField command, FieldProperties properties)
         {
+            Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
+            Guard.NotNull(properties, nameof(properties));
+
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldAdded { FieldId = ++totalFields, Name = name, Properties = properties });
+            RaiseEvent(new FieldAdded { FieldId = ++totalFields, Name = command.Name, Properties = properties });
         }
 
-        public void Create(Guid newAppId, string name, SchemaProperties properties)
+        public void UpdateField(UpdateField command, FieldProperties properties)
         {
+            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
+            Guard.NotNull(properties, nameof(properties));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(new FieldUpdated { FieldId = command.FieldId, Properties = properties });
+        }
+
+        public void Create(CreateSchema command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot create schema");
+
             VerifyNotCreated();
-            
-            RaiseEvent(new SchemaCreated { AppId = newAppId, Name = name, Properties = properties });
+
+            RaiseEvent(SimpleMapper.Map(command, new SchemaCreated()));
         }
 
-        public void Update(SchemaProperties properties)
+        public void Update(UpdateSchema command)
         {
-            VerifyCreatedAndNotDeleted();
-            
-            RaiseEvent(new SchemaUpdated { Properties = properties });
-        }
+            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
 
-        public void UpdateField(long fieldId, FieldProperties properties)
-        {
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new FieldUpdated { FieldId = fieldId, Properties = properties });
+            RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
         }
 
         public void HideField(long fieldId)

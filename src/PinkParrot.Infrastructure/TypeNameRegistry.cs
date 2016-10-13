@@ -72,7 +72,7 @@ namespace PinkParrot.Infrastructure
 
             if (result == null)
             {
-                throw new ArgumentException($"There is not name for type '{type}");
+                throw new ArgumentException($"There is no name for type '{type}");
             }
 
             return result;
@@ -84,7 +84,7 @@ namespace PinkParrot.Infrastructure
 
             if (result == null)
             {
-                throw new ArgumentException($"There is not type for name '{name}");
+                throw new ArgumentException($"There is no type for name '{name}");
             }
 
             return result;

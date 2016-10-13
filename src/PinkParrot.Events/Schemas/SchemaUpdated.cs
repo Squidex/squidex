@@ -8,11 +8,12 @@
 
 using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("SchemaUpdated")]
-    public class SchemaUpdated : AppEvent
+    public class SchemaUpdated : IEvent
     {
         public SchemaProperties Properties { get; set; }
     }

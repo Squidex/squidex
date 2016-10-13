@@ -199,11 +199,11 @@ namespace PinkParrot.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Valid(IValidatable target, string parameterName, string message)
+        public static void Valid(IValidatable target, string parameterName, Func<string> message)
         {
             NotNull(target, parameterName);
 
-            target.Validate(() => message);
+            target.Validate(message);
         }
     }
 }

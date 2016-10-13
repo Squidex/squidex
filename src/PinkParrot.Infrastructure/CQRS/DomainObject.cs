@@ -71,7 +71,7 @@ namespace PinkParrot.Infrastructure.CQRS
             uncomittedEvents.Clear();
         }
 
-        ICollection<Envelope<IEvent>> IAggregate.GetUncomittedEvents()
+        public ICollection<Envelope<IEvent>> GetUncomittedEvents()
         {
             return uncomittedEvents;
         }

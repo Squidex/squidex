@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ListSchemaDto.cs
+//  MongoEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,17 +7,25 @@
 // ==========================================================================
 
 using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using PinkParrot.Read;
 
-namespace PinkParrot.Modules.Api.Schemas.Models
+namespace PinkParrot.Store.MongoDb.Utils
 {
-    public class ListSchemaDto
+    public abstract class MongoEntity : IEntity
     {
+        [BsonId]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
-        
-        public string Name { get; set; }
-        
+
+        [BsonRequired]
+        [BsonElement]
         public DateTime Created { get; set; }
-        
+
+        [BsonRequired]
+        [BsonElement]
         public DateTime LastModified { get; set; }
     }
 }

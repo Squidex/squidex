@@ -14,11 +14,9 @@ namespace PinkParrot.Modules.Api.Schemas.Models
 {
     public class CreateFieldDto
     {
-        [Required]
         [JsonProperty("$type")]
         public string Type { get; set; }
-
-        [Required]
+        
         public string Name { get; set; }
         
         public JObject Properties { get; set; }

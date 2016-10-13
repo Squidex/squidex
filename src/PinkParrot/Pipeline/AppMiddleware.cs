@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using PinkParrot.Read.Apps.Services;
 
@@ -15,22 +16,28 @@ namespace PinkParrot.Pipeline
     public sealed class AppMiddleware
     {
         private readonly IAppProvider appProvider;
+        private readonly IHostingEnvironment appEnvironment;
         private readonly RequestDelegate next;
 
-        public AppMiddleware(RequestDelegate next, IAppProvider appProvider)
+        public AppMiddleware(RequestDelegate next, IAppProvider appProvider, IHostingEnvironment appEnvironment)
         {
             this.next = next;
-
             this.appProvider = appProvider;
+            this.appEnvironment = appEnvironment;
         }
 
         public async Task Invoke(HttpContext context)
         {
-            var appId = await appProvider.FindAppIdByNameAsync(context.Request.Host.ToString().Split('.')[0]);
+            var hostParts = context.Request.Host.ToString().Split('.');
 
-            if (appId.HasValue)
+            if (appEnvironment.IsDevelopment() || hostParts.Length >= 3)
             {
-                context.Features.Set<IAppFeature>(new AppFeature(appId.Value));
+                var appId = await appProvider.FindAppIdByNameAsync(hostParts[0]);
+
+                if (appId.HasValue)
+                {
+                    context.Features.Set<IAppFeature>(new AppFeature(appId.Value));
+                }
             }
 
             await next(context);

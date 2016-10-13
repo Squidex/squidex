@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  FieldAdded.cs
+//  SchemaFixture.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -8,17 +8,21 @@
 
 using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
+using System.Reflection;
+using Xunit;
 
-namespace PinkParrot.Events.Schemas
+namespace PinkParrot.Write.Tests.Utils
 {
-    [TypeName("FieldAddedEvent")]
-    public class FieldAdded : IEvent
+    public class SchemaFixture
     {
-        public long FieldId { get; set; }
+        public SchemaFixture()
+        {
+            TypeNameRegistry.Map(typeof(Schema).GetTypeInfo().Assembly);
+        }
+    }
 
-        public string Name { get; set; }
-
-        public FieldProperties Properties { get; set; }
+    [CollectionDefinition("Schema")]
+    public class DatabaseCollection : ICollectionFixture<SchemaFixture>
+    {
     }
 }

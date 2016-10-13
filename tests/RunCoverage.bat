@@ -19,7 +19,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\pinkparrot_infrastructure\PinkParrot.Infrastructure.Tests" ^
+-targetargs:"test %~dp0\PinkParrot.Infrastructure.Tests" ^
 -filter:"+[PinkParrot*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Infrastructure.xml" ^
@@ -28,7 +28,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\pinkparrot_write\PinkParrot.Write.Tests" ^
+-targetargs:"test %~dp0\PinkParrot.Write.Tests" ^
 -filter:"+[PinkParrot*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Write.xml" ^

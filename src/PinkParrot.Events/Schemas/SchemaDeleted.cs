@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using PinkParrot.Infrastructure;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("SchemaDeleted")]
-    public class SchemaDeleted : AppEvent
+    public class SchemaDeleted : IEvent
     {
     }
 }

@@ -17,26 +17,13 @@ using PinkParrot.Store.MongoDb.Utils;
 
 namespace PinkParrot.Store.MongoDb.Schemas
 {
-    public sealed class MongoSchemaEntity : ISchemaEntityWithSchema
+    public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntityWithSchema
     {
         private Schema schema;
-
-        [BsonId]
-        [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
         public string Name { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public DateTime Created { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public DateTime LastModified { get; set; }
 
         [BsonRequired]
         [BsonElement]

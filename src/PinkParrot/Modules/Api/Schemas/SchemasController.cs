@@ -62,8 +62,6 @@ namespace PinkParrot.Modules.Api.Schemas
         {
             var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
 
-            command.Properties = command.Properties ?? new SchemaProperties(null, null);
-
             await CommandBus.PublishAsync(command);
 
             return CreatedAtAction("Query", new EntityCreatedDto { Id = command.AggregateId });

@@ -8,11 +8,12 @@
 
 using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("FieldUpdatedEvent")]
-    public class FieldUpdated : AppEvent
+    public class FieldUpdated : IEvent
     {
         public long FieldId { get; set; }
 

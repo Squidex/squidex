@@ -9,6 +9,7 @@
 using Autofac;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Pipeline.CommandHandlers;
+using PinkParrot.Write.Apps;
 using PinkParrot.Write.Schemas;
 
 namespace PinkParrot.Configurations
@@ -24,6 +25,14 @@ namespace PinkParrot.Configurations
             builder.RegisterType<EnrichWithAppIdHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
+
+            builder.RegisterType<AppCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<AppDomainObject>()
+                .AsSelf()
+                .InstancePerDependency();
 
             builder.RegisterType<SchemaCommandHandler>()
                 .As<ICommandHandler>()

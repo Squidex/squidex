@@ -8,10 +8,11 @@
 
 using System.Collections.Generic;
 using PinkParrot.Infrastructure;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write.Apps.Commands
 {
-    public sealed class CreateApp : IValidatable
+    public sealed class CreateApp : AggregateCommand, IValidatable
     {
         public string Name { get; set; }
 
@@ -19,7 +20,7 @@ namespace PinkParrot.Write.Apps.Commands
         {
             if (!Name.IsSlug())
             {
-                errors.Add(new ValidationError("Name must be a valid slug", "Name"));
+                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
             }
         }
     }

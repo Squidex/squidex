@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using PinkParrot.Infrastructure;
+using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("FieldShownEvent")]
-    public class FieldShown : AppEvent
+    public class FieldShown : IEvent
     {
         public long FieldId { get; set; }
     }

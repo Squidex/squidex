@@ -12,7 +12,11 @@ using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using PinkParrot.Infrastructure.CQRS.EventStore;
+using PinkParrot.Read.Apps.Repositories;
+using PinkParrot.Read.Schemas.Repositories;
+using PinkParrot.Store.MongoDb.Apps;
 using PinkParrot.Store.MongoDb.Infrastructure;
+using PinkParrot.Store.MongoDb.Schemas;
 
 namespace PinkParrot.Store.MongoDb
 {
@@ -51,6 +55,14 @@ namespace PinkParrot.Store.MongoDb
 
             builder.RegisterType<MongoPositionStorage>()
                 .As<IStreamPositionStorage>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoSchemaRepository>()
+                .As<ISchemaRepository>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoAppRepository>()
+                .As<IAppRepository>()
                 .SingleInstance();
         }
     }

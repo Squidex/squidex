@@ -8,7 +8,6 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Modules.Api.Schemas.Models;
@@ -31,8 +30,6 @@ namespace PinkParrot.Modules.Api.Schemas
         {
             var command = SimpleMapper.Map(model, new AddField());
 
-            command.Properties = command.Properties ?? new JObject();
-
             return CommandBus.PublishAsync(command);
         }
 
@@ -40,7 +37,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [Route("api/schemas/{name}/fields/{fieldId:long}/")]
         public Task Update(string name, long fieldId, [FromBody] UpdateFieldDto model)
         {
-            var command = new UpdateField { FieldId = fieldId, Properties = model.Properties };
+            var command = SimpleMapper.Map(model, new UpdateField());
 
             return CommandBus.PublishAsync(command);
         }

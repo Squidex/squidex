@@ -41,7 +41,7 @@ namespace PinkParrot.Write.Apps
 
         public void Create(CreateApp command)
         {
-            Guard.Valid(command, nameof(command), "Cannot create app");
+            Guard.Valid(command, nameof(command), () => "Cannot create app");
 
             VerifyNotCreated();
 

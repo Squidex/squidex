@@ -51,7 +51,7 @@ namespace PinkParrot.Write.Schemas
 
                 throw new ValidationException("Cannot create a new schema", error);
             }
-            await CreateAsync(command, s => s.Create(command.AppId, command.Name, command.Properties));
+            await CreateAsync(command, s => s.Create(command));
         }
 
         public Task On(DeleteSchema command)
@@ -86,7 +86,7 @@ namespace PinkParrot.Write.Schemas
 
         public Task On(UpdateSchema command)
         {
-            return UpdateAsync(command, s => s.Update(command.Properties));
+            return UpdateAsync(command, s => s.Update(command));
         }
 
         public Task On(AddField command)
@@ -94,7 +94,7 @@ namespace PinkParrot.Write.Schemas
             var propertiesType = registry.FindByTypeName(command.Type).PropertiesType;
             var propertiesValue = CreateProperties(command.Properties, propertiesType);
 
-            return UpdateAsync(command, s => s.AddField(command.Name, propertiesValue));
+            return UpdateAsync(command, s => s.AddField(command, propertiesValue));
         }
 
         public Task On(UpdateField command)
@@ -111,7 +111,7 @@ namespace PinkParrot.Write.Schemas
                 var propertiesType = registry.FindByPropertiesType(field.RawProperties.GetType()).PropertiesType;
                 var propertiesValue = CreateProperties(command.Properties, propertiesType);
 
-                s.UpdateField(command.FieldId, propertiesValue);
+                s.UpdateField(command, propertiesValue);
             });
         }
 

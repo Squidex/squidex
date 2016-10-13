@@ -1,19 +1,21 @@
 ﻿// ==========================================================================
-//  FieldDeleted.cs
+//  MongoAppEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
+using MongoDB.Bson.Serialization.Attributes;
+using PinkParrot.Read.Apps;
+using PinkParrot.Store.MongoDb.Utils;
 
-namespace PinkParrot.Events.Schemas
+namespace PinkParrot.Store.MongoDb.Apps
 {
-    [TypeName("FieldDeletedEvent")]
-    public class FieldDeleted : IEvent
+    public sealed class MongoAppEntity : MongoEntity, IAppEntity
     {
-        public long FieldId { get; set; }
+        [BsonRequired]
+        [BsonElement]
+        public string Name { get; set; }
     }
 }

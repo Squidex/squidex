@@ -14,7 +14,7 @@ namespace PinkParrot.Read.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
-        Task<List<ISchemaEntity>> QueryAllAsync(Guid appId);
+        Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId);
 
         Task<Guid?> FindSchemaIdAsync(Guid appId, string name);
 

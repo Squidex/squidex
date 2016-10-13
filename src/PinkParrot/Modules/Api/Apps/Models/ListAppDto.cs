@@ -1,19 +1,23 @@
 ﻿// ==========================================================================
-//  FieldDeleted.cs
+//  ListAppDto.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
+using System;
 
-namespace PinkParrot.Events.Schemas
+namespace PinkParrot.Modules.Api.Apps.Models
 {
-    [TypeName("FieldDeletedEvent")]
-    public class FieldDeleted : IEvent
+    public sealed class ListAppDto
     {
-        public long FieldId { get; set; }
+        public Guid Id { get; set; }
+        
+        public string Name { get; set; }
+        
+        public DateTime Created { get; set; }
+        
+        public DateTime LastModified { get; set; }
     }
 }

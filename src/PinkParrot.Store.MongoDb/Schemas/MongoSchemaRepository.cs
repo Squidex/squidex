@@ -18,6 +18,7 @@ using PinkParrot.Infrastructure;
 using PinkParrot.Infrastructure.CQRS;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.Dispatching;
+using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Read.Schemas.Repositories;
 using PinkParrot.Store.MongoDb.Schemas.Models;
 using PinkParrot.Store.MongoDb.Utils;
@@ -44,7 +45,7 @@ namespace PinkParrot.Store.MongoDb.Schemas
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
         }
 
-        public async Task<List<ISchemaEntity>> QueryAllAsync(Guid appId)
+        public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
             var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
 
@@ -131,12 +132,7 @@ namespace PinkParrot.Store.MongoDb.Schemas
 
         public Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, e =>
-            {
-                e.Name = @event.Name;
-
-                Serialize(e, Schema.Create(@event.Name, @event.Properties));
-            });
+            return Collection.CreateAsync(headers, s => SimpleMapper.Map(s, @event));
         }
 
         public Task On(Envelope<IEvent> @event)
