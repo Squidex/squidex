@@ -40,9 +40,9 @@ namespace PinkParrot.Pipeline.CommandHandlers
                 return false;
             }
             
-            var tenantCommand = context.Command as ITenantCommand;
+            var appCommand = context.Command as IAppCommand;
 
-            if (tenantCommand == null)
+            if (appCommand == null)
             {
                 return false;
             }
@@ -53,7 +53,7 @@ namespace PinkParrot.Pipeline.CommandHandlers
             {
                 var schemaName = routeValues["name"].ToString();
 
-                var id = await schemaProvider.FindSchemaIdByNameAsync(tenantCommand.TenantId, schemaName);
+                var id = await schemaProvider.FindSchemaIdByNameAsync(appCommand.AppId, schemaName);
 
                 if (!id.HasValue)
                 {

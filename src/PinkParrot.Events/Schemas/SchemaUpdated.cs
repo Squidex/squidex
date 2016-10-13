@@ -12,7 +12,7 @@ using PinkParrot.Infrastructure;
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("SchemaUpdated")]
-    public class SchemaUpdated : TenantEvent
+    public class SchemaUpdated : AppEvent
     {
         public SchemaProperties Properties { get; set; }
     }

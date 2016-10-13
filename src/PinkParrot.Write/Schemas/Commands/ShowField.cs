@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class ShowField : TenantCommand
+    public class ShowField : AppCommand
     {
         public long FieldId { get; set; }
     }

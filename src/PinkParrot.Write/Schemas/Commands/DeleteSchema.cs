@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class DeleteSchema : TenantCommand
+    public class DeleteSchema : AppCommand
     {
     }
 }

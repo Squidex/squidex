@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class AddField : TenantCommand
+    public class AddField : AppCommand
     {
         public string Name { get; set; }
 

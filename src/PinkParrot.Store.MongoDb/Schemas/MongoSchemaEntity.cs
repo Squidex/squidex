@@ -40,7 +40,7 @@ namespace PinkParrot.Store.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public Guid TenantId { get; set; }
+        public Guid AppId { get; set; }
         
         [BsonRequired]
         [BsonElement]

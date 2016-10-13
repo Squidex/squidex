@@ -37,7 +37,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [Route("api/schemas/")]
         public async Task<List<ListSchemaDto>> Query()
         {
-            var schemas = await schemaRepository.QueryAllAsync(TenantId);
+            var schemas = await schemaRepository.QueryAllAsync(AppId);
 
             return schemas.Select(s => SimpleMapper.Map(s, new ListSchemaDto())).ToList();
         }
@@ -46,7 +46,7 @@ namespace PinkParrot.Modules.Api.Schemas
         [Route("api/schemas/{name}/")]
         public async Task<ActionResult> Get(string name)
         {
-            var entity = await schemaRepository.FindSchemaAsync(TenantId, name);
+            var entity = await schemaRepository.FindSchemaAsync(AppId, name);
 
             if (entity == null)
             {

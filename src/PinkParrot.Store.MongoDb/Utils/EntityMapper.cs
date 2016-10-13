@@ -12,7 +12,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using PinkParrot.Infrastructure.CQRS;
-using PinkParrot.Read.Schemas.Repositories;
+using PinkParrot.Read;
 
 namespace PinkParrot.Store.MongoDb.Utils
 {
@@ -24,11 +24,11 @@ namespace PinkParrot.Store.MongoDb.Utils
 
             var entity = new T { Id = headers.AggregateId(), Created = timestamp };
 
-            var tenantEntity = entity as ITenantEntity;
+            var appEntity = entity as IAppEntity;
 
-            if (tenantEntity != null)
+            if (appEntity != null)
             {
-                tenantEntity.TenantId = headers.TenantId();
+                appEntity.AppId = headers.AppId();
             }
             
             return Update(entity, headers);

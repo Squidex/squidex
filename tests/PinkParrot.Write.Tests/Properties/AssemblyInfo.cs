@@ -1,5 +1,12 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿// ==========================================================================
+//  AssemblyInfo.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following

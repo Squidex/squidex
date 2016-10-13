@@ -12,7 +12,7 @@ using PinkParrot.Infrastructure;
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("FieldUpdatedEvent")]
-    public class FieldUpdated : TenantEvent
+    public class FieldUpdated : AppEvent
     {
         public long FieldId { get; set; }
 

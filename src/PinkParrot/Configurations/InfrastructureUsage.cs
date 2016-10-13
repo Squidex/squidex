@@ -13,9 +13,9 @@ namespace PinkParrot.Configurations
 {
     public static class InfrastructureUsage
     {
-        public static void UseTenants(this IApplicationBuilder app)
+        public static void UseApps(this IApplicationBuilder app)
         {
-            app.UseMiddleware<TenantMiddleware>();
+            app.UseMiddleware<AppMiddleware>();
         }
     }
 }

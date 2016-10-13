@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ITenantFeature.cs
+//  IAppAggregate.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -8,10 +8,10 @@
 
 using System;
 
-namespace PinkParrot.Pipeline
+namespace PinkParrot.Infrastructure.CQRS
 {
-    public interface ITenantFeature
+    public interface IAppAggregate : IAggregate
     {
-        Guid TenantId { get; }
+        Guid AppId { get; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ITenantAggregate.cs
+//  IAppCommand.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using System;
+using PinkParrot.Infrastructure.CQRS.Commands;
 
-namespace PinkParrot.Infrastructure.CQRS
+namespace PinkParrot.Write
 {
-    public interface ITenantAggregate : IAggregate
+    public interface IAppCommand : ICommand
     {
-        Guid TenantId { get; }
+        Guid AppId { get; set; }
     }
 }

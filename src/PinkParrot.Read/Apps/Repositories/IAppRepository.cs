@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  ITenantCommand.cs
+//  IAppRepository.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using System.Threading.Tasks;
 
-namespace PinkParrot.Write
+namespace PinkParrot.Read.Apps.Repositories
 {
-    public interface ITenantCommand : ICommand
+    public interface IAppRepository
     {
-        Guid TenantId { get; set; }
+        Task<IAppEntity> FindAppByNameAsync(string name);
     }
 }

@@ -45,13 +45,13 @@ namespace PinkParrot.Write.Schemas
 
         public async Task On(CreateSchema command)
         {
-            if (await schemaProvider.FindSchemaIdByNameAsync(command.TenantId, command.Name) != null)
+            if (await schemaProvider.FindSchemaIdByNameAsync(command.AppId, command.Name) != null)
             {
                 var error = new ValidationError($"A schema with name '{command.Name}' already exists", "Name");
 
                 throw new ValidationException("Cannot create a new schema", error);
             }
-            await CreateAsync(command, s => s.Create(command.TenantId, command.Name, command.Properties));
+            await CreateAsync(command, s => s.Create(command.AppId, command.Name, command.Properties));
         }
 
         public Task On(DeleteSchema command)

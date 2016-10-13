@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ITenantProvider.cs
+//  IEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,12 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 
-namespace PinkParrot.Read.Infrastructure.Services
+namespace PinkParrot.Read
 {
-    public interface ITenantProvider
+    public interface IEntity
     {
-        Task<Guid?> ProvideTenantIdByDomainAsync(string domain);
+        Guid Id { get; set; }
+
+        DateTime Created { get; set; }
+
+        DateTime LastModified { get; set; }
     }
 }

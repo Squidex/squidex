@@ -11,7 +11,7 @@ using PinkParrot.Infrastructure;
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("FieldDeletedEvent")]
-    public class FieldDeleted : TenantEvent
+    public class FieldDeleted : AppEvent
     {
         public long FieldId { get; set; }
     }

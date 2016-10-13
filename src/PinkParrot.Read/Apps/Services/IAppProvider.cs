@@ -1,18 +1,18 @@
 ﻿// ==========================================================================
-//  FieldShown.cs
+//  IAppProvider.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
+using System;
+using System.Threading.Tasks;
 
-namespace PinkParrot.Events.Schemas
+namespace PinkParrot.Read.Apps.Services
 {
-    [TypeName("FieldShownEvent")]
-    public class FieldShown : AppEvent
+    public interface IAppProvider
     {
-        public long FieldId { get; set; }
+        Task<Guid?> FindAppIdByNameAsync(string name);
     }
 }

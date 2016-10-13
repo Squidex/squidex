@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  TenantProvider.cs
+//  IAppEntity.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -7,15 +7,11 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 
-namespace PinkParrot.Read.Infrastructure.Services.Implementations
+namespace PinkParrot.Read
 {
-    public sealed class TenantProvider : ITenantProvider
+    public interface IAppEntity : IEntity
     {
-        public Task<Guid?> ProvideTenantIdByDomainAsync(string domain)
-        {
-            return Task.FromResult<Guid?>(Guid.Empty);
-        }
+        Guid AppId { get; set; }
     }
 }

@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace PinkParrot.Read.Schemas.Repositories
 {
-    public interface ISchemaEntity : ITenantEntity
+    public interface ISchemaEntity : IAppEntity
     {
         string Name { get; }
     }

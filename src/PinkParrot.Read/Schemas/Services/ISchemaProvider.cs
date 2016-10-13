@@ -13,6 +13,6 @@ namespace PinkParrot.Read.Schemas.Services
 {
     public interface ISchemaProvider
     {
-        Task<Guid?> FindSchemaIdByNameAsync(Guid tenantId, string name);
+        Task<Guid?> FindSchemaIdByNameAsync(Guid appId, string name);
     }
 }

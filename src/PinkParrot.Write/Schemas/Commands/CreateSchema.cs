@@ -10,7 +10,7 @@ using PinkParrot.Core.Schemas;
 
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class CreateSchema : TenantCommand
+    public class CreateSchema : AppCommand
     {
         public string Name { get; set; }
 

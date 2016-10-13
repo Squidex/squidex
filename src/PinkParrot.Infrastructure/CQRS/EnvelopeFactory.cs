@@ -24,11 +24,11 @@ namespace PinkParrot.Infrastructure.CQRS
                     .SetEventId(eventId)
                     .SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
-            var tenantAggregate = aggregate as ITenantAggregate;
+            var appAggregate = aggregate as IAppAggregate;
 
-            if (tenantAggregate != null)
+            if (appAggregate != null)
             {
-                envelope = envelope.SetTenantId(tenantAggregate.TenantId);
+                envelope = envelope.SetAppId(appAggregate.AppId);
             }
 
             return envelope;

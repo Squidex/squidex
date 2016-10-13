@@ -62,14 +62,14 @@ namespace PinkParrot.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Guid TenantId(this EnvelopeHeaders headers)
+        public static Guid AppId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.TenantId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.AppId].ToGuid(CultureInfo.InvariantCulture);
         }
 
-        public static Envelope<T> SetTenantId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.TenantId, value);
+            envelope.Headers.Set(CommonHeaders.AppId, value);
 
             return envelope;
         }

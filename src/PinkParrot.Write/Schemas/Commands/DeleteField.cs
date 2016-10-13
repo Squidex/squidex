@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class DeleteField : TenantCommand
+    public class DeleteField : AppCommand
     {
         public long FieldId { get; set; }
     }

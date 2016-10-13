@@ -1,7 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// ==========================================================================
+//  AppDomainObjectTest.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using PinkParrot.Infrastructure;
 using PinkParrot.Write.Apps;
 using PinkParrot.Write.Apps.Commands;

@@ -21,7 +21,7 @@ namespace PinkParrot.Configurations
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithTenantIdHandler>()
+            builder.RegisterType<EnrichWithAppIdHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 

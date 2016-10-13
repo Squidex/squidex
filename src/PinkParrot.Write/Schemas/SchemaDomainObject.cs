@@ -16,10 +16,10 @@ using PinkParrot.Infrastructure.Dispatching;
 
 namespace PinkParrot.Write.Schemas
 {
-    public class SchemaDomainObject : DomainObject, ITenantAggregate
+    public class SchemaDomainObject : DomainObject, IAppAggregate
     {
         private readonly FieldRegistry registry;
-        private Guid tenantId;
+        private Guid appId;
         private bool isDeleted;
         private long totalFields;
         private Schema schema;
@@ -29,9 +29,9 @@ namespace PinkParrot.Write.Schemas
             get { return schema; }
         }
 
-        public Guid TenantId
+        public Guid AppId
         {
-            get { return tenantId; }
+            get { return appId; }
         }
 
         public bool IsDeleted
@@ -56,7 +56,7 @@ namespace PinkParrot.Write.Schemas
 
         public void On(SchemaCreated @event)
         {
-            tenantId = @event.TenantId;
+            appId = @event.AppId;
 
             schema = Schema.Create(@event.Name, @event.Properties);
         }
@@ -108,11 +108,11 @@ namespace PinkParrot.Write.Schemas
             RaiseEvent(new FieldAdded { FieldId = ++totalFields, Name = name, Properties = properties });
         }
 
-        public void Create(Guid newTenantId, string name, SchemaProperties properties)
+        public void Create(Guid newAppId, string name, SchemaProperties properties)
         {
             VerifyNotCreated();
             
-            RaiseEvent(new SchemaCreated { TenantId = newTenantId, Name = name, Properties = properties });
+            RaiseEvent(new SchemaCreated { AppId = newAppId, Name = name, Properties = properties });
         }
 
         public void Update(SchemaProperties properties)

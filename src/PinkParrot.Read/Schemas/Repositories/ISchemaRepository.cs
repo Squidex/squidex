@@ -14,11 +14,11 @@ namespace PinkParrot.Read.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
-        Task<List<ISchemaEntity>> QueryAllAsync(Guid tenantId);
+        Task<List<ISchemaEntity>> QueryAllAsync(Guid appId);
 
-        Task<Guid?> FindSchemaIdAsync(Guid tenantId, string name);
+        Task<Guid?> FindSchemaIdAsync(Guid appId, string name);
 
-        Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid tenantId, string name);
+        Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name);
 
         Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid schemaId);
     }

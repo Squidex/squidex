@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithTenantIdHandler.cs
+//  EnrichWithAppIdHandler.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -16,29 +16,29 @@ using PinkParrot.Write;
 
 namespace PinkParrot.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithTenantIdHandler : ICommandHandler
+    public sealed class EnrichWithAppIdHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithTenantIdHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithAppIdHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var tenantCommand = context.Command as ITenantCommand;
+            var appCommand = context.Command as IAppCommand;
 
-            if (tenantCommand != null)
+            if (appCommand != null)
             {
-                var tenantFeature = httpContextAccessor.HttpContext.Features.Get<ITenantFeature>();
+                var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
 
-                if (tenantFeature == null)
+                if (appFeature == null)
                 {
-                    throw new InvalidOperationException("Cannot reslolve tenant");
+                    throw new InvalidOperationException("Cannot resolve app");
                 }
 
-                tenantCommand.TenantId = tenantFeature.TenantId;
+                appCommand.AppId = appFeature.AppId;
             }
 
             return Task.FromResult(false);

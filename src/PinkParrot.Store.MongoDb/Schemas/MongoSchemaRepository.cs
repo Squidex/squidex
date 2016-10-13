@@ -44,17 +44,17 @@ namespace PinkParrot.Store.MongoDb.Schemas
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
         }
 
-        public async Task<List<ISchemaEntity>> QueryAllAsync(Guid tenantId)
+        public async Task<List<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.TenantId == tenantId && !s.IsDeleted).ToListAsync();
+            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
 
             return entities.OfType<ISchemaEntity>().ToList();
         }
 
-        public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid tenantId, string name)
+        public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name)
         {
             var entity = 
-                await Collection.Find(s => s.Name == name && s.TenantId == tenantId && !s.IsDeleted)
+                await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
             entity?.DeserializeSchema(serializerSettings, fieldRegistry);
@@ -73,10 +73,10 @@ namespace PinkParrot.Store.MongoDb.Schemas
             return entity;
         }
 
-        public async Task<Guid?> FindSchemaIdAsync(Guid tenantId, string name)
+        public async Task<Guid?> FindSchemaIdAsync(Guid appId, string name)
         {
             var entity = 
-                await Collection.Find(s => s.Name == name & s.TenantId == tenantId && !s.IsDeleted)
+                await Collection.Find(s => s.Name == name & s.AppId == appId && !s.IsDeleted)
                     .Project<MongoSchemaEntity>(Projection.Include(x => x.Id)).FirstOrDefaultAsync();
 
             return entity?.Id;

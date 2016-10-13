@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace PinkParrot.Write.Schemas.Commands
 {
-    public class HideField : TenantCommand
+    public class HideField : AppCommand
     {
         public long FieldId { get; set; }
     }

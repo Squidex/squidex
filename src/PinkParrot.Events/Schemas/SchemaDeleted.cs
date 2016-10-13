@@ -11,7 +11,7 @@ using PinkParrot.Infrastructure;
 namespace PinkParrot.Events.Schemas
 {
     [TypeName("SchemaDeleted")]
-    public class SchemaDeleted : TenantEvent
+    public class SchemaDeleted : AppEvent
     {
     }
 }

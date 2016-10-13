@@ -69,7 +69,7 @@ namespace PinkParrot
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseTenants();
+            app.UseApps();
             app.UseMvc();
             app.UseStaticFiles();
             app.UseEventStore();

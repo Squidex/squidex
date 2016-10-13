@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  TenantCommand.cs
+//  AppCommand.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -11,8 +11,8 @@ using PinkParrot.Infrastructure.CQRS.Commands;
 
 namespace PinkParrot.Write
 {
-    public abstract class TenantCommand : AggregateCommand, ITenantCommand
+    public abstract class AppCommand : AggregateCommand, IAppCommand
     {
-        public Guid TenantId { get; set; }
+        public Guid AppId { get; set; }
     }
 }

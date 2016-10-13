@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  TenantEvent.cs
+//  AppEvent.cs
 //  PinkParrot Headless CMS
 // ==========================================================================
 //  Copyright (c) PinkParrot Group
@@ -11,8 +11,8 @@ using PinkParrot.Infrastructure.CQRS.Events;
 
 namespace PinkParrot.Events
 {
-    public class TenantEvent : IEvent
+    public class AppEvent : IEvent
     {
-        public Guid TenantId { get; set; }
+        public Guid AppId { get; set; }
     }
 }

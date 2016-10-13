@@ -22,18 +22,18 @@ namespace PinkParrot.Modules
             CommandBus = commandBus;
         }
 
-        public Guid TenantId
+        public Guid AppId
         {
             get
             {
-                var tenantFeature = HttpContext.Features.Get<ITenantFeature>();
+                var appFeature = HttpContext.Features.Get<IAppFeature>();
 
-                if (tenantFeature == null)
+                if (appFeature == null)
                 {
-                    throw new InvalidOperationException("Not in a tenant context");
+                    throw new InvalidOperationException("Not in a app context");
                 }
 
-                return tenantFeature.TenantId;
+                return appFeature.AppId;
             }
         }
     }
