@@ -7,10 +7,26 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PinkParrot.Infrastructure
 {
+    public sealed class ValidatableValid : IValidatable
+    {
+        public void Validate(IList<ValidationError> errors)
+        {
+        }
+    }
+
+    public sealed class ValidatableInvalid : IValidatable
+    {
+        public void Validate(IList<ValidationError> errors)
+        {
+            errors.Add(new ValidationError("error", "error"));
+        }
+    }
+
     public class GuardTest
     {
         [Theory]
@@ -300,6 +316,24 @@ namespace PinkParrot.Infrastructure
         public void ValidFileName_should_do_nothing_for_valid_file_name()
         {
             Guard.ValidFileName("FileName", "Parameter");
+        }
+
+        [Fact]
+        public void Valid_should_throw_if_null()
+        {
+            Assert.Throws<ArgumentNullException>(() => Guard.Valid(null, "Parameter", "Message"));
+        }
+
+        [Fact]
+        public void Valid_should_throw_if_invalid()
+        {
+            Assert.Throws<ValidationException>(() => Guard.Valid(new ValidatableInvalid(), "Parameter", "Message"));
+        }
+
+        [Fact]
+        public void Valid_should_do_nothing_if_valid()
+        {
+            Guard.Valid(new ValidatableValid(), "Parameter", "Message");
         }
     }
 }

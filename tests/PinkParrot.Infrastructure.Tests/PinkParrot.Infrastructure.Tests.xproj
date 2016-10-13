@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>840c02b1-48f8-4c8a-8862-8a3fdefde8d5</ProjectGuid>
+    <ProjectGuid>7fd0a92b-7862-4bb1-932b-b52a9cacb56b</ProjectGuid>
     <RootNamespace>PinkParrot.Infrastructure</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>

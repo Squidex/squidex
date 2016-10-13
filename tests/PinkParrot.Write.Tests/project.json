@@ -1,0 +1,31 @@
+﻿{
+  "buildOptions": {
+    "copyToOutput": {
+      "include": [
+        "xunit.runner.json"
+      ]
+    }
+  },
+  "dependencies": {
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "PinkParrot.Core": "1.0.0-*",
+    "PinkParrot.Infrastructure": "1.0.0-*",
+    "PinkParrot.Write": "1.0.0-*",
+    "xunit": "2.2.0-beta3-build3402"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.1"
+        }
+      }
+    }
+  },
+  "testRunner": "xunit",
+  "tooling": {
+    "defaultNamespace": "PinkParrot.Core.Tests"
+  },
+  "version": "1.0.0-*"
+}
