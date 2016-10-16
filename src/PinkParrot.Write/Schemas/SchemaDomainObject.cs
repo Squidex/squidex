@@ -100,7 +100,7 @@ namespace PinkParrot.Write.Schemas
 
         public void On(SchemaDeleted @event)
         {
-            isDeleted = false;
+            isDeleted = true;
         }
 
         public void AddField(AddField command, FieldProperties properties)

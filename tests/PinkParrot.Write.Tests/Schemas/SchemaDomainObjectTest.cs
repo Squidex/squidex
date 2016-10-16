@@ -102,5 +102,30 @@ namespace PinkParrot.Write.Tests.Schemas
                 .ShouldBeEquivalentTo(
                     new SchemaUpdated { Properties = props });
         }
+
+        [Fact]
+        public void Delete_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Delete());
+        }
+
+        [Fact]
+        public void Delete_should_throw_if_already_deleted()
+        {
+            sut.Create(new CreateSchema { Name = TestName });
+            sut.Delete();
+
+            Assert.Throws<DomainException>(() => sut.Delete());
+        }
+
+        [Fact]
+        public void Delete_should_refresh_properties()
+        {
+            sut.Create(new CreateSchema { Name = TestName, AppId = appId });
+            sut.Delete();
+
+            Assert.True(sut.IsDeleted);
+            Assert.IsType<SchemaDeleted>(sut.GetUncomittedEvents().Last().Payload);
+        }
     }
 }
