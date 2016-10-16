@@ -58,11 +58,6 @@ namespace PinkParrot.Infrastructure
         {
             result = null;
 
-            if (binder.Type == typeof(object))
-            {
-                result = rawValue;
-            }
-
             Func<PropertyValue, CultureInfo, object> parser;
 
             if (!Parsers.TryGetValue(binder.Type, out parser))

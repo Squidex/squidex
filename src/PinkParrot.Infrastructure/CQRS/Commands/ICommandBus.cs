@@ -12,6 +12,6 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
 {
     public interface ICommandBus
     {
-        Task PublishAsync(ICommand command);
+        Task<CommandContext> PublishAsync(ICommand command);
     }
 }

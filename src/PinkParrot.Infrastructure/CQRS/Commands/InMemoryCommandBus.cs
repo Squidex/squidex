@@ -23,7 +23,7 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
             this.handlers = handlers;
         }
 
-        public async Task PublishAsync(ICommand command)
+        public async Task<CommandContext> PublishAsync(ICommand command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -50,6 +50,8 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
             {
                 throw context.Exception;
             }
+
+            return context;
         }
     }
 }

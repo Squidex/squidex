@@ -49,14 +49,11 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
 
         protected Task CreateAsync(IAggregateCommand command, Action<T> creator)
         {
-            Guard.NotNull(creator, nameof(creator));
-            Guard.NotNull(command, nameof(command));
-
-            var domainObject = domainObjectFactory.CreateNew<T>(command.AggregateId);
-
-            creator(domainObject);
-
-            return domainObjectRepository.SaveAsync(domainObject, command.AggregateId);
+            return CreateAsync(command, x =>
+            {
+                creator(x);
+                return Task.FromResult(true);
+            });
         }
 
         protected async Task UpdateAsync(IAggregateCommand command, Func<T, Task> updater)
@@ -71,16 +68,13 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
             await domainObjectRepository.SaveAsync(domainObject, Guid.NewGuid());
         }
 
-        protected async Task UpdateAsync(IAggregateCommand command, Action<T> updater)
+        protected Task UpdateAsync(IAggregateCommand command, Action<T> updater)
         {
-            Guard.NotNull(updater, nameof(updater));
-            Guard.NotNull(command, nameof(command));
-
-            var domainObject = await domainObjectRepository.GetByIdAsync<T>(command.AggregateId);
-
-            updater(domainObject);
-
-            await domainObjectRepository.SaveAsync(domainObject, Guid.NewGuid());
+            return UpdateAsync(command, x =>
+            {
+                updater(x);
+                return Task.FromResult(true);
+            });
         }
 
         public abstract Task<bool> HandleAsync(CommandContext context);

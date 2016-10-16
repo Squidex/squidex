@@ -7,8 +7,10 @@
 // ==========================================================================
 
 using System;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
 using NodaTime;
 using PinkParrot.Infrastructure.Json;
@@ -179,6 +181,22 @@ namespace PinkParrot.Infrastructure
         public void Should_provide_default_value_if_not_exists()
         {
             Assert.Equal(0, (int)dynamicBag.Key);
+        }
+
+        [Fact]
+        public void Should_throw_when_parsing_failed()
+        {
+            bag.Set("Key", "abc");
+
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt32(CultureInfo.InvariantCulture));
+        }
+
+        [Fact]
+        public void Should_return_false_when_converter_does_not_exist()
+        {
+            bag.Set("Key", "abc");
+
+            Assert.Throws<RuntimeBinderException>(() => (TimeSpan)dynamicBag.Key);
         }
 
         [Fact]
