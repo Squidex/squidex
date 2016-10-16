@@ -13,6 +13,7 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 {
     public sealed class DefaultNameResolver : IStreamNameResolver
     {
+        private const string Suffix = "DomainObject";
         private readonly string prefix;
         
         public DefaultNameResolver(string prefix)
@@ -24,7 +25,14 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 
         public string GetStreamName(Type aggregateType, Guid id)
         {
-            return string.Format(CultureInfo.InvariantCulture, "{0}-{1}-{2}", prefix, char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1), id);
+            var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
+
+            if (typeName.EndsWith(Suffix))
+            {
+                typeName = typeName.Substring(0, typeName.Length - Suffix.Length);
+            }
+
+            return string.Format(CultureInfo.InvariantCulture, "{0}-{1}-{2}", prefix, typeName, id);
         }
     }
 }

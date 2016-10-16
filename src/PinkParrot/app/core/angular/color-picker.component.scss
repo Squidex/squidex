@@ -1,0 +1,56 @@
+@import '../../theme/_mixins.scss';
+
+$color-size: 24px;
+$button-size: 1.81rem;
+
+.color-palette {
+    & {
+        @include clearfix();
+        width: 8 * ($color-size + 6);
+        padding: 6px;
+    }
+
+    &-box {
+        margin: 2px;
+        border: 2px solid transparent;
+        width: $color-size;
+        height: $color-size;
+        float: left;
+    }
+
+    &-box:hover {
+        border-color: #1460A8;
+    }
+
+    &-box.selected {
+        border-color: #1875CC;
+    }
+
+    &-box.selected:hover {
+        border-color: #1875CC;
+    }
+
+    &-box.disabled {
+        border-color: transparent;
+    }
+
+    &-color {
+        border: 1px solid white;
+        width: $color-size - 4;
+        height: $color-size - 4;
+        display: block;
+    }
+}
+
+.dropdown-menu {
+    background: #eee;
+}
+
+.btn-group > .btn:first-child {
+    @include border-radius(0.25em);
+}
+
+.btn {
+    width: $button-size;
+    height: $button-size;
+}

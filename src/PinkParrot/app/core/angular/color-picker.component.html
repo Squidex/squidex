@@ -1,0 +1,11 @@
+<div class="btn-group" [class.open]="isOpen">
+    <button type="button" class="btn btn-secondary btn-sm" (click)="toggleOpen()" [style.background]="selectedColor.toString()"></button>
+
+    <div class="dropdown-menu dropdown-menu-right">
+        <div class="color-palette">
+            <span *ngFor="let color of palette.colors" class="color-palette-box" (click)="selectColor(color)" [class.selected]="selectedColor && color.eq(selectedColor)">
+                <span class="color-palette-color" [style.background]="color.toString()"></span>
+            </span>
+        </div>
+    </div>
+</div>

@@ -17,7 +17,7 @@ using PinkParrot.Events.Apps;
 
 namespace PinkParrot.Write.Tests.Apps
 {
-    public class AppDomainObjectTest
+    public class AppDomainObjectTests
     {
         private const string TestName = "app";
         private readonly AppDomainObject sut = new AppDomainObject(Guid.NewGuid(), 0);

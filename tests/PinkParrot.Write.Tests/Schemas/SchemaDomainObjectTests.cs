@@ -19,14 +19,14 @@ using Xunit;
 namespace PinkParrot.Write.Tests.Schemas
 {
     [Collection("Schema")]
-    public class SchemaDomainObjectTest
+    public class SchemaDomainObjectTests
     {
         private const string TestName = "schema";
         private readonly Guid appId = Guid.NewGuid();
         private readonly FieldRegistry registry = new FieldRegistry();
         private readonly SchemaDomainObject sut;
 
-        public SchemaDomainObjectTest()
+        public SchemaDomainObjectTests()
         {
             sut = new SchemaDomainObject(Guid.NewGuid(), 0, registry);
         }

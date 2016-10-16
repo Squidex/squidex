@@ -1,6 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// ==========================================================================
+//  InMemoryCommandBusTests.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Threading.Tasks;
 using Xunit;
 

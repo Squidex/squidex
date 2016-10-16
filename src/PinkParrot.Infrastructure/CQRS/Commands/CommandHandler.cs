@@ -44,7 +44,7 @@ namespace PinkParrot.Infrastructure.CQRS.Commands
 
             await creator(domainObject);
 
-            await domainObjectRepository.SaveAsync(domainObject, command.AggregateId);
+            await domainObjectRepository.SaveAsync(domainObject, Guid.NewGuid());
         }
 
         protected Task CreateAsync(IAggregateCommand command, Action<T> creator)

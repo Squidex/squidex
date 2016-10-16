@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ==========================================================================
+//  EnvelopeExtensionsTests.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using NodaTime;
 using Xunit;
 

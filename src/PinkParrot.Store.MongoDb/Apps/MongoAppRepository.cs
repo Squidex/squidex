@@ -28,6 +28,11 @@ namespace PinkParrot.Store.MongoDb.Apps
         {
         }
 
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
+        {
+            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+        }
+
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync()
         {
             var entities =
@@ -46,7 +51,7 @@ namespace PinkParrot.Store.MongoDb.Apps
 
         public Task On(AppCreated @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, a => SimpleMapper.Map(a, @event));
+            return Collection.CreateAsync(headers, a => SimpleMapper.Map(@event, a));
         }
 
         public Task On(Envelope<IEvent> @event)

@@ -50,6 +50,10 @@ namespace PinkParrot.Configurations
 
                 return new DefaultNameResolver(options.Prefix);
             }).SingleInstance();
+
+            builder.Register(c => new DefaultNameResolver("pinkparrot"))
+                .As<IStreamNameResolver>()
+                .SingleInstance();
         }
     }
 }

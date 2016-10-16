@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Core.Schemas;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
 using PinkParrot.Modules.Api.Schemas.Models;
@@ -64,7 +63,7 @@ namespace PinkParrot.Modules.Api.Schemas
 
             await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction("Query", new EntityCreatedDto { Id = command.AggregateId });
+            return CreatedAtAction("Get", new { name = model.Name }, new EntityCreatedDto { Id = command.Name });
         }
 
         [HttpPut]

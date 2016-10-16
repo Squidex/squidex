@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Infrastructure.CQRS.EventStore;
 using PinkParrot.Read.Apps.Repositories;
 using PinkParrot.Read.Schemas.Repositories;
@@ -59,10 +60,12 @@ namespace PinkParrot.Store.MongoDb
 
             builder.RegisterType<MongoSchemaRepository>()
                 .As<ISchemaRepository>()
+                .As<ICatchEventConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<MongoAppRepository>()
                 .As<IAppRepository>()
+                .As<ICatchEventConsumer>()
                 .SingleInstance();
         }
     }

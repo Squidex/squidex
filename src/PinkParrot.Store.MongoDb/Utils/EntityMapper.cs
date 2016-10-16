@@ -63,7 +63,7 @@ namespace PinkParrot.Store.MongoDb.Utils
 
             updater(entity);
 
-            return collection.InsertOneIfExistsAsync(entity);
+            return collection.InsertOneIfNotExistsAsync(entity);
         }
 
         public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity

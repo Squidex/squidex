@@ -10,10 +10,8 @@ using Autofac;
 using PinkParrot.Infrastructure.CQRS.Events;
 using PinkParrot.Read.Apps.Services;
 using PinkParrot.Read.Apps.Services.Implementations;
-using PinkParrot.Read.Schemas.Repositories;
 using PinkParrot.Read.Schemas.Services;
 using PinkParrot.Read.Schemas.Services.Implementations;
-using PinkParrot.Store.MongoDb.Schemas;
 
 namespace PinkParrot.Configurations
 {
@@ -28,11 +26,6 @@ namespace PinkParrot.Configurations
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
                 .As<ILiveEventConsumer>()
-                .SingleInstance();
-
-            builder.RegisterType<MongoSchemaRepository>()
-                .As<ISchemaRepository>()
-                .As<ICatchEventConsumer>()
                 .SingleInstance();
         }
     }

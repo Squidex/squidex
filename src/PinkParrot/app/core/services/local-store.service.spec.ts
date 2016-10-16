@@ -1,0 +1,59 @@
+﻿/*
+ * Athene Requirements Center
+ * 
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+import { LocalStoreService, LocalStoreServiceFactory } from './../';
+
+describe('LocalStore', () => {
+    it('should instantiate from factory', () => {
+        const localStoreService = LocalStoreServiceFactory();
+
+        expect(localStoreService).toBeDefined();
+    });
+
+    it('should instantiate', () => {
+        const localStoreService = new LocalStoreService();
+
+        expect(localStoreService).toBeDefined();
+    });
+
+    it('should call local store for set function', () => {
+        const localStoreService = new LocalStoreService();
+
+        let passedKey = '', passedVal = '';
+
+        localStoreService.configureStore({
+            setItem: (k: string, v: string) => {
+                passedKey = k;
+                passedVal = v;
+            }
+        });
+
+        localStoreService.set('mykey', 'myval');
+
+        expect(passedKey).toBe('mykey');
+        expect(passedVal).toBe('myval');
+    });
+
+    it('should call local store for get function', () => {
+        const localStoreService = new LocalStoreService();
+
+        let passedKey = '';
+
+        localStoreService.configureStore({
+            getItem: (key: string): string => {
+                passedKey = key;
+
+                return 'myval';
+            }
+        });
+
+        let returnedVal = localStoreService.get('mykey');
+
+        expect(passedKey).toBe('mykey');
+        expect(returnedVal).toBe('myval');
+    });
+});

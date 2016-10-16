@@ -1,7 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// ==========================================================================
+//  AutofacDomainObjectFactoryTests.cs
+//  PinkParrot Headless CMS
+// ==========================================================================
+//  Copyright (c) PinkParrot Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using Autofac;
 using PinkParrot.Infrastructure.CQRS.Events;
 using Xunit;

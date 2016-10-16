@@ -13,7 +13,7 @@ namespace PinkParrot.Store.MongoDb.Utils
 {
     public static class MongoExtensions
     {
-        public static async Task<bool> InsertOneIfExistsAsync<T>(this IMongoCollection<T> collection, T document)
+        public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document)
         {
             try
             {

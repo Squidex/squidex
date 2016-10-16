@@ -66,7 +66,7 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
 
             var position = positions.ReadPosition();
             
-            logger.LogInformation($"Subscribing from: {0}", position);
+            logger.LogInformation("Subscribing from {0}", position.HasValue ? position.Value.ToString() : "beginning");
 
             var settings =
                 new CatchUpSubscriptionSettings(
@@ -96,6 +96,8 @@ namespace PinkParrot.Infrastructure.CQRS.EventStore
                 }
 
                 var @event = formatter.Parse(resolvedEvent);
+
+                logger.LogInformation("Received event {0} ({1})", @event.Payload.GetType().Name, @event.Headers.AggregateId());
 
                 if (isLive)
                 {

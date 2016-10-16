@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -39,20 +40,24 @@ namespace PinkParrot
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddAppSerializers();
-            services.AddRouting();
-            services.AddMemoryCache();
-            services.AddOptions();
             services.AddEventFormatter();
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
+            services.AddLogging();
+            services.AddMemoryCache();
+            services.AddMvc().AddAppSerializers();
+            services.AddOptions();
+            services.AddRouting();
+            services.AddWebpack();
 
-            services.Configure<MongoDbModule>(
-                Configuration.GetSection("MongoDb"));
+            services.Configure<MongoDbOptions>(
+                Configuration.GetSection("stores:mongoDb"));
             services.Configure<EventStoreOptions>(
-                Configuration.GetSection("EventStore"));
+                Configuration.GetSection("stores:eventStore"));
 
             var builder = new ContainerBuilder();
             builder.RegisterModule<InfrastructureModule>();
+            builder.RegisterModule<EventStoreModule>();
+            builder.RegisterModule<MongoDbModule>();
             builder.RegisterModule<ReadModule>();
             builder.RegisterModule<WriteModule>();
             builder.Populate(services);
@@ -63,10 +68,17 @@ namespace PinkParrot
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
+            loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseWebpack();
+                app.UseDefaultFiles();
+            }
+            else
+            {
+                app.UseDefaultFiles(new DefaultFilesOptions { DefaultFileNames = new List<string> { "build/index.html" } });
             }
 
             app.UseApps();

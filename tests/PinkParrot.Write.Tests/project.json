@@ -9,6 +9,7 @@
   "dependencies": {
     "FluentAssertions": "4.15.0",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "Moq": "4.6.38-alpha",
     "PinkParrot.Core": "1.0.0-*",
     "PinkParrot.Infrastructure": "1.0.0-*",
     "PinkParrot.Write": "1.0.0-*",
@@ -27,6 +28,9 @@
   "testRunner": "xunit",
   "tooling": {
     "defaultNamespace": "PinkParrot.Core.Tests"
+  },
+  "tools": {
+    "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"
   },
   "version": "1.0.0-*"
 }

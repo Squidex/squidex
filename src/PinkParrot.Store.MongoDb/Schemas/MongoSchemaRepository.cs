@@ -132,7 +132,7 @@ namespace PinkParrot.Store.MongoDb.Schemas
 
         public Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, s => SimpleMapper.Map(s, @event));
+            return Collection.CreateAsync(headers, s => SimpleMapper.Map(@event, s));
         }
 
         public Task On(Envelope<IEvent> @event)

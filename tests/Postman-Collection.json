@@ -1,0 +1,145 @@
+{
+	"variables": [],
+	"info": {
+		"name": "PinkParrot",
+		"_postman_id": "3534653d-3285-a837-6257-a9454368e761",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Apps",
+			"description": "",
+			"item": [
+				{
+					"name": "{{url}}/api/apps",
+					"request": {
+						"url": "{{url}}/api/apps",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"my-app\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/api/apps",
+					"request": {
+						"url": "{{url}}/api/apps",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schemas",
+			"description": "",
+			"item": [
+				{
+					"name": "{{url}}/api/schemas",
+					"request": {
+						"url": "{{url}}/api/schemas",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": "Get schemas"
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/api/schemas/users",
+					"request": {
+						"url": "{{url}}/api/schemas/users",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": "Get schema"
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/api/schemas/users",
+					"request": {
+						"url": "{{url}}/api/schemas/users",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"label\": \"Users\",\n  \"hints\": \"All users in our system\"\n}"
+						},
+						"description": "Update user"
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/api/schemas",
+					"request": {
+						"url": "{{url}}/api/schemas",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"users\"\n}"
+						},
+						"description": "Create schema"
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/api/schemas/users/fields",
+					"request": {
+						"url": "{{url}}/api/schemas/users/fields",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"number\",\n  \"name\": \"age\",\n  \"properties\": {\n    \"minValue\": 1\n  }\n}"
+						},
+						"description": "Creates a field"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
