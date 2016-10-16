@@ -1,1 +1,0 @@
-{"version":3,"file":"color-palette.spec.js","sourceRoot":"","sources":["color-palette.spec.ts"],"names":[],"mappings":"AAAA;;;;;GAKG;;AAEH,iBAA6B,OAAO,CAAC,CAAA;AAErC,QAAQ,CAAC,cAAc,EAAE;IACrB,EAAE,CAAC,wBAAwB,EAAE;QACzB,IAAM,OAAO,GAAG,eAAY,CAAC,MAAM,EAAE,CAAC;QAEtC,MAAM,CAAC,OAAO,CAAC,MAAM,CAAC,MAAM,CAAC,CAAC,eAAe,CAAC,EAAE,CAAC,CAAC;IACtD,CAAC,CAAC,CAAC;AACP,CAAC,CAAC,CAAC"}
