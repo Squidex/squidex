@@ -1,0 +1,15 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model PinkParrot.Modules.UI.Account.LoginVM
+
+<form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post" class="form-horizontal">
+    <div>
+        <p>
+            @foreach (var provider in Model.ExternalProviders)
+            {
+                <button type="submit" class="btn btn-default" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+            }
+        </p>
+    </div>
+</form>

@@ -2,6 +2,13 @@
   "dependencies": {
     "Autofac": "4.1.1",
     "Autofac.Extensions.DependencyInjection": "4.0.0",
+    "IdentityServer4": "1.0.0-rc2",
+    "IdentityServer4.AspNetIdentity": "1.0.0-rc2",
+    "IdentityServer4.AccessTokenValidation": "1.0.1-rc2",
+    "Microsoft.AspNetCore.Identity": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Razor.Tools": {

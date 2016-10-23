@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "Autofac": "4.1.1",
+    "IdentityServer4": "1.0.0-rc2",
     "Microsoft.AspNetCore.Identity": "1.0.0",
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",
     "MongoDB.Driver": "2.4.0-beta1",

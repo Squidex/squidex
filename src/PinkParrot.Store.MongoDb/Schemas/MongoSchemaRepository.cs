@@ -40,6 +40,11 @@ namespace PinkParrot.Store.MongoDb.Schemas
             this.fieldRegistry = fieldRegistry;
         }
 
+        protected override string CollectionName()
+        {
+            return "Apps";
+        }
+
         protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
@@ -140,6 +145,11 @@ namespace PinkParrot.Store.MongoDb.Schemas
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
         }
 
+        private Task UpdateSchema(EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        {
+            return Collection.UpdateAsync(headers, e => UpdateSchema(e, updater));
+        }
+
         private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)
         {
             var currentSchema = Deserialize(entity);
@@ -147,11 +157,6 @@ namespace PinkParrot.Store.MongoDb.Schemas
             currentSchema = updater(currentSchema);
             
             Serialize(entity, currentSchema);
-        }
-
-        private Task UpdateSchema(EnvelopeHeaders headers, Func<Schema, Schema> updater)
-        {
-            return Collection.UpdateAsync(headers, e=> UpdateSchema(e, updater));
         }
 
         private void Serialize(MongoSchemaEntity entity, Schema schema)

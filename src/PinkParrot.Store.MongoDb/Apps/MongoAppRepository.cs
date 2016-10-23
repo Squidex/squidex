@@ -28,6 +28,11 @@ namespace PinkParrot.Store.MongoDb.Apps
         {
         }
 
+        protected override string CollectionName()
+        {
+            return "Apps";
+        }
+
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));

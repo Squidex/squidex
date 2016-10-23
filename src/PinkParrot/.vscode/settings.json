@@ -1,0 +1,30 @@
+{
+     // Controls if the editor shows reference information for the modes that support it
+    "editor.referenceInfos": false,
+
+    // When opening a file, `editor.tabSize` and `editor.insertSpaces` will be detected based on the file contents.
+    "editor.detectIndentation": false,
+
+    // Typescript version from local package to be consistent
+    "typescript.tsdk": "node_modules/typescript/lib",
+
+    // Configure glob patterns for excluding files and folders.
+    "files.exclude": {
+        "_test-output": true,
+        "**/node_modules": true,
+        "**/artifacts": true,
+        "**/build": true,
+        "**/out": true,
+        "**/obj": true,
+        "**/bin": true,
+        "**/*.lock.json": true,
+        "**/*.bat": true,
+        "**/*.sln": true,
+        "**/*.sln.DotSettings": true,
+        "**/*.user": true,
+        "**/*.xproj": true,
+        "**/*.gitattributes": true,
+        ".vs:": true,
+        ".vscode:": true
+    }
+}

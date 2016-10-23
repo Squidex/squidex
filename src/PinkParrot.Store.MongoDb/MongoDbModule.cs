@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Autofac;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
@@ -27,7 +28,7 @@ namespace PinkParrot.Store.MongoDb
         {
             builder.Register(context =>
             {
-                var options = context.Resolve<IOptions<MongoDbOptions>>().Value;
+                var options = context.Resolve<IOptions<MyMongoDbOptions>>().Value;
 
                 var mongoDbClient = new MongoClient(options.ConnectionString);
                 var mongoDatabase = mongoDbClient.GetDatabase(options.DatabaseName);
@@ -54,7 +55,11 @@ namespace PinkParrot.Store.MongoDb
                 return new RoleStore<IdentityRole>(rolesCollection);
             }).SingleInstance();
 
-            builder.RegisterType<MongoPositionStorage>()
+            builder.RegisterType<MongoPersistedGrantStore>()
+                .As<IPersistedGrantStore>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoStreamPositionStorage>()
                 .As<IStreamPositionStorage>()
                 .SingleInstance();
 

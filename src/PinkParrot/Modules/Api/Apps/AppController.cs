@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PinkParrot.Infrastructure.CQRS.Commands;
 using PinkParrot.Infrastructure.Reflection;
@@ -20,6 +21,8 @@ using PinkParrot.Write.Apps.Commands;
 
 namespace PinkParrot.Modules.Api.Apps
 {
+    [Authorize]
+    [ApiExceptionFilter]
     [DeactivateForAppDomain]
     public class AppController : ControllerBase
     {

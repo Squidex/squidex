@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +43,7 @@ namespace PinkParrot.Pipeline
 
             buffer.Seek(0, SeekOrigin.Begin);
 
-            if (context.Response.StatusCode == 200 && IsHtml(context))
+            if (context.Response.StatusCode == 200 && IsIndex(context) && IsHtml(context))
             {
                 using (var reader = new StreamReader(buffer))
                 {
@@ -119,6 +120,11 @@ namespace PinkParrot.Pipeline
             logger.LogInformation($"Inject script {scriptsTag} as a last element in the body ");
 
             return response;
+        }
+
+        private static bool IsIndex(HttpContext context)
+        {
+            return context.Request.Path.Value.Equals("/index.html", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsHtml(HttpContext context)
