@@ -42,7 +42,7 @@ namespace Squidex.Store.MongoDb.Schemas
 
         protected override string CollectionName()
         {
-            return "Apps";
+            return "Projections_Schemas";
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)

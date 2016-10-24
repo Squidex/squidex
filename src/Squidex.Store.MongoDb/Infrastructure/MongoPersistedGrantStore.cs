@@ -34,7 +34,7 @@ namespace Squidex.Store.MongoDb.Infrastructure
         
         protected override string CollectionName()
         {
-            return "PersistedGrants";
+            return "Identity_PersistedGrants";
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<PersistedGrant> collection)

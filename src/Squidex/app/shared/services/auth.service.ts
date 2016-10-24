@@ -38,13 +38,12 @@ export class AuthService {
             silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'), 
              popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
                       authority: apiUrl.buildUrl('identity-server/'),
-                      response_type: 'id_token token',
-                      scope: 'openid profile squidex-api'
+                  response_type: 'id_token token',
+                          scope: 'openid profile squidex-api'
         });
 
         this.userManager.getUser()
             .then((user) => {
-                debugger;
                 this.currentUser = user;
             })
             .catch((err) => {
