@@ -1,4 +1,11 @@
-﻿// Angular 2
+﻿/*
+ *PinkParrot CMS
+ * 
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+// Angular 2
 import '@angular/platform-browser';
 import '@angular/platform-browser-dynamic';
 import '@angular/core';

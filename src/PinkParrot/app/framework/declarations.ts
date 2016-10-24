@@ -1,4 +1,11 @@
-﻿export * from './angular/cloak.directive';
+﻿/*
+ *PinkParrot CMS
+ * 
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+export * from './angular/cloak.directive';
 export * from './angular/color-picker.component';
 export * from './angular/date-time.pipes';
 export * from './angular/drag-model.directive';

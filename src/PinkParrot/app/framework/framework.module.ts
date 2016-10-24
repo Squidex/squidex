@@ -1,4 +1,11 @@
-﻿import * as Ng2 from '@angular/core';
+﻿/*
+ *PinkParrot CMS
+ * 
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+import * as Ng2 from '@angular/core';
 import * as Ng2Http from '@angular/http';
 import * as Ng2Forms from '@angular/forms';
 import * as Ng2Common from '@angular/common';

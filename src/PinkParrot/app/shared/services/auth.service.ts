@@ -42,6 +42,7 @@ export class AuthService {
 
         this.userManager.getUser()
             .then((user) => {
+                debugger;
                 this.currentUser = user;
             })
             .catch((err) => {
