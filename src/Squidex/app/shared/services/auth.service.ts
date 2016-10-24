@@ -34,10 +34,12 @@ export class AuthService {
         Log.logger = console;
 
         this.userManager = new UserManager({
-                      client_id: 'management-portal', 
-            silent_redirect_uri: apiUrl.buildUrl('account/client-silent'), 
-             popup_redirect_uri: apiUrl.buildUrl('account/client-popup'),
-                      authority: apiUrl.buildUrl('/'), 
+                      client_id: 'squidex-frontend', 
+            silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'), 
+             popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
+                      authority: apiUrl.buildUrl('identity-server/'),
+                      response_type: 'id_token token',
+                      scope: 'openid profile squidex-api'
         });
 
         this.userManager.getUser()

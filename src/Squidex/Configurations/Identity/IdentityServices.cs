@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServer4.Models;
+using IdentityServer4.Stores;
+using IdentityServer4.Stores.InMemory;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,10 +26,14 @@ namespace Squidex.Configurations.Identity
 
             var certificate = new X509Certificate2(certPath, "password");
 
-            services.AddIdentityServer()
-                .SetSigningCredential(certificate)
-                .AddInMemoryScopes(GetScopes())
-                .AddInMemoryClients(GetClients())
+            services.AddSingleton(
+                GetScopes());
+            services.AddSingleton<IClientStore,
+                LazyClientStore>();
+            services.AddSingleton<IScopeStore,
+                InMemoryScopeStore>();
+
+            services.AddIdentityServer().SetSigningCredential(certificate)
                 .AddAspNetIdentity<IdentityUser>();
 
             return services;
@@ -47,35 +53,9 @@ namespace Squidex.Configurations.Identity
             {
                 StandardScopes.OpenId,
                 StandardScopes.Profile,
-
                 new Scope
                 {
-                    Name = "api1",
-                    Description = "My API"
-                }
-            };
-        }
-
-        public static IEnumerable<Client> GetClients()
-        {
-            return new List<Client>
-            {
-                new Client
-                {
-                    ClientId = "management-portal",
-                    ClientName = "MVC Client",
-                    RedirectUris = new List<string>
-                    {
-                        "http://localhost:5000/account/client-silent",
-                        "http://localhost:5000/account/client-popup"
-                    },
-                    AllowedGrantTypes = GrantTypes.Implicit,
-                    AllowedScopes = new List<string>
-                    {
-                        StandardScopes.OpenId.Name,
-                        StandardScopes.Profile.Name
-                    },
-                    RequireConsent = false
+                    Name = Constants.ApiScope, Type = ScopeType.Resource
                 }
             };
         }

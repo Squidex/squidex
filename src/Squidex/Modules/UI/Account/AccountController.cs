@@ -38,14 +38,14 @@ namespace Squidex.Modules.UI.Account
         }
 
         [HttpGet]
-        [Route("account/client-silent/")]
+        [Route("client-callback-silent/")]
         public IActionResult ClientSilent()
         {
             return View();
         }
 
         [HttpGet]
-        [Route("account/client-popup/")]
+        [Route("client-callback-popup/")]
         public IActionResult ClientPopup()
         {
             return View();

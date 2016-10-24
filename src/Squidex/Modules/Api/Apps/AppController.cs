@@ -23,7 +23,6 @@ namespace Squidex.Modules.Api.Apps
 {
     [Authorize]
     [ApiExceptionFilter]
-    [DeactivateForAppDomain]
     public class AppController : ControllerBase
     {
         private readonly IAppRepository appRepository;
@@ -35,7 +34,7 @@ namespace Squidex.Modules.Api.Apps
         }
 
         [HttpGet]
-        [Route("api/apps/")]
+        [Route("apps/")]
         public async Task<List<ListAppDto>> Query()
         {
             var schemas = await appRepository.QueryAllAsync();
@@ -44,7 +43,7 @@ namespace Squidex.Modules.Api.Apps
         }
 
         [HttpPost]
-        [Route("api/apps/")]
+        [Route("apps/")]
         public async Task<IActionResult> Create([FromBody] CreateAppDto model)
         {
             var command = SimpleMapper.Map(model, new CreateApp { AggregateId = Guid.NewGuid() });

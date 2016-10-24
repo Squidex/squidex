@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -16,7 +17,10 @@ using Squidex.Write.Schemas.Commands;
 
 namespace Squidex.Modules.Api.Schemas
 {
+    [Authorize]
     [ApiExceptionFilter]
+    [ServiceFilter(typeof(AppFilterAttribute))]
+    [Route("api/apps/{app}")]
     public class SchemasFieldsController : ControllerBase
     {
         public SchemasFieldsController(ICommandBus commandBus)
@@ -25,7 +29,7 @@ namespace Squidex.Modules.Api.Schemas
         }
         
         [HttpPost]
-        [Route("api/schemas/{name}/fields/")]
+        [Route("schemas/{name}/fields/")]
         public Task Add(string name, [FromBody] CreateFieldDto model)
         {
             var command = SimpleMapper.Map(model, new AddField());
@@ -34,7 +38,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpPut]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/")]
         public Task Update(string name, long fieldId, [FromBody] UpdateFieldDto model)
         {
             var command = SimpleMapper.Map(model, new UpdateField());
@@ -43,7 +47,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpPut]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/hide/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/hide/")]
         public Task Hide(string name, long fieldId)
         {
             var command = new HideField { FieldId = fieldId };
@@ -52,7 +56,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpPut]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/show/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/show/")]
         public Task Show(string name, long fieldId)
         {
             var command = new ShowField { FieldId = fieldId };
@@ -61,7 +65,7 @@ namespace Squidex.Modules.Api.Schemas
         }
         
         [HttpPut]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/enable/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/enable/")]
         public Task Enable(string name, long fieldId)
         {
             var command = new EnableField { FieldId = fieldId };
@@ -70,7 +74,7 @@ namespace Squidex.Modules.Api.Schemas
         }
         
         [HttpPut]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/disable/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/disable/")]
         public Task Disable(string name, long fieldId)
         {
             var command = new DisableField { FieldId = fieldId };
@@ -79,7 +83,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpDelete]
-        [Route("api/schemas/{name}/fields/{fieldId:long}/")]
+        [Route("schemas/{name}/fields/{fieldId:long}/")]
         public Task Delete(string name, long fieldId)
         {
             var command = new DeleteField { FieldId = fieldId };

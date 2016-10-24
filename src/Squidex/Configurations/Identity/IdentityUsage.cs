@@ -24,17 +24,12 @@ namespace Squidex.Configurations.Identity
         {
             app.UseIdentity();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = "Cookies"
-            });
-
             return app;
         }
 
         public static IApplicationBuilder UseMyIdentityServer(this IApplicationBuilder app)
         {
-            app.UseIdentityServer();
+             app.UseIdentityServer();
 
             return app;
         }
@@ -85,18 +80,19 @@ namespace Squidex.Configurations.Identity
 
         public static IApplicationBuilder UseMyApiProtection(this IApplicationBuilder app)
         {
+            const string apiScope = Constants.ApiScope;
+
             var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
 
             if (!string.IsNullOrWhiteSpace(options.BaseUrl))
             {
-                app.Map("/api", api =>
+                var apiAuthorityUrl = options.BuildUrl(Constants.IdentityPrefix);
+                
+                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
                 {
-                    api.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-                    {
-                        Authority = options.BaseUrl,
-                        ScopeName = "api",
-                        RequireHttpsMetadata = options.RequiresHttps
-                    });
+                    Authority = apiAuthorityUrl,
+                    ScopeName = apiScope,
+                    RequireHttpsMetadata = options.RequiresHttps
                 });
             }
 

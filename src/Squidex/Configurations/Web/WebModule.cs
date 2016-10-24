@@ -1,23 +1,23 @@
 ﻿// ==========================================================================
-//  InfrastructureUsage.cs
+//  WebModule.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
+using Autofac;
 using Squidex.Pipeline;
 
-namespace Squidex.Configurations.Domain
+namespace Squidex.Configurations.Web
 {
-    public static class InfrastructureUsage
+    public class WebModule : Module
     {
-        public static IApplicationBuilder UseMyApps(this IApplicationBuilder app)
+        protected override void Load(ContainerBuilder builder)
         {
-            app.UseMiddleware<AppMiddleware>();
-
-            return app;
+            builder.RegisterType<AppFilterAttribute>()
+                .AsSelf()
+                .SingleInstance();
         }
     }
 }
