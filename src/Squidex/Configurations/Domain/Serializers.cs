@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  Serializers.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,13 +10,13 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Events.Schemas;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.EventStore;
-using PinkParrot.Infrastructure.Json;
+using Squidex.Core.Schemas;
+using Squidex.Events.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.Json;
 
-namespace PinkParrot.Configurations.Domain
+namespace Squidex.Configurations.Domain
 {
     public static class Serializers
     {

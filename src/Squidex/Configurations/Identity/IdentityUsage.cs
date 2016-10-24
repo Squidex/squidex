@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  IdentityUsage.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Configurations.Identity
+namespace Squidex.Configurations.Identity
 {
     public static class IdentityUsage
     {

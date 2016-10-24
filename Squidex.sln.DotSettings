@@ -40,9 +40,9 @@
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/QUOTE_STYLE/@EntryValue">SingleQuoted</s:String>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">==========================================================================&#xD;
  $FILENAME$&#xD;
- PinkParrot Headless CMS&#xD;
+ Squidex Headless CMS&#xD;
 ==========================================================================&#xD;
- Copyright (c) PinkParrot Group&#xD;
+ Copyright (c) Squidex Group&#xD;
  All rights reserved.&#xD;
 ==========================================================================</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateInstanceFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>

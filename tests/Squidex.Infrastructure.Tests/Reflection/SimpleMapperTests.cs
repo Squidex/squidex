@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  SimpleMapperTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using Xunit;
 
-namespace PinkParrot.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection
 {
     public class SimpleMapperTests
     {

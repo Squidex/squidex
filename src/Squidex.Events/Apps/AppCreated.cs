@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  AppCreated.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace PinkParrot.Events.Apps
+namespace Squidex.Events.Apps
 {
     [TypeName("AppCreated")]
     public class AppCreated : IEvent

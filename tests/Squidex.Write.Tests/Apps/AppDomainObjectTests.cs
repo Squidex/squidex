@@ -1,21 +1,21 @@
 ﻿// ==========================================================================
 //  AppDomainObjectTest.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Infrastructure;
-using PinkParrot.Write.Apps;
-using PinkParrot.Write.Apps.Commands;
+using Squidex.Infrastructure;
+using Squidex.Write.Apps;
+using Squidex.Write.Apps.Commands;
 using Xunit;
 using System.Linq;
 using FluentAssertions;
-using PinkParrot.Events.Apps;
+using Squidex.Events.Apps;
 
-namespace PinkParrot.Write.Tests.Apps
+namespace Squidex.Write.Tests.Apps
 {
     public class AppDomainObjectTests
     {

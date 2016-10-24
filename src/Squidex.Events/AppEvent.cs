@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  AppEvent.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace PinkParrot.Events
+namespace Squidex.Events
 {
     public class AppEvent : IEvent
     {

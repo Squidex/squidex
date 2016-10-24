@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  EnumExtensionsTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using Xunit;
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     public sealed class EnumExtensionsTests
     {

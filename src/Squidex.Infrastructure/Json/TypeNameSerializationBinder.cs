@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  TypeNameSerializationBinder.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using Newtonsoft.Json.Serialization;
 
-namespace PinkParrot.Infrastructure.Json
+namespace Squidex.Infrastructure.Json
 {
     public class TypeNameSerializationBinder : DefaultSerializationBinder
     {

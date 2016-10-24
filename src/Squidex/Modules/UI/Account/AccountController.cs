@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  AccountController.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertIfStatementToReturnStatement
 
-namespace PinkParrot.Modules.UI.Account
+namespace Squidex.Modules.UI.Account
 {
     public sealed class AccountController : Controller
     {

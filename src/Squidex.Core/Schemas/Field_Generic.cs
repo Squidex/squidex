@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  Field_Generic.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Infrastructure;
+using Squidex.Infrastructure;
 
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public abstract class Field<T> : Field where T : FieldProperties
     {

@@ -1,14 +1,14 @@
 // ==========================================================================
 //  Helper.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Reflection;
 
-namespace PinkParrot.Infrastructure.Dispatching
+namespace Squidex.Infrastructure.Dispatching
 {
     internal static class Helper
     {

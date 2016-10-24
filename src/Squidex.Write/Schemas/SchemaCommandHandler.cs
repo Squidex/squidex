@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  SchemaCommandHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,14 +10,14 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Read.Schemas.Services;
-using PinkParrot.Write.Schemas.Commands;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Read.Schemas.Services;
+using Squidex.Write.Schemas.Commands;
 
-namespace PinkParrot.Write.Schemas
+namespace Squidex.Write.Schemas
 {
     public class SchemaCommandHandler : CommandHandler<SchemaDomainObject>
     {

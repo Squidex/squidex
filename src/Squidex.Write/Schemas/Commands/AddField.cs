@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  AddField.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using PinkParrot.Infrastructure;
+using Squidex.Infrastructure;
 
-namespace PinkParrot.Write.Schemas.Commands
+namespace Squidex.Write.Schemas.Commands
 {
     public class AddField : AppCommand, IValidatable
     {

@@ -1,22 +1,22 @@
 ﻿// ==========================================================================
 //  SchemaDomainObjectTest.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Linq;
 using FluentAssertions;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Events.Schemas;
-using PinkParrot.Infrastructure;
-using PinkParrot.Write.Schemas;
-using PinkParrot.Write.Schemas.Commands;
+using Squidex.Core.Schemas;
+using Squidex.Events.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Write.Schemas;
+using Squidex.Write.Schemas.Commands;
 using Xunit;
 
-namespace PinkParrot.Write.Tests.Schemas
+namespace Squidex.Write.Tests.Schemas
 {
     [Collection("Schema")]
     public class SchemaDomainObjectTests

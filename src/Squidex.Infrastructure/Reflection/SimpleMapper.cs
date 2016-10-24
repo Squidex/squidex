@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  SimpleMapper.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -13,7 +13,7 @@ using System.Linq;
 
 // ReSharper disable StaticMemberInGenericType
 
-namespace PinkParrot.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection
 {
     public static class SimpleMapper
     {

@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  SchemasController.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -12,15 +12,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.Reflection;
-using PinkParrot.Modules.Api.Schemas.Models;
-using PinkParrot.Pipeline;
-using PinkParrot.Read.Schemas.Repositories;
-using PinkParrot.Store.MongoDb.Schemas.Models;
-using PinkParrot.Write.Schemas.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Modules.Api.Schemas.Models;
+using Squidex.Pipeline;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Store.MongoDb.Schemas.Models;
+using Squidex.Write.Schemas.Commands;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace Squidex.Modules.Api.Schemas
 {
     [Authorize]
     [ApiExceptionFilter]

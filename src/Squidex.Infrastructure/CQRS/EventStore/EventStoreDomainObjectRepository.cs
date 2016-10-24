@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  EventStoreDomainObjectRepository.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -13,13 +13,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
 
 // ReSharper disable RedundantAssignment
 // ReSharper disable ConvertIfStatementToSwitchStatement
 // ReSharper disable TooWideLocalVariableScope
 
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public sealed class EventStoreDomainObjectRepository : IDomainObjectRepository
     {

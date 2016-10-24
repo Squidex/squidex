@@ -22,6 +22,6 @@
     }
   },
   "tooling": {
-    "defaultNamespace": "PinkParrot.Infrastructure"
+    "defaultNamespace": "Squidex.Infrastructure"
   }
 }

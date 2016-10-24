@@ -1,9 +1,9 @@
 {
-  "name": "pinkparrot",
+  "name": "squidex",
   "version": "1.0.0",
-  "description": "PinkParrot CMS",
+  "description": "Squidex Headless CMS",
   "license": "MIT",
-  "repository": "https://github.com/SebastianStehle/PinkParrot",
+  "repository": "https://github.com/SebastianStehle/Squidex",
   "scripts": {
     "test": "karma start",
     "test:coverage": "karma start karma.coverage.conf.js",

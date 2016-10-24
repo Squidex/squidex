@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  DispatchExtensions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
 
-namespace PinkParrot.Infrastructure.Dispatching
+namespace Squidex.Infrastructure.Dispatching
 {
     public static class DispatchExtensions
     {

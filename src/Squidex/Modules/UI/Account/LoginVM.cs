@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  LoginVM.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Collections.Generic;
 
-namespace PinkParrot.Modules.UI.Account
+namespace Squidex.Modules.UI.Account
 {
     public class LoginVM
     {

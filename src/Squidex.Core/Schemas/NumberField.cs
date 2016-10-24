@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  NumberField.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.Tasks;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public sealed class NumberField : Field<NumberFieldProperties>
     {

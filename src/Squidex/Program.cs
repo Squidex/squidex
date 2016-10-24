@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  Program.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
-namespace PinkParrot
+namespace Squidex
 {
     public class Program
     {

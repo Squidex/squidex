@@ -1,21 +1,21 @@
 ﻿// ==========================================================================
 //  InfrastructureModule.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Autofac;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Infrastructure.CQRS.Autofac;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.CQRS.EventStore;
-using PinkParrot.Store.MongoDb.Infrastructure;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure.CQRS.Autofac;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Store.MongoDb.Infrastructure;
 
-namespace PinkParrot.Configurations.Domain
+namespace Squidex.Configurations.Domain
 {
     public class InfrastructureModule : Module
     {

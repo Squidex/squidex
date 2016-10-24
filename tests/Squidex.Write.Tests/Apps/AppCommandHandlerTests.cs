@@ -1,23 +1,23 @@
 ﻿// ==========================================================================
 //  AppCommandHandlerTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Moq;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Read.Apps;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Write.Apps;
-using PinkParrot.Write.Apps.Commands;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Read.Apps;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Write.Apps;
+using Squidex.Write.Apps.Commands;
 using Xunit;
 
-namespace PinkParrot.Write.Tests.Apps
+namespace Squidex.Write.Tests.Apps
 {
     public class AppCommandHandlerTests
     {

@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  UpdateFieldDto.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Newtonsoft.Json.Linq;
 
-namespace PinkParrot.Modules.Api.Schemas.Models
+namespace Squidex.Modules.Api.Schemas.Models
 {
     public class UpdateFieldDto
     {

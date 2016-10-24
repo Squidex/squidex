@@ -9,7 +9,7 @@
   "dependencies": {
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "Moq": "4.6.38-alpha",
-    "PinkParrot.Infrastructure": "1.0.0-*",
+    "Squidex.Infrastructure": "1.0.0-*",
     "xunit": "2.2.0-beta3-build3402"
   },
   "frameworks": {
@@ -24,7 +24,7 @@
   },
   "testRunner": "xunit",
   "tooling": {
-    "defaultNamespace": "PinkParrot.Core.Tests"
+    "defaultNamespace": "Squidex.Core.Tests"
   },
   "tools": {
     "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"

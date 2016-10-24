@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  ExceptionFilter.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,12 +11,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using PinkParrot.Infrastructure;
-using PinkParrot.Modules.Api;
+using Squidex.Infrastructure;
+using Squidex.Modules.Api;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Pipeline
+namespace Squidex.Pipeline
 {
     public class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
     {

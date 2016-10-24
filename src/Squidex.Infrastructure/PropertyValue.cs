@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  PropertyValue.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -13,7 +13,7 @@ using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     public sealed class PropertyValue : DynamicObject
     {

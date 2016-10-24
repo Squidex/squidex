@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  EnvelopeExtensions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,7 +10,7 @@ using System;
 using System.Globalization;
 using NodaTime;
 
-namespace PinkParrot.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS
 {
     public static class EnvelopeExtensions
     {

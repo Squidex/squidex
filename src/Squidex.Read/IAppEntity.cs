@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  IAppEntity.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 
-namespace PinkParrot.Read
+namespace Squidex.Read
 {
     public interface IAppEntity : IEntity
     {

@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  WebDependencies.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
-using PinkParrot.Configurations.Domain;
+using Squidex.Configurations.Domain;
 
-namespace PinkParrot.Configurations.Web
+namespace Squidex.Configurations.Web
 {
     public static class WebDependencies
     {

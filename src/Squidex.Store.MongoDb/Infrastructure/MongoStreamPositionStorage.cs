@@ -1,19 +1,19 @@
 ﻿// ==========================================================================
 //  MongoPositionStorage.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using MongoDB.Bson;
 using MongoDB.Driver;
-using PinkParrot.Infrastructure.CQRS.EventStore;
-using PinkParrot.Store.MongoDb.Utils;
+using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Store.MongoDb.Utils;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Store.MongoDb.Infrastructure
+namespace Squidex.Store.MongoDb.Infrastructure
 {
     public sealed class MongoStreamPositionStorage : MongoRepositoryBase<MongoStreamPositionEntity>, IStreamPositionStorage
     {

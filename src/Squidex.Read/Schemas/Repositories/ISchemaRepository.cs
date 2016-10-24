@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  ISchemaRepository.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PinkParrot.Read.Schemas.Repositories
+namespace Squidex.Read.Schemas.Repositories
 {
     public interface ISchemaRepository
     {

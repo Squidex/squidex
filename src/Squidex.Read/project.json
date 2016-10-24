@@ -6,9 +6,9 @@
     "MongoDB.Driver": "2.4.0-beta1",
     "NETStandard.Library": "1.6.0",
     "NodaTime": "2.0.0-alpha20160729",
-    "PinkParrot.Core": "1.0.0-*",
-    "PinkParrot.Events": "1.0.0-*",
-    "PinkParrot.Infrastructure": "1.0.0-*"
+    "Squidex.Core": "1.0.0-*",
+    "Squidex.Events": "1.0.0-*",
+    "Squidex.Infrastructure": "1.0.0-*"
   },
 
   "frameworks": {
@@ -23,6 +23,6 @@
   },
 
   "tooling": {
-    "defaultNamespace": "PinkParrot.Read"
+    "defaultNamespace": "Squidex.Read"
   }
 }

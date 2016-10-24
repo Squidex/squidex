@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  MongoRepositoryBase.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Globalization;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using PinkParrot.Infrastructure;
+using Squidex.Infrastructure;
 
-namespace PinkParrot.Store.MongoDb.Utils
+namespace Squidex.Store.MongoDb.Utils
 {
     public abstract class MongoRepositoryBase<TEntity>
     {

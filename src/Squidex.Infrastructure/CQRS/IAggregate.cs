@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  IAggregate.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Collections.Generic;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace PinkParrot.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS
 {
     public interface IAggregate
     {

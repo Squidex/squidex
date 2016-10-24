@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  EventStoreModule.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,9 +11,9 @@ using Autofac;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Microsoft.Extensions.Options;
-using PinkParrot.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.CQRS.EventStore;
 
-namespace PinkParrot.Configurations.EventStore
+namespace Squidex.Configurations.EventStore
 {
     public class EventStoreModule : Module
     {
@@ -51,7 +51,7 @@ namespace PinkParrot.Configurations.EventStore
                 return new DefaultNameResolver(options.Prefix);
             }).SingleInstance();
 
-            builder.Register(c => new DefaultNameResolver("pinkparrot"))
+            builder.Register(c => new DefaultNameResolver("squidex"))
                 .As<IStreamNameResolver>()
                 .SingleInstance();
         }

@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  MongoDbModule.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -12,15 +12,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Infrastructure.CQRS.EventStore;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Read.Schemas.Repositories;
-using PinkParrot.Store.MongoDb.Apps;
-using PinkParrot.Store.MongoDb.Infrastructure;
-using PinkParrot.Store.MongoDb.Schemas;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Store.MongoDb.Apps;
+using Squidex.Store.MongoDb.Infrastructure;
+using Squidex.Store.MongoDb.Schemas;
 
-namespace PinkParrot.Store.MongoDb
+namespace Squidex.Store.MongoDb
 {
     public class MongoDbModule : Module
     {

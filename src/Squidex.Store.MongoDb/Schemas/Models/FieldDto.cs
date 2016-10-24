@@ -1,14 +1,14 @@
 // ==========================================================================
 //  FieldDto.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schemas;
+using Squidex.Core.Schemas;
 
-namespace PinkParrot.Store.MongoDb.Schemas.Models
+namespace Squidex.Store.MongoDb.Schemas.Models
 {
     public class FieldDto
     {

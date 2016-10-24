@@ -1,8 +1,8 @@
 // ==========================================================================
 //  Schema.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,11 +11,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using PinkParrot.Infrastructure;
+using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public sealed class Schema
     {

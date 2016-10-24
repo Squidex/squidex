@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  WebpackRunner.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace PinkParrot.Pipeline
+namespace Squidex.Pipeline
 {
     public sealed class WebpackRunner
     {

@@ -1,19 +1,19 @@
 ﻿// ==========================================================================
 //  AppCommandHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Write.Apps.Commands;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Write.Apps.Commands;
 
-namespace PinkParrot.Write.Apps
+namespace Squidex.Write.Apps
 {
     public class AppCommandHandler : CommandHandler<AppDomainObject>
     {

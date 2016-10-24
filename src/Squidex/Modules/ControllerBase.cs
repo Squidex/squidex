@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  ControllerBase.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Pipeline;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Pipeline;
 
-namespace PinkParrot.Modules
+namespace Squidex.Modules
 {
     public abstract class ControllerBase : Controller
     {

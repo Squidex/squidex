@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  MyIdentityOptions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Configurations.Identity
+namespace Squidex.Configurations.Identity
 {
     public sealed class MyIdentityOptions
     {

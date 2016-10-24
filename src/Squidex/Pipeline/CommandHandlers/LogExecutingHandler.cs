@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  LogExecutingHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace PinkParrot.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandHandlers
 {
     public sealed class LogExecutingHandler : ICommandHandler
     {

@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  WebpackUsage.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using PinkParrot.Pipeline;
+using Squidex.Pipeline;
 
-namespace PinkParrot.Configurations.Web
+namespace Squidex.Configurations.Web
 {
     public static class WebpackExtensions
     {

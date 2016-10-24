@@ -1,22 +1,22 @@
 ﻿// ==========================================================================
 //  SchemaDomainObject.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Events.Schemas;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Infrastructure.Reflection;
-using PinkParrot.Write.Schemas.Commands;
+using Squidex.Core.Schemas;
+using Squidex.Events.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Write.Schemas.Commands;
 
-namespace PinkParrot.Write.Schemas
+namespace Squidex.Write.Schemas
 {
     public class SchemaDomainObject : DomainObject, IAppAggregate
     {

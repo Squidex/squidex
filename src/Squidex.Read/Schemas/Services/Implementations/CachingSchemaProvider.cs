@@ -1,24 +1,24 @@
 ﻿// ==========================================================================
 //  CachingSchemaProvider.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using PinkParrot.Events.Schemas;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Read.Schemas.Repositories;
-using PinkParrot.Read.Utils;
+using Squidex.Events.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Utils;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Read.Schemas.Services.Implementations
+namespace Squidex.Read.Schemas.Services.Implementations
 {
     public class CachingSchemaProvider : CachingProvider, ISchemaProvider, ILiveEventConsumer
     {

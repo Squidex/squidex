@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  MyEventStoreOptions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Configurations.EventStore
+namespace Squidex.Configurations.EventStore
 {
     public sealed class MyEventStoreOptions
     {

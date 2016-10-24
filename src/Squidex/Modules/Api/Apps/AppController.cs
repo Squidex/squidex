@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  AppController.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -12,14 +12,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.Reflection;
-using PinkParrot.Modules.Api.Apps.Models;
-using PinkParrot.Pipeline;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Write.Apps.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Modules.Api.Apps.Models;
+using Squidex.Pipeline;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Write.Apps.Commands;
 
-namespace PinkParrot.Modules.Api.Apps
+namespace Squidex.Modules.Api.Apps
 {
     [Authorize]
     [ApiExceptionFilter]

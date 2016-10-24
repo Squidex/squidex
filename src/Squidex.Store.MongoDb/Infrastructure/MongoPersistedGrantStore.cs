@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  MongoPersistedGrantStore.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -12,9 +12,9 @@ using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using PinkParrot.Store.MongoDb.Utils;
+using Squidex.Store.MongoDb.Utils;
 
-namespace PinkParrot.Store.MongoDb.Infrastructure
+namespace Squidex.Store.MongoDb.Infrastructure
 {
     public class MongoPersistedGrantStore : MongoRepositoryBase<PersistedGrant>, IPersistedGrantStore
     {

@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  AppCommand.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace PinkParrot.Write
+namespace Squidex.Write
 {
     public abstract class AppCommand : AggregateCommand, IAppCommand
     {

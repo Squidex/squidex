@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  CreateSchemaDto.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schemas;
+using Squidex.Core.Schemas;
 
-namespace PinkParrot.Modules.Api.Schemas.Models
+namespace Squidex.Modules.Api.Schemas.Models
 {
     public class CreateSchemaDto
     {

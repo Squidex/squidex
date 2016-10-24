@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  EventStoreFormatter.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,11 +11,11 @@ using System.Text;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
 using NodaTime;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable InconsistentNaming
 
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public class EventStoreFormatter
     {

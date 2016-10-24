@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  DeactivateForAppDomainAttribute.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace PinkParrot.Pipeline
+namespace Squidex.Pipeline
 {
     public sealed class DeactivateForAppDomainAttribute : ActionFilterAttribute
     {

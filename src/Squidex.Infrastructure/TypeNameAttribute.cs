@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  TypeNameAttribute.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class TypeNameAttribute : Attribute

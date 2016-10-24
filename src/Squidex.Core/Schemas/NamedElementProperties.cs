@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  NamedElementProperties.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public abstract class NamedElementProperties
     {

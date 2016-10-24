@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  AppDomainObject.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
-using PinkParrot.Events.Apps;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Write.Apps.Commands;
+using Squidex.Events.Apps;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Write.Apps.Commands;
 
-namespace PinkParrot.Write.Apps
+namespace Squidex.Write.Apps
 {
     public sealed class AppDomainObject : DomainObject
     {

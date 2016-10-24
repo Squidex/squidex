@@ -1,21 +1,21 @@
 // ==========================================================================
 //  Field.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.Tasks;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public abstract class Field
     {

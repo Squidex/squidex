@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  SchemaFieldsController.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Infrastructure.Reflection;
-using PinkParrot.Modules.Api.Schemas.Models;
-using PinkParrot.Pipeline;
-using PinkParrot.Write.Schemas.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Modules.Api.Schemas.Models;
+using Squidex.Pipeline;
+using Squidex.Write.Schemas.Commands;
 
-namespace PinkParrot.Modules.Api.Schemas
+namespace Squidex.Modules.Api.Schemas
 {
     [ApiExceptionFilter]
     public class SchemasFieldsController : ControllerBase

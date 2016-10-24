@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  MongoEntity.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using PinkParrot.Read;
+using Squidex.Read;
 
-namespace PinkParrot.Store.MongoDb.Utils
+namespace Squidex.Store.MongoDb.Utils
 {
     public abstract class MongoEntity : IEntity
     {

@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  PropertiesTypeAccessor.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace PinkParrot.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection
 {
     public sealed class PropertiesTypeAccessor
     {

@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  CommonHeaders.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS
 {
     public sealed class CommonHeaders
     {

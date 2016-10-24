@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  InfrastructureUsage.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
-using PinkParrot.Pipeline;
+using Squidex.Pipeline;
 
-namespace PinkParrot.Configurations.Domain
+namespace Squidex.Configurations.Domain
 {
     public static class InfrastructureUsage
     {

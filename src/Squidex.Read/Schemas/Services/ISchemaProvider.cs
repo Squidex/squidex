@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  ISchemaProvider.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 
-namespace PinkParrot.Read.Schemas.Services
+namespace Squidex.Read.Schemas.Services
 {
     public interface ISchemaProvider
     {

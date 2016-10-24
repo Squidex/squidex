@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  DisableField.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Write.Schemas.Commands
+namespace Squidex.Write.Schemas.Commands
 {
     public class DisableField : AppCommand
     {

@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  AutofacDomainObjectFactoryTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using Autofac;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-namespace PinkParrot.Infrastructure.CQRS.Autofac
+namespace Squidex.Infrastructure.CQRS.Autofac
 {
     public class AutofacDomainObjectFactoryTests
     {

@@ -1,18 +1,18 @@
 ﻿// ==========================================================================
 //  WriteModule.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Autofac;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Pipeline.CommandHandlers;
-using PinkParrot.Write.Apps;
-using PinkParrot.Write.Schemas;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Pipeline.CommandHandlers;
+using Squidex.Write.Apps;
+using Squidex.Write.Schemas;
 
-namespace PinkParrot.Configurations.Web
+namespace Squidex.Configurations.Web
 {
     public class WriteModule : Module
     {

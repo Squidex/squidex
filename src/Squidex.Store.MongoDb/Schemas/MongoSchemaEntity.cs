@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  MongoSchemaEntity.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,12 +10,12 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Read.Schemas.Repositories;
-using PinkParrot.Store.MongoDb.Schemas.Models;
-using PinkParrot.Store.MongoDb.Utils;
+using Squidex.Core.Schemas;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Store.MongoDb.Schemas.Models;
+using Squidex.Store.MongoDb.Utils;
 
-namespace PinkParrot.Store.MongoDb.Schemas
+namespace Squidex.Store.MongoDb.Schemas
 {
     public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntityWithSchema
     {

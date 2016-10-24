@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  AppMiddleware.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using PinkParrot.Read.Apps.Services;
+using Squidex.Read.Apps.Services;
 
-namespace PinkParrot.Pipeline
+namespace Squidex.Pipeline
 {
     public sealed class AppMiddleware
     {

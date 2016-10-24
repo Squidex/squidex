@@ -1,6 +1,6 @@
 using System;
 
-namespace PinkParrot.Pipeline
+namespace Squidex.Pipeline
 {
     public sealed class AppFeature : IAppFeature
     {

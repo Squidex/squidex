@@ -6,10 +6,10 @@
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",
     "MongoDB.Driver": "2.4.0-beta1",
     "NETStandard.Library": "1.6.0",
-    "PinkParrot.Core": "1.0.0-*",
-    "PinkParrot.Events": "1.0.0-*",
-    "PinkParrot.Infrastructure": "1.0.0-*",
-    "PinkParrot.Read": "1.0.0-*"
+    "Squidex.Core": "1.0.0-*",
+    "Squidex.Events": "1.0.0-*",
+    "Squidex.Infrastructure": "1.0.0-*",
+    "Squidex.Read": "1.0.0-*"
   },
   "frameworks": {
     "netcoreapp1.0": {

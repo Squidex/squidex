@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  FieldProperties.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Collections.Generic;
-using PinkParrot.Infrastructure;
+using Squidex.Infrastructure;
 
-namespace PinkParrot.Core.Schemas
+namespace Squidex.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementProperties, IValidatable
     {

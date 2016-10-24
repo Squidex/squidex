@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  MongoStreamPositionEntity.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace PinkParrot.Store.MongoDb.Infrastructure
+namespace Squidex.Store.MongoDb.Infrastructure
 {
     [DataContract]
     public class MongoStreamPositionEntity

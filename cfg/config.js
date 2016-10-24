@@ -1,4 +1,4 @@
-fromCategory('pinkparrot')
+fromCategory('squidex')
   .whenAny(function(s,e) {
-    linkTo('pinkparrot',e);
+    linkTo('squidex',e);
   });

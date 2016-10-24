@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  DefaultNameResolver.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Globalization;
 
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public sealed class DefaultNameResolver : IStreamNameResolver
     {

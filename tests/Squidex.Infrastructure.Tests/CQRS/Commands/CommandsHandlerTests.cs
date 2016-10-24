@@ -1,18 +1,18 @@
 ﻿// ==========================================================================
 //  CommandsHandlerTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Moq;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-namespace PinkParrot.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class CommandsHandlerTests
     {

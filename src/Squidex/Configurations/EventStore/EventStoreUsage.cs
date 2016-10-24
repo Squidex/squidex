@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  EventStoreUsage.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using PinkParrot.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.CQRS.EventStore;
 
-namespace PinkParrot.Configurations.EventStore
+namespace Squidex.Configurations.EventStore
 {
     public static class EventStoreUsage
     {

@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  Startup.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -15,15 +15,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PinkParrot.Configurations.Domain;
-using PinkParrot.Configurations.EventStore;
-using PinkParrot.Configurations.Identity;
-using PinkParrot.Configurations.Web;
-using PinkParrot.Store.MongoDb;
+using Squidex.Configurations.Domain;
+using Squidex.Configurations.EventStore;
+using Squidex.Configurations.Identity;
+using Squidex.Configurations.Web;
+using Squidex.Store.MongoDb;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace PinkParrot
+namespace Squidex
 {
     public class Startup
     {

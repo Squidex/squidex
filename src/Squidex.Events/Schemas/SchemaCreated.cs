@@ -1,15 +1,15 @@
 // ==========================================================================
 //  SchemaCreated.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schemas;
-using PinkParrot.Infrastructure;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
 
-namespace PinkParrot.Events.Schemas
+namespace Squidex.Events.Schemas
 {
     [TypeName("SchemaCreatedEvent")]
     public class SchemaCreated : AppEvent

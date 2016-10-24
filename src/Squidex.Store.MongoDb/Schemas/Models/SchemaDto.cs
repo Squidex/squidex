@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  SchemaDto.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Collections.Generic;
 using System.Linq;
-using PinkParrot.Core.Schemas;
-using PinkParrot.Infrastructure;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
 
 // ReSharper disable UseObjectOrCollectionInitializer
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Store.MongoDb.Schemas.Models
+namespace Squidex.Store.MongoDb.Schemas.Models
 {
     public sealed class SchemaDto
     {

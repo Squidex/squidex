@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  MongoAppEntity.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
-using PinkParrot.Read.Apps;
-using PinkParrot.Store.MongoDb.Utils;
+using Squidex.Read.Apps;
+using Squidex.Store.MongoDb.Utils;
 
-namespace PinkParrot.Store.MongoDb.Apps
+namespace Squidex.Store.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity
     {

@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  ICommandHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
 
-namespace PinkParrot.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface ICommandHandler
     {

@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  IValidatable.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Collections.Generic;
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     public interface IValidatable
     {

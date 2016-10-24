@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
 //  SchemaFixture.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using PinkParrot.Core.Schemas;
-using PinkParrot.Infrastructure;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
 using System.Reflection;
 using Xunit;
 
-namespace PinkParrot.Write.Tests.Utils
+namespace Squidex.Write.Tests.Utils
 {
     public class SchemaFixture
     {

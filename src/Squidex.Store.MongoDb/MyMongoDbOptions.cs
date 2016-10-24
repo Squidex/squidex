@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  MyMongoDbOptions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Store.MongoDb
+namespace Squidex.Store.MongoDb
 {
     public class MyMongoDbOptions
     {

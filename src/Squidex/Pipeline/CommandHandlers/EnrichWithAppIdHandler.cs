@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  EnrichWithAppIdHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Write;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Write;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandHandlers
 {
     public sealed class EnrichWithAppIdHandler : ICommandHandler
     {

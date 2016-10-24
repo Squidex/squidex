@@ -1,11 +1,11 @@
 ﻿// ==========================================================================
 //  ILiveEventConsumer.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace PinkParrot.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface ILiveEventConsumer : IEventConsumer
     {

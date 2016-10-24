@@ -1,21 +1,21 @@
 ﻿// ==========================================================================
 //  DispatchingTests.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System.Threading.Tasks;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Infrastructure.Tasks;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 // ReSharper disable UnusedMethodReturnValue.Local
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedMember.Local
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     public sealed class DispatchingTests
     {

@@ -1,23 +1,23 @@
 ﻿// ==========================================================================
 //  EnrichWithAggregateIdHandler.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using PinkParrot.Infrastructure;
-using PinkParrot.Infrastructure.CQRS.Commands;
-using PinkParrot.Read.Schemas.Services;
-using PinkParrot.Write;
-using PinkParrot.Write.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Read.Schemas.Services;
+using Squidex.Write;
+using Squidex.Write.Schemas;
 
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandHandlers
 {
     public sealed class EnrichWithAggregateIdHandler : ICommandHandler
     {

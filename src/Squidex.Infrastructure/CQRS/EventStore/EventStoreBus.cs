@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  EventStoreBus.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Microsoft.Extensions.Logging;
-using PinkParrot.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace PinkParrot.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public sealed class EventStoreBus
     {

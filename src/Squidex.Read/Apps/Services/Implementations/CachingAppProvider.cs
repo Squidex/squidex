@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  CachingAppProvider.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using PinkParrot.Infrastructure;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Read.Utils;
+using Squidex.Infrastructure;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Utils;
 // ReSharper disable InvertIf
 
-namespace PinkParrot.Read.Apps.Services.Implementations
+namespace Squidex.Read.Apps.Services.Implementations
 {
     public class CachingAppProvider : CachingProvider, IAppProvider
     {

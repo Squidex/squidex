@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  CollectionExtensions.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -13,7 +13,7 @@ using System.Linq;
 // ReSharper disable InvertIf
 // ReSharper disable LoopCanBeConvertedToQuery
 
-namespace PinkParrot.Infrastructure
+namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {

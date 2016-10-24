@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  MongoAppRepository.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -10,16 +10,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using PinkParrot.Events.Apps;
-using PinkParrot.Infrastructure.CQRS;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Infrastructure.Dispatching;
-using PinkParrot.Infrastructure.Reflection;
-using PinkParrot.Read.Apps;
-using PinkParrot.Read.Apps.Repositories;
-using PinkParrot.Store.MongoDb.Utils;
+using Squidex.Events.Apps;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Read.Apps;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Store.MongoDb.Utils;
 
-namespace PinkParrot.Store.MongoDb.Apps
+namespace Squidex.Store.MongoDb.Apps
 {
     public sealed class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ICatchEventConsumer
     {

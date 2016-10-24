@@ -1,8 +1,8 @@
 ﻿// ==========================================================================
 //  PropertiesBagConverter.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Extensions;
 
-namespace PinkParrot.Infrastructure.Json
+namespace Squidex.Infrastructure.Json
 {
     public sealed class PropertiesBagConverter : JsonConverter
     {

@@ -1,19 +1,19 @@
 ﻿// ==========================================================================
 //  ReadModule.cs
-//  PinkParrot Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) PinkParrot Group
+//  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
 using Autofac;
-using PinkParrot.Infrastructure.CQRS.Events;
-using PinkParrot.Read.Apps.Services;
-using PinkParrot.Read.Apps.Services.Implementations;
-using PinkParrot.Read.Schemas.Services;
-using PinkParrot.Read.Schemas.Services.Implementations;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Read.Apps.Services;
+using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Read.Schemas.Services;
+using Squidex.Read.Schemas.Services.Implementations;
 
-namespace PinkParrot.Configurations.Domain
+namespace Squidex.Configurations.Domain
 {
     public sealed class ReadModule : Module
     {
