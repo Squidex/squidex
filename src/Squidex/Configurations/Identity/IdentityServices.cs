@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IdentityDependencies.cs
+//  IdentityServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

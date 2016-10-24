@@ -20,7 +20,7 @@ namespace Squidex.Modules.Api.Schemas
     [Authorize]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    [Route("api/apps/{app}")]
+    [Route("apps/{app}")]
     public class SchemasFieldsController : ControllerBase
     {
         public SchemasFieldsController(ICommandBus commandBus)

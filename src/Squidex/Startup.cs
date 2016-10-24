@@ -12,6 +12,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ using Squidex.Configurations.Identity;
 using Squidex.Configurations.Web;
 using Squidex.Store.MongoDb;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
+
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
 

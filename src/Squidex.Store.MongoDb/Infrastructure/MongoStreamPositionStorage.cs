@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MongoPositionStorage.cs
+//  MongoStreamPositionStorage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

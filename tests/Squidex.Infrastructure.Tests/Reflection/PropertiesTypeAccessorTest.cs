@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-// ReSharper disable ValueParameterNotUsed
-
 using System;
 using System.Linq;
 using Xunit;

@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Reflection;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using System.Reflection;
 using Xunit;
 
 namespace Squidex.Write.Tests.Utils

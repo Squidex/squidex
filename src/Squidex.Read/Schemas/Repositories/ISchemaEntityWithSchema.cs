@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EntityWithSchema.cs
+//  ISchemaEntityWithSchema.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

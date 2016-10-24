@@ -24,7 +24,8 @@ namespace Squidex.Modules.Api.Schemas
 {
     [Authorize]
     [ApiExceptionFilter]
-    [DeactivateForAppDomain]
+    [ServiceFilter(typeof(AppFilterAttribute))]
+    [Route("apps/{app}")]
     public class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
@@ -36,7 +37,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpGet]
-        [Route("api/schemas/")]
+        [Route("schemas/")]
         public async Task<List<ListSchemaDto>> Query()
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
@@ -45,7 +46,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpGet]
-        [Route("api/schemas/{name}/")]
+        [Route("schemas/{name}/")]
         public async Task<ActionResult> Get(string name)
         {
             var entity = await schemaRepository.FindSchemaAsync(AppId, name);
@@ -59,7 +60,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpPost]
-        [Route("api/schemas/")]
+        [Route("schemas/")]
         public async Task<ActionResult> Create([FromBody] CreateSchemaDto model)
         {
             var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
@@ -70,7 +71,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpPut]
-        [Route("api/schemas/{name}/")]
+        [Route("schemas/{name}/")]
         public async Task<ActionResult> Update(string name, [FromBody] UpdateSchemaDto model)
         {
             var command = SimpleMapper.Map(model, new UpdateSchema());
@@ -81,7 +82,7 @@ namespace Squidex.Modules.Api.Schemas
         }
 
         [HttpDelete]
-        [Route("api/schemas/{name}/")]
+        [Route("schemas/{name}/")]
         public async Task<ActionResult> Delete(string name)
         {
             await CommandBus.PublishAsync(new DeleteSchema());

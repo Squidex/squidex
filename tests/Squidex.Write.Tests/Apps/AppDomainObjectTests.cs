@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppDomainObjectTest.cs
+//  AppDomainObjectTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,13 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
+using FluentAssertions;
+using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 using Xunit;
-using System.Linq;
-using FluentAssertions;
-using Squidex.Events.Apps;
 
 namespace Squidex.Write.Tests.Apps
 {

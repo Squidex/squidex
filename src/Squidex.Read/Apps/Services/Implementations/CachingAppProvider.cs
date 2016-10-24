@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Squidex.Infrastructure;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Utils;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Read.Apps.Services.Implementations
