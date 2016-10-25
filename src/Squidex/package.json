@@ -9,7 +9,7 @@
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
     "dev": "webpack-dev-server --inline --hot --port 3000",
-    "build": "webpack --config app-config/webpack.prod.js --progress --display-error-details",
+    "build": "webpack --config app-config/webpack.prod.js --bail",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {

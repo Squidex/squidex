@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+/* tslint:disable:no-bitwise */
+
 interface IColorDefinition {
     regex: RegExp;
 
