@@ -27,7 +27,7 @@ namespace Squidex.Pipeline
 
         public async Task Invoke(HttpContext context)
         {
-            var currentUrl = string.Concat(context.Request.Scheme, context.Request.Host, context.Request.Path);
+            var currentUrl = string.Concat(context.Request.Scheme, "//:", context.Request.Host, context.Request.Path);
 
             var hostName = context.Request.Host.ToString().ToLowerInvariant();
             if (hostName.StartsWith("www"))
@@ -36,7 +36,9 @@ namespace Squidex.Pipeline
             }
 
             var requestPath = context.Request.Path.ToString();
-            if (requestPath.EndsWith("/") == false)
+
+            if (!requestPath.EndsWith("/") && 
+                !requestPath.Contains("."))
             {
                 requestPath = requestPath + "/";
             }
@@ -46,9 +48,13 @@ namespace Squidex.Pipeline
             if (!string.Equals(newUrl, currentUrl, StringComparison.OrdinalIgnoreCase))
             {
                 logger.LogError("Invalid url: {0} instead {1}", currentUrl, newUrl);
-            }
 
-            await next(context);
+                context.Response.Redirect(newUrl, true);
+            }
+            else
+            {
+                await next(context);
+            }
         }
     }
 }

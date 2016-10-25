@@ -93,7 +93,10 @@ namespace Squidex
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
-            app.UseMiddleware<SingleUrlsMiddleware>();
+            if (!Environment.IsDevelopment())
+            {
+                app.UseMiddleware<SingleUrlsMiddleware>();
+            }
 
             if (Environment.IsDevelopment())
             {
