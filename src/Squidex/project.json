@@ -55,8 +55,13 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "preserveCompilationContext": true,
-    "xmlDoc": true,
-    "nowarn": [ "1591", "1573", "1572" ]
+    "xmlDoc": false,
+    "nowarn": [ "1591", "1573", "1572" ],
+    "embed": {
+      "include": [
+        "Configurations/Identity/Cert/*.*"
+      ]
+    } 
   },
 
   "runtimeOptions": {

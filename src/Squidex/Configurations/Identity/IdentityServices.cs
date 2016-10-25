@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
@@ -22,9 +22,18 @@ namespace Squidex.Configurations.Identity
     {
         public static IServiceCollection AddMyIdentityServer(this IServiceCollection services, IHostingEnvironment env)
         {
-            var certPath = Path.Combine(env.ContentRootPath, "Configurations", "Identity", "Cert", "IdentityCert.pfx");
+            X509Certificate2 certificate;
 
-            var certificate = new X509Certificate2(certPath, "password");
+            var assemblyName = new AssemblyName("Squidex");
+            var assemblyRef = Assembly.Load(assemblyName);
+
+            using (var certStream = assemblyRef.GetManifestResourceStream("Squidex.Configurations.Identity.Cert.IdentityCert.pfx"))
+            {
+                var certData = new byte[certStream.Length];
+
+                certStream.Read(certData, 0, certData.Length);
+                certificate = new X509Certificate2(certData, "password");
+            }
 
             services.AddSingleton(
                 GetScopes());
