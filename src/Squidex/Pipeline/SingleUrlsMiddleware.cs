@@ -49,7 +49,7 @@ namespace Squidex.Pipeline
             {
                 logger.LogError("Invalid url: {0} instead {1}", currentUrl, newUrl);
 
-                context.Response.Redirect(newUrl, true);
+                context.Response.Redirect(newUrl + context.Request.QueryString, true);
             }
             else
             {
