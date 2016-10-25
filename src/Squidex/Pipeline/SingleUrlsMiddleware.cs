@@ -27,7 +27,7 @@ namespace Squidex.Pipeline
 
         public async Task Invoke(HttpContext context)
         {
-            var currentUrl = string.Concat(context.Request.Scheme, "//:", context.Request.Host, context.Request.Path);
+            var currentUrl = string.Concat(context.Request.Scheme, "://", context.Request.Host, context.Request.Path);
 
             var hostName = context.Request.Host.ToString().ToLowerInvariant();
             if (hostName.StartsWith("www"))
