@@ -53,6 +53,13 @@ namespace Squidex.Modules.UI.Account
         }
 
         [HttpGet]
+        [Route("account/error/")]
+        public IActionResult Error()
+        {
+            return View();
+        }
+
+        [HttpGet]
         [Route("account/login/")]
         public IActionResult Login(string returnUrl = null)
         {

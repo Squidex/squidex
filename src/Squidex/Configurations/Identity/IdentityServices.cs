@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using IdentityServer4.Configuration;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using IdentityServer4.Stores.InMemory;
@@ -45,7 +46,11 @@ namespace Squidex.Configurations.Identity
             services.AddSingleton<IScopeStore,
                 InMemoryScopeStore>();
 
-            services.AddIdentityServer().SetSigningCredential(certificate)
+            services.AddIdentityServer(options =>
+                {
+                    options.UserInteractionOptions.ErrorUrl = "/account/error/";
+                })
+                .SetSigningCredential(certificate)
                 .AddAspNetIdentity<IdentityUser>();
 
             return services;

@@ -3,13 +3,23 @@
 @using Microsoft.AspNetCore.Http.Authentication
 @model Squidex.Modules.UI.Account.LoginVM
 
-<form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post" class="form-horizontal">
-    <div>
-        <p>
-            @foreach (var provider in Model.ExternalProviders)
-            {
-                <button type="submit" class="btn btn-default" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
-            }
-        </p>
-    </div>
-</form>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Squidex - Login</title>
+    </head>
+    <body>
+        <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post" class="form-horizontal">
+            <div>
+                <p>
+                    @foreach (var provider in Model.ExternalProviders)
+                    {
+                        <button type="submit" class="btn btn-default" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+                    }
+                </p>
+            </div>
+        </form>
+    </body>
+</html>
+
+
