@@ -23,6 +23,7 @@ using Squidex.Configurations.Identity;
 using Squidex.Configurations.Web;
 using Squidex.Store.MongoDb;
 using System.Linq;
+using Squidex.Pipeline;
 
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
@@ -91,6 +92,8 @@ namespace Squidex
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
+
+            app.UseMiddleware<SingleUrlsMiddleware>();
 
             if (Environment.IsDevelopment())
             {

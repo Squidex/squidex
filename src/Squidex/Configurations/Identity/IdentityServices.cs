@@ -32,7 +32,7 @@ namespace Squidex.Configurations.Identity
                 var certData = new byte[certStream.Length];
 
                 certStream.Read(certData, 0, certData.Length);
-                certificate = new X509Certificate2(certData, "password");
+                certificate = new X509Certificate2(certData, "password", X509KeyStorageFlags.MachineKeySet);
             }
 
             services.AddSingleton(
