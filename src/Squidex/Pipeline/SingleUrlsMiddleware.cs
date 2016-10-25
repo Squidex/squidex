@@ -30,20 +30,12 @@ namespace Squidex.Pipeline
             var currentUrl = string.Concat(context.Request.Scheme, "://", context.Request.Host, context.Request.Path);
 
             var hostName = context.Request.Host.ToString().ToLowerInvariant();
-            if (hostName.StartsWith("www"))
+            if (hostName.StartsWith("www."))
             {
-                hostName = hostName.Substring(3);
+                hostName = hostName.Substring(4);
             }
-
-            var requestPath = context.Request.Path.ToString();
-
-            if (!requestPath.EndsWith("/") && 
-                !requestPath.Contains("."))
-            {
-                requestPath = requestPath + "/";
-            }
-
-            var newUrl = string.Concat("https://", hostName, requestPath);
+            
+            var newUrl = string.Concat("https://", hostName, context.Request.Path);
 
             if (!string.Equals(newUrl, currentUrl, StringComparison.OrdinalIgnoreCase))
             {
