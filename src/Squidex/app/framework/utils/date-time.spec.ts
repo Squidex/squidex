@@ -13,7 +13,7 @@ describe('DateTime', () => {
     const now = DateTime.now();
 
     it('should parse from iso string', () => {
-        const value = DateTime.parse('2013-10-16T12:13:14.125', DateTime.iso8601());
+        const value = DateTime.parseISO('2013-10-16T12:13:14.125');
 
         expect(value.year).toBe(2013);
         expect(value.month).toBe(10);
@@ -28,7 +28,7 @@ describe('DateTime', () => {
     });
 
     it('should throw when date string to parse is null', () => {
-        expect(() => DateTime.parseUTC('#', DateTime.iso8601())).toThrow();
+        expect(() => DateTime.parseISO('#')).toThrow();
     });
 
     it('should throw when date string to parse is invalid', () => {
@@ -37,21 +37,21 @@ describe('DateTime', () => {
 
     it('should parse Microsoft date format', () => {
         const actual = DateTime.parseMSDate('/Date(1224043200000)/');
-        const expected = DateTime.parse('2008-10-15T04:00:00', DateTime.iso8601());
+        const expected = DateTime.parseISO('2008-10-15T04:00:00');
 
         expect(actual).toEqual(expected);
     });
 
     it('should parse Microsoft date format with positive offset', () => {
         const actual = DateTime.parseMSDate('/Date(1224043200000+2)/');
-        const expected = DateTime.parse('2008-10-15T06:00:00', DateTime.iso8601());
+        const expected = DateTime.parseISO('2008-10-15T06:00:00');
 
         expect(actual).toEqual(expected);
     });
 
     it('should parse Microsoft date format with negative offset', () => {
         const actual = DateTime.parseMSDate('/Date(1224043200000-2)/');
-        const expected = DateTime.parse('2008-10-15T02:00:00', DateTime.iso8601());
+        const expected = DateTime.parseISO('2008-10-15T02:00:00');
 
         expect(actual).toEqual(expected);
     });
@@ -78,7 +78,7 @@ describe('DateTime', () => {
     });
 
     it('should print to formatted string', () => {
-        const value = DateTime.parseUTC('2013-10-16T12:13:14T', DateTime.iso8601());
+        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14T');
         const actual = value.toStringFormat('hh:mm');
         const expected = '12:13';
         
@@ -86,7 +86,7 @@ describe('DateTime', () => {
     });
 
     it('should print to iso string', () => {
-        const value = DateTime.parseUTC('2013-10-16T12:13:14', DateTime.iso8601());
+        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
         const actual = value.toString().substr(0, 19);
         const expected = '2013-10-16T12:13:14';
         
@@ -94,35 +94,35 @@ describe('DateTime', () => {
     });
 
     it('should print to valid utc string', () => {
-        const value = DateTime.parseUTC('2013-10-16T12:13:14', DateTime.iso8601());
+        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
 
         expect(value.toUTCString()).toBeDefined();
     });
 
     it('should print from format with underscore', () => {
-        const actual = DateTime.parse('2013-10-16T00:00:00', DateTime.iso8601());
+        const actual = DateTime.parseISO('2013-10-16T00:00:00');
         const expected = DateTime.parse('10_2013_16', 'MM_YYYY_DD');
 
         expect(actual).toEqual(expected);
     });
 
     it('should calculate valid first of week', () => {
-        const actual = DateTime.parseUTC('2013-10-16T12:13:14.125', DateTime.iso8601()).date.firstOfWeek();
-        const expected = DateTime.parseUTC('2013-10-14T00:00:00', DateTime.iso8601());
+        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').date.firstOfWeek();
+        const expected = DateTime.parseISO_UTC('2013-10-14T00:00:00');
 
         expect(actual).toEqual(expected);
     });
 
     it('should calculate valid first of month', () => {
-        const actual = DateTime.parseUTC('2013-10-16T12:13:14.125', DateTime.iso8601()).date.firstOfMonth();
-        const expected = DateTime.parseUTC('2013-10-01', DateTime.iso8601());
+        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').date.firstOfMonth();
+        const expected = DateTime.parseISO_UTC('2013-10-01');
 
         expect(actual).toEqual(expected);
     });
 
     it('should add various offsets to date time', () => {
         const actual =
-            DateTime.parseUTC('2013-05-01T12:12:12.100', DateTime.iso8601())
+            DateTime.parseISO_UTC('2013-05-01T12:12:12.100')
                 .addYears(1)
                 .addMonths(2)
                 .addDays(13)
@@ -130,7 +130,7 @@ describe('DateTime', () => {
                 .addMinutes(10)
                 .addSeconds(15)
                 .addMilliseconds(125);
-        const expected = DateTime.parseUTC('2014-07-16T15:22:27.225', DateTime.iso8601());
+        const expected = DateTime.parseISO_UTC('2014-07-16T15:22:27.225');
 
         expect(actual).toEqual(expected);
     });

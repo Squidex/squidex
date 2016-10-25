@@ -96,6 +96,14 @@ export class DateTime {
         return new DateTime(date);
     }
 
+    public static parseISO(value: string): DateTime {
+        return DateTime.parse(value, DateTime.iso8601());
+    }
+
+    public static parseISO_UTC(value: string): DateTime {
+        return DateTime.parseUTC(value, DateTime.iso8601());
+    }
+
     public static parse(value: string, format: string): DateTime {
         const parsedMoment = moment(value, format);
 

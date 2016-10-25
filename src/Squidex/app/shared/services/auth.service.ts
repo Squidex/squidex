@@ -6,11 +6,12 @@
  */
 
 import * as Ng2 from '@angular/core';
+import * as Ng2Http from '@angular/http';
 
-import { 
-    Log, 
+import {
+    Log,
     User,
-    UserManager 
+    UserManager
 } from 'oidc-client';
 
 import { Observable } from 'rxjs';
@@ -30,16 +31,18 @@ export class AuthService {
         return this.currentUser;
     }
 
-    constructor(apiUrl: ApiUrlConfig) {
+    constructor(apiUrl: ApiUrlConfig,
+        private readonly http: Ng2Http.Http, 
+    ) {
         Log.logger = console;
 
         this.userManager = new UserManager({
-                      client_id: 'squidex-frontend', 
-            silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'), 
+                      client_id: 'squidex-frontend',
+                          scope: 'squidex-api openid profile ',
+                  response_type: 'id_token token',
+            silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
              popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
                       authority: apiUrl.buildUrl('identity-server/'),
-                  response_type: 'id_token token',
-                          scope: 'openid profile squidex-api'
         });
 
         this.userManager.getUser()
@@ -51,12 +54,16 @@ export class AuthService {
             });
 
         this.userManager.events.addUserUnloaded(() => {
-                this.currentUser = null;
+            this.currentUser = null;
         });
     }
 
+    public logout(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signoutRedirectCallback());
+    }
+
     public login(): Observable<User> {
-        let userPromise = 
+        let userPromise =
             this.userManager.signinSilent()
                 .then(user => {
                     if (user) {
@@ -70,7 +77,38 @@ export class AuthService {
         return Observable.fromPromise(userPromise);
     }
 
-    public logout(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signoutRedirectCallback());
+    public authGet(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+        options = this.setRequestOptions(options);
+
+        return this.http.get(url, options);
+    }
+
+    public authPut(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+        options = this.setRequestOptions(options);
+
+        return this.http.put(url, data, options);
+    }
+
+    public authDelete(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+        options = this.setRequestOptions(options);
+        return this.http.delete(url, options);
+    }
+
+    public authPost(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+        options = this.setRequestOptions(options);
+
+        return this.http.post(url, data, options);
+    }
+
+    private setRequestOptions(options?: Ng2Http.RequestOptions) {
+        if (!options) {
+            options = new Ng2Http.RequestOptions();
+
+            options.headers.append('Content-Type', 'application/json');
+        }
+
+        options.headers.append('Authorization', '${this.user.token_type} {this.user.access_token}');
+
+        return options;
     }
 }

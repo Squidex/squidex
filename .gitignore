@@ -246,3 +246,5 @@ ModelManifest.xml
 
 # OpenCover
 GeneratedReports/
+
+_test-output
