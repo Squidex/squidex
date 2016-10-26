@@ -14,5 +14,8 @@ import '@angular/http';
 import '@angular/forms';
 import '@angular/router';
 
+// Oidc-client
+import 'oidc-client';
+
 // RxJS
 import 'rxjs';
