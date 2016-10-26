@@ -20,10 +20,16 @@ export class AuthGuard implements Ng2Router.CanActivate {
     ) {
     }
 
-    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): boolean {
-        if (state.url !== LOGIN_URL && !this.authService.isAuthenticated) {
-            this.router.navigate([LOGIN_URL]);
-            return false;
+    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Promise<boolean> | boolean {
+        if (state.url !== LOGIN_URL) {
+            return this.authService.checkLogin().then(isAuthenticated => {
+                if (!isAuthenticated) {
+                    this.router.navigate([LOGIN_URL]);
+
+                    return false;
+                }
+                return true;
+            });
         }
 
         return true;

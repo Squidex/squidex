@@ -22,13 +22,30 @@ import { ApiUrlConfig } from './../../framework';
 export class AuthService {
     private readonly userManager: UserManager;
     private currentUser: User | null = null;
+    private checkLoginPromise: Promise<boolean>;
 
     public get user(): User | null {
         return this.currentUser;
     }
 
-    public get isAuthenticated() {
-        return this.currentUser;
+    public get isAuthenticated(): boolean {
+        return !!this.currentUser;
+    }
+
+    public checkLogin(): Promise<boolean> {
+        if (this.checkLoginPromise) {
+            return this.checkLoginPromise;
+        } else if (this.currentUser) {
+            return Promise.resolve(true);
+        } else {
+            this.checkLoginPromise = 
+                this.checkState(this.userManager.getUser())
+                    .then(result => {
+                        return result || this.checkState(this.userManager.signinSilent());
+                    });
+
+            return this.checkLoginPromise;
+        }
     }
 
     constructor(apiUrl: ApiUrlConfig,
@@ -42,39 +59,47 @@ export class AuthService {
                   response_type: 'id_token token',
             silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
              popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
-                      authority: apiUrl.buildUrl('identity-server/'),
+                      authority: apiUrl.buildUrl('identity-server/')
         });
 
-        this.userManager.getUser()
-            .then((user) => {
-                this.currentUser = user;
-            })
-            .catch((err) => {
-                this.currentUser = null;
-            });
+        this.userManager.events.addUserLoaded(user => {
+            this.currentUser = user;
+        });
 
         this.userManager.events.addUserUnloaded(() => {
             this.currentUser = null;
         });
+
+        this.checkLogin();
     }
 
     public logout(): Observable<any> {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
-    public login(): Observable<User> {
-        let userPromise =
-            this.userManager.signinSilent()
-                .then(user => {
-                    if (user) {
-                        return user;
-                    } else {
-                        return this.userManager.signinPopup();
-                    }
-                })
-                .catch(() => this.userManager.signinPopup());
+    public login(): Observable<boolean> {
+        const userPromise =
+            this.checkState(this.userManager.signinSilent())
+                .then(result => {
+                    return result || this.checkState(this.userManager.signinPopup());
+                });
 
         return Observable.fromPromise(userPromise);
+    }
+
+    private checkState(promise: Promise<User>): Promise<boolean> {
+        const resultPromise =
+            promise
+                .then(user => {
+                    if (user) {
+                        this.currentUser = user;
+                    }
+                    return !!this.currentUser;
+                }).catch((err) => {
+                    return false;
+                });
+
+        return resultPromise;
     }
 
     public authGet(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {

@@ -97,18 +97,7 @@ namespace Squidex
             {
                 app.UseMiddleware<SingleUrlsMiddleware>();
             }
-
-            if (Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseWebpackProxy();
-                app.UseDefaultFiles();
-            }
-            else
-            {
-                app.UseDefaultFiles(new DefaultFilesOptions { DefaultFileNames = new List<string> { "build/index.html" } });
-            }
-
+            
             UseIdentity(app);
             UseApi(app);
             UseFrontend(app);

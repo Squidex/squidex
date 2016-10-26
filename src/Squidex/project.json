@@ -83,6 +83,7 @@
   "scripts": {
     "prepublish": [
       "npm install",
+      "npm run-script build:copy",
       "npm run-script build"
     ],
     "postpublish": [
