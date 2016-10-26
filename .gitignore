@@ -244,6 +244,9 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
+# Scripts (should be copied from node_modules on build)
+**/wwwroot/scripts/**/*.*
+
 # OpenCover
 GeneratedReports/
 
