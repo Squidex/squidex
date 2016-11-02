@@ -77,7 +77,7 @@ export class DragModelDirective {
 
         let dropCandidate: Element | null = document.elementFromPoint(event.clientX, event.clientY);
 
-        while (dropCandidate && (dropCandidate.classList && !dropCandidate.classList.contains('gp-drop'))) {
+        while (dropCandidate && (dropCandidate.classList && !dropCandidate.classList.contains('sqx-drop'))) {
             dropCandidate = dropCandidate.parentNode as Element;
         }
 

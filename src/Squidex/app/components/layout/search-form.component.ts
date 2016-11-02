@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  * 
  * @license
@@ -8,9 +8,10 @@
 import * as Ng2 from '@angular/core';
 
 @Ng2.Component({
-    selector: 'apps',
+    selector: 'sqx-search-form',
+    styles,
     template
 })
-export class AppsComponent {
+export class SearchFormComponent {
     
 }

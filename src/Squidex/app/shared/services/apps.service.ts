@@ -14,17 +14,17 @@ import { AuthService } from './auth.service';
 
 export class AppDto {
     constructor(
-        private readonly id: string,
-        private readonly name: string,
-        private readonly created: DateTime,
-        private readonly lastModified: DateTime
+        public readonly id: string,
+        public readonly name: string,
+        public readonly created: DateTime,
+        public readonly lastModified: DateTime
     ) {
     }
 }
 
 export class AppCreateDto {
     constructor(
-        private readonly name: string
+        public readonly name: string
     ) {
     }
 }
@@ -53,7 +53,13 @@ export class AppsService {
                 });
     }
 
-    public postApp(app: AppCreateDto): Observable<any> {
-        return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), app);
+    public postApp(appToCreate: AppCreateDto): Observable<AppDto> {
+        const now = DateTime.now();
+
+        return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), appToCreate)
+                .map(response => response.json())
+                .map(response => {
+                    return new AppDto(response.id, appToCreate.name, now, now);
+                });
     }
 }

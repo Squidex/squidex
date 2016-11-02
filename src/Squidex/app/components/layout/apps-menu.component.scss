@@ -1,0 +1,33 @@
+@import '../../theme/_vars.scss';
+@import '../../theme/_mixins.scss';
+
+.navbar-dark .navbar-nav .nav-link {
+    color: white;
+}
+
+.nav-link {
+    @include truncate();
+}
+
+.drodown-button {
+    padding: 3px 1.5rem;
+}
+
+#app-name {
+    & {
+        padding-right: 15px;
+        @include transition(opacity 0.4 ease);
+        @include opacity(0.95);
+        color: white;
+        cursor: pointer;
+        width: 200px;
+    }
+
+    &:hover {
+        @include opacity(1);
+    }
+
+    &:after {
+        @include absolute(50%, 0px, auto, auto);
+    }
+}

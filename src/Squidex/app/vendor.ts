@@ -19,3 +19,6 @@ import 'oidc-client';
 
 // RxJS
 import 'rxjs';
+
+// Bootstrap
+import 'theme/vendor.scss';

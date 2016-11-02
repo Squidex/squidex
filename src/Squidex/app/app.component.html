@@ -1,1 +1,15 @@
-﻿<router-outlet></router-outlet>
+﻿<nav class="navbar navbar-fixed-top navbar-dark bg-primary bg-faded">
+    <span class="navbar-brand">Squidex</span>
+
+    <div class="float-xs-left apps-menu">
+        <sqx-apps-menu></sqx-apps-menu>
+    </div>
+
+    <div class="float-xs-left search-form">
+        <sqx-search-form></sqx-search-form>
+    </div>
+</nav>
+
+<main>
+    <router-outlet></router-outlet>
+</main>

@@ -8,7 +8,7 @@
 import * as Ng2 from '@angular/core';
 
 @Ng2.Component({
-    selector: 'gp-slider',
+    selector: 'sqx-slider',
     styles,
     template
 })

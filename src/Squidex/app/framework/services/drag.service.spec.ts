@@ -29,7 +29,7 @@ describe('DragService', () => {
 
         const dragService = new DragService();
 
-        dragService.drop.subscribe(e => {
+        dragService.onDrop.subscribe(e => {
             emittedEvent = e;
         });
 

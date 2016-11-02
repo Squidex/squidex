@@ -10,7 +10,7 @@ import * as Ng2 from '@angular/core';
 import { ShortcutService } from './../services/shortcut.service';
 
 @Ng2.Component({
-    selector: 'gp-shortcut', 
+    selector: 'sqx-shortcut', 
     template: ''
 })
 export class ShortcutComponent implements Ng2.OnInit, Ng2.OnDestroy {

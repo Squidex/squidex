@@ -21,7 +21,7 @@ export const DragServiceFactory = () => {
 export class DragService {
     private readonly dropEvent = new Subject<DropEvent>();
 
-    public get drop(): Observable<DropEvent> {
+    public get onDrop(): Observable<DropEvent> {
         return this.dropEvent;
     }
 

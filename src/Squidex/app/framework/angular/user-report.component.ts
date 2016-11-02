@@ -10,7 +10,7 @@ import * as Ng2 from '@angular/core';
 import { UserReportConfig } from './../configurations';
 
 @Ng2.Component({
-    selector: 'gp-user-report', 
+    selector: 'sqx-user-report', 
     template: ''
 })
 export class UserReportComponent implements Ng2.OnInit {

@@ -10,7 +10,9 @@ import * as Ng2 from '@angular/core';
 import { SqxFrameworkModule } from './../../framework';
 
 import {
-    LoginPageComponent
+    AppFormComponent,
+    AppsMenuComponent,
+    SearchFormComponent
 } from './declarations';
 
 @Ng2.NgModule({
@@ -18,7 +20,14 @@ import {
         SqxFrameworkModule
     ],
     declarations: [
-        LoginPageComponent
+        AppFormComponent,
+        AppsMenuComponent,
+        SearchFormComponent,
+    ],
+    exports: [
+        AppFormComponent,
+        AppsMenuComponent,
+        SearchFormComponent,
     ]
 })
-export class SqxLoginModule { }
+export class SqxLayoutModule { }

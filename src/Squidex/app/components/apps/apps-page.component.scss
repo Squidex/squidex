@@ -1,0 +1,17 @@
+@import '../../theme/_vars.scss';
+@import '../../theme/_mixins.scss';
+
+content {
+    padding: 20px;
+}
+
+.apps-empty {
+    & {
+        text-align: center;
+    }
+
+    &-headline {
+        margin-top: 100px;
+        margin-bottom: 20px;
+    }
+}

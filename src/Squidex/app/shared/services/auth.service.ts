@@ -14,13 +14,14 @@ import {
     UserManager
 } from 'oidc-client';
 
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ApiUrlConfig } from './../../framework';
 
 @Ng2.Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
+    private readonly isAuthenticatedChanged$ = new BehaviorSubject<boolean>(false);
     private currentUser: User | null = null;
     private checkLoginPromise: Promise<boolean>;
 
@@ -32,20 +33,8 @@ export class AuthService {
         return !!this.currentUser;
     }
 
-    public checkLogin(): Promise<boolean> {
-        if (this.checkLoginPromise) {
-            return this.checkLoginPromise;
-        } else if (this.currentUser) {
-            return Promise.resolve(true);
-        } else {
-            this.checkLoginPromise = 
-                this.checkState(this.userManager.getUser())
-                    .then(result => {
-                        return result || this.checkState(this.userManager.signinSilent());
-                    });
-
-            return this.checkLoginPromise;
-        }
+    public get isAuthenticatedChanges(): Observable<boolean> {
+        return this.isAuthenticatedChanged$;
     }
 
     constructor(apiUrl: ApiUrlConfig,
@@ -53,24 +42,43 @@ export class AuthService {
     ) {
         Log.logger = console;
 
-        this.userManager = new UserManager({
-                      client_id: 'squidex-frontend',
-                          scope: 'squidex-api openid profile ',
-                  response_type: 'id_token token',
-            silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
-             popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
-                      authority: apiUrl.buildUrl('identity-server/')
-        });
+        if (apiUrl) {
+            this.userManager = new UserManager({
+                        client_id: 'squidex-frontend',
+                            scope: 'squidex-api openid profile ',
+                    response_type: 'id_token token',
+              silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
+               popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
+                        authority: apiUrl.buildUrl('identity-server/'),
+             automaticSilentRenew: true
+            });
 
-        this.userManager.events.addUserLoaded(user => {
-            this.currentUser = user;
-        });
+            this.userManager.events.addUserLoaded(user => {
+                this.onAuthenticated(user);
+            });
 
-        this.userManager.events.addUserUnloaded(() => {
-            this.currentUser = null;
-        });
+            this.userManager.events.addUserUnloaded(() => {
+                this.onDeauthenticated();
+            });
 
-        this.checkLogin();
+            this.checkLogin();
+        }
+    }
+
+    public checkLogin(): Promise<boolean> {
+        if (this.checkLoginPromise) {
+            return this.checkLoginPromise;
+        } else if (this.currentUser) {
+            return Promise.resolve(true);
+        } else {
+            this.checkLoginPromise = 
+                this.checkState(this.userManager.signinSilent())
+                    .then(result => {
+                        return result || this.checkState(this.userManager.signinSilent());
+                    });
+
+            return this.checkLoginPromise;
+        }
     }
 
     public logout(): Observable<any> {
@@ -87,12 +95,24 @@ export class AuthService {
         return Observable.fromPromise(userPromise);
     }
 
+    private onAuthenticated(user: User) {
+        this.currentUser = user;
+
+        this.isAuthenticatedChanged$.next(true);
+    }
+
+    private onDeauthenticated() {
+        this.currentUser = null;
+
+        this.isAuthenticatedChanged$.next(false);
+    }
+
     private checkState(promise: Promise<User>): Promise<boolean> {
         const resultPromise =
             promise
                 .then(user => {
                     if (user) {
-                        this.currentUser = user;
+                        this.onAuthenticated(user);
                     }
                     return !!this.currentUser;
                 }).catch((err) => {
@@ -128,11 +148,13 @@ export class AuthService {
     private setRequestOptions(options?: Ng2Http.RequestOptions) {
         if (!options) {
             options = new Ng2Http.RequestOptions();
-
-            options.headers.append('Content-Type', 'application/json');
         }
 
-        options.headers.append('Authorization', '${this.user.token_type} {this.user.access_token}');
+        if (!options.headers) {
+            options.headers = new Ng2Http.Headers();
+            options.headers.append('Content-Type', 'application/json');
+        }
+        options.headers.append('Authorization', `${this.currentUser.token_type} ${this.currentUser.access_token}`);
 
         return options;
     }

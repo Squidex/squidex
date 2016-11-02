@@ -16,10 +16,9 @@ import {
     ColorPickerComponent,
     DayOfWeekPipe,
     DayPipe,
-    DragModelDirective,
     DurationPipe,
     FocusOnChangeDirective,
-    ImageDropDirective,
+    ModalViewDirective,
     MoneyPipe,
     MonthPipe,
     ShortcutComponent,
@@ -32,18 +31,20 @@ import {
 
 @Ng2.NgModule({
     imports: [
+        Ng2Http.HttpModule,
         Ng2Forms.FormsModule,
-        Ng2Common.CommonModule
+        Ng2Forms.ReactiveFormsModule,
+        Ng2Common.CommonModule,
+        Ng2Router.RouterModule
     ],
     declarations: [
         CloakDirective,
         ColorPickerComponent,
         DayOfWeekPipe,
         DayPipe,
-        DragModelDirective,
         DurationPipe,
         FocusOnChangeDirective,
-        ImageDropDirective,
+        ModalViewDirective,
         MoneyPipe,
         MonthPipe,
         ShortcutComponent,
@@ -51,7 +52,7 @@ import {
         ShortTimePipe,
         SliderComponent,
         SpinnerComponent,
-        UserReportComponent
+        UserReportComponent,
     ],
     exports: [
         CloakDirective,
@@ -60,6 +61,7 @@ import {
         DayPipe,
         DurationPipe,
         FocusOnChangeDirective,
+        ModalViewDirective,
         MoneyPipe,
         MonthPipe,
         ShortcutComponent,
@@ -70,8 +72,9 @@ import {
         UserReportComponent,
         Ng2Http.HttpModule,
         Ng2Forms.FormsModule,
+        Ng2Forms.ReactiveFormsModule,
         Ng2Common.CommonModule,
         Ng2Router.RouterModule
     ]
 })
-export class FrameworkModule { }
+export class SqxFrameworkModule { }

@@ -1,69 +1,50 @@
 @import '_mixins.scss';
 @import '_vars.scss';
 
-.nav-icon {
-    & {
-        margin-top: -0.5rem;
-        text-align: center;
-        text-decoration: none;
-        cursor: default;
+.form-hint {
+    font-size: 0.8rem;
+}
+
+.ng-invalid.ng-dirty {
+    border-color: $accent-error;
+}
+
+.ng-invalid.ng-dirty :focus, .ng-invalid.ng-dirty :hover {
+    border-color: $accent-error-dark;
+}
+
+.errors {
+    &-box {
+        position: relative;
     }
 
-    span {
-        display: block;
-        font-size: 0.8em;
+    &:after {
+        @include absolute(2rem, auto, auto, 0.6rem);
+        content: '';
+        height: 0;
+        border-style: solid;
+        border-width: 0.4rem;
+        border-color: $accent-error transparent transparent transparent;
+        width: 0;
+    }
+
+    & {
+        @include absolute(-2.4rem, 0px, auto, 0px);
+        @include border-radius(2px);
+        color: white;
+        cursor: none;
+        font-size: 0.9rem;
         font-weight: normal;
-        cursor: default;
+        line-height: 2rem;
+        padding: 0 0.4rem;
+        background: $accent-error;
     }
 }
 
-.navbar-light .navbar-nav .nav-link, .btn-icon {
-    & {
-        color: $nav-text-color;
-    }
-
-    &:hover, &:focus {
-        text-decoration: none;
-    }
-
-    &:hover {
-        color: black;
-    }
-
-    &.disabled {
-        color: lighten($nav-text-color, 55%);
-    }
+.modal-content {
+    @include box-shadow(0px, 6px, 16px, 0.2px);
 }
 
-.navbar-light .navbar-nav .nav-link.btn-blue, .btn-icon.btn-blue, .btn-blue {
-    &:hover {
-        color: $accent-normal;
-    }
-
-    &:focus {
-        color: $accent-dark
-    }
-
-    &.disabled {
-        color: lighten($nav-text-color, 55%);
-    }
-}
-
-.btn-icon {
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
-    cursor: default;
-}
-
-.navbar-nav .nav-item + .nav-nomargin {
-    margin-left: 0;
-    margin-right: -1rem;
-}
-
-.nav-separator {
-    margin-top: .425rem;
-    margin-bottom: .425rem;
-    margin-left: 1.2em;
-    margin-right: 1.2em;
-    display: block;
+.modal-content, .modal-header {
+    border: 0;
 }

@@ -7,4 +7,4 @@
 
 export * from './declarations';
 
-export * from './login.module';
+export * from './layout.module';

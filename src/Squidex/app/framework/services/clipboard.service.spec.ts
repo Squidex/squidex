@@ -40,7 +40,7 @@ describe('ShortcutService', () => {
 
         let text = '';
 
-        clipboardService.text.subscribe(t => {
+        clipboardService.textChanges.subscribe(t => {
             text = t;
         });
 

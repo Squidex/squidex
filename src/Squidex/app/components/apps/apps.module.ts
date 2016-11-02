@@ -7,18 +7,20 @@
 
 import * as Ng2 from '@angular/core';
 
-import { FrameworkModule } from './../../framework';
+import { SqxFrameworkModule } from './../../framework';
+import { SqxLayoutModule } from './../layout';
 
 import {
-    AppsComponent
+    AppsPageComponent
 } from './declarations';
 
 @Ng2.NgModule({
     imports: [
-        FrameworkModule
+        SqxFrameworkModule,
+        SqxLayoutModule
     ],
     declarations: [
-        AppsComponent
+        AppsPageComponent
     ]
 })
-export class MyAppModule { }
+export class SqxAppModule { }

@@ -5,5 +5,6 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-export * from './apps.component';
+export * from './declarations';
+
 export * from './apps.module';

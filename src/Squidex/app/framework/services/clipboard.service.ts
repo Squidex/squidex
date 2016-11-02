@@ -15,16 +15,16 @@ export const ClipboardServiceFactory = () => {
 
 @Ng2.Injectable()
 export class ClipboardService {
-    private textInstance = new BehaviorSubject<string>('');
+    private readonly text$ = new BehaviorSubject<string>('');
 
-    public get text(): Observable<string> {
-        return this.textInstance;
+    public get textChanges(): Observable<string> {
+        return this.text$;
     }
 
     public selectText(): string {
         let result = '';
 
-        this.textInstance.subscribe(t => {
+        this.text$.subscribe(t => {
             result = t;
         }).unsubscribe();
 
@@ -32,6 +32,6 @@ export class ClipboardService {
     }
 
     public setText(text: any) {
-        this.textInstance.next(text);
+        this.text$.next(text);
     }
 }

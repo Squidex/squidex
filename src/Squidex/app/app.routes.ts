@@ -9,8 +9,8 @@ import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
 import {
-    AppsComponent,
-    LoginComponent
+    AppsPageComponent,
+    LoginPageComponent
 } from './components';
 
 import { 
@@ -25,12 +25,12 @@ export const routes: Ng2Router.Routes = [
     },
     {
         path: 'apps',
-        component: AppsComponent,
+        component: AppsPageComponent,
         canActivate: [AuthGuard]
     },
     {
         path: 'login',
-        component: LoginComponent
+        component: LoginPageComponent
     }
 ];
 

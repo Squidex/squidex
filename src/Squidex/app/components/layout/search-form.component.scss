@@ -1,0 +1,16 @@
+@import '../../theme/_vars.scss';
+@import '../../theme/_mixins.scss';
+
+.search {
+    & {
+        @include transition(background 0.4s ease);
+        color: white;
+        background: $accent-blue-dark;
+        border-color: $accent-blue-dark;
+        border-width: 1px;
+    }
+
+    &:focus {
+        background: darken($accent-blue-dark, 5%);
+    }
+}

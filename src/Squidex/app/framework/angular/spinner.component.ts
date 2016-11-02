@@ -10,7 +10,7 @@ import * as Ng2 from '@angular/core';
 declare var Spinner: any;
 
 @Ng2.Component({
-    selector: 'gp-spinner',
+    selector: 'sqx-spinner',
     template: ''
 })
 export class SpinnerComponent {

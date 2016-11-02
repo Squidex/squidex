@@ -11,7 +11,7 @@ import { DragService } from './../services/drag.service';
 import { Vec2 } from './../utils/vec2';
 
 @Ng2.Directive({
-    selector: '.gp-image-drop'
+    selector: '.sqx-image-drop'
 })
 export class ImageDropDirective {
     constructor(

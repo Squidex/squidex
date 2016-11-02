@@ -14,7 +14,7 @@ import { AuthService } from './../../shared';
     selector: 'login',
     template
 })
-export class LoginComponent implements Ng2.OnInit {
+export class LoginPageComponent implements Ng2.OnInit {
     public showFailedError = false;
 
     constructor(

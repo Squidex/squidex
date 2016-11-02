@@ -16,7 +16,7 @@ import {
 } from './../utils/color-palette';
 
 @Ng2.Component({
-    selector: 'gp-color-picker',
+    selector: 'sqx-color-picker',
     styles,
     template
 })

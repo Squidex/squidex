@@ -1,8 +1,13 @@
+@import 'theme/mixins.scss';
+
+.navbar {
+    @include box-shadow(0, 4px, 4px, 0.2px);
+}
+
+.search-form {
+    margin-left: 15px;
+}
+
 main {
-    padding: 1em;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.1rem;
-    text-align: center;
-    margin-top: 50px;
-    display: block;
+    margin-top: 54px
 }

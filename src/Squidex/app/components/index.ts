@@ -6,4 +6,5 @@
  */
 
 export * from './apps';
+export * from './layout';
 export * from './login';
