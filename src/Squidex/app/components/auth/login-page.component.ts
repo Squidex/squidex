@@ -10,27 +10,30 @@ import * as Ng2Router from '@angular/router';
 
 import { AuthService } from './../../shared';
 
+import { TitleService } from './../../framework';
+
 @Ng2.Component({
     selector: 'login',
-    template: ''
+    template
 })
 export class LoginPageComponent implements Ng2.OnInit {
     public showError = false;
 
     constructor(
         private readonly authService: AuthService,
-        private readonly router: Ng2Router.Router
+        private readonly router: Ng2Router.Router,
+        private readonly title: TitleService,
     ) {
     }
 
     public ngOnInit() {
         this.authService.loginComplete().subscribe(
             () => {
-        debugger;
-                this.router.navigate(['/']);
+                this.router.navigate(['/'], { replaceUrl: true });
             },
            e => {
-        debugger;
+                this.title.setTitle('Login failed');
+                
                 this.showError = true;
             }
         );

@@ -6,6 +6,7 @@
  */
 
 import * as Ng2 from '@angular/core';
+import * as Ng2Router from '@angular/router';
 
 import {
     AppDto, 
@@ -13,6 +14,8 @@ import {
 } from './../../shared';
 
 import { fadeAnimation, ModalView } from './../../framework';
+
+const FALLBACK_NAME = 'Apps Overview';
 
 @Ng2.Component({
     selector: 'sqx-apps-menu',
@@ -23,27 +26,41 @@ import { fadeAnimation, ModalView } from './../../framework';
     ]
 })
 export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
-    private subscription: any | null = null;
+    private appsSubscription: any | null = null;
+    private routeSubscription: any | null = null;
 
     public modalMenu = new ModalView();
     public modalDialog = new ModalView();
 
     public apps: AppDto[] | null = null;
 
+    public app = FALLBACK_NAME;
+
     constructor(
-        private readonly appsStore: AppsStoreService 
+        private readonly appsStore: AppsStoreService,
+        private readonly route: Ng2Router.ActivatedRoute
     ) {
     }
 
     public ngOnInit() {
-        this.subscription = this.appsStore.appsChanges.subscribe(apps => {
+        this.appsSubscription = this.appsStore.appsChanges.subscribe(apps => {
             this.apps = apps;
+        });
+
+        this.routeSubscription = this.route.params.map(p => p['app']).subscribe(app => {
+            this.app = app || FALLBACK_NAME;
         });
     }
 
     public ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
+        if (this.appsSubscription) {
+            this.appsSubscription.unsubscribe();
+            this.appsSubscription = null;
+        }
+
+        if (this.routeSubscription) {
+            this.routeSubscription.unsubscribe();
+            this.routeSubscription = null;
         }
     }
 

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -101,6 +100,8 @@ namespace Squidex
             UseIdentity(app);
             UseApi(app);
             UseFrontend(app);
+
+            app.UseMyEventStore();
         }
 
         private void UseIdentity(IApplicationBuilder app)

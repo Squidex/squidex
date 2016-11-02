@@ -7,7 +7,11 @@
 
 import * as Ng2 from '@angular/core';
 
-import { fadeAnimation, ModalView } from './../../framework';
+import { 
+    fadeAnimation, 
+    ModalView,
+    TitleService 
+} from './../../framework';
 
 @Ng2.Component({
     selector: 'sqx-apps-page',
@@ -17,6 +21,15 @@ import { fadeAnimation, ModalView } from './../../framework';
         fadeAnimation()
     ]
 })
-export class AppsPageComponent {
+export class AppsPageComponent implements Ng2.OnInit {
     public modalDialog = new ModalView();
+
+    constructor(
+        private readonly title: TitleService
+    ) {
+    }
+
+    public ngOnInit() {
+        this.title.setTitle('Apps');
+    }
 }

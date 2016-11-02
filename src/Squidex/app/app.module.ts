@@ -16,6 +16,8 @@ import {
     DragService,
     DragServiceFactory,
     DecimalSeparatorConfig,
+    TitlesConfig,
+    TitleService
 } from './framework';
 
 import { 
@@ -54,10 +56,12 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         AppsService,
         AuthGuard,
         AuthService,
+        TitleService,
         { provide: ApiUrlConfig, useValue: new ApiUrlConfig(baseUrl) },
         { provide: CurrencyConfig, useValue: new CurrencyConfig('EUR', '€', true) },
         { provide: DecimalSeparatorConfig, useValue: new DecimalSeparatorConfig('.') },
-        { provide: DragService, useFactory: DragServiceFactory }
+        { provide: DragService, useFactory: DragServiceFactory },
+        { provide: TitlesConfig, useValue: new TitlesConfig({}, null, 'Squidex Headless CMS') }
     ],
     bootstrap: [AppComponent]
 })

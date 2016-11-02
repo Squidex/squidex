@@ -7,4 +7,5 @@
 
 export * from './app-form.component';
 export * from './apps-menu.component';
+export * from './not-found-page.component';
 export * from './search-form.component';

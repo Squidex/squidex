@@ -39,7 +39,8 @@ export class AuthService {
     }
 
     constructor(apiUrl: ApiUrlConfig,
-        private readonly http: Ng2Http.Http
+        private readonly http: Ng2Http.Http,
+        private readonly router: Ng2Router.Router,
     ) {
         Log.logger = console;
 
@@ -130,24 +131,36 @@ export class AuthService {
     public authGet(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
         options = this.setRequestOptions(options);
 
-        return this.http.get(url, options);
+        return this.checkResponse(this.http.get(url, options));
     }
 
     public authPut(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
         options = this.setRequestOptions(options);
 
-        return this.http.put(url, data, options);
+        return this.checkResponse(this.http.put(url, data, options));
     }
 
     public authDelete(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
         options = this.setRequestOptions(options);
-        return this.http.delete(url, options);
+        return this.checkResponse(this.http.delete(url, options));
     }
 
     public authPost(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
         options = this.setRequestOptions(options);
 
-        return this.http.post(url, data, options);
+        return this.checkResponse(this.http.post(url, data, options));
+    }
+
+    private checkResponse(response: Observable<Ng2Http.Response>) {
+        return response.catch((errorResponse: Ng2Http.Response) => {
+            if (errorResponse.status === 401) {
+                this.login();
+            } else {
+                this.router.navigate(['/404']);
+            }
+
+            return Observable.throw(response);
+        });
     }
 
     private setRequestOptions(options?: Ng2Http.RequestOptions) {

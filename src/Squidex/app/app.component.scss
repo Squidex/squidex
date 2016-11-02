@@ -4,6 +4,14 @@
     @include box-shadow(0, 4px, 4px, 0.2px);
 }
 
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -0.2rem;
+    margin-bottom: -0.2rem;
+    font-size: 1.8rem;
+}
+
 .search-form {
     margin-left: 15px;
 }

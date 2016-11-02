@@ -1,20 +1,21 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">My App with a really very long name</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{app}}</span>
 
         <div class="dropdown-menu" [(sqxModalView)]="modalMenu">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
+            <a class="dropdown-item all-apps" routerLink="/apps">
+                <span class="all-apps-text">All Apps</span> 
+                <span class="all-apps-pill tag tag-pill tag-default">{{apps.length}}</span>
+            </a>
 
             <div class="dropdown-divider"></div>
-
-            <a class="dropdown-item" routerLink="/apps">All apps</a>
+            
+            <a class="dropdown-item" *ngFor="let app of apps">{{app.name}}</a>
 
             <div class="dropdown-divider"></div>
 
             <div class="drodown-button">
-                <button class="btn btn-block btn-success" id="app-create" (click)="createApp()">Create App</button>
+                <button class="btn btn-block btn-success" id="app-create" (click)="createApp()"><i class="icon-plus"></i> Create New App</button>
             </div>
         </div>
     </li>

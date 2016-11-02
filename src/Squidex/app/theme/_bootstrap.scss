@@ -41,10 +41,14 @@
     }
 }
 
-.modal-content {
+.modal-content, .dropdown-menu {
     @include box-shadow(0px, 6px, 16px, 0.2px);
 }
 
 .modal-content, .modal-header {
+    border: 0;
+}
+
+.dropdown-menu {
     border: 0;
 }

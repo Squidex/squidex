@@ -22,5 +22,5 @@ export const fadeAnimation = (name = 'fade', timing = '200ms'): Ng2.AnimationEnt
             Ng2.transition('0 => 1', Ng2.animate(timing))
         ]
     );
-}
+};
     

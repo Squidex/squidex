@@ -12,10 +12,9 @@ import { AuthService } from './../../shared';
 
 @Ng2.Component({
     selector: 'logout',
-    template: ''
+    template
 })
 export class LogoutPageComponent implements Ng2.OnInit {
-    public showFailedError = false;
 
     constructor(
         private readonly authService: AuthService,
@@ -26,10 +25,10 @@ export class LogoutPageComponent implements Ng2.OnInit {
     public ngOnInit() {
         this.authService.logoutComplete().subscribe(
             () => {
-                this.router.navigate(['/']);
+                this.router.navigate(['/'], { replaceUrl: true });
             },
             () => {
-                this.showFailedError = true;
+                this.router.navigate(['/'], { replaceUrl: true });
             }
         );
     }

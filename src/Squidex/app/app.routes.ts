@@ -11,7 +11,8 @@ import * as Ng2Router from '@angular/router';
 import {
     AppsPageComponent,
     LoginPageComponent,
-    LogoutPageComponent
+    LogoutPageComponent,
+    NotFoundPageComponent
 } from './components';
 
 import { 
@@ -36,6 +37,14 @@ export const routes: Ng2Router.Routes = [
     {
         path: 'logout',
         component: LogoutPageComponent
+    },
+    {
+        path: '404',
+        component: NotFoundPageComponent
+    },
+    {
+        path: '**',
+        component: NotFoundPageComponent
     }
 ];
 

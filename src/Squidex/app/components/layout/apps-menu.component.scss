@@ -13,6 +13,37 @@
     padding: 3px 1.5rem;
 }
 
+.dropdown-menu {
+    top: 44px;
+}
+
+.dropdown-menu:before {
+    @include absolute(-18px, auto, auto, 10px);
+    content: '';
+    height: 0;
+    border-style: solid;
+    border-width: 10px;
+    border-color: transparent transparent white transparent;
+    width: 0;
+}
+
+.all-apps {
+    & {
+        position: relative;
+    }
+
+    &-text {
+        font-weight: bold;
+    }
+
+    &-pill {
+        @include absolute(auto, 10px, auto, auto);
+        color: $accent-blue;
+        border: none;
+        background: $accent-blue-lighter;
+    }
+}
+
 #app-name {
     & {
         padding-right: 15px;
@@ -29,5 +60,6 @@
 
     &:after {
         @include absolute(50%, 0px, auto, auto);
+        color: $accent-blue-light;
     }
 }

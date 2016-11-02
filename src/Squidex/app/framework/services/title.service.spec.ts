@@ -28,12 +28,28 @@ describe('TitleService', () => {
         expect(titleService).toBeDefined();
     });
 
-    it('should do nothing when title key is not found in configuration', () => {
+    it('should use key when title key is not found in configuration', () => {
         const titleService = new TitleService(new TitlesConfig({}));
 
-        titleService.setTitle('invalid', {});
+        titleService.setTitle('my-title', {});
 
-        expect(document.title).toBe('');
+        expect(document.title).toBe('my-title');
+    });
+
+    it('should prepand prefix to title', () => {
+        const titleService = new TitleService(new TitlesConfig({}, 'myapp'));
+
+        titleService.setTitle('my-title', {});
+
+        expect(document.title).toBe('myapp - my-title');
+    });
+
+    it('should append suffix to title', () => {
+        const titleService = new TitleService(new TitlesConfig({}, null, 'myapp'));
+
+        titleService.setTitle('my-title', {});
+
+        expect(document.title).toBe('my-title - myapp');
     });
 
     it('should set document title when title key is found in configuration', () => {
