@@ -7,6 +7,7 @@
 
 import * as Ng2 from '@angular/core';
 import * as Ng2Http from '@angular/http';
+import * as Ng2Router from '@angular/router';
 
 import {
     Log,
@@ -38,19 +39,21 @@ export class AuthService {
     }
 
     constructor(apiUrl: ApiUrlConfig,
-        private readonly http: Ng2Http.Http, 
+        private readonly http: Ng2Http.Http
     ) {
         Log.logger = console;
 
         if (apiUrl) {
             this.userManager = new UserManager({
-                        client_id: 'squidex-frontend',
-                            scope: 'squidex-api openid profile ',
-                    response_type: 'id_token token',
-              silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
-               popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
-                        authority: apiUrl.buildUrl('identity-server/'),
-             automaticSilentRenew: true
+                           client_id: 'squidex-frontend',
+                               scope: 'squidex-api openid profile ',
+                       response_type: 'id_token token',
+                        redirect_uri: apiUrl.buildUrl('/login;'),
+            post_logout_redirect_uri: apiUrl.buildUrl('/logout;'),
+                 silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
+                  popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
+                           authority: apiUrl.buildUrl('identity-server/'),
+                automaticSilentRenew: true
             });
 
             this.userManager.events.addUserLoaded(user => {
@@ -82,17 +85,19 @@ export class AuthService {
     }
 
     public logout(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signoutRedirect());
+    }
+
+    public logoutComplete(): Observable<any> {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
-    public login(): Observable<boolean> {
-        const userPromise =
-            this.checkState(this.userManager.signinSilent())
-                .then(result => {
-                    return result || this.checkState(this.userManager.signinPopup());
-                });
+    public login(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signinRedirect());
+    }
 
-        return Observable.fromPromise(userPromise);
+    public loginComplete(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signinRedirectCallback());
     }
 
     private onAuthenticated(user: User) {

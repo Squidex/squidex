@@ -47,6 +47,10 @@ namespace Squidex.Configurations.Identity
                 ClientName = id,
                 RedirectUris = new List<string>
                 {
+                    options.BuildUrl("#/login;"),
+                    options.BuildUrl("#/logout;"),
+                    options.BuildUrl("login;"),
+                    options.BuildUrl("logout;"),
                     options.BuildUrl("identity-server/client-callback-silent/"),
                     options.BuildUrl("identity-server/client-callback-popup/")
                 },

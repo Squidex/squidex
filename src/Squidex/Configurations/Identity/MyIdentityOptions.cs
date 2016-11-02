@@ -5,6 +5,9 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
+using System;
+
 namespace Squidex.Configurations.Identity
 {
     public sealed class MyIdentityOptions
@@ -23,7 +26,14 @@ namespace Squidex.Configurations.Identity
 
         public string BuildUrl(string path)
         {
-            return $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}/";
+            var url = $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}";
+
+            if (url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
+                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0) {
+                url = url + "/";
+            }
+
+            return url;
         }
     }
 }

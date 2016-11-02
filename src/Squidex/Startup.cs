@@ -149,11 +149,20 @@ namespace Squidex
             {
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackProxy();
-                app.UseDefaultFiles();
+                
+                app.Use((context, next) => {
+                    context.Request.Path = new PathString("/index.html");
+
+                    return next();
+                });
             }
             else
             {
-                app.UseDefaultFiles(new DefaultFilesOptions { DefaultFileNames = new List<string> { "build/index.html" } });
+                app.Use((context, next) => {
+                    context.Request.Path = new PathString("/build/index.html");
+
+                    return next();
+                });
             }
 
             app.UseStaticFiles();

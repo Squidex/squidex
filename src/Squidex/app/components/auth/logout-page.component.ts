@@ -6,27 +6,27 @@
  */
 
 import * as Ng2 from '@angular/core';
-import * as Ng2Common from '@angular/common';
+import * as Ng2Router from '@angular/router';
 
 import { AuthService } from './../../shared';
 
 @Ng2.Component({
-    selector: 'login',
-    template
+    selector: 'logout',
+    template: ''
 })
-export class LoginPageComponent implements Ng2.OnInit {
+export class LogoutPageComponent implements Ng2.OnInit {
     public showFailedError = false;
 
     constructor(
         private readonly authService: AuthService,
-        private readonly location: Ng2Common.Location
+        private readonly router: Ng2Router.Router
     ) {
     }
 
     public ngOnInit() {
-        this.authService.login().subscribe(
+        this.authService.logoutComplete().subscribe(
             () => {
-                this.location.back();
+                this.router.navigate(['/']);
             },
             () => {
                 this.showFailedError = true;

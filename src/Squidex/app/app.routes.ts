@@ -10,7 +10,8 @@ import * as Ng2Router from '@angular/router';
 
 import {
     AppsPageComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    LogoutPageComponent
 } from './components';
 
 import { 
@@ -31,7 +32,11 @@ export const routes: Ng2Router.Routes = [
     {
         path: 'login',
         component: LoginPageComponent
+    },
+    {
+        path: 'logout',
+        component: LogoutPageComponent
     }
 ];
 
-export const routing: Ng2.ModuleWithProviders = Ng2Router.RouterModule.forRoot(routes, { useHash: true });
+export const routing: Ng2.ModuleWithProviders = Ng2Router.RouterModule.forRoot(routes, { useHash: false });

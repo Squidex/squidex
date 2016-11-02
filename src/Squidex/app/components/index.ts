@@ -6,5 +6,5 @@
  */
 
 export * from './apps';
+export * from './auth';
 export * from './layout';
-export * from './login';

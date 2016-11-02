@@ -6,3 +6,4 @@
  */
 
 export * from './login-page.component';
+export * from './logout-page.component';
