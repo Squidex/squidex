@@ -1,17 +1,19 @@
 ﻿// ==========================================================================
-//  IAppFeature.cs
+//  IAppContributorEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Read.Apps;
+using Squidex.Core.Apps;
 
-namespace Squidex.Pipeline
+namespace Squidex.Read.Apps
 {
-    public interface IAppFeature
+    public interface IAppContributorEntity
     {
-        IAppEntity App { get; }
+        string SubjectId { get; }
+        
+        PermissionLevel Permission { get; }
     }
 }

@@ -45,7 +45,7 @@ export class ModalViewDirective implements Ng2.OnChanges {
         }
 
         if (this.modalView) {
-            this.subscription = this.modalView.isOpenChanges.subscribe(isOpen => {
+            this.subscription = this.modalView.isOpen.subscribe(isOpen => {
                 if (this.isEnabled) {
                     if (isOpen) {
                         this.renderer.setElementStyle(this.elementRef.nativeElement, 'display', 'block');

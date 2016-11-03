@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  IAppFeature.cs
+//  ISubjectCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Read.Apps;
-
-namespace Squidex.Pipeline
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public interface IAppFeature
+    public interface ISubjectCommand : ICommand
     {
-        IAppEntity App { get; }
+        string SubjectId { get; set; }
     }
 }

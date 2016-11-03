@@ -55,7 +55,7 @@ describe('ModalView', () => {
     function checkValue(dialog: ModalView, expected: boolean) {
         let result: boolean | null = null;
 
-        dialog.isOpenChanges.subscribe(value => {
+        dialog.isOpen.subscribe(value => {
             result = value;
         }).unsubscribe();
 

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace Squidex.Modules.Api.Apps
         [Route("apps/")]
         public async Task<List<ListAppDto>> Query()
         {
-            var schemas = await appRepository.QueryAllAsync();
+            var schemas = await appRepository.QueryAllAsync(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             return schemas.Select(s => SimpleMapper.Map(s, new ListAppDto())).ToList();
         }

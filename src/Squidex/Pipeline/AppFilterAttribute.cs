@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -28,21 +30,23 @@ namespace Squidex.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var appId = await appProvider.FindAppIdByNameAsync(appName);
+                var app = await appProvider.FindAppByNameAsync(appName);
 
-                if (!appId.HasValue)
+                if (app == null)
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
-                if (!context.HttpContext.User.HasClaim("app", appName))
+                var subject = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (subject == null || app.Contributors.Any(x => x.SubjectId == subject))
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
-                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(appId.Value));
+                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
             }
 
             await next();

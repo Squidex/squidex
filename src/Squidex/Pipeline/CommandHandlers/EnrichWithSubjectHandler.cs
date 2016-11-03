@@ -1,44 +1,43 @@
 ﻿// ==========================================================================
-//  EnrichWithAppIdHandler.cs
+//  EnrichWithSubjectHandler.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Security;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Write;
-
 // ReSharper disable InvertIf
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithAppIdHandler : ICommandHandler
+    public class EnrichWithSubjectHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithAppIdHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithSubjectHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var appCommand = context.Command as IAppCommand;
+            var subjectCommand = context.Command as ISubjectCommand;
 
-            if (appCommand != null)
+            if (subjectCommand != null)
             {
-                var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
+                var user = httpContextAccessor.HttpContext.User;
 
-                if (appFeature == null)
+                if (user?.FindFirst(ClaimTypes.NameIdentifier) == null)
                 {
-                    throw new InvalidOperationException("Cannot resolve app");
+                    throw new SecurityException("No user available");
                 }
 
-                appCommand.AppId = appFeature.App.Id;
+                subjectCommand.SubjectId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
             }
 
             return Task.FromResult(false);

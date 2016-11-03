@@ -8,10 +8,7 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
-import {
-    AppDto, 
-    AppsStoreService 
-} from './../../shared';
+import { AppsStoreService } from './../../shared';
 
 import { fadeAnimation, ModalView } from './../../framework';
 
@@ -25,43 +22,20 @@ const FALLBACK_NAME = 'Apps Overview';
         fadeAnimation()
     ]
 })
-export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
-    private appsSubscription: any | null = null;
-    private routeSubscription: any | null = null;
-
+export class AppsMenuComponent {
     public modalMenu = new ModalView();
     public modalDialog = new ModalView();
 
-    public apps: AppDto[] | null = null;
+    public apps =
+        this.appsStore.apps.map(a => a || []);
 
-    public app = FALLBACK_NAME;
+    public app = 
+        this.route.params.map((p: any) => p.app || FALLBACK_NAME);
 
     constructor(
         private readonly appsStore: AppsStoreService,
         private readonly route: Ng2Router.ActivatedRoute
     ) {
-    }
-
-    public ngOnInit() {
-        this.appsSubscription = this.appsStore.appsChanges.subscribe(apps => {
-            this.apps = apps;
-        });
-
-        this.routeSubscription = this.route.params.map(p => p['app']).subscribe(app => {
-            this.app = app || FALLBACK_NAME;
-        });
-    }
-
-    public ngOnDestroy() {
-        if (this.appsSubscription) {
-            this.appsSubscription.unsubscribe();
-            this.appsSubscription = null;
-        }
-
-        if (this.routeSubscription) {
-            this.routeSubscription.unsubscribe();
-            this.routeSubscription = null;
-        }
     }
 
     public createApp() {

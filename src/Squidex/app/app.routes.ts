@@ -48,4 +48,4 @@ export const routes: Ng2Router.Routes = [
     }
 ];
 
-export const routing: Ng2.ModuleWithProviders = Ng2Router.RouterModule.forRoot(routes, { useHash: false });
+export const routing: Ng2.ModuleWithProviders = Ng2Router.RouterModule.forRoot(routes, { useHash: false, enableTracing: true });

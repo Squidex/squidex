@@ -13,7 +13,7 @@ namespace Squidex.Read.Apps.Repositories
 {
     public interface IAppRepository
     {
-        Task<IReadOnlyList<IAppEntity>> QueryAllAsync();
+        Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string currentSubjectId);
 
         Task<IAppEntity> FindAppByNameAsync(string name);
     }

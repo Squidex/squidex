@@ -33,7 +33,7 @@ namespace Squidex.Modules
                     throw new InvalidOperationException("Not in a app context");
                 }
 
-                return appFeature.AppId;
+                return appFeature.App.Id;
             }
         }
     }

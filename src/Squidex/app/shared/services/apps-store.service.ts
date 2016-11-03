@@ -22,7 +22,7 @@ export class AppsStoreService {
     private lastApps: AppDto[] = null;
     private readonly apps$ = new BehaviorSubject<AppDto[]>(null);
 
-    public get appsChanges(): Observable<AppDto[]> {
+    public get apps(): Observable<AppDto[]> {
         return this.apps$;
     }
 

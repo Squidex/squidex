@@ -10,7 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class ModalView {
     private readonly isOpen$: BehaviorSubject<boolean>;
 
-    public get isOpenChanges(): Observable<boolean> {
+    public get isOpen(): Observable<boolean> {
         return this.isOpen$.distinctUntilChanged();
     }
 
@@ -29,7 +29,7 @@ export class ModalView {
     public toggle() {
         let value = false;
 
-        this.isOpenChanges.subscribe(v => {
+        this.isOpen.subscribe(v => {
             value = v;
         }).unsubscribe();
 

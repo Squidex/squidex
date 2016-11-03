@@ -19,12 +19,12 @@ using Squidex.Write.Schemas;
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithAggregateIdHandler : ICommandHandler
+    public sealed class EnrichWithSchemaAggregateIdHandler : ICommandHandler
     {
         private readonly ISchemaProvider schemaProvider;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithAggregateIdHandler(ISchemaProvider schemaProvider, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaAggregateIdHandler(ISchemaProvider schemaProvider, IActionContextAccessor actionContextAccessor)
         {
             this.schemaProvider = schemaProvider;
 

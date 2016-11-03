@@ -7,11 +7,13 @@
 // ==========================================================================
 
 using System;
+using Squidex.Core.Apps;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Write.Apps
@@ -45,7 +47,8 @@ namespace Squidex.Write.Apps
 
             VerifyNotCreated();
 
-            RaiseEvent(new AppCreated { Name = command.Name });
+            RaiseEvent(SimpleMapper.Map(command, new AppCreated()));
+            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { Permission = PermissionLevel.Owner }));
         }
 
         private void VerifyNotCreated()

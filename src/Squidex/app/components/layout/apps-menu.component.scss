@@ -37,7 +37,7 @@
     }
 
     &-pill {
-        @include absolute(auto, 10px, auto, auto);
+        @include absolute(6px, 10px, auto, auto);
         color: $accent-blue;
         border: none;
         background: $accent-blue-lighter;

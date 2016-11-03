@@ -36,11 +36,11 @@ describe('AppsStoreService', () => {
         let result1: AppDto[];  
         let result2: AppDto[]; 
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result1 = x;
         }).unsubscribe();
         
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result2 = x;
         }).unsubscribe();
 
@@ -68,13 +68,13 @@ describe('AppsStoreService', () => {
         let result1: AppDto[];  
         let result2: AppDto[]; 
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result1 = x;
         }).unsubscribe();
 
         store.reload();
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result2 = x;
         }).unsubscribe();
 
@@ -102,13 +102,13 @@ describe('AppsStoreService', () => {
         let result1: AppDto[];  
         let result2: AppDto[]; 
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result1 = x;
         }).unsubscribe();
 
         store.createApp(new AppCreateDto('new-name')).subscribe(x => { });
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result2 = x;
         }).unsubscribe();
 
@@ -133,7 +133,7 @@ describe('AppsStoreService', () => {
 
         store.createApp(new AppCreateDto('new-name')).subscribe(x => { });
 
-        store.appsChanges.subscribe(x => {
+        store.apps.subscribe(x => {
             result = x;
         }).unsubscribe();
 

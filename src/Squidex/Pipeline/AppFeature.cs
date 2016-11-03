@@ -6,17 +6,17 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using Squidex.Read.Apps;
 
 namespace Squidex.Pipeline
 {
     public sealed class AppFeature : IAppFeature
     {
-        public Guid AppId { get; }
+        public IAppEntity App { get; }
 
-        public AppFeature(Guid appId)
+        public AppFeature(IAppEntity app)
         {
-            AppId = appId;
+            App = app;
         }
     }
 }

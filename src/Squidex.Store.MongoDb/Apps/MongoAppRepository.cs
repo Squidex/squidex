@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure.CQRS;
@@ -38,10 +38,10 @@ namespace Squidex.Store.MongoDb.Apps
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
         }
 
-        public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync()
+        public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string currentSubjectId)
         {
             var entities =
-                await Collection.Find(new BsonDocument()).ToListAsync();
+                await Collection.Find(s => s.Contributors.Any(c => c.SubjectId == currentSubjectId)).ToListAsync();
 
             return entities;
         }
@@ -57,6 +57,23 @@ namespace Squidex.Store.MongoDb.Apps
         public Task On(AppCreated @event, EnvelopeHeaders headers)
         {
             return Collection.CreateAsync(headers, a => SimpleMapper.Map(@event, a));
+        }
+
+        public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, a =>
+            {
+                var contributor = a.Contributors.Find(x => x.SubjectId == @event.SubjectId);
+
+                if (contributor == null)
+                {
+                    contributor = new MongoAppContributorEntity { SubjectId = @event.SubjectId };
+
+                    a.Contributors.Add(contributor);
+                }
+
+                contributor.Permission = @event.Permission;
+            });
         }
 
         public Task On(Envelope<IEvent> @event)

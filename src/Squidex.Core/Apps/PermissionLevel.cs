@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  IAppFeature.cs
+//  PermissionLevel.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Read.Apps;
-
-namespace Squidex.Pipeline
+namespace Squidex.Core.Apps
 {
-    public interface IAppFeature
+    public enum PermissionLevel
     {
-        IAppEntity App { get; }
+        Owner,
+        Developer,
+        Editor
     }
 }

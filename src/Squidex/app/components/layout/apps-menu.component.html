@@ -1,16 +1,16 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{app}}</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{app | async}}</span>
 
-        <div class="dropdown-menu" [(sqxModalView)]="modalMenu">
+        <div class="dropdown-menu" [(sqxModalView)]="modalMenu" [@fade]="(modalMenu.isOpen | async)">
             <a class="dropdown-item all-apps" routerLink="/apps">
                 <span class="all-apps-text">All Apps</span> 
-                <span class="all-apps-pill tag tag-pill tag-default">{{apps.length}}</span>
+                <span class="all-apps-pill tag tag-pill tag-default">{{(apps | async).length}}</span>
             </a>
 
             <div class="dropdown-divider"></div>
             
-            <a class="dropdown-item" *ngFor="let app of apps">{{app.name}}</a>
+            <a class="dropdown-item" *ngFor="let app of (apps | async)">{{app.name}}</a>
 
             <div class="dropdown-divider"></div>
 
@@ -21,7 +21,7 @@
     </li>
 </ul>
 
-<div class="modal ng-animate" [(sqxModalView)]="modalDialog" [@fade]="(modalDialog.isOpenChanges | async)">
+<div class="modal ng-animate" [(sqxModalView)]="modalDialog" [@fade]="(modalDialog.isOpen | async)">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

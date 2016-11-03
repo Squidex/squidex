@@ -1,37 +1,25 @@
 ﻿// ==========================================================================
-//  MongoAppEntity.cs
+//  MongoAppContributorEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Core.Apps;
 using Squidex.Read.Apps;
-using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Apps
 {
-    public sealed class MongoAppEntity : MongoEntity, IAppEntity
+    public sealed class MongoAppContributorEntity : IAppContributorEntity
     {
         [BsonRequired]
         [BsonElement]
-        public string Name { get; set; }
+        public string SubjectId { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public List<MongoAppContributorEntity> Contributors { get; set; }
-
-        IEnumerable<IAppContributorEntity> IAppEntity.Contributors
-        {
-            get { return Contributors; }
-        }
-
-        public MongoAppEntity()
-        {
-            Contributors = new List<MongoAppContributorEntity>();
-        }
+        public PermissionLevel Permission { get; set; }
     }
 }

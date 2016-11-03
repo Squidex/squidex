@@ -35,7 +35,7 @@ namespace Squidex.Read.Apps.Services.Implementations
             this.appRepository = appRepository;
         }
 
-        public async Task<Guid?> FindAppIdByNameAsync(string name)
+        public async Task<IAppEntity> FindAppByNameAsync(string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -51,7 +51,7 @@ namespace Squidex.Read.Apps.Services.Implementations
                 Cache.Set(cacheKey, cacheItem, new MemoryCacheEntryOptions { SlidingExpiration = CacheDuration });
             }
 
-            return cacheItem.Entity?.Id;
+            return cacheItem.Entity;
         }
 
         private static string BulidCacheKey(string name)
