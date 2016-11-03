@@ -153,7 +153,7 @@ namespace Squidex
                 app.UseWebpackProxy();
                 
                 app.Use((context, next) => {
-                    if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value))
+                    if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/index.html");
                     }
@@ -163,7 +163,7 @@ namespace Squidex
             else
             {
                 app.Use((context, next) => {
-                    if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value))
+                    if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/build/index.html");
                     }
