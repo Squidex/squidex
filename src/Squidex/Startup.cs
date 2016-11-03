@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -152,15 +153,20 @@ namespace Squidex
                 app.UseWebpackProxy();
                 
                 app.Use((context, next) => {
-                    context.Request.Path = new PathString("/index.html");
-
+                    if (!Path.HasExtension(context.Request.Path.Value))
+                    {
+                        context.Request.Path = new PathString("/index.html");
+                    }
                     return next();
                 });
             }
             else
             {
                 app.Use((context, next) => {
-                    context.Request.Path = new PathString("/build/index.html");
+                    if (!Path.HasExtension(context.Request.Path.Value))
+                    {
+                        context.Request.Path = new PathString("/build/index.html");
+                    }
 
                     return next();
                 });

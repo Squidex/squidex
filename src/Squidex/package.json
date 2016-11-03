@@ -10,7 +10,7 @@
     "test:clean": "rimraf _test-output",
     "dev": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ & webpack-dev-server --inline --hot --port 3000",
     "build": "webpack --config app-config/webpack.prod.js --bail",
-    "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js",
+    "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {
