@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System.Security;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Security;
 // ReSharper disable InvertIf
 
 namespace Squidex.Pipeline.CommandHandlers
@@ -30,14 +30,14 @@ namespace Squidex.Pipeline.CommandHandlers
 
             if (subjectCommand != null)
             {
-                var user = httpContextAccessor.HttpContext.User;
+                var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
 
-                if (user?.FindFirst(ClaimTypes.NameIdentifier) == null)
+                if (subjectId == null)
                 {
-                    throw new SecurityException("No user available");
+                    throw new SecurityException("No user with subject id available");
                 }
 
-                subjectCommand.SubjectId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+                subjectCommand.SubjectId = subjectId;
             }
 
             return Task.FromResult(false);

@@ -3,10 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { RouterModule, provideRoutes } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { SqxLayoutModule } from './components/layout';
-
-import { AppsStoreService } from './shared';
-
 import { AppComponent } from './app.component';
 
 describe('App', () => {
@@ -17,12 +13,10 @@ describe('App', () => {
             ],
             imports: [
                 RouterModule,
-                RouterTestingModule,
-                SqxLayoutModule
+                RouterTestingModule
             ],
             providers: [
-                provideRoutes([]),
-                { provide: AppsStoreService, useValue: new AppsStoreService(null, null) }
+                provideRoutes([])
             ]
         });
     });

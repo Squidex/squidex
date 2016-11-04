@@ -11,7 +11,10 @@ import { SqxFrameworkModule } from './../../framework';
 import { SqxLayoutModule } from './../layout';
 
 import {
-    AppsPageComponent
+    AppAreaComponent,
+    AppsPageComponent,
+    DashboardComponent,
+    InternalAreaComponent
 } from './declarations';
 
 @Ng2.NgModule({
@@ -20,7 +23,10 @@ import {
         SqxLayoutModule
     ],
     declarations: [
-        AppsPageComponent
+        AppAreaComponent,
+        AppsPageComponent,
+        DashboardComponent,
+        InternalAreaComponent
     ]
 })
 export class SqxAppModule { }

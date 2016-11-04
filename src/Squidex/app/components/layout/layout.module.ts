@@ -12,7 +12,7 @@ import { SqxFrameworkModule } from './../../framework';
 import {
     AppFormComponent,
     AppsMenuComponent,
-    NotFoundPageComponent,
+    AppsMenuListComponent,
     SearchFormComponent
 } from './declarations';
 
@@ -23,12 +23,13 @@ import {
     declarations: [
         AppFormComponent,
         AppsMenuComponent,
-        NotFoundPageComponent,
+        AppsMenuListComponent,
         SearchFormComponent,
     ],
     exports: [
         AppFormComponent,
         AppsMenuComponent,
+        AppsMenuListComponent,
         SearchFormComponent,
     ]
 })

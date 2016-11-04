@@ -5,6 +5,16 @@
     font-size: 0.8rem;
 }
 
+.form-error {
+    @include border-radius(3px);
+    @include truncate();
+    color: white;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    padding: 6px;
+    background: $accent-error;
+}
+
 .ng-invalid.ng-dirty {
     border-color: $accent-error;
 }

@@ -10,6 +10,9 @@ import * as Ng2Router from '@angular/router';
 
 import {
     AppsPageComponent,
+    AppAreaComponent,
+    DashboardComponent,
+    InternalAreaComponent,
     LoginPageComponent,
     LogoutPageComponent,
     NotFoundPageComponent
@@ -22,13 +25,28 @@ import {
 export const routes: Ng2Router.Routes = [
     {
         path: '',
-        redirectTo: 'apps',
-        pathMatch: 'full'
+        redirectTo: 'app', pathMatch: 'full'
     },
     {
-        path: 'apps',
-        component: AppsPageComponent,
-        canActivate: [AuthGuard]
+        path: 'app',
+        component: InternalAreaComponent,
+        canActivate: [AuthGuard],
+        children: [
+            {
+                path: '',
+                component: AppsPageComponent
+            },
+            {
+                path: ':appName',
+                component: AppAreaComponent,
+                children: [
+                    {
+                        path: '',
+                        component: DashboardComponent
+                    }
+                ]
+            }
+        ]
     },
     {
         path: 'login',
@@ -37,10 +55,6 @@ export const routes: Ng2Router.Routes = [
     {
         path: 'logout',
         component: LogoutPageComponent
-    },
-    {
-        path: '404',
-        component: NotFoundPageComponent
     },
     {
         path: '**',

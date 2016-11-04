@@ -30,7 +30,8 @@ import {
 import {
     SqxAppModule,
     SqxLayoutModule,
-    SqxLoginModule
+    SqxLoginModule,
+    SqxPublicModule
 } from './components';
 
 import { SqxFrameworkModule } from './framework';
@@ -46,6 +47,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         SqxLayoutModule,
         SqxLoginModule,
         SqxFrameworkModule,
+        SqxPublicModule,
         routing
     ],
     declarations: [

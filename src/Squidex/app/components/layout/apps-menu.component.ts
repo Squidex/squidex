@@ -8,9 +8,9 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
-import { AppsStoreService } from './../../shared';
+import { AppsStoreService } from 'shared';
 
-import { fadeAnimation, ModalView } from './../../framework';
+import { fadeAnimation, ModalView } from 'framework';
 
 const FALLBACK_NAME = 'Apps Overview';
 
@@ -30,10 +30,15 @@ export class AppsMenuComponent {
         this.appsStore.apps.map(a => a || []);
 
     public app = 
-        this.route.params.map((p: any) => p.app || FALLBACK_NAME);
+        this.router.events.switchMap(() => {
+        return this.router.routerState.root.params.map(p => {
+            return p['my_named'] || FALLBACK_NAME;
+        } );
+    });
 
     constructor(
         private readonly appsStore: AppsStoreService,
+        private readonly router: Ng2Router.Router,
         private readonly route: Ng2Router.ActivatedRoute
     ) {
     }

@@ -14,14 +14,14 @@ import {
 } from './../../framework';
 
 @Ng2.Component({
-    selector: 'sqx-apps-page',
+    selector: 'sqx-internal-area',
     styles,
     template,
     animations: [
         fadeAnimation()
     ]
 })
-export class AppsPageComponent implements Ng2.OnInit {
+export class InternalAreaComponent implements Ng2.OnInit {
     public modalDialog = new ModalView();
 
     constructor(

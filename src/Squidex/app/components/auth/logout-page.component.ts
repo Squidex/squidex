@@ -15,7 +15,6 @@ import { AuthService } from './../../shared';
     template
 })
 export class LogoutPageComponent implements Ng2.OnInit {
-
     constructor(
         private readonly authService: AuthService,
         private readonly router: Ng2Router.Router

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  * 
  * @license
@@ -8,9 +8,7 @@
 import * as Ng2 from '@angular/core';
 
 @Ng2.Component({
-    selector: 'sqx-app',
+    selector: 'sqx-app-area',
     template
 })
-export class AppComponent { 
-    public isLoaded = false;
-}
+export class AppAreaComponent { }

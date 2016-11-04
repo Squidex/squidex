@@ -8,7 +8,7 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { fadeAnimation } from './../../framework';
 
@@ -24,32 +24,18 @@ const FALLBACK_NAME = 'my-app';
         fadeAnimation()
     ]
 })
-export class AppFormComponent implements Ng2.OnInit {
-    public createForm: Ng2Forms.FormGroup;
-
-    public appName: Observable<string>;
-
+export class AppFormComponent {
     @Ng2.Input()
     public showClose = false;
 
     @Ng2.Output()
-    public onCreated = new Ng2.EventEmitter();
+    public created = new Ng2.EventEmitter();
 
     @Ng2.Output()
-    public onCancelled = new Ng2.EventEmitter();
+    public cancelled = new Ng2.EventEmitter();
 
-    public creating = new Ng2.EventEmitter<boolean>();
-
-    public creationError = new Ng2.EventEmitter<any>();
-
-    constructor(
-        private readonly appsStore: AppsStoreService,
-        private readonly formBuilder: Ng2Forms.FormBuilder
-    ) {
-    }
-
-    public ngOnInit() {
-        this.createForm = this.formBuilder.group({
+    public createForm =
+        this.formBuilder.group({
             name: ['', 
                 [
                     Ng2Forms.Validators.required,
@@ -58,34 +44,49 @@ export class AppFormComponent implements Ng2.OnInit {
                 ]]
         });
 
-        this.appName = this.createForm.controls['name'].valueChanges.map(name => name || FALLBACK_NAME).publishBehavior(FALLBACK_NAME).refCount();
+    public appName = 
+        this.createForm.controls['name'].valueChanges.map(name => name || FALLBACK_NAME).publishBehavior(FALLBACK_NAME).refCount();
+
+    public creating = 
+        new BehaviorSubject<boolean>(false);
+
+    public creationError = 
+        new BehaviorSubject<string>('');
+
+    constructor(
+        private readonly appsStore: AppsStoreService,
+        private readonly formBuilder: Ng2Forms.FormBuilder
+    ) {
     }
 
     public submit() {
+        this.createForm.markAsDirty();
+
         if (this.createForm.valid) {
             this.createForm.disable();
-            this.creating.emit(true);
+            this.creating.next(true);
             
             const dto = new AppCreateDto(this.createForm.controls['name'].value);
 
             this.appsStore.createApp(dto)
-                .finally(() => {
-                    this.reset();
-                })
                 .subscribe(() => {
-                    this.onCreated.emit();
+                    this.createForm.reset();
+                    this.created.emit();
                 }, error => {
-                    this.creationError.emit(error);
+                    this.reset();
+                    this.creationError.next(error);
                 });
         }
     }
 
     private reset() {
         this.createForm.enable();
-        this.creating.emit(false);
+        this.creating.next(false);
+        this.creationError.next(null);
     }
 
     public cancel() {
-        this.onCancelled.emit();
+        this.reset();
+        this.cancelled.emit();
     }
 }

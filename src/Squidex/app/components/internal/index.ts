@@ -7,4 +7,4 @@
 
 export * from './declarations';
 
-export * from './apps.module';
+export * from './internal.module';

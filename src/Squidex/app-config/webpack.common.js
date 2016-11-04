@@ -35,6 +35,11 @@ module.exports = {
         root: [
             helpers.root('app'),
             helpers.root('app-libs')
+        ],
+        moduleDirectories: [
+            "*",
+            "app/*",
+            "app/theme/*"
         ]
     },
 
@@ -77,7 +82,9 @@ module.exports = {
             }
         ]
     },
-
+    sassLoader: {
+        includePaths: [helpers.root('app', 'theme')]
+    },
     plugins: [
         /**
          * Plugin: CommonsChunkPlugin

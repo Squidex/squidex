@@ -152,14 +152,14 @@ export class AuthService {
     }
 
     private checkResponse(response: Observable<Ng2Http.Response>) {
-        return response.catch((errorResponse: Ng2Http.Response) => {
-            if (errorResponse.status === 401) {
+        return response.catch((error: Ng2Http.Response) => {
+            if (error.status === 401) {
                 this.login();
-            } else {
+            } else if (error.status === 403) {
                 this.router.navigate(['/404']);
             }
 
-            return Observable.throw(response);
+            return Observable.throw(error);
         });
     }
 

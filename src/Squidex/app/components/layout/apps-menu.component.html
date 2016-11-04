@@ -3,16 +3,7 @@
         <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{app | async}}</span>
 
         <div class="dropdown-menu" [(sqxModalView)]="modalMenu" [@fade]="(modalMenu.isOpen | async)">
-            <a class="dropdown-item all-apps" routerLink="/apps">
-                <span class="all-apps-text">All Apps</span> 
-                <span class="all-apps-pill tag tag-pill tag-default">{{(apps | async).length}}</span>
-            </a>
-
-            <div class="dropdown-divider"></div>
-            
-            <a class="dropdown-item" *ngFor="let app of (apps | async)">{{app.name}}</a>
-
-            <div class="dropdown-divider"></div>
+            <sqx-apps-menu-list [apps]="apps | async"></sqx-apps-menu-list>
 
             <div class="drodown-button">
                 <button class="btn btn-block btn-success" id="app-create" (click)="createApp()"><i class="icon-plus"></i> Create New App</button>
@@ -34,8 +25,8 @@
 
 			<div class="modal-body">
 				<sqx-app-form 
-                    (onCreated)="modalDialog.hide()"
-                    (onCancelled)="modalDialog.hide()"></sqx-app-form>
+                    (created)="modalDialog.hide()"
+                    (cancelled)="modalDialog.hide()"></sqx-app-form>
 			</div>
 		</div>
 	</div>

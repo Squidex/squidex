@@ -5,4 +5,4 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-export * from './apps-page.component';
+export * from './not-found-page.component';

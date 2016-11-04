@@ -1,0 +1,19 @@
+@import '_vars.scss';
+@import '_mixins.scss';
+
+.all-apps {
+    & {
+        position: relative;
+    }
+
+    &-text {
+        font-weight: bold;
+    }
+
+    &-pill {
+        @include absolute(6px, 10px, auto, auto);
+        color: $accent-blue;
+        border: none;
+        background: $accent-blue-lighter;
+    }
+}
