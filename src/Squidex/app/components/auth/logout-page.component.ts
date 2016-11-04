@@ -8,7 +8,7 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
-import { AuthService } from './../../shared';
+import { AuthService } from 'shared';
 
 @Ng2.Component({
     selector: 'logout',

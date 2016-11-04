@@ -17,7 +17,7 @@ import {
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { ApiUrlConfig } from './../../framework';
+import { ApiUrlConfig } from 'framework';
 
 @Ng2.Injectable()
 export class AuthService {

@@ -6,5 +6,4 @@
  */
 
 export * from './declarations';
-
-export * from './framework.module';
+export * from './module';

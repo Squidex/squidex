@@ -9,3 +9,5 @@ export * from './guards/auth.guard';
 export * from './services/apps-store.service';
 export * from './services/apps.service';
 export * from './services/auth.service';
+
+export * from 'framework';

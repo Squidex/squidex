@@ -10,21 +10,19 @@ import * as Ng2Browser from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import {
-    ApiUrlConfig,
-    CurrencyConfig,
-    DragService,
-    DragServiceFactory,
-    DecimalSeparatorConfig,
-    TitlesConfig,
-    TitleService
-} from './framework';
-
 import { 
+    ApiUrlConfig,
     AppsStoreService,
     AppsService,
     AuthGuard,
     AuthService,
+    CurrencyConfig,
+    DragService,
+    DragServiceFactory,
+    DecimalSeparatorConfig,
+    SqxFrameworkModule,
+    TitlesConfig,
+    TitleService
 } from './shared';
 
 import {
@@ -33,8 +31,6 @@ import {
     SqxLoginModule,
     SqxPublicModule
 } from './components';
-
-import { SqxFrameworkModule } from './framework';
 
 import { routing } from './app.routes';
 

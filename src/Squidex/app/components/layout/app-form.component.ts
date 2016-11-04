@@ -10,15 +10,16 @@ import * as Ng2Forms from '@angular/forms';
 
 import { BehaviorSubject } from 'rxjs';
 
-import { fadeAnimation } from './../../framework';
-
-import { AppCreateDto, AppsStoreService } from './../../shared';
+import { 
+    AppCreateDto, 
+    AppsStoreService,
+    fadeAnimation 
+} from 'shared';
 
 const FALLBACK_NAME = 'my-app';
 
 @Ng2.Component({
     selector: 'sqx-app-form',
-    styles,
     template,
     animations: [
         fadeAnimation()

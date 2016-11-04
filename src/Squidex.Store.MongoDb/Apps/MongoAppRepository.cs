@@ -61,7 +61,7 @@ namespace Squidex.Store.MongoDb.Apps
 
         public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, a =>
+            return Collection.UpdateAsync(headers, a =>
             {
                 var contributor = a.Contributors.Find(x => x.SubjectId == @event.SubjectId);
 

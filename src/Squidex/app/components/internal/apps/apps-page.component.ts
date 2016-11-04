@@ -11,7 +11,7 @@ import {
     fadeAnimation, 
     ModalView,
     TitleService 
-} from './../../../framework';
+} from 'shared';
 
 @Ng2.Component({
     selector: 'sqx-apps-page',

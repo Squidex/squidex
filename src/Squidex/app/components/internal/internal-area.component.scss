@@ -1,4 +1,5 @@
-@import '../../theme/mixins.scss';
+@import '_vars.scss';
+@import '_mixins.scss';
 
 .navbar {
     @include box-shadow(0, 4px, 4px, 0.2px);

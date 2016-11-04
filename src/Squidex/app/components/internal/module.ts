@@ -7,8 +7,8 @@
 
 import * as Ng2 from '@angular/core';
 
-import { SqxFrameworkModule } from './../../framework';
-import { SqxLayoutModule } from './../layout';
+import { SqxFrameworkModule } from 'shared';
+import { SqxLayoutModule } from 'components/layout';
 
 import {
     AppAreaComponent,

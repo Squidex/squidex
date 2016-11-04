@@ -7,7 +7,7 @@
 
 import * as Ng2 from '@angular/core';
 
-import { SqxFrameworkModule } from './../../framework';
+import { SqxFrameworkModule } from 'shared';
 
 import {
     AppFormComponent,

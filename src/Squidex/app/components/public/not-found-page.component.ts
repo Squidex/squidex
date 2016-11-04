@@ -7,7 +7,7 @@
 
 import * as Ng2 from '@angular/core';
 
-import { TitleService } from './../../framework';
+import { TitleService } from 'shared';
 
 @Ng2.Component({
     selector: 'not-found',
