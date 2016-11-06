@@ -1,5 +1,5 @@
 @mixin clearfix() {
-    &:after {
+    &::after {
         content: "";
         display: table;
         clear: both;
@@ -7,34 +7,34 @@
 }
 
 @mixin flex-box {
-	display: -webkit-box;
-	display: -webkit-flex;
-	display: -moz-flex;
-	display: -ms-flexbox;
-	display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
 }
 
 @mixin flex-inline {
-	display: -webkit-inline-box;
-	display: -webkit-inline-flex;
-	display: -moz-inline-flex;
-	display: -ms-inline-flexbox;
-	display: inline-flex;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -moz-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
 }
 
 @mixin flex-flow($values: (row nowrap)) {
-	-webkit-flex-flow: $values;
-	   -moz-flex-flow: $values;
-	    -ms-flex-flow: $values;
-	        flex-flow: $values;
+    -webkit-flex-flow: $values;
+       -moz-flex-flow: $values;
+        -ms-flex-flow: $values;
+            flex-flow: $values;
 }
 
 @mixin flex-grow($int: 0) {
-	 -webkit-box-flex: $int;
-	-webkit-flex-grow: $int;
-	   -moz-flex-grow: $int;
-	-ms-flex-positive: $int;
-	        flex-grow: $int;
+     -webkit-box-flex: $int;
+    -webkit-flex-grow: $int;
+       -moz-flex-grow: $int;
+    -ms-flex-positive: $int;
+            flex-grow: $int;
 }
 
 @mixin inner-border($color: #999) {

@@ -1,5 +1,5 @@
-@import '_vars.scss';
-@import '_mixins.scss';
+@import '_vars';
+@import '_mixins';
 
 content {
     padding: 20px;
@@ -11,7 +11,7 @@ content {
     }
 
     &-headline {
-        margin-top: 100px;
         margin-bottom: 20px;
+        margin-top: 100px;
     }
 }

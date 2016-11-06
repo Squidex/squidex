@@ -27,10 +27,10 @@ export class AppsStoreService {
     }
 
     constructor(
-        private readonly authService: AuthService,
+        private readonly auth: AuthService,
         private readonly appService: AppsService
     ) {
-        if (!authService || !appService) {
+        if (!auth || !appService) {
             return;
         }
 
@@ -38,7 +38,7 @@ export class AppsStoreService {
             this.lastApps = apps;
         });
 
-        this.authService.isAuthenticatedChanges.subscribe(isAuthenticated => {
+        this.auth.isAuthenticatedChanges.subscribe(isAuthenticated => {
             if (isAuthenticated) {
                 this.load();
             }
@@ -46,7 +46,7 @@ export class AppsStoreService {
     }
 
     public reload() {
-        if (this.authService.isAuthenticated) {
+        if (this.auth.isAuthenticated) {
             this.load();
         }
     }

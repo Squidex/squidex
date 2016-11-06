@@ -6,13 +6,21 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Security;
 
 // ReSharper disable InvertIf
 
@@ -68,6 +76,7 @@ namespace Squidex.Configurations.Identity
                 var googleOptions =
                     new GoogleOptions
                     {
+                        Events = new GoogleHandler(),
                         ClientId = options.GoogleClient,
                         ClientSecret = options.GoogleSecret
                     };
@@ -97,6 +106,53 @@ namespace Squidex.Configurations.Identity
             }
 
             return app;
+        }
+
+        private class RetrieveClaimsHandler : OAuthEvents
+        {
+            public override Task CreatingTicket(OAuthCreatingTicketContext context)
+            {
+                var displayNameClaim = context.Identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name);
+                if (displayNameClaim != null)
+                {
+                    context.Identity.AddClaim(new Claim(ExtendedClaimTypes.SquidexDisplayName, displayNameClaim.Value));
+                }
+
+                return base.CreatingTicket(context);
+            }
+        }
+
+        private sealed class GoogleHandler : RetrieveClaimsHandler
+        {
+            private static readonly HttpClient HttpClient = new HttpClient();
+
+            public override Task RedirectToAuthorizationEndpoint(OAuthRedirectToAuthorizationContext context)
+            {
+                context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
+
+                return Task.FromResult(true);
+            }
+
+            public override async Task CreatingTicket(OAuthCreatingTicketContext context)
+            {
+                if (!string.IsNullOrWhiteSpace(context.AccessToken))
+                {
+                    var apiRequestUri = new Uri($"https://www.googleapis.com/oauth2/v2/userinfo?access_token={context.AccessToken}");
+
+                    var jsonReponseString =
+                        await HttpClient.GetStringAsync(apiRequestUri);
+                    var jsonResponse = JToken.Parse(jsonReponseString);
+
+                    var pictureUrl = jsonResponse["picture"]?.Value<string>();
+
+                    if (!string.IsNullOrWhiteSpace(pictureUrl))
+                    {
+                        context.Identity.AddClaim(new Claim(ExtendedClaimTypes.SquidexPictureUrl, pictureUrl));
+                    }
+                }
+
+                await base.CreatingTicket(context);
+            }
         }
     }
 }

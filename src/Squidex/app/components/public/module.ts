@@ -10,7 +10,8 @@ import * as Ng2 from '@angular/core';
 import { SqxFrameworkModule } from 'shared';
 
 import {
-    NotFoundPageComponent,
+    HomePageComponent,
+    NotFoundPageComponent
 } from './declarations';
 
 @Ng2.NgModule({
@@ -18,7 +19,8 @@ import {
         SqxFrameworkModule
     ],
     declarations: [
-        NotFoundPageComponent
+        NotFoundPageComponent,
+        HomePageComponent
     ]
 })
 export class SqxPublicModule { }

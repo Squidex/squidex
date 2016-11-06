@@ -1,26 +1,31 @@
-@import '_mixins.scss';
-@import '_vars.scss';
+@import '_mixins';
+@import '_vars';
 
 .form-hint {
-    font-size: 0.8rem;
+    font-size: .8rem;
 }
 
 .form-error {
     @include border-radius(3px);
-    @include truncate();
-    color: white;
+    @include truncate;
+    color: $accent-dark;
     margin-top: 4px;
     margin-bottom: 10px;
     padding: 6px;
-    background: $accent-error;
+    background: $theme-error;
 }
 
-.ng-invalid.ng-dirty {
-    border-color: $accent-error;
-}
+.ng-invalid {
+    &.ng-dirty {
+        & {
+            border-color: $theme-error;
+        }
 
-.ng-invalid.ng-dirty :focus, .ng-invalid.ng-dirty :hover {
-    border-color: $accent-error-dark;
+        &:hover,
+        &:focus {
+            border-color: $theme-error-dark;
+        }
+    }
 }
 
 .errors {
@@ -28,37 +33,39 @@
         position: relative;
     }
 
-    &:after {
-        @include absolute(2rem, auto, auto, 0.6rem);
+    &::after {
+        @include absolute(2rem, auto, auto, .6rem);
         content: '';
         height: 0;
         border-style: solid;
-        border-width: 0.4rem;
-        border-color: $accent-error transparent transparent transparent;
+        border-width: .4rem;
+        border-color: $theme-error transparent transparent;
         width: 0;
     }
 
     & {
-        @include absolute(-2.4rem, 0px, auto, 0px);
+        @include absolute(-2.4rem, 0, auto, 0);
         @include border-radius(2px);
-        color: white;
+        color: $accent-dark;
         cursor: none;
-        font-size: 0.9rem;
+        font-size: .9rem;
         font-weight: normal;
         line-height: 2rem;
-        padding: 0 0.4rem;
-        background: $accent-error;
+        padding: 0 .4rem;
+        background: $theme-error;
     }
 }
 
-.modal-content, .dropdown-menu {
-    @include box-shadow(0px, 6px, 16px, 0.2px);
+.modal-content {
+    @include box-shadow(0, 6px, 16px, .2px);
 }
 
-.modal-content, .modal-header {
+.modal-content,
+.modal-header {
     border: 0;
 }
 
 .dropdown-menu {
+    @include box-shadow(0, 6px, 16px, .2px);
     border: 0;
 }

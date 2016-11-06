@@ -13,6 +13,7 @@ import {
     AppFormComponent,
     AppsMenuComponent,
     AppsMenuListComponent,
+    ProfileMenuComponent,
     SearchFormComponent
 } from './declarations';
 
@@ -24,12 +25,14 @@ import {
         AppFormComponent,
         AppsMenuComponent,
         AppsMenuListComponent,
+        ProfileMenuComponent,
         SearchFormComponent,
     ],
     exports: [
         AppFormComponent,
         AppsMenuComponent,
         AppsMenuListComponent,
+        ProfileMenuComponent,
         SearchFormComponent,
     ]
 })

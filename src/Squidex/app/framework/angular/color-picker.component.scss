@@ -1,41 +1,48 @@
-@import '../../theme/_mixins.scss';
+@import '_mixins';
 
 $color-size: 24px;
+$color-button: #1875cc;
+$color-button-hover: #1460a8;
+$color-border: #fff;
 $button-size: 1.81rem;
 
 .color-palette {
     & {
-        @include clearfix();
-        width: 8 * ($color-size + 6);
+        @include clearfix;
         padding: 6px;
+        width: 8 * ($color-size + 6);
     }
 
     &-box {
-        margin: 2px;
-        border: 2px solid transparent;
-        width: $color-size;
-        height: $color-size;
-        float: left;
-    }
+        & {
+            border: 2px solid transparent;
+            margin: 2px;
+            height: $color-size;
+            width: $color-size;
+            float: left;
+        }
 
-    &-box:hover {
-        border-color: #1460A8;
-    }
+        &:hover {
+            border-color: $color-button-hover;
+        }
 
-    &-box.selected {
-        border-color: #1875CC;
-    }
+        &.selected {
+            & {
+                border-color: $color-button;
+            }
 
-    &-box.selected:hover {
-        border-color: #1875CC;
-    }
+            &:hover {
+                border-color: $color-button;
+            }
+        }
 
-    &-box.disabled {
-        border-color: transparent;
+        &.disabled {
+            border-color: transparent;
+        }
     }
 
     &-color {
-        border: 1px solid white;
+        border: 1px solid $color-border;
         width: $color-size - 4;
         height: $color-size - 4;
         display: block;
@@ -43,11 +50,15 @@ $button-size: 1.81rem;
 }
 
 .dropdown-menu {
-    background: #eee;
+    background: $color-border;
 }
 
-.btn-group > .btn:first-child {
-    @include border-radius(0.25em);
+.btn-group {
+    > .btn {
+        &:first-child {
+            @include border-radius(.25em);
+        }
+    }
 }
 
 .btn {

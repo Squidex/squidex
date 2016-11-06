@@ -15,6 +15,7 @@ using IdentityServer4.Stores.InMemory;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Configurations.Identity
 {
@@ -69,6 +70,15 @@ namespace Squidex.Configurations.Identity
             {
                 StandardScopes.OpenId,
                 StandardScopes.Profile,
+                new Scope
+                {
+                    Name = Constants.ProfileScope, Type = ScopeType.Identity,
+                    Claims = new List<ScopeClaim>
+                    {
+                        new ScopeClaim(ExtendedClaimTypes.SquidexDisplayName, true),
+                        new ScopeClaim(ExtendedClaimTypes.SquidexPictureUrl, true)
+                    }
+                },
                 new Scope
                 {
                     Name = Constants.ApiScope, Type = ScopeType.Resource

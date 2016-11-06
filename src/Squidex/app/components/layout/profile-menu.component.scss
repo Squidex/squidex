@@ -1,0 +1,39 @@
+@import '_mixins';
+@import '_vars';
+
+$size: 2.2rem;
+
+a {
+    cursor: pointer;
+}
+
+img {
+    @include border-radius($size * .5);
+    height: $size;
+    width: $size;
+}
+
+.navbar-nav {
+    .nav-link {
+        padding: 0;
+        cursor: pointer;
+        color: $accent-dark;
+        line-height: 2.2rem;
+    }
+}
+
+.dropdown-menu {
+    & {
+        @include absolute(44px, 0, auto, auto);
+    }
+
+    &::before {
+        @include absolute(-18px, 10px, auto, auto);
+        border-color: transparent transparent $accent-dark;
+        border-style: solid;
+        border-width: 10px;
+        content: '';
+        height: 0;
+        width: 0;
+    }
+}

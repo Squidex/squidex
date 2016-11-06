@@ -13,6 +13,8 @@ namespace Squidex.Configurations
 
         public const string ApiScope = "squidex-api";
 
+        public const string ProfileScope = "squidex-profile";
+
         public const string FrontendClient = "squidex-frontend";
 
         public const string IdentityPrefix = "/identity-server";

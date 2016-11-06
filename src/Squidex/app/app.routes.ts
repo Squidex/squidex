@@ -13,24 +13,26 @@ import {
     AppAreaComponent,
     DashboardComponent,
     InternalAreaComponent,
-    LoginPageComponent,
+    HomePageComponent,
     LogoutPageComponent,
     NotFoundPageComponent
 } from './components';
 
 import { 
-    AuthGuard
+    MustBeAuthenticatedGuard,
+    MustBeNotAuthenticatedGuard
 } from './shared';
 
 export const routes: Ng2Router.Routes = [
     {
         path: '',
-        redirectTo: 'app', pathMatch: 'full'
+        component: HomePageComponent,
+        canActivate: [MustBeNotAuthenticatedGuard],
     },
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [AuthGuard],
+        canActivate: [MustBeAuthenticatedGuard],
         children: [
             {
                 path: '',
@@ -47,10 +49,6 @@ export const routes: Ng2Router.Routes = [
                 ]
             }
         ]
-    },
-    {
-        path: 'login',
-        component: LoginPageComponent
     },
     {
         path: 'logout',

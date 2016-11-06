@@ -1,12 +1,16 @@
-@import '_vars.scss';
-@import '_mixins.scss';
+@import '_vars';
+@import '_mixins';
 
-.navbar-dark .navbar-nav .nav-link {
-    color: white;
+.navbar-dark {
+    .navbar-nav {
+        .nav-link {
+            color: $accent-dark;
+        }
+    }
 }
 
 .nav-link {
-    @include truncate();
+    @include truncate;
 }
 
 .drodown-button {
@@ -14,26 +18,28 @@
 }
 
 .dropdown-menu {
-    top: 44px;
-}
+    & {
+        top: 44px;
+    }
 
-.dropdown-menu:before {
-    @include absolute(-18px, auto, auto, 10px);
-    content: '';
-    height: 0;
-    border-style: solid;
-    border-width: 10px;
-    border-color: transparent transparent white transparent;
-    width: 0;
+    &::before {
+        @include absolute(-18px, auto, auto, 10px);
+        border-color: transparent transparent $accent-dark;
+        border-style: solid;
+        border-width: 10px;
+        content: '';
+        height: 0;
+        width: 0;
+    }
 }
 
 #app-name {
     & {
+        @include transition(opacity .4 ease);
+        @include opacity(.95);
         padding-right: 15px;
-        @include transition(opacity 0.4 ease);
-        @include opacity(0.95);
-        color: white;
         cursor: pointer;
+        color: $accent-dark;
         width: 200px;
     }
 
@@ -41,8 +47,8 @@
         @include opacity(1);
     }
 
-    &:after {
-        @include absolute(50%, 0px, auto, auto);
-        color: $accent-blue-light;
+    &::after {
+        @include absolute(50%, 0, auto, auto);
+        color: $theme-blue-light;
     }
 }

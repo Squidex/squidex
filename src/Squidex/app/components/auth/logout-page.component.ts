@@ -12,17 +12,17 @@ import { AuthService } from 'shared';
 
 @Ng2.Component({
     selector: 'logout',
-    template
+    template: ''
 })
 export class LogoutPageComponent implements Ng2.OnInit {
     constructor(
-        private readonly authService: AuthService,
+        private readonly auth: AuthService,
         private readonly router: Ng2Router.Router
     ) {
     }
 
     public ngOnInit() {
-        this.authService.logoutComplete().subscribe(
+        this.auth.logoutComplete().subscribe(
             () => {
                 this.router.navigate(['/'], { replaceUrl: true });
             },

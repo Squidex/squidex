@@ -1,15 +1,18 @@
 $nav-text-color: #333;
 
-$background: #F4F8F9;
-$border: #EAEEEF;
+$background: #f4f8f9;
+$border: #eaeeef;
 
-$accent-blue: #438CEF;
-$accent-blue-dark: #3F83DF;
-$accent-blue-light: #A1C6F7;
-$accent-blue-lighter: #D9E8FC;
+$theme-blue: #438cef;
+$theme-blue-dark: #3f83df;
+$theme-blue-light: #a1c6f7;
+$theme-blue-lighter: #d9e8fc;
 
-$accent-green: #4CC159;
-$accent-green-dark: #47B353;
+$theme-green: #4cc159;
+$theme-green-dark: #47b353;
 
-$accent-error: red;
-$accent-error-dark: darken(red, 5%);
+$theme-error: #f00;
+$theme-error-dark: darken($theme-error, 5%);
+
+$accent-dark: #fff;
+

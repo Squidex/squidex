@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{app | async}}</span>
 
-        <div class="dropdown-menu" [(sqxModalView)]="modalMenu" [@fade]="(modalMenu.isOpen | async)">
+        <div class="dropdown-menu" *sqxModalView="modalMenu">
             <sqx-apps-menu-list [apps]="apps | async"></sqx-apps-menu-list>
 
             <div class="drodown-button">
@@ -12,7 +12,7 @@
     </li>
 </ul>
 
-<div class="modal ng-animate" [(sqxModalView)]="modalDialog" [@fade]="(modalDialog.isOpen | async)">
+<div class="modal ng-animate" *sqxModalView="modalDialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

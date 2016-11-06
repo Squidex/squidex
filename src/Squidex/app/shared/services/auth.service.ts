@@ -19,14 +19,28 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ApiUrlConfig } from 'framework';
 
+export class Profile {
+    public get displayName() {
+        return this.user.profile['urn:squidex:name'];
+    }
+
+    public get pictureUrl() {
+        return this.user.profile['urn:squidex:picture'];
+    }
+
+    constructor(
+        public readonly user: User
+    ) {
+    }
+}
+
 @Ng2.Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly isAuthenticatedChanged$ = new BehaviorSubject<boolean>(false);
-    private currentUser: User | null = null;
-    private checkLoginPromise: Promise<boolean>;
+    private currentUser: Profile | null = null;
 
-    public get user(): User | null {
+    public get user(): Profile | null {
         return this.currentUser;
     }
 
@@ -47,7 +61,7 @@ export class AuthService {
         if (apiUrl) {
             this.userManager = new UserManager({
                            client_id: 'squidex-frontend',
-                               scope: 'squidex-api openid profile ',
+                               scope: 'squidex-api openid profile squidex-profile',
                        response_type: 'id_token token',
                         redirect_uri: apiUrl.buildUrl('/login;'),
             post_logout_redirect_uri: apiUrl.buildUrl('/logout;'),
@@ -70,18 +84,16 @@ export class AuthService {
     }
 
     public checkLogin(): Promise<boolean> {
-        if (this.checkLoginPromise) {
-            return this.checkLoginPromise;
-        } else if (this.currentUser) {
+        if (this.currentUser) {
             return Promise.resolve(true);
         } else {
-            this.checkLoginPromise = 
+            const promise = 
                 this.checkState(this.userManager.signinSilent())
                     .then(result => {
                         return result || this.checkState(this.userManager.signinSilent());
                     });
 
-            return this.checkLoginPromise;
+            return promise;
         }
     }
 
@@ -101,16 +113,26 @@ export class AuthService {
         return Observable.fromPromise(this.userManager.signinRedirectCallback());
     }
 
-    private onAuthenticated(user: User) {
-        this.currentUser = user;
+    public loginPopup(): Observable<boolean> {
+        const promise = 
+            this.checkState(this.userManager.signinPopup())
+                .then(result => {
+                    return result || this.checkState(this.userManager.signinSilent());
+                });
 
+        return Observable.fromPromise(promise);
+    }
+
+    private onAuthenticated(user: User) {
         this.isAuthenticatedChanged$.next(true);
+
+        this.currentUser = new Profile(user);
     }
 
     private onDeauthenticated() {
-        this.currentUser = null;
-
         this.isAuthenticatedChanged$.next(false);
+
+        this.currentUser = null;
     }
 
     private checkState(promise: Promise<User>): Promise<boolean> {
@@ -172,7 +194,7 @@ export class AuthService {
             options.headers = new Ng2Http.Headers();
             options.headers.append('Content-Type', 'application/json');
         }
-        options.headers.append('Authorization', `${this.currentUser.token_type} ${this.currentUser.access_token}`);
+        options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);
 
         return options;
     }

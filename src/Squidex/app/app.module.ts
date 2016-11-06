@@ -14,12 +14,13 @@ import {
     ApiUrlConfig,
     AppsStoreService,
     AppsService,
-    AuthGuard,
     AuthService,
     CurrencyConfig,
     DragService,
     DragServiceFactory,
     DecimalSeparatorConfig,
+    MustBeAuthenticatedGuard,
+    MustBeNotAuthenticatedGuard,
     SqxFrameworkModule,
     TitlesConfig,
     TitleService
@@ -27,8 +28,8 @@ import {
 
 import {
     SqxAppModule,
+    SqxAuthModule,
     SqxLayoutModule,
-    SqxLoginModule,
     SqxPublicModule
 } from './components';
 
@@ -40,8 +41,8 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
     imports: [
         Ng2Browser.BrowserModule,
         SqxAppModule,
+        SqxAuthModule,
         SqxLayoutModule,
-        SqxLoginModule,
         SqxFrameworkModule,
         SqxPublicModule,
         routing
@@ -52,8 +53,9 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
     providers: [
         AppsStoreService,
         AppsService,
-        AuthGuard,
         AuthService,
+        MustBeAuthenticatedGuard,
+        MustBeNotAuthenticatedGuard,
         TitleService,
         { provide: ApiUrlConfig, useValue: new ApiUrlConfig(baseUrl) },
         { provide: CurrencyConfig, useValue: new CurrencyConfig('EUR', '€', true) },

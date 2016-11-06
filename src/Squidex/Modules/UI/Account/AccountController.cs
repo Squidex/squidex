@@ -9,10 +9,12 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Infrastructure.Security;
 
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertIfStatementToReturnStatement
@@ -23,11 +25,16 @@ namespace Squidex.Modules.UI.Account
     {
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IIdentityServerInteractionService interactions;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public AccountController(
+            SignInManager<IdentityUser> signInManager, 
+            UserManager<IdentityUser> userManager, 
+            IIdentityServerInteractionService interactions)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.interactions = interactions;
         }
 
         [Authorize]
@@ -57,6 +64,17 @@ namespace Squidex.Modules.UI.Account
         public IActionResult Error()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Route("account/logout/")]
+        public async Task<IActionResult> Logout(string logoutId)
+        {
+            var context = await interactions.GetLogoutContextAsync(logoutId);
+            
+            await signInManager.SignOutAsync();
+
+            return context.PostLogoutRedirectUri != null ? (IActionResult)Redirect(context.PostLogoutRedirectUri) : StatusCode(201);
         }
 
         [HttpGet]
@@ -144,7 +162,21 @@ namespace Squidex.Modules.UI.Account
         {
             var mail = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
-            return new IdentityUser { Email = mail, UserName = mail };
+            var user = new IdentityUser { Email = mail, UserName = mail };
+
+            var profileUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexPictureUrl);
+            if (profileUrl != null)
+            {
+                user.AddClaim(profileUrl);
+            }
+
+            var displayName = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexDisplayName);
+            if (displayName != null)
+            {
+                user.AddClaim(displayName);
+            }
+
+            return user;
         }
     }
 }

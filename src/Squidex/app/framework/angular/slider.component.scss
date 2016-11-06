@@ -1,37 +1,39 @@
-@import '../../theme/_mixins.scss';
+@import '_mixins';
 
 $bar-height: 12px;
 
 $thumb-size: 20px;
-$thumb-margin: ($thumb-size - $bar-height) * 0.5;
+$thumb-margin: ($thumb-size - $bar-height) * .5;
 
 $color-border: #ccc;
 $color-focus: #66afe9;
 
 .slider {
     &-bar {
-        @include border-radius($bar-height * 0.5);
+        @include border-radius($bar-height * .5);
         position: relative;
         border: 1px solid $color-border;
         margin-bottom: 20px;
         margin-top: 5px;
-        margin-right: $thumb-size * 0.5;
-        background: white;
+        margin-right: $thumb-size * .5;
+        background: $color-border;
         height: $bar-height;
     }
 
     &-thumb {
-        @include border-radius($thumb-size * 0.5);
-        position: absolute;
-        width: $thumb-size;
-        height: $thumb-size;
-        border: 1px solid $color-border;
-        background: white;
-        margin-top: -$thumb-margin;
-        margin-left: -$thumb-size * 0.5;
-    }
+        & {
+            @include border-radius($thumb-size * .5);
+            position: absolute;
+            width: $thumb-size;
+            height: $thumb-size;
+            border: 1px solid $color-border;
+            background: $color-border;
+            margin-top: -$thumb-margin;
+            margin-left: -$thumb-size * .5;
+        }
 
-    &-thumb.focused {
-        border-color: $color-focus;
+        &.focused {
+            border-color: $color-focus;
+        }
     }
 }

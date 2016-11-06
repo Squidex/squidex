@@ -1,5 +1,5 @@
-@import '_vars.scss';
-@import '_mixins.scss';
+@import '_vars';
+@import '_mixins';
 
 .all-apps {
     & {
@@ -12,8 +12,8 @@
 
     &-pill {
         @include absolute(6px, 10px, auto, auto);
-        color: $accent-blue;
-        border: none;
-        background: $accent-blue-lighter;
+        background: $theme-blue-lighter;
+        border: 0;
+        color: $theme-blue;
     }
 }

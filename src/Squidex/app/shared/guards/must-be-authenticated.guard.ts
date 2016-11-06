@@ -11,16 +11,17 @@ import * as Ng2Router from '@angular/router';
 import { AuthService } from './../services/auth.service';
     
 @Ng2.Injectable()
-export class AuthGuard implements Ng2Router.CanActivate {
+export class MustBeAuthenticatedGuard implements Ng2Router.CanActivate {
     constructor(
-        private readonly authService: AuthService
+        private readonly auth: AuthService,
+        private readonly router: Ng2Router.Router
     ) {
     }
 
     public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Promise<boolean> | boolean {
-        return this.authService.checkLogin().then(isAuthenticated => {
+        return this.auth.checkLogin().then(isAuthenticated => {
             if (!isAuthenticated) {
-                this.authService.login();
+                this.router.navigate(['']);
 
                 return false;
             }
