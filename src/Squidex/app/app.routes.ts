@@ -18,7 +18,8 @@ import {
     NotFoundPageComponent
 } from './components';
 
-import { 
+import {
+    AppMustExistGuard,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard
 } from './shared';
@@ -27,7 +28,7 @@ export const routes: Ng2Router.Routes = [
     {
         path: '',
         component: HomePageComponent,
-        canActivate: [MustBeNotAuthenticatedGuard],
+        canActivate: [MustBeNotAuthenticatedGuard]
     },
     {
         path: 'app',
@@ -41,6 +42,7 @@ export const routes: Ng2Router.Routes = [
             {
                 path: ':appName',
                 component: AppAreaComponent,
+                canActivate: [AppMustExistGuard],
                 children: [
                     {
                         path: '',

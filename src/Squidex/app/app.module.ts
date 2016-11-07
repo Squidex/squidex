@@ -10,8 +10,9 @@ import * as Ng2Browser from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import { 
+import {
     ApiUrlConfig,
+    AppMustExistGuard,
     AppsStoreService,
     AppsService,
     AuthService,
@@ -53,6 +54,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
     providers: [
         AppsStoreService,
         AppsService,
+        AppMustExistGuard,
         AuthService,
         MustBeAuthenticatedGuard,
         MustBeNotAuthenticatedGuard,
@@ -61,7 +63,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         { provide: CurrencyConfig, useValue: new CurrencyConfig('EUR', '€', true) },
         { provide: DecimalSeparatorConfig, useValue: new DecimalSeparatorConfig('.') },
         { provide: DragService, useFactory: DragServiceFactory },
-        { provide: TitlesConfig, useValue: new TitlesConfig({}, null, 'Squidex Headless CMS') }
+        { provide: TitlesConfig, useValue: new TitlesConfig({}, undefined, 'Squidex Headless CMS') }
     ],
     bootstrap: [AppComponent]
 })

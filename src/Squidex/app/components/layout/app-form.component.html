@@ -1,7 +1,7 @@
 <form [formGroup]="createForm" (ngSubmit)="submit()">
-    <div *ngIf="creationError | async" [@fade]>
+    <div *ngIf="creationError" [@fade]>
         <div class="form-error">
-            {{creationError | async}}
+            {{creationError}}
         </div>
     </div>
 
@@ -25,7 +25,7 @@
 		<input type="text" class="form-control" id="app-name" formControlName="name" />
         
         <span class="form-hint">
-            The app name becomes part of the api url, e.g, https://<b>{{appName | async}}</b>.squidex.io/.<br />
+            The app name becomes part of the api url, e.g, https://<b>{{appName}}</b>.squidex.io/.<br />
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
         </span>
 	</div>

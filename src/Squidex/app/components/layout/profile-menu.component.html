@@ -1,12 +1,12 @@
 <ul class="nav navbar-nav">
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
-            <img [attr.src]="(pictureUrl | async)" />
+            <img [attr.src]="profilePictureUrl" />
 
-            <span>{{displayName | async}}</span>
+            <span>{{profileDisplayName}}</span>
         </span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu" [@fade]>
+        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
             <a class="dropdown-item" (click)="logout()">Logout</a>
         </div>
     </li>

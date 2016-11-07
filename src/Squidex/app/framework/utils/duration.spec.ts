@@ -43,7 +43,7 @@ describe('Duration', () => {
         const d = s.addHours(1).addMinutes(1).addSeconds(60);
 
         const duration = Duration.create(s, d);
-        
+
         const actual = duration.toString();
         const expected = '1:02h';
 

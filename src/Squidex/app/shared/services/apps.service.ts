@@ -33,7 +33,7 @@ export class AppCreateDto {
 @Ng2.Injectable()
 export class AppsService {
     constructor(
-        private readonly authService: AuthService, 
+        private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -41,7 +41,7 @@ export class AppsService {
     public getApps(): Observable<AppDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl('/api/apps'))
                 .map(response => {
-                    let body: any[] = response.json() || [];
+                    const body: any[] = response.json() || [];
 
                     return body.map(item => {
                         return new AppDto(

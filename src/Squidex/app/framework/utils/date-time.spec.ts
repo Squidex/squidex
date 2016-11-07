@@ -73,7 +73,7 @@ describe('DateTime', () => {
     it('should create yesterday instance correctly', () => {
         const actual = DateTime.yesterday();
         const expected = DateTime.today().addDays(-1);
-        
+
         expect(actual).toEqual(expected);
     });
 
@@ -81,7 +81,7 @@ describe('DateTime', () => {
         const value = DateTime.parseISO_UTC('2013-10-16T12:13:14T');
         const actual = value.toStringFormat('hh:mm');
         const expected = '12:13';
-        
+
         expect(actual).toEqual(expected);
     });
 
@@ -89,7 +89,7 @@ describe('DateTime', () => {
         const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
         const actual = value.toString().substr(0, 19);
         const expected = '2013-10-16T12:13:14';
-        
+
         expect(actual).toEqual(expected);
     });
 

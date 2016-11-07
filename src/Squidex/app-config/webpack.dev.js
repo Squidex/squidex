@@ -48,6 +48,10 @@ module.exports = webpackMerge(commonConfig, {
         new ExtractTextPlugin('[name].css')
     ],
 
+    sassLoader: {
+        includePaths: [helpers.root('app', 'theme')]
+    },
+
     tslint: {
         /**
          * Run tslint in production build, but do not fail if there is a warning.

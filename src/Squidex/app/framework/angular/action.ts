@@ -7,14 +7,14 @@
 
 const EMPTY_FUNC = () => { };
 
-export function Action() {
-    return function (target: any, key: string) {
+export const Action = () => {
+    return (target: any, key: string) => {
         let observable: any;
         let instance: any;
         let subscriptions: any;
         let subscription: any;
 
-        function subscribe() {
+        const subscribe = () => {
             const store = instance.store;
 
             if (store && observable && observable.subscribe && typeof observable.subscribe === 'function') {
@@ -24,7 +24,7 @@ export function Action() {
             }
         };
 
-        function unsubscribe() {
+        const unsubscribe = () => {
             if (subscription) {
                 subscription.unsubscribe();
 
@@ -34,16 +34,16 @@ export function Action() {
 
         if (delete target[key]) {
             Object.defineProperty(target, key, {
-                get: function () {
+                get: () => {
                     return observable;
                 },
-                set: function (v) {
+                set: (v) => {
                     instance = this;
 
                     if (!instance.___subscriptions) {
                         instance.___subscriptions = [];
 
-                        let destroy = instance.ngOnDestroy ? instance.ngOnDestroy.bind(instance) : EMPTY_FUNC;
+                        const destroy = instance.ngOnDestroy ? instance.ngOnDestroy.bind(instance) : EMPTY_FUNC;
 
                         instance.ngOnDestroy = () => {
                             for (let s of subscriptions) {
@@ -66,4 +66,4 @@ export function Action() {
             });
         }
     };
-}
+};

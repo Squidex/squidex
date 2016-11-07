@@ -44,7 +44,7 @@ module.exports = webpackMerge(commonConfig, {
     module: {
         preLoaders: [{
             test: /\.ts$/,
-            loader: "tslint"
+            loader: 'tslint'
         }],
 
         /**
@@ -94,7 +94,7 @@ module.exports = webpackMerge(commonConfig, {
         new ExtractTextPlugin('[name].[hash].css'),
 
         function () {
-            this.plugin("done", function (stats) {
+            this.plugin('done', function (stats) {
                 if (stats.compilation.errors && stats.compilation.errors.length && process.argv.indexOf('--watch') == -1) {
                     console.log(stats.compilation.errors);
 

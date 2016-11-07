@@ -15,7 +15,7 @@ import {
     UserManager
 } from 'oidc-client';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { ApiUrlConfig } from 'framework';
 
@@ -37,8 +37,14 @@ export class Profile {
 @Ng2.Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
-    private readonly isAuthenticatedChanged$ = new BehaviorSubject<boolean>(false);
+    private readonly isAuthenticatedChanged$ = new Subject<boolean>();
     private currentUser: Profile | null = null;
+
+    private readonly isAuthenticatedChangedPublished$ =
+        this.isAuthenticatedChanged$
+            .distinctUntilChanged()
+            .publishReplay(1)
+            .refCount();
 
     public get user(): Profile | null {
         return this.currentUser;
@@ -49,7 +55,7 @@ export class AuthService {
     }
 
     public get isAuthenticatedChanges(): Observable<boolean> {
-        return this.isAuthenticatedChanged$;
+        return this.isAuthenticatedChangedPublished$;
     }
 
     constructor(apiUrl: ApiUrlConfig,
@@ -87,7 +93,7 @@ export class AuthService {
         if (this.currentUser) {
             return Promise.resolve(true);
         } else {
-            const promise = 
+            const promise =
                 this.checkState(this.userManager.signinSilent())
                     .then(result => {
                         return result || this.checkState(this.userManager.signinSilent());
@@ -114,7 +120,7 @@ export class AuthService {
     }
 
     public loginPopup(): Observable<boolean> {
-        const promise = 
+        const promise =
             this.checkState(this.userManager.signinPopup())
                 .then(result => {
                     return result || this.checkState(this.userManager.signinSilent());
@@ -124,15 +130,16 @@ export class AuthService {
     }
 
     private onAuthenticated(user: User) {
+        this.currentUser = new Profile(user);
+
         this.isAuthenticatedChanged$.next(true);
 
-        this.currentUser = new Profile(user);
     }
 
     private onDeauthenticated() {
-        this.isAuthenticatedChanged$.next(false);
-
         this.currentUser = null;
+
+        this.isAuthenticatedChanged$.next(false);
     }
 
     private checkState(promise: Promise<User>): Promise<boolean> {
@@ -194,7 +201,10 @@ export class AuthService {
             options.headers = new Ng2Http.Headers();
             options.headers.append('Content-Type', 'application/json');
         }
-        options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);
+
+        if (this.currentUser && this.currentUser.user) {
+            options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);
+        }
 
         return options;
     }

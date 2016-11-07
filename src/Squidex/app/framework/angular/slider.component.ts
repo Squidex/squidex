@@ -25,10 +25,10 @@ export class SliderComponent implements Ng2.OnChanges {
     public thumb: Ng2.ElementRef;
 
     @Ng2.Input()
-    public min: number = 0;
+    public min = 0;
 
     @Ng2.Input()
-    public max: number = 100;
+    public max = 100;
 
     @Ng2.Input()
     public value: number;

@@ -16,11 +16,11 @@ export class ModalViewDirective implements Ng2.OnChanges, Ng2.OnInit, Ng2.OnDest
     private subscription: any | null;
     private isEnabled = true;
     private clickHandler: Function | null;
-    private view: Ng2.EmbeddedViewRef<any> | null;
+    private renderedView: Ng2.EmbeddedViewRef<any> | null;
 
     @Ng2.Input('sqxModalView')
     public modalView: ModalView;
-    
+
     constructor(
         private readonly templateRef: Ng2.TemplateRef<any>,
         private readonly renderer: Ng2.Renderer,
@@ -29,20 +29,26 @@ export class ModalViewDirective implements Ng2.OnChanges, Ng2.OnInit, Ng2.OnDest
     }
 
     public ngOnInit() {
-        this.clickHandler = 
+        this.clickHandler =
             this.renderer.listenGlobal('document', 'click', (event: MouseEvent) => {
-                if (!event.target || this.view === null) {
+                if (!event.target || this.renderedView === null) {
                     return;
                 }
 
-                if (this.view.rootNodes.length === 0) {
+                if (this.renderedView.rootNodes.length === 0) {
                     return;
                 }
 
-                const clickedInside = this.view.rootNodes[0].contains(event.target);
-                
-                if (!clickedInside && this.modalView && this.isEnabled) {
-                    this.modalView.hide();
+                if (this.isEnabled) {
+                    if (this.modalView.closeAlways) {
+                        this.modalView.hide();
+                    } else {
+                        const clickedInside = this.renderedView.rootNodes[0].contains(event.target);
+
+                        if (!clickedInside && this.modalView) {
+                            this.modalView.hide();
+                        }
+                    }
                 }
             });
     }
@@ -63,17 +69,15 @@ export class ModalViewDirective implements Ng2.OnChanges, Ng2.OnInit, Ng2.OnDest
         if (this.modalView) {
             this.subscription = this.modalView.isOpen.subscribe(isOpen => {
                 if (this.isEnabled) {
-                    if (isOpen === (this.view !== null)) {
+                    if (isOpen === (this.renderedView !== null)) {
                         return;
                     }
 
                     if (isOpen) {
-                        this.view = this.viewContainer.createEmbeddedView(this.templateRef);
-
-                        this.renderer.setElementStyle(this.view.rootNodes[0], 'display', 'block');
+                        this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
+                        this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
                     } else {
-                        this.view = null;
-
+                        this.renderedView = null;
                         this.viewContainer.clear();
                     }
 

@@ -62,6 +62,10 @@ module.exports = {
             }
         ]
     },
+    
+    sassLoader: {
+        includePaths: [helpers.root('app', 'theme')]
+    },
 
     plugins: [
         /**

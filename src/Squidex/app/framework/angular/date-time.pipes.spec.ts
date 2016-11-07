@@ -78,7 +78,7 @@ describe('ShortDatePipe', () => {
 describe('ShortTimePipe', () => {
     it('should format to short time string', () => {
         const pipe = new ShortTimePipe();
-        
+
         const actual = pipe.transform(dateTime, []);
         const expected = '12:13';
 

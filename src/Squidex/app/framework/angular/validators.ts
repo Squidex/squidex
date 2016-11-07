@@ -10,7 +10,7 @@ import * as Ng2Forms from '@angular/forms';
 export class Validators {
     public static between(minValue: number, maxValue: number) {
         return (control: Ng2Forms.AbstractControl): { [key: string]: any } => {
-            let n: number = control.value;
+            const n: number = control.value;
 
             if (typeof n !== 'number') {
                 return { 'validNumber': false };

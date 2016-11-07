@@ -21,18 +21,33 @@ import {
         fadeAnimation()
     ]
 })
-export class ProfileMenuComponent {
-    public modalMenu = new ModalView();
+export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
+    private authenticationSubscription: any | null;
 
-    public displayName
-        = this.auth.isAuthenticatedChanges.map(t => t ? this.auth.user.displayName : null);
+    public modalMenu = new ModalView(false, true);
 
-    public pictureUrl
-        = this.auth.isAuthenticatedChanges.map(t => t ? this.auth.user.pictureUrl : null);
+    public profileDisplayName = '';
+    public profilePictureUrl = '';
 
     constructor(
         private readonly auth: AuthService
     ) {
+    }
+
+    public ngOnInit() {
+        this.authenticationSubscription =
+            this.auth.isAuthenticatedChanges.subscribe(() => {
+                const user = this.auth.user;
+
+                if (user) {
+                    this.profilePictureUrl = user.pictureUrl;
+                    this.profileDisplayName = user.displayName;
+                }
+            });
+    }
+
+    public ngOnDestroy() {
+        this.authenticationSubscription.unsubscribe();
     }
 
     public logout() {

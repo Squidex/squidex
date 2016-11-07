@@ -7,13 +7,8 @@
 
 import * as Ng2 from '@angular/core';
 
-import {
-     Color }  
-from './../utils/color';
-
-import { 
-    ColorPalette 
-} from './../utils/color-palette';
+import { Color } from './../utils/color';
+import { ColorPalette } from './../utils/color-palette';
 
 @Ng2.Component({
     selector: 'sqx-color-picker',

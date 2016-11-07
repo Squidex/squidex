@@ -95,7 +95,7 @@ export class Vec2 {
         return new Vec2(MathHelper.roundToMultipleOf(this.x, 2), MathHelper.roundToMultipleOf(this.y, 2));
     }
 
-    public static createRotated(vec: Vec2, center: Vec2, rotation: Rotation): Vec2 {        
+    public static createRotated(vec: Vec2, center: Vec2, rotation: Rotation): Vec2 {
         const x = vec.x - center.x;
         const y = vec.y - center.y;
 
@@ -106,7 +106,7 @@ export class Vec2 {
         return result;
     }
 
-    public static createMedian(...vecs: Vec2[]) {        
+    public static createMedian(...vecs: Vec2[]) {
         let medianX = 0;
         let medianY = 0;
 

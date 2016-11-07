@@ -2,10 +2,10 @@ import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
 
-import { 
+import {
     AppCreateDto,
     AppDto,
-    AppsStoreService, 
+    AppsStoreService,
     AppsService,
     AuthService
 } from './../';
@@ -33,13 +33,13 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];  
-        let result2: AppDto[]; 
+        let result1: AppDto[];
+        let result2: AppDto[];
 
         store.apps.subscribe(x => {
             result1 = x;
         }).unsubscribe();
-        
+
         store.apps.subscribe(x => {
             result2 = x;
         }).unsubscribe();
@@ -65,8 +65,8 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];  
-        let result2: AppDto[]; 
+        let result1: AppDto[];
+        let result2: AppDto[];
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -92,15 +92,15 @@ describe('AppsStoreService', () => {
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
             .verifiable(TypeMoq.Times.once());
-            
+
         appsService.setup(x => x.postApp(TypeMoq.It.isAny()))
             .returns(() => Observable.of(newApp))
             .verifiable(TypeMoq.Times.once());
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];  
-        let result2: AppDto[]; 
+        let result1: AppDto[];
+        let result2: AppDto[];
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -129,7 +129,7 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result: AppDto[];   
+        let result: AppDto[] = null;
 
         store.createApp(new AppCreateDto('new-name')).subscribe(x => { });
 
@@ -138,6 +138,28 @@ describe('AppsStoreService', () => {
         }).unsubscribe();
 
         expect(result).toBeNull();
+
+        appsService.verifyAll();
+    });
+
+    it('should select app', () => {
+        authService.setup(x => x.isAuthenticatedChanges)
+            .returns(() => Observable.of(true))
+            .verifiable(TypeMoq.Times.once());
+
+        appsService.setup(x => x.getApps())
+            .returns(() => Observable.of(oldApps))
+            .verifiable(TypeMoq.Times.once());
+
+        const store = new AppsStoreService(authService.object, appsService.object);
+
+        let result: AppDto = null;
+
+        store.selectApp('name').subscribe(app => {
+            result = app;
+        });
+
+        expect(result).toEqual(oldApps[0]);
 
         appsService.verifyAll();
     });

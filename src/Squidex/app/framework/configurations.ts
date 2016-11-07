@@ -11,7 +11,7 @@ import * as Ng2 from '@angular/core';
 export class ApiUrlConfig {
     public readonly value: string;
 
-    constructor(value: string) { 
+    constructor(value: string) {
         if (value.indexOf('/', value.length - 1) < 0) {
             value = value + '/';
         }
@@ -23,7 +23,7 @@ export class ApiUrlConfig {
         if (path.indexOf('/') === 0) {
             path = path.substr(1);
         }
-        
+
         return this.value + path;
     }
 }

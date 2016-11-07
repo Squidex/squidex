@@ -11,7 +11,7 @@ export abstract class ImmutableObject {
     protected afterClone() { }
 
     protected cloned<T extends ImmutableObject>(updater: (instance: ImmutableObject) => void) {
-        let cloned = <T>this.clone();
+        const cloned = <T>this.clone();
 
         updater(cloned);
 

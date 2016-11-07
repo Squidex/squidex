@@ -5,10 +5,10 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { 
-    DragService, 
+import {
+    DragService,
     DragServiceFactory,
-    DropEvent 
+    DropEvent
 } from './../';
 
 describe('DragService', () => {

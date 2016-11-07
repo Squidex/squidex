@@ -33,6 +33,23 @@
     }
 }
 
+.all-apps {
+    & {
+        position: relative;
+    }
+
+    &-text {
+        font-weight: bold;
+    }
+
+    &-pill {
+        @include absolute(6px, 10px, auto, auto);
+        background: $theme-blue-lighter;
+        border: 0;
+        color: $theme-blue;
+    }
+}
+
 #app-name {
     & {
         @include transition(opacity .4 ease);

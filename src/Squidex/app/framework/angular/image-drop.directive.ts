@@ -110,7 +110,7 @@ export class ImageDropDirective {
     private getRelativeCoordinates(e: any, container: any): Vec2 {
         const rect = container.getBoundingClientRect();
 
-        let pos = { x: 0, y: 0 };
+        const pos = { x: 0, y: 0 };
 
         pos.x = !!e.touches ? e.touches[0].pageX : e.pageX;
         pos.y = !!e.touches ? e.touches[0].pageY : e.pageY;

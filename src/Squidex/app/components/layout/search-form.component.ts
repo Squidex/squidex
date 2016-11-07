@@ -12,6 +12,4 @@ import * as Ng2 from '@angular/core';
     styles,
     template
 })
-export class SearchFormComponent {
-    
-}
+export class SearchFormComponent { }

@@ -18,7 +18,10 @@
       true,
       240
     ],
-    "member-access": false,
+    "member-access": [
+      true, 
+      "check-accessor"
+    ],
     "member-ordering": [
       true,
       "variables-before-functions"
@@ -43,7 +46,7 @@
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
-    "no-trailing-whitespace": false,
+    "no-trailing-whitespace": true,
     "no-unreachable": true,
     "no-unused-expression": true,
     "no-unused-variable": true,
@@ -57,6 +60,9 @@
       "check-else",
       "check-whitespace"
     ],
+    "only-arrow-functions": [
+      true, 
+      "allow-declarations"],
     "quotemark": [
       true,
       "single"

@@ -51,7 +51,7 @@ describe('LocalStore', () => {
             }
         });
 
-        let returnedVal = localStoreService.get('mykey');
+        const returnedVal = localStoreService.get('mykey');
 
         expect(passedKey).toBe('mykey');
         expect(returnedVal).toBe('myval');

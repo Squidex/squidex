@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 
 describe('App', () => {
     beforeEach(() => {
-        TestBed.configureTestingModule({ 
+        TestBed.configureTestingModule({
             declarations: [
                 AppComponent
             ],
@@ -20,7 +20,7 @@ describe('App', () => {
             ]
         });
     });
-    
+
     it('should work', () => {
         const fixture = TestBed.createComponent(AppComponent);
 

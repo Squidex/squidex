@@ -18,7 +18,7 @@ describe('MoneyPipe', () => {
 
         expect(actual).toBe(expected);
     });
-    
+
     it('should format money values with symbol after number and one decimal', () => {
         const pipe = new MoneyPipe(new CurrencyConfig('EUR', '€'), new DecimalSeparatorConfig(','));
 
@@ -36,7 +36,7 @@ describe('MoneyPipe', () => {
 
         expect(actual).toBe(expected);
     });
-    
+
     it('should format money values with symbol before number and one decimal', () => {
         const pipe = new MoneyPipe(new CurrencyConfig('EUR', '€', false), new DecimalSeparatorConfig(','));
 

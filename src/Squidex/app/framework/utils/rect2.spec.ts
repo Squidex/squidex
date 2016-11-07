@@ -90,7 +90,7 @@ describe('Rect2', () => {
     it('should return empty for no intersection', () => {
         const rect = new Rect2(new Vec2(10, 20), new Vec2(50, 30));
         const outer = new Rect2(new Vec2(100, 20), new Vec2(50, 30));
-        
+
         const actual = rect.intersect(outer);
         const expected = Rect2.EMPTY;
 
@@ -100,7 +100,7 @@ describe('Rect2', () => {
     it('should return result for intersection', () => {
         const rect = new Rect2(new Vec2(10, 20), new Vec2(50, 30));
         const inner = new Rect2(new Vec2(35, 35), new Vec2(100, 30));
-        
+
         const actual = rect.intersect(inner);
         const expected = new Rect2(new Vec2(35, 35), new Vec2(25, 15));
 
@@ -171,7 +171,7 @@ describe('Rect2', () => {
     it('should provide valid zero instance', () => {
         const actual = Rect2.ZERO;
         const expected = new Rect2(new Vec2(0, 0), new Vec2(0, 0));
-        
+
         expect(actual).toEqual(expected);
     });
 

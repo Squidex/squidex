@@ -7,29 +7,9 @@
 
 import * as Ng2 from '@angular/core';
 
-import { 
-    fadeAnimation, 
-    ModalView,
-    TitleService 
-} from 'shared';
-
 @Ng2.Component({
     selector: 'sqx-internal-area',
     styles,
-    template,
-    animations: [
-        fadeAnimation()
-    ]
+    template
 })
-export class InternalAreaComponent implements Ng2.OnInit {
-    public modalDialog = new ModalView();
-
-    constructor(
-        private readonly title: TitleService
-    ) {
-    }
-
-    public ngOnInit() {
-        this.title.setTitle('Apps');
-    }
-}
+export class InternalAreaComponent { }

@@ -16,30 +16,24 @@ interface IColorDefinition {
 const ColorDefinitions: IColorDefinition[] = [
     {
         regex: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
-        process: function (bits) {
-            return new Color(
-                parseInt(bits[1], 10) / 255,
-                parseInt(bits[2], 10) / 255,
-                parseInt(bits[3], 10) / 255);
-        }
+        process: bits => new Color(
+            parseInt(bits[1], 10) / 255,
+            parseInt(bits[2], 10) / 255,
+            parseInt(bits[3], 10) / 255)
     },
     {
         regex: /^(\w{2})(\w{2})(\w{2})$/,
-        process: function (bits) {
-            return new Color(
-                parseInt(bits[1], 16) / 255,
-                parseInt(bits[2], 16) / 255,
-                parseInt(bits[3], 16) / 255);
-        }
+        process: bits => new Color(
+            parseInt(bits[1], 16) / 255,
+            parseInt(bits[2], 16) / 255,
+            parseInt(bits[3], 16) / 255)
     },
     {
         regex: /^(\w{1})(\w{1})(\w{1})$/,
-        process: function (bits) {
-            return new Color(
-                parseInt(bits[1] + bits[1], 16) / 255,
-                parseInt(bits[2] + bits[2], 16) / 255,
-                parseInt(bits[3] + bits[3], 16) / 255);
-        }
+        process: bits => new Color(
+            parseInt(bits[1] + bits[1], 16) / 255,
+            parseInt(bits[2] + bits[2], 16) / 255,
+            parseInt(bits[3] + bits[3], 16) / 255)
     }
 ];
 

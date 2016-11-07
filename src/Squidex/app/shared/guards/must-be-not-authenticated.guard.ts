@@ -9,7 +9,7 @@ import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
 import { AuthService } from './../services/auth.service';
-    
+
 @Ng2.Injectable()
 export class MustBeNotAuthenticatedGuard implements Ng2Router.CanActivate {
     constructor(

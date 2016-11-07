@@ -10,7 +10,7 @@ import * as Ng2 from '@angular/core';
 import { ShortcutService } from './../services/shortcut.service';
 
 @Ng2.Component({
-    selector: 'sqx-shortcut', 
+    selector: 'sqx-shortcut',
     template: ''
 })
 export class ShortcutComponent implements Ng2.OnInit, Ng2.OnDestroy {
@@ -22,11 +22,11 @@ export class ShortcutComponent implements Ng2.OnInit, Ng2.OnDestroy {
 
     @Ng2.Output()
     public trigger = new Ng2.EventEmitter();
-    
+
     private lastKeys: string;
 
     constructor(
-        private readonly shortcutService: ShortcutService, 
+        private readonly shortcutService: ShortcutService,
         private readonly zone: Ng2.NgZone
     ) {
     }

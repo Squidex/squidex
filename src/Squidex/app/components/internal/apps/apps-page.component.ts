@@ -7,10 +7,11 @@
 
 import * as Ng2 from '@angular/core';
 
-import { 
-    fadeAnimation, 
+import {
+    AppsStoreService,
+    fadeAnimation,
     ModalView,
-    TitleService 
+    TitleService
 } from 'shared';
 
 @Ng2.Component({
@@ -25,11 +26,14 @@ export class AppsPageComponent implements Ng2.OnInit {
     public modalDialog = new ModalView();
 
     constructor(
-        private readonly title: TitleService
+        private readonly title: TitleService,
+        private readonly appsStore: AppsStoreService,
     ) {
     }
 
     public ngOnInit() {
+        this.appsStore.selectApp(null);
+
         this.title.setTitle('Apps');
     }
 }

@@ -8,12 +8,11 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
-import { BehaviorSubject } from 'rxjs';
-
-import { 
-    AppCreateDto, 
+import {
+    AppDto,
+    AppCreateDto,
     AppsStoreService,
-    fadeAnimation 
+    fadeAnimation
 } from 'shared';
 
 const FALLBACK_NAME = 'my-app';
@@ -25,34 +24,30 @@ const FALLBACK_NAME = 'my-app';
         fadeAnimation()
     ]
 })
-export class AppFormComponent {
+export class AppFormComponent implements Ng2.OnInit {
     @Ng2.Input()
     public showClose = false;
 
     @Ng2.Output()
-    public created = new Ng2.EventEmitter();
+    public created = new Ng2.EventEmitter<AppDto>();
 
     @Ng2.Output()
     public cancelled = new Ng2.EventEmitter();
 
     public createForm =
         this.formBuilder.group({
-            name: ['', 
+            name: ['',
                 [
                     Ng2Forms.Validators.required,
                     Ng2Forms.Validators.maxLength(40),
-                    Ng2Forms.Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*'),
+                    Ng2Forms.Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
                 ]]
         });
 
-    public appName = 
-        this.createForm.controls['name'].valueChanges.map(name => name || FALLBACK_NAME).publishBehavior(FALLBACK_NAME).refCount();
+    public appName = FALLBACK_NAME;
 
-    public creating = 
-        new BehaviorSubject<boolean>(false);
-
-    public creationError = 
-        new BehaviorSubject<string>('');
+    public creating = false;
+    public creationError = '';
 
     constructor(
         private readonly appsStore: AppsStoreService,
@@ -60,30 +55,36 @@ export class AppFormComponent {
     ) {
     }
 
+    public ngOnInit() {
+        this.createForm.controls['name'].valueChanges.subscribe(value => {
+            this.appName = value;
+        });
+    }
+
     public submit() {
         this.createForm.markAsDirty();
 
         if (this.createForm.valid) {
             this.createForm.disable();
-            this.creating.next(true);
-            
+            this.creating = true;
+
             const dto = new AppCreateDto(this.createForm.controls['name'].value);
 
             this.appsStore.createApp(dto)
-                .subscribe(() => {
+                .subscribe(app => {
                     this.createForm.reset();
-                    this.created.emit();
+                    this.created.emit(app);
                 }, error => {
                     this.reset();
-                    this.creationError.next(error);
+                    this.creationError = error;
                 });
         }
     }
 
     private reset() {
         this.createForm.enable();
-        this.creating.next(false);
-        this.creationError.next(null);
+        this.creating = false;
+        this.creationError = '';
     }
 
     public cancel() {

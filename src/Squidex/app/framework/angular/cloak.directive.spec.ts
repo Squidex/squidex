@@ -20,8 +20,8 @@ describe('CloakDirective', () => {
                 }
             }
         };
-    
-         new CloakDirective(element).ngOnInit();
+
+        new CloakDirective(element).ngOnInit();
 
         expect(called).toBeTruthy();
     });

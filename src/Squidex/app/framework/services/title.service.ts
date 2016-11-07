@@ -10,7 +10,7 @@ import * as Ng2 from '@angular/core';
 @Ng2.Injectable()
 export class TitlesConfig {
     constructor(
-        public readonly value: { [key: string]: string }, 
+        public readonly value: { [key: string]: string },
         public readonly prefix?: string,
         public readonly suffix?: string) { }
 }

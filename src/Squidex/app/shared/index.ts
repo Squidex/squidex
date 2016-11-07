@@ -5,6 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+export * from './guards/app-must-exist.guard';
 export * from './guards/must-be-authenticated.guard';
 export * from './guards/must-be-not-authenticated.guard';
 export * from './services/apps-store.service';

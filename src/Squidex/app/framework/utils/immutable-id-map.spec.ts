@@ -266,7 +266,7 @@ describe('ImmutableIdMap', () => {
         const items: MockupData[] = [];
 
         for (let i = 0; i < size; i++) {
-            items.push(new MockupData('id' + i));
+            items.push(new MockupData(`id${i}`));
         }
 
         const list_1 = new ImmutableIdMap<MockupData>();
