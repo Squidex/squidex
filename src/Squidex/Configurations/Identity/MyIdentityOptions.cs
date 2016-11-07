@@ -24,12 +24,14 @@ namespace Squidex.Configurations.Identity
 
         public bool RequiresHttps { get; set; }
 
-        public string BuildUrl(string path)
+        public string BuildUrl(string path, bool trailingSlash = true)
         {
             var url = $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}";
 
-            if (url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
-                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0) {
+            if (trailingSlash && 
+                url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
+                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0) 
+            {
                 url = url + "/";
             }
 

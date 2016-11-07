@@ -53,7 +53,7 @@ namespace Squidex.Configurations.Identity
                 },
                 PostLogoutRedirectUris = new List<string>
                 {
-                    options.BuildUrl("logout")
+                    options.BuildUrl("logout", false)
                 },
                 AllowAccessTokensViaBrowser = true,
                 AllowedGrantTypes = GrantTypes.Implicit,

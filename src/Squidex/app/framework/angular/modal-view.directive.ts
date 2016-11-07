@@ -63,6 +63,10 @@ export class ModalViewDirective implements Ng2.OnChanges, Ng2.OnInit, Ng2.OnDest
         if (this.modalView) {
             this.subscription = this.modalView.isOpen.subscribe(isOpen => {
                 if (this.isEnabled) {
+                    if (isOpen === (this.view !== null)) {
+                        return;
+                    }
+
                     if (isOpen) {
                         this.view = this.viewContainer.createEmbeddedView(this.templateRef);
 

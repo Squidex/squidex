@@ -15,6 +15,7 @@ img {
 
 .navbar-nav {
     .nav-link {
+        @include no-selection;
         padding: 0;
         cursor: pointer;
         color: $accent-dark;

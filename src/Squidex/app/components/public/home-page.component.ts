@@ -11,7 +11,8 @@ import * as Ng2Router from '@angular/router';
 import { AuthService, TitleService } from 'shared';
 
 @Ng2.Component({
-    selector: 'not-found',
+    selector: 'home-page',
+    styles,
     template
 })
 export class HomePageComponent implements Ng2.OnInit {

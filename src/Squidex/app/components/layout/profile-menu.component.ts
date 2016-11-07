@@ -7,20 +7,27 @@
 
 import * as Ng2 from '@angular/core';
 
-import { AuthService, ModalView } from 'shared';
+import {
+    AuthService,
+    fadeAnimation,
+    ModalView
+} from 'shared';
 
 @Ng2.Component({
     selector: 'sqx-profile-menu',
     styles,
-    template
+    template,
+    animations: [
+        fadeAnimation()
+    ]
 })
 export class ProfileMenuComponent {
     public modalMenu = new ModalView();
 
-    public displayName 
+    public displayName
         = this.auth.isAuthenticatedChanges.map(t => t ? this.auth.user.displayName : null);
 
-    public pictureUrl 
+    public pictureUrl
         = this.auth.isAuthenticatedChanges.map(t => t ? this.auth.user.pictureUrl : null);
 
     constructor(

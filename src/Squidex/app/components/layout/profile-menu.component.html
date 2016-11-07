@@ -6,7 +6,7 @@
             <span>{{displayName | async}}</span>
         </span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu">
+        <div class="dropdown-menu" *sqxModalView="modalMenu" [@fade]>
             <a class="dropdown-item" (click)="logout()">Logout</a>
         </div>
     </li>

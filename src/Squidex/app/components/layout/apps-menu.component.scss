@@ -37,6 +37,7 @@
     & {
         @include transition(opacity .4 ease);
         @include opacity(.95);
+        @include no-selection;
         padding-right: 15px;
         cursor: pointer;
         color: $accent-dark;

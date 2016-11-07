@@ -11,6 +11,6 @@ import * as Ng2 from '@angular/core';
     selector: 'sqx-app',
     template
 })
-export class AppComponent { 
+export class AppComponent {
     public isLoaded = false;
 }

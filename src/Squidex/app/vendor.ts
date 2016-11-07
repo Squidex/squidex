@@ -14,11 +14,13 @@ import '@angular/http';
 import '@angular/forms';
 import '@angular/router';
 
-// Oidc-client
+// Additional libs
+import 'rxjs';
+
 import 'oidc-client';
 
-// RxJS
-import 'rxjs';
+import 'moment';
+import 'immutable';
 
 // Bootstrap
 import 'theme/vendor.scss';
