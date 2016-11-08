@@ -52,10 +52,6 @@ describe('AppsStoreService', () => {
 
     it('should reload value from apps-service when called', () => {
          authService.setup(x => x.isAuthenticated)
-            .returns(() => true)
-            .verifiable(TypeMoq.Times.once());
-
-         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
 
