@@ -43,18 +43,13 @@ export class AuthService {
     private readonly isAuthenticatedChangedPublished$ =
         this.isAuthenticatedChanged$
             .distinctUntilChanged()
-            .publishReplay(1)
-            .refCount();
+            .publishReplay(1);
 
     public get user(): Profile | null {
         return this.currentUser;
     }
 
-    public get isAuthenticated(): boolean {
-        return !!this.currentUser;
-    }
-
-    public get isAuthenticatedChanges(): Observable<boolean> {
+    public get isAuthenticated(): Observable<boolean> {
         return this.isAuthenticatedChangedPublished$;
     }
 
@@ -87,6 +82,8 @@ export class AuthService {
 
             this.checkLogin();
         }
+
+        this.isAuthenticatedChangedPublished$.connect();
     }
 
     public checkLogin(): Promise<boolean> {

@@ -3,18 +3,19 @@
     "Autofac": "4.1.1",
     "Autofac.Extensions.DependencyInjection": "4.0.0",
     "IdentityServer4": "1.0.0-rc2",
-    "IdentityServer4.AspNetIdentity": "1.0.0-rc2",
     "IdentityServer4.AccessTokenValidation": "1.0.1-rc2",
-    "Microsoft.AspNetCore.Identity": "1.0.0",
+    "IdentityServer4.AspNetIdentity": "1.0.0-rc2",
     "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
     "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
+    "Microsoft.AspNetCore.Identity": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Razor.Tools": {
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
+    "Microsoft.AspNetCore.ResponseCompression": "1.0.0-preview2-22573",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0",
@@ -30,13 +31,13 @@
     },
     "MongoDB.Driver": "2.4.0-beta1",
     "OpenCover": "4.6.519",
+    "ReportGenerator": "2.5.0-beta1",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
     "Squidex.Read": "1.0.0-*",
     "Squidex.Store.MongoDb": "1.0.0-*",
-    "Squidex.Write": "1.0.0-*",
-    "ReportGenerator": "2.5.0-beta1"
+    "Squidex.Write": "1.0.0-*"
   },
 
   "tools": {

@@ -24,20 +24,19 @@ import { AuthService } from './auth.service';
 @Ng2.Injectable()
 export class AppsStoreService {
     private lastApps: AppDto[] | null = null;
+    private isAuthenticated = false;
     private readonly apps$ = new Subject<AppDto[]>();
     private readonly appName$ = new BehaviorSubject<string | null>(null);
 
     private readonly appsPublished$ =
         this.apps$
             .distinctUntilChanged()
-            .publishReplay(1)
-            .refCount();
+            .publishReplay(1);
 
     private readonly selectedApp$ =
         this.appsPublished$.combineLatest(this.appName$, (apps, name) => apps && name ? apps.find(x => x.name === name) || null : null)
             .distinctUntilChanged()
-            .publishReplay(1)
-            .refCount();
+            .publishReplay(1);
 
     public get apps(): Observable<AppDto[]> {
         return this.appsPublished$;
@@ -55,11 +54,16 @@ export class AppsStoreService {
             return;
         }
 
+        this.selectedApp$.connect();
+
+        this.appsPublished$.connect();
         this.appsPublished$.subscribe(apps => {
             this.lastApps = apps;
         });
 
-        this.auth.isAuthenticatedChanges.subscribe(isAuthenticated => {
+        this.auth.isAuthenticated.subscribe(isAuthenticated => {
+            this.isAuthenticated = isAuthenticated;
+
             if (isAuthenticated) {
                 this.load();
             }
@@ -67,7 +71,7 @@ export class AppsStoreService {
     }
 
     public reload() {
-        if (this.auth.isAuthenticated) {
+        if (this.isAuthenticated) {
             this.load();
         }
     }

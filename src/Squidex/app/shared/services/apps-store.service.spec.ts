@@ -23,7 +23,7 @@ describe('AppsStoreService', () => {
     });
 
     it('should load when authenticated once', () => {
-        authService.setup(x => x.isAuthenticatedChanges)
+        authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
 
@@ -55,7 +55,7 @@ describe('AppsStoreService', () => {
             .returns(() => true)
             .verifiable(TypeMoq.Times.once());
 
-         authService.setup(x => x.isAuthenticatedChanges)
+         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
 
@@ -85,7 +85,7 @@ describe('AppsStoreService', () => {
     });
 
     it('should add app to cache when created', () => {
-        authService.setup(x => x.isAuthenticatedChanges)
+        authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
 
@@ -119,7 +119,7 @@ describe('AppsStoreService', () => {
     });
 
     it('should not add app to cache when cache is null', () => {
-        authService.setup(x => x.isAuthenticatedChanges)
+        authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(false))
             .verifiable(TypeMoq.Times.once());
 
@@ -143,7 +143,7 @@ describe('AppsStoreService', () => {
     });
 
     it('should select app', () => {
-        authService.setup(x => x.isAuthenticatedChanges)
+        authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
 

@@ -67,6 +67,7 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddOptions();
             services.AddRouting();
+            services.AddResponseCompression();
             services.AddWebpackBuilder();
 
             services.Configure<MyMongoDbOptions>(
@@ -93,19 +94,21 @@ namespace Squidex
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
+            app.UseResponseCompression();
+
             if (!Environment.IsDevelopment())
             {
                 app.UseMiddleware<SingleUrlsMiddleware>();
             }
             
-            UseIdentity(app);
-            UseApi(app);
-            UseFrontend(app);
+            MapAndUseIdentity(app);
+            MapAndUseApi(app);
+            MapAndUseFrontend(app);
 
             app.UseMyEventStore();
         }
 
-        private void UseIdentity(IApplicationBuilder app)
+        private void MapAndUseIdentity(IApplicationBuilder app)
         {
             app.Map(Constants.IdentityPrefix, identityApp =>
             {
@@ -127,7 +130,7 @@ namespace Squidex
             });
         }
 
-        private void UseApi(IApplicationBuilder app)
+        private void MapAndUseApi(IApplicationBuilder app)
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
@@ -145,7 +148,7 @@ namespace Squidex
             });
         }
 
-        private void UseFrontend(IApplicationBuilder app)
+        private void MapAndUseFrontend(IApplicationBuilder app)
         {
             if (Environment.IsDevelopment())
             {
