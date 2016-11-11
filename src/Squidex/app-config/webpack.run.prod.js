@@ -6,7 +6,7 @@ ExtractTextPlugin = require('extract-text-webpack-plugin'),
 
 const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
-commonConfig.plugins[0].options.options.tslint.emitErrors = true;
+runConfig.plugins[0].options.options.tslint.emitErrors = true;
 
 module.exports = webpackMerge(runConfig, {
     devtool: 'source-map',
