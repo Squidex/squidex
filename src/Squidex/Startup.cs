@@ -98,7 +98,7 @@ namespace Squidex
 
             if (!Environment.IsDevelopment())
             {
-                app.UseMiddleware<SingleUrlsMiddleware>();
+                //app.UseMiddleware<SingleUrlsMiddleware>();
             }
             
             MapAndUseIdentity(app);

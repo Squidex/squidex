@@ -29,37 +29,61 @@ function loadBaggage(source, sourcemap) {
 
     this.cacheable();
 
-    if (Object.keys(query).length) {
-        var inject = '\n/* injects from baggage-loader */\n';
+    if (!Object.keys(query).length) {
+        return source;
+    }
 
-        Object.keys(query).forEach(function (baggageFile) {
-            var baggageVar = query[baggageFile];
+    var componentOffset = source.indexOf('@Component');
 
-            if (typeof baggageVar === 'string' || baggageVar === true) {
-                baggageFile = applyPlaceholders(baggageFile, srcDirname, srcFilename);
+    if (componentOffset < 0) {
+        componentOffset = source.indexOf('@Ng2.Component');
+    }
 
-                try {
-                    var stats = fs.statSync(path.resolve(srcDirpath, baggageFile));
+    if (componentOffset < 0) {
+        return source;
+    }
 
-                    if (stats.isFile()) {
-                        if (baggageVar.length) {
-                            inject += 'const ' + baggageVar + ' = ';
-                        }
+    Object.keys(query).forEach(function (baggageFile) {
+        var baggageVar = query[baggageFile];
 
-                        if (baggageVar === 'styles') {
-                            inject += '[require(\'./' + baggageFile + '\')];\n';
+        if ((typeof baggageVar === 'string' || baggageVar === true) && baggageFile !== 'noRequire') {
+            baggageFile = applyPlaceholders(baggageFile, srcDirname, srcFilename);
+
+            try {
+                var stats = fs.statSync(path.resolve(srcDirpath, baggageFile));
+
+                if (stats.isFile()) {                        
+                    let replacement = null;
+
+                    if (baggageVar === 'styles') {
+                        if (query.noRequire) {
+                            replacement = '[\'' + baggageFile + '\']';
                         } else {
-                            inject += 'require(\'./' + baggageFile + '\');\n';
+                            replacement = '[require(\'./' + baggageFile + '\')]';
+                        }
+                    } else {
+                        if (query.noRequire) {
+                            replacement = '\'' + baggageFile + '\'';
+                        } else {
+                            replacement = 'require(\'./' + baggageFile + '\')';
                         }
                     }
-                } catch (e) { }
-            }
-        });
 
-        inject += '\n';
+                    var isReplaced = false;
 
-        return inject + source;
-    }
+                    source = source.replace(baggageVar, function (match, offset, full) {
+                        if (isReplaced || offset <= componentOffset) {
+                            return baggageVar;
+                        } else {
+                            isReplaced = true;
+
+                            return baggageVar + ': ' + replacement;
+                        }
+                    });
+                }
+            } catch (e) { }
+        }
+    });
 
     return source;
 };

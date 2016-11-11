@@ -78,7 +78,7 @@ describe('DateTime', () => {
     });
 
     it('should print to formatted string', () => {
-        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14T');
+        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
         const actual = value.toStringFormat('hh:mm');
         const expected = '12:13';
 

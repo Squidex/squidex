@@ -6,7 +6,7 @@ var webpackMerge = require('webpack-merge'),
 
 module.exports = webpackMerge(testConfig, {
     module: {
-        postLoaders: [
+        loaders: [
             {
                 test: /\.(js|ts)$/, 
                 include: helpers.root('app'),

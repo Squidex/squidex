@@ -6,6 +6,8 @@ ExtractTextPlugin = require('extract-text-webpack-plugin'),
 
 const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
+commonConfig.plugins[0].options.options.tslint.emitErrors = true;
+
 module.exports = webpackMerge(commonConfig, {
     devtool: 'source-map',
 
@@ -42,11 +44,6 @@ module.exports = webpackMerge(commonConfig, {
      * See: http://webpack.github.io/docs/configuration.html#module
      */
     module: {
-        preLoaders: [{
-            test: /\.ts$/,
-            loader: 'tslint'
-        }],
-
         /**
          * An array of automatically applied loaders.
          *
@@ -59,38 +56,26 @@ module.exports = webpackMerge(commonConfig, {
             {
                 test: /\.scss$/,
                 include: helpers.root('app', 'theme'),
-                loader: ExtractTextPlugin.extract('style', 'css!sass?sourceMap')
+                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css!sass?sourceMap' })
             }
         ]
     },
 
-    tslint: {
-        /**
-         * Run tslint in production build and fail if there is one warning.
-         * 
-         * See: https://github.com/wbuchwalter/tslint-loader
-         */
-        failOnHint: true,
-        /**
-         * Share the configuration file with the IDE
-         */
-        configuration: require('./../tslint.json')
-    },
-
-    /**
-     * Html loader advanced options
-     *
-     * See: https://github.com/webpack/html-loader#advanced-options
-     */
-    htmlLoader: {
-        minimize: false
-    },
-
     plugins: [
         new webpack.NoErrorsPlugin(),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.UglifyJsPlugin({ mangle: { screw_ie8: true, keep_fnames: true } }),
         new webpack.DefinePlugin({ 'process.env': { 'ENV': JSON.stringify(ENV) } }),
+
+        new webpack.optimize.UglifyJsPlugin({ 
+            mangle: { 
+                screw_ie8: true, keep_fnames: true 
+            } 
+        }),
+
+        /*
+         * Puts each bundle into a file and appends the hash of the file to the path.
+         * 
+         * See: https://github.com/webpack/extract-text-webpack-plugin
+         */
         new ExtractTextPlugin('[name].[hash].css'),
 
         function () {

@@ -48,23 +48,6 @@ module.exports = webpackMerge(commonConfig, {
         new ExtractTextPlugin('[name].css')
     ],
 
-    sassLoader: {
-        includePaths: [helpers.root('app', 'theme')]
-    },
-
-    tslint: {
-        /**
-         * Run tslint in production build, but do not fail if there is a warning.
-         * 
-         * See: https://github.com/wbuchwalter/tslint-loader
-         */
-        failOnHint: false,
-        /**
-         * Share the configuration file with the IDE
-         */
-        configuration: require('./../tslint.json')
-    },
-
     devServer: {
         historyApiFallback: true, stats: 'minimal'
     }

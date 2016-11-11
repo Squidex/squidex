@@ -7,14 +7,16 @@
 
 const EMPTY_FUNC = () => { };
 
-export const Action = () => {
-    return (target: any, key: string) => {
+/* tslint:disable:only-arrow-functions */
+
+export function Action() {
+    return function (target: any, key: string) {
         let observable: any;
         let instance: any;
         let subscriptions: any;
         let subscription: any;
 
-        const subscribe = () => {
+        function subscribe() {
             const store = instance.store;
 
             if (store && observable && observable.subscribe && typeof observable.subscribe === 'function') {
@@ -24,7 +26,7 @@ export const Action = () => {
             }
         };
 
-        const unsubscribe = () => {
+        function unsubscribe() {
             if (subscription) {
                 subscription.unsubscribe();
 
@@ -34,16 +36,16 @@ export const Action = () => {
 
         if (delete target[key]) {
             Object.defineProperty(target, key, {
-                get: () => {
+                get: function () {
                     return observable;
                 },
-                set: (v) => {
+                set: function (v) {
                     instance = this;
 
                     if (!instance.___subscriptions) {
                         instance.___subscriptions = [];
 
-                        const destroy = instance.ngOnDestroy ? instance.ngOnDestroy.bind(instance) : EMPTY_FUNC;
+                        let destroy = instance.ngOnDestroy ? instance.ngOnDestroy.bind(instance) : EMPTY_FUNC;
 
                         instance.ngOnDestroy = () => {
                             for (let s of subscriptions) {
@@ -66,4 +68,4 @@ export const Action = () => {
             });
         }
     };
-};
+}
