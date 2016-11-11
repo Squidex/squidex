@@ -1,14 +1,14 @@
 ﻿      var webpack = require('webpack'),
      webpackMerge = require('webpack-merge'),
 ExtractTextPlugin = require('extract-text-webpack-plugin'),
-     commonConfig = require('./webpack.common.js'),
+        runConfig = require('./webpack.run.base.js'),
           helpers = require('./helpers');
 
 const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
 commonConfig.plugins[0].options.options.tslint.emitErrors = true;
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(runConfig, {
     devtool: 'source-map',
 
     output: {
@@ -70,13 +70,6 @@ module.exports = webpackMerge(commonConfig, {
                 screw_ie8: true, keep_fnames: true 
             } 
         }),
-
-        /*
-         * Puts each bundle into a file and appends the hash of the file to the path.
-         * 
-         * See: https://github.com/webpack/extract-text-webpack-plugin
-         */
-        new ExtractTextPlugin('[name].[hash].css'),
 
         function () {
             this.plugin('done', function (stats) {

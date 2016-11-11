@@ -36,7 +36,7 @@ import {
 
 import { routing } from './app.routes';
 
-const baseUrl = window.location.protocol + '//' + window.location.host + '/';;;
+const baseUrl = window.location.protocol + '//' + window.location.host + '/';
 
 @Ng2.NgModule({
     imports: [

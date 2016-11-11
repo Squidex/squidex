@@ -3,10 +3,10 @@
 
      var webpackMerge = require('webpack-merge'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
-         commonConfig = require('./webpack.common.js'),
+            runConfig = require('./webpack.run.base.js'),
               helpers = require('./helpers');
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(runConfig, {
     /**
      * Developer tool to enhance debugging
      *
