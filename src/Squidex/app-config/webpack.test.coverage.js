@@ -4,7 +4,7 @@ var webpackMerge = require('webpack-merge'),
          helpers = require('./helpers'),
       testConfig = require('./webpack.test.js');
 
-testConfig.module.loaders.shift();
+removeTsLoader();
 
 module.exports = webpackMerge(testConfig, {
     module: {
@@ -23,4 +23,17 @@ module.exports = webpackMerge(testConfig, {
     }
 });
 
-console.log(JSON.stringify(module.exports, null, 4));
+function removeTsLoader() {
+    var tsModuleIndex = -1;
+
+    for (var i = 0, len = testConfig.module.loaders.length; i < len; i += 1) {
+        if (testConfig.module.loaders[i].test.source.indexOf('.ts') > 0) {
+            tsModuleIndex = i;
+            break;
+        }
+    }
+
+    if (tsModuleIndex >= 0) {
+        testConfig.module.loaders.splice(tsModuleIndex, 1);
+    }
+}

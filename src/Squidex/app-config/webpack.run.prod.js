@@ -6,9 +6,7 @@ ExtractTextPlugin = require('extract-text-webpack-plugin'),
 
 const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
-runConfig.plugins[0].options.options.tslint.emitErrors = true;
-
-module.exports = webpackMerge(runConfig, {
+module.exports = webpackMerge.smart(runConfig, {
     devtool: 'source-map',
 
     output: {
@@ -57,6 +55,9 @@ module.exports = webpackMerge(runConfig, {
                 test: /\.scss$/,
                 include: helpers.root('app', 'theme'),
                 loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css!sass?sourceMap' })
+            }, {
+                test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
+                loaders: ['file?hash=sha512&digest=hex&name=[hash].[ext]', 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false']
             }
         ]
     },
@@ -65,20 +66,17 @@ module.exports = webpackMerge(runConfig, {
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({ 'process.env': { 'ENV': JSON.stringify(ENV) } }),
 
+        /*
+         * Puts each bundle into a file and appends the hash of the file to the path.
+         * 
+         * See: https://github.com/webpack/extract-text-webpack-plugin
+         */
+        new ExtractTextPlugin('[name].[hash].css'),
+
         new webpack.optimize.UglifyJsPlugin({ 
             mangle: { 
                 screw_ie8: true, keep_fnames: true 
             } 
         }),
-
-        function () {
-            this.plugin('done', function (stats) {
-                if (stats.compilation.errors && stats.compilation.errors.length && process.argv.indexOf('--watch') == -1) {
-                    console.log(stats.compilation.errors);
-
-                    throw new Error('webpack build failed.');
-                }
-            });
-        }
     ]
 });

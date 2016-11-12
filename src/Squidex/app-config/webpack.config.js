@@ -50,7 +50,10 @@ module.exports = {
                 test: /\.html$/,
                 loader: 'html'
             }, {
-                test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?.*$|$)/,
+                test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
+                loader: 'file?name=assets/[name].[hash].[ext]'
+            }, {
+                test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 loader: 'file?name=assets/[name].[hash].[ext]'
             }, {
                 test: /\.css$/,
@@ -72,11 +75,19 @@ module.exports = {
                     * 
                     * See: https://github.com/wbuchwalter/tslint-loader
                     */
-                    emitErrors: false,
+                    emitErrors: true,
                     /**
                     * Share the configuration file with the IDE
                     */
                     configuration: require('./../tslint.json')
+                },
+                htmlLoader: {
+                    /**
+                     * Define the root for images, so that we can use absolute urls
+                     * 
+                     * See: https://github.com/webpack/html-loader#Advanced_Options
+                     */
+                    root: helpers.root('app', 'images')
                 },
                 sassLoader: {
                     includePaths: [helpers.root('app', 'theme')]

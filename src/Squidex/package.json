@@ -49,6 +49,7 @@
     "font-awesome-sass-loader": "^1.0.1",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.22.0",
+    "image-webpack-loader": "^3.0.0",
     "istanbul-instrumenter-loader": "^0.2.0",
     "jasmine-core": "^2.4.1",
     "karma": "^1.1.1",
