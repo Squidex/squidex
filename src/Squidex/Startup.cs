@@ -68,7 +68,6 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddOptions();
             services.AddRouting();
-            services.AddResponseCompression();
             services.AddWebpackBuilder();
 
             services.Configure<MyMongoDbOptions>(
@@ -94,8 +93,6 @@ namespace Squidex
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
-
-            app.UseResponseCompression();
 
             if (!Environment.IsDevelopment())
             {
@@ -185,7 +182,6 @@ namespace Squidex
                     headers.CacheControl = new CacheControlHeaderValue
                     {
                         MaxAge = TimeSpan.FromDays(60),
-            
                     };
                 }
             });

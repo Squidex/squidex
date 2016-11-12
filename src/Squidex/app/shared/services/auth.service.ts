@@ -38,6 +38,8 @@ export class Profile {
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly isAuthenticatedChanged$ = new Subject<boolean>();
+    private loginCompleted = false;
+    private loginCache: Promise<boolean> | null = null;
     private currentUser: Profile | null = null;
 
     private readonly isAuthenticatedChangedPublished$ =
@@ -87,16 +89,18 @@ export class AuthService {
     }
 
     public checkLogin(): Promise<boolean> {
-        if (this.currentUser) {
-            return Promise.resolve(true);
+        if (this.loginCompleted) {
+            return Promise.resolve(this.currentUser !== null);
+        } else if (this.loginCache) {
+          return this.loginCache;
         } else {
-            const promise =
+            this.loginCache =
                 this.checkState(this.userManager.signinSilent())
                     .then(result => {
                         return result || this.checkState(this.userManager.signinSilent());
                     });
 
-            return promise;
+            return this.loginCache;
         }
     }
 
@@ -143,11 +147,18 @@ export class AuthService {
         const resultPromise =
             promise
                 .then(user => {
-                    if (user) {
-                        this.onAuthenticated(user);
-                    }
+                    this.loginCache = null;
+                    this.loginCompleted = null;
+
+                    this.onAuthenticated(user);
+
                     return !!this.currentUser;
                 }).catch((err) => {
+                    this.loginCache = null;
+                    this.loginCompleted = null;
+
+                    this.onAuthenticated(null);
+
                     return false;
                 });
 

@@ -8,8 +8,6 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
-import { Observable } from 'rxjs';
-
 import { AppsStoreService } from './../services/apps-store.service';
 
 @Ng2.Injectable()
@@ -20,17 +18,19 @@ export class AppMustExistGuard implements Ng2Router.CanActivate {
     ) {
     }
 
-    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Observable<boolean> {
+    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Promise<boolean> {
         const appName = route.params['appName'];
 
         const result =
             this.appsStore.selectApp(appName)
-                .take(1)
-                .map(app => app !== null)
-                .do(hasApp => {
+                .then(hasApp => {
                     if (!hasApp) {
                         this.router.navigate(['/404']);
                     }
+
+                    return hasApp;
+                }).catch(() => {
+                    this.router.navigate(['/404']);
                 });
 
         return result;

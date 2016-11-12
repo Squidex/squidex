@@ -82,10 +82,10 @@ export class AppsStoreService {
         });
     }
 
-    public selectApp(name: string | null): Observable<AppDto | null> {
+    public selectApp(name: string | null): Promise<boolean> {
         this.appName$.next(name);
 
-        return this.selectedApp;
+        return this.selectedApp.take(1).map(app => app !== null).toPromise();
     }
 
     public createApp(appToCreate: AppCreateDto): Observable<AppDto> {

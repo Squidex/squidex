@@ -57,7 +57,7 @@ module.exports = webpackMerge.smart(runConfig, {
                 loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css!sass?sourceMap' })
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                loaders: ['file?hash=sha512&digest=hex&name=[hash].[ext]', 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false']
+                loaders: ['file?hash=sha512&digest=hex&name=assets/[name].[hash].[ext]', 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false']
             }
         ]
     },
