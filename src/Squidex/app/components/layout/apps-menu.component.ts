@@ -26,8 +26,8 @@ const FALLBACK_NAME = 'Apps Overview';
     ]
 })
 export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
-    private appsSubscription: any | null;
-    private appNameSubscription: any | null;
+    private appsSubscription: any | null = null;
+    private appSubscription: any | null = null;
 
     public modalMenu = new ModalView(false, true);
     public modalDialog = new ModalView();
@@ -49,13 +49,13 @@ export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
                 this.apps = apps || [];
             });
 
-        this.appNameSubscription =
+        this.appSubscription =
             this.appsStore.selectedApp.subscribe(selectedApp => this.appName = selectedApp ? selectedApp.name : FALLBACK_NAME);
     }
 
     public ngOnDestroy() {
         this.appsSubscription.unsubscribe();
-        this.appNameSubscription.unsubscribe();
+        this.appSubscription.unsubscribe();
     }
 
     public onAppCreationCancelled() {

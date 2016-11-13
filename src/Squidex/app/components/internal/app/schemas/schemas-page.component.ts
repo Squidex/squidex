@@ -10,11 +10,11 @@ import * as Ng2 from '@angular/core';
 import { AppsStoreService, TitleService } from 'shared';
 
 @Ng2.Component({
-    selector: 'sqx-dashboard-page',
+    selector: 'sqx-schemas-page',
     styles,
     template
 })
-export class DashboardPageComponent implements Ng2.OnInit {
+export class SchemasPageComponent implements Ng2.OnInit {
     private appSubscription: any | null = null;
 
     constructor(
@@ -27,7 +27,7 @@ export class DashboardPageComponent implements Ng2.OnInit {
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
                 if (app) {
-                    this.titles.setTitle('{appName} | Dashboard', { appName: app.name });
+                    this.titles.setTitle('{appName} | Schemas', { appName: app.name });
                 }
             });
     }

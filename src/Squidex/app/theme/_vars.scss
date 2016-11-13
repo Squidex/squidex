@@ -1,18 +1,28 @@
-$nav-text-color: #333;
+$color-nav-text: #333;
 
-$background: #f4f8f9;
-$border: #eaeeef;
+$color-background: #eff3f4;
+$color-border: #eaeeef;
 
-$theme-blue: #438cef;
-$theme-blue-dark: #3f83df;
-$theme-blue-light: #a1c6f7;
-$theme-blue-lighter: #d9e8fc;
+$color-text: #373a3c;
 
-$theme-green: #4cc159;
-$theme-green-dark: #47b353;
+$color-section-media: #ab6eee;
+$color-section-settings: #ff5800;
+$color-section-content: #07a6ff;
+$color-section-schemas: #7c8d92;
+$color-section-dashboard: #438cef;
 
-$theme-error: #f00;
-$theme-error-dark: darken($theme-error, 5%);
+$color-theme-blue: #438cef;
+$color-theme-blue-dark: #3f83df;
+$color-theme-blue-light: #a1c6f7;
+$color-theme-blue-lighter: #d9e8fc;
 
-$accent-dark: #fff;
+$color-theme-green: #4cc159;
+$color-theme-green-dark: #47b353;
+
+$color-theme-error: #f00;
+$color-theme-error-dark: darken($color-theme-error, 5%);
+
+$color-accent-dark: #fff;
+
+$padding-layout: 30px;
 

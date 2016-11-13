@@ -13,8 +13,10 @@ import { SqxLayoutModule } from 'components/layout';
 import {
     AppAreaComponent,
     AppsPageComponent,
-    DashboardComponent,
-    InternalAreaComponent
+    DashboardPageComponent,
+    InternalAreaComponent,
+    LeftMenuComponent,
+    SchemasPageComponent
 } from './declarations';
 
 @Ng2.NgModule({
@@ -22,11 +24,16 @@ import {
         SqxFrameworkModule,
         SqxLayoutModule
     ],
+    exports: [
+        LeftMenuComponent
+    ],
     declarations: [
         AppAreaComponent,
         AppsPageComponent,
-        DashboardComponent,
-        InternalAreaComponent
+        DashboardPageComponent,
+        InternalAreaComponent,
+        LeftMenuComponent,
+        SchemasPageComponent
     ]
 })
 export class SqxAppModule { }

@@ -4,13 +4,13 @@
 .search-control {
     & {
         @include transition(background .4s ease);
-        background: $theme-blue-dark;
-        border-color: $theme-blue-dark;
+        background: $color-theme-blue-dark;
+        border-color: $color-theme-blue-dark;
         border-width: 1px;
-        color: $accent-dark;
+        color: $color-accent-dark;
     }
 
     &:focus {
-        background: darken($theme-blue-dark, 5%);
+        background: darken($color-theme-blue-dark, 5%);
     }
 }

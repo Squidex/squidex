@@ -1,11 +1,62 @@
 @import '_mixins';
 @import '_vars';
 
+$sidebar-color: #fff;
+
 body {
-    overflow: hidden;
-    background: $background;
+    background: $color-background;
+}
+
+h1 {
+    font-size: 2rem;
 }
 
 .hidden {
     display: none;
+}
+
+.layout {
+    &-title-icon {
+        margin-right: .6rem;
+    }
+
+    &-new-button {
+        display: block;
+        width: 100%;
+    }
+
+    &-content {
+        & {
+            @include fixed(54px, 0, 0, 0);
+            @include flex-box;
+            @include flex-flow(row);
+        }
+
+        &-left,
+        &-right {
+            background: $sidebar-color;
+            padding: $padding-layout;
+            position: relative;
+            width: 220px;
+        }
+
+        &-right {
+            border-left: 1px solid $color-border;
+        }
+
+        &-left {
+            & {
+                border-right: 1px solid $color-border;
+            }
+
+            &--no-button {
+                padding-top: $padding-layout + 38px;
+            }
+        }
+        
+        &-main {
+            @include flex-grow(1);
+            padding: $padding-layout;
+        }
+    }
 }

@@ -4,7 +4,7 @@
 .navbar-dark {
     .navbar-nav {
         .nav-link {
-            color: $accent-dark;
+            color: $color-accent-dark;
         }
     }
 }
@@ -24,7 +24,7 @@
 
     &::before {
         @include absolute(-18px, auto, auto, 10px);
-        border-color: transparent transparent $accent-dark;
+        border-color: transparent transparent $color-accent-dark;
         border-style: solid;
         border-width: 10px;
         content: '';
@@ -44,9 +44,9 @@
 
     &-pill {
         @include absolute(6px, 10px, auto, auto);
-        background: $theme-blue-lighter;
+        background: $color-theme-blue-lighter;
         border: 0;
-        color: $theme-blue;
+        color: $color-theme-blue;
     }
 }
 
@@ -57,7 +57,7 @@
         @include no-selection;
         padding-right: 15px;
         cursor: pointer;
-        color: $accent-dark;
+        color: $color-accent-dark;
         width: 200px;
     }
 
@@ -67,6 +67,6 @@
 
     &::after {
         @include absolute(50%, 0, auto, auto);
-        color: $theme-blue-light;
+        color: $color-theme-blue-light;
     }
 }

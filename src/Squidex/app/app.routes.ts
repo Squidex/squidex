@@ -11,11 +11,12 @@ import * as Ng2Router from '@angular/router';
 import {
     AppsPageComponent,
     AppAreaComponent,
-    DashboardComponent,
+    DashboardPageComponent,
     InternalAreaComponent,
     HomePageComponent,
     LogoutPageComponent,
-    NotFoundPageComponent
+    NotFoundPageComponent,
+    SchemasPageComponent
 } from './components';
 
 import {
@@ -46,7 +47,15 @@ export const routes: Ng2Router.Routes = [
                 children: [
                     {
                         path: '',
-                        component: DashboardComponent
+                        redirectTo: 'dashboard'
+                    },
+                    {
+                        path: 'dashboard',
+                        component: DashboardPageComponent
+                    },
+                    {
+                        path: 'schemas',
+                        component: SchemasPageComponent
                     }
                 ]
             }

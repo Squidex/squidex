@@ -8,22 +8,22 @@
 .form-error {
     @include border-radius(3px);
     @include truncate;
-    color: $accent-dark;
+    color: $color-accent-dark;
     margin-top: 4px;
     margin-bottom: 10px;
     padding: 6px;
-    background: $theme-error;
+    background: $color-theme-error;
 }
 
 .ng-invalid {
     &.ng-dirty {
         & {
-            border-color: $theme-error;
+            border-color: $color-theme-error;
         }
 
         &:hover,
         &:focus {
-            border-color: $theme-error-dark;
+            border-color: $color-theme-error-dark;
         }
     }
 }
@@ -39,20 +39,20 @@
         height: 0;
         border-style: solid;
         border-width: .4rem;
-        border-color: $theme-error transparent transparent;
+        border-color: $color-theme-error transparent transparent;
         width: 0;
     }
 
     & {
         @include absolute(-2.4rem, 0, auto, 0);
         @include border-radius(2px);
-        color: $accent-dark;
+        color: $color-accent-dark;
         cursor: none;
         font-size: .9rem;
         font-weight: normal;
         line-height: 2rem;
         padding: 0 .4rem;
-        background: $theme-error;
+        background: $color-theme-error;
     }
 }
 

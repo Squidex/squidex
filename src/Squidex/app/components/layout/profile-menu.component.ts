@@ -22,7 +22,7 @@ import {
     ]
 })
 export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
-    private authenticationSubscription: any | null;
+    private authenticationSubscription: any | null = null;
 
     public modalMenu = new ModalView(false, true);
 

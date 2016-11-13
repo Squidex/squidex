@@ -1,16 +1,16 @@
 @import '_mixins';
 @import '_vars';
 
-$size: 2.2rem;
+$size-avatar: 2.2rem;
 
 a {
     cursor: pointer;
 }
 
 img {
-    @include border-radius($size * .5);
-    height: $size;
-    width: $size;
+    @include border-radius($size-avatar * .5);
+    height: $size-avatar;
+    width: $size-avatar;
 }
 
 .navbar-nav {
@@ -18,7 +18,7 @@ img {
         @include no-selection;
         padding: 0;
         cursor: pointer;
-        color: $accent-dark;
+        color: $color-accent-dark;
         line-height: 2.2rem;
     }
 }
@@ -30,7 +30,7 @@ img {
 
     &::before {
         @include absolute(-18px, 10px, auto, auto);
-        border-color: transparent transparent $accent-dark;
+        border-color: transparent transparent $color-accent-dark;
         border-style: solid;
         border-width: 10px;
         content: '';
