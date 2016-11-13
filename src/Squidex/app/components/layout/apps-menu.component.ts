@@ -63,8 +63,6 @@ export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
     }
 
     public onAppCreationCompleted(app: AppDto) {
-        this.router.navigate(['/app', app.name]);
-
         this.modalDialog.hide();
     }
 
