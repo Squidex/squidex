@@ -4,9 +4,11 @@ ExtractTextPlugin = require('extract-text-webpack-plugin'),
         runConfig = require('./webpack.run.base.js'),
           helpers = require('./helpers');
 
-const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
+var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
-module.exports = webpackMerge.smart(runConfig, {
+helpers.removeLoaders(runConfig, ['scss', 'png']);
+
+module.exports = webpackMerge(runConfig, {
     devtool: 'source-map',
 
     output: {
@@ -55,6 +57,10 @@ module.exports = webpackMerge.smart(runConfig, {
                 test: /\.scss$/,
                 include: helpers.root('app', 'theme'),
                 loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css!sass?sourceMap' })
+            }, {
+                test: /\.scss$/,
+                exclude: helpers.root('app', 'theme'),
+                loaders: ['raw', helpers.root('app-config', 'clean-css-loader'), 'sass']
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 loaders: ['file?hash=sha512&digest=hex&name=assets/[name].[hash].[ext]', 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false']

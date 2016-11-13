@@ -11,3 +11,19 @@ exports.root = function () {
 
     return path.join.apply(path, [appRoot].concat(newArgs));
 };
+
+exports.removeLoaders = function (config, extensions) {
+    var loaders = config.module.loaders;
+
+    for (var i = 0; i < loaders.length; i += 1) {
+        var loader = loaders[i];
+
+        for (var j = 0; j < extensions.length; j += 1) {
+            if (loader.test.source.indexOf(extensions[j]) >= 0) {
+                loaders.splice(i, 1);
+                i--;
+                break;
+            }
+        }
+    }
+}
