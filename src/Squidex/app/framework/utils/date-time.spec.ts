@@ -35,6 +35,10 @@ describe('DateTime', () => {
         expect(() => DateTime.parse('#', 'yyyy-MM-dd')).toThrow();
     });
 
+    it('should throw when utc date string to parse is invalid', () => {
+        expect(() => DateTime.parseUTC('#', 'yyyy-MM-dd')).toThrow();
+    });
+
     it('should parse Microsoft date format', () => {
         const actual = DateTime.parseMSDate('/Date(1224043200000)/');
         const expected = DateTime.parseISO('2008-10-15T04:00:00');

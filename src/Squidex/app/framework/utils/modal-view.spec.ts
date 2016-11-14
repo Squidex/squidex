@@ -8,6 +8,14 @@
 import { ModalView } from './../';
 
 describe('ModalView', () => {
+    it('should have default values', () => {
+        const dialog = new ModalView();
+
+        checkValue(dialog, false);
+
+        expect(dialog.closeAlways).toBeFalsy();
+    });
+
     it('should have initial true value', () => {
         const dialog = new ModalView(true);
 
@@ -18,6 +26,12 @@ describe('ModalView', () => {
         const dialog = new ModalView(false);
 
         checkValue(dialog, false);
+    });
+
+    it('should have close always set by constructor', () => {
+        const dialog = new ModalView(false, true);
+
+        expect(dialog.closeAlways).toBeTruthy();
     });
 
     it('should become open after show', () => {

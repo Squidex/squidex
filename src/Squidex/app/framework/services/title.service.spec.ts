@@ -52,6 +52,14 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title - myapp');
     });
 
+    it('should do nothing if title is null', () => {
+        const titleService = new TitleService(new TitlesConfig({}, null, 'myapp'));
+
+        titleService.setTitle(null, {});
+
+        expect(document.title).toBe('');
+    });
+
     it('should set document title when title key is found in configuration', () => {
         const titles: { [key: string]: string } = {
             found: 'found-title'

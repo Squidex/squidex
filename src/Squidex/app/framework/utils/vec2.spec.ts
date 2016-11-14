@@ -27,6 +27,13 @@ describe('Vec2', () => {
         expect(new Vec2(10, 10).ne(new Vec2(10, 10))).toBeFalsy();
     });
 
+    it('should round with default value', () => {
+        const actual = new Vec2(1.3, 1.6).round();
+        const expected = new Vec2(1, 2);
+
+        expect(actual).toEqual(expected);
+    });
+
     it('should calculate multiple of 10', () => {
         const actual = new Vec2(13, 16).round(10);
         const expected = new Vec2(10, 20);

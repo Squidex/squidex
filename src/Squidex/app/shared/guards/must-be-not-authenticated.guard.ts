@@ -18,14 +18,12 @@ export class MustBeNotAuthenticatedGuard implements Ng2Router.CanActivate {
     ) {
     }
 
-    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Promise<boolean> | boolean {
+    public canActivate(route: Ng2Router.ActivatedRouteSnapshot, state: Ng2Router.RouterStateSnapshot): Promise<boolean> {
         return this.auth.checkLogin().then(isAuthenticated => {
             if (isAuthenticated) {
                 this.router.navigate(['app']);
-
-                return false;
             }
-            return true;
+            return !isAuthenticated;
         });
     }
 }
