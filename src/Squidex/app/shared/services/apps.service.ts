@@ -54,18 +54,18 @@ export class AppsService {
                 });
     }
 
-    public postApp(appToCreate: AppCreateDto): Observable<AppDto> {
-        const now = DateTime.now();
+    public postApp(appToCreate: AppCreateDto, now?: DateTime): Observable<AppDto> {
+        now = now || DateTime.now();
 
         return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), appToCreate)
+                .map(response => response.json())
+                .map(response => new AppDto(response.id, appToCreate.name, now, now))
                 .catch(response => {
                     if (response.status === 400) {
                         return Observable.throw('An app with the same name already exists.');
                     } else {
                         return Observable.throw('A new app could not be created.');
                     }
-                })
-                .map(response => response.json())
-                .map(response => new AppDto(response.id, appToCreate.name, now, now));
+                });
     }
 }

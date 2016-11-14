@@ -1,3 +1,10 @@
+/*
+ * Squidex Headless CMS
+ * 
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
 import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
@@ -138,7 +145,7 @@ describe('AppsStoreService', () => {
         appsService.verifyAll();
     });
 
-    it('should select app', () => {
+    it('should select app', (done) => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
             .verifiable(TypeMoq.Times.once());
@@ -149,14 +156,16 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result: AppDto = null;
+        store.selectApp('name').then((isSelected) => {
+            expect(isSelected).toBeTruthy();
 
-        store.selectApp('name').subscribe(app => {
-            result = app;
+            appsService.verifyAll();
+
+            done();
+        }, err => {
+            expect(err).toBeNull();
+
+            done();
         });
-
-        expect(result).toEqual(oldApps[0]);
-
-        appsService.verifyAll();
     });
 });

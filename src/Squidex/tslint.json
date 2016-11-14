@@ -46,7 +46,7 @@
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
-    "no-trailing-whitespace": true,
+    "no-trailing-whitespace": false,
     "no-unreachable": true,
     "no-unused-expression": true,
     "no-unused-variable": true,

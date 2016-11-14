@@ -59,31 +59,33 @@ export class AuthService {
         private readonly http: Ng2Http.Http,
         private readonly router: Ng2Router.Router,
     ) {
+        if (!apiUrl) {
+            return;
+        }
+
         Log.logger = console;
 
-        if (apiUrl) {
-            this.userManager = new UserManager({
-                           client_id: 'squidex-frontend',
-                               scope: 'squidex-api openid profile squidex-profile',
-                       response_type: 'id_token token',
-                        redirect_uri: apiUrl.buildUrl('login;'),
-            post_logout_redirect_uri: apiUrl.buildUrl('logout'),
-                 silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
-                  popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
-                           authority: apiUrl.buildUrl('identity-server/'),
-                automaticSilentRenew: true
-            });
+        this.userManager = new UserManager({
+                       client_id: 'squidex-frontend',
+                           scope: 'squidex-api openid profile squidex-profile',
+                   response_type: 'id_token token',
+                    redirect_uri: apiUrl.buildUrl('login;'),
+        post_logout_redirect_uri: apiUrl.buildUrl('logout'),
+             silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
+              popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
+                       authority: apiUrl.buildUrl('identity-server/'),
+            automaticSilentRenew: true
+        });
 
-            this.userManager.events.addUserLoaded(user => {
-                this.onAuthenticated(user);
-            });
+        this.userManager.events.addUserLoaded(user => {
+            this.onAuthenticated(user);
+        });
 
-            this.userManager.events.addUserUnloaded(() => {
-                this.onDeauthenticated();
-            });
+        this.userManager.events.addUserUnloaded(() => {
+            this.onDeauthenticated();
+        });
 
-            this.checkLogin();
-        }
+        this.checkLogin();
 
         this.isAuthenticatedChangedPublished$.connect();
     }
