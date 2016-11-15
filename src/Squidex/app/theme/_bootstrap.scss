@@ -56,13 +56,36 @@
     }
 }
 
-.modal-content {
-    @include box-shadow(0, 6px, 16px, .2px);
+.form-group {
+    &:last-child {
+        margin: 0;
+    }
 }
 
-.modal-content,
-.modal-header {
-    border: 0;
+.modal {
+    &-content,
+    &-header {
+        border: 0;
+    }
+
+    &-header {
+        @include border-radius-top(.3rem);
+        background: $color-modal-header-background;
+
+        h4 {
+            color: $color-modal-header-foreground;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .close {
+            color: $color-modal-header-foreground;
+        }
+    }
+
+    &-content {
+        @include box-shadow(0, 6px, 16px, .2px);
+    }
 }
 
 .dropdown-menu {

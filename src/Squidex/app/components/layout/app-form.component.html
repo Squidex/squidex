@@ -30,8 +30,8 @@
         </span>
 	</div>
 
-    <div class="form-group">
-        <button type="reset" class="btn btn-link" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-success" [disabled]="createForm.invalid">Create</button>
+    <div class="form-group clearfix">
+        <button type="reset" class="pull-left btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="pull-right btn btn-primary" [disabled]="createForm.invalid">Create</button>
     </div>
 </form>
