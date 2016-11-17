@@ -153,6 +153,13 @@ namespace Squidex.Infrastructure.Reflection
             }
         }
 
+        public static TDestination Map<TSource, TDestination>(TSource source)
+            where TSource : class
+            where TDestination : class, new()
+        {
+            return Map(source, new TDestination(), CultureInfo.CurrentCulture);
+        }
+
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
             where TSource : class
             where TDestination : class

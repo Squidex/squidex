@@ -11,6 +11,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Users.Repositories;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Write.Apps
@@ -18,28 +19,55 @@ namespace Squidex.Write.Apps
     public class AppCommandHandler : CommandHandler<AppDomainObject>
     {
         private readonly IAppRepository appRepository;
+        private readonly IUserRepository userRepository;
 
         public AppCommandHandler(
             IDomainObjectFactory domainObjectFactory, 
             IDomainObjectRepository domainObjectRepository,
-            IAppRepository appRepository) 
+            IAppRepository appRepository, 
+            IUserRepository userRepository) 
             : base(domainObjectFactory, domainObjectRepository)
         {
             Guard.NotNull(appRepository, nameof(appRepository));
+            Guard.NotNull(userRepository, nameof(userRepository));
 
             this.appRepository = appRepository;
+            this.userRepository = userRepository;
         }
 
-        public async Task On(CreateApp command)
+        public Task On(CreateApp command)
         {
-            if (await appRepository.FindAppByNameAsync(command.Name) != null)
+            return CreateAsync(command, async x =>
             {
-                var error = new ValidationError($"A app with name '{command.Name}' already exists", "Name");
+                if (await appRepository.FindAppByNameAsync(command.Name) != null)
+                {
+                    var error = new ValidationError($"A app with name '{command.Name}' already exists", nameof(CreateApp.Name));
 
-                throw new ValidationException("Cannot create a new app", error);
-            }
+                    throw new ValidationException("Cannot create a new app", error);
+                }
 
-            await CreateAsync(command, x => x.Create(command));
+                x.Create(command);
+            });
+        }
+
+        public Task On(AssignContributor command)
+        {
+            return UpdateAsync(command, async x =>
+            {
+                if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
+                {
+                    var error = new ValidationError($"Cannot find contributor '{command.ContributorId}", nameof(AssignContributor.ContributorId));
+
+                    throw new ValidationException("Cannot assign contributor to app", error);
+                }
+
+                x.AssignContributor(command);
+            });
+        }
+
+        public Task On(RemoveContributor command)
+        {
+            return UpdateAsync(command, x => x.RemoveContributor(command));
         }
 
         public override Task<bool> HandleAsync(CommandContext context)

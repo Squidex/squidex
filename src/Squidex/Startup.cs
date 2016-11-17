@@ -181,7 +181,7 @@ namespace Squidex
 
                     headers.CacheControl = new CacheControlHeaderValue
                     {
-                        MaxAge = TimeSpan.FromDays(60),
+                        MaxAge = TimeSpan.FromDays(60)
                     };
                 }
             });

@@ -6,26 +6,26 @@
     </div>
 
 	<div class="form-group">
-		<label for="app-name">Name</label>
+		<label for="app-name">DisplayName</label>
         
         <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty" [@fade]>
             <div class="errors">
                 <span *ngIf="createForm.get('name').hasError('required')">
-                    Name is required.
+                    DisplayName is required.
                 </span>
                 <span *ngIf="createForm.get('name').hasError('maxlength')">
-                    Name can not have more than 40 characters.
+                    DisplayName can not have more than 40 characters.
                 </span>
                 <span *ngIf="createForm.get('name').hasError('pattern')">
-                    Name can contain lower case letters (a-z), numbers and dashes only.
+                    DisplayName can contain lower case letters (a-z), numbers and dashes only.
                 </span>
             </div>
         </div>
 
-		<input type="text" class="form-control" id="app-name" formControlName="name" />
+		<input type="text" class="form-control" id="app-name" formControlDisplayName="name" />
         
         <span class="form-hint">
-            The app name becomes part of the api url, e.g, https://<b>{{appName}}</b>.squidex.io/.<br />
+            The app name becomes part of the api url, e.g, https://<b>{{appDisplayName}}</b>.squidex.io/.<br />
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
         </span>
 	</div>

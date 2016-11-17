@@ -1,22 +1,19 @@
 ﻿// ==========================================================================
-//  AppContributorAssigned.cs
+//  AppContributorRemoved.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
-    [TypeName("AppContributorAssigned")]
-    public class AppContributorAssigned : IEvent
+    [TypeName("AppContributorRemoved")]
+    public class AppContributorRemoved : IEvent
     {
         public string ContributorId { get; set; }
-
-        public PermissionLevel Permission { get; set; }
     }
 }

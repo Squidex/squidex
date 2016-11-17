@@ -56,7 +56,9 @@ namespace Squidex.Modules.Api.Schemas
                 return NotFound();
             }
 
-            return Ok(SchemaDto.Create(entity.Schema));
+            var model = SchemaDto.Create(entity.Schema);
+
+            return Ok(model);
         }
 
         [HttpPost]

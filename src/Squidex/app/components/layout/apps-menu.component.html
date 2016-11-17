@@ -1,6 +1,6 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{appName}}</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{appDisplayName}}</span>
 
         <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
             <a class="dropdown-item all-apps"  [routerLink]="['/app']">

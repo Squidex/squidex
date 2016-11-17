@@ -12,6 +12,7 @@ using FluentAssertions;
 using Squidex.Core.Schemas;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Write.Schemas;
 using Squidex.Write.Schemas.Commands;
 using Xunit;
@@ -56,11 +57,12 @@ namespace Squidex.Write.Tests.Schemas
             Assert.Equal(props, sut.Schema.Properties);
             Assert.Equal(appId, sut.AppId);
 
-            sut.GetUncomittedEvents()
-                .Select(x => x.Payload as SchemaCreated)
-                .Single()
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
                 .ShouldBeEquivalentTo(
-                    new SchemaCreated { Name = TestName, AppId = appId, Properties = props });
+                    new IEvent[]
+                    {
+                        new SchemaCreated { Name = TestName, AppId = appId, Properties = props }
+                    });
         }
 
         [Fact]
@@ -70,7 +72,7 @@ namespace Squidex.Write.Tests.Schemas
         }
 
         [Fact]
-        public void Update_should_throw_if_command_is_deleted()
+        public void Update_should_throw_if_schema_is_deleted()
         {
             sut.Create(new CreateSchema { Name = TestName });
             sut.Delete();
@@ -96,11 +98,12 @@ namespace Squidex.Write.Tests.Schemas
             
             Assert.Equal(props, sut.Schema.Properties);
 
-            sut.GetUncomittedEvents()
-                .Select(x => x.Payload as SchemaUpdated)
-                .Last()
+            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
-                    new SchemaUpdated { Properties = props });
+                    new IEvent[]
+                    {
+                        new SchemaUpdated { Properties = props }
+                    });
         }
 
         [Fact]
@@ -125,7 +128,13 @@ namespace Squidex.Write.Tests.Schemas
             sut.Delete();
 
             Assert.True(sut.IsDeleted);
-            Assert.IsType<SchemaDeleted>(sut.GetUncomittedEvents().Last().Payload);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new SchemaDeleted()
+                    });
         }
     }
 }

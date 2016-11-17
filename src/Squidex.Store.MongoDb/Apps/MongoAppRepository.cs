@@ -59,15 +59,20 @@ namespace Squidex.Store.MongoDb.Apps
             return Collection.CreateAsync(headers, a => SimpleMapper.Map(@event, a));
         }
 
+        public Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a => a.Contributors.RemoveAll(c => c.SubjectId == @event.ContributorId));
+        }
+
         public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
-                var contributor = a.Contributors.Find(x => x.SubjectId == @event.SubjectId);
+                var contributor = a.Contributors.Find(x => x.SubjectId == @event.ContributorId);
 
                 if (contributor == null)
                 {
-                    contributor = new MongoAppContributorEntity { SubjectId = @event.SubjectId };
+                    contributor = new MongoAppContributorEntity { SubjectId = @event.ContributorId };
 
                     a.Contributors.Add(contributor);
                 }

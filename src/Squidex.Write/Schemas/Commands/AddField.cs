@@ -24,7 +24,7 @@ namespace Squidex.Write.Schemas.Commands
         {
             if (!Name.IsSlug())
             {
-                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("DisplayName must be a valid slug", nameof(Name)));
             }
 
             if (string.IsNullOrWhiteSpace(Type))

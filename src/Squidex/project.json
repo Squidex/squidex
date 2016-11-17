@@ -36,7 +36,8 @@
     "Squidex.Infrastructure": "1.0.0-*",
     "Squidex.Read": "1.0.0-*",
     "Squidex.Store.MongoDb": "1.0.0-*",
-    "Squidex.Write": "1.0.0-*"
+    "Squidex.Write": "1.0.0-*",
+    "System.Linq": "4.1.0"
   },
 
   "tools": {

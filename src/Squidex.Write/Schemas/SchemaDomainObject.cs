@@ -103,7 +103,7 @@ namespace Squidex.Write.Schemas
             isDeleted = true;
         }
 
-        public void AddField(AddField command, FieldProperties properties)
+        public SchemaDomainObject AddField(AddField command, FieldProperties properties)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
             Guard.NotNull(properties, nameof(properties));
@@ -111,9 +111,11 @@ namespace Squidex.Write.Schemas
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldAdded { FieldId = ++totalFields, Name = command.Name, Properties = properties });
+
+            return this;
         }
 
-        public void UpdateField(UpdateField command, FieldProperties properties)
+        public SchemaDomainObject UpdateField(UpdateField command, FieldProperties properties)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
             Guard.NotNull(properties, nameof(properties));
@@ -121,66 +123,84 @@ namespace Squidex.Write.Schemas
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(new FieldUpdated { FieldId = command.FieldId, Properties = properties });
+
+            return this;
         }
 
-        public void Create(CreateSchema command)
+        public SchemaDomainObject Create(CreateSchema command)
         {
             Guard.Valid(command, nameof(command), () => "Cannot create schema");
 
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaCreated()));
+
+            return this;
         }
 
-        public void Update(UpdateSchema command)
+        public SchemaDomainObject Update(UpdateSchema command)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
 
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
+
+            return this;
         }
 
-        public void HideField(long fieldId)
+        public SchemaDomainObject HideField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldHidden { FieldId = fieldId });
+
+            return this;
         }
 
-        public void ShowField(long fieldId)
+        public SchemaDomainObject ShowField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldShown { FieldId = fieldId });
+
+            return this;
         }
 
-        public void DisableField(long fieldId)
+        public SchemaDomainObject DisableField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(new FieldDisabled { FieldId = fieldId });
+
+            return this;
         }
 
-        public void EnableField(long fieldId)
+        public SchemaDomainObject EnableField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldEnabled { FieldId = fieldId });
+
+            return this;
         }
 
-        public void DeleteField(long fieldId)
+        public SchemaDomainObject DeleteField(long fieldId)
         {
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldDeleted { FieldId = fieldId });
+
+            return this;
         }
 
-        public void Delete()
+        public SchemaDomainObject Delete()
         {
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new SchemaDeleted());
+
+            return this;
         }
 
         private void VerifyNotCreated()

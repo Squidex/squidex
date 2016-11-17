@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateApp.cs
+//  RemoveContributor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,21 +8,18 @@
 
 using System.Collections.Generic;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write.Apps.Commands
 {
-    public sealed class CreateApp : AggregateCommand, ISubjectCommand, IValidatable
+    public class RemoveContributor : AppAggregateCommand, IValidatable
     {
-        public string Name { get; set; }
-
-        public string SubjectId { get; set; }
+        public string ContributorId { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!Name.IsSlug())
+            if (string.IsNullOrWhiteSpace(ContributorId))
             {
-                errors.Add(new ValidationError("DisplayName must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("Contributor id not assigned", nameof(ContributorId)));
             }
         }
     }

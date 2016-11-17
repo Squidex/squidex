@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppContributorAssigned.cs
+//  PutContributorDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,10 @@
 // ==========================================================================
 
 using Squidex.Core.Apps;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Events.Apps
+namespace Squidex.Modules.Api.Apps.Models
 {
-    [TypeName("AppContributorAssigned")]
-    public class AppContributorAssigned : IEvent
+    public class AssignContributorDto
     {
         public string ContributorId { get; set; }
 

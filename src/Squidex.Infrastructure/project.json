@@ -22,6 +22,11 @@
       }
     }
   },
+  "buildOptions": {
+    "embed": [
+      "*.csv"
+    ]
+  },
   "tooling": {
     "defaultNamespace": "Squidex.Infrastructure"
   }
