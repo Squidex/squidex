@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 
 import {
     ApiUrlConfig,
+    AppContributorsService,
     AppMustExistGuard,
     AppsStoreService,
     AppsService,
@@ -22,6 +23,7 @@ import {
     DecimalSeparatorConfig,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
+    LanguageService,
     SqxFrameworkModule,
     TitlesConfig,
     TitleService
@@ -52,10 +54,12 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         AppComponent
     ],
     providers: [
+        AppContributorsService,
         AppsStoreService,
         AppsService,
         AppMustExistGuard,
         AuthService,
+        LanguageService,
         MustBeAuthenticatedGuard,
         MustBeNotAuthenticatedGuard,
         TitleService,

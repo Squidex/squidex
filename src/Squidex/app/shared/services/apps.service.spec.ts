@@ -12,11 +12,11 @@ import { Observable } from 'rxjs';
 
 import {
     ApiUrlConfig,
-    DateTime,
     AppCreateDto,
     AppDto,
     AppsService,
-    AuthService
+    AuthService,
+    DateTime
 } from './../';
 
 describe('AppsService', () => {
@@ -28,7 +28,7 @@ describe('AppsService', () => {
         appsService = new AppsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service', () => {
+    it('should make get request with auth service to get apps', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
@@ -37,12 +37,12 @@ describe('AppsService', () => {
                             id: '123',
                             name: 'name1',
                             created: '2016-01-01',
-                            lastModified: '2017-01-01'
+                            lastModified: '2016-02-02'
                         }, {
                             id: '456',
                             name: 'name2',
-                            created: '2016-01-01',
-                            lastModified: '2017-01-01'
+                            created: '2017-01-01',
+                            lastModified: '2017-02-02'
                         }]
                     })
                 )
@@ -55,15 +55,15 @@ describe('AppsService', () => {
             apps = result;
         }).unsubscribe();
 
-        expect(apps[1].id).toBe('456');
-        expect(apps[1].name).toBe('name2');
-        expect(apps[1].created.eq(DateTime.parseISO('2016-01-01'))).toBeTruthy();
-        expect(apps[1].lastModified.eq(DateTime.parseISO('2017-01-01'))).toBeTruthy();
+        expect(apps).toEqual([
+            new AppDto('123', 'name1', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02')),
+            new AppDto('456', 'name2', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02')),
+        ]);
 
         authService.verifyAll();
     });
 
-    it('should make post request', () => {
+    it('should make post request to create app', () => {
         const now = DateTime.now();
 
         authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(y => y['name'] === 'new-app')))
@@ -83,15 +83,12 @@ describe('AppsService', () => {
             newApp = result;
         }).unsubscribe();
 
-        expect(newApp.id).toBe('123');
-        expect(newApp.name).toBe('new-app');
-        expect(newApp.created.eq(now)).toBeTruthy();
-        expect(newApp.lastModified.eq(now)).toBeTruthy();
+        expect(newApp).toEqual(new AppDto('123', 'new-app', now, now));
 
         authService.verifyAll();
     });
 
-    it('should throw fallback error on 500', () => {
+    it('should throw fallback error on 500 when creating app failed', () => {
         authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isAny()))
             .returns(() => Observable.throw(
                 new Ng2Http.Response(
@@ -112,7 +109,7 @@ describe('AppsService', () => {
         authService.verifyAll();
     });
 
-    it('should throw duplicate error on 400', () => {
+    it('should throw duplicate error on 400 when creating app failed', () => {
         authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isAny()))
             .returns(() => Observable.throw(
                 new Ng2Http.Response(
