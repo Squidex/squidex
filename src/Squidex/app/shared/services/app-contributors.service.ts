@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  * 

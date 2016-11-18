@@ -26,7 +26,9 @@ import {
     LanguageService,
     SqxFrameworkModule,
     TitlesConfig,
-    TitleService
+    TitleService,
+    UsersProviderService,
+    UsersService
 } from './shared';
 
 import {
@@ -63,6 +65,8 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         MustBeAuthenticatedGuard,
         MustBeNotAuthenticatedGuard,
         TitleService,
+        UsersProviderService,
+        UsersService,
         { provide: ApiUrlConfig, useValue: new ApiUrlConfig(baseUrl) },
         { provide: CurrencyConfig, useValue: new CurrencyConfig('EUR', '€', true) },
         { provide: DecimalSeparatorConfig, useValue: new DecimalSeparatorConfig('.') },

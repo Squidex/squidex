@@ -20,11 +20,15 @@ import { Observable, Subject } from 'rxjs';
 import { ApiUrlConfig } from 'framework';
 
 export class Profile {
-    public get displayName() {
+    public get id(): string {
+        return this.user.profile['sub'];
+    }
+
+    public get displayName(): string {
         return this.user.profile['urn:squidex:name'];
     }
 
-    public get pictureUrl() {
+    public get pictureUrl(): string {
         return this.user.profile['urn:squidex:picture'];
     }
 
@@ -94,7 +98,7 @@ export class AuthService {
         if (this.loginCompleted) {
             return Promise.resolve(this.currentUser !== null);
         } else if (this.loginCache) {
-          return this.loginCache;
+            return this.loginCache;
         } else {
             this.loginCache =
                 this.checkState(this.userManager.signinSilent())
@@ -136,7 +140,6 @@ export class AuthService {
         this.currentUser = new Profile(user);
 
         this.isAuthenticatedChanged$.next(true);
-
     }
 
     private onDeauthenticated() {

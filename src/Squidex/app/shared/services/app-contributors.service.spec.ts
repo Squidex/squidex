@@ -26,7 +26,7 @@ describe('AppContributorsService', () => {
         appContributorsService = new AppContributorsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service', () => {
+    it('should make get request with auth service to get app contributors', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/contributors'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
@@ -58,7 +58,7 @@ describe('AppContributorsService', () => {
         authService.verifyAll();
     });
 
-    it('should make post assign contributor', () => {
+    it('should make post request to assign contributor', () => {
         const contributor = new AppContributor('123', 'Owner');
 
         authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', TypeMoq.It.is(c => c === contributor)))
