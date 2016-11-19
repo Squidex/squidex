@@ -35,7 +35,7 @@
                                 </select>
                             </td>
                             <td>
-                                <button class="btn btn-block btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="revokeContributor(contributor)">Revoke</button>
+                                <button class="btn btn-block btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="removeContributor(contributor)">Remove</button>
                             </td>
                         </tr>
                     </table>

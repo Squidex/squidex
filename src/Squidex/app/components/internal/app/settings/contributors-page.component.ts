@@ -133,7 +133,7 @@ export class ContributorsPageComponent implements Ng2.OnInit {
         this.selectedUserName = null;
     }
 
-    public revokeContributor(contributor: AppContributorDto) {
+    public removeContributor(contributor: AppContributorDto) {
         this.appContributorsService.deleteContributor(this.appName, contributor.contributorId).subscribe();
 
         this.appContributors.splice(this.appContributors.indexOf(contributor), 1);
