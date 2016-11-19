@@ -42,7 +42,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            var cacheKey = BuildModelsCacheKey(appId, name);
+            var cacheKey = BuildModelCacheKey(appId, name);
             var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
             if (cacheItem == null)
@@ -70,16 +70,16 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
                 if (oldName != null)
                 {
-                    Cache.Remove(BuildModelsCacheKey(@event.Headers.AppId(), oldName));
+                    Cache.Remove(BuildModelCacheKey(@event.Headers.AppId(), oldName));
                 }
             }
 
             return Task.FromResult(true);
         }
 
-        private static string BuildModelsCacheKey(Guid appId, string name)
+        private static string BuildModelCacheKey(Guid appId, string name)
         {
-            return $"Schemas_Models_{appId}_{name}";
+            return $"Schema_{appId}_{name}";
         }
 
         private static string BuildNamesCacheKey(Guid schemaId)

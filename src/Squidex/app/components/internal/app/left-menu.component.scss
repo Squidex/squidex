@@ -2,16 +2,20 @@
 @import '_mixins';
 
 $color-selection-background: #ebf0f2;
-
+$color-subnav-text: #818181;
+$color-subnav-dot: #bdc6d0;
 $color-border-left-width: 4px;
 
 @mixin build-item($color) {
-    &:hover,
-    &.active {
-        border-color: $color;
+    & .nav-link {
+        &:hover,
+        &.active {
+            border-color: $color;
+        }
     }
 
     & i {
+        margin-right: .5rem;
         color: $color;
     }
 }
@@ -20,38 +24,11 @@ $color-border-left-width: 4px;
     & {
         list-style: none;
         padding: 0;
-        margin-top: 40px;
-        margin-left: -$padding-layout - 1px;
-        margin-right: -$padding-layout;
+        margin-left: -$padding-layout-h - 1px;
+        margin-right: -$padding-layout-h;
     }
 
-    &-link {
-        & {
-            @include transition(background .2s ease);
-            border-left: $color-border-left-width solid transparent;
-            color: $color-text;
-            cursor: pointer;
-            display: block;
-            font-size: 1rem;
-            font-weight: 450;
-            line-height: 3rem;
-            padding-left: $padding-layout - $color-border-left-width;
-            padding-right: $padding-layout;
-        }
-
-        &.active {
-            font-weight: bold;
-        }
-
-        &:hover {
-            text-decoration: none;
-        }
-
-        &:hover,
-        &.active {
-            background: $color-selection-background;
-        }
-
+    &-item {
         &--media {
             @include build-item($color-section-media);
         }
@@ -70,6 +47,75 @@ $color-border-left-width: 4px;
 
         &--settings {
             @include build-item($color-section-settings);
+        }
+    }
+
+    &-item-group > a {
+        & {
+            position: relative;
+        }
+
+        &::after {
+            @include absolute(50%, 30px, auto, auto);
+            @include caret-bottom;
+        }
+    }
+
+    &-link {
+        & {
+            @include transition(background .2s ease);
+            border-left: $color-border-left-width solid transparent;
+            color: $color-text;
+            cursor: pointer;
+            display: block;
+            font-size: 1rem;
+            font-weight: 450;
+            line-height: 3rem;
+            padding-left: $padding-layout-h - $color-border-left-width;
+            padding-right: $padding-layout-h;
+        }
+
+        &:hover,
+        &.active {
+            background: $color-selection-background;
+        }
+
+        &.active {
+            font-weight: bold;
+        }
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+
+.subnav {
+    & {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .nav-link {
+        & {
+            color: $color-subnav-text;
+            padding-left: 55px;
+            font-size: .9rem;
+            font-weight: 450;
+            line-height: 2rem;
+        }
+    }
+
+    &-item {
+        &::before {
+            content: '•';
+            color: $color-subnav-dot;
+            float: left;
+            font-weight: bold;
+            line-height: 2rem;
+            margin-left: 35px;
         }
     }
 }

@@ -18,8 +18,8 @@ import {
 } from './../';
 
 describe('AppsStoreService', () => {
-    const oldApps = [new AppDto('id', 'name', null, null)];
-    const newApp = new AppDto('id', 'new-name', null, null);
+    const oldApps = [new AppDto('id', 'old-name', null, null, 'Owner')];
+    const newApp =   new AppDto('id', 'new-name', null, null, 'Owner');
 
     let appsService: TypeMoq.Mock<AppsService>;
     let authService: TypeMoq.Mock<AuthService>;
@@ -156,7 +156,7 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        store.selectApp('name').then((isSelected) => {
+        store.selectApp('old-name').then((isSelected) => {
             expect(isSelected).toBeTruthy();
 
             appsService.verifyAll();

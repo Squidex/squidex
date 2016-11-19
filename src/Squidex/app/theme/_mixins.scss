@@ -1,6 +1,6 @@
 @mixin clearfix() {
     &::after {
-        content: "";
+        content: '';
         display: table;
         clear: both;
     }
@@ -70,6 +70,32 @@
         -ms-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
+}
+
+@mixin caret-top() {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    content: '';
+    border-bottom: .3em solid;
+    border-right: .3em solid transparent;
+    border-left: .3em solid transparent;
+}
+
+@mixin caret-bottom() {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    content: '';
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-left: .3em solid transparent;
+}
+ 
+@mixin circle($size) {
+    @include border-radius($size * .5);
+     width: $size;
+    height: $size;
 }
 
 @mixin wrap() {

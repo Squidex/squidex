@@ -23,13 +23,10 @@
     }
 
     &::before {
-        @include absolute(-18px, auto, auto, 10px);
+        @include absolute(-10px, auto, auto, 10px);
+        @include caret-top;
         border-color: transparent transparent $color-accent-dark;
-        border-style: solid;
         border-width: 10px;
-        content: '';
-        height: 0;
-        width: 0;
     }
 }
 
@@ -56,8 +53,8 @@
         @include opacity(.95);
         @include no-selection;
         padding-right: 15px;
-        cursor: pointer;
         color: $color-accent-dark;
+        cursor: pointer;
         width: 200px;
     }
 

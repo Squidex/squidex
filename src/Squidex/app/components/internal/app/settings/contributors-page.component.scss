@@ -1,0 +1,28 @@
+@import '_vars';
+@import '_mixins';
+
+.layout-title-icon {
+    color: $color-section-settings;
+}
+
+.card {
+    max-width: 700px;
+}
+
+.user {
+    &-picture {
+        @include circle(2.2rem);
+        float: left;
+    }
+
+    &-name,
+    &-email {
+        @include truncate;
+        padding-left: 10px;
+    }
+
+    &-email {
+        font-size: .8rem;
+        font-style: italic;
+    }
+}

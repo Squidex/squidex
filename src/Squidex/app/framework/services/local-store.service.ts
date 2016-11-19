@@ -13,6 +13,7 @@ export const LocalStoreServiceFactory = () => {
 
 @Ng2.Injectable()
 export class LocalStoreService {
+    private readonly fallback = {};
     private store: any = localStorage;
 
     public configureStore(store: any) {
@@ -20,10 +21,18 @@ export class LocalStoreService {
     }
 
     public get(key: string): any {
-        return this.store.getItem(key);
+        try {
+            return this.store.getItem(key);
+        } catch (e) {
+            return this.fallback[key];
+        }
     }
 
     public set(key: string, value: any) {
-        this.store.setItem(key, value);
+        try {
+            this.store.setItem(key, value);
+        } catch (e) {
+            this.fallback[key] = value;
+        }
     }
 }

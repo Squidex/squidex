@@ -20,7 +20,7 @@
                 <p>
                     @foreach (var provider in Model.ExternalProviders)
                     {
-                        <button type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayDisplayName account">@provider.AuthenticationScheme</button>
+                        <button type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
                     }
                 </p>
             </div>

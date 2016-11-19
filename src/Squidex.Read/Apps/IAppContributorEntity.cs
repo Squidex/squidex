@@ -12,7 +12,7 @@ namespace Squidex.Read.Apps
 {
     public interface IAppContributorEntity
     {
-        string SubjectId { get; }
+        string ContributorId { get; }
         
         PermissionLevel Permission { get; }
     }

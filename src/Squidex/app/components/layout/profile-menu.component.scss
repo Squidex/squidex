@@ -3,14 +3,10 @@
 
 $size-avatar: 2.2rem;
 
-a {
-    cursor: pointer;
-}
-
-img {
-    @include border-radius($size-avatar * .5);
-    height: $size-avatar;
-    width: $size-avatar;
+.user {
+    &-picture {
+        @include circle(2.2rem);
+    }
 }
 
 .navbar-nav {
@@ -23,18 +19,27 @@ img {
     }
 }
 
-.dropdown-menu {
-    & {
-        @include absolute(44px, 0, auto, auto);
+.nav-link {
+    &::after {
+        color: $color-theme-blue-light;
+    }
+}
+
+.dropdown {
+    &-item {
+        cursor: pointer;
     }
 
-    &::before {
-        @include absolute(-18px, 10px, auto, auto);
-        border-color: transparent transparent $color-accent-dark;
-        border-style: solid;
-        border-width: 10px;
-        content: '';
-        height: 0;
-        width: 0;
+    &-menu {
+        & {
+            @include absolute(44px, 0, auto, auto);
+        }
+
+        &::before {
+            @include absolute(-10px, 10px, auto, auto);
+            @include caret-top;
+            border-color: transparent transparent $color-accent-dark;
+            border-width: 10px;
+        }
     }
 }

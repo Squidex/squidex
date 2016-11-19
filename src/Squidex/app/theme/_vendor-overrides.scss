@@ -8,3 +8,10 @@ $brand-success: $color-theme-green;
 
 $btn-secondary-bg: #dce5e8;
 $btn-secondary-border: #dce5e8;
+
+$card-border-color: $color-border;
+$card-cap-bg: $color-card-footer;
+
+.completer-input {
+    @extend .form-control;
+}

@@ -15,48 +15,61 @@ h1 {
     display: none;
 }
 
+.card {
+    @include box-shadow(0, 2px, 2px, .1);
+}
+
 .layout {
+    & {
+        @include fixed(54px, 0, 0, 0);
+        @include flex-box;
+        @include flex-flow(row);
+    }
+
     &-title-icon {
         margin-right: .6rem;
+        font-size: 1.7rem;
+        font-weight: normal;
     }
 
-    &-new-button {
-        display: block;
-        width: 100%;
+    &-left,
+    &-right,
+    &-middle-header,
+    &-middle-content {
+        padding: $padding-layout-v $padding-layout-h;
     }
 
-    &-content {
+    &-left,
+    &-right {
+        background: $sidebar-color;
+        position: relative;
+        width: 220px;
+    }
+
+    &-right {
+        border-left: 1px solid $color-border;
+    }
+
+    &-left {
+        border-right: 1px solid $color-border;
+    }
+    
+    &-middle {
         & {
-            @include fixed(54px, 0, 0, 0);
-            @include flex-box;
-            @include flex-flow(row);
-        }
-
-        &-left,
-        &-right {
-            background: $sidebar-color;
-            padding: $padding-layout;
-            position: relative;
-            width: 220px;
-        }
-
-        &-right {
-            border-left: 1px solid $color-border;
-        }
-
-        &-left {
-            & {
-                border-right: 1px solid $color-border;
-            }
-
-            &--no-button {
-                padding-top: $padding-layout + 38px;
-            }
-        }
-        
-        &-main {
             @include flex-grow(1);
-            padding: $padding-layout;
+            @include flex-box;
+            @include flex-flow(column);
+        }
+
+        &-header {
+            @include box-shadow(0, 2px, 2px, .1);
+            background: $sidebar-color;
+            border-bottom: 1px solid $color-border;
+        }
+
+        &-content {
+            @include flex-grow(1);
+            padding: $padding-layout-v;
         }
     }
 }

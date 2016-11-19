@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 import {
     ApiUrlConfig,
     AuthService,
-    Language,
+    LanguageDto,
     LanguageService
 } from './../';
 
@@ -43,7 +43,7 @@ describe('LanguageService', () => {
             ))
             .verifiable(TypeMoq.Times.once());
 
-        let languages: Language[] = null;
+        let languages: LanguageDto[] = null;
         
         languageService.getLanguages().subscribe(result => {
             languages = result;
@@ -51,8 +51,8 @@ describe('LanguageService', () => {
 
         expect(languages).toEqual(
             [
-                new Language('de', 'German'),
-                new Language('en', 'English'),
+                new LanguageDto('de', 'German'),
+                new LanguageDto('en', 'English'),
             ]);
 
         authService.verifyAll();

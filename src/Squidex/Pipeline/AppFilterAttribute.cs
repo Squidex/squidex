@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Infrastructure.Security;
 using Squidex.Read.Apps.Services;
 
 namespace Squidex.Pipeline
@@ -38,9 +38,9 @@ namespace Squidex.Pipeline
                     return;
                 }
 
-                var subject = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var subject = context.HttpContext.User.FindFirst(OpenIdClaims.Subject)?.Value;
 
-                if (subject == null || app.Contributors.Any(x => x.SubjectId == subject))
+                if (subject == null || app.Contributors.All(x => x.ContributorId != subject))
                 {
                     context.Result = new NotFoundResult();
                     return;

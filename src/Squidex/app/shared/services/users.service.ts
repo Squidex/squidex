@@ -13,11 +13,12 @@ import { ApiUrlConfig } from 'framework';
 
 import { AuthService } from './auth.service';
 
-export class User {
+export class UserDto {
     constructor(
         public readonly id: string,
-        public readonly profileUrl: string,
-        public readonly displayName: string
+        public readonly email: string,
+        public readonly displayName: string,
+        public readonly pictureUrl: string
     ) {
     }
 }
@@ -30,29 +31,31 @@ export class UsersService {
     ) {
     }
 
-    public getUsers(query?: string): Observable<User[]> {
+    public getUsers(query?: string): Observable<UserDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/users/?query=${query || ''}`))
                 .map(response => {                    
                     const body: any[] = response.json() || [];
 
                     return body.map(item => {
-                        return new User(
+                        return new UserDto(
                             item.id,
-                            item.profileUrl,
-                            item.displayName);
+                            item.email,
+                            item.displayName,
+                            item.pictureUrl);
                     });
                 });
     }
 
-    public getUser(id: string): Observable<User> {
+    public getUser(id: string): Observable<UserDto> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/users/${id}`))
                 .map(response => {                    
                     const body: any = response.json();
 
-                    return new User(
+                    return new UserDto(
                         body.id,
-                        body.profileUrl,
-                        body.displayName);
+                        body.email,
+                        body.displayName,
+                        body.pictureUrl);
                 });
     }
 }

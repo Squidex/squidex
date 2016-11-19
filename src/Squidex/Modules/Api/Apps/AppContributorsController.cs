@@ -14,7 +14,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Modules.Api.Apps.Models;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Apps.Services;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Modules.Api.Apps
@@ -22,22 +22,21 @@ namespace Squidex.Modules.Api.Apps
     [Authorize]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    [Route("apps/{app}")]
     public class AppContributorsController : ControllerBase
     {
-        private readonly IAppRepository appRepository;
+        private readonly IAppProvider appProvider;
 
-        public AppContributorsController(ICommandBus commandBus, IAppRepository appRepository) 
+        public AppContributorsController(ICommandBus commandBus, IAppProvider appProvider) 
             : base(commandBus)
         {
-            this.appRepository = appRepository;
+            this.appProvider = appProvider;
         }
 
         [HttpGet]
-        [Route("contributors")]
+        [Route("apps/{app}/contributors/")]
         public async Task<IActionResult> GetContributors(string app)
         {
-            var entity = await appRepository.FindAppByNameAsync(app);
+            var entity = await appProvider.FindAppByNameAsync(app);
 
             if (entity == null)
             {
@@ -49,9 +48,9 @@ namespace Squidex.Modules.Api.Apps
             return Ok(model);
         }
 
-        [HttpPut]
-        [Route("contributors")]
-        public async Task<IActionResult> PutContributor([FromBody] AssignContributorDto model)
+        [HttpPost]
+        [Route("apps/{app}/contributors/")]
+        public async Task<IActionResult> PostContributor([FromBody] AssignContributorDto model)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
 
@@ -59,7 +58,7 @@ namespace Squidex.Modules.Api.Apps
         }
 
         [HttpDelete]
-        [Route("contributors/{contributorId}")]
+        [Route("apps/{app}/contributors/{contributorId}/")]
         public async Task<IActionResult> PutContributor(string contributorId)
         {
             await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });

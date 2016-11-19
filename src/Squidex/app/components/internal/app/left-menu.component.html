@@ -1,26 +1,38 @@
 <ul class="nav">
-    <li class="nav-item">
-        <a class="nav-link nav-link--dashboard" routerLink="../dashboard" routerLinkActive="active">
+    <li class="nav-item nav-item--dashboard">
+        <a class="nav-link" routerLink="../dashboard" routerLinkActive="active">
             <i class="icon-dashboard"></i> Dashboard
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link nav-link--schemas" routerLink="../schemas" routerLinkActive="active">
+    <li class="nav-items nav-item--schemas" *ngIf="permission !== 'Editor'">
+        <a class="nav-link" routerLink="../schemas" routerLinkActive="active">
             <i class="icon-schemas"></i> Schemas
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link nav-link--content">
+    <li class="nav-item nav-item--content">
+        <a class="nav-link">
             <i class="icon-content"></i> Content
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link nav-link--media">
+    <li class="nav-item nav-item--media">
+        <a class="nav-link">
             <i class="icon-media"></i> Media</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link nav-link--settings">
+    <li class="nav-item nav-item--settings nav-item-group" *ngIf="permission === 'Owner'">
+        <a class="nav-link" (click)="toggleSettingsMenu()">
             <i class="icon-settings"></i> Settings
         </a>
+
+        <ul class="subnav" *ngIf="showSettingsMenu">
+            <li class="subnav-item">
+                <a class="nav-link" routerLink="../contributors" routerLinkActive="active">Contributors</a>
+            </li>
+            <li class="subnav-item">
+                <a class="nav-link" routerLink="../credentials" routerLinkActive="active">Credentials</a>
+            </li>
+            <li class="subnav-item">
+                <a class="nav-link" routerLink="../languages" routerLinkActive="active">Languages</a>
+            </li>
+        </ul>
     </li>
 </ul>

@@ -17,7 +17,8 @@ export class AppDto {
         public readonly id: string,
         public readonly name: string,
         public readonly created: DateTime,
-        public readonly lastModified: DateTime
+        public readonly lastModified: DateTime,
+        public readonly permission: string
     ) {
     }
 }
@@ -47,7 +48,8 @@ export class AppsService {
                             item.id,
                             item.name,
                             DateTime.parseISO(item.created),
-                            DateTime.parseISO(item.lastModified)
+                            DateTime.parseISO(item.lastModified),
+                            item.permission
                         );
                     });
                 });
@@ -58,7 +60,7 @@ export class AppsService {
 
         return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), appToCreate)
                 .map(response => response.json())
-                .map(response => new AppDto(response.id, appToCreate.name, now, now))
+                .map(response => new AppDto(response.id, appToCreate.name, now, now, 'Owner'))
                 .catch(response => {
                     if (response.status === 400) {
                         return Observable.throw('An app with the same name already exists.');

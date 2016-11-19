@@ -37,12 +37,14 @@ describe('AppsService', () => {
                             id: '123',
                             name: 'name1',
                             created: '2016-01-01',
-                            lastModified: '2016-02-02'
+                            lastModified: '2016-02-02',
+                            permission: 'Owner'
                         }, {
                             id: '456',
                             name: 'name2',
                             created: '2017-01-01',
-                            lastModified: '2017-02-02'
+                            lastModified: '2017-02-02',
+                            permission: 'Editor'
                         }]
                     })
                 )
@@ -56,8 +58,8 @@ describe('AppsService', () => {
         }).unsubscribe();
 
         expect(apps).toEqual([
-            new AppDto('123', 'name1', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02')),
-            new AppDto('456', 'name2', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02')),
+            new AppDto('123', 'name1', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Owner'),
+            new AppDto('456', 'name2', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Editor'),
         ]);
 
         authService.verifyAll();
@@ -83,7 +85,7 @@ describe('AppsService', () => {
             newApp = result;
         }).unsubscribe();
 
-        expect(newApp).toEqual(new AppDto('123', 'new-app', now, now));
+        expect(newApp).toEqual(new AppDto('123', 'new-app', now, now, 'Owner'));
 
         authService.verifyAll();
     });

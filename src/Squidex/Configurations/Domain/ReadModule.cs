@@ -21,6 +21,7 @@ namespace Squidex.Configurations.Domain
         {
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
+                .As<ILiveEventConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<CachingSchemaProvider>()

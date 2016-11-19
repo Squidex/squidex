@@ -56,7 +56,7 @@ namespace Squidex.Write.Apps
             {
                 if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
                 {
-                    var error = new ValidationError($"Cannot find contributor '{command.ContributorId}", nameof(AssignContributor.ContributorId));
+                    var error = new ValidationError($"Cannot find contributor '{command.ContributorId ?? "UNKNOWN"}'", nameof(AssignContributor.ContributorId));
 
                     throw new ValidationException("Cannot assign contributor to app", error);
                 }

@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 import {
     ApiUrlConfig,
     AuthService,
-    User,
+    UserDto,
     UsersService,
 } from './../';
 
@@ -33,19 +33,21 @@ describe('UsersService', () => {
                     new Ng2Http.ResponseOptions({
                         body: [{
                             id: '123',
-                            profileUrl: 'path/to/image1',
-                            displayName: 'mail1@domain.com'
+                            email: 'mail1@domain.com',
+                            displayName: 'User1',
+                            pictureUrl: 'path/to/image1'
                         }, {
                             id: '456',
-                            profileUrl: 'path/to/image2',
-                            displayName: 'mail2@domain.com'
+                            email: 'mail2@domain.com',
+                            displayName: 'User2',
+                            pictureUrl: 'path/to/image2'
                         }]
                     })
                 )
             ))
             .verifiable(TypeMoq.Times.once());
 
-        let user: User[] = null;
+        let user: UserDto[] = null;
         
         usersService.getUsers().subscribe(result => {
             user = result;
@@ -53,8 +55,8 @@ describe('UsersService', () => {
 
         expect(user).toEqual(
             [
-                new User('123', 'path/to/image1', 'mail1@domain.com'),
-                new User('456', 'path/to/image2', 'mail2@domain.com')
+                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1'),
+                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2')
             ]);
 
         authService.verifyAll();
@@ -67,19 +69,21 @@ describe('UsersService', () => {
                     new Ng2Http.ResponseOptions({
                         body: [{
                             id: '123',
-                            profileUrl: 'path/to/image1',
-                            displayName: 'mail1@domain.com'
+                            email: 'mail1@domain.com',
+                            displayName: 'User1',
+                            pictureUrl: 'path/to/image1'
                         }, {
                             id: '456',
-                            profileUrl: 'path/to/image2',
-                            displayName: 'mail2@domain.com'
+                            email: 'mail2@domain.com',
+                            displayName: 'User2',
+                            pictureUrl: 'path/to/image2'
                         }]
                     })
                 )
             ))
             .verifiable(TypeMoq.Times.once());
 
-        let user: User[] = null;
+        let user: UserDto[] = null;
         
         usersService.getUsers('my-query').subscribe(result => {
             user = result;
@@ -87,8 +91,8 @@ describe('UsersService', () => {
 
         expect(user).toEqual(
             [
-                new User('123', 'path/to/image1', 'mail1@domain.com'),
-                new User('456', 'path/to/image2', 'mail2@domain.com')
+                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1'),
+                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2')
             ]);
 
         authService.verifyAll();
@@ -101,21 +105,22 @@ describe('UsersService', () => {
                     new Ng2Http.ResponseOptions({
                         body: {
                             id: '123',
-                            profileUrl: 'path/to/image',
-                            displayName: 'mail@domain.com'
+                            email: 'mail1@domain.com',
+                            displayName: 'User1',
+                            pictureUrl: 'path/to/image1'
                         }
                     })
                 )
             ))
             .verifiable(TypeMoq.Times.once());
 
-        let user: User = null;
+        let user: UserDto = null;
         
         usersService.getUser('123').subscribe(result => {
             user = result;
         }).unsubscribe();
 
-        expect(user).toEqual(new User('123', 'path/to/image', 'mail@domain.com'));
+        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1'));
 
         authService.verifyAll();
     });

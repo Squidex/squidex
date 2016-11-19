@@ -1,6 +1,18 @@
 @import '_mixins';
 @import '_vars';
 
+.table {
+    &-fixed {
+        table-layout: fixed;
+    }
+
+    &-borderless {
+        td {
+            border: none;
+        }
+    }
+}
+
 .form-hint {
     font-size: .8rem;
 }

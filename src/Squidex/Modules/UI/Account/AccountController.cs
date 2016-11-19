@@ -42,7 +42,7 @@ namespace Squidex.Modules.UI.Account
         [Route("account/forbidden")]
         public IActionResult Forbidden()
         {
-            return View();
+            return View("Error");
         }
 
         [HttpGet]
@@ -164,10 +164,10 @@ namespace Squidex.Modules.UI.Account
 
             var user = new IdentityUser { Email = mail, UserName = mail };
 
-            var profileUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexPictureUrl);
-            if (profileUrl != null)
+            var pictureUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexPictureUrl);
+            if (pictureUrl != null)
             {
-                user.AddClaim(profileUrl);
+                user.AddClaim(pictureUrl);
             }
 
             var displayName = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexDisplayName);

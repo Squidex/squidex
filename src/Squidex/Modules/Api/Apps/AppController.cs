@@ -38,9 +38,17 @@ namespace Squidex.Modules.Api.Apps
         [Route("apps/")]
         public async Task<List<ListAppDto>> Query()
         {
-            var schemas = await appRepository.QueryAllAsync(HttpContext.User.OpenIdSubject());
+            var subject = HttpContext.User.OpenIdSubject();
+            var schemas = await appRepository.QueryAllAsync(subject);
 
-            return schemas.Select(s => SimpleMapper.Map(s, new ListAppDto())).ToList();
+            return schemas.Select(s =>
+            {
+                var dto = SimpleMapper.Map(s, new ListAppDto());
+
+                dto.Permission = s.Contributors.Single(x => x.ContributorId == subject).Permission;
+
+                return dto;
+            }).ToList();
         }
 
         [HttpPost]

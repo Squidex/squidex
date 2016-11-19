@@ -13,7 +13,7 @@ import { ApiUrlConfig } from 'framework';
 
 import { AuthService } from './auth.service';
 
-export class AppContributor {
+export class AppContributorDto {
     constructor(
         public readonly contributorId: string,
         public readonly permission: string
@@ -29,24 +29,24 @@ export class AppContributorsService {
     ) {
     }
 
-    public getContributors(appName: string): Observable<AppContributor[]> {
+    public getContributors(appName: string): Observable<AppContributorDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/apps/${appName}/contributors`))
                 .map(response => {                    
                     const body: any[] = response.json();
 
                     return body.map(item => {
-                        return new AppContributor(
+                        return new AppContributorDto(
                             item.contributorId, 
                             item.permission);
                     });
                 });
     }
 
-    public postContributor(appName: string, contributor: AppContributor): Observable<any> {
+    public postContributor(appName: string, contributor: AppContributorDto): Observable<any> {
         return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/contributors`), contributor);
     }
 
     public deleteContributor(appName: string, contributorId: string): Observable<any> {
-        return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/contributors/{contributorId}`));
+        return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`));
     }
 }

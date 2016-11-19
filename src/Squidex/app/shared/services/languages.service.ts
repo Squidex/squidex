@@ -12,7 +12,7 @@ import { ApiUrlConfig } from 'framework';
 
 import { AuthService } from './auth.service';
 
-export class Language {
+export class LanguageDto {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string
@@ -28,13 +28,13 @@ export class LanguageService {
     ) {
     }
 
-    public getLanguages(): Observable<Language[]> {
+    public getLanguages(): Observable<LanguageDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl('api/languages'))
                 .map(response => {                    
                     const body: any[] = response.json();
 
                     return body.map(item => {
-                        return new Language(
+                        return new LanguageDto(
                             item.iso2Code, 
                             item.englishName);
                     });

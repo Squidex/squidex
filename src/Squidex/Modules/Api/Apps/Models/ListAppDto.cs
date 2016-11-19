@@ -7,6 +7,9 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Squidex.Core.Apps;
 
 namespace Squidex.Modules.Api.Apps.Models
 {
@@ -19,5 +22,8 @@ namespace Squidex.Modules.Api.Apps.Models
         public DateTime Created { get; set; }
         
         public DateTime LastModified { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PermissionLevel Permission { get; set; }
     }
 }

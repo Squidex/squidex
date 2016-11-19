@@ -10,5 +10,8 @@ export * from './app/app-area.component';
 export * from './app/left-menu.component';
 export * from './app/dashboard/dashboard-page.component';
 export * from './app/schemas/schemas-page.component';
+export * from './app/settings/contributors-page.component';
+export * from './app/settings/credentials-page.component';
+export * from './app/settings/languages-page.component';
 
 export * from './internal-area.component';

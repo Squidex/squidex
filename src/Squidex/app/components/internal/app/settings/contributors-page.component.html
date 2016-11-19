@@ -1,0 +1,67 @@
+<div class="layout">
+    <div class="layout-left">
+        <sqx-left-menu></sqx-left-menu>
+    </div>
+    <div class="layout-middle">
+        <div class="layout-middle-header">
+            <h1>
+                <i class="layout-title-icon icon-settings"></i> Contributors
+            </h1>
+        </div>
+        <div class="layout-middle-content">
+            <div class="card">
+                <div class="card-block">
+                    <table class="table table-borderless table-fixed">
+                        <colgroup>
+                            <col style="width: 100%" />
+                            <col style="width: 150px" />
+                            <col style="width: 110px" />
+                        </colgroup>
+
+                        <tr *ngFor="let contributor of appContributors">
+                            <td class="col-xs-7">
+                                <img class="user-picture" [attr.src]="pictureUrl(contributor) | async" />
+
+                                <span class="user-name">
+                                    {{displayName(contributor) | async}}
+                                </span>
+                                <span class="user-email">
+                                    {{email(contributor) | async}}
+                                </span>
+                            </td>
+                            <td>
+                                <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="saveContributor(contributor)" [disabled]="currrentUserId === contributor.contributorId">
+                                    <option *ngFor="let permission of usersPermissions">{{permission}}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-block btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="revokeContributor(contributor)">Revoke</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <form class="form-inline" (submit)="addContributor()" >
+                        <div class="form-group">
+                            <ng2-completer 
+                                [autoMatch]="true"
+                                [dataService]="usersDataSource" 
+                                [minSearchLength]="3" 
+                                [placeholder]="'Search user by e-email'"
+                                [pause]="300"
+                                [clearSelected]="false"
+                                [textSearching]="'Searching...'"
+                                [inputName]="contributor"
+                                [ngModel]="selectedUserName"
+                                [ngModelOptions]="{standalone: true}"
+                                (selected)="selectUser($event)">
+                            </ng2-completer>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" [disabled]="!selectedUser">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

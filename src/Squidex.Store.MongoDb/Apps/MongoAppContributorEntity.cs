@@ -16,7 +16,7 @@ namespace Squidex.Store.MongoDb.Apps
     {
         [BsonRequired]
         [BsonElement]
-        public string SubjectId { get; set; }
+        public string ContributorId { get; set; }
 
         [BsonRequired]
         [BsonElement]

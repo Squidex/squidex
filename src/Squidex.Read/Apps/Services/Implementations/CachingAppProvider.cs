@@ -9,7 +9,10 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Squidex.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Utils;
 
@@ -17,7 +20,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Apps.Services.Implementations
 {
-    public class CachingAppProvider : CachingProvider, IAppProvider
+    public class CachingAppProvider : CachingProvider, IAppProvider, ILiveEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
         private readonly IAppRepository appRepository;
@@ -39,7 +42,7 @@ namespace Squidex.Read.Apps.Services.Implementations
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            var cacheKey = BulidCacheKey(name);
+            var cacheKey = BuildModelCacheKey(name);
             var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
             if (cacheItem == null)
@@ -49,12 +52,37 @@ namespace Squidex.Read.Apps.Services.Implementations
                 cacheItem = new CacheItem { Entity = app };
 
                 Cache.Set(cacheKey, cacheItem, new MemoryCacheEntryOptions { SlidingExpiration = CacheDuration });
+
+                if (cacheItem.Entity != null)
+                {
+                    Cache.Set(BuildNamesCacheKey(cacheItem.Entity.Id), cacheItem.Entity.Name, CacheDuration);
+                }
             }
 
             return cacheItem.Entity;
         }
 
-        private static string BulidCacheKey(string name)
+        public Task On(Envelope<IEvent> @event)
+        {
+            if (@event.Payload is AppContributorAssigned || @event.Payload is AppContributorRemoved)
+            {
+                var appName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
+
+                if (appName != null)
+                {
+                    Cache.Remove(BuildModelCacheKey(appName));
+                }
+            }
+
+            return Task.FromResult(true);
+        }
+
+        private static string BuildNamesCacheKey(Guid schemaId)
+        {
+            return $"App_Names_{schemaId}";
+        }
+
+        private static string BuildModelCacheKey(string name)
         {
             return $"App_{name}";
         }

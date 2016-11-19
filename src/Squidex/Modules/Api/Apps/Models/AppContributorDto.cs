@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Squidex.Core.Apps;
 
 namespace Squidex.Modules.Api.Apps.Models
@@ -14,6 +16,7 @@ namespace Squidex.Modules.Api.Apps.Models
     {
         public string ContributorId { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public PermissionLevel Permission { get; set; }
     }
 }

@@ -30,9 +30,9 @@ namespace Squidex.Modules.Api.Users
 
         [HttpGet]
         [Route("users")]
-        public async Task<IActionResult> GetUsers(string email)
+        public async Task<IActionResult> GetUsers(string query)
         {
-            var entities = await userRepository.FindUsersByEmail(email);
+            var entities = await userRepository.FindUsersByQuery(query ?? string.Empty);
 
             var model = entities.Select(x => SimpleMapper.Map(x, new UserDto())).ToList();
 

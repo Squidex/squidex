@@ -9,13 +9,13 @@ import * as Ng2 from '@angular/core';
 
 import { Observable,  } from 'rxjs';
 
-import { User, UsersService } from './users.service';
+import { UserDto, UsersService } from './users.service';
 
 import { AuthService } from './auth.service';
 
 @Ng2.Injectable()
 export class UsersProviderService {
-    private readonly caches: { [id: string]: Observable<User> } = {};
+    private readonly caches: { [id: string]: Observable<UserDto> } = {};
 
     constructor(
         private readonly usersService: UsersService,
@@ -23,20 +23,24 @@ export class UsersProviderService {
     ) {
     }
 
-    public getUser(id: string): Observable<User> {
+    public getUser(id: string): Observable<UserDto> {
         let result = this.caches[id];
 
         if (!result) {
-            result = this.caches[id] = 
+            const request = 
                 this.usersService.getUser(id)
                     .map(u => {
                         if (this.authService.user && u.id === this.authService.user.id) {
-                            return new User(u.id, u.profileUrl, 'Me');
+                            return new UserDto(u.id, u.email, 'Me', u.pictureUrl);
                         } else {
                             return u;
                         }
                     })
-                    .publishLast().refCount();
+                    .publishLast();
+
+            request.connect();
+
+            result = this.caches[id] = request;
         }
 
         return result;
