@@ -10,9 +10,13 @@ import * as Ng2Browser from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
+import { DndModule } from 'ng2-dnd';
+
 import {
     ApiUrlConfig,
+    AppClientKeysService,
     AppContributorsService,
+    AppLanguagesService,
     AppMustExistGuard,
     AppsStoreService,
     AppsService,
@@ -45,6 +49,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
 
 @Ng2.NgModule({
     imports: [
+        DndModule.forRoot(),
         Ng2Browser.BrowserModule,
         SqxAppModule,
         SqxAuthModule,
@@ -57,7 +62,9 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         AppComponent
     ],
     providers: [
+        AppClientKeysService,
         AppContributorsService,
+        AppLanguagesService,
         AppsStoreService,
         AppsService,
         AppMustExistGuard,

@@ -4,3 +4,17 @@
 .layout-title-icon {
     color: $color-section-settings;
 }
+
+.card {
+    max-width: 700px;
+}
+
+.language {
+    &-select {
+        max-width: 200px;
+    }
+
+    &-name {
+        @include truncate;
+    }
+}

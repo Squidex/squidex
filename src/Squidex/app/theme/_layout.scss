@@ -70,6 +70,7 @@ h1 {
         &-content {
             @include flex-grow(1);
             padding: $padding-layout-v;
+            overflow-y: scroll;
         }
     }
 }

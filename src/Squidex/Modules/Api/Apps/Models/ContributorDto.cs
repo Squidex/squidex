@@ -1,5 +1,5 @@
-﻿// =========================================================================
-//  AppContributorDto.cs
+﻿// ==========================================================================
+//  ContributorDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,7 +12,7 @@ using Squidex.Core.Apps;
 
 namespace Squidex.Modules.Api.Apps.Models
 {
-    public sealed class AppContributorDto
+    public sealed class ContributorDto
     {
         public string ContributorId { get; set; }
 

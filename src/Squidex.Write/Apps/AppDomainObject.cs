@@ -16,6 +16,7 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Write.Apps.Commands;
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 // ReSharper disable InvertIf
 
@@ -23,6 +24,8 @@ namespace Squidex.Write.Apps
 {
     public sealed class AppDomainObject : DomainObject
     {
+        private static readonly List<Language> DefaultLanguages = new List<Language> { Language.GetLanguage("en") };
+        private readonly HashSet<string> clientKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, PermissionLevel> contributors = new Dictionary<string, PermissionLevel>();
         private string name;
 
@@ -36,7 +39,8 @@ namespace Squidex.Write.Apps
             get { return contributors; }
         }
 
-        public AppDomainObject(Guid id, int version) : base(id, version)
+        public AppDomainObject(Guid id, int version) 
+            : base(id, version)
         {
         }
 
@@ -55,6 +59,16 @@ namespace Squidex.Write.Apps
             contributors.Remove(@event.ContributorId);
         }
 
+        public void On(AppClientKeyCreated @event)
+        {
+            clientKeys.Add(@event.ClientKey);
+        }
+
+        public void On(AppClientKeyRevoked @event)
+        {
+            clientKeys.Remove(@event.ClientKey);
+        }
+
         protected override void DispatchEvent(Envelope<IEvent> @event)
         {
             this.DispatchAction(@event.Payload);
@@ -67,7 +81,9 @@ namespace Squidex.Write.Apps
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppCreated()));
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { ContributorId = command.SubjectId, Permission = PermissionLevel.Owner }));
+
+            RaiseEvent(CreateInitialOwner(command));
+            RaiseEvent(CreateInitialLanguage());
 
             return this;
         }
@@ -77,7 +93,7 @@ namespace Squidex.Write.Apps
             Guard.Valid(command, nameof(command), () => "Cannot assign contributor");
 
             VerifyCreated();
-            VerifyHasStillOwner(c => c[command.ContributorId] = command.Permission);
+            VerifyOwnership(c => c[command.ContributorId] = command.Permission);
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
 
@@ -90,11 +106,55 @@ namespace Squidex.Write.Apps
 
             VerifyCreated();
             VerifyContributorFound(command);
-            VerifyHasStillOwner(c => c.Remove(command.ContributorId));
+            VerifyOwnership(c => c.Remove(command.ContributorId));
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
 
             return this;
+        }
+
+        public AppDomainObject ConfigureLanguages(ConfigureLanguages command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
+
+            VerifyCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppLanguagesConfigured()));
+
+            return this;
+        }
+
+        public AppDomainObject RevokeClientKey(RevokeClientKey command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot revoke client key");
+
+            VerifyCreated();
+            VerifyClientKeyFound(command);
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientKeyRevoked()));
+
+            return this;
+        }
+
+        public AppDomainObject CreateClientKey(CreateClientKey command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot create client key");
+
+            VerifyCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientKeyCreated()));
+
+            return this;
+        }
+
+        private static AppLanguagesConfigured CreateInitialLanguage()
+        {
+            return new AppLanguagesConfigured { Languages = DefaultLanguages };
+        }
+
+        private static AppContributorAssigned CreateInitialOwner(ISubjectCommand command)
+        {
+            return new AppContributorAssigned { ContributorId = command.SubjectId, Permission = PermissionLevel.Owner };
         }
 
         private void VerifyCreated()
@@ -113,6 +173,16 @@ namespace Squidex.Write.Apps
             }
         }
 
+        private void VerifyClientKeyFound(RevokeClientKey command)
+        {
+            if (!clientKeys.Contains(command.ClientKey))
+            {
+                var error = new ValidationError("Client key is not part of the app", "ClientKey");
+
+                throw new ValidationException("Cannot revoke client key", error);
+            }
+        }
+
         private void VerifyContributorFound(RemoveContributor command)
         {
             if (!contributors.ContainsKey(command.ContributorId))
@@ -123,7 +193,7 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void VerifyHasStillOwner(Action<Dictionary<string, PermissionLevel>> change)
+        private void VerifyOwnership(Action<Dictionary<string, PermissionLevel>> change)
         {
             var contributorsCopy = new Dictionary<string, PermissionLevel>(contributors);
 

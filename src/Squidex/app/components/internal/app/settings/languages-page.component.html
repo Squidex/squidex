@@ -9,6 +9,46 @@
             </h1>
         </div>
         <div class="layout-middle-content">
+            <div class="card">
+                <div class="card-block">
+                    <table class="table table-borderless table-fixed" dnd-sortable-container [sortableData]="appLanguages">
+                        <colgroup>
+                            <col style="width: 60px" />
+                            <col style="width: 100%" />
+                            <col style="width: 110px" />
+                        </colgroup>
+
+                        <tr *ngFor="let language of appLanguages; let i = index" dnd-sortable [sortableIndex]="i">
+                            <td>
+                                <span class="language-code">
+                                    {{language.iso2Code}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="language-name">
+                                    {{language.englishName}}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-block btn-sm btn-danger" [disabled]="i === 0" (click)="removeLanguage(language)">Remove</button>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <button class="btn btn-primary" (click)="saveLanguages()" [disabled]="isSaving">{{isSaving ? 'Saving...' : 'Save'}}</button>
+                </div>
+                <div class="card-footer">
+                    <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
+                        <div class="form-group">
+                            <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
+                                <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" [disabled]="!selectedLanguage">Add</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

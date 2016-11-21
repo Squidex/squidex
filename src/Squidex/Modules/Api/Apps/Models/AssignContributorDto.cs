@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  PutContributorDto.cs
+//  AssignContributorDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

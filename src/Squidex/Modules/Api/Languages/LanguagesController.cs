@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Modules.Api.Languages
@@ -22,7 +23,7 @@ namespace Squidex.Modules.Api.Languages
         [Route("languages/")]
         public IActionResult GetLanguages()
         {
-            var model = Language.AllLanguages.ToList();
+            var model = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
 
             return Ok(model);
         }

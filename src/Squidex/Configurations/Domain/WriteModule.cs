@@ -30,9 +30,17 @@ namespace Squidex.Configurations.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
+            builder.RegisterType<EnrichWithTimestampHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
             builder.RegisterType<AppCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
+
+            builder.RegisterType<ClientKeyGenerator>()
+                .AsSelf()
+                .InstancePerDependency();
 
             builder.RegisterType<AppDomainObject>()
                 .AsSelf()

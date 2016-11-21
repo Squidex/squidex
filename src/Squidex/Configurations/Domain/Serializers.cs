@@ -24,6 +24,7 @@ namespace Squidex.Configurations.Domain
         {
             settings.SerializationBinder = new TypeNameSerializationBinder();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new PropertiesBagConverter());
             settings.NullValueHandling = NullValueHandling.Ignore;
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;

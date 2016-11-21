@@ -64,7 +64,11 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is AppContributorAssigned || @event.Payload is AppContributorRemoved)
+            if (@event.Payload is AppContributorAssigned || 
+                @event.Payload is AppContributorRemoved ||
+                @event.Payload is AppClientKeyCreated || 
+                @event.Payload is AppClientKeyRevoked ||
+                @event.Payload is AppLanguagesConfigured)
             {
                 var appName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
 

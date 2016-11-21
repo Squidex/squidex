@@ -1,0 +1,24 @@
+@import '_mixins';
+@import '_vars';
+
+$color-drag-border: #000;
+
+.dnd {
+    &-drag {
+        &-start,
+        &-enter {
+            @include opacity(.6);
+        }
+
+        &-start,
+        &-over,
+        &-enter {
+            border: 2px dashed $color-drag-border;
+        }
+    }
+
+    &-sortable-drag {
+        @include opacity(.6);
+        border: 2px dashed $color-drag-border;
+    }
+}

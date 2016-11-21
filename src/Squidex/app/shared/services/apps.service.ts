@@ -9,7 +9,6 @@ import * as Ng2 from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiUrlConfig, DateTime } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class AppDto {

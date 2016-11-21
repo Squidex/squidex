@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppContributorsController.cs
+//  AppLanguagesController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -15,7 +15,6 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Modules.Api.Apps.Models;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Services;
-using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Modules.Api.Apps
@@ -23,18 +22,18 @@ namespace Squidex.Modules.Api.Apps
     [Authorize(Roles = "app-owner")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    public class AppContributorsController : ControllerBase
+    public class AppLanguagesController : ControllerBase
     {
         private readonly IAppProvider appProvider;
 
-        public AppContributorsController(ICommandBus commandBus, IAppProvider appProvider) 
+        public AppLanguagesController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
             this.appProvider = appProvider;
         }
 
         [HttpGet]
-        [Route("apps/{app}/contributors/")]
+        [Route("apps/{app}/languages/")]
         public async Task<IActionResult> GetContributors(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -44,25 +43,16 @@ namespace Squidex.Modules.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
+            var model = entity.Languages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
 
             return Ok(model);
         }
 
         [HttpPost]
-        [Route("apps/{app}/contributors/")]
-        public async Task<IActionResult> PostContributor([FromBody] AssignContributorDto model)
+        [Route("apps/{app}/languages/")]
+        public async Task<IActionResult> PostLanguages([FromBody] ConfigureLanguagesDto model)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
-
-            return Ok();
-        }
-
-        [HttpDelete]
-        [Route("apps/{app}/contributors/{contributorId}/")]
-        public async Task<IActionResult> PutContributor(string contributorId)
-        {
-            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });
+            await CommandBus.PublishAsync(SimpleMapper.Map(model, new ConfigureLanguages()));
 
             return Ok();
         }

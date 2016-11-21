@@ -6,7 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,7 +17,7 @@ using Squidex.Read.Apps.Services;
 
 namespace Squidex.Pipeline
 {
-    public sealed class AppFilterAttribute : ActionFilterAttribute
+    public sealed class AppFilterAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly IAppProvider appProvider;
 
@@ -24,7 +26,7 @@ namespace Squidex.Pipeline
             this.appProvider = appProvider;
         }
 
-        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var appName = context.RouteData.Values["app"]?.ToString();
 
@@ -40,16 +42,30 @@ namespace Squidex.Pipeline
 
                 var subject = context.HttpContext.User.FindFirst(OpenIdClaims.Subject)?.Value;
 
-                if (subject == null || app.Contributors.All(x => x.ContributorId != subject))
+                if (subject == null)
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
+                var contributor = app.Contributors.FirstOrDefault(x => string.Equals(x.ContributorId, subject, StringComparison.OrdinalIgnoreCase));
+
+                if (contributor == null)
+                {
+                    context.Result = new NotFoundResult();
+                    return;
+                }
+
+                var roleName = $"app-{contributor.Permission.ToString().ToLowerInvariant()}";
+
+                var defaultIdentity = context.HttpContext.User.Identities.First();
+
+                defaultIdentity
+                    .AddClaim(
+                        new Claim(defaultIdentity.RoleClaimType, roleName));
+
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
             }
-
-            await next();
         }
     }
 }

@@ -70,6 +70,21 @@ namespace Squidex.Write.Apps
             return UpdateAsync(command, x => x.RemoveContributor(command));
         }
 
+        public Task On(CreateClientKey command)
+        {
+            return UpdateAsync(command, x => x.CreateClientKey(command));
+        }
+
+        public Task On(RevokeClientKey command)
+        {
+            return UpdateAsync(command, x => x.RevokeClientKey(command));
+        }
+
+        public Task On(ConfigureLanguages command)
+        {
+            return UpdateAsync(command, x => x.ConfigureLanguages(command));
+        }
+
         public override Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command);

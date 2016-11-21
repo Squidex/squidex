@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  CreateAppDto.cs
+//  ITimestampCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Modules.Api.Apps.Models
+using System;
+
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class CreateAppDto
+    public interface ITimestampCommand : ICommand
     {
-        public string Name { get; set; }
+        DateTime Timestamp { get; set; }
     }
 }

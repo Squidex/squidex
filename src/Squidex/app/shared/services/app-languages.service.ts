@@ -6,29 +6,23 @@
  */
 
 import * as Ng2 from '@angular/core';
+
 import { Observable } from 'rxjs';
 
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
-
-export class LanguageDto {
-    constructor(
-        public readonly iso2Code: string,
-        public readonly englishName: string
-    ) {
-    }
-}
+import { LanguageDto } from './languages.service';
 
 @Ng2.Injectable()
-export class LanguageService {
+export class AppLanguagesService {
     constructor(
         private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
 
-    public getLanguages(): Observable<LanguageDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl('api/languages'))
+    public getLanguages(appName: string): Observable<LanguageDto[]> {
+        return this.authService.authGet(this.apiUrl.buildUrl(`api/apps/${appName}/languages`))
                 .map(response => {                    
                     const body: any[] = response.json();
 
@@ -38,5 +32,9 @@ export class LanguageService {
                             item.englishName);
                     });
                 });
+    }
+
+    public postLanguages(appName: string, languageCodes: string[]): Observable<any> {
+        return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/languages`), { languages: languageCodes });
     }
 }

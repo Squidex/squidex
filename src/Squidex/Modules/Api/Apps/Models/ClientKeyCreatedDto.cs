@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateAppDto.cs
+//  ClientKeyCreatedDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,8 +8,8 @@
 
 namespace Squidex.Modules.Api.Apps.Models
 {
-    public sealed class CreateAppDto
+    public sealed class ClientKeyCreatedDto
     {
-        public string Name { get; set; }
+        public string ClientKey { get; set; }
     }
 }

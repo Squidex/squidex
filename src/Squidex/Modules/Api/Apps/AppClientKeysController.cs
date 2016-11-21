@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppContributorsController.cs
+//  AppClientKeysController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -23,18 +23,20 @@ namespace Squidex.Modules.Api.Apps
     [Authorize(Roles = "app-owner")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    public class AppContributorsController : ControllerBase
+    public class AppClientKeysController : ControllerBase
     {
         private readonly IAppProvider appProvider;
+        private readonly ClientKeyGenerator keyGenerator;
 
-        public AppContributorsController(ICommandBus commandBus, IAppProvider appProvider) 
+        public AppClientKeysController(ICommandBus commandBus, IAppProvider appProvider, ClientKeyGenerator keyGenerator)
             : base(commandBus)
         {
             this.appProvider = appProvider;
+            this.keyGenerator = keyGenerator;
         }
 
         [HttpGet]
-        [Route("apps/{app}/contributors/")]
+        [Route("apps/{app}/client-keys/")]
         public async Task<IActionResult> GetContributors(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -44,27 +46,20 @@ namespace Squidex.Modules.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
+            var model = entity.ClientKeys.Select(x => SimpleMapper.Map(x, new ClientKeyDto())).ToList();
 
             return Ok(model);
         }
 
         [HttpPost]
-        [Route("apps/{app}/contributors/")]
-        public async Task<IActionResult> PostContributor([FromBody] AssignContributorDto model)
+        [Route("apps/{app}/client-keys/")]
+        public async Task<IActionResult> PostClientKey()
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
+            var clientKey = keyGenerator.GenerateKey();
 
-            return Ok();
-        }
+            await CommandBus.PublishAsync(new CreateClientKey { ClientKey = clientKey });
 
-        [HttpDelete]
-        [Route("apps/{app}/contributors/{contributorId}/")]
-        public async Task<IActionResult> PutContributor(string contributorId)
-        {
-            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });
-
-            return Ok();
+            return Ok(new ClientKeyCreatedDto { ClientKey = clientKey });
         }
     }
 }

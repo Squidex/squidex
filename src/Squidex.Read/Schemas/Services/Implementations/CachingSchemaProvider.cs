@@ -64,7 +64,8 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
         public Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is SchemaUpdated || @event.Payload is SchemaDeleted)
+            if (@event.Payload is SchemaUpdated || 
+                @event.Payload is SchemaDeleted)
             {
                 var oldName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
 

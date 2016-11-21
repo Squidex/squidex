@@ -8,36 +8,78 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
+using Squidex.Read.Apps;
+using Squidex.Read.Apps.Services;
 
 namespace Squidex.Configurations.Identity
 {
     public class LazyClientStore : IClientStore
     {
-        private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
+        private readonly IAppProvider appProvider;
+        private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(IOptions<MyIdentityOptions> identityOptions)
+        public LazyClientStore(IOptions<MyIdentityOptions> identityOptions, IAppProvider appProvider)
         {
             Guard.NotNull(identityOptions, nameof(identityOptions));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
-            foreach (var client in CreateClients(identityOptions.Value))
+            this.appProvider = appProvider;
+
+            CreateStaticClients(identityOptions);
+        }
+
+        public async Task<Client> FindClientByIdAsync(string clientId)
+        {
+            var client = staticClients.GetOrDefault(clientId);
+
+            if (client == null)
             {
-                clients[client.ClientId] = client;
+                return null;
+            }
+
+            var app = await appProvider.FindAppByNameAsync(clientId);
+
+            if (app != null)
+            {
+                client = CreateClientFromApp(app);
+            }
+
+            return client;
+        }
+
+        private void CreateStaticClients(IOptions<MyIdentityOptions> identityOptions)
+        {
+            foreach (var client in CreateStaticClients(identityOptions.Value))
+            {
+                staticClients[client.ClientId] = client;
             }
         }
 
-        public Task<Client> FindClientByIdAsync(string clientId)
+        private static Client CreateClientFromApp(IAppEntity app)
         {
-            var client = clients.GetOrDefault(clientId);
+            var id = app.Name;
 
-            return Task.FromResult(client);
+            return new Client
+            {
+                ClientId = id,
+                ClientName = id,
+                ClientSecrets = app.ClientKeys.Select(x => new Secret(x.ClientKey, x.ExpiresUtc)).ToList(),
+                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                AllowedScopes = new List<string>
+                {
+                    Constants.ApiScope
+                }
+            };
         }
 
-        private static IEnumerable<Client> CreateClients(MyIdentityOptions options)
+        private static IEnumerable<Client> CreateStaticClients(MyIdentityOptions options)
         {
             const string id = Constants.FrontendClient;
 

@@ -1,15 +1,20 @@
 ﻿// ==========================================================================
-//  CreateAppDto.cs
+//  AppLanguagesConfigured.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Modules.Api.Apps.Models
+using System.Collections.Generic;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
+
+namespace Squidex.Events.Apps
 {
-    public sealed class CreateAppDto
+    [TypeName("AppLanguagesConfigured")]
+    public sealed class AppLanguagesConfigured : IEvent
     {
-        public string Name { get; set; }
+        public List<Language> Languages { get; set; }
     }
 }

@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  CreateAppDto.cs
+//  LanguageDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Modules.Api.Apps.Models
+namespace Squidex.Modules.Api
 {
-    public sealed class CreateAppDto
+    public class LanguageDto
     {
-        public string Name { get; set; }
+        public string Iso2Code { get; set; }
+
+        public string EnglishName { get; set; }
     }
 }
