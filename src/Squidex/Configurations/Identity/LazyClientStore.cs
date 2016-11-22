@@ -24,14 +24,14 @@ namespace Squidex.Configurations.Identity
         private readonly IAppProvider appProvider;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(IOptions<MyIdentityOptions> identityOptions, IAppProvider appProvider)
+        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appProvider)
         {
-            Guard.NotNull(identityOptions, nameof(identityOptions));
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
 
-            CreateStaticClients(identityOptions);
+            CreateStaticClients(urlsOptions);
         }
 
         public async Task<Client> FindClientByIdAsync(string clientId)
@@ -53,9 +53,9 @@ namespace Squidex.Configurations.Identity
             return client;
         }
 
-        private void CreateStaticClients(IOptions<MyIdentityOptions> identityOptions)
+        private void CreateStaticClients(IOptions<MyUrlsOptions> urlsOptions)
         {
-            foreach (var client in CreateStaticClients(identityOptions.Value))
+            foreach (var client in CreateStaticClients(urlsOptions.Value))
             {
                 staticClients[client.ClientId] = client;
             }
@@ -79,7 +79,7 @@ namespace Squidex.Configurations.Identity
             };
         }
 
-        private static IEnumerable<Client> CreateStaticClients(MyIdentityOptions options)
+        private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions)
         {
             const string id = Constants.FrontendClient;
 
@@ -89,13 +89,13 @@ namespace Squidex.Configurations.Identity
                 ClientName = id,
                 RedirectUris = new List<string>
                 {
-                    options.BuildUrl("login;"),
-                    options.BuildUrl("identity-server/client-callback-silent/"),
-                    options.BuildUrl("identity-server/client-callback-popup/")
+                    urlsOptions.BuildUrl("login;"),
+                    urlsOptions.BuildUrl("identity-server/client-callback-silent/"),
+                    urlsOptions.BuildUrl("identity-server/client-callback-popup/")
                 },
                 PostLogoutRedirectUris = new List<string>
                 {
-                    options.BuildUrl("logout", false)
+                    urlsOptions.BuildUrl("logout", false)
                 },
                 AllowAccessTokensViaBrowser = true,
                 AllowedGrantTypes = GrantTypes.Implicit,

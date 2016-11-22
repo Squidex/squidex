@@ -9,6 +9,9 @@ namespace Squidex.Modules.Api
 {
     public class EntityCreatedDto
     {
+        /// <summary>
+        /// Id of the created entity.
+        /// </summary>
         public object Id { get; set; }
     }
 }

@@ -6,14 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Configurations.Identity
 {
     public sealed class MyIdentityOptions
     {
-        public string BaseUrl { get; set; }
-
         public string DefaultUsername { get; set; }
 
         public string DefaultPassword { get; set; }
@@ -23,19 +19,5 @@ namespace Squidex.Configurations.Identity
         public string GoogleSecret { get; set; }
 
         public bool RequiresHttps { get; set; }
-
-        public string BuildUrl(string path, bool trailingSlash = true)
-        {
-            var url = $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}";
-
-            if (trailingSlash && 
-                url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
-                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0) 
-            {
-                url = url + "/";
-            }
-
-            return url;
-        }
     }
 }

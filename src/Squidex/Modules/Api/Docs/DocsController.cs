@@ -1,21 +1,24 @@
 ﻿// ==========================================================================
-//  ConfigureLanguagesDto.cs
+//  DocsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 
-namespace Squidex.Modules.Api.Apps.Models
+namespace Squidex.Modules.Api.Docs
 {
-    public class ConfigureLanguagesDto
+    [SwaggerIgnore]
+    public sealed class DocsController : Controller
     {
-        /// <summary>
-        /// The list of languages to configure the app.
-        /// </summary>
-        public List<Language> Languages { get; set; }
+        [HttpGet]
+        [Route("docs/")]
+        public IActionResult Docs()
+        {
+            return View();
+        }
     }
 }

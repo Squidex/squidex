@@ -74,6 +74,8 @@ namespace Squidex
                 Configuration.GetSection("stores:mongoDb"));
             services.Configure<MyEventStoreOptions>(
                 Configuration.GetSection("stores:eventStore"));
+            services.Configure<MyUrlsOptions>(
+                Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 Configuration.GetSection("identity"));
 
@@ -98,7 +100,7 @@ namespace Squidex
             {
                 app.UseMiddleware<SingleUrlsMiddleware>();
             }
-            
+
             MapAndUseIdentity(app);
             MapAndUseApi(app);
             MapAndUseFrontend(app);
@@ -137,6 +139,7 @@ namespace Squidex
                     appApi.UseDeveloperExceptionPage();
                 }
 
+                appApi.UseMySwagger();
                 appApi.UseMyApiProtection();
 
                 appApi.MapWhen(x => !IsIdentityRequest(x), mvcApp =>

@@ -89,17 +89,20 @@ namespace Squidex.Configurations.Identity
         {
             const string apiScope = Constants.ApiScope;
 
-            var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
+            var urlsOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
 
-            if (!string.IsNullOrWhiteSpace(options.BaseUrl))
+            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
             {
-                var apiAuthorityUrl = options.BuildUrl(Constants.IdentityPrefix);
-                
+                var apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityPrefix);
+
+                var identityOptions = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
+
                 app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
                 {
                     Authority = apiAuthorityUrl,
                     ScopeName = apiScope,
-                    RequireHttpsMetadata = options.RequiresHttps
+                    ScopeSecret = null,
+                    RequireHttpsMetadata = identityOptions.RequiresHttps
                 });
             }
 

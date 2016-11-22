@@ -9,6 +9,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Modules.Api.Schemas.Models;
@@ -20,6 +21,7 @@ namespace Squidex.Modules.Api.Schemas
     [Authorize]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerIgnore]
     public class SchemasFieldsController : ControllerBase
     {
         public SchemasFieldsController(ICommandBus commandBus)

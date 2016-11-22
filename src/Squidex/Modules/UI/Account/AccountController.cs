@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Squidex.Infrastructure.Security;
 
 // ReSharper disable RedundantIfElseBlock
@@ -21,6 +22,7 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Modules.UI.Account
 {
+    [SwaggerIgnore]
     public sealed class AccountController : Controller
     {
         private readonly SignInManager<IdentityUser> signInManager;

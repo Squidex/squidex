@@ -12,11 +12,20 @@ namespace Squidex.Modules.Api
 {
     public sealed class ErrorDto
     {
+        /// <summary>
+        /// Error message.
+        /// </summary>
         [Required]
         public string Message { get; set; }
 
+        /// <summary>
+        /// Detailed error messages.
+        /// </summary>
         public string[] Details { get; set; }
 
+        /// <summary>
+        /// Status code of the http response.
+        /// </summary>
         public int? StatusCode { get; set; } = 400;
     }
 }
