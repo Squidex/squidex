@@ -35,6 +35,7 @@ export class AppLanguagesService {
     }
 
     public postLanguages(appName: string, languageCodes: string[]): Observable<any> {
+        languageCodes = [ null, null ];
         return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/languages`), { languages: languageCodes });
     }
 }

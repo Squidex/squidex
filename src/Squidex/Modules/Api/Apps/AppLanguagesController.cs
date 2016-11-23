@@ -20,9 +20,13 @@ using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Modules.Api.Apps
 {
+    /// <summary>
+    /// Manages and configures apps.
+    /// </summary>
     [Authorize(Roles = "app-owner")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerTag("Apps")]
     public class AppLanguagesController : ControllerBase
     {
         private readonly IAppProvider appProvider;
@@ -37,10 +41,12 @@ namespace Squidex.Modules.Api.Apps
         /// Get app languages.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Language configuration returned.
+        /// </returns>
         [HttpGet]
         [Route("apps/{app}/languages/")]
-        [SwaggerTags("Apps")]
-        [DescribedResponseType(200, typeof(AppDto[]), "Language configuration returned.")]
+        [ProducesResponseType(typeof(LanguageDto[]), 200)]
         public async Task<IActionResult> GetLanguages(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -60,6 +66,10 @@ namespace Squidex.Modules.Api.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="model">The language configuration for the app.</param>
+        /// <returns>
+        /// 201 => App languages configured.
+        /// 400 => Language configuration is empty or contains an invalid language.
+        /// </returns>
         /// <remarks>
         /// The ordering of the languages matterns: When you retrieve a content with a localized content squidex tries
         /// to resolve the correct language for these properties. When there is no value for a property in the specified language,
@@ -67,9 +77,7 @@ namespace Squidex.Modules.Api.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/languages/")]
-        [SwaggerTags("Apps")]
-        [DescribedResponseType(400, typeof(ErrorDto[]), "Language configuration is empty.")]
-        [DescribedResponseType(400, typeof(ErrorDto[]), "Language configuration contains an invalid language.")]
+        [ProducesResponseType(typeof(ErrorDto[]), 400)]
         public async Task<IActionResult> PostLanguages(string app, [FromBody] ConfigureLanguagesDto model)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new ConfigureLanguages()));

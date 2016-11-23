@@ -18,9 +18,12 @@ using Squidex.Read.Users.Repositories;
 
 namespace Squidex.Modules.Api.Users
 {
+    /// <summary>
+    /// Readonly API to retrieve information about squidex users.
+    /// </summary>
     [Authorize]
     [ApiExceptionFilter]
-    [SwaggerTag("Users", Description = "Readonly API to retrieve information about squidex users.")]
+    [SwaggerTag("Users")]
     public class UsersController : Controller
     {
         private readonly IUserRepository userRepository;
@@ -37,10 +40,12 @@ namespace Squidex.Modules.Api.Users
         /// <remarks>
         /// Search the user by query that contains the email address or the part of the email address.
         /// </remarks>
+        /// <returns>
+        /// 200 => Users returned.
+        /// </returns>
         [HttpGet]
         [Route("users")]
-        [SwaggerTags("Users")]
-        [DescribedResponseType(200, typeof(UserDto[]), "Users returned.")]
+        [ProducesResponseType(typeof(UserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
             var entities = await userRepository.FindUsersByQuery(query ?? string.Empty);
@@ -54,11 +59,13 @@ namespace Squidex.Modules.Api.Users
         /// Get user by id.
         /// </summary>
         /// <param name="id">The id of the user (GUID).</param>
+        /// <returns>
+        /// 200 => User found.
+        /// 400 => User not found.
+        /// </returns>
         [HttpGet]
         [Route("users/{id}/")]
-        [SwaggerTags("Users")]
-        [DescribedResponseType(200, typeof(UserDto), "User found.")]
-        [DescribedResponseType(404, typeof(void), "User not found.")]
+        [ProducesResponseType(typeof(UserDto), 200)]
         public async Task<IActionResult> GetUser(string id)
         {
             var entity = await userRepository.FindUserByIdAsync(id);

@@ -20,9 +20,13 @@ using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Modules.Api.Apps
 {
+    /// <summary>
+    /// Manages and configures apps.
+    /// </summary>
     [Authorize(Roles = "app-owner")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerTag("Apps")]
     public class AppContributorsController : ControllerBase
     {
         private readonly IAppProvider appProvider;
@@ -37,9 +41,12 @@ namespace Squidex.Modules.Api.Apps
         /// Get contributors for the app.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => App contributors returned.
+        /// </returns>
         [HttpGet]
         [Route("apps/{app}/contributors/")]
-        [SwaggerTags("Apps")]
+        [ProducesResponseType(typeof(ContributorDto[]), 200)]
         public async Task<IActionResult> GetContributors(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -59,10 +66,13 @@ namespace Squidex.Modules.Api.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="model">Contributor object that needs to be added to the app.</param>
+        /// <returns>
+        /// 200 => User assigned to app.
+        /// 400 => User is already assigned to the app or not found.
+        /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [SwaggerTags("Apps")]
-        [DescribedResponseType(400, typeof(ErrorDto), "User is already assigned to the app or not found.")]
+        [ProducesResponseType(typeof(ErrorDto[]), 400)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto model)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
@@ -75,10 +85,13 @@ namespace Squidex.Modules.Api.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="contributorId"></param>
+        /// <returns>
+        /// 200 => User removed from app.
+        /// 400 => User is not assigned to the app.
+        /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{contributorId}/")]
-        [SwaggerTags("Apps")]
-        [DescribedResponseType(400, typeof(ErrorDto), "User is not assigned to the app.")]
+        [ProducesResponseType(typeof(ErrorDto[]), 400)]
         public async Task<IActionResult> DeleteContributor(string app, string contributorId)
         {
             await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });

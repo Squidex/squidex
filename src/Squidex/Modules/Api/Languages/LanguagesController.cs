@@ -16,9 +16,12 @@ using Squidex.Pipeline;
 
 namespace Squidex.Modules.Api.Languages
 {
+    /// <summary>
+    /// Readonly API to the supported langauges.
+    /// </summary>
     [Authorize]
     [ApiExceptionFilter]
-    [SwaggerTag("Languages", Description = "Readonly API to the supported langauges.")]
+    [SwaggerTag("Languages")]
     public class LanguagesController : Controller
     {
         /// <summary>
@@ -27,11 +30,12 @@ namespace Squidex.Modules.Api.Languages
         /// <remarks>
         /// Provide a list of supported langauges code, following the ISO2Code standard.
         /// </remarks>
-        /// <response code="200">Language codes returned.</response>
+        /// <returns>
+        /// 200 => Supported language codes returned.
+        /// </returns>
         [HttpGet]
         [Route("languages/")]
-        [SwaggerTags("Languages")]
-        [DescribedResponseType(200, typeof(string[]), "Supported languages returned.")]
+        [ProducesResponseType(typeof(string[]), 200)]
         public IActionResult GetLanguages()
         {
             var model = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();

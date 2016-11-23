@@ -5,6 +5,9 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
+using System.ComponentModel.DataAnnotations;
+
 namespace Squidex.Modules.Api
 {
     public class EntityCreatedDto
@@ -12,6 +15,7 @@ namespace Squidex.Modules.Api
         /// <summary>
         /// Id of the created entity.
         /// </summary>
-        public object Id { get; set; }
+        [Required]
+        public string Id { get; set; }
     }
 }

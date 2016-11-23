@@ -22,6 +22,7 @@ using Squidex.Configurations;
 using Squidex.Configurations.Domain;
 using Squidex.Configurations.EventStore;
 using Squidex.Configurations.Identity;
+using Squidex.Configurations.Swagger;
 using Squidex.Configurations.Web;
 using Squidex.Pipeline;
 using Squidex.Store.MongoDb;

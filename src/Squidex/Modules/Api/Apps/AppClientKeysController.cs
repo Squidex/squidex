@@ -21,9 +21,13 @@ using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Modules.Api.Apps
 {
+    /// <summary>
+    /// Manages and configures apps.
+    /// </summary>
     [Authorize(Roles = "app-owner")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerTag("Apps")]
     public class AppClientKeysController : ControllerBase
     {
         private readonly IAppProvider appProvider;
@@ -40,13 +44,15 @@ namespace Squidex.Modules.Api.Apps
         /// Get app client keys.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Client keys returned.
+        /// </returns>
         /// <remarks>
         /// Gets all configured client keys for the app with the specified name.
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/client-keys/")]
-        [SwaggerTags("Apps")]
-        [DescribedResponseType(200, typeof(ClientKeyDto[]), "Client keys returned..")]
+        [ProducesResponseType(typeof(ClientKeyDto[]), 200)]
         public async Task<IActionResult> GetContributors(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -65,6 +71,9 @@ namespace Squidex.Modules.Api.Apps
         /// Create new client key.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 201 => Client key generated.
+        /// </returns>
         /// <remarks>
         /// Create a new client key for the app with the specified name. 
         /// The client key is auto generated on the server and returned.
@@ -72,7 +81,7 @@ namespace Squidex.Modules.Api.Apps
         [HttpPost]
         [Route("apps/{app}/client-keys/")]
         [SwaggerTags("Apps")]
-        [DescribedResponseType(201, typeof(ClientKeyCreatedDto[]), "Client key created.")]
+        [ProducesResponseType(typeof(ClientKeyCreatedDto[]), 201)]
         public async Task<IActionResult> PostClientKey(string app)
         {
             var clientKey = keyGenerator.GenerateKey();
