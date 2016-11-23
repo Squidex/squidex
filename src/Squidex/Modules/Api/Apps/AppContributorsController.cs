@@ -62,7 +62,7 @@ namespace Squidex.Modules.Api.Apps
         [HttpPost]
         [Route("apps/{app}/contributors/")]
         [SwaggerTags("Apps")]
-        [DescribedResponseType(400, typeof(ErrorDto), "User is already contributed to the app or user not found.")]
+        [DescribedResponseType(400, typeof(ErrorDto), "User is already assigned to the app or not found.")]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto model)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
@@ -78,7 +78,7 @@ namespace Squidex.Modules.Api.Apps
         [HttpDelete]
         [Route("apps/{app}/contributors/{contributorId}/")]
         [SwaggerTags("Apps")]
-        [DescribedResponseType(400, typeof(ErrorDto), "User is not a contributor of the app.")]
+        [DescribedResponseType(400, typeof(ErrorDto), "User is not assigned to the app.")]
         public async Task<IActionResult> DeleteContributor(string app, string contributorId)
         {
             await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });

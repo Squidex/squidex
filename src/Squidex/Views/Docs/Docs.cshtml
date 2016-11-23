@@ -4,6 +4,20 @@
     <title>API Docs</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        h1,
+        .menu-header,
+        .menu-cat-header:hover,
+        .menu-cat-header.active {
+            color: #3f83df !important;
+        }
+    </style>
 </head>
 <body>
     <redoc spec-url="@Url.Content("~/swagger/v1/swagger.json")"></redoc>
