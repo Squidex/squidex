@@ -54,7 +54,7 @@ export class AppClientsService {
                 .map(response => new AppClientDto(response.clientName, response.clientSecret, DateTime.parseISO_UTC(response.expiresUtc)))
                 .catch(response => {
                     if (response.status === 400) {
-                        return Observable.throw('An client with the same name already exists.');
+                        return Observable.throw('A client with the same name already exists.');
                     } else {
                         return Observable.throw('A new client could not be created.');
                     }

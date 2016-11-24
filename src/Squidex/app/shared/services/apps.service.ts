@@ -55,12 +55,12 @@ export class AppsService {
                 });
     }
 
-    public postApp(appToCreate: AppCreateDto, now?: DateTime): Observable<AppDto> {
+    public postApp(app: AppCreateDto, now?: DateTime): Observable<AppDto> {
         now = now || DateTime.now();
 
-        return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), appToCreate)
+        return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), app)
                 .map(response => response.json())
-                .map(response => new AppDto(response.id, appToCreate.name, now, now, 'Owner'))
+                .map(response => new AppDto(response.id, app.name, now, now, 'Owner'))
                 .catch(response => {
                     if (response.status === 400) {
                         return Observable.throw('An app with the same name already exists.');

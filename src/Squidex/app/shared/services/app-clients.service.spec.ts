@@ -91,6 +91,52 @@ describe('AppClientsService', () => {
         authService.verifyAll();
     });
 
+    it('should throw fallback error on 500 when creating client failed', () => {
+        const createClient = new AppClientCreateDto('client1');
+
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.is(c => c === createClient)))
+            .returns(() => Observable.throw(
+                new Ng2Http.Response(
+                    new Ng2Http.ResponseOptions({
+                        status: 500
+                    })
+                )
+            ));
+
+        let error = '';
+
+        appClientsService.postClient('my-app', createClient).subscribe(x => {}, result => {
+            error = result;
+        }).unsubscribe();
+
+        expect(error).toBe('A new client could not be created.');
+
+        authService.verifyAll();
+    });
+
+    it('should throw duplicate error on 400 when creating client failed', () => {
+        const createClient = new AppClientCreateDto('client1');
+
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.is(c => c === createClient)))
+            .returns(() => Observable.throw(
+                new Ng2Http.Response(
+                    new Ng2Http.ResponseOptions({
+                        status: 400
+                    })
+                )
+            ));
+
+        let error = '';
+
+        appClientsService.postClient('my-app', createClient).subscribe(x => {}, result => {
+            error = result;
+        }).unsubscribe();
+
+        expect(error).toBe('A client with the same name already exists.');
+
+        authService.verifyAll();
+    });
+
     it('should make delete request to remove client', () => {
         authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/clients/client1'))
             .returns(() => Observable.of(

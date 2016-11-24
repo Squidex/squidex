@@ -66,9 +66,10 @@ describe('AppsService', () => {
     });
 
     it('should make post request to create app', () => {
+        const createApp = new AppCreateDto('new-app');
         const now = DateTime.now();
 
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(y => y['name'] === 'new-app')))
+        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -81,7 +82,7 @@ describe('AppsService', () => {
 
         let newApp: AppDto = null;
 
-        appsService.postApp(new AppCreateDto('new-app'), now).subscribe(result => {
+        appsService.postApp(createApp, now).subscribe(result => {
             newApp = result;
         }).unsubscribe();
 
@@ -91,7 +92,9 @@ describe('AppsService', () => {
     });
 
     it('should throw fallback error on 500 when creating app failed', () => {
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isAny()))
+        const createApp = new AppCreateDto('new-app');
+        
+        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
             .returns(() => Observable.throw(
                 new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -102,7 +105,7 @@ describe('AppsService', () => {
 
         let error = '';
 
-        appsService.postApp(new AppCreateDto('new-app')).subscribe(x => {}, result => {
+        appsService.postApp(createApp).subscribe(x => {}, result => {
             error = result;
         }).unsubscribe();
 
@@ -112,7 +115,9 @@ describe('AppsService', () => {
     });
 
     it('should throw duplicate error on 400 when creating app failed', () => {
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isAny()))
+        const createApp = new AppCreateDto('new-app');
+        
+        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
             .returns(() => Observable.throw(
                 new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -123,7 +128,7 @@ describe('AppsService', () => {
 
         let error = '';
 
-        appsService.postApp(new AppCreateDto('new-app')).subscribe(x => {}, result => {
+        appsService.postApp(createApp).subscribe(x => {}, result => {
             error = result;
         }).unsubscribe();
 
