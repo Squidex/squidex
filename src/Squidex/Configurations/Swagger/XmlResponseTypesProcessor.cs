@@ -6,11 +6,15 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Text.RegularExpressions;
+using NJsonSchema;
 using NJsonSchema.Infrastructure;
 using NSwag;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Contexts;
+using Squidex.Modules.Api;
+// ReSharper disable UseObjectOrCollectionInitializer
 
 namespace Squidex.Configurations.Swagger
 {
@@ -20,6 +24,10 @@ namespace Squidex.Configurations.Swagger
 
         public bool Process(OperationProcessorContext context)
         {
+            var hasOkResponse = false;
+
+            var operation = context.OperationDescription.Operation;
+
             var returnsDescription = context.MethodInfo.GetXmlDocumentation("returns") ?? string.Empty;
 
             foreach (Match match in ResponseRegex.Matches(returnsDescription))
@@ -28,17 +36,58 @@ namespace Squidex.Configurations.Swagger
 
                 SwaggerResponse response;
 
-                if (!context.OperationDescription.Operation.Responses.TryGetValue(statusCode, out response))
+                if (!operation.Responses.TryGetValue(statusCode, out response))
                 {
                     response = new SwaggerResponse();
 
-                    context.OperationDescription.Operation.Responses[statusCode] = response;
+                    operation.Responses[statusCode] = response;
                 }
 
                 response.Description = match.Groups["Description"].Value;
+
+                if (statusCode == "200")
+                {
+                    hasOkResponse = true;
+                }
+            }
+            
+            AddInternalErrorResponse(context, operation);
+
+            if (!hasOkResponse)
+            {
+                RemoveOkResponse(operation);
             }
 
             return true;
+        }
+
+        private static void AddInternalErrorResponse(OperationProcessorContext context, SwaggerOperation operation)
+        {
+            if (operation.Responses.ContainsKey("500"))
+            {
+                return;    
+            }
+
+            var errorType = typeof(ErrorDto);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
+
+            var response = new SwaggerResponse { Description = "Operation failed." };
+
+            response.Schema = context.SwaggerGenerator.GenerateAndAppendSchemaFromType(errorType, errorSchema.IsNullable, null);
+
+            operation.Responses.Add("500", response);
+        }
+
+        private static void RemoveOkResponse(SwaggerOperation operation)
+        {
+            SwaggerResponse response;
+
+            if (operation.Responses.TryGetValue("200", out response) &&
+                response.Description != null &&
+                response.Description.Contains("=>"))
+            {
+                operation.Responses.Remove("200");
+            }
         }
     }
 }

@@ -50,9 +50,9 @@ namespace Squidex.Modules.Api.Users
         {
             var entities = await userRepository.FindUsersByQuery(query ?? string.Empty);
 
-            var model = entities.Select(x => SimpleMapper.Map(x, new UserDto())).ToList();
+            var response = entities.Select(x => SimpleMapper.Map(x, new UserDto())).ToList();
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>
@@ -75,9 +75,9 @@ namespace Squidex.Modules.Api.Users
                 return NotFound();
             }
 
-            var model = SimpleMapper.Map(entity, new UserDto());
+            var response = SimpleMapper.Map(entity, new UserDto());
 
-            return Ok(model);
+            return Ok(response);
         } 
     }
 }

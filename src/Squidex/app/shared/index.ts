@@ -9,7 +9,7 @@ export * from './guards/app-must-exist.guard';
 export * from './guards/must-be-authenticated.guard';
 export * from './guards/must-be-not-authenticated.guard';
 export * from './services/app-contributors.service';
-export * from './services/app-client-keys.service';
+export * from './services/app-clients.service';
 export * from './services/app-languages.service';
 export * from './services/apps-store.service';
 export * from './services/apps.service';

@@ -1,0 +1,91 @@
+<div class="layout">
+    <div class="layout-left">
+        <sqx-left-menu></sqx-left-menu>
+    </div>
+    <div class="layout-middle">
+        <div class="layout-middle-header">
+            <h1>
+                <i class="layout-title-icon icon-settings"></i> Clients
+            </h1>
+        </div>
+        <div class="layout-middle-content">
+            <div class="card">
+                <div class="card-block">
+                    <div class="clients-empty" *ngIf="appClients && appClients.length === 0">
+                        No client created yet.
+                    </div>
+
+                    <table class="table table-borderless-top table-fixed clients-table">
+                        <colgroup>
+                            <col style="width: 100%" />
+                            <col style="width: 160px" />
+                        </colgroup>
+
+                        <tr *ngFor="let client of appClients">
+                            <td>
+                                <table class="table table-middle table-sm table-borderless table-fixed client-info">
+                                    <colgroup>
+                                        <col style="width: 160px; text-align: right;" />
+                                        <col style="width: 100%" />
+                                    </colgroup>
+                                    <tr>
+                                        <td>Client Name:</td>
+                                        <td>
+                                            <input readonly class="form-control" [attr.value]="fullAppName(client)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Client Secret:</td>
+                                        <td>
+                                            <input readonly class="form-control" [attr.value]="client.clientSecret" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Expires:</td>
+                                        <td class="client-expires">
+                                            {{client.expiresUtc}}
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                            <td>
+                                <button class="btn btn-block btn-danger client-delete" (click)="revokeClient(client)">Revoke</button>
+                                <button class="btn btn-block btn-default">Create Token</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <div *ngIf="creationError" [@fade]>
+                        <div class="form-error">
+                            {{creationError}}
+                        </div>
+                    </div>
+
+                    <form class="form-inline" [formGroup]="createForm" (submit)="attachClient()">
+                        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty">
+                            <div class="errors">
+                                <span *ngIf="createForm.get('name').hasError('required')">
+                                    Name is required.
+                                </span>
+                                <span *ngIf="createForm.get('name').hasError('maxlength')">
+                                    Name can not have more than 40 characters.
+                                </span>
+                                <span *ngIf="createForm.get('name').hasError('pattern')">
+                                    Name can contain lower case letters (a-z), numbers and dashes (not at the end).
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="app-name" formControlName="name" placeholder="Enter client name" />
+                        </div>
+
+                        <button type="submit" class="btn btn-success" [disabled]="createForm.invalid">Create Client</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

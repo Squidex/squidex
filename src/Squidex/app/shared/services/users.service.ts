@@ -32,10 +32,11 @@ export class UsersService {
 
     public getUsers(query?: string): Observable<UserDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/users/?query=${query || ''}`))
+                .map(response => response.json())
                 .map(response => {                    
-                    const body: any[] = response.json() || [];
+                    const items: any[] = response;
 
-                    return body.map(item => {
+                    return items.map(item => {
                         return new UserDto(
                             item.id,
                             item.email,
@@ -47,14 +48,13 @@ export class UsersService {
 
     public getUser(id: string): Observable<UserDto> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/users/${id}`))
+                .map(response => response.json())
                 .map(response => {                    
-                    const body: any = response.json();
-
                     return new UserDto(
-                        body.id,
-                        body.email,
-                        body.displayName,
-                        body.pictureUrl);
+                        response.id,
+                        response.email,
+                        response.displayName,
+                        response.pictureUrl);
                 });
     }
 }

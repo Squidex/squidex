@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -18,15 +17,17 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Modules.Api.Schemas.Models;
 using Squidex.Pipeline;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Store.MongoDb.Schemas.Models;
 using Squidex.Write.Schemas.Commands;
 
 namespace Squidex.Modules.Api.Schemas
 {
-    [Authorize]
+    /// <summary>
+    /// Manages and retrieves information about schemas.
+    /// </summary>
+    [Authorize("app-owner,app-developer")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    [SwaggerIgnore]
+    [SwaggerTag("Schemas")]
     public class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
@@ -37,18 +38,36 @@ namespace Squidex.Modules.Api.Schemas
             this.schemaRepository = schemaRepository;
         }
 
+        /// <summary>
+        /// Get app schemas.
+        /// </summary>
+        /// <returns>
+        /// 200 => Schemas returned.
+        /// </returns>
         [HttpGet]
         [Route("apps/{app}/schemas/")]
-        public async Task<List<ListSchemaDto>> Query()
+        [ProducesResponseType(typeof(SchemaDto[]), 200)]
+        public async Task<IActionResult> GetSchemas()
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
 
-            return schemas.Select(s => SimpleMapper.Map(s, new ListSchemaDto())).ToList();
+            var model = schemas.Select(s => SimpleMapper.Map(s, new SchemaDto())).ToList();
+
+            return Ok(model);
         }
 
+        /// <summary>
+        /// Get a schema by name.
+        /// </summary>
+        /// <param name="name">The name of the schema to retrieve.</param>
+        /// <returns>
+        /// 200 => Schema found.
+        /// 404 => Schema not found.
+        /// </returns>
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
-        public async Task<ActionResult> Get(string name)
+        [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
+        public async Task<IActionResult> GetSchema(string name)
         {
             var entity = await schemaRepository.FindSchemaAsync(AppId, name);
 
@@ -57,25 +76,45 @@ namespace Squidex.Modules.Api.Schemas
                 return NotFound();
             }
 
-            var model = SchemaDto.Create(entity.Schema);
-
-            return Ok(model);
+            return Ok(null);
         }
 
+        /// <summary>
+        /// Create a new schema.
+        /// </summary>
+        /// <param name="model">The schema object that needs to be added to the app.</param>
+        /// <param name="app">The name of the app to create the schema to.</param>
+        /// <returns>
+        /// 201 => Schema created.  
+        /// 400 => Schema name is not valid.
+        /// 409 => Schema name already in use.
+        /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/")]
-        public async Task<ActionResult> Create([FromBody] CreateSchemaDto model)
+        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 409)]
+        public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto model)
         {
             var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
 
             await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction("Get", new { name = model.Name }, new EntityCreatedDto { Id = command.Name });
+            return CreatedAtAction(nameof(GetSchema), new { name = model.Name }, new EntityCreatedDto { Id = command.Name });
         }
 
+        /// <summary>
+        /// Update a schema.
+        /// </summary>
+        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="model">The schema object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Schema updated.
+        /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/")]
-        public async Task<ActionResult> Update(string name, [FromBody] UpdateSchemaDto model)
+        public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto model)
         {
             var command = SimpleMapper.Map(model, new UpdateSchema());
 
@@ -84,9 +123,17 @@ namespace Squidex.Modules.Api.Schemas
             return NoContent();
         }
 
+        /// <summary>
+        /// Delete a schema.
+        /// </summary>
+        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="name">The name of the schema to delete.</param>
+        /// <returns>
+        /// 204 => Schema has been deleted.
+        /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/")]
-        public async Task<ActionResult> Delete(string name)
+        public async Task<IActionResult> DeleteSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new DeleteSchema());
 

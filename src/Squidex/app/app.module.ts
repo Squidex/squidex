@@ -14,7 +14,7 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     ApiUrlConfig,
-    AppClientKeysService,
+    AppClientsService,
     AppContributorsService,
     AppLanguagesService,
     AppMustExistGuard,
@@ -62,7 +62,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         AppComponent
     ],
     providers: [
-        AppClientKeysService,
+        AppClientsService,
         AppContributorsService,
         AppLanguagesService,
         AppsStoreService,

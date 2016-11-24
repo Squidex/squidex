@@ -1,0 +1,44 @@
+@import '_vars';
+@import '_mixins';
+
+.layout-title-icon {
+    color: $color-section-settings;
+}
+
+.card {
+    & {
+        max-width: 700px;
+    }
+
+    &-block {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+}
+
+.clients {
+    &-empty {
+        color: $color-empty;
+        font-size: 1.2rem;
+        font-weight: lighter;
+        padding: .2rem 1rem;
+    }
+
+    &-table {
+        margin: 0;
+    }
+}
+
+.client {
+    &-delete {
+        margin-top: .3rem;
+    }
+
+    &-info {
+        margin: 0;
+    }
+
+    &-expires {
+        padding: .3rem .8rem;
+    }
+}

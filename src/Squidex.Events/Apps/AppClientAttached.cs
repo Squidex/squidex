@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppClientKeyRevoked.cs
+//  AppClientKeyCreated.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,10 +12,12 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
-    [TypeName("AppClientKeyRevoked")]
-    public sealed class AppClientKeyRevoked : IEvent
+    [TypeName("AppClientAttachedEvent")]
+    public sealed class AppClientAttached : IEvent
     {
-        public string ClientKey { get; set; }
+        public string ClientName { get; set; }
+
+        public string ClientSecret { get; set; }
 
         public DateTime ExpiresUtc { get; set; }
     }

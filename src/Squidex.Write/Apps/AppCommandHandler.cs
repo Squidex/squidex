@@ -20,22 +20,26 @@ namespace Squidex.Write.Apps
     {
         private readonly IAppRepository appRepository;
         private readonly IUserRepository userRepository;
+        private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
             IDomainObjectFactory domainObjectFactory, 
-            IDomainObjectRepository domainObjectRepository,
-            IAppRepository appRepository, 
-            IUserRepository userRepository) 
+            IDomainObjectRepository domainObjectRepository, 
+            IUserRepository userRepository,
+            IAppRepository appRepository,
+            ClientKeyGenerator keyGenerator) 
             : base(domainObjectFactory, domainObjectRepository)
         {
+            Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(userRepository, nameof(userRepository));
 
+            this.keyGenerator = keyGenerator;
             this.appRepository = appRepository;
             this.userRepository = userRepository;
         }
 
-        public Task On(CreateApp command)
+        protected Task On(CreateApp command, CommandContext context)
         {
             return CreateAsync(command, async x =>
             {
@@ -47,10 +51,12 @@ namespace Squidex.Write.Apps
                 }
 
                 x.Create(command);
+
+                context.Succeed(command.AggregateId);
             });
         }
 
-        public Task On(AssignContributor command)
+        protected Task On(AssignContributor command, CommandContext context)
         {
             return UpdateAsync(command, async x =>
             {
@@ -65,29 +71,36 @@ namespace Squidex.Write.Apps
             });
         }
 
-        public Task On(RemoveContributor command)
+        protected Task On(AttachClient command, CommandContext context)
+        {
+            return UpdateAsync(command, x =>
+            {
+                var clientKey = keyGenerator.GenerateKey();
+
+                x.AttachClient(command, clientKey);
+
+                context.Succeed(x.Clients[command.ClientName]);
+            });
+        }
+
+        protected Task On(RemoveContributor command, CommandContext context)
         {
             return UpdateAsync(command, x => x.RemoveContributor(command));
         }
 
-        public Task On(CreateClientKey command)
+        protected Task On(RevokeClient command, CommandContext context)
         {
-            return UpdateAsync(command, x => x.CreateClientKey(command));
+            return UpdateAsync(command, x => x.RevokeClient(command));
         }
 
-        public Task On(RevokeClientKey command)
-        {
-            return UpdateAsync(command, x => x.RevokeClientKey(command));
-        }
-
-        public Task On(ConfigureLanguages command)
+        protected Task On(ConfigureLanguages command, CommandContext context)
         {
             return UpdateAsync(command, x => x.ConfigureLanguages(command));
         }
 
         public override Task<bool> HandleAsync(CommandContext context)
         {
-            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command);
+            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
         }
     }
 }

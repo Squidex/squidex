@@ -16,24 +16,24 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Store.MongoDb.Schemas.Models
 {
-    public sealed class SchemaDto
+    public sealed class SchemaModel
     {
         public string Name { get; set; }
         
-        public Dictionary<long, FieldDto> Fields { get; set; }
+        public Dictionary<long, FieldModel> Fields { get; set; }
         
         public SchemaProperties Properties { get; set; }
 
-        public static SchemaDto Create(Schema schema)
+        public static SchemaModel Create(Schema schema)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var dto = new SchemaDto { Properties = schema.Properties, Name = schema.Name };
+            var dto = new SchemaModel { Properties = schema.Properties, Name = schema.Name };
 
             dto.Fields = 
                 schema.Fields.ToDictionary(
                     kvp => kvp.Key,
-                    kvp => FieldDto.Create(kvp.Value));
+                    kvp => FieldModel.Create(kvp.Value));
 
             return dto;
         }

@@ -161,14 +161,14 @@ namespace Squidex.Store.MongoDb.Schemas
 
         private void Serialize(MongoSchemaEntity entity, Schema schema)
         {
-            var dto = SchemaDto.Create(schema);
+            var dto = SchemaModel.Create(schema);
 
             entity.Schema = dto.ToJsonBsonDocument(serializerSettings);
         }
 
         private Schema Deserialize(MongoSchemaEntity entity)
         {
-            var dto = entity?.Schema.ToJsonObject<SchemaDto>(serializerSettings);
+            var dto = entity?.Schema.ToJsonObject<SchemaModel>(serializerSettings);
 
             return dto?.ToSchema(fieldRegistry);
         }

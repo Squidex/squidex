@@ -49,7 +49,7 @@ namespace Squidex.Store.MongoDb.Schemas
                 return;
             }
 
-            var dto = Schema.ToJsonObject<SchemaDto>(serializerSettings);
+            var dto = Schema.ToJsonObject<SchemaModel>(serializerSettings);
 
             schema = dto?.ToSchema(fieldRegistry);
         }

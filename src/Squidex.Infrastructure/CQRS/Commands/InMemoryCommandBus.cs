@@ -37,12 +37,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
                     if (isHandled)
                     {
-                        context.MarkSucceeded();
+                        context.Succeed();
                     }
                 }
                 catch (Exception e)
                 {
-                    context.MarkFailed(e);
+                    context.Fail(e);
                 }
             }
 

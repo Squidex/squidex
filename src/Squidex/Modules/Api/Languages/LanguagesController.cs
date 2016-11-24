@@ -38,9 +38,9 @@ namespace Squidex.Modules.Api.Languages
         [ProducesResponseType(typeof(string[]), 200)]
         public IActionResult GetLanguages()
         {
-            var model = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
+            var response = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
 
-            return Ok(model);
+            return Ok(response);
         }
     }
 }

@@ -38,11 +38,12 @@ namespace Squidex.Modules.Api.Apps
         }
 
         /// <summary>
-        /// Get contributors for the app.
+        /// Get app contributors.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 200 => App contributors returned.
+        /// 404 => App not found.
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/contributors/")]
@@ -56,19 +57,20 @@ namespace Squidex.Modules.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
+            var response = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>
-        /// Assign contributor to the app.
+        /// Assign contributor to app.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="model">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 200 => User assigned to app.
+        /// 204 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
+        /// 404 => App not found.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
@@ -77,26 +79,26 @@ namespace Squidex.Modules.Api.Apps
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
-        /// Removes contributor from app.
+        /// Remove contributor from app.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="contributorId"></param>
+        /// <param name="id">The id of the contributor.</param>
         /// <returns>
-        /// 200 => User removed from app.
+        /// 204 => User removed from app.
         /// 400 => User is not assigned to the app.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/contributors/{contributorId}/")]
+        [Route("apps/{app}/contributors/{id}/")]
         [ProducesResponseType(typeof(ErrorDto[]), 400)]
-        public async Task<IActionResult> DeleteContributor(string app, string contributorId)
+        public async Task<IActionResult> DeleteContributor(string app, string id)
         {
-            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = contributorId });
+            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = id });
 
-            return Ok();
+            return NoContent();
         }
     }
 }

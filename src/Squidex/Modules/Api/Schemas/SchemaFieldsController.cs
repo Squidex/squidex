@@ -18,78 +18,197 @@ using Squidex.Write.Schemas.Commands;
 
 namespace Squidex.Modules.Api.Schemas
 {
-    [Authorize]
+    /// <summary>
+    /// Manages and retrieves information about schemas.
+    /// </summary>
+    [Authorize("app-owner,app-developer")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    [SwaggerIgnore]
-    public class SchemasFieldsController : ControllerBase
+    [SwaggerTag("Schemas")]
+    public class SchemaFieldsController : ControllerBase
     {
-        public SchemasFieldsController(ICommandBus commandBus)
+        public SchemaFieldsController(ICommandBus commandBus)
             : base(commandBus)
         {
         }
-        
+
+        /// <summary>
+        /// Create a new schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="model">The field object that needs to be added to the schema.</param>
+        /// <returns>
+        /// 201 => Field created.
+        /// 409 => Field name already in use.
+        /// 404 => App or schema not found.
+        /// 404 => Field properties not valid.
+        /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
-        public Task Add(string name, [FromBody] CreateFieldDto model)
+        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
+        [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PostField(string app, string name, [FromBody] FieldDto model)
         {
             var command = SimpleMapper.Map(model, new AddField());
 
-            return CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
+            var result = context.Result<long>();
+
+            return StatusCode(201, new EntityCreatedDto { Id = result.ToString() });
         }
 
+        /// <summary>
+        /// Update a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="model">The field object that needs to be added to the schema.</param>
+        /// <returns>
+        /// 204 => Field created.
+        /// 409 => Field name already in use.
+        /// 404 => App, schema or field not found.
+        /// 404 => Field properties not valid.
+        /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/{fieldId:long}/")]
-        public Task Update(string name, long fieldId, [FromBody] UpdateFieldDto model)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
+        [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] FieldDto model)
         {
             var command = SimpleMapper.Map(model, new UpdateField());
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
 
+        /// <summary>
+        /// Hide a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to hide.</param>
+        /// <returns>
+        /// 400 => Field already hidden.
+        /// 204 => Schema field hidden.
+        /// 404 => App, schema or field not found.
+        /// </returns>
+        /// <remarks>
+        /// A hidden field is not part of the API response, but can still be edited in the portal.
+        /// </remarks>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/{fieldId:long}/hide/")]
-        public Task Hide(string name, long fieldId)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> HideField(string app, string name, long id)
         {
-            var command = new HideField { FieldId = fieldId };
+            var command = new HideField { FieldId = id };
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
 
+        /// <summary>
+        /// Show a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to shows.</param>
+        /// <returns>
+        /// 400 => Field already visible.
+        /// 204 => Schema field shown.
+        /// 404 => App, schema or field not found.
+        /// </returns>
+        /// <remarks>
+        /// A hidden field is not part of the API response, but can still be edited in the portal.
+        /// </remarks>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/{fieldId:long}/show/")]
-        public Task Show(string name, long fieldId)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/show/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> ShowField(string app, string name, long id)
         {
-            var command = new ShowField { FieldId = fieldId };
+            var command = new ShowField { FieldId = id };
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
-        
+
+        /// <summary>
+        /// Enable a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to enable.</param>
+        /// <returns>
+        /// 400 => Field already enabled.
+        /// 204 => Schema field enabled.
+        /// 404 => App, schema or field not found.
+        /// </returns>
+        /// <remarks>
+        /// A disabled field cannot not be edited in the squidex portal anymore,
+        /// but will be part of the API response.
+        /// </remarks>
         [HttpPut]
-        [Route("schemas/{name}/fields/{fieldId:long}/enable/")]
-        public Task Enable(string name, long fieldId)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> EnableField(string app, string name, long id)
         {
-            var command = new EnableField { FieldId = fieldId };
+            var command = new EnableField { FieldId = id };
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
-        
+
+        /// <summary>
+        /// Disable a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to disable.</param>
+        /// <returns>
+        /// 400 => Field already disabled.
+        /// 204 => Schema field disabled.
+        /// 404 => App, schema or field not found.
+        /// </returns>
+        /// <remarks>
+        /// A disabled field cannot not be edited in the squidex portal anymore,
+        /// but will be part of the API response.
+        /// </remarks>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/{fieldId:long}/disable/")]
-        public Task Disable(string name, long fieldId)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> DisableField(string app, string name, long id)
         {
-            var command = new DisableField { FieldId = fieldId };
+            var command = new DisableField { FieldId = id };
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
 
+        /// <summary>
+        /// Delete a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to disable.</param>
+        /// <returns>
+        /// 204 => Schema field deleted.
+        /// 404 => App, schema or field not found.
+        /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/schemas/{name}/fields/{fieldId:long}/")]
-        public Task Delete(string name, long fieldId)
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
+        public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
-            var command = new DeleteField { FieldId = fieldId };
+            var command = new DeleteField { FieldId = id };
 
-            return CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
         }
     }
 }

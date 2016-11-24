@@ -11,7 +11,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
-    [TypeName("AppCreated")]
+    [TypeName("AppCreatedEvent")]
     public class AppCreated : IEvent
     {
         public string Name { get; set; }

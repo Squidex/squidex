@@ -11,7 +11,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
-    [TypeName("FieldDeletedEvent")]
+    [TypeName("FieldDeleted")]
     public class FieldDeleted : IEvent
     {
         public long FieldId { get; set; }

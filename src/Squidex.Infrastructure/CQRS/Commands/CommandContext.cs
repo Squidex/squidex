@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         private readonly ICommand command;
         private Exception exception;
-        private bool isSucceeded;
+        private Tuple<object> result;
         
         public ICommand Command
         {
@@ -23,12 +23,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public bool IsHandled
         {
-            get { return isSucceeded || exception != null; }
+            get { return result != null || exception != null; }
         }
 
         public bool IsSucceeded
         {
-            get { return isSucceeded; }
+            get { return result != null; }
         }
 
         public Exception Exception
@@ -43,14 +43,29 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.command = command;
         }
 
-        public void MarkSucceeded()
+        public void Succeed(object resultValue = null)
         {
-            isSucceeded = true;
+            if (IsHandled)
+            {
+                return;
+            }
+
+            result = Tuple.Create(resultValue);
         }
 
-        public void MarkFailed(Exception handlerException)
+        public void Fail(Exception handlerException)
         {
+            if (IsHandled)
+            {
+                return;
+            }
+
             exception = handlerException;
+        }
+
+        public T Result<T>()
+        {
+            return result != null ? (T)result.Item1 : default(T);
         }
     }
 }

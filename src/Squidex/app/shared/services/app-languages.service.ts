@@ -23,10 +23,11 @@ export class AppLanguagesService {
 
     public getLanguages(appName: string): Observable<LanguageDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl(`api/apps/${appName}/languages`))
+                .map(response => response.json())
                 .map(response => {                    
-                    const body: any[] = response.json();
+                    const items: any[] = response;
 
-                    return body.map(item => {
+                    return items.map(item => {
                         return new LanguageDto(
                             item.iso2Code, 
                             item.englishName);
@@ -35,7 +36,6 @@ export class AppLanguagesService {
     }
 
     public postLanguages(appName: string, languageCodes: string[]): Observable<any> {
-        languageCodes = [ null, null ];
         return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/languages`), { languages: languageCodes });
     }
 }

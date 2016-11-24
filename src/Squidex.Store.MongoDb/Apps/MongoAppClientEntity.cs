@@ -12,11 +12,15 @@ using Squidex.Read.Apps;
 
 namespace Squidex.Store.MongoDb.Apps
 {
-    public class MongoAppClientKeyEntity : IAppClientKeyEntity
+    public sealed class MongoAppClientEntity : IAppClientEntity
     {
         [BsonRequired]
         [BsonElement]
-        public string ClientKey { get; set; }
+        public string ClientName { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public string ClientSecret { get; set; }
 
         [BsonRequired]
         [BsonElement]

@@ -4,6 +4,10 @@
     </div>
     <div class="layout-middle">
         <div class="layout-middle-header">
+            <div class="pull-right">
+                <button class="btn btn-success" (click)="saveLanguages()" [disabled]="isSaving">{{isSaving ? 'Saving...' : 'Save Changes'}}</button>
+            </div>
+
             <h1>
                 <i class="layout-title-icon icon-settings"></i> Languages
             </h1>
@@ -11,7 +15,7 @@
         <div class="layout-middle-content">
             <div class="card">
                 <div class="card-block">
-                    <table class="table table-borderless table-fixed" dnd-sortable-container [sortableData]="appLanguages">
+                    <table class="table table-borderless-top table-fixed languages-table" dnd-sortable-container [sortableData]="appLanguages">
                         <colgroup>
                             <col style="width: 60px" />
                             <col style="width: 100%" />
@@ -34,8 +38,6 @@
                             </td>
                         </tr>
                     </table>
-                    
-                    <button class="btn btn-primary" (click)="saveLanguages()" [disabled]="isSaving">{{isSaving ? 'Saving...' : 'Save'}}</button>
                 </div>
                 <div class="card-footer">
                     <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
@@ -45,7 +47,7 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary" [disabled]="!selectedLanguage">Add</button>
+                        <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add</button>
                     </form>
                 </div>
             </div>

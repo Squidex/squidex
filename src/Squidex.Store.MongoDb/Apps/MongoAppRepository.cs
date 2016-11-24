@@ -69,14 +69,14 @@ namespace Squidex.Store.MongoDb.Apps
             return Collection.UpdateAsync(headers, a => a.Languages = @event.Languages.Select(x => x.Iso2Code).ToList());
         }
 
-        public Task On(AppClientKeyCreated @event, EnvelopeHeaders headers)
+        public Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.ClientKeys.Add(SimpleMapper.Map(@event, new MongoAppClientKeyEntity())));
+            return Collection.UpdateAsync(headers, a => a.Clients.Add(SimpleMapper.Map(@event, new MongoAppClientEntity())));
         }
 
-        public Task On(AppClientKeyRevoked @event, EnvelopeHeaders headers)
+        public Task On(AppClientRevoked @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.ClientKeys.RemoveAll(c => c.ClientKey == @event.ClientKey));
+            return Collection.UpdateAsync(headers, a => a.Clients.RemoveAll(c => c.ClientName == @event.ClientName));
         }
 
         public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)

@@ -1,4 +1,4 @@
-<form [formGroup]="createForm" (ngSubmit)="submit()">
+<form [formGroup]="createForm" (ngSubmit)="createApp()">
     <div *ngIf="creationError" [@fade]>
         <div class="form-error">
             {{creationError}}
@@ -17,7 +17,7 @@
                     Name can not have more than 40 characters.
                 </span>
                 <span *ngIf="createForm.get('name').hasError('pattern')">
-                    Name can contain lower case letters (a-z), numbers and dashes only.
+                    Name can contain lower case letters (a-z), numbers and dashes only (not at the end).
                 </span>
             </div>
         </div>
@@ -26,6 +26,7 @@
         
         <span class="form-hint">
             The app name becomes part of the api url, e.g, https://<b>{{appName}}</b>.squidex.io/.<br />
+
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
         </span>
 	</div>

@@ -43,6 +43,7 @@ namespace Squidex.Modules.Api.Apps
         /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 200 => Language configuration returned.
+        /// 404 => App not found.
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/languages/")]
@@ -62,13 +63,14 @@ namespace Squidex.Modules.Api.Apps
         }
 
         /// <summary>
-        /// Configures the app languages.
+        /// Configure the app languages.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="model">The language configuration for the app.</param>
         /// <returns>
-        /// 201 => App languages configured.
+        /// 204 => App languages configured.
         /// 400 => Language configuration is empty or contains an invalid language.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// The ordering of the languages matterns: When you retrieve a content with a localized content squidex tries
@@ -82,7 +84,7 @@ namespace Squidex.Modules.Api.Apps
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new ConfigureLanguages()));
 
-            return Ok();
+            return NoContent();
         }
     }
 }

@@ -119,7 +119,7 @@ export class ContributorsPageComponent implements Ng2.OnInit {
         this.appSubscription.unsubscribe();
     }
 
-    public addContributor() {
+    public assignContributor() {
         if (!this.selectedUser) {
             return;
         }

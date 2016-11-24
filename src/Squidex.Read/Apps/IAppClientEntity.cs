@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppClientKeyCreated.cs
+//  IAppClientKeyEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,16 +7,15 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Events.Apps
+namespace Squidex.Read.Apps
 {
-    [TypeName("AppClientKeyCreated")]
-    public sealed class AppClientKeyCreated : IEvent
+    public interface IAppClientEntity
     {
-        public string ClientKey { get; set; }
+        string ClientName { get; }
 
-        public DateTime ExpiresUtc { get; set; }
+        string ClientSecret { get; }
+
+        DateTime ExpiresUtc { get; }
     }
 }

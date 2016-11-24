@@ -17,7 +17,7 @@ namespace Squidex.Read.Apps
 
         IEnumerable<Language> Languages { get; }
 
-        IEnumerable<IAppClientKeyEntity> ClientKeys { get; }
+        IEnumerable<IAppClientEntity> Clients { get; }
 
         IEnumerable<IAppContributorEntity> Contributors { get; }
     }

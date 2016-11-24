@@ -11,8 +11,8 @@ import * as Ng2Router from '@angular/router';
 import {
     AppsPageComponent,
     AppAreaComponent,
+    ClientsPageComponent,
     ContributorsPageComponent,
-    CredentialsPageComponent,
     DashboardPageComponent,
     InternalAreaComponent,
     HomePageComponent,
@@ -65,8 +65,8 @@ export const routes: Ng2Router.Routes = [
                         component: ContributorsPageComponent
                     },
                     {
-                        path: 'credentials',
-                        component: CredentialsPageComponent
+                        path: 'clients',
+                        component: ClientsPageComponent
                     },
                     {
                         path: 'languages',

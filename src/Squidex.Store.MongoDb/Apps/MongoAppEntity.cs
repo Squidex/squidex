@@ -27,7 +27,7 @@ namespace Squidex.Store.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public List<MongoAppClientKeyEntity> ClientKeys { get; set; }
+        public List<MongoAppClientEntity> Clients { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -38,9 +38,9 @@ namespace Squidex.Store.MongoDb.Apps
             get { return Languages.Select(Language.GetLanguage); }
         }
 
-        IEnumerable<IAppClientKeyEntity> IAppEntity.ClientKeys
+        IEnumerable<IAppClientEntity> IAppEntity.Clients
         {
-            get { return ClientKeys; }
+            get { return Clients; }
         }
 
         IEnumerable<IAppContributorEntity> IAppEntity.Contributors
@@ -52,7 +52,7 @@ namespace Squidex.Store.MongoDb.Apps
         {
             Contributors = new List<MongoAppContributorEntity>();
 
-            ClientKeys = new List<MongoAppClientKeyEntity>();
+            Clients = new List<MongoAppClientEntity>();
         }
     }
 }

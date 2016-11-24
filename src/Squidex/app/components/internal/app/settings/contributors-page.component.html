@@ -11,7 +11,7 @@
         <div class="layout-middle-content">
             <div class="card">
                 <div class="card-block">
-                    <table class="table table-borderless table-fixed">
+                    <table class="table table-borderless-top table-fixed contributors-table">
                         <colgroup>
                             <col style="width: 100%" />
                             <col style="width: 150px" />
@@ -41,7 +41,7 @@
                     </table>
                 </div>
                 <div class="card-footer">
-                    <form class="form-inline" (submit)="addContributor()" >
+                    <form class="form-inline" (submit)="assignContributor()" >
                         <div class="form-group">
                             <ng2-completer 
                                 [autoMatch]="true"
@@ -58,7 +58,7 @@
                             </ng2-completer>
                         </div>
 
-                        <button type="submit" class="btn btn-primary" [disabled]="!selectedUser">Add</button>
+                        <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
                     </form>
                 </div>
             </div>

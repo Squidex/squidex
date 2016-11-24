@@ -21,12 +21,27 @@ namespace Squidex.Configurations.Swagger
 {
     public static class SwaggerUsage
     {
+        /*
+        class TypeNameGenerator : DefaultTypeNameGenerator
+        {
+            public override string Generate(JsonSchema4 schema, string typeNameHint)
+            {
+                try
+                {
+                    return TypeNameRegistry.GetName(schema.Ty);
+                }
+                catch
+                {
+                    return base.Generate(schema, typeNameHint);
+                }
+            }
+        }*/
         public static void UseMySwagger(this IApplicationBuilder app)
         {
             var options = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
 
             var settings =
-                new SwaggerOwinSettings { Title = "Squidex API Specification" }
+                new SwaggerOwinSettings { Title = "Squidex API Specification", IsAspNetCore = false}
                     .ConfigurePaths()
                     .ConfigureSchemaSettings()
                     .ConfigureIdentity(options);

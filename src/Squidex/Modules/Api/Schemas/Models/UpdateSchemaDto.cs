@@ -6,12 +6,22 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
+using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Modules.Api.Schemas.Models
 {
     public class UpdateSchemaDto
     {
-        public SchemaProperties Properties { get; set; }
+        /// <summary>
+        /// Optional label for the editor.
+        /// </summary>
+        [StringLength(100)]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Hints to describe the schema.
+        /// </summary>
+        [StringLength(1000)]
+        public string Hints { get; set; }
     }
 }

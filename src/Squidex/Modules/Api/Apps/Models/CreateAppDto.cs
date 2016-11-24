@@ -13,7 +13,7 @@ namespace Squidex.Modules.Api.Apps.Models
     public sealed class CreateAppDto
     {
         /// <summary>
-        /// The new name of the app.
+        /// The name of the app.
         /// </summary>
         [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]

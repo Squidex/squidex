@@ -39,7 +39,7 @@ namespace Squidex.Modules.Api.Apps
         }
 
         /// <summary>
-        /// Gets your apps.
+        /// Get your apps.
         /// </summary>
         /// <returns>
         /// 200 => Apps returned.
@@ -56,7 +56,7 @@ namespace Squidex.Modules.Api.Apps
             var subject = HttpContext.User.OpenIdSubject();
             var schemas = await appRepository.QueryAllAsync(subject);
 
-            var models = schemas.Select(s =>
+            var response = schemas.Select(s =>
             {
                 var dto = SimpleMapper.Map(s, new AppDto());
 
@@ -65,13 +65,13 @@ namespace Squidex.Modules.Api.Apps
                 return dto;
             }).ToList();
 
-            return Ok(models);
+            return Ok(response);
         }
 
         /// <summary>
         /// Create a new app.
         /// </summary>
-        /// <param name="model">The app object that needs to be added to squided.</param>
+        /// <param name="model">The app object that needs to be added to squidex.</param>
         /// <returns>
         /// 201 => App created.
         /// 400 => App object is not valid.
@@ -88,11 +88,12 @@ namespace Squidex.Modules.Api.Apps
         [ProducesResponseType(typeof(ErrorDto), 409)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto model)
         {
-            var command = SimpleMapper.Map(model, new CreateApp { AggregateId = Guid.NewGuid() });
+            var command = SimpleMapper.Map(model, new CreateApp());
 
-            await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
+            var result = context.Result<Guid>();
 
-            return CreatedAtAction(nameof(GetApps), new EntityCreatedDto { Id = command.AggregateId.ToString() });
+            return CreatedAtAction(nameof(GetApps), new EntityCreatedDto { Id = result.ToString() });
         }
     }
 }

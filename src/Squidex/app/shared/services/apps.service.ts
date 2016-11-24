@@ -39,10 +39,11 @@ export class AppsService {
 
     public getApps(): Observable<AppDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl('/api/apps'))
+                .map(response => response.json())
                 .map(response => {
-                    const body: any[] = response.json() || [];
+                    const items: any[] = response;
 
-                    return body.map(item => {
+                    return items.map(item => {
                         return new AppDto(
                             item.id,
                             item.name,

@@ -34,6 +34,7 @@ export class AppFormComponent implements Ng2.OnInit {
     @Ng2.Output()
     public cancelled = new Ng2.EventEmitter();
 
+    public creationError = '';
     public createForm =
         this.formBuilder.group({
             name: ['',
@@ -45,9 +46,6 @@ export class AppFormComponent implements Ng2.OnInit {
         });
 
     public appName = FALLBACK_NAME;
-
-    public creating = false;
-    public creationError = '';
 
     constructor(
         private readonly appsStore: AppsStoreService,
@@ -61,12 +59,11 @@ export class AppFormComponent implements Ng2.OnInit {
         });
     }
 
-    public submit() {
+    public createApp() {
         this.createForm.markAsDirty();
 
         if (this.createForm.valid) {
             this.createForm.disable();
-            this.creating = true;
 
             const dto = new AppCreateDto(this.createForm.controls['name'].value);
 
@@ -83,7 +80,6 @@ export class AppFormComponent implements Ng2.OnInit {
 
     private reset() {
         this.createForm.enable();
-        this.creating = false;
         this.creationError = '';
     }
 

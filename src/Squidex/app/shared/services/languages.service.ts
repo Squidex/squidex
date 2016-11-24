@@ -29,10 +29,11 @@ export class LanguageService {
 
     public getLanguages(): Observable<LanguageDto[]> {
         return this.authService.authGet(this.apiUrl.buildUrl('api/languages'))
+                .map(response => response.json())
                 .map(response => {                    
-                    const body: any[] = response.json();
+                    const items: any[] = response;
 
-                    return body.map(item => {
+                    return items.map(item => {
                         return new LanguageDto(
                             item.iso2Code, 
                             item.englishName);

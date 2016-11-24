@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -18,11 +19,16 @@ namespace Squidex.Write.Apps.Commands
 
         public string SubjectId { get; set; }
 
+        public CreateApp()
+        {
+            AggregateId = Guid.NewGuid();
+        }
+
         public void Validate(IList<ValidationError> errors)
         {
             if (!Name.IsSlug())
             {
-                errors.Add(new ValidationError("DisplayName must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
             }
         }
     }

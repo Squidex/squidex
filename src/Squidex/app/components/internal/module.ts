@@ -17,8 +17,8 @@ import { SqxLayoutModule } from 'components/layout';
 import {
     AppAreaComponent,
     AppsPageComponent,
+    ClientsPageComponent,
     ContributorsPageComponent,
-    CredentialsPageComponent,
     DashboardPageComponent,
     InternalAreaComponent,
     LeftMenuComponent,
@@ -39,8 +39,8 @@ import {
     declarations: [
         AppAreaComponent,
         AppsPageComponent,
+        ClientsPageComponent,
         ContributorsPageComponent,
-        CredentialsPageComponent,
         DashboardPageComponent,
         InternalAreaComponent,
         LanguagesPageComponent,

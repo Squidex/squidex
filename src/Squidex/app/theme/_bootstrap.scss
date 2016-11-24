@@ -8,7 +8,19 @@
 
     &-borderless {
         td {
-            border: none;
+            border: 0;
+        }
+    }
+
+    &-borderless-top {
+        tr:first-child td {
+            border: 0;
+        }
+    }
+
+    &-middle {
+        td {
+            vertical-align: middle;
         }
     }
 }

@@ -18,6 +18,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 using Xunit;
+// ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Write.Tests.Apps
 {
@@ -27,7 +28,8 @@ namespace Squidex.Write.Tests.Apps
         private readonly AppDomainObject sut;
         private readonly string subjectId = Guid.NewGuid().ToString();
         private readonly string contributorId = Guid.NewGuid().ToString();
-        private readonly string clientKey = Guid.NewGuid().ToString();
+        private readonly string clientSecret = Guid.NewGuid().ToString();
+        private readonly string clientName = "client";
         private readonly List<Language> languages = new List<Language> { Language.GetLanguage("de") };
 
         public AppDomainObjectTests()
@@ -63,7 +65,7 @@ namespace Squidex.Write.Tests.Apps
                     {
                         new AppCreated { Name = TestName },
                         new AppContributorAssigned { ContributorId = subjectId, Permission = PermissionLevel.Owner },
-                        new AppLanguagesConfigured { Languages= new List<Language> { Language.GetLanguage("de") } }
+                        new AppLanguagesConfigured { Languages= new List<Language> { Language.GetLanguage("en") } }
                     });
         }
 
@@ -173,28 +175,38 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void CreateClientKey_should_throw_if_not_created()
+        public void AttachClient_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.CreateClientKey(new CreateClientKey { ClientKey = clientKey }));
+            Assert.Throws<DomainException>(() => sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret));
         }
 
         [Fact]
-        public void CreateClientKey_should_throw_if_client_key_is_null_or_empty()
+        public void AttachClient_should_throw_if_name_not_valid()
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.CreateClientKey(new CreateClientKey()));
-            Assert.Throws<ValidationException>(() => sut.CreateClientKey(new CreateClientKey { ClientKey = string.Empty }));
+            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient(), clientSecret));
+            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientName = string.Empty }, clientSecret));
         }
 
         [Fact]
-        public void CreateClientKey_should_create_events()
+        public void AttachClient_should_throw_if_name_already_exists()
+        {
+            CreateApp();
+
+            sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret);
+
+            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret));
+        }
+
+        [Fact]
+        public void AttachClient_should_create_events()
         {
             var now = DateTime.Today;
 
             CreateApp();
 
-            sut.CreateClientKey(new CreateClientKey { ClientKey = clientKey, Timestamp = now });
+            sut.AttachClient(new AttachClient { ClientName = clientName, Timestamp = now }, clientSecret);
 
             Assert.False(sut.Contributors.ContainsKey(contributorId));
 
@@ -202,46 +214,46 @@ namespace Squidex.Write.Tests.Apps
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppClientKeyCreated { ClientKey = clientKey, ExpiresUtc = now.AddYears(1) }
+                        new AppClientAttached { ClientName = clientName, ClientSecret = clientSecret, ExpiresUtc = now.AddYears(1) }
                     });
         }
 
         [Fact]
-        public void RevokeClientKey_should_throw_if_not_created()
+        public void RevokeKey_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RevokeClientKey(new RevokeClientKey { ClientKey = "not-found" }));
+            Assert.Throws<DomainException>(() => sut.RevokeClient(new RevokeClient { ClientName = "not-found" }));
         }
 
         [Fact]
-        public void RevokeClientKey_should_throw_if_client_key_is_null_or_empty()
+        public void RevokeClient_should_throw_if_client_key_is_null_or_empty()
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RevokeClientKey(new RevokeClientKey()));
-            Assert.Throws<ValidationException>(() => sut.RevokeClientKey(new RevokeClientKey { ClientKey = string.Empty }));
+            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient()));
+            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientName = string.Empty }));
         }
 
         [Fact]
-        public void RevokeClientKey_should_throw_if_key_not_found()
+        public void RevokeClient_should_throw_if_client_not_found()
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RevokeClientKey(new RevokeClientKey { ClientKey = "not-found" }));
+            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientName = "not-found" }));
         }
 
         [Fact]
-        public void RevokeClientKey_should_create_events()
+        public void RevokeClient_should_create_events()
         {
             CreateApp();
 
-            sut.CreateClientKey(new CreateClientKey { ClientKey = clientKey });
-            sut.RevokeClientKey(new RevokeClientKey { ClientKey = clientKey });
+            sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret);
+            sut.RevokeClient(new RevokeClient { ClientName = clientName });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppClientKeyRevoked { ClientKey = clientKey }
+                        new AppClientRevoked { ClientName = clientSecret }
                     });
         }
 

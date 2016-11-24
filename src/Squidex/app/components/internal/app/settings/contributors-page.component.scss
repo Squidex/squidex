@@ -9,6 +9,12 @@
     max-width: 700px;
 }
 
+.contributors {
+    &-table {
+        margin: 0;
+    }
+}
+
 .user {
     &-picture {
         @include circle(2.2rem);

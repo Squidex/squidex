@@ -10,7 +10,7 @@ using Squidex.Core.Schemas;
 
 namespace Squidex.Store.MongoDb.Schemas.Models
 {
-    public class FieldDto
+    public class FieldModel
     {
         public string Name { get; set; }
 
@@ -20,9 +20,9 @@ namespace Squidex.Store.MongoDb.Schemas.Models
         
         public FieldProperties Properties { get; set; }
 
-        public static FieldDto Create(Field field)
+        public static FieldModel Create(Field field)
         {
-            return new FieldDto
+            return new FieldModel
             {
                 Name = field.Name,
                 IsHidden = field.IsHidden,

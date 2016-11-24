@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppClientKeyEntity.cs
+//  AppClientKeyRevoked.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,16 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Events.Apps
 {
-    public interface IAppClientKeyEntity
+    [TypeName("AppClientRevokedEvent")]
+    public sealed class AppClientRevoked : IEvent
     {
-        string ClientKey { get; }
+        public string ClientName { get; set; }
 
-        DateTime ExpiresUtc { get; }
+        public DateTime ExpiresUtc { get; set; }
     }
 }

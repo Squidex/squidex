@@ -13,7 +13,7 @@ namespace Squidex.Modules.Api.Users.Models
     public sealed class UserDto
     {
         /// <summary>
-        /// The id of the user. Unique value.
+        /// The id of the user.
         /// </summary>
         [Required]
         public string Id { get; set; }

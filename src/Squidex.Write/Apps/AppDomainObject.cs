@@ -25,7 +25,7 @@ namespace Squidex.Write.Apps
     public sealed class AppDomainObject : DomainObject
     {
         private static readonly List<Language> DefaultLanguages = new List<Language> { Language.GetLanguage("en") };
-        private readonly HashSet<string> clientKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, AppClient> clients = new Dictionary<string, AppClient>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, PermissionLevel> contributors = new Dictionary<string, PermissionLevel>();
         private string name;
 
@@ -37,6 +37,11 @@ namespace Squidex.Write.Apps
         public IReadOnlyDictionary<string, PermissionLevel> Contributors
         {
             get { return contributors; }
+        }
+
+        public IReadOnlyDictionary<string, AppClient> Clients
+        {
+            get { return clients; }
         }
 
         public AppDomainObject(Guid id, int version) 
@@ -59,14 +64,14 @@ namespace Squidex.Write.Apps
             contributors.Remove(@event.ContributorId);
         }
 
-        public void On(AppClientKeyCreated @event)
+        public void On(AppClientAttached @event)
         {
-            clientKeys.Add(@event.ClientKey);
+            clients.Add(@event.ClientName, new AppClient(@event.ClientName, @event.ClientSecret, @event.ExpiresUtc));
         }
 
-        public void On(AppClientKeyRevoked @event)
+        public void On(AppClientRevoked @event)
         {
-            clientKeys.Remove(@event.ClientKey);
+            clients.Remove(@event.ClientName);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -76,9 +81,11 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject Create(CreateApp command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create app");
+            Func<string> message = () => "Cannot create app";
 
-            VerifyNotCreated();
+            Guard.Valid(command, nameof(command), message);
+
+            ThrowIfCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppCreated()));
 
@@ -90,23 +97,58 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject AssignContributor(AssignContributor command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot assign contributor");
+            Func<string> message = () => "Cannot assign contributor";
 
-            VerifyCreated();
-            VerifyOwnership(c => c[command.ContributorId] = command.Permission);
+            Guard.Valid(command, nameof(command), message);
+
+            ThrowIfNotCreated();
+            ThrowIfNoOwner(c => c[command.ContributorId] = command.Permission, message);
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
 
             return this;
         }
 
+        public AppDomainObject RevokeClient(RevokeClient command)
+        {
+            Func<string> message = () => "Cannot revoke client";
+
+            Guard.Valid(command, nameof(command), () => "Cannot revoke client");
+
+            ThrowIfNotCreated();
+            ThrowIfClientNotFound(command, message);
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
+
+            return this;
+        }
+
+        public AppDomainObject AttachClient(AttachClient command, string secret)
+        {
+            Func<string> message = () => "Cannot attach client";
+
+            Guard.Valid(command, nameof(command), () => "Cannot attach client");
+
+            ThrowIfNotCreated();
+            ThrowIfClientFound(command, message);
+
+            var expire = command.Timestamp.AddYears(1);
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { ClientSecret = secret, ExpiresUtc = expire }));
+
+            return this;
+        }
+
         public AppDomainObject RemoveContributor(RemoveContributor command)
         {
+            Func<string> message = () => "Cannot remove contributor";
+
             Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
 
-            VerifyCreated();
-            VerifyContributorFound(command);
-            VerifyOwnership(c => c.Remove(command.ContributorId));
+            ThrowIfNotCreated();
+            ThrowIfContributorNotFound(command, message);
+
+            ThrowIfNoOwner(c => c.Remove(command.ContributorId), message);
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
 
@@ -115,34 +157,13 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject ConfigureLanguages(ConfigureLanguages command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
+            Func<string> message = () => "Cannot configure languages";
 
-            VerifyCreated();
+            Guard.Valid(command, nameof(command), message);
+
+            ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguagesConfigured()));
-
-            return this;
-        }
-
-        public AppDomainObject RevokeClientKey(RevokeClientKey command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot revoke client key");
-
-            VerifyCreated();
-            VerifyClientKeyFound(command);
-
-            RaiseEvent(SimpleMapper.Map(command, new AppClientKeyRevoked()));
-
-            return this;
-        }
-
-        public AppDomainObject CreateClientKey(CreateClientKey command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot create client key");
-
-            VerifyCreated();
-
-            RaiseEvent(SimpleMapper.Map(command, new AppClientKeyCreated()));
 
             return this;
         }
@@ -157,7 +178,7 @@ namespace Squidex.Write.Apps
             return new AppContributorAssigned { ContributorId = command.SubjectId, Permission = PermissionLevel.Owner };
         }
 
-        private void VerifyCreated()
+        private void ThrowIfNotCreated()
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -165,7 +186,7 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void VerifyNotCreated()
+        private void ThrowIfCreated()
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
@@ -173,27 +194,37 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void VerifyClientKeyFound(RevokeClientKey command)
+        private void ThrowIfClientFound(AttachClient command, Func<string> message)
         {
-            if (!clientKeys.Contains(command.ClientKey))
+            if (clients.ContainsKey(command.ClientName))
             {
-                var error = new ValidationError("Client key is not part of the app", "ClientKey");
+                var error = new ValidationError("Client name is alreay part of the app", "ClientName");
 
-                throw new ValidationException("Cannot revoke client key", error);
+                throw new ValidationException(message(), error);
             }
         }
 
-        private void VerifyContributorFound(RemoveContributor command)
+        private void ThrowIfClientNotFound(RevokeClient command, Func<string> message)
+        {
+            if (!clients.ContainsKey(command.ClientName))
+            {
+                var error = new ValidationError("Client is not part of the app", "ClientName");
+
+                throw new ValidationException(message(), error);
+            }
+        }
+
+        private void ThrowIfContributorNotFound(RemoveContributor command, Func<string> message)
         {
             if (!contributors.ContainsKey(command.ContributorId))
             {
                 var error = new ValidationError("Contributor is not part of the app", "ContributorId");
 
-                throw new ValidationException("Cannot remove contributor", error);
+                throw new ValidationException(message(), error);
             }
         }
 
-        private void VerifyOwnership(Action<Dictionary<string, PermissionLevel>> change)
+        private void ThrowIfNoOwner(Action<Dictionary<string, PermissionLevel>> change, Func<string> message)
         {
             var contributorsCopy = new Dictionary<string, PermissionLevel>(contributors);
 
@@ -203,7 +234,7 @@ namespace Squidex.Write.Apps
             {
                 var error = new ValidationError("Contributor is the last owner", "ContributorId");
 
-                throw new ValidationException("Cannot assign contributor", error);
+                throw new ValidationException(message(), error);
             }
         }
     }

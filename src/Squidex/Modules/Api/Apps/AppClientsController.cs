@@ -28,32 +28,31 @@ namespace Squidex.Modules.Api.Apps
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Apps")]
-    public class AppClientKeysController : ControllerBase
+    public class AppClientsController : ControllerBase
     {
         private readonly IAppProvider appProvider;
-        private readonly ClientKeyGenerator keyGenerator;
 
-        public AppClientKeysController(ICommandBus commandBus, IAppProvider appProvider, ClientKeyGenerator keyGenerator)
+        public AppClientsController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
             this.appProvider = appProvider;
-            this.keyGenerator = keyGenerator;
         }
 
         /// <summary>
-        /// Get app client keys.
+        /// Get app clients.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 200 => Client keys returned.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// Gets all configured client keys for the app with the specified name.
         /// </remarks>
         [HttpGet]
-        [Route("apps/{app}/client-keys/")]
-        [ProducesResponseType(typeof(ClientKeyDto[]), 200)]
-        public async Task<IActionResult> GetContributors(string app)
+        [Route("apps/{app}/clients/")]
+        [ProducesResponseType(typeof(ClientDto[]), 200)]
+        public async Task<IActionResult> GetClients(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
 
@@ -62,33 +61,52 @@ namespace Squidex.Modules.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.ClientKeys.Select(x => SimpleMapper.Map(x, new ClientKeyDto())).ToList();
+            var response = entity.Clients.Select(x => SimpleMapper.Map(x, new ClientDto())).ToList();
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>
-        /// Create new client key.
+        /// Create a new app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Client key generated.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// Create a new client key for the app with the specified name. 
         /// The client key is auto generated on the server and returned.
         /// </remarks>
         [HttpPost]
-        [Route("apps/{app}/client-keys/")]
-        [SwaggerTags("Apps")]
-        [ProducesResponseType(typeof(ClientKeyCreatedDto[]), 201)]
-        public async Task<IActionResult> PostClientKey(string app)
+        [Route("apps/{app}/clients/")]
+        [ProducesResponseType(typeof(ClientDto[]), 201)]
+        public async Task<IActionResult> PostClient(string app, [FromBody] AttachClientDto request)
         {
-            var clientKey = keyGenerator.GenerateKey();
+            var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new AttachClient()));
+            var result = context.Result<AppClient>();
 
-            await CommandBus.PublishAsync(new CreateClientKey { ClientKey = clientKey });
+            var response = SimpleMapper.Map(result, new ClientDto());
 
-            return StatusCode(201, new ClientKeyCreatedDto { ClientKey = clientKey });
+            return StatusCode(201, response);
+        }
+
+        /// <summary>
+        /// Revoke an app client
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="client">Client object that needs to be added to the app.</param>
+        /// <returns>
+        /// 204 => Client revoked.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/clients/{client}/")]
+        public async Task<IActionResult> DeleteClient(string app, string client)
+        {
+            await CommandBus.PublishAsync(new RevokeClient { ClientName = client });
+
+            return NoContent();
         }
     }
 }
