@@ -18,12 +18,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using Squidex.Configurations;
-using Squidex.Configurations.Domain;
-using Squidex.Configurations.EventStore;
-using Squidex.Configurations.Identity;
-using Squidex.Configurations.Swagger;
-using Squidex.Configurations.Web;
+using Squidex.Config;
+using Squidex.Config.Domain;
+using Squidex.Config.EventStore;
+using Squidex.Config.Identity;
+using Squidex.Config.Swagger;
+using Squidex.Config.Web;
 using Squidex.Pipeline;
 using Squidex.Store.MongoDb;
 
