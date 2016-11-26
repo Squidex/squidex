@@ -22,7 +22,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             if (min.HasValue && max.HasValue && min.Value.CompareTo(max.Value) >= 0)
             {
-                throw new ArgumentException("MinValue must larger than max value");
+                throw new ArgumentException("Min value must be greater than max value", nameof(min));
             }
 
             this.min = min;
@@ -40,12 +40,12 @@ namespace Squidex.Core.Schemas.Validators
 
             if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
             {
-                errors.Add($"<FIELD> must be greater than {min}");
+                errors.Add($"<FIELD> must be greater than '{min}'");
             }
 
             if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
             {
-                errors.Add($"<FIELD> must be greater than {min}");
+                errors.Add($"<FIELD> must be less than '{max}'");
             }
 
             return TaskHelper.Done;

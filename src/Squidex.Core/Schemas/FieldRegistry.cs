@@ -66,7 +66,12 @@ namespace Squidex.Core.Schemas
 
         public Field CreateField(long id, string name, FieldProperties properties)
         {
-            var registered = fieldsByPropertyType[properties.GetType()];
+            var registered = fieldsByPropertyType.GetOrDefault(properties.GetType());
+
+            if (registered == null)
+            {
+                throw new InvalidOperationException($"The field property '{properties.GetType()}' is not supported.");
+            }
 
             return registered.CreateField(id, name, properties);
         }

@@ -13,7 +13,30 @@ namespace Squidex.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementProperties, IValidatable
     {
-        public bool IsRequired { get; set; }
+        private bool isRequired;
+        private string placeholder;
+
+        public bool IsRequired
+        {
+            get { return isRequired; }
+            set
+            {
+                ThrowIfFrozen();
+
+                isRequired = value;
+            }
+        }
+
+        public string Placeholder
+        {
+            get { return placeholder; }
+            set
+            {
+                ThrowIfFrozen();
+
+                placeholder = value;
+            }
+        }
 
         public void Validate(IList<ValidationError> errors)
         {
@@ -23,14 +46,6 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected virtual IEnumerable<ValidationError> ValidateCore()
-        {
-            yield break;
-        }
-
-        public FieldProperties Clone()
-        {
-            return (FieldProperties) MemberwiseClone();
-        }
+        protected abstract IEnumerable<ValidationError> ValidateCore();
     }
 }

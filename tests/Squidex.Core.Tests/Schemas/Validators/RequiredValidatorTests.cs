@@ -19,7 +19,7 @@ namespace Squidex.Core.Tests.Schemas.Validators
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_not_add_error_if_object_is_valid()
+        public async Task Should_not_add_error_if_value_is_valid()
         {
             var sut = new RequiredValidator();
 
@@ -39,7 +39,7 @@ namespace Squidex.Core.Tests.Schemas.Validators
         }
 
         [Fact]
-        public async Task Should_add_error_if_object_is_null()
+        public async Task Should_add_error_if_value_is_null()
         {
             var sut = new RequiredValidator();
 

@@ -43,6 +43,8 @@ namespace Squidex.Core.Schemas
             get { return isDisabled; }
         }
 
+        public abstract FieldProperties RawProperties { get; }
+
         protected Field(long id, string name)
         {
             Guard.ValidSlug(name, nameof(name));
@@ -61,24 +63,31 @@ namespace Squidex.Core.Schemas
         {
             Guard.NotNull(property, nameof(property));
 
-            var value = ConvertValue(property);
-
-            var tempErrors = new List<string>();
-
-            foreach (var validator in validators.Value)
+            var rawErrors = new List<string>();
+            try
             {
-                await validator.ValidateAsync(value, tempErrors);
+                var value = ConvertValue(property);
+
+                foreach (var validator in validators.Value)
+                {
+                    await validator.ValidateAsync(value, rawErrors);
+                }
+            }
+            catch (InvalidCastException)
+            {
+                rawErrors.Add("<FIELD> is not a valid value");
             }
 
-            foreach (var error in tempErrors)
+            if (rawErrors.Count > 0)
             {
-                errors.Add(error.Replace("<FIELD>", name));
+                var displayName = !string.IsNullOrWhiteSpace(RawProperties.Label) ? RawProperties.Label : name;
+
+                foreach (var error in rawErrors)
+                {
+                    errors.Add(error.Replace("<FIELD>", displayName));
+                }
             }
         }
-
-        protected abstract IEnumerable<IValidator> CreateValidators();
-
-        protected abstract object ConvertValue(PropertyValue property);
 
         public Field Hide()
         {
@@ -121,8 +130,10 @@ namespace Squidex.Core.Schemas
             return clone;
         }
 
-        public abstract Field Clone();
+        protected abstract IEnumerable<IValidator> CreateValidators();
 
-        public abstract FieldProperties CloneProperties();
+        protected abstract object ConvertValue(PropertyValue property);
+
+        protected abstract Field Clone();
     }
 }

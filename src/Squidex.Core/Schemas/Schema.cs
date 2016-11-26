@@ -51,6 +51,8 @@ namespace Squidex.Core.Schemas
 
             fieldsById = fields;
             fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+
+            properties.Freeze();
         }
 
         public static Schema Create(string name, SchemaProperties newProperties)
@@ -101,7 +103,7 @@ namespace Squidex.Core.Schemas
 
         public Schema HideField(long fieldId)
         {
-            return UpdateField(fieldId, field => field.Show());
+            return UpdateField(fieldId, field => field.Hide());
         }
 
         public Schema ShowField(long fieldId)
@@ -152,10 +154,21 @@ namespace Squidex.Core.Schemas
                 }
                 else
                 {
-                    fieldErrors.Add($"'{kvp.Key}' is not a known field");
+                    fieldErrors.Add($"{kvp.Key} is not a known field");
                 }
 
-                fieldErrors.ForEach(error => errors.Add(new ValidationError(error, kvp.Key)));
+                foreach (var error in fieldErrors)
+                {
+                    errors.Add(new ValidationError(error, kvp.Key));
+                }
+            }
+
+            foreach (var field in fieldsByName.Values)
+            {
+                if (field.RawProperties.IsRequired && !data.Contains(field.Name))
+                {
+                    errors.Add(new ValidationError($"{field.Name} is required", field.Name));
+                }
             }
         }
     }

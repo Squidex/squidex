@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  NumberField.cs
+//  StringField.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,16 +7,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Globalization;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
-using System.Linq;
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class NumberField : Field<NumberFieldProperties>
+    public sealed class StringField : Field<StringFieldProperties>
     {
-        public NumberField(long id, string name, NumberFieldProperties properties) 
+        public StringField(long id, string name, StringFieldProperties properties) 
             : base(id, name, properties)
         {
         }
@@ -25,28 +23,28 @@ namespace Squidex.Core.Schemas
         {
             if (Properties.IsRequired)
             {
-                yield return new RequiredValidator();
+                yield return new RequiredStringValidator();
             }
 
-            if (Properties.MinValue.HasValue || Properties.MaxValue.HasValue)
+            if (Properties.MinLength.HasValue || Properties.MaxLength.HasValue)
             {
-                yield return new RangeValidator<double>(Properties.MinValue, Properties.MaxValue);
+                yield return new StringLengthValidator(Properties.MinLength, Properties.MaxLength);
             }
 
-            if (Properties.AllowedValues != null)
+            if (!string.IsNullOrWhiteSpace(Properties.Pattern))
             {
-                yield return new AllowedValuesValidator<double>(Properties.AllowedValues.ToArray());
+                yield return new PatternValidator(Properties.Pattern, Properties.PatternMessage);
             }
         }
 
         protected override object ConvertValue(PropertyValue property)
         {
-            return property.ToNullableDouble(CultureInfo.InvariantCulture);
+            return property.ToString();
         }
 
         protected override Field Clone()
         {
-            return new NumberField(Id, Name, Properties);
+            return new StringField(Id, Name, Properties);
         }
     }
 }

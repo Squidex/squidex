@@ -49,26 +49,24 @@ namespace Squidex.Write.Tests.Schemas
         [Fact]
         public void Create_should_create_schema()
         {
-            var props = new SchemaProperties(null, null);
+            var properties = new SchemaProperties();
 
-            sut.Create(new CreateSchema { Name = TestName, AppId = appId, Properties = props });
+            sut.Create(new CreateSchema { Name = TestName, AppId = appId, Properties = properties });
             
             Assert.Equal("schema", sut.Schema.Name);
-            Assert.Equal(props, sut.Schema.Properties);
-            Assert.Equal(appId, sut.AppId);
 
             sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new SchemaCreated { Name = TestName, AppId = appId, Properties = props }
+                        new SchemaCreated { Name = TestName, AppId = appId, Properties = properties }
                     });
         }
 
         [Fact]
         public void Update_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Update(new UpdateSchema { Properties = new SchemaProperties(null, null) }));
+            Assert.Throws<DomainException>(() => sut.Update(new UpdateSchema { Properties = new SchemaProperties() }));
         }
 
         [Fact]
@@ -91,18 +89,18 @@ namespace Squidex.Write.Tests.Schemas
         [Fact]
         public void Update_should_refresh_properties()
         {
-            var props = new SchemaProperties(null, null);
+            var properties = new SchemaProperties();
 
             sut.Create(new CreateSchema { Name = TestName, AppId = appId });
-            sut.Update(new UpdateSchema { Properties = props });
+            sut.Update(new UpdateSchema { Properties = properties });
             
-            Assert.Equal(props, sut.Schema.Properties);
+            Assert.Equal(properties, sut.Schema.Properties);
 
             sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new SchemaUpdated { Properties = props }
+                        new SchemaUpdated { Properties = properties }
                     });
         }
 

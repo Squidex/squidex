@@ -23,7 +23,7 @@ namespace Squidex.Core.Tests.Schemas.Validators
         [InlineData("")]
         [InlineData(" ")]
         [InlineData("  ")]
-        public async Task Should_not_add_error_if_object_is_valid(string value)
+        public async Task Should_not_add_error_if_value_is_valid(string value)
         {
             var sut = new RequiredStringValidator();
 
@@ -33,7 +33,7 @@ namespace Squidex.Core.Tests.Schemas.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_object_is_another_type()
+        public async Task Should_not_add_error_if_value_is_another_type()
         {
             var sut = new RequiredStringValidator();
 
@@ -54,7 +54,7 @@ namespace Squidex.Core.Tests.Schemas.Validators
         }
 
         [Fact]
-        public async Task Should_add_error_if_object_is_null()
+        public async Task Should_add_error_if_value_is_null()
         {
             var sut = new RequiredStringValidator();
 

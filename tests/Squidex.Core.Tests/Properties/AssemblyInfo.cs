@@ -1,5 +1,12 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿// ==========================================================================
+//  AssemblyInfo.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following

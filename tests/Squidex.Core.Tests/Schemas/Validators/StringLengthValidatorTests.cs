@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Core.Schemas.Validators;
@@ -15,14 +16,14 @@ using Xunit;
 
 namespace Squidex.Core.Tests.Schemas.Validators
 {
-    public class RangeValidatorTests
+    public class StringLengthValidatorTests
     {
         private readonly List<string> errors = new List<string>();
 
         [Fact]
         public async Task Should_not_error_if_value_is_null()
         {
-            var sut = new RangeValidator<int>(100, 200);
+            var sut = new StringLengthValidator(100, 200);
 
             await sut.ValidateAsync(null, errors);
 
@@ -36,9 +37,9 @@ namespace Squidex.Core.Tests.Schemas.Validators
         [InlineData(null, 2000)]
         public async Task Should_not_add_error_if_value_is_within_range(int? min, int? max)
         {
-            var sut = new RangeValidator<int>(min, max);
+            var sut = new StringLengthValidator(min, max);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(CreateString(1500), errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -48,29 +49,41 @@ namespace Squidex.Core.Tests.Schemas.Validators
         [InlineData(10, 10)]
         public void Should_throw_error_if_min_greater_than_max(int? min, int? max)
         {
-            Assert.Throws<ArgumentException>(() => new RangeValidator<int>(min, max));
+            Assert.Throws<ArgumentException>(() => new StringLengthValidator(min, max));
         }
 
         [Fact]
         public async Task Should_add_error_if_value_is_smaller_than_min()
         {
-            var sut = new RangeValidator<int>(2000, null);
+            var sut = new StringLengthValidator(2000, null);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be greater than '2000'" });
+                new[] { "<FIELD> must have more than '2000' characters" });
         }
 
         [Fact]
         public async Task Should_add_error_if_value_is_greater_than_max()
         {
-            var sut = new RangeValidator<int>(null, 1000);
+            var sut = new StringLengthValidator(null, 1000);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be less than '1000'" });
+                new[] { "<FIELD> must have less than '1000' characters" });
+        }
+
+        private static string CreateString(int size)
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < size; i++)
+            {
+                sb.Append("x");
+            }
+
+            return sb.ToString();
         }
     }
 }

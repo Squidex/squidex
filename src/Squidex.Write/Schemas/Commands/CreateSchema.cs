@@ -22,7 +22,7 @@ namespace Squidex.Write.Schemas.Commands
         {
             get
             {
-                return properties ?? (properties = new SchemaProperties(null, null)); 
+                return properties ?? (properties = new SchemaProperties()); 
             }
             set { properties = value; }
         }
