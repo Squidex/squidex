@@ -7,7 +7,7 @@
 
 import * as Ng2 from '@angular/core';
 
-export const fadeAnimation = (name = 'fade', timing = '200ms'): Ng2.AnimationEntryMetadata => {
+function buildFadeAnimation(name = 'fade', timing = '200ms'): Ng2.AnimationEntryMetadata {
     return Ng2.trigger(
         name, [
             Ng2.transition(':enter', [
@@ -30,7 +30,7 @@ export const fadeAnimation = (name = 'fade', timing = '200ms'): Ng2.AnimationEnt
     );
 };
 
-export const heightAnimation = (name = 'height', timing = '200ms'): Ng2.AnimationEntryMetadata => {
+function buildHeightAnimation(name = 'height', timing = '200ms'): Ng2.AnimationEntryMetadata {
     return Ng2.trigger(
         name, [
             Ng2.transition(':enter', [
@@ -52,4 +52,6 @@ export const heightAnimation = (name = 'height', timing = '200ms'): Ng2.Animatio
         ]
     );
 };
+
+export const fadeAnimation = buildfadeAnimation;
     

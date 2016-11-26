@@ -22,7 +22,7 @@ import {
     styles,
     template,
     animations: [
-        fadeAnimation()
+        fadeAnimation
     ]
 })
 export class ClientsPageComponent implements Ng2.OnInit {

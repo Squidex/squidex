@@ -19,7 +19,7 @@ import {
     styles,
     template,
     animations: [
-        fadeAnimation()
+        fadeAnimation
     ]
 })
 export class AppsPageComponent implements Ng2.OnInit {

@@ -21,7 +21,7 @@ const FALLBACK_NAME = 'my-app';
     selector: 'sqx-app-form',
     template,
     animations: [
-        fadeAnimation()
+        fadeAnimation
     ]
 })
 export class AppFormComponent implements Ng2.OnInit {

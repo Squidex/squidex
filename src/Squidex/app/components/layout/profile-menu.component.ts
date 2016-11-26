@@ -18,7 +18,7 @@ import {
     styles,
     template,
     animations: [
-        fadeAnimation()
+        fadeAnimation
     ]
 })
 export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
