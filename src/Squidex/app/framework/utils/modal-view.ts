@@ -15,7 +15,7 @@ export class ModalView {
     }
 
     constructor(isOpen = false,
-        public readonly closeAlways = false
+        public readonly closeAlways: boolean = false
     ) {
         this.isOpen$ = new BehaviorSubject(isOpen);
     }
