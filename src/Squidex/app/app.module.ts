@@ -45,7 +45,21 @@ import {
 
 import { routing } from './app.routes';
 
-const baseUrl = window.location.protocol + '//' + window.location.host + '/';
+export function configApiUrl() {
+    return new ApiUrlConfig(window.location.protocol + '//' + window.location.host + '/');
+}
+
+export function configTitles() {
+    return new TitlesConfig({}, undefined, 'Squidex Headless CMS');
+}
+
+export function configDecimalSeparator() {
+    return  new DecimalSeparatorConfig('.');
+}
+
+export function configCurrency() {
+    return new CurrencyConfig('EUR', '€', true);
+}
 
 @Ng2.NgModule({
     imports: [
@@ -69,6 +83,7 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         AppsService,
         AppMustExistGuard,
         AuthService,
+        DragService,
         LanguageService,
         LocalStoreService,
         MustBeAuthenticatedGuard,
@@ -76,11 +91,10 @@ const baseUrl = window.location.protocol + '//' + window.location.host + '/';
         TitleService,
         UsersProviderService,
         UsersService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig(baseUrl) },
-        { provide: CurrencyConfig, useValue: new CurrencyConfig('EUR', '€', true) },
-        { provide: DecimalSeparatorConfig, useValue: new DecimalSeparatorConfig('.') },
-        { provide: DragService, useFactory: DragServiceFactory },
-        { provide: TitlesConfig, useValue: new TitlesConfig({}, undefined, 'Squidex Headless CMS') }
+        { provide: ApiUrlConfig, useFactory: configApiUrl },
+        { provide: CurrencyConfig, useFactory: configCurrency },
+        { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
+        { provide: TitlesConfig, useFactory: configTitles }
     ],
     bootstrap: [AppComponent]
 })
