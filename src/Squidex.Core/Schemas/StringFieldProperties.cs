@@ -10,16 +10,19 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Squidex.Infrastructure;
+using System.Collections.Immutable;
 // ReSharper disable ObjectCreationAsStatement
 
 namespace Squidex.Core.Schemas
 {
+    [TypeName("StringField")]
     public sealed class StringFieldProperties : FieldProperties
     {
         private int? minLength;
         private int? maxLength;
         private string pattern;
         private string patternMessage;
+        private ImmutableList<string> allowedValues;
 
         public int? MinLength
         {
@@ -62,6 +65,17 @@ namespace Squidex.Core.Schemas
                 ThrowIfFrozen();
 
                 patternMessage = value;
+            }
+        }
+
+        public ImmutableList<string> AllowedValues
+        {
+            get { return allowedValues; }
+            set
+            {
+                ThrowIfFrozen();
+
+                allowedValues = value;
             }
         }
 

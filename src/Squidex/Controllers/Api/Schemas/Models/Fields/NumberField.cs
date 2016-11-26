@@ -6,6 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure.Reflection;
+
 namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
     public class NumberField : FieldDto
@@ -29,5 +32,10 @@ namespace Squidex.Controllers.Api.Schemas.Models.Fields
         /// The allowed values for the field value.
         /// </summary>
         public double[] AllowedValues { get; set; }
+
+        public override FieldProperties ToProperties()
+        {
+            return SimpleMapper.Map(this, new NumberFieldProperties());
+        }
     }
 }

@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Read;
 
@@ -34,18 +34,18 @@ namespace Squidex.Store.MongoDb.Utils
             return Update(entity, headers);
         }
 
-        public static BsonDocument ToJsonBsonDocument<T>(this T value, JsonSerializerSettings settings)
+        public static BsonDocument ToBsonDocument(this JToken value)
         {
-            var json = JsonConvert.SerializeObject(value, settings).Replace("$type", "§type");
+            var json = value.ToString().Replace("$type", "§type");
 
             return BsonDocument.Parse(json);
         }
 
-        public static T ToJsonObject<T>(this BsonDocument document, JsonSerializerSettings settings)
+        public static JToken ToJToken(this BsonDocument document)
         {
             var json = document.ToJson().Replace("§type", "$type");
 
-            return JsonConvert.DeserializeObject<T>(json, settings);
+            return JToken.Parse(json);
         }
 
         public static T Update<T>(T entity, EnvelopeHeaders headers) where T : IEntity

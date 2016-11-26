@@ -10,6 +10,7 @@ using Autofac;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Squidex.Core.Schemas;
+using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure.CQRS.Autofac;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.EventStore;
@@ -46,6 +47,10 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<EventStoreBus>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<SchemaJsonSerializer>()
                 .AsSelf()
                 .SingleInstance();
 

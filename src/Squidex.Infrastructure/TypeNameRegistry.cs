@@ -30,9 +30,12 @@ namespace Squidex.Infrastructure
                 }
                 catch (ArgumentException)
                 {
-                    var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
+                    if (namesByType[type] != name)
+                    {
+                        var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                        throw new ArgumentException(message, nameof(type));
+                    }
                 }
 
                 try
@@ -41,9 +44,12 @@ namespace Squidex.Infrastructure
                 }
                 catch (ArgumentException)
                 {
-                    var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+                    if (typesByName[name] != type)
+                    {
+                        var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                        throw new ArgumentException(message, nameof(type));
+                    }
                 }
             }
         }

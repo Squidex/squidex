@@ -6,6 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure.Reflection;
+
 namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
     public sealed class StringField : FieldDto
@@ -21,6 +24,11 @@ namespace Squidex.Controllers.Api.Schemas.Models.Fields
         public string Pattern { get; set; }
 
         /// <summary>
+        /// The validation message for the pattern.
+        /// </summary>
+        public string PatternMessage { get; set; }
+
+        /// <summary>
         /// The minimum allowed length for the field value.
         /// </summary>
         public int? MinLength { get; set; }
@@ -33,6 +41,11 @@ namespace Squidex.Controllers.Api.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public double[] AllowedValues { get; set; }
+        public string[] AllowedValues { get; set; }
+
+        public override FieldProperties ToProperties()
+        {
+            return SimpleMapper.Map(this, new StringFieldProperties());
+        }
     }
 }

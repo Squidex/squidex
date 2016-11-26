@@ -52,6 +52,7 @@ namespace Squidex.Core.Schemas
         public FieldRegistry()
         {
             Add<NumberFieldProperties>((id, name, properties) => new NumberField(id, name, (NumberFieldProperties)properties));
+            Add<StringFieldProperties>((id, name, properties) => new StringField(id, name, (StringFieldProperties)properties));
         }
 
         public void Add<TFieldProperties>(FactoryFunction fieldFactory)

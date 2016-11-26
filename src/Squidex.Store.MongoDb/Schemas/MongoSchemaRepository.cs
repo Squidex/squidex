@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Core.Schemas;
+using Squidex.Core.Schemas.Json;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -20,23 +20,23 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Store.MongoDb.Schemas.Models;
 using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Schemas
 {
     public sealed class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ICatchEventConsumer
     {
-        private readonly JsonSerializerSettings serializerSettings;
+        private readonly SchemaJsonSerializer serializer;
         private readonly FieldRegistry fieldRegistry;
 
-        public MongoSchemaRepository(IMongoDatabase database, JsonSerializerSettings serializerSettings, FieldRegistry fieldRegistry)
+        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry fieldRegistry)
             : base(database)
         {
-            Guard.NotNull(serializerSettings, nameof(serializerSettings));
+            Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
 
-            this.serializerSettings = serializerSettings;
+            this.serializer = serializer;
+
             this.fieldRegistry = fieldRegistry;
         }
 
@@ -63,7 +63,7 @@ namespace Squidex.Store.MongoDb.Schemas
                 await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
-            entity?.DeserializeSchema(serializerSettings, fieldRegistry);
+            entity?.DeserializeSchema(serializer);
 
             return entity;
         }
@@ -74,7 +74,7 @@ namespace Squidex.Store.MongoDb.Schemas
                 await Collection.Find(s => s.Id == schemaId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
-            entity?.DeserializeSchema(serializerSettings, fieldRegistry);
+            entity?.DeserializeSchema(serializer);
 
             return entity;
         }
@@ -161,16 +161,12 @@ namespace Squidex.Store.MongoDb.Schemas
 
         private void Serialize(MongoSchemaEntity entity, Schema schema)
         {
-            var dto = SchemaModel.Create(schema);
-
-            entity.Schema = dto.ToJsonBsonDocument(serializerSettings);
+            entity.Schema = serializer.Serialize(schema).ToBsonDocument();
         }
 
         private Schema Deserialize(MongoSchemaEntity entity)
         {
-            var dto = entity?.Schema.ToJsonObject<SchemaModel>(serializerSettings);
-
-            return dto?.ToSchema(fieldRegistry);
+            return entity.DeserializeSchema(serializer).Value;
         }
     }
 }

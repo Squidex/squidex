@@ -10,14 +10,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
-using Squidex.Controllers.Api.Schemas.Models.Fields;
+using Squidex.Core.Schemas;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
+    [JsonConverter(typeof(JsonInheritanceConverter), "$type")]
     [KnownType(typeof(NumberField))]
     [KnownType(typeof(StringField))]
-    public class FieldDto
+    public abstract class FieldDto
     {
         /// <summary>
         /// The name of the field. Must be unique within the schema.
@@ -48,5 +48,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// Indicates if the field is required.
         /// </summary>
         public bool IsRequired { get; set; }
+
+        public abstract FieldProperties ToProperties();
     }
 }

@@ -25,7 +25,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             this.errorMessage = errorMessage;
 
-            regex = new Regex(pattern);
+            regex = new Regex("^" + pattern + "$");
         }
 
         public Task ValidateAsync(object value, ICollection<string> errors)

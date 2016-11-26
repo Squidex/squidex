@@ -12,7 +12,6 @@ using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Squidex.Core.Schemas;
-using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 using Xunit;
 

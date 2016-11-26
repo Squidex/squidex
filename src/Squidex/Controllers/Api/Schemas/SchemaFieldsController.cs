@@ -9,10 +9,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Schemas.Models;
+using Squidex.Infrastructure;
 using Squidex.Pipeline;
 using Squidex.Write.Schemas.Commands;
 
@@ -51,7 +52,12 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] FieldDto model)
         {
-            var command = SimpleMapper.Map(model, new AddField());
+            var properties = model.ToProperties();
+
+            var fieldName = model.Name;
+            var fieldType = TypeNameRegistry.GetName(properties.GetType());
+
+            var command = new AddField { Name = fieldName, Type = fieldType, Properties = JToken.FromObject(properties) };
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<long>();
@@ -77,7 +83,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] FieldDto model)
         {
-            var command = SimpleMapper.Map(model, new UpdateField());
+            var command = new UpdateField { FieldId = id, Properties = JToken.FromObject(model) };
 
             await CommandBus.PublishAsync(command);
 

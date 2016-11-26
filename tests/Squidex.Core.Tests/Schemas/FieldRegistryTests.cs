@@ -28,7 +28,8 @@ namespace Squidex.Core.Tests.Schemas
 
         static FieldRegistryTests()
         {
-            TypeNameRegistry.Map(typeof(NumberFieldProperties), "number");
+            TypeNameRegistry.Map(typeof(NumberFieldProperties), "NumberField");
+            TypeNameRegistry.Map(typeof(StringFieldProperties), "StringField");
             TypeNameRegistry.Map(typeof(InvalidProperties), "invalid");
         }
 
@@ -71,7 +72,7 @@ namespace Squidex.Core.Tests.Schemas
         [Fact]
         public void Should_find_registration_by_name()
         {
-            var registry = sut.FindByTypeName("number");
+            var registry = sut.FindByTypeName("NumberField");
 
             Assert.Equal(typeof(NumberFieldProperties), registry.PropertiesType);
         }

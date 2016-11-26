@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
@@ -34,6 +35,11 @@ namespace Squidex.Core.Schemas
             if (!string.IsNullOrWhiteSpace(Properties.Pattern))
             {
                 yield return new PatternValidator(Properties.Pattern, Properties.PatternMessage);
+            }
+
+            if (Properties.AllowedValues != null)
+            {
+                yield return new AllowedValuesValidator<string>(Properties.AllowedValues.ToArray());
             }
         }
 

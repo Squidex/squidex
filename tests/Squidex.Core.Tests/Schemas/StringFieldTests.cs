@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -47,7 +48,7 @@ namespace Squidex.Core.Tests.Schemas
         }
 
         [Fact]
-        public async Task Should_add_errors_if_string_shorter_than_max()
+        public async Task Should_add_errors_if_string_is_shorter_than_min_length()
         {
             var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", MinLength = 10 });
 
@@ -58,7 +59,7 @@ namespace Squidex.Core.Tests.Schemas
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_greater_than_max()
+        public async Task Should_add_errors_if_string_is_longer_than_max_length()
         {
             var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", MaxLength = 5 });
 
@@ -69,9 +70,20 @@ namespace Squidex.Core.Tests.Schemas
         }
 
         [Fact]
+        public async Task Should_add_errors_if_string_not_allowed()
+        {
+            var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", AllowedValues = ImmutableList.Create("Foo") });
+
+            await sut.ValidateAsync(CreateValue("Bar"), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "Name is not an allowed value" });
+        }
+
+        [Fact]
         public async Task Should_add_errors_if_number_is_not_valid_pattern()
         {
-            var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", Pattern = "^[0-9]{3}$" });
+            var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", Pattern = "[0-9]{3}" });
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
@@ -82,7 +94,7 @@ namespace Squidex.Core.Tests.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_not_valid_pattern_with_message()
         {
-            var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", Pattern = "^[0-9]{3}$", PatternMessage = "Custom Error Message" });
+            var sut = new StringField(1, "name", new StringFieldProperties { Label = "Name", Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message" });
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 

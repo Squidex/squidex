@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    [TypeName("number")]
+    [TypeName("NumberField")]
     public sealed class NumberFieldProperties : FieldProperties
     {
         private double? maxValue;

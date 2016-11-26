@@ -9,17 +9,16 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using Squidex.Core.Schemas;
+using Squidex.Core.Schemas.Json;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Store.MongoDb.Schemas.Models;
 using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Schemas
 {
     public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntityWithSchema
     {
-        private Schema schema;
+        private Lazy<Schema> schema;
 
         [BsonRequired]
         [BsonElement]
@@ -39,19 +38,14 @@ namespace Squidex.Store.MongoDb.Schemas
 
         Schema ISchemaEntityWithSchema.Schema
         {
-            get { return schema; }
+            get { return schema.Value; }
         }
 
-        public void DeserializeSchema(JsonSerializerSettings serializerSettings, FieldRegistry fieldRegistry)
+        public Lazy<Schema> DeserializeSchema(SchemaJsonSerializer serializer)
         {
-            if (schema != null)
-            {
-                return;
-            }
+            schema = new Lazy<Schema>(() => schema != null ? null : serializer.Deserialize(Schema.ToJToken()));
 
-            var dto = Schema.ToJsonObject<SchemaModel>(serializerSettings);
-
-            schema = dto?.ToSchema(fieldRegistry);
+            return schema;
         }
     }
 }

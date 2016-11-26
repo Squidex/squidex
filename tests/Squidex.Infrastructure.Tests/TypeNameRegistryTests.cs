@@ -22,13 +22,13 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_and_retrieve_types()
         {
-            TypeNameRegistry.Map(typeof(int), "number");
+            TypeNameRegistry.Map(typeof(int), "NumberField");
 
-            Assert.Equal("number", TypeNameRegistry.GetName<int>());
-            Assert.Equal("number", TypeNameRegistry.GetName(typeof(int)));
+            Assert.Equal("NumberField", TypeNameRegistry.GetName<int>());
+            Assert.Equal("NumberField", TypeNameRegistry.GetName(typeof(int)));
 
-            Assert.Equal(typeof(int), TypeNameRegistry.GetType("number"));
-            Assert.Equal(typeof(int), TypeNameRegistry.GetType("Number"));
+            Assert.Equal(typeof(int), TypeNameRegistry.GetType("NumberField"));
+            Assert.Equal(typeof(int), TypeNameRegistry.GetType("NumberField"));
         }
 
         [Fact]
@@ -41,6 +41,13 @@ namespace Squidex.Infrastructure
 
             Assert.Equal(typeof(MyType), TypeNameRegistry.GetType("my"));
             Assert.Equal(typeof(MyType), TypeNameRegistry.GetType("My"));
+        }
+
+        [Fact]
+        public void Should_not_throw_if_type_is_already_registered_with_same_name()
+        {
+            TypeNameRegistry.Map(typeof(long), "long");
+            TypeNameRegistry.Map(typeof(long), "long");
         }
 
         [Fact]
