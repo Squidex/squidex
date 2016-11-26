@@ -8,6 +8,7 @@
 
 using System;
 using Xunit;
+// ReSharper disable UnusedParameter.Local
 
 namespace Squidex.Infrastructure.Reflection
 {
@@ -69,6 +70,22 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
+        public void Should_to_type()
+        {
+            var class1 = new Class1
+            {
+                UnmappedString = Guid.NewGuid().ToString(),
+                MappedString = Guid.NewGuid().ToString(),
+                MappedNumber = 123,
+                MappedGuid = Guid.NewGuid()
+            };
+
+            var class2 = SimpleMapper.Map<Class1, Class2>(class1);
+
+            AssertObjectEquality(class1, class2);
+        }
+
+        [Fact]
         public void Should_map_between_types()
         {
             var class1 = new Class1
@@ -82,6 +99,11 @@ namespace Squidex.Infrastructure.Reflection
 
             SimpleMapper.Map(class1, class2);
 
+            AssertObjectEquality(class1, class2);
+        }
+
+        private static void AssertObjectEquality(Class1 class1, Class2 class2)
+        {
             Assert.Equal(class1.MappedString, class2.MappedString);
             Assert.Equal(class1.MappedNumber, class2.MappedNumber);
             Assert.Equal(class1.MappedGuid.ToString(), class2.MappedGuid);

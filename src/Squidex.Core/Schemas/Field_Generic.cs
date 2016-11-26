@@ -15,12 +15,7 @@ namespace Squidex.Core.Schemas
     {
         private T properties;
 
-        public override FieldProperties RawProperties
-        {
-            get { return properties; }
-        }
-
-        public T Properties
+        protected T Properties
         {
             get { return properties; }
         }
@@ -36,7 +31,9 @@ namespace Squidex.Core.Schemas
         public override Field Update(FieldProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
-            
+
+            newProperties = newProperties.Clone();
+
             var typedProperties = newProperties as T;
 
             if (typedProperties == null)
@@ -44,9 +41,14 @@ namespace Squidex.Core.Schemas
                 throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
             }
 
-            newProperties.Validate(() => $"Cannot update field with id '{Id}', becase the settings are invalid.");
+            newProperties.Validate(() => $"Cannot update field with id '{Id}', because the settings are invalid.");
 
             return Update<Field<T>>(clone => clone.properties = typedProperties);
+        }
+
+        public override FieldProperties CloneProperties()
+        {
+            return properties.Clone();
         }
     }
 }

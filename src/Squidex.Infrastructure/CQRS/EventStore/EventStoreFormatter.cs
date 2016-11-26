@@ -26,17 +26,17 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
         }
 
-        public Envelope<IEvent> Parse(ResolvedEvent @event)
+        public Envelope<IEvent> Parse(IReceivedEvent @event)
         {
-            var headers = ReadJson<PropertiesBag>(@event.Event.Metadata);
+            var headers = ReadJson<PropertiesBag>(@event.Metadata);
 
-            var eventType = TypeNameRegistry.GetType(@event.Event.EventType);
-            var eventData = ReadJson<IEvent>(@event.Event.Data, eventType);
+            var eventType = TypeNameRegistry.GetType(@event.EventType);
+            var eventData = ReadJson<IEvent>(@event.Payload, eventType);
 
             var envelope = new Envelope<IEvent>(eventData, headers);
 
-            envelope.Headers.Set(CommonHeaders.Timestamp, Instant.FromDateTimeUtc(DateTime.SpecifyKind(@event.Event.Created, DateTimeKind.Utc)));
-            envelope.Headers.Set(CommonHeaders.EventNumber, @event.OriginalEventNumber);
+            envelope.Headers.Set(CommonHeaders.Timestamp, Instant.FromDateTimeUtc(DateTime.SpecifyKind(@event.Created, DateTimeKind.Utc)));
+            envelope.Headers.Set(CommonHeaders.EventNumber, @event.EventNumber);
 
             return envelope;
         }

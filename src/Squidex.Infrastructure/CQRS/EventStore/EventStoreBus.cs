@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                     return;
                 }
 
-                var @event = formatter.Parse(resolvedEvent);
+                var @event = formatter.Parse(new EventWrapper(resolvedEvent));
 
                 logger.LogInformation("Received event {0} ({1})", @event.Payload.GetType().Name, @event.Headers.AggregateId());
 

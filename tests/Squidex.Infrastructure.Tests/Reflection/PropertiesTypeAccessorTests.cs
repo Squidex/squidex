@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Reflection
 {
-    public class PropertiesTypeAccessorTest
+    public class PropertiesTypeAccessorTests
     {
         public class TestClass
         {

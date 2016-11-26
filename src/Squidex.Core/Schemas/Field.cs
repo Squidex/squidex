@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
-
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 
@@ -19,6 +17,7 @@ namespace Squidex.Core.Schemas
 {
     public abstract class Field
     {
+        private readonly Lazy<List<IValidator>> validators;
         private readonly long id;
         private string name;
         private bool isDisabled;
@@ -34,16 +33,6 @@ namespace Squidex.Core.Schemas
             get { return name; }
         }
 
-        public string Hints
-        {
-            get { return RawProperties.Hints; }
-        }
-
-        public string Label
-        {
-            get { return RawProperties.Label; }
-        }
-
         public bool IsHidden
         {
             get { return isHidden; }
@@ -54,46 +43,42 @@ namespace Squidex.Core.Schemas
             get { return isDisabled; }
         }
 
-        public bool IsRequired
-        {
-            get { return RawProperties.IsRequired; }
-        }
-
-        public abstract FieldProperties RawProperties { get; }
-
         protected Field(long id, string name)
         {
-            Guard.GreaterThan(id, 0, nameof(id));
             Guard.ValidSlug(name, nameof(name));
+            Guard.GreaterThan(id, 0, nameof(id));
 
             this.id = id;
 
             this.name = name;
+
+            validators = new Lazy<List<IValidator>>(() => new List<IValidator>(CreateValidators()));
         }
 
         public abstract Field Update(FieldProperties newProperties);
 
-        public Task ValidateAsync(PropertyValue property, ICollection<string> errors)
+        public async Task ValidateAsync(PropertyValue property, ICollection<string> errors)
         {
             Guard.NotNull(property, nameof(property));
-            
-            if (IsRequired && property.RawValue == null)
+
+            var value = ConvertValue(property);
+
+            var tempErrors = new List<string>();
+
+            foreach (var validator in validators.Value)
             {
-                errors.Add("Field is required");
+                await validator.ValidateAsync(value, tempErrors);
             }
 
-            if (property.RawValue == null)
+            foreach (var error in tempErrors)
             {
-                return TaskHelper.Done;
+                errors.Add(error.Replace("<FIELD>", name));
             }
-
-            return ValidateCoreAsync(property, errors);
         }
 
-        protected virtual Task ValidateCoreAsync(PropertyValue property, ICollection<string> errors)
-        {
-            return TaskHelper.Done;
-        }
+        protected abstract IEnumerable<IValidator> CreateValidators();
+
+        protected abstract object ConvertValue(PropertyValue property);
 
         public Field Hide()
         {
@@ -136,6 +121,8 @@ namespace Squidex.Core.Schemas
             return clone;
         }
 
-        protected abstract Field Clone();
+        public abstract Field Clone();
+
+        public abstract FieldProperties CloneProperties();
     }
 }

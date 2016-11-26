@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_serialize_and_deserialize_empty()
+        public void Should_serialize_and_deserialize_empty_bag()
         {
             var serializerSettings = new JsonSerializerSettings();
 

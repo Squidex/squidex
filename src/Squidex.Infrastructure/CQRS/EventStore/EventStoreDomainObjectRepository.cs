@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 
                 foreach (var resolved in currentSlice.Events)
                 {
-                    var envelope = formatter.Parse(resolved);
+                    var envelope = formatter.Parse(new EventWrapper(resolved));
 
                     domainObject.ApplyEvent(envelope);
                 }

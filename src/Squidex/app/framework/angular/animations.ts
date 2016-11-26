@@ -53,5 +53,5 @@ function buildHeightAnimation(name = 'height', timing = '200ms'): Ng2.AnimationE
     );
 };
 
-export const fadeAnimation = buildfadeAnimation;
+export const fadeAnimation = buildFadeAnimation();
     

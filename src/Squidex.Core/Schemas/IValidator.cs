@@ -1,17 +1,18 @@
 ﻿// ==========================================================================
-//  NamedElementProperties.cs
+//  IValidator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace Squidex.Core.Schemas
 {
-    public abstract class NamedElementProperties
+    public interface IValidator
     {
-        public string Label { get; set; }
-
-        public string Hints { get; set; }
+        Task ValidateAsync(object value, ICollection<string> errors);
     }
 }

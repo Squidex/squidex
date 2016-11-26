@@ -1,17 +1,25 @@
 ﻿// ==========================================================================
-//  NamedElementProperties.cs
+//  IReceivedEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Core.Schemas
-{
-    public abstract class NamedElementProperties
-    {
-        public string Label { get; set; }
+using System;
 
-        public string Hints { get; set; }
+namespace Squidex.Infrastructure.CQRS.EventStore
+{
+    public interface IReceivedEvent
+    {
+        int EventNumber { get; }
+
+        string EventType { get; }
+
+        byte[] Metadata { get; }
+
+        byte[] Payload { get; }
+
+        DateTime Created { get; }
     }
 }

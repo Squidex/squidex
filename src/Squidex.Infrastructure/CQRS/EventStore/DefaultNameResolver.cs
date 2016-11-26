@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
         {
             Guard.NotNullOrEmpty(prefix, nameof(prefix));
 
-            this.prefix = prefix;
+            this.prefix = prefix.ToLowerInvariant();
         }
 
         public string GetStreamName(Type aggregateType, Guid id)

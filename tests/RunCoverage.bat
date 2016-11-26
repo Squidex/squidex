@@ -28,6 +28,16 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
+-targetargs:"test %~dp0\Squidex.Core.Tests" ^
+-filter:"+[Squidex*]*" ^
+-skipautoprops ^
+-output:"%~dp0\GeneratedReports\Core.xml" ^
+-oldStyle
+exit /b %errorlevel%
+
+"%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
+-register:user ^
+-target:"C:\Program Files\dotnet\dotnet.exe" ^
 -targetargs:"test %~dp0\Squidex.Write.Tests" ^
 -filter:"+[Squidex*]*" ^
 -skipautoprops ^

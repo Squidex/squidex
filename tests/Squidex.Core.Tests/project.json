@@ -1,4 +1,4 @@
-{
+﻿{
   "buildOptions": {
     "copyToOutput": {
       "include": [
@@ -12,7 +12,6 @@
     "Moq": "4.6.38-alpha",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
-    "Squidex.Write": "1.0.0-*",
     "xunit": "2.2.0-beta3-build3402"
   },
   "frameworks": {
@@ -27,7 +26,7 @@
   },
   "testRunner": "xunit",
   "tooling": {
-    "defaultNamespace": "Squidex.Write.Tests"
+    "defaultNamespace": "Squidex.Core.Tests"
   },
   "tools": {
     "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"

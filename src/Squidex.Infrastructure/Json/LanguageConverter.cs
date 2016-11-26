@@ -15,16 +15,7 @@ namespace Squidex.Infrastructure.Json
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var language = value as Language;
-
-            if (language != null)
-            {
-                writer.WriteValue(language.Iso2Code);
-            }
-            else
-            {
-                writer.WriteNull();
-            }
+            writer.WriteValue(((Language)value).Iso2Code);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

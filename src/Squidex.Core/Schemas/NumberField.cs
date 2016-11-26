@@ -6,70 +6,47 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
+using System.Linq;
 
 namespace Squidex.Core.Schemas
 {
     public sealed class NumberField : Field<NumberFieldProperties>
     {
-        public double? MaxValue
-        {
-            get { return Properties.MaxValue; }
-        }
-
-        public double? MinValue
-        {
-            get { return Properties.MinValue; }
-        }
-
-        public double[] AllowedValues
-        {
-            get { return Properties.AllowedValues; }
-        }
-
         public NumberField(long id, string name, NumberFieldProperties properties) 
             : base(id, name, properties)
         {
         }
 
-        protected override Task ValidateCoreAsync(PropertyValue property, ICollection<string> errors)
+        protected override IEnumerable<IValidator> CreateValidators()
         {
-            try
+            if (Properties.IsRequired)
             {
-                var value = property.ToDouble(CultureInfo.InvariantCulture);
-
-                if (MinValue.HasValue && value < MinValue.Value)
-                {
-                    errors.Add($"Must be greater than {MinValue}");
-                }
-
-                if (MaxValue.HasValue && value > MaxValue.Value)
-                {
-                    errors.Add($"Must be less than {MaxValue}");
-                }
-
-                if (AllowedValues != null && !AllowedValues.Contains(value))
-                {
-                    errors.Add($"Can only be one of the following value: {string.Join(", ", AllowedValues)}");
-                }
-            }
-            catch (InvalidCastException)
-            {
-                errors.Add("Value is not a valid number");
+                yield return new RequiredValidator();
             }
 
-            return TaskHelper.Done;
+            if (Properties.MinValue.HasValue || Properties.MaxValue.HasValue)
+            {
+                yield return new RangeValidator<double>(Properties.MinValue, Properties.MaxValue);
+            }
+
+            if (Properties.AllowedValues != null)
+            {
+                yield return new AllowedValuesValidator<double>(Properties.AllowedValues.ToArray());
+            }
         }
 
-        protected override Field Clone()
+        protected override object ConvertValue(PropertyValue property)
         {
-            return (Field)MemberwiseClone();
+            return property.ToNullableDouble(CultureInfo.InvariantCulture);
+        }
+
+        public override Field Clone()
+        {
+            return new NumberField(Id, Name, Properties);
         }
     }
 }
