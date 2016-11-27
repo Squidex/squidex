@@ -5,7 +5,6 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-
 using Autofac;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline.CommandHandlers;

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppClientKeysController.cs
+//  AppClientsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Services;
 using Squidex.Write.Apps;

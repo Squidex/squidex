@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppClientKeyCreated.cs
+//  AppClientAttached.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

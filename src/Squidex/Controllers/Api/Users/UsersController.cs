@@ -1,4 +1,4 @@
-﻿// =========================================================================
+﻿// ==========================================================================
 //  UsersController.cs
 //  Squidex Headless CMS
 // ==========================================================================
@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Users.Models;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Users.Repositories;
 

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithAggregateIdHandler.cs
+//  EnrichWithSchemaAggregateIdHandler.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
