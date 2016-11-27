@@ -26,6 +26,7 @@ namespace Squidex.Config.Domain
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new PropertiesBagConverter());
+            settings.Converters.Add(new UserTokenConverter());
             settings.NullValueHandling = NullValueHandling.Ignore;
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             settings.DateParseHandling = DateParseHandling.DateTime;

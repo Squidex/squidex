@@ -10,6 +10,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface IUserCommand : ICommand
     {
-        string UserId { get; set; }
+        UserToken User { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿// =========================================================================
-//  LanguageConverter.cs
+// ==========================================================================
+//  UserTokenConverter.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,21 +11,21 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class LanguageConverter : JsonConverter
+    public sealed class UserTokenConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteValue(((Language)value).Iso2Code);
+            writer.WriteValue(value.ToString());
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return reader.TokenType == JsonToken.Null ? null : Language.GetLanguage((string)reader.Value);
+            return reader.TokenType == JsonToken.Null ? null : UserToken.Parse((string)reader.Value);
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(Language);
+            return objectType == typeof(UserToken);
         }
     }
 }

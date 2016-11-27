@@ -21,6 +21,7 @@ namespace Squidex.Infrastructure
         static LanguageTests()
         {
             serializerSettings.Converters.Add(new LanguageConverter());
+            serializerSettings.NullValueHandling = NullValueHandling.Include;
         }
 
         [Theory]

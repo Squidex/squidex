@@ -26,7 +26,7 @@ namespace Squidex.Write.Apps
     {
         private const string TestName = "app";
         private readonly AppDomainObject sut;
-        private readonly string subjectId = Guid.NewGuid().ToString();
+        private readonly UserToken user = new UserToken("subject", Guid.NewGuid().ToString());
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
@@ -54,17 +54,17 @@ namespace Squidex.Write.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(new CreateApp { Name = TestName, UserId = subjectId });
+            sut.Create(new CreateApp { Name = TestName, User = user });
 
             Assert.Equal(TestName, sut.Name);
-            Assert.Equal(PermissionLevel.Owner, sut.Contributors[subjectId]);
+            Assert.Equal(PermissionLevel.Owner, sut.Contributors[user.Identifier]);
 
             sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
                         new AppCreated { Name = TestName },
-                        new AppContributorAssigned { ContributorId = subjectId, Permission = PermissionLevel.Owner },
+                        new AppContributorAssigned { ContributorId = user.Identifier, Permission = PermissionLevel.Owner },
                         new AppLanguagesConfigured { Languages= new List<Language> { Language.GetLanguage("en") } }
                     });
         }
@@ -86,7 +86,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor { ContributorId = subjectId, Permission = PermissionLevel.Editor }));
+            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor { ContributorId = user.Identifier, Permission = PermissionLevel.Editor }));
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = subjectId }));
+            Assert.Throws<ValidationException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = user.Identifier }));
         }
 
         [Fact]
@@ -271,7 +271,7 @@ namespace Squidex.Write.Apps
 
         private void CreateApp()
         {
-            sut.Create(new CreateApp { Name = TestName, UserId = subjectId });
+            sut.Create(new CreateApp { Name = TestName, User = user });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

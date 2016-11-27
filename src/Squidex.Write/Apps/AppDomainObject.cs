@@ -175,7 +175,7 @@ namespace Squidex.Write.Apps
 
         private static AppContributorAssigned CreateInitialOwner(IUserCommand command)
         {
-            return new AppContributorAssigned { ContributorId = command.UserId, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { ContributorId = command.User.Identifier, Permission = PermissionLevel.Owner };
         }
 
         private void ThrowIfNotCreated()

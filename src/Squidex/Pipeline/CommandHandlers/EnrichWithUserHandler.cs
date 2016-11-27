@@ -9,6 +9,7 @@
 using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Security;
 // ReSharper disable InvertIf
@@ -30,27 +31,33 @@ namespace Squidex.Pipeline.CommandHandlers
 
             if (subjectCommand != null)
             {
-                var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
+                var userToken = 
+                    FindUserFromSubject() ?? 
+                    FindUserFromClient();
 
-                if (subjectId == null)
+                if (userToken == null)
                 {
-                    var clientId = httpContextAccessor.HttpContext.User.OpenIdClientId();
-
-                    if (clientId != null)
-                    {
-                        subjectId = $"Client:"
-                    }
+                    throw new SecurityException("No user with subject or client id available");
                 }
 
-                if (subjectId == null)
-                {
-                    throw new SecurityException("No user with subject id available");
-                }
-
-                subjectCommand.UserId = subjectId;
+                subjectCommand.User = userToken;
             }
 
             return Task.FromResult(false);
+        }
+
+        private UserToken FindUserFromSubject()
+        {
+            var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
+
+            return subjectId == null ? null : new UserToken("subject", subjectId);
+        }
+
+        private UserToken FindUserFromClient()
+        {
+            var clientId = httpContextAccessor.HttpContext.User.OpenIdClientId();
+
+            return clientId == null ? null : new UserToken("client", clientId);
         }
     }
 }

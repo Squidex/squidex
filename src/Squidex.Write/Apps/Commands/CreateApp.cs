@@ -17,7 +17,7 @@ namespace Squidex.Write.Apps.Commands
     {
         public string Name { get; set; }
 
-        public string UserId { get; set; }
+        public UserToken User { get; set; }
 
         public CreateApp()
         {
