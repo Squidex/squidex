@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure
         {
             var token1a = UserToken.Parse("client:client1");
             var token1b = UserToken.Parse("client:client1");
-            var token2 = UserToken.Parse("client:client2");
+            var token2  = UserToken.Parse("client:client2");
 
             Assert.True(token1a.Equals(token1b));
 
@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure
         {
             var token1a = UserToken.Parse("client:client1");
             var token1b = UserToken.Parse("client:client1");
-            var token2 = UserToken.Parse("client:client2");
+            var token2  = UserToken.Parse("client:client2");
 
             Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
 

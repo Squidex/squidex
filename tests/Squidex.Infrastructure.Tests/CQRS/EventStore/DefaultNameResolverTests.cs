@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             var sut = new DefaultNameResolver("Squidex");
             var user = new UserDomainObject(Guid.NewGuid(), 1);
 
-            var name = sut.GetStreamName(typeof(User), user.Id);
+            var name = sut.GetStreamName(typeof(UserDomainObject), user.Id);
 
             Assert.Equal($"squidex-user-{user.Id}", name);
         }
