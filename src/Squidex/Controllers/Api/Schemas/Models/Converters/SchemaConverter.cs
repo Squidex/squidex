@@ -17,31 +17,15 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
     public static class SchemaConverter
     {
-        private static readonly Dictionary<Type, Func<Field, FieldDto>> Factories = new Dictionary<Type, Func<Field, FieldDto>>
+        private static readonly Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>> Factories = new Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>>
         {
             {
-                typeof(NumberField),
-                field =>
-                {
-                    var dto = new Dtos.NumberField();
-
-                    SimpleMapper.Map(field, dto);
-                    SimpleMapper.Map((NumberFieldProperties)field.RawProperties, dto);
-
-                    return dto;
-                }
+                typeof(NumberFieldProperties),
+                p => SimpleMapper.Map((NumberFieldProperties)p, new Dtos.NumberField())
             },
             {
-                typeof(StringField),
-                field =>
-                {
-                    var dto = new Dtos.StringField();
-
-                    SimpleMapper.Map(field, dto);
-                    SimpleMapper.Map((StringFieldProperties)field.RawProperties, dto);
-
-                    return dto;
-                }
+                typeof(StringFieldProperties),
+                p => SimpleMapper.Map((StringFieldProperties)p, new Dtos.StringField())
             }
         };
 
@@ -57,7 +41,15 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 
             foreach (var field in entity.Schema.Fields.Values)
             {
-                var fieldDto = Factories[field.RawProperties.GetType()](field);
+                var fieldPropertiesDto = Factories[field.RawProperties.GetType()](field.RawProperties);
+
+                var fieldDto = new FieldDto
+                {
+                    Name = field.Name,
+                    IsHidden = field.IsHidden,
+                    IsDisabled = field.IsDisabled,
+                    Properties = fieldPropertiesDto
+                };
 
                 dto.Fields.Add(fieldDto);
             }

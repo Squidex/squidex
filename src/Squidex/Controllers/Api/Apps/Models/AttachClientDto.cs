@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class AttachClientDto
+    public sealed class AttachClientDto
     {
         /// <summary>
         /// The name of the client.

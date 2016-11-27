@@ -103,26 +103,24 @@ namespace Squidex.Write.Schemas
             isDeleted = true;
         }
 
-        public SchemaDomainObject AddField(AddField command, FieldProperties properties)
+        public SchemaDomainObject AddField(AddField command)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
-            Guard.NotNull(properties, nameof(properties));
 
             VerifyCreatedAndNotDeleted();
-            
-            RaiseEvent(new FieldAdded { FieldId = ++totalFields, Name = command.Name, Properties = properties });
+
+            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = ++totalFields }));
 
             return this;
         }
 
-        public SchemaDomainObject UpdateField(UpdateField command, FieldProperties properties)
+        public SchemaDomainObject UpdateField(UpdateField command)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
-            Guard.NotNull(properties, nameof(properties));
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new FieldUpdated { FieldId = command.FieldId, Properties = properties });
+            RaiseEvent(SimpleMapper.Map(command, new FieldUpdated()));
 
             return this;
         }

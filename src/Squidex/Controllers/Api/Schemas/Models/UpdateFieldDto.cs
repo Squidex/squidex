@@ -1,20 +1,15 @@
 ﻿// ==========================================================================
-//  SchemaUpdated.cs
+//  UpdateFieldDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
-
-namespace Squidex.Events.Schemas
+namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [TypeName("SchemaUpdatedEvent")]
-    public class SchemaUpdated : IEvent
+    public class UpdateFieldDto
     {
-        public SchemaProperties Properties { get; set; }
+        public FieldPropertiesDto Properties { get; set; }
     }
 }

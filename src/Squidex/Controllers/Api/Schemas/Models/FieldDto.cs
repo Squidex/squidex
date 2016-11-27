@@ -7,17 +7,10 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using NJsonSchema.Converters;
-using Squidex.Core.Schemas;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonConverter(typeof(JsonInheritanceConverter), "$type")]
-    [KnownType(typeof(NumberField))]
-    [KnownType(typeof(StringField))]
-    public abstract class FieldDto
+    public sealed class FieldDto
     {
         /// <summary>
         /// The name of the field. Must be unique within the schema.
@@ -27,28 +20,19 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Optional label for the editor.
+        /// Defines if the field is hidden.
         /// </summary>
-        [StringLength(100)]
-        public string Label { get; set; }
+        public bool IsHidden { get; set; }
 
         /// <summary>
-        /// Hints to describe the schema.
+        /// Defines if the field is disabled.
         /// </summary>
-        [StringLength(1000)]
-        public string Hints { get; set; }
+        public bool IsDisabled { get; set; }
 
         /// <summary>
-        /// Placeholder to show when no value has been entered.
+        /// The field properties.
         /// </summary>
-        [StringLength(100)]
-        public string Placeholder { get; set; }
-
-        /// <summary>
-        /// Indicates if the field is required.
-        /// </summary>
-        public bool IsRequired { get; set; }
-
-        public abstract FieldProperties ToProperties();
+        [Required]
+        public FieldPropertiesDto Properties { get; set; }
     }
 }

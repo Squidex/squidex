@@ -137,7 +137,9 @@ namespace Squidex.Store.MongoDb.Schemas
 
         public Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, s => SimpleMapper.Map(@event, s));
+            var schema = Schema.Create(@event.Name, @event.Properties);
+
+            return Collection.CreateAsync(headers, s => { Serialize(s, schema); SimpleMapper.Map(@event, s); });
         }
 
         public Task On(Envelope<IEvent> @event)

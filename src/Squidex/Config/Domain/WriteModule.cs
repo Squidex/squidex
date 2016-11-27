@@ -18,10 +18,6 @@ namespace Squidex.Config.Domain
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EnrichWithSchemaAggregateIdHandler>()
-                .As<ICommandHandler>()
-                .SingleInstance();
-
             builder.RegisterType<EnrichWithAppIdHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
@@ -31,6 +27,10 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<EnrichWithTimestampHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<EnrichWithSchemaAggregateIdHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 

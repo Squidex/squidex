@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
-    public class NumberField : FieldDto
+    public sealed class NumberField : FieldPropertiesDto
     {
         /// <summary>
         /// The default value for the field value.

@@ -62,7 +62,7 @@
     "nowarn": [ "1591", "1573", "1572" ],
     "embed": {
       "include": [
-        "Configurations/Identity/Cert/*.*"
+        "Config/Identity/Cert/*.*"
       ]
     } 
   },

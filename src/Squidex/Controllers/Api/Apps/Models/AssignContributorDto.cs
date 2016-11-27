@@ -13,7 +13,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class AssignContributorDto
+    public sealed class AssignContributorDto
     {
         /// <summary>
         /// The id of the user to add to the app (GUID).

@@ -49,11 +49,7 @@ namespace Squidex.Config.EventStore
                 var options = context.Resolve<IOptions<MyEventStoreOptions>>().Value;
 
                 return new DefaultNameResolver(options.Prefix);
-            }).SingleInstance();
-
-            builder.Register(c => new DefaultNameResolver("squidex"))
-                .As<IStreamNameResolver>()
-                .SingleInstance();
+            }).As<IStreamNameResolver>().SingleInstance();
         }
     }
 }

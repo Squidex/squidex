@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
@@ -16,9 +16,7 @@ namespace Squidex.Write.Schemas.Commands
     {
         public string Name { get; set; }
 
-        public string Type { get; set; }
-
-        public JToken Properties { get; set; }
+        public FieldProperties Properties { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
@@ -27,14 +25,9 @@ namespace Squidex.Write.Schemas.Commands
                 errors.Add(new ValidationError("DisplayName must be a valid slug", nameof(Name)));
             }
 
-            if (string.IsNullOrWhiteSpace(Type))
+            if (Properties == null)
             {
-                errors.Add(new ValidationError("Type must be specified", nameof(Type)));
-            }
-
-            if (Properties != null && !(Properties is JObject))
-            {
-                errors.Add(new ValidationError("Properties must be a object or null.", nameof(Properties)));
+                errors.Add(new ValidationError("Properties must be defined.", nameof(Properties)));
             }
         }
     }

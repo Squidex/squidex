@@ -43,7 +43,7 @@ namespace Squidex.Store.MongoDb.Schemas
 
         public Lazy<Schema> DeserializeSchema(SchemaJsonSerializer serializer)
         {
-            schema = new Lazy<Schema>(() => schema != null ? null : serializer.Deserialize(Schema.ToJToken()));
+            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(Schema.ToJToken()) : null);
 
             return schema;
         }

@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
@@ -16,13 +16,13 @@ namespace Squidex.Write.Schemas.Commands
     {
         public long FieldId { get; set; }
 
-        public JToken Properties { get; set; }
+        public FieldProperties Properties { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!(Properties is JObject))
+            if (Properties == null)
             {
-                errors.Add(new ValidationError("Properties must be a object.", nameof(Properties)));
+                errors.Add(new ValidationError("Properties must be defined.", nameof(Properties)));
             }
         }
     }

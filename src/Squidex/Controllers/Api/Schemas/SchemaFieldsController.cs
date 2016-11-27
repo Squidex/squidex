@@ -9,11 +9,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Controllers.Api.Schemas.Models;
-using Squidex.Infrastructure;
 using Squidex.Pipeline;
 using Squidex.Write.Schemas.Commands;
 
@@ -22,7 +20,7 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [Authorize("app-owner,app-developer")]
+    [Authorize(Roles = "app-owner,app-developer")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Schemas")]
@@ -50,14 +48,9 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostField(string app, string name, [FromBody] FieldDto model)
+        public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto model)
         {
-            var properties = model.ToProperties();
-
-            var fieldName = model.Name;
-            var fieldType = TypeNameRegistry.GetName(properties.GetType());
-
-            var command = new AddField { Name = fieldName, Type = fieldType, Properties = JToken.FromObject(properties) };
+            var command = new AddField { Name = model.Name, Properties = model.Properties.ToProperties() };
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<long>();
@@ -81,9 +74,9 @@ namespace Squidex.Controllers.Api.Schemas
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] FieldDto model)
+        public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto model)
         {
-            var command = new UpdateField { FieldId = id, Properties = JToken.FromObject(model) };
+            var command = new UpdateField { FieldId = id, Properties = model.Properties.ToProperties() };
 
             await CommandBus.PublishAsync(command);
 

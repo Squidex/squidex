@@ -25,7 +25,7 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [Authorize("app-owner,app-developer")]
+    [Authorize(Roles = "app-owner,app-developer")]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Schemas")]

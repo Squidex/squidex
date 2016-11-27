@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class ConfigureLanguagesDto
+    public sealed class ConfigureLanguagesDto
     {
         /// <summary>
         /// The list of languages to configure the app.

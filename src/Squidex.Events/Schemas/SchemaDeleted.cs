@@ -11,7 +11,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
-    [TypeName("SchemaDeleted")]
+    [TypeName("SchemaDeletedEvent")]
     public class SchemaDeleted : IEvent
     {
     }
