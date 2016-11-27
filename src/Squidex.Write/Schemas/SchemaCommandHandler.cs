@@ -21,15 +21,15 @@ namespace Squidex.Write.Schemas
         private readonly ISchemaProvider schemaProvider;
 
         public SchemaCommandHandler(
-            ISchemaProvider schemaProvider,
             IDomainObjectFactory domainObjectFactory,
-            IDomainObjectRepository domainObjectRepository)
+            IDomainObjectRepository domainObjectRepository,
+            ISchemaProvider schemaProvider)
             : base(domainObjectFactory, domainObjectRepository)
         {
             this.schemaProvider = schemaProvider;
         }
 
-        public async Task On(CreateSchema command, CommandContext context)
+        protected async Task On(CreateSchema command, CommandContext context)
         {
             if (await schemaProvider.FindSchemaIdByNameAsync(command.AppId, command.Name) != null)
             {
@@ -37,10 +37,15 @@ namespace Squidex.Write.Schemas
 
                 throw new ValidationException("Cannot create a new schema", error);
             }
-            await CreateAsync(command, s => s.Create(command));
+            await CreateAsync(command, s =>
+            {
+                s.Create(command);
+
+                context.Succeed(command.Name);
+            });
         }
 
-        public Task On(AddField command, CommandContext context)
+        protected Task On(AddField command, CommandContext context)
         {
             return UpdateAsync(command, s =>
             {
@@ -50,42 +55,42 @@ namespace Squidex.Write.Schemas
             });
         }
 
-        public Task On(DeleteSchema command, CommandContext context)
+        protected Task On(DeleteSchema command, CommandContext context)
         {
             return UpdateAsync(command, s => s.Delete(command));
         }
 
-        public Task On(DeleteField command, CommandContext context)
+        protected Task On(DeleteField command, CommandContext context)
         {
             return UpdateAsync(command, s => s.DeleteField(command));
         }
 
-        public Task On(DisableField command, CommandContext context)
+        protected Task On(DisableField command, CommandContext context)
         {
             return UpdateAsync(command, s => s.DisableField(command));
         }
 
-        public Task On(EnableField command, CommandContext context)
+        protected Task On(EnableField command, CommandContext context)
         {
             return UpdateAsync(command, s => s.EnableField(command));
         }
 
-        public Task On(HideField command, CommandContext context)
+        protected Task On(HideField command, CommandContext context)
         {
             return UpdateAsync(command, s => s.HideField(command));
         }
 
-        public Task On(ShowField command, CommandContext context)
+        protected Task On(ShowField command, CommandContext context)
         {
             return UpdateAsync(command, s => s.ShowField(command));
         }
 
-        public Task On(UpdateSchema command, CommandContext context)
+        protected Task On(UpdateSchema command, CommandContext context)
         {
             return UpdateAsync(command, s => s.Update(command));
         }
 
-        public Task On(UpdateField command)
+        protected Task On(UpdateField command, CommandContext context)
         {
             return UpdateAsync(command, s => { s.UpdateField(command); });
         }

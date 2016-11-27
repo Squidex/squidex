@@ -29,7 +29,7 @@ namespace Squidex.Write.Tests.Schemas
         private readonly string appName = "schema";
         private readonly FieldRegistry registry = new FieldRegistry();
         private readonly SchemaDomainObject sut;
-
+        
         public SchemaDomainObjectTests()
         {
             sut = new SchemaDomainObject(Guid.NewGuid(), 0, registry);

@@ -114,6 +114,22 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
+        public async Task AssignContributor_should_throw_if_null_user_not_found()
+        {
+            CreateApp();
+
+            var command = new AssignContributor { AggregateId = Id, ContributorId = null };
+            var context = new CommandContext(command);
+
+            userRepository.Setup(x => x.FindUserByIdAsync(command.ContributorId)).Returns(Task.FromResult<IUserEntity>(null));
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
         public async Task AssignContributor_should_assign_if_user_found()
         {
             CreateApp();
