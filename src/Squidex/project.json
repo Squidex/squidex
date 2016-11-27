@@ -55,11 +55,13 @@
     }
   },
 
+  "nowarn": [ "1591" ],
+
   "buildOptions": {
     "emitEntryPoint": true,
     "preserveCompilationContext": true,
     "xmlDoc": true,
-    "nowarn": [ "1591", "1573", "1572" ],
+    "nowarn": [ "CS1591", "1591", "1573", "1572" ],
     "embed": {
       "include": [
         "Config/Identity/Cert/*.*"

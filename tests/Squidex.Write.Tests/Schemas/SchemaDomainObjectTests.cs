@@ -14,12 +14,12 @@ using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Write.Schemas;
 using Squidex.Write.Schemas.Commands;
 using Xunit;
+
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Tests.Schemas
+namespace Squidex.Write.Schemas
 {
     [Collection("Schema")]
     public class SchemaDomainObjectTests

@@ -11,7 +11,7 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Write.Tests.Utils
+namespace Squidex.Write.Utils
 {
     public class SchemaFixture
     {

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ISubjectCommand.cs
+//  IUserCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,8 +8,8 @@
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public interface ISubjectCommand : ICommand
+    public interface IUserCommand : ICommand
     {
-        string SubjectId { get; set; }
+        string UserId { get; set; }
     }
 }

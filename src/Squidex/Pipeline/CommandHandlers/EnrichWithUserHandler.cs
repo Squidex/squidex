@@ -15,18 +15,18 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public class EnrichWithSubjectHandler : ICommandHandler
+    public class EnrichWithUserHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithSubjectHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithUserHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var subjectCommand = context.Command as ISubjectCommand;
+            var subjectCommand = context.Command as IUserCommand;
 
             if (subjectCommand != null)
             {
@@ -34,10 +34,20 @@ namespace Squidex.Pipeline.CommandHandlers
 
                 if (subjectId == null)
                 {
+                    var clientId = httpContextAccessor.HttpContext.User.OpenIdClientId();
+
+                    if (clientId != null)
+                    {
+                        subjectId = $"Client:"
+                    }
+                }
+
+                if (subjectId == null)
+                {
                     throw new SecurityException("No user with subject id available");
                 }
 
-                subjectCommand.SubjectId = subjectId;
+                subjectCommand.UserId = subjectId;
             }
 
             return Task.FromResult(false);

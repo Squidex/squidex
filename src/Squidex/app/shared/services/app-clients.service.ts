@@ -29,6 +29,14 @@ export class AppClientCreateDto {
     }
 }
 
+export class AccessTokenDto {
+    constructor(
+        public readonly accessToken: string,
+        public readonly tokenType: string
+    ) {
+    }
+}
+
 @Ng2.Injectable()
 export class AppClientsService {
     constructor(
@@ -67,7 +75,7 @@ export class AppClientsService {
         return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/clients/${name}`));
     }
 
-    public createToken(appName: string, client: AppClientDto): Observable<any> {
+    public createToken(appName: string, client: AppClientDto): Observable<AccessTokenDto> {
         const options = new Ng2Http.RequestOptions({
             headers: new Ng2Http.Headers({
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -76,6 +84,8 @@ export class AppClientsService {
 
         const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.clientName}&client_secret=${client.clientSecret}`;
 
-        return this.http.post(this.apiUrl.buildUrl('identity-server/connect/token'), body, options);
+        return this.http.post(this.apiUrl.buildUrl('identity-server/connect/token'), body, options)
+                .map(response => response.json())
+                .map(response => new AccessTokenDto(response.access_token, response.token_type));
     }
 }

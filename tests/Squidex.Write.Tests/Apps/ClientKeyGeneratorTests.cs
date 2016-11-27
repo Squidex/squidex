@@ -6,10 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Write.Apps;
 using Xunit;
 
-namespace Squidex.Write.Tests.Apps
+namespace Squidex.Write.Apps
 {
     public class ClientKeyGeneratorTests
     {

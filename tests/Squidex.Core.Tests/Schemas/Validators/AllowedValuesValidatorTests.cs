@@ -8,11 +8,10 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Core.Schemas.Validators;
-using Xunit;
 using FluentAssertions;
+using Xunit;
 
-namespace Squidex.Core.Tests.Schemas.Validators
+namespace Squidex.Core.Schemas.Validators
 {
     public class AllowedValuesValidatorTests
     {

@@ -8,11 +8,10 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Core.Tests.Schemas
+namespace Squidex.Core.Schemas
 {
     public class FieldRegistryTests
     {

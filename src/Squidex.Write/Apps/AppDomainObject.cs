@@ -173,9 +173,9 @@ namespace Squidex.Write.Apps
             return new AppLanguagesConfigured { Languages = DefaultLanguages };
         }
 
-        private static AppContributorAssigned CreateInitialOwner(ISubjectCommand command)
+        private static AppContributorAssigned CreateInitialOwner(IUserCommand command)
         {
-            return new AppContributorAssigned { ContributorId = command.SubjectId, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { ContributorId = command.UserId, Permission = PermissionLevel.Owner };
         }
 
         private void ThrowIfNotCreated()

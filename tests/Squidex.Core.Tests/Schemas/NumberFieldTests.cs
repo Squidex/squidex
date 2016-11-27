@@ -9,12 +9,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using Squidex.Core.Schemas;
+using FluentAssertions;
 using Squidex.Infrastructure;
 using Xunit;
-using FluentAssertions;
 
-namespace Squidex.Core.Tests.Schemas
+namespace Squidex.Core.Schemas
 {
     public class NumberFieldTests
     {

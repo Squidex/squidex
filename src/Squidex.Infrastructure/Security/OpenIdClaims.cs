@@ -16,6 +16,11 @@ namespace Squidex.Infrastructure.Security
         public const string Subject = "sub";
 
         /// <summary>
+        /// The client id claim.
+        /// </summary>
+        public const string ClientId = "client_id";
+
+        /// <summary>
         /// End-User's full name in displayable form including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.
         /// </summary>
         public const string Name = "name";

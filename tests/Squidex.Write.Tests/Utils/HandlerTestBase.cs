@@ -12,7 +12,7 @@ using Moq;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Write.Tests.Utils
+namespace Squidex.Write.Utils
 {
     public abstract class HandlerTestBase<T> where T : DomainObject
     {

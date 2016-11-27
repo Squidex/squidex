@@ -22,7 +22,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithSubjectHandler>()
+            builder.RegisterType<EnrichWithUserHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 

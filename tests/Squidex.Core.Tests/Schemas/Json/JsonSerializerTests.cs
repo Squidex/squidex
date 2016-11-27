@@ -9,13 +9,11 @@
 using System.Reflection;
 using FluentAssertions;
 using Newtonsoft.Json;
-using Squidex.Core.Schemas;
-using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
-namespace Squidex.Core.Tests.Schemas.Json
+namespace Squidex.Core.Schemas.Json
 {
     public class JsonSerializerTests
     {

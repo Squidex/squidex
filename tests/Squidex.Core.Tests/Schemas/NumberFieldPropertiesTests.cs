@@ -9,14 +9,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
-using Squidex.Core.Schemas;
+using FluentAssertions;
 using Squidex.Infrastructure;
 using Xunit;
-using FluentAssertions;
-using System.Linq;
 
-namespace Squidex.Core.Tests.Schemas
+namespace Squidex.Core.Schemas
 {
     public class NumberFieldPropertiesTests
     {

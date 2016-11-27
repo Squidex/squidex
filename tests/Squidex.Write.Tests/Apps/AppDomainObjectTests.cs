@@ -15,12 +15,12 @@ using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 using Xunit;
+
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Tests.Apps
+namespace Squidex.Write.Apps
 {
     public class AppDomainObjectTests
     {
@@ -54,7 +54,7 @@ namespace Squidex.Write.Tests.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(new CreateApp { Name = TestName, SubjectId = subjectId });
+            sut.Create(new CreateApp { Name = TestName, UserId = subjectId });
 
             Assert.Equal(TestName, sut.Name);
             Assert.Equal(PermissionLevel.Owner, sut.Contributors[subjectId]);
@@ -271,7 +271,7 @@ namespace Squidex.Write.Tests.Apps
 
         private void CreateApp()
         {
-            sut.Create(new CreateApp { Name = TestName, SubjectId = subjectId });
+            sut.Create(new CreateApp { Name = TestName, UserId = subjectId });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

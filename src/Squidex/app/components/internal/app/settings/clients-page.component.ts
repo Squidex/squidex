@@ -8,12 +8,14 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
-import { 
+import {
+    AccessTokenDto,
     AppsStoreService,
     AppClientDto,
     AppClientCreateDto,
     AppClientsService,
     fadeAnimation,
+    ModalView,
     Notification,
     NotificationService,
     TitleService 
@@ -31,7 +33,10 @@ export class ClientsPageComponent implements Ng2.OnInit {
     private appSubscription: any | null = null;
     private appName: string | null = null;
 
+    public modalDialog = new ModalView();
+
     public appClients: AppClientDto[];
+    public appClientToken: AccessTokenDto;
     
     public creationError = '';
     public createForm =
@@ -90,7 +95,13 @@ export class ClientsPageComponent implements Ng2.OnInit {
     }
 
     public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.appName, client).subscribe();
+        this.appClientsService.createToken(this.appName, client)
+            .subscribe(token => {
+                this.appClientToken = token;
+                this.modalDialog.show();
+            }, error => {
+                this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
+            });
     }
 
     public attachClient() {

@@ -11,10 +11,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Core.Schemas.Validators;
 using Xunit;
 
-namespace Squidex.Core.Tests.Schemas.Validators
+namespace Squidex.Core.Schemas.Validators
 {
     public class StringLengthValidatorTests
     {

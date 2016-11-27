@@ -14,13 +14,13 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Schemas.Services;
-using Squidex.Write.Schemas;
 using Squidex.Write.Schemas.Commands;
-using Squidex.Write.Tests.Utils;
+using Squidex.Write.Utils;
 using Xunit;
+
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Tests.Schemas
+namespace Squidex.Write.Schemas
 {
     public class SchemaCommandHandlerTests : HandlerTestBase<SchemaDomainObject>
     {

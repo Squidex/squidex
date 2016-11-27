@@ -11,11 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Core.Tests.Schemas
+namespace Squidex.Core.Schemas
 {
     public class StringFieldPropertiesTests
     {

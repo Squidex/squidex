@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -16,15 +17,14 @@ using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Users;
 using Squidex.Read.Users.Repositories;
-using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
-using Squidex.Write.Tests.Utils;
+using Squidex.Write.Utils;
 using Xunit;
-using FluentAssertions;
+
 // ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Tests.Apps
+namespace Squidex.Write.Apps
 {
     public class AppCommandHandlerTests : HandlerTestBase<AppDomainObject>
     {
@@ -54,7 +54,7 @@ namespace Squidex.Write.Tests.Apps
         [Fact]
         public async Task Create_should_throw_if_a_name_with_same_name_already_exists()
         {
-            var command = new CreateApp { Name = appName, AggregateId = Id, SubjectId = subjectId };
+            var command = new CreateApp { Name = appName, AggregateId = Id, UserId = subjectId };
             var context = new CommandContext(command);
 
             appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
@@ -70,7 +70,7 @@ namespace Squidex.Write.Tests.Apps
         [Fact]
         public async Task Create_should_create_app_if_name_is_free()
         {
-            var command = new CreateApp { Name = appName, AggregateId = Id, SubjectId = subjectId };
+            var command = new CreateApp { Name = appName, AggregateId = Id, UserId = subjectId };
             var context = new CommandContext(command);
 
             appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
@@ -200,7 +200,7 @@ namespace Squidex.Write.Tests.Apps
 
         private AppDomainObject CreateApp()
         {
-            app.Create(new CreateApp { Name = appName, SubjectId = subjectId });
+            app.Create(new CreateApp { Name = appName, UserId = subjectId });
 
             return app;
         }
