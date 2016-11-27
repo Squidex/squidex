@@ -76,6 +76,12 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
+        public void AssignContributor_should_throw_if_contributor_id_not_valid()
+        {
+            Assert.Throws<DomainException>(() => sut.AssignContributor(new AssignContributor()));
+        }
+
+        [Fact]
         public void AssignContributor_should_throw_if_single_owner_becomes_non_owner()
         {
             CreateApp();
@@ -104,6 +110,12 @@ namespace Squidex.Write.Tests.Apps
         public void RemoveContributor_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = contributorId }));
+        }
+
+        [Fact]
+        public void RemoveContributor_should_throw_if_contributor_id_not_valid()
+        {
+            Assert.Throws<DomainException>(() => sut.RemoveContributor(new RemoveContributor()));
         }
 
         [Fact]

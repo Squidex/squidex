@@ -33,7 +33,6 @@ exit /b %errorlevel%
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Core.xml" ^
 -oldStyle
-exit /b %errorlevel%
 
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
