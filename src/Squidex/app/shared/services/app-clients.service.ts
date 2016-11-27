@@ -6,6 +6,7 @@
  */
 
 import * as Ng2 from '@angular/core';
+import * as Ng2Http from '@angular/http';
 
 import { Observable } from 'rxjs';
 
@@ -32,7 +33,8 @@ export class AppClientCreateDto {
 export class AppClientsService {
     constructor(
         private readonly authService: AuthService,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly http: Ng2Http.Http
     ) {
     }
 
@@ -63,5 +65,17 @@ export class AppClientsService {
 
     public deleteClient(appName: string, name: string): Observable<any> {
         return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/clients/${name}`));
+    }
+
+    public createToken(appName: string, client: AppClientDto): Observable<any> {
+        const options = new Ng2Http.RequestOptions({
+            headers: new Ng2Http.Headers({
+                'Content-Type': 'application/x-www-form-urlencoded'
+            })
+        });
+
+        const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.clientName}&client_secret=${client.clientSecret}`;
+
+        return this.http.post(this.apiUrl.buildUrl('identity-server/connect/token'), body, options);
     }
 }

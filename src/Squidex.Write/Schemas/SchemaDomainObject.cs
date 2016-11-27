@@ -116,7 +116,7 @@ namespace Squidex.Write.Schemas
 
         public SchemaDomainObject UpdateField(UpdateField command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
+            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{Id}'");
 
             VerifyCreatedAndNotDeleted();
 
@@ -138,7 +138,7 @@ namespace Squidex.Write.Schemas
 
         public SchemaDomainObject Update(UpdateSchema command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{schema.Name} ({Id})'");
+            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{Id}'");
 
             VerifyCreatedAndNotDeleted();
 
@@ -147,52 +147,62 @@ namespace Squidex.Write.Schemas
             return this;
         }
 
-        public SchemaDomainObject HideField(long fieldId)
+        public SchemaDomainObject HideField(HideField command)
         {
+            Guard.NotNull(command, nameof(command));
+
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldHidden { FieldId = fieldId });
+            RaiseEvent(new FieldHidden { FieldId = command.FieldId });
 
             return this;
         }
 
-        public SchemaDomainObject ShowField(long fieldId)
+        public SchemaDomainObject ShowField(ShowField command)
         {
+            Guard.NotNull(command, nameof(command));
+
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldShown { FieldId = fieldId });
+            RaiseEvent(new FieldShown { FieldId = command.FieldId });
 
             return this;
         }
 
-        public SchemaDomainObject DisableField(long fieldId)
+        public SchemaDomainObject DisableField(DisableField command)
         {
+            Guard.NotNull(command, nameof(command));
+
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new FieldDisabled { FieldId = fieldId });
+            RaiseEvent(new FieldDisabled { FieldId = command.FieldId });
 
             return this;
         }
 
-        public SchemaDomainObject EnableField(long fieldId)
+        public SchemaDomainObject EnableField(EnableField command)
         {
-            VerifyCreatedAndNotDeleted();
-            
-            RaiseEvent(new FieldEnabled { FieldId = fieldId });
+            Guard.NotNull(command, nameof(command));
 
-            return this;
-        }
-
-        public SchemaDomainObject DeleteField(long fieldId)
-        {
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldDeleted { FieldId = fieldId });
+            RaiseEvent(new FieldEnabled { FieldId = command.FieldId });
 
             return this;
         }
 
-        public SchemaDomainObject Delete()
+        public SchemaDomainObject DeleteField(DeleteField command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+            
+            RaiseEvent(new FieldDeleted { FieldId = command.FieldId });
+
+            return this;
+        }
+
+        public SchemaDomainObject Delete(DeleteSchema command)
         {
             VerifyCreatedAndNotDeleted();
             

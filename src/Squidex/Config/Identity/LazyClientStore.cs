@@ -38,19 +38,47 @@ namespace Squidex.Config.Identity
         {
             var client = staticClients.GetOrDefault(clientId);
 
-            if (client == null)
+            if (client != null)
+            {
+                return client;
+            }
+
+            var token = clientId.Split(':');
+
+            if (token.Length != 2)
             {
                 return null;
             }
 
-            var app = await appProvider.FindAppByNameAsync(clientId);
+            var app = await appProvider.FindAppByNameAsync(token[0]);
 
-            if (app != null)
+            var appClient = app?.Clients.FirstOrDefault(x => x.ClientName == token[1]);
+
+            if (appClient == null)
             {
-                client = CreateClientFromApp(app);
+                return null;
+
             }
 
+            client = CreateClientFromApp(clientId, appClient);
+
             return client;
+        }
+
+        private static Client CreateClientFromApp(string id, IAppClientEntity appClient)
+        {
+            return new Client
+            {
+                ClientId = id,
+                ClientName = id,
+                ClientSecrets = new List<Secret> { new Secret(appClient.ClientSecret.Sha512(), appClient.ExpiresUtc) },
+                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                AllowedScopes = new List<string>
+                {
+                    Constants.ApiScope
+                }
+            };
         }
 
         private void CreateStaticClients(IOptions<MyUrlsOptions> urlsOptions)
@@ -59,24 +87,6 @@ namespace Squidex.Config.Identity
             {
                 staticClients[client.ClientId] = client;
             }
-        }
-
-        private static Client CreateClientFromApp(IAppEntity app)
-        {
-            var id = app.Name;
-
-            return new Client
-            {
-                ClientId = id,
-                ClientName = id,
-                ClientSecrets = app.Clients.Select(x => new Secret(x.ClientName, x.ExpiresUtc)).ToList(),
-                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
-                AllowedGrantTypes = GrantTypes.ClientCredentials,
-                AllowedScopes = new List<string>
-                {
-                    Constants.ApiScope
-                }
-            };
         }
 
         private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions)

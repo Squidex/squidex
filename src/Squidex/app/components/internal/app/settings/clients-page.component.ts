@@ -14,6 +14,8 @@ import {
     AppClientCreateDto,
     AppClientsService,
     fadeAnimation,
+    Notification,
+    NotificationService,
     TitleService 
 } from 'shared';
 
@@ -46,7 +48,8 @@ export class ClientsPageComponent implements Ng2.OnInit {
         private readonly titles: TitleService,
         private readonly appsStore: AppsStoreService,
         private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: Ng2Forms.FormBuilder
+        private readonly formBuilder: Ng2Forms.FormBuilder,
+        private readonly notifications: NotificationService
     ) {
     }
 
@@ -58,9 +61,13 @@ export class ClientsPageComponent implements Ng2.OnInit {
 
                     this.titles.setTitle('{appName} | Settings | Clients', { appName: app.name });
 
-                    this.appClientsService.getClients(app.name).subscribe(clients => {
-                        this.appClients = clients;
-                    });
+                    this.appClientsService.getClients(app.name)
+                        .subscribe(clients => {
+                            this.appClients = clients;
+                        }, () => {
+                            this.notifications.notify(Notification.error('Failed to load clients. Please reload squidex portal.'));
+                            this.appClients = [];
+                        });
                 }
             });
     }
@@ -74,9 +81,16 @@ export class ClientsPageComponent implements Ng2.OnInit {
     }
 
     public revokeClient(client: AppClientDto) {
-        this.appClientsService.deleteClient(this.appName, client.clientName).subscribe();
+        this.appClientsService.deleteClient(this.appName, client.clientName)
+            .subscribe(() => {
+                this.appClients.splice(this.appClients.indexOf(client), 1);
+            }, error => {
+                this.notifications.notify(Notification.error('Failed to revoke client. Please retry.'));
+            });
+    }
 
-        this.appClients.splice(this.appClients.indexOf(client), 1);
+    public createToken(client: AppClientDto) {
+        this.appClientsService.createToken(this.appName, client).subscribe();
     }
 
     public attachClient() {

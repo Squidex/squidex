@@ -25,7 +25,7 @@ describe('AppClientsService', () => {
 
     beforeEach(() => {
         authService = TypeMoq.Mock.ofType(AuthService);
-        appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'));
+        appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'), null);
     });
 
     it('should make get request with auth service to get app clients', () => {

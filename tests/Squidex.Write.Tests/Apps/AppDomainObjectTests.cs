@@ -46,7 +46,7 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void Create_should_throw_if_command_is_invalid()
+        public void Create_should_throw_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() => sut.Create(new CreateApp()));
         }
@@ -76,9 +76,9 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_if_contributor_id_not_valid()
+        public void AssignContributor_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<DomainException>(() => sut.AssignContributor(new AssignContributor()));
+            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor()));
         }
 
         [Fact]
@@ -113,9 +113,9 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_if_contributor_id_not_valid()
+        public void RemoveContributor_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<DomainException>(() => sut.RemoveContributor(new RemoveContributor()));
+            Assert.Throws<ValidationException>(() => sut.RemoveContributor(new RemoveContributor()));
         }
 
         [Fact]
@@ -161,7 +161,7 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void ConfigureLanguages_should_throw_if_languages_are_null_or_empty()
+        public void ConfigureLanguages_should_throw_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -193,7 +193,7 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void AttachClient_should_throw_if_name_not_valid()
+        public void AttachClient_should_throw_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -237,7 +237,7 @@ namespace Squidex.Write.Tests.Apps
         }
 
         [Fact]
-        public void RevokeClient_should_throw_if_client_key_is_null_or_empty()
+        public void RevokeClient_should_throw_if_command_is_not_valid()
         {
             CreateApp();
 

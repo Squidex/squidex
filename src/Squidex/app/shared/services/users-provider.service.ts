@@ -28,7 +28,7 @@ export class UsersProviderService {
 
         if (!result) {
             const request = 
-                this.usersService.getUser(id)
+                this.usersService.getUser(id).retry(2)
                     .map(u => {
                         if (this.authService.user && u.id === this.authService.user.id) {
                             return new UserDto(u.id, u.email, 'Me', u.pictureUrl);

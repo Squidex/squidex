@@ -16,3 +16,25 @@
 .search-form {
     margin-left: 15px;
 }
+
+.notification {
+    &-container {
+        @include fixed(auto, 10px, 10px, auto);
+        width: 260px;
+    }
+
+    &-item {
+        @include border-radius;
+        @include box-shadow;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: .8rem;
+        font-weight: normal;
+        color: $color-accent-dark;
+        cursor: pointer;
+    }
+
+    &-error {
+        background: $color-theme-error;
+    }
+}

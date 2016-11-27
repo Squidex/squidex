@@ -17,3 +17,9 @@
 </nav>
 
 <router-outlet></router-outlet>
+
+<div class="notification-container">
+    <div class="notification-item notification-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" [@fade]>
+        {{notification.message}}
+    </div>
+</div>

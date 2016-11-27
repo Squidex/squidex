@@ -52,32 +52,32 @@ namespace Squidex.Write.Schemas
 
         public Task On(DeleteSchema command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.Delete());
+            return UpdateAsync(command, s => s.Delete(command));
         }
 
         public Task On(DeleteField command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.DeleteField(command.FieldId));
+            return UpdateAsync(command, s => s.DeleteField(command));
         }
 
         public Task On(DisableField command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.DisableField(command.FieldId));
+            return UpdateAsync(command, s => s.DisableField(command));
         }
 
         public Task On(EnableField command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.EnableField(command.FieldId));
+            return UpdateAsync(command, s => s.EnableField(command));
         }
 
         public Task On(HideField command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.HideField(command.FieldId));
+            return UpdateAsync(command, s => s.HideField(command));
         }
 
         public Task On(ShowField command, CommandContext context)
         {
-            return UpdateAsync(command, s => s.ShowField(command.FieldId));
+            return UpdateAsync(command, s => s.ShowField(command));
         }
 
         public Task On(UpdateSchema command, CommandContext context)

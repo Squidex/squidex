@@ -8,7 +8,6 @@
 import { ClipboardService, ClipboardServiceFactory } from './../';
 
 describe('ShortcutService', () => {
-
     it('should instantiate from factory', () => {
         const clipboardService = ClipboardServiceFactory();
 

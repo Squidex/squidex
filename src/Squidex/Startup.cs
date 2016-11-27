@@ -94,7 +94,7 @@ namespace Squidex
         
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
+            loggerFactory.AddConsole(LogLevel.Debug);
             loggerFactory.AddDebug();
 
             if (!Environment.IsDevelopment())

@@ -12,6 +12,8 @@ import {
     AppsStoreService,
     LanguageDto, 
     LanguageService,
+    Notification,
+    NotificationService,
     TitleService 
 } from 'shared';
 
@@ -38,14 +40,18 @@ export class LanguagesPageComponent implements Ng2.OnInit {
         private readonly titles: TitleService,
         private readonly appsStore: AppsStoreService,
         private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguageService
+        private readonly languagesService: LanguageService,
+        private readonly notifications: NotificationService
     ) {
     }
 
     public ngOnInit() {
-        this.languagesService.getLanguages().subscribe(languages => {
-            this.allLanguages = languages;
-        });
+        this.languagesService.getLanguages().retry(2)
+            .subscribe(languages => {
+                this.allLanguages = languages;
+            }, error => {
+                this.notifications.notify(Notification.error('Failed to load languages. Please reload squidex portal.'));
+            });
 
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
@@ -54,9 +60,12 @@ export class LanguagesPageComponent implements Ng2.OnInit {
 
                     this.titles.setTitle('{appName} | Settings | Languages', { appName: app.name });
 
-                    this.appLanguagesService.getLanguages(app.name).subscribe(appLanguages => {
-                        this.appLanguages = appLanguages;
-                    });
+                    this.appLanguagesService.getLanguages(app.name).retry(2)
+                        .subscribe(appLanguages => {
+                            this.appLanguages = appLanguages;
+                        }, error => {
+                            this.notifications.notify(Notification.error('Failed to load app languages. Please reload squidex portal.'));
+                        });
                 }
             });
     }
@@ -80,10 +89,13 @@ export class LanguagesPageComponent implements Ng2.OnInit {
 
         this.appLanguagesService.postLanguages(this.appName, this.appLanguages.map(l => l.iso2Code))
             .delay(500)
-            .finally(() => {
-                this.isSaving = false;
-            })
-            .subscribe();
+            .subscribe(() => { 
+                    this.isSaving = false;
+                }, error => {
+                    this.isSaving = false;
+
+                    this.notifications.notify(Notification.error('Failed to save app languages. Please retry.'));
+                });
     }
 }
 
