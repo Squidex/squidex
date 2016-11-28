@@ -8,15 +8,12 @@
 
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
     [TypeName("FieldAddedEvent")]
-    public class FieldAdded : IEvent
+    public class FieldAdded : FieldEvent
     {
-        public long FieldId { get; set; }
-
         public string Name { get; set; }
 
         public FieldProperties Properties { get; set; }

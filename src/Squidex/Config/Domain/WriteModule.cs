@@ -7,7 +7,9 @@
 // ==========================================================================
 using Autofac;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline.CommandHandlers;
+using Squidex.Write;
 using Squidex.Write.Apps;
 using Squidex.Write.Schemas;
 
@@ -31,6 +33,18 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<EnrichWithSchemaAggregateIdHandler>()
                 .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<EnrichWithAppIdProcessor>()
+                .As<IEventProcessor>()
+                .SingleInstance();
+
+            builder.RegisterType<EnrichWithAggregateIdProcessor>()
+                .As<IEventProcessor>()
+                .SingleInstance();
+
+            builder.RegisterType<EnrichWithUserHandler>()
+                .As<IEventProcessor>()
                 .SingleInstance();
 
             builder.RegisterType<AppCommandHandler>()

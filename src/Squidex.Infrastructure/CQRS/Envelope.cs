@@ -5,6 +5,10 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
+using System;
+using NodaTime;
+
 namespace Squidex.Infrastructure.CQRS
 {
     public class Envelope<TPayload> where TPayload : class
@@ -14,18 +18,22 @@ namespace Squidex.Infrastructure.CQRS
 
         public EnvelopeHeaders Headers
         {
-            get
-            {
-                return headers;
-            }
+            get { return headers; }
         }
 
         public TPayload Payload
         {
-            get
-            {
-                return payload;
-            }
+            get { return payload; }
+        }
+
+        public Envelope(TPayload payload)
+            : this(payload, new EnvelopeHeaders())
+        {
+        }
+
+        public Envelope(TPayload payload, PropertiesBag bag)
+            : this(payload, new EnvelopeHeaders(bag))
+        {
         }
 
         public Envelope(TPayload payload, EnvelopeHeaders headers)
@@ -37,14 +45,16 @@ namespace Squidex.Infrastructure.CQRS
             this.headers = headers;
         }
 
-        public Envelope(TPayload payload)
-            : this(payload, new EnvelopeHeaders())
+        public static Envelope<TPayload> Create(TPayload payload)
         {
-        }
+            var eventId = Guid.NewGuid();
 
-        public Envelope(TPayload payload, PropertiesBag bag)
-            : this(payload, new EnvelopeHeaders(bag))
-        {
+            var envelope =
+                new Envelope<TPayload>(payload)
+                    .SetEventId(eventId)
+                    .SetTimestamp(SystemClock.Instance.GetCurrentInstant());
+
+            return envelope;
         }
 
         public Envelope<TOther> To<TOther>() where TOther : class

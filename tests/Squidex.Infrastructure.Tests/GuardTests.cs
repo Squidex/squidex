@@ -12,14 +12,14 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class ValidatableValid : IValidatable
+    public sealed class MyValidatableValid : IValidatable
     {
         public void Validate(IList<ValidationError> errors)
         {
         }
     }
 
-    public sealed class ValidatableInvalid : IValidatable
+    public sealed class MyValidatableInvalid : IValidatable
     {
         public void Validate(IList<ValidationError> errors)
         {
@@ -327,13 +327,13 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Valid_should_throw_if_invalid()
         {
-            Assert.Throws<ValidationException>(() => Guard.Valid(new ValidatableInvalid(), "Parameter", () => "Message"));
+            Assert.Throws<ValidationException>(() => Guard.Valid(new MyValidatableInvalid(), "Parameter", () => "Message"));
         }
 
         [Fact]
         public void Valid_should_do_nothing_if_valid()
         {
-            Guard.Valid(new ValidatableValid(), "Parameter", () => "Message");
+            Guard.Valid(new MyValidatableValid(), "Parameter", () => "Message");
         }
     }
 }

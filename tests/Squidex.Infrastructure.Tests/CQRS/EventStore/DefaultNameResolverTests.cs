@@ -14,9 +14,9 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public class DefaultNameResolverTests
     {
-        private sealed class User : DomainObject
+        private sealed class MyUser : DomainObject
         {
-            public User(Guid id, int version)
+            public MyUser(Guid id, int version)
                 : base(id, version)
             {
             }
@@ -26,9 +26,9 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             }
         }
 
-        private sealed class UserDomainObject : DomainObject
+        private sealed class MyUserDomainObject : DomainObject
         {
-            public UserDomainObject(Guid id, int version) 
+            public MyUserDomainObject(Guid id, int version) 
                 : base(id, version)
             {
             }
@@ -42,22 +42,22 @@ namespace Squidex.Infrastructure.CQRS.EventStore
         public void Should_calculate_name()
         {
             var sut = new DefaultNameResolver("Squidex");
-            var user = new User(Guid.NewGuid(), 1);
+            var user = new MyUser(Guid.NewGuid(), 1);
 
-            var name = sut.GetStreamName(typeof(User), user.Id);
+            var name = sut.GetStreamName(typeof(MyUser), user.Id);
 
-            Assert.Equal($"squidex-user-{user.Id}", name);
+            Assert.Equal($"squidex-myUser-{user.Id}", name);
         }
 
         [Fact]
         public void Should_calculate_name_and_remove_suffix()
         {
             var sut = new DefaultNameResolver("Squidex");
-            var user = new UserDomainObject(Guid.NewGuid(), 1);
+            var user = new MyUserDomainObject(Guid.NewGuid(), 1);
 
-            var name = sut.GetStreamName(typeof(UserDomainObject), user.Id);
+            var name = sut.GetStreamName(typeof(MyUserDomainObject), user.Id);
 
-            Assert.Equal($"squidex-user-{user.Id}", name);
+            Assert.Equal($"squidex-myUser-{user.Id}", name);
         }
     }
 }

@@ -1,18 +1,18 @@
 ﻿// ==========================================================================
-//  AppEvent.cs
+//  IEventProcessor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.CQRS.Events;
+using System.Threading.Tasks;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Events
+namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class AppEvent : IEvent
+    public interface IEventProcessor
     {
-        public Guid AppId { get; set; }
+        Task ProcessEventAsync(Envelope<IEvent> @event, IAggregate aggregate, ICommand command);
     }
 }

@@ -14,11 +14,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class EnrichWithTimestampHandlerTests
     {
-        private sealed class NormalCommand : AggregateCommand
+        private sealed class MyNormalCommand : AggregateCommand
         {
         }
 
-        private sealed class TimestampCommand : AggregateCommand, ITimestampCommand
+        private sealed class MyTimestampCommand : AggregateCommand, ITimestampCommand
         {
             public DateTime Timestamp { get; set; }
         }
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var utc = DateTime.Today;
             var sut = new EnrichWithTimestampHandler(() => utc);
 
-            var command = new TimestampCommand();
+            var command = new MyTimestampCommand();
 
             var result = await sut.HandleAsync(new CommandContext(command));
 
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var now = DateTime.UtcNow;
             var sut = new EnrichWithTimestampHandler();
 
-            var command = new TimestampCommand();
+            var command = new MyTimestampCommand();
 
             var result = await sut.HandleAsync(new CommandContext(command));
 
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var utc = DateTime.Today;
             var sut = new EnrichWithTimestampHandler(() => utc);
 
-            var result = await sut.HandleAsync(new CommandContext(new NormalCommand()));
+            var result = await sut.HandleAsync(new CommandContext(new MyNormalCommand()));
 
             Assert.False(result);
         }

@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Reflection
 {
     public class SimpleMapperTests
     {
-        public class Class1Base
+        public class MyClass1Base
         {
             public string MappedString { get; set; }
 
@@ -29,12 +29,12 @@ namespace Squidex.Infrastructure.Reflection
             public long WrongType2 { get; set; }
         }
 
-        public class Class1 : Class1Base
+        public class MyClass1 : MyClass1Base
         {
             public string UnmappedString { get; set; }
         }
 
-        public class Class2Base
+        public class MyClass2Base
         {
             public string MappedString { get; protected set; }
 
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Reflection
             public string MappedGuid { get; set; }
         }
 
-        public class Class2 : Class2Base
+        public class MyClass2 : MyClass2Base
         {
             public string UnmappedString
             {
@@ -60,19 +60,19 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_throw_if_mapping_with_null_source()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((Class1)null, new Class2()));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((MyClass1)null, new MyClass2()));
         }
 
         [Fact]
         public void Should_throw_if_mapping_with_null_target()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new Class1(), (Class2)null));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new MyClass1(), (MyClass2)null));
         }
 
         [Fact]
         public void Should_to_type()
         {
-            var class1 = new Class1
+            var class1 = new MyClass1
             {
                 UnmappedString = Guid.NewGuid().ToString(),
                 MappedString = Guid.NewGuid().ToString(),
@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.Reflection
                 MappedGuid = Guid.NewGuid()
             };
 
-            var class2 = SimpleMapper.Map<Class1, Class2>(class1);
+            var class2 = SimpleMapper.Map<MyClass1, MyClass2>(class1);
 
             AssertObjectEquality(class1, class2);
         }
@@ -88,21 +88,21 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_map_between_types()
         {
-            var class1 = new Class1
+            var class1 = new MyClass1
             {
                 UnmappedString = Guid.NewGuid().ToString(),
                 MappedString = Guid.NewGuid().ToString(),
                 MappedNumber = 123,
                 MappedGuid = Guid.NewGuid()
             };
-            var class2 = new Class2();
+            var class2 = new MyClass2();
 
             SimpleMapper.Map(class1, class2);
 
             AssertObjectEquality(class1, class2);
         }
 
-        private static void AssertObjectEquality(Class1 class1, Class2 class2)
+        private static void AssertObjectEquality(MyClass1 class1, MyClass2 class2)
         {
             Assert.Equal(class1.MappedString, class2.MappedString);
             Assert.Equal(class1.MappedNumber, class2.MappedNumber);

@@ -16,68 +16,71 @@ using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Write.Apps
 {
-    public class AppCommandHandler : CommandHandler<AppDomainObject>
+    public class AppCommandHandler : ICommandHandler
     {
+        private readonly IAggregateHandler handler;
         private readonly IAppRepository appRepository;
         private readonly IUserRepository userRepository;
         private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
-            IDomainObjectFactory domainObjectFactory, 
-            IDomainObjectRepository domainObjectRepository, 
-            IUserRepository userRepository,
+            IAggregateHandler handler,
             IAppRepository appRepository,
-            ClientKeyGenerator keyGenerator) 
-            : base(domainObjectFactory, domainObjectRepository)
+            IUserRepository userRepository,
+            ClientKeyGenerator keyGenerator)
         {
+            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(userRepository, nameof(userRepository));
 
+            this.handler = handler;
             this.keyGenerator = keyGenerator;
             this.appRepository = appRepository;
             this.userRepository = userRepository;
         }
 
-        protected Task On(CreateApp command, CommandContext context)
+        protected async Task On(CreateApp command, CommandContext context)
         {
-            return CreateAsync(command, async x =>
+            if (await appRepository.FindAppByNameAsync(command.Name) != null)
             {
-                if (await appRepository.FindAppByNameAsync(command.Name) != null)
-                {
-                    var error = new ValidationError($"A app with name '{command.Name}' already exists", nameof(CreateApp.Name));
+                var error =
+                    new ValidationError($"A app with name '{command.Name}' already exists",
+                        nameof(CreateApp.Name));
 
-                    throw new ValidationException("Cannot create a new app", error);
-                }
+                throw new ValidationException("Cannot create a new app", error);
+            }
 
+            await handler.CreateAsync<AppDomainObject>(command, x =>
+            {
                 x.Create(command);
 
                 context.Succeed(command.AggregateId);
             });
         }
 
-        protected Task On(AssignContributor command, CommandContext context)
+        protected async Task On(AssignContributor command, CommandContext context)
         {
-            return UpdateAsync(command, async x =>
+            if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
             {
-                if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
-                {
-                    var error = new ValidationError($"Cannot find contributor '{command.ContributorId ?? "UNKNOWN"}'", nameof(AssignContributor.ContributorId));
+                var error =
+                    new ValidationError($"Cannot find contributor '{command.ContributorId ?? "UNKNOWN"}'",
+                        nameof(AssignContributor.ContributorId));
 
-                    throw new ValidationException("Cannot assign contributor to app", error);
-                }
+                throw new ValidationException("Cannot assign contributor to app", error);
+            }
 
+            await handler.UpdateAsync<AppDomainObject>(command, x =>
+            {
                 x.AssignContributor(command);
             });
         }
 
         protected Task On(AttachClient command, CommandContext context)
         {
-            return UpdateAsync(command, x =>
+            return handler.UpdateAsync<AppDomainObject>(command, x =>
             {
-                var clientKey = keyGenerator.GenerateKey();
-
-                x.AttachClient(command, clientKey);
+                x.AttachClient(command, keyGenerator.GenerateKey());
 
                 context.Succeed(x.Clients[command.ClientName]);
             });
@@ -85,20 +88,20 @@ namespace Squidex.Write.Apps
 
         protected Task On(RemoveContributor command, CommandContext context)
         {
-            return UpdateAsync(command, x => x.RemoveContributor(command));
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.RemoveContributor(command));
         }
 
         protected Task On(RevokeClient command, CommandContext context)
         {
-            return UpdateAsync(command, x => x.RevokeClient(command));
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.RevokeClient(command));
         }
 
         protected Task On(ConfigureLanguages command, CommandContext context)
         {
-            return UpdateAsync(command, x => x.ConfigureLanguages(command));
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.ConfigureLanguages(command));
         }
 
-        public override Task<bool> HandleAsync(CommandContext context)
+        public Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
         }

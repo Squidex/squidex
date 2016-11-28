@@ -41,10 +41,7 @@ namespace Squidex.Write.Schemas
         {
             schema = new SchemaDomainObject(Id, 0, registry);
 
-            sut = new SchemaCommandHandler(
-                DomainObjectFactory.Object,
-                DomainObjectRepository.Object,
-                schemaProvider.Object);
+            sut = new SchemaCommandHandler(Handler, schemaProvider.Object);
         }
 
         [Fact]

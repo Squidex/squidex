@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  FieldDisabled.cs
+//  SquidexCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Write
 {
-    [TypeName("FieldDisabledEvent")]
-    public class FieldDisabled : FieldEvent
+    public abstract class SquidexCommand : AggregateCommand, IUserCommand
     {
+        public UserToken User { get; set; }
     }
 }

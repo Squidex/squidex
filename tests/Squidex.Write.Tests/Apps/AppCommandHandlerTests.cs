@@ -43,12 +43,7 @@ namespace Squidex.Write.Apps
         {
             app = new AppDomainObject(Id, 0);
 
-            sut = new AppCommandHandler(
-                DomainObjectFactory.Object, 
-                DomainObjectRepository.Object,
-                userRepository.Object,
-                appRepository.Object,
-                keyGenerator.Object);
+            sut = new AppCommandHandler(Handler, appRepository.Object, userRepository.Object, keyGenerator.Object);
         }
 
         [Fact]

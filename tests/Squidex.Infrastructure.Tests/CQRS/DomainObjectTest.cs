@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.CQRS
 {
     public class DomainObjectTest
     {
-        private sealed class Event : IEvent
+        private sealed class MyEvent : IEvent
         {
         }
 
@@ -52,8 +52,8 @@ namespace Squidex.Infrastructure.CQRS
         [Fact]
         public void Should_add_event_to_uncommitted_events_and_increase_version_when_raised()
         {
-            var event1 = new Event();
-            var event2 = new Event();
+            var event1 = new MyEvent();
+            var event2 = new MyEvent();
 
             var sut = new UserDomainObject(Guid.NewGuid(), 10);
 
@@ -74,8 +74,8 @@ namespace Squidex.Infrastructure.CQRS
         [Fact]
         public void Should_not_add_event_to_uncommitted_events_and_increase_version_when_raised()
         {
-            var event1 = new Event();
-            var event2 = new Event();
+            var event1 = new MyEvent();
+            var event2 = new MyEvent();
 
             var sut = new UserDomainObject(Guid.NewGuid(), 10);
 

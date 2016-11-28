@@ -14,9 +14,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class InMemoryCommandBusTests
     {
-        private readonly TestCommand command = new TestCommand();
+        private readonly MyCommand command = new MyCommand();
 
-        private sealed class TestCommand : ICommand
+        private sealed class MyCommand : ICommand
         {    
         }
 

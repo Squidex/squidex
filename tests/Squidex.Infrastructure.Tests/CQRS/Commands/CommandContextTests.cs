@@ -13,9 +13,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class CommandContextTests
     {
-        private readonly MockupCommand command = new MockupCommand();
+        private readonly MyCommand command = new MyCommand();
 
-        private sealed class MockupCommand : ICommand
+        private sealed class MyCommand : ICommand
         {
         }
 

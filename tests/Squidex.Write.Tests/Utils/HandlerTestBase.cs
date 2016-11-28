@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
@@ -16,8 +15,37 @@ namespace Squidex.Write.Utils
 {
     public abstract class HandlerTestBase<T> where T : DomainObject
     {
-        private readonly Mock<IDomainObjectFactory> domainObjectFactory = new Mock<IDomainObjectFactory>();
-        private readonly Mock<IDomainObjectRepository> domainObjectRepository = new Mock<IDomainObjectRepository>();
+        private sealed class MockupHandler : IAggregateHandler
+        {
+            private T domainObject;
+
+            public bool IsCreated { get; private set; }
+            public bool IsUpdated { get; private set; }
+
+            public void Init(T newDomainObject)
+            {
+                domainObject = newDomainObject;
+
+                IsCreated = false;
+                IsUpdated = false;
+            }
+
+            public Task CreateAsync<V>(IAggregateCommand command, Func<V, Task> creator) where V : class, IAggregate
+            {
+                IsCreated = true;
+
+                return creator(domainObject as V);
+            }
+
+            public Task UpdateAsync<V>(IAggregateCommand command, Func<V, Task> updater) where V : class, IAggregate
+            {
+                IsUpdated = true;
+
+                return updater(domainObject as V);
+            }
+        }
+
+        private readonly MockupHandler handler = new MockupHandler();
         private readonly Guid id = Guid.NewGuid();
 
         protected Guid Id
@@ -25,40 +53,32 @@ namespace Squidex.Write.Utils
             get { return id; }
         }
 
-        protected Mock<IDomainObjectFactory> DomainObjectFactory
+        protected IAggregateHandler Handler
         {
-            get { return domainObjectFactory; }
+            get { return handler; }
         }
 
-        protected Mock<IDomainObjectRepository> DomainObjectRepository
+        public async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
         {
-            get { return domainObjectRepository; }
-        }
-
-        public async Task TestCreate(T domainObject, Func<T, Task> action, bool succeeded = true)
-        {
-            domainObjectFactory.Setup(x => x.CreateNew(typeof(T), id)).Returns(domainObject).Verifiable();
-            domainObjectRepository.Setup(x => x.SaveAsync(domainObject, It.IsAny<Guid>())).Returns(Task.FromResult(true)).Verifiable();
+            handler.Init(domainObject);
 
             await action(domainObject);
 
-            if (succeeded)
+            if (!handler.IsCreated && shouldCreate)
             {
-                domainObjectFactory.VerifyAll();
-                domainObjectRepository.VerifyAll();
+                throw new InvalidOperationException("Create not called");
             }
         }
 
-        public async Task TestUpdate(T domainObject, Func<T, Task> action, bool succeeded = true)
+        public async Task TestUpdate(T domainObject, Func<T, Task> action, bool shouldUpdate = true)
         {
-            domainObjectRepository.Setup(x => x.GetByIdAsync<T>(domainObject.Id, int.MaxValue)).Returns(Task.FromResult(domainObject)).Verifiable();
-            domainObjectRepository.Setup(x => x.SaveAsync(domainObject, It.IsAny<Guid>())).Returns(Task.FromResult(true)).Verifiable();
+            handler.Init(domainObject);
 
             await action(domainObject);
 
-            if (succeeded)
+            if (!handler.IsUpdated && shouldUpdate)
             {
-                domainObjectRepository.VerifyAll();
+                throw new InvalidOperationException("Create not called");
             }
         }
     }

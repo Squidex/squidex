@@ -7,7 +7,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
@@ -15,6 +17,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = int.MaxValue) where TDomainObject : class, IAggregate;
 
-        Task SaveAsync(IAggregate domainObject, Guid commitId);
+        Task SaveAsync(IAggregate domainObject, ICollection<Envelope<IEvent>> events, Guid commitId);
     }
 }

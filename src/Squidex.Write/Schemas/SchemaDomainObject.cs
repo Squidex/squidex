@@ -18,10 +18,9 @@ using Squidex.Write.Schemas.Commands;
 
 namespace Squidex.Write.Schemas
 {
-    public class SchemaDomainObject : DomainObject, IAppAggregate
+    public class SchemaDomainObject : DomainObject
     {
         private readonly FieldRegistry registry;
-        private Guid appId;
         private bool isDeleted;
         private long totalFields;
         private Schema schema;
@@ -29,11 +28,6 @@ namespace Squidex.Write.Schemas
         public Schema Schema
         {
             get { return schema; }
-        }
-
-        public Guid AppId
-        {
-            get { return appId; }
         }
 
         public bool IsDeleted
@@ -58,8 +52,6 @@ namespace Squidex.Write.Schemas
 
         public void On(SchemaCreated @event)
         {
-            appId = @event.AppId;
-
             schema = Schema.Create(@event.Name, @event.Properties);
         }
 

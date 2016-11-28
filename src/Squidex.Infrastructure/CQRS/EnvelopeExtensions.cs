@@ -62,14 +62,14 @@ namespace Squidex.Infrastructure.CQRS
             return envelope;
         }
 
-        public static Guid AppId(this EnvelopeHeaders headers)
+        public static UserToken User(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.AppId].ToGuid(CultureInfo.InvariantCulture);
+            return UserToken.Parse(headers[CommonHeaders.User].ToString());
         }
 
-        public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetUser<T>(this Envelope<T> envelope, UserToken value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.AppId, value);
+            envelope.Headers.Set(CommonHeaders.User, value.ToString());
 
             return envelope;
         }

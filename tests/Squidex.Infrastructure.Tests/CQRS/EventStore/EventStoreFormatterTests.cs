@@ -18,12 +18,12 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public class EventStoreFormatterTests
     {
-        public sealed class Event : IEvent
+        public sealed class MyEvent : IEvent
         {
             public string MyProperty { get; set; }
         }
 
-        public sealed class ReceivedEvent : IReceivedEvent
+        public sealed class MyReceivedEvent : IReceivedEvent
         {
             public int EventNumber { get; set; }
 
@@ -45,17 +45,16 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 
         public EventStoreFormatterTests()
         {
-            TypeNameRegistry.Map(typeof(Event), "Event");
+            TypeNameRegistry.Map(typeof(MyEvent), "Event");
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_envelope()
         {
             var commitId = Guid.NewGuid();
-            var inputEvent = new Envelope<Event>(new Event { MyProperty = "My-Property" });
+            var inputEvent = new Envelope<MyEvent>(new MyEvent { MyProperty = "My-Property" });
 
             inputEvent.SetAggregateId(Guid.NewGuid());
-            inputEvent.SetAppId(Guid.NewGuid());
             inputEvent.SetCommitId(commitId);
             inputEvent.SetEventId(Guid.NewGuid());
             inputEvent.SetEventNumber(1);
@@ -65,7 +64,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 
             var eventData = sut.ToEventData(inputEvent.To<IEvent>(), commitId);
 
-            var receivedEvent = new ReceivedEvent
+            var receivedEvent = new MyReceivedEvent
             {
                 Payload = eventData.Data,
                 Created = inputEvent.Headers.Timestamp().ToDateTimeUtc(),
@@ -74,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                 Metadata = eventData.Metadata
             };
 
-            var outputEvent = sut.Parse(receivedEvent).To<Event>();
+            var outputEvent = sut.Parse(receivedEvent).To<MyEvent>();
 
             CompareHeaders(outputEvent.Headers, inputEvent.Headers);
 

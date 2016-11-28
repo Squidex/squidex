@@ -7,11 +7,10 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write
 {
-    public abstract class AppCommand : AggregateCommand, IAppCommand
+    public abstract class AppCommand : SquidexCommand, IAppCommand
     {
         public Guid AppId { get; set; }
     }

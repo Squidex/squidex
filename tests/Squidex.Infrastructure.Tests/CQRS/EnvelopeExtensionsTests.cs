@@ -63,14 +63,14 @@ namespace Squidex.Infrastructure.CQRS
         }
 
         [Fact]
-        public void Should_set_and_get_app_id()
+        public void Should_set_and_get_user()
         {
-            var commitId = Guid.NewGuid();
+            var user = new UserToken("subject", "123");
 
-            sut.SetAppId(commitId);
+            sut.SetUser(user);
 
-            Assert.Equal(commitId, sut.Headers.AppId());
-            Assert.Equal(commitId, sut.Headers["AppId"].ToGuid(culture));
+            Assert.Equal(user, sut.Headers.User());
+            Assert.Equal(user, UserToken.Parse(sut.Headers["User"].ToString()));
         }
 
         [Fact]

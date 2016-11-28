@@ -40,25 +40,23 @@ namespace Squidex.Infrastructure.CQRS
 
         protected abstract void DispatchEvent(Envelope<IEvent> @event);
 
-        protected void RaiseEvent(IEvent @event)
-        {
-            RaiseEvent(EnvelopeFactory.ForEvent(@event, this));
-        }
-
         private void ApplyEventCore(Envelope<IEvent> @event)
         {
             DispatchEvent(@event); version++;
+        }
+
+        protected void RaiseEvent(IEvent @event)
+        {
+            RaiseEvent(Envelope<IEvent>.Create(@event));
         }
 
         protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
         {
             Guard.NotNull(@event, nameof(@event));
 
-            var envelopeToAdd = @event.To<IEvent>();
+            uncomittedEvents.Add(@event.To<IEvent>());
 
-            uncomittedEvents.Add(envelopeToAdd);
-
-            ApplyEventCore(envelopeToAdd);
+            ApplyEventCore(@event.To<IEvent>());
         }
 
         void IAggregate.ApplyEvent(Envelope<IEvent> @event)

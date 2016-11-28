@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable RedundantAssignment
 // ReSharper disable ConvertIfStatementToSwitchStatement
@@ -98,19 +99,17 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             return domainObject;
         }
 
-        public async Task SaveAsync(IAggregate domainObject, Guid commitId)
+        public async Task SaveAsync(IAggregate domainObject, ICollection<Envelope<IEvent>> events, Guid commitId)
         {
             Guard.NotNull(domainObject, nameof(domainObject));
 
             var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id);
 
-            var newEvents = domainObject.GetUncomittedEvents();
-
             var versionCurrent = domainObject.Version;
-            var versionPrevious = versionCurrent - newEvents.Count;
-            var versionExpected = versionPrevious == 0 ? ExpectedVersion.NoStream : versionPrevious - 1;
+            var versionBefore = versionCurrent - events.Count;
+            var versionExpected = versionBefore == 0 ? ExpectedVersion.NoStream : versionBefore - 1;
 
-            var eventsToSave = newEvents.Select(x => formatter.ToEventData(x, commitId)).ToList();
+            var eventsToSave = events.Select(x => formatter.ToEventData(x, commitId)).ToList();
 
             await InsertEventsAsync(streamName, versionExpected, eventsToSave);
 

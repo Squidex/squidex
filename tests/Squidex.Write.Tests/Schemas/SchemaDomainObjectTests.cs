@@ -62,7 +62,7 @@ namespace Squidex.Write.Schemas
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new SchemaCreated { Name = appName, AppId = appId, Properties = properties }
+                        new SchemaCreated { Name = appName, Properties = properties }
                     });
         }
 

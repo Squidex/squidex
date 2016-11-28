@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -16,15 +17,23 @@ namespace Squidex.Write.Schemas.Commands
     {
         private SchemaProperties properties;
 
-        public string Name { get; set; }
-
         public SchemaProperties Properties
         {
             get
             {
                 return properties ?? (properties = new SchemaProperties()); 
             }
-            set { properties = value; }
+            set
+            {
+                properties = value;
+            }
+        }
+
+        public string Name { get; set; }
+
+        public CreateSchema()
+        {
+            AggregateId = Guid.NewGuid();
         }
 
         public void Validate(IList<ValidationError> errors)

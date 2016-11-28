@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
+using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Read;
 

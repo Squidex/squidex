@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  IAppAggregate.cs
+//  FieldEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Infrastructure.CQRS
+namespace Squidex.Events.Schemas
 {
-    public interface IAppAggregate : IAggregate
+    public abstract class FieldEvent : IEvent
     {
-        Guid AppId { get; }
+        public long FieldId { get; set; }
     }
 }

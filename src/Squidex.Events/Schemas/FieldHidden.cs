@@ -7,13 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
     [TypeName("FieldHiddenEvent")]
-    public class FieldHidden : IEvent
+    public class FieldHidden : FieldEvent
     {
-        public long FieldId { get; set; }
     }
 }

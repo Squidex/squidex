@@ -14,22 +14,22 @@ namespace Squidex.Infrastructure.Reflection
 {
     public class ReflectionExtensionTests
     {
-        private interface IMain : ISub1
+        private interface IMyMain : IMySub1
         {
             string MainProp { get; set; }
         }
 
-        private interface ISub1 : ISub2
+        private interface IMySub1 : IMySub2
         {
             string Sub1Prop { get; set; }
         }
 
-        private interface ISub2
+        private interface IMySub2
         {
             string Sub2Prop { get; set; }
         }
 
-        private class Main
+        private class MyMain
         {
             public string MainProp { get; set; }
         }
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_find_all_public_properties_of_interfaces()
         {
-            var properties = typeof(IMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
+            var properties = typeof(IMyMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
 
             Assert.Equal(new [] { "MainProp", "Sub1Prop", "Sub2Prop" }, properties);
         }
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_find_all_public_properties_of_classes()
         {
-            var properties = typeof(Main).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
+            var properties = typeof(MyMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
 
             Assert.Equal(new[] { "MainProp" }, properties);
         }
