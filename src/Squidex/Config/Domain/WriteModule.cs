@@ -43,7 +43,7 @@ namespace Squidex.Config.Domain
                 .As<IEventProcessor>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithUserHandler>()
+            builder.RegisterType<EnrichWithUserProcessor>()
                 .As<IEventProcessor>()
                 .SingleInstance();
 
