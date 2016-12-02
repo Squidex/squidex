@@ -161,6 +161,39 @@
     {
       "icon": {
         "paths": [
+          "M128 320v640c0 35.2 28.8 64 64 64h576c35.2 0 64-28.8 64-64v-640h-704zM320 896h-64v-448h64v448zM448 896h-64v-448h64v448zM576 896h-64v-448h64v448zM704 896h-64v-448h64v448z",
+          "M848 128h-208v-80c0-26.4-21.6-48-48-48h-224c-26.4 0-48 21.6-48 48v80h-208c-26.4 0-48 21.6-48 48v80h832v-80c0-26.4-21.6-48-48-48zM576 128h-192v-63.198h192v63.198z"
+        ],
+        "attrs": [],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "tags": [
+          "bin",
+          "trashcan",
+          "remove",
+          "delete",
+          "recycle",
+          "dispose"
+        ],
+        "defaultCode": 59820,
+        "grid": 16
+      },
+      "attrs": [],
+      "properties": {
+        "ligatures": "bin, trashcan",
+        "name": "bin",
+        "id": 172,
+        "order": 9,
+        "prevSize": 32,
+        "code": 59820
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 172
+    },
+    {
+      "icon": {
+        "paths": [
           "M810 554h-256v256h-84v-256h-256v-84h256v-256h84v256h256v84z"
         ],
         "attrs": [

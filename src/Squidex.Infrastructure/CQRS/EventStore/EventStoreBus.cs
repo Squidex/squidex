@@ -9,15 +9,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.SystemData;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.CQRS.Events;
+// ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.CQRS.EventStore
 {
-    public sealed class EventStoreBus
+    public sealed class EventStoreBus : IDisposable
     {
         private readonly IEventStoreConnection connection;
         private readonly UserCredentials credentials;
@@ -26,8 +28,9 @@ namespace Squidex.Infrastructure.CQRS.EventStore
         private readonly IEnumerable<ICatchEventConsumer> catchConsumers;
         private readonly ILogger<EventStoreBus> logger;
         private readonly IStreamPositionStorage positions;
-        private EventStoreCatchUpSubscription catchSubscription;
-        private bool isLive;
+        private readonly List<EventStoreCatchUpSubscription> catchSubscriptions = new List<EventStoreCatchUpSubscription>();
+        private EventStoreSubscription liveSubscription;
+        private bool isSubscribed;
 
         public EventStoreBus(
             ILogger<EventStoreBus> logger,
@@ -55,18 +58,62 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             this.catchConsumers = catchConsumers;
         }
 
+        public void Dispose()
+        {
+            lock (catchSubscriptions)
+            {
+                foreach (var catchSubscription in catchSubscriptions)
+                {
+                    catchSubscription.Stop(TimeSpan.FromMinutes(1));
+                }
+
+                liveSubscription.Unsubscribe();
+            }
+        }
+
         public void Subscribe(string streamName = "$all")
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            if (catchSubscription != null)
+            if (isSubscribed)
             {
                 return;
             }
 
-            var position = positions.ReadPosition();
-            
-            logger.LogInformation("Subscribing from {0}", position.HasValue ? position.Value.ToString() : "beginning");
+            SubscribeLive(streamName);
+            SubscribeCatch(streamName);
+
+            isSubscribed = true;
+        }
+
+        private void SubscribeLive(string streamName)
+        {
+            Task.Run(async () =>
+            {
+                liveSubscription =
+                    await connection.SubscribeToStreamAsync(streamName, true,
+                        (subscription, resolvedEvent) =>
+                        {
+                            OnLiveEvent(streamName, resolvedEvent);
+                        }, userCredentials: credentials);
+            }).Wait();
+        }
+
+        private void SubscribeCatch(string streamName)
+        {
+            foreach (var catchConsumer in catchConsumers)
+            {
+                SubscribeCatchFor(catchConsumer, streamName);
+            }
+        }
+
+        private void SubscribeCatchFor(IEventConsumer consumer, string streamName)
+        {
+            var subscriptionName = consumer.GetType().GetTypeInfo().Name;
+
+            var position = positions.ReadPosition(subscriptionName);
+
+            logger.LogInformation("[{0}]: Subscribing from {0}", consumer, position ?? 0);
 
             var settings =
                 new CatchUpSubscriptionSettings(
@@ -74,47 +121,92 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                     true,
                     true);
 
-            catchSubscription = 
+            var catchSubscription =
                 connection.SubscribeToStreamFrom(streamName, position, settings,
-                    OnEvent, 
-                    OnLiveProcessingStarted, 
-                    userCredentials: credentials);
+                    (subscription, resolvedEvent) =>
+                    {
+                        OnCatchEvent(consumer, streamName, resolvedEvent, subscriptionName, subscription);
+                    }, userCredentials: credentials);
+
+            lock (catchSubscriptions)
+            {
+                catchSubscriptions.Add(catchSubscription);
+            }
         }
 
-        private void OnEvent(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
+        private void OnLiveEvent(string streamName, ResolvedEvent resolvedEvent)
         {
+            Envelope<IEvent> @event = null;
+
             try
             {
-                if (resolvedEvent.OriginalEvent.EventStreamId.StartsWith("$", StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
-
-                if (!liveConsumers.Any() && !catchConsumers.Any())
-                {
-                    return;
-                }
-
-                var @event = formatter.Parse(new EventWrapper(resolvedEvent));
-
-                logger.LogInformation("Received event {0} ({1})", @event.Payload.GetType().Name, @event.Headers.AggregateId());
-
-                if (isLive)
-                {
-                    DispatchConsumers(liveConsumers, @event).Wait();
-                }
-
-                DispatchConsumers(catchConsumers, @event).Wait();
+                @event = formatter.Parse(new EventWrapper(resolvedEvent));
             }
-            finally
+            catch (Exception ex)
             {
-                positions.WritePosition(resolvedEvent.OriginalEventNumber);
+                logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex,
+                    "[LiveConsumers]: Failed to deserialize event {0}#{1}", streamName,
+                    resolvedEvent.OriginalEventNumber);
+            }
+
+            if (@event != null)
+            {
+                DispatchConsumers(liveConsumers, @event).Wait();
             }
         }
 
-        private void OnLiveProcessingStarted(EventStoreCatchUpSubscription subscription)
+        private void OnCatchEvent(IEventConsumer consumer, string streamName, ResolvedEvent resolvedEvent, string subscriptionName, EventStoreCatchUpSubscription subscription)
         {
-            isLive = true;
+            if (resolvedEvent.OriginalEvent.EventStreamId.StartsWith("$", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var isFailed = false;
+
+            Envelope<IEvent> @event = null;
+
+            try
+            {
+                @event = formatter.Parse(new EventWrapper(resolvedEvent));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex,
+                    "[{consumer}]: Failed to deserialize event {1}#{2}", consumer, streamName, 
+                    resolvedEvent.OriginalEventNumber);
+
+                isFailed = true;
+            }
+
+            if (@event != null)
+            {
+                try
+                {
+                    logger.LogInformation("Received event {0} ({1})", @event.Payload.GetType().Name, @event.Headers.AggregateId());
+
+                    consumer.On(@event).Wait();
+
+                    positions.WritePosition(subscriptionName, resolvedEvent.OriginalEventNumber);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(InfrastructureErrors.EventHandlingFailed, ex,
+                        "[{0}]: Failed to handle event {1} ({2})", consumer, 
+                        @event.Payload, 
+                        @event.Headers.EventId());
+                }
+            }
+
+            if (isFailed)
+            {
+                lock (catchSubscriptions)
+                {
+                    subscription.Stop();
+
+                    catchSubscriptions.Remove(subscription);
+                }
+            }
         }
 
         private Task DispatchConsumers(IEnumerable<IEventConsumer> consumers, Envelope<IEvent> @event)
@@ -130,9 +222,8 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             }
             catch (Exception ex)
             {
-                var eventId = new EventId(10001, "EventConsumeFailed");
-
-                logger.LogError(eventId, ex, "'{0}' failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
+                logger.LogError(InfrastructureErrors.EventHandlingFailed, ex,
+                    "[{0}]: Failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
             }
         }
     }

@@ -1,23 +1,22 @@
 ﻿// ==========================================================================
-//  IAppClientKeyEntity.cs
+//  RenameClientDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Controllers.Api.Apps.Models
 {
-    public interface IAppClientEntity
+    public class RenameClientDto
     {
-        string Name { get; }
-
-        string ClientId { get; }
-
-        string ClientSecret { get; }
-
-        DateTime ExpiresUtc { get; }
+        /// <summary>
+        /// The new display name of the client.
+        /// </summary>
+        [Required]
+        [StringLength(20)]
+        public string Name { get; set; }
     }
 }

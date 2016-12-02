@@ -9,8 +9,8 @@ namespace Squidex.Infrastructure.CQRS.EventStore
 {
     public interface IStreamPositionStorage
     {
-        int? ReadPosition();
+        int? ReadPosition(string subscriptionName);
 
-        void WritePosition(int position);
+        void WritePosition(string subscriptionName, int position);
     }
 }

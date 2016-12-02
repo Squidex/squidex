@@ -14,10 +14,10 @@ namespace Squidex.Controllers.Api.Apps.Models
     public sealed class ClientDto
     {
         /// <summary>
-        /// The client name. 
+        /// The client id. 
         /// </summary>
         [Required]
-        public string ClientName { get; set; }
+        public string ClientId { get; set; }
 
         /// <summary>
         /// The client secret. 
@@ -30,5 +30,11 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// </summary>
         [Required]
         public DateTime ExpiresUtc { get; set; }
+
+        /// <summary>
+        /// The client name.
+        /// </summary>
+        [Required]
+        public string Name { get; set; }
     }
 }

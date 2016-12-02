@@ -16,7 +16,7 @@ namespace Squidex.Store.MongoDb.Apps
     {
         [BsonRequired]
         [BsonElement]
-        public string ClientName { get; set; }
+        public string ClientId { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -25,5 +25,9 @@ namespace Squidex.Store.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public DateTime ExpiresUtc { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public string Name { get; set; }
     }
 }

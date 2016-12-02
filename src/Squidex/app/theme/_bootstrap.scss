@@ -13,14 +13,51 @@
     }
 
     &-borderless-top {
-        tr:first-child td {
-            border: 0;
+        tr {
+            &:first-child {
+                td {
+                    border: 0;
+                }
+            }
         }
     }
 
     &-middle {
         td {
             vertical-align: middle;
+        }
+    }
+
+    &-items {
+        & {
+            margin-bottom: .25rem;
+        }
+
+        td {
+            padding: 10px 12px;
+            margin: 0;
+            margin-bottom: 10px;
+            vertical-align: middle;
+        }
+
+        tr {
+            padding: 10px 12px;
+            background: $color-table;
+            border: 1px solid $color-border;
+            border-bottom: 2px solid $color-border;
+            margin-bottom: 10px;
+        }
+
+        &-footer {
+            @include border-radius(.25rem);
+            padding: 10px 12px;
+            background: $color-table;
+            border: 1px solid $color-border;
+            border-bottom: 2px solid $color-border;
+        }
+
+        .spacer {
+            height: .25rem;
         }
     }
 }
@@ -115,4 +152,10 @@
 .dropdown-menu {
     @include box-shadow(0, 6px, 16px, .2px);
     border: 0;
+}
+
+.btn-link {
+    &.btn-danger {
+        color: $color-theme-error;
+    }
 }

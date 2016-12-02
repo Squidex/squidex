@@ -6,8 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using MongoDB.Bson;
+using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.EventStore;
 using Squidex.Store.MongoDb.Utils;
 
@@ -17,11 +18,14 @@ namespace Squidex.Store.MongoDb.Infrastructure
 {
     public sealed class MongoStreamPositionStorage : MongoRepositoryBase<MongoStreamPositionEntity>, IStreamPositionStorage
     {
-        private static readonly ObjectId Id = new ObjectId("507f1f77bcf86cd799439011");
-
         public MongoStreamPositionStorage(IMongoDatabase database)
             : base(database)
         {
+        }
+
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoStreamPositionEntity> collection)
+        {
+            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.SubscriptionName), new CreateIndexOptions { Unique = true });
         }
 
         protected override string CollectionName()
@@ -29,13 +33,15 @@ namespace Squidex.Store.MongoDb.Infrastructure
             return "StreamPositions";
         }
 
-        public int? ReadPosition()
+        public int? ReadPosition(string subscriptionName)
         {
-            var document = Collection.Find(t => t.Id == Id).FirstOrDefault();
+            Guard.NotNullOrEmpty(subscriptionName, nameof(subscriptionName));
+
+            var document = Collection.Find(t => t.SubscriptionName == subscriptionName).FirstOrDefault();
 
             if (document == null)
             {
-                document = new MongoStreamPositionEntity { Id = Id };
+                document = new MongoStreamPositionEntity { SubscriptionName = subscriptionName };
 
                 Collection.InsertOne(document);
             }
@@ -43,9 +49,11 @@ namespace Squidex.Store.MongoDb.Infrastructure
             return document.Position;
         }
 
-        public void WritePosition(int position)
+        public void WritePosition(string subscriptionName, int position)
         {
-            Collection.UpdateOne(t => t.Id == Id, Update.Set(t => t.Position, position));
+            Guard.NotNullOrEmpty(subscriptionName, nameof(subscriptionName));
+
+            Collection.UpdateOne(t => t.SubscriptionName == subscriptionName, Update.Set(t => t.Position, position));
         }
     }
 }

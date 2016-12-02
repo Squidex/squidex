@@ -82,13 +82,18 @@ namespace Squidex.Write.Apps
             {
                 x.AttachClient(command, keyGenerator.GenerateKey());
 
-                context.Succeed(x.Clients[command.ClientName]);
+                context.Succeed(x.Clients[command.ClientId]);
             });
         }
 
         protected Task On(RemoveContributor command, CommandContext context)
         {
             return handler.UpdateAsync<AppDomainObject>(command, x => x.RemoveContributor(command));
+        }
+
+        protected Task On(RenameClient command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.RenameClient(command));
         }
 
         protected Task On(RevokeClient command, CommandContext context)

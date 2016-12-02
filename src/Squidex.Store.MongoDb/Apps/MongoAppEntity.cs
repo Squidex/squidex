@@ -27,11 +27,11 @@ namespace Squidex.Store.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public List<MongoAppClientEntity> Clients { get; set; }
+        public Dictionary<string, MongoAppClientEntity> Clients { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public List<MongoAppContributorEntity> Contributors { get; set; }
+        public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; }
 
         IEnumerable<Language> IAppEntity.Languages
         {
@@ -40,19 +40,19 @@ namespace Squidex.Store.MongoDb.Apps
 
         IEnumerable<IAppClientEntity> IAppEntity.Clients
         {
-            get { return Clients; }
+            get { return Clients.Values; }
         }
 
         IEnumerable<IAppContributorEntity> IAppEntity.Contributors
         {
-            get { return Contributors; }
+            get { return Contributors.Values; }
         }
 
         public MongoAppEntity()
         {
-            Contributors = new List<MongoAppContributorEntity>();
+            Contributors = new Dictionary<string, MongoAppContributorEntity>();
 
-            Clients = new List<MongoAppClientEntity>();
+            Clients = new Dictionary<string, MongoAppClientEntity>();
         }
     }
 }

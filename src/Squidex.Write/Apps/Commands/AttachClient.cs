@@ -15,15 +15,15 @@ namespace Squidex.Write.Apps.Commands
 {
     public sealed class AttachClient : AppAggregateCommand, ITimestampCommand, IValidatable
     {
-        public string ClientName { get; set; }
+        public string ClientId { get; set; }
 
         public DateTime Timestamp { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!ClientName.IsSlug())
+            if (!ClientId.IsSlug())
             {
-                errors.Add(new ValidationError("Name must be a valid slug", nameof(ClientName)));
+                errors.Add(new ValidationError("Client id must be a valid slug", nameof(ClientId)));
             }
         }
     }

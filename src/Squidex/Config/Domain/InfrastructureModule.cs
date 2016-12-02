@@ -42,6 +42,10 @@ namespace Squidex.Config.Domain
                 .As<IDomainObjectRepository>()
                 .SingleInstance();
 
+            builder.RegisterType<AggregateHandler>()
+                .As<IAggregateHandler>()
+                .SingleInstance();
+
             builder.RegisterType<InMemoryCommandBus>()
                 .As<ICommandBus>()
                 .SingleInstance();

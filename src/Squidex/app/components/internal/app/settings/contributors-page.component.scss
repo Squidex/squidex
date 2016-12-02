@@ -18,17 +18,15 @@
 .user {
     &-picture {
         @include circle(2.2rem);
-        float: left;
     }
 
     &-name,
     &-email {
         @include truncate;
-        padding-left: 10px;
     }
 
     &-email {
-        font-size: .8rem;
         font-style: italic;
+        font-size: .8rem;
     }
 }

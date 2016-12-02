@@ -77,7 +77,7 @@ namespace Squidex.Pipeline
 
             clientId = clientId.Split(':')[0];
 
-            var contributor = app.Clients.FirstOrDefault(x => string.Equals(x.ClientName, clientId, StringComparison.OrdinalIgnoreCase));
+            var contributor = app.Clients.FirstOrDefault(x => string.Equals(x.ClientId, clientId, StringComparison.OrdinalIgnoreCase));
 
             return contributor != null ? PermissionLevel.Owner : PermissionLevel.Editor;
         }

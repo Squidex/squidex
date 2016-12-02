@@ -29,7 +29,8 @@ namespace Squidex.Write.Apps
         private readonly UserToken user = new UserToken("subject", Guid.NewGuid().ToString());
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
-        private readonly string clientName = "client";
+        private readonly string clientId = "client";
+        private readonly string clientNewName = "My Client";
         private readonly List<Language> languages = new List<Language> { Language.GetLanguage("de") };
 
         public AppDomainObjectTests()
@@ -189,7 +190,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public void AttachClient_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret));
+            Assert.Throws<DomainException>(() => sut.AttachClient(new AttachClient { ClientId = clientId }, clientSecret));
         }
 
         [Fact]
@@ -198,7 +199,7 @@ namespace Squidex.Write.Apps
             CreateApp();
 
             Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient(), clientSecret));
-            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientName = string.Empty }, clientSecret));
+            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientId = string.Empty }, clientSecret));
         }
 
         [Fact]
@@ -206,9 +207,9 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret);
+            sut.AttachClient(new AttachClient { ClientId = clientId }, clientSecret);
 
-            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret));
+            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { ClientId = clientId }, clientSecret));
         }
 
         [Fact]
@@ -218,7 +219,7 @@ namespace Squidex.Write.Apps
 
             CreateApp();
 
-            sut.AttachClient(new AttachClient { ClientName = clientName, Timestamp = now }, clientSecret);
+            sut.AttachClient(new AttachClient { ClientId = clientId, Timestamp = now }, clientSecret);
 
             Assert.False(sut.Contributors.ContainsKey(contributorId));
 
@@ -226,14 +227,14 @@ namespace Squidex.Write.Apps
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppClientAttached { ClientName = clientName, ClientSecret = clientSecret, ExpiresUtc = now.AddYears(1) }
+                        new AppClientAttached { ClientId = clientId, ClientSecret = clientSecret, ExpiresUtc = now.AddYears(1) }
                     });
         }
 
         [Fact]
         public void RevokeKey_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RevokeClient(new RevokeClient { ClientName = "not-found" }));
+            Assert.Throws<DomainException>(() => sut.RevokeClient(new RevokeClient { ClientId = "not-found" }));
         }
 
         [Fact]
@@ -242,7 +243,7 @@ namespace Squidex.Write.Apps
             CreateApp();
 
             Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient()));
-            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientName = string.Empty }));
+            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientId = string.Empty }));
         }
 
         [Fact]
@@ -250,7 +251,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientName = "not-found" }));
+            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { ClientId = "not-found" }));
         }
 
         [Fact]
@@ -258,14 +259,55 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AttachClient(new AttachClient { ClientName = clientName }, clientSecret);
-            sut.RevokeClient(new RevokeClient { ClientName = clientName });
+            sut.AttachClient(new AttachClient { ClientId = clientId }, clientSecret);
+            sut.RevokeClient(new RevokeClient { ClientId = clientId });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppClientRevoked { ClientName = clientSecret }
+                        new AppClientRevoked { ClientId = clientSecret }
+                    });
+        }
+
+        [Fact]
+        public void RenameKey_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.RenameClient(new RenameClient { ClientId = "not-found", Name = clientNewName }));
+        }
+
+        [Fact]
+        public void RenameClient_should_throw_if_command_is_not_valid()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient()));
+            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient { ClientId = string.Empty }));
+        }
+
+        [Fact]
+        public void RenameClient_should_throw_if_client_not_found()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient { ClientId = "not-found", Name = clientNewName }));
+        }
+
+        [Fact]
+        public void RenameClient_should_create_events()
+        {
+            CreateApp();
+
+            sut.AttachClient(new AttachClient { ClientId = clientId }, clientSecret);
+            sut.RenameClient(new RenameClient { ClientId = clientId, Name = clientNewName });
+
+            Assert.Equal(clientNewName, sut.Clients[clientId].Name);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new AppClientRenamed { ClientId = clientId, Name = clientNewName }
                     });
         }
 

@@ -53,7 +53,7 @@ h1 {
     &-left {
         border-right: 1px solid $color-border;
     }
-    
+
     &-middle {
         & {
             @include flex-grow(1);

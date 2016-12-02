@@ -13,10 +13,10 @@ namespace Squidex.Controllers.Api.Apps.Models
     public sealed class AttachClientDto
     {
         /// <summary>
-        /// The name of the client.
+        /// The id of the client.
         /// </summary>
         [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
-        public string ClientName { get; set; }
+        public string ClientId { get; set; }
     }
 }

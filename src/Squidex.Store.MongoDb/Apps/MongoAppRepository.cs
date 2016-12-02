@@ -18,6 +18,7 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Store.MongoDb.Utils;
+using Squidex.Infrastructure;
 
 namespace Squidex.Store.MongoDb.Apps
 {
@@ -41,7 +42,7 @@ namespace Squidex.Store.MongoDb.Apps
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId)
         {
             var entities =
-                await Collection.Find(s => s.Contributors.Any(c => c.ContributorId == subjectId)).ToListAsync();
+                await Collection.Find(s => s.Contributors.ContainsKey(subjectId)).ToListAsync();
 
             return entities;
         }
@@ -56,43 +57,59 @@ namespace Squidex.Store.MongoDb.Apps
 
         public Task On(AppCreated @event, EnvelopeHeaders headers)
         {
-            return Collection.CreateAsync(headers, a => SimpleMapper.Map(@event, a));
+            return Collection.CreateAsync(headers, a =>
+            {
+                SimpleMapper.Map(@event, a);
+            });
         }
 
         public Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.Contributors.RemoveAll(c => c.ContributorId == @event.ContributorId));
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Contributors.Remove(@event.ContributorId);
+            });
         }
 
         public Task On(AppLanguagesConfigured @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.Languages = @event.Languages.Select(x => x.Iso2Code).ToList());
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Languages = @event.Languages.Select(x => x.Iso2Code).ToList();
+            });
         }
 
         public Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.Clients.Add(SimpleMapper.Map(@event, new MongoAppClientEntity())));
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Clients.Add(@event.ClientId, SimpleMapper.Map(@event, new MongoAppClientEntity()));
+            });
         }
 
         public Task On(AppClientRevoked @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, a => a.Clients.RemoveAll(c => c.ClientName == @event.ClientName));
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Clients.Remove(@event.ClientId);
+            });
+        }
+
+        public Task On(AppClientRenamed @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Clients[@event.ClientId].Name = @event.Name;
+            });
         }
 
         public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
-                var contributor = a.Contributors.Find(x => x.ContributorId == @event.ContributorId);
+                var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
 
-                if (contributor == null)
-                {
-                    contributor = new MongoAppContributorEntity { ContributorId = @event.ContributorId };
-
-                    a.Contributors.Add(contributor);
-                }
-
-                contributor.Permission = @event.Permission;
+                SimpleMapper.Map(@event, contributor);
             });
         }
 

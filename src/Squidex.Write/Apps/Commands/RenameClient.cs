@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RevokeClient.cs
+//  RenameClient.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,12 +11,19 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Apps.Commands
 {
-    public class RevokeClient : AppAggregateCommand, IValidatable
+    public class RenameClient : AppAggregateCommand, IValidatable
     {
         public string ClientId { get; set; }
 
+        public string Name { get; set; }
+
         public void Validate(IList<ValidationError> errors)
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                errors.Add(new ValidationError("Name cannot be null or empty", nameof(Name)));
+            }
+
             if (!ClientId.IsSlug())
             {
                 errors.Add(new ValidationError("Client id must be a valid slug", nameof(ClientId)));

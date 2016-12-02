@@ -93,18 +93,39 @@ namespace Squidex.Controllers.Api.Apps
         }
 
         /// <summary>
+        /// Updates an app client.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="client">The id of the client that must be updated.</param>
+        /// <param name="request">Client object that needs to be added to the app.</param>
+        /// <returns>
+        /// 201 => Client key generated.
+        /// 404 => App not found or client not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/clients/{client}/")]
+        [ProducesResponseType(typeof(ClientDto[]), 201)]
+        public async Task<IActionResult> PutClient(string app, string client, [FromBody] RenameClientDto request)
+        {
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient()));
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Revoke an app client
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="client">Client object that needs to be added to the app.</param>
+        /// <param name="client">The id of the client that must be deleted.</param>
         /// <returns>
+        /// 404 => App not found or client not found.
         /// 204 => Client revoked.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/clients/{client}/")]
         public async Task<IActionResult> DeleteClient(string app, string client)
         {
-            await CommandBus.PublishAsync(new RevokeClient { ClientName = client });
+            await CommandBus.PublishAsync(new RevokeClient { ClientId = client });
 
             return NoContent();
         }

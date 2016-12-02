@@ -66,12 +66,17 @@ namespace Squidex.Write.Apps
 
         public void On(AppClientAttached @event)
         {
-            clients.Add(@event.ClientName, new AppClient(@event.ClientName, @event.ClientSecret, @event.ExpiresUtc));
+            clients.Add(@event.ClientId, new AppClient(@event.ClientId, @event.ClientSecret, @event.ExpiresUtc));
         }
 
         public void On(AppClientRevoked @event)
         {
-            clients.Remove(@event.ClientName);
+            clients.Remove(@event.ClientId);
+        }
+
+        public void On(AppClientRenamed @event)
+        {
+            clients[@event.ClientId].Rename(@event.Name);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -109,14 +114,28 @@ namespace Squidex.Write.Apps
             return this;
         }
 
+        public AppDomainObject RenameClient(RenameClient command)
+        {
+            Func<string> message = () => "Cannot rename client";
+
+            Guard.Valid(command, nameof(command), message);
+
+            ThrowIfNotCreated();
+            ThrowIfClientNotFound(command.ClientId, message);
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
+
+            return this;
+        }
+
         public AppDomainObject RevokeClient(RevokeClient command)
         {
             Func<string> message = () => "Cannot revoke client";
 
-            Guard.Valid(command, nameof(command), () => "Cannot revoke client");
+            Guard.Valid(command, nameof(command), message);
 
             ThrowIfNotCreated();
-            ThrowIfClientNotFound(command, message);
+            ThrowIfClientNotFound(command.ClientId, message);
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
 
@@ -130,7 +149,7 @@ namespace Squidex.Write.Apps
             Guard.Valid(command, nameof(command), () => "Cannot attach client");
 
             ThrowIfNotCreated();
-            ThrowIfClientFound(command, message);
+            ThrowIfClientFound(command.ClientId, message);
 
             var expire = command.Timestamp.AddYears(1);
 
@@ -146,7 +165,7 @@ namespace Squidex.Write.Apps
             Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
 
             ThrowIfNotCreated();
-            ThrowIfContributorNotFound(command, message);
+            ThrowIfContributorNotFound(command.ContributorId, message);
 
             ThrowIfNoOwner(c => c.Remove(command.ContributorId), message);
 
@@ -194,19 +213,19 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void ThrowIfClientFound(AttachClient command, Func<string> message)
+        private void ThrowIfClientFound(string clientId, Func<string> message)
         {
-            if (clients.ContainsKey(command.ClientName))
+            if (clients.ContainsKey(clientId))
             {
-                var error = new ValidationError("Client name is alreay part of the app", "ClientName");
+                var error = new ValidationError("Client id is alreay part of the app", "ClientName");
 
                 throw new ValidationException(message(), error);
             }
         }
 
-        private void ThrowIfClientNotFound(RevokeClient command, Func<string> message)
+        private void ThrowIfClientNotFound(string clientId, Func<string> message)
         {
-            if (!clients.ContainsKey(command.ClientName))
+            if (!clients.ContainsKey(clientId))
             {
                 var error = new ValidationError("Client is not part of the app", "ClientName");
 
@@ -214,9 +233,9 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void ThrowIfContributorNotFound(RemoveContributor command, Func<string> message)
+        private void ThrowIfContributorNotFound(string contributorId, Func<string> message)
         {
-            if (!contributors.ContainsKey(command.ContributorId))
+            if (!contributors.ContainsKey(contributorId))
             {
                 var error = new ValidationError("Contributor is not part of the app", "ContributorId");
 

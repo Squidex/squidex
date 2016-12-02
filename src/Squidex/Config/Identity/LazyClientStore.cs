@@ -52,7 +52,7 @@ namespace Squidex.Config.Identity
 
             var app = await appProvider.FindAppByNameAsync(token[0]);
 
-            var appClient = app?.Clients.FirstOrDefault(x => x.ClientName == token[1]);
+            var appClient = app?.Clients.FirstOrDefault(x => x.ClientId == token[1]);
 
             if (appClient == null)
             {

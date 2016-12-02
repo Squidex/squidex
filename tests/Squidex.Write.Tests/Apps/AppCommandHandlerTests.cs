@@ -164,7 +164,7 @@ namespace Squidex.Write.Apps
 
             var timestamp = DateTime.Today;
 
-            var command = new AttachClient { ClientName = clientName, AggregateId = Id, Timestamp = timestamp };
+            var command = new AttachClient { ClientId = clientName, AggregateId = Id, Timestamp = timestamp };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>
@@ -179,12 +179,27 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
+        public async Task RenameClient_should_update_domain_object()
+        {
+            CreateApp()
+                .AttachClient(new AttachClient { ClientId = clientName }, clientSecret);
+
+            var command = new RenameClient { AggregateId = Id, ClientId = clientName, Name = "New Name" };
+            var context = new CommandContext(command);
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
         public async Task RevokeClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(new AttachClient { ClientName = clientName }, clientSecret);
+                .AttachClient(new AttachClient { ClientId = clientName }, clientSecret);
 
-            var command = new RevokeClient { AggregateId = Id, ClientName = clientName };
+            var command = new RevokeClient { AggregateId = Id, ClientId = clientName };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>

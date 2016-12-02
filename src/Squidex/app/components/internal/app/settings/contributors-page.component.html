@@ -9,58 +9,60 @@
             </h1>
         </div>
         <div class="layout-middle-content">
-            <div class="card">
-                <div class="card-block">
-                    <table class="table table-borderless-top table-fixed contributors-table">
-                        <colgroup>
-                            <col style="width: 100%" />
-                            <col style="width: 150px" />
-                            <col style="width: 110px" />
-                        </colgroup>
+            <table class="table table-items table-fixed">
+                <colgroup>
+                    <col style="width: 50px" />
+                    <col style="width: 50%" />
+                    <col style="width: 50%" />
+                    <col style="width: 150px" />
+                    <col style="width: 60px" />
+                </colgroup>
+                <template ngFor let-contributor [ngForOf]="appContributors">
+                    <tr>
+                        <td>
+                            <img class="user-picture" [attr.src]="pictureUrl(contributor) | async" />
+                        </td>
+                        <td>
+                            <span class="user-name">{{displayName(contributor) | async}}</span>
+                        </td>
+                        <td>
+                            <span class="user-email">{{email(contributor) | async}}</span>
+                        </td>
+                        <td>
+                            <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="saveContributor(contributor)" [disabled]="currrentUserId === contributor.contributorId">
+                                <option *ngFor="let permission of usersPermissions">{{permission}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-link btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="removeContributor(contributor)">
+                                <i class="icon-bin"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="spacer"></tr>
+                </template>
+            </table>
+            
+            <div class="table-items-footer">
+                <form class="form-inline" (submit)="assignContributor()" >
+                    <div class="form-group">
+                        <ng2-completer 
+                            [autoMatch]="true"
+                            [dataService]="usersDataSource" 
+                            [minSearchLength]="3" 
+                            [placeholder]="'Search user by e-mail'"
+                            [pause]="300"
+                            [clearSelected]="false"
+                            [textSearching]="'Searching...'"
+                            [inputName]="contributor"
+                            [ngModel]="selectedUserName"
+                            [ngModelOptions]="{standalone: true}"
+                            (selected)="selectUser($event)">
+                        </ng2-completer>
+                    </div>
 
-                        <tr *ngFor="let contributor of appContributors">
-                            <td class="col-xs-7">
-                                <img class="user-picture" [attr.src]="pictureUrl(contributor) | async" />
-
-                                <span class="user-name">
-                                    {{displayName(contributor) | async}}
-                                </span>
-                                <span class="user-email">
-                                    {{email(contributor) | async}}
-                                </span>
-                            </td>
-                            <td>
-                                <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="saveContributor(contributor)" [disabled]="currrentUserId === contributor.contributorId">
-                                    <option *ngFor="let permission of usersPermissions">{{permission}}</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="btn btn-block btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="removeContributor(contributor)">Remove</button>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="card-footer">
-                    <form class="form-inline" (submit)="assignContributor()" >
-                        <div class="form-group">
-                            <ng2-completer 
-                                [autoMatch]="true"
-                                [dataService]="usersDataSource" 
-                                [minSearchLength]="3" 
-                                [placeholder]="'Search user by e-mail'"
-                                [pause]="300"
-                                [clearSelected]="false"
-                                [textSearching]="'Searching...'"
-                                [inputName]="contributor"
-                                [ngModel]="selectedUserName"
-                                [ngModelOptions]="{standalone: true}"
-                                (selected)="selectUser($event)">
-                            </ng2-completer>
-                        </div>
-
-                        <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
-                    </form>
-                </div>
+                    <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
+                </form>
             </div>
         </div>
     </div>
