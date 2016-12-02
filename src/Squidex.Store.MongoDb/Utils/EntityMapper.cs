@@ -19,7 +19,7 @@ namespace Squidex.Store.MongoDb.Utils
 {
     public static class EntityMapper
     {
-        public static T Create<T>(EnvelopeHeaders headers) where T : IEntity, new()
+        public static T Create<T>(EnvelopeHeaders headers) where T : MongoEntity, new()
         {
             var timestamp = headers.Timestamp().ToDateTimeUtc();
 
@@ -49,7 +49,7 @@ namespace Squidex.Store.MongoDb.Utils
             return JToken.Parse(json);
         }
 
-        public static T Update<T>(T entity, EnvelopeHeaders headers) where T : IEntity
+        public static T Update<T>(T entity, EnvelopeHeaders headers) where T : MongoEntity
         {
             var timestamp = headers.Timestamp().ToDateTimeUtc();
 
@@ -58,7 +58,7 @@ namespace Squidex.Store.MongoDb.Utils
             return entity;
         }
 
-        public static Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity, new()
+        public static Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : MongoEntity, new()
         {
             var entity = Create<T>(headers);
 
@@ -67,7 +67,7 @@ namespace Squidex.Store.MongoDb.Utils
             return collection.InsertOneIfNotExistsAsync(entity);
         }
 
-        public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity
+        public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : MongoEntity
         {
             var entity = await collection.Find(t => t.Id == headers.AggregateId()).FirstOrDefaultAsync();
 

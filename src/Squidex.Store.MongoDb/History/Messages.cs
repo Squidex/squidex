@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
-//  IEntity.cs
+//  Messages.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Read
+namespace Squidex.Store.MongoDb.History
 {
-    public interface IEntity
+    public static class Messages
     {
-        Guid Id { get; }
+        public const string AppCreated = "AppCreated";
 
-        DateTime Created { get; }
-
-        DateTime LastModified { get; }
+        public const string AppContributor = "SchemaDeleted";
     }
 }

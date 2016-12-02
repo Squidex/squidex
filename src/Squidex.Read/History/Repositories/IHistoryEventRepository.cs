@@ -1,21 +1,18 @@
 ﻿// ==========================================================================
-//  IEntity.cs
+//  IHistoryEventRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Squidex.Read
+namespace Squidex.Read.History.Repositories
 {
-    public interface IEntity
+    public interface IHistoryEventRepository
     {
-        Guid Id { get; }
-
-        DateTime Created { get; }
-
-        DateTime LastModified { get; }
+        Task<List<IHistoryEventEntity>> FindHistoryByChannel(string channelPrefix, int count);
     }
 }

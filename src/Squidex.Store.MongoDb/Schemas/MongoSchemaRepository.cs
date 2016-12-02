@@ -24,7 +24,7 @@ using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Schemas
 {
-    public sealed class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ICatchEventConsumer
+    public  class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ICatchEventConsumer
     {
         private readonly SchemaJsonSerializer serializer;
         private readonly FieldRegistry fieldRegistry;
@@ -88,54 +88,54 @@ namespace Squidex.Store.MongoDb.Schemas
             return entity?.Id;
         }
 
-        public Task On(SchemaDeleted @event, EnvelopeHeaders headers)
+        protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(headers, e => e.IsDeleted = true);
+            return Collection.UpdateAsync(headers, s => s.IsDeleted = true);
         }
 
-        public Task On(FieldDeleted @event, EnvelopeHeaders headers)
+        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.DeleteField(@event.FieldId));
         }
 
-        public Task On(FieldDisabled @event, EnvelopeHeaders headers)
+        protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.DisableField(@event.FieldId));
         }
 
-        public Task On(FieldEnabled @event, EnvelopeHeaders headers)
+        protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.EnableField(@event.FieldId));
         }
 
-        public Task On(FieldHidden @event, EnvelopeHeaders headers)
+        protected Task On(FieldHidden @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.HideField(@event.FieldId));
         }
 
-        public Task On(FieldShown @event, EnvelopeHeaders headers)
+        protected Task On(FieldShown @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.ShowField(@event.FieldId));
         }
 
-        public Task On(FieldUpdated @event, EnvelopeHeaders headers)
+        protected Task On(FieldUpdated @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.UpdateField(@event.FieldId, @event.Properties));
         }
 
-        public Task On(SchemaUpdated @event, EnvelopeHeaders headers)
+        protected Task On(SchemaUpdated @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(headers, s => s.Update(@event.Properties));
         }
 
-        public Task On(FieldAdded @event, EnvelopeHeaders headers)
+        protected Task On(FieldAdded @event, EnvelopeHeaders headers)
         {
             var field = fieldRegistry.CreateField(@event.FieldId, @event.Name, @event.Properties);
 
             return UpdateSchema(headers, s => s.AddOrUpdateField(field));
         }
 
-        public Task On(SchemaCreated @event, EnvelopeHeaders headers)
+        protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
             var schema = Schema.Create(@event.Name, @event.Properties);
 

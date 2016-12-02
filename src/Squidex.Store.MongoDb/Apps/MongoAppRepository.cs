@@ -22,7 +22,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Store.MongoDb.Apps
 {
-    public sealed class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ICatchEventConsumer
+    public class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ICatchEventConsumer
     {
         public MongoAppRepository(IMongoDatabase database) 
             : base(database)
@@ -55,7 +55,7 @@ namespace Squidex.Store.MongoDb.Apps
             return entity;
         }
 
-        public Task On(AppCreated @event, EnvelopeHeaders headers)
+        protected Task On(AppCreated @event, EnvelopeHeaders headers)
         {
             return Collection.CreateAsync(headers, a =>
             {
@@ -63,7 +63,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
@@ -71,7 +71,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppLanguagesConfigured @event, EnvelopeHeaders headers)
+        protected Task On(AppLanguagesConfigured @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
@@ -79,7 +79,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppClientAttached @event, EnvelopeHeaders headers)
+        protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
@@ -87,7 +87,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppClientRevoked @event, EnvelopeHeaders headers)
+        protected Task On(AppClientRevoked @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
@@ -95,7 +95,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppClientRenamed @event, EnvelopeHeaders headers)
+        protected Task On(AppClientRenamed @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
@@ -103,7 +103,7 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        public Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {

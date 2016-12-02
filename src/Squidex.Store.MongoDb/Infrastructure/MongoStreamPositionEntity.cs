@@ -18,9 +18,11 @@ namespace Squidex.Store.MongoDb.Infrastructure
         [BsonId]
         public ObjectId Id { get; set; }
 
+        [BsonRequired]
         [BsonElement]
         public string SubscriptionName { get; set; }
 
+        [BsonRequired]
         [BsonElement]
         public int? Position { get; set; }
     }

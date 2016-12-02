@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
-//  IEntity.cs
+//  IHistoryEventEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Read
+namespace Squidex.Read.History
 {
-    public interface IEntity
+    public interface IHistoryEventEntity : IEntity
     {
-        Guid Id { get; }
+        string Channel { get; }
 
-        DateTime Created { get; }
-
-        DateTime LastModified { get; }
+        string Message { get; }
     }
 }
