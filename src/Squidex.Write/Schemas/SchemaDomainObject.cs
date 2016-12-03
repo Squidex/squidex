@@ -50,47 +50,47 @@ namespace Squidex.Write.Schemas
             schema = schema.AddOrUpdateField(registry.CreateField(@event.FieldId, @event.Name, @event.Properties));
         }
 
-        public void On(SchemaCreated @event)
+        protected void On(SchemaCreated @event)
         {
             schema = Schema.Create(@event.Name, @event.Properties);
         }
 
-        public void On(FieldUpdated @event)
+        protected void On(FieldUpdated @event)
         {
             schema = schema.UpdateField(@event.FieldId, @event.Properties);
         }
 
-        public void On(FieldHidden @event)
+        protected void On(FieldHidden @event)
         {
             schema = schema.HideField(@event.FieldId);
         }
 
-        public void On(FieldShown @event)
+        protected void On(FieldShown @event)
         {
             schema = schema.ShowField(@event.FieldId);
         }
 
-        public void On(FieldDisabled @event)
+        protected void On(FieldDisabled @event)
         {
             schema = schema.DisableField(@event.FieldId);
         }
 
-        public void On(FieldEnabled @event)
+        protected void On(FieldEnabled @event)
         {
             schema = schema.EnableField(@event.FieldId);
         }
 
-        public void On(SchemaUpdated @event)
+        protected void On(SchemaUpdated @event)
         {
             schema = schema.Update(@event.Properties);
         }
 
-        public void On(FieldDeleted @event)
+        protected void On(FieldDeleted @event)
         {
             schema = schema.DeleteField(@event.FieldId);
         }
 
-        public void On(SchemaDeleted @event)
+        protected void On(SchemaDeleted @event)
         {
             isDeleted = true;
         }

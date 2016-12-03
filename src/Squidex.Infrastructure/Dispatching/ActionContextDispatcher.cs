@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Dispatching
         {
             Handlers =
                 typeof(TTarget)
-                    .GetMethods()
+                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .Where(Helper.HasRightName)
                     .Where(Helper.HasRightParameters<TIn, TContext>)
                     .Select(ActionContextDispatcherFactory.CreateActionHandler<TTarget, TContext>)

@@ -85,7 +85,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Create a new schema.
         /// </summary>
-        /// <param name="model">The schema object that needs to be added to the app.</param>
+        /// <param name="request">The schema object that needs to be added to the app.</param>
         /// <param name="app">The name of the app to create the schema to.</param>
         /// <returns>
         /// 201 => Schema created.  
@@ -97,13 +97,13 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
-        public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto model)
+        public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
-            var command = SimpleMapper.Map(model, new CreateSchema { AggregateId = Guid.NewGuid() });
+            var command = SimpleMapper.Map(request, new CreateSchema { AggregateId = Guid.NewGuid() });
 
             await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction(nameof(GetSchema), new { name = model.Name }, new EntityCreatedDto { Id = command.Name });
+            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, new EntityCreatedDto { Id = command.Name });
         }
 
         /// <summary>
@@ -111,15 +111,15 @@ namespace Squidex.Controllers.Api.Schemas
         /// </summary>
         /// <param name="app">The app where the schema is a part of.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="model">The schema object that needs to updated.</param>
+        /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 204 => Schema updated.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/")]
-        public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto model)
+        public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto request)
         {
-            var command = SimpleMapper.Map(model, new UpdateSchema());
+            var command = SimpleMapper.Map(request, new UpdateSchema());
 
             await CommandBus.PublishAsync(command);
 

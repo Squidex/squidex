@@ -18,11 +18,6 @@ namespace Squidex.Write.Apps
         private readonly HashSet<Language> languages = new HashSet<Language>();
         private Language masterLanguage;
 
-        public IReadOnlyCollection<Language> Languages
-        {
-            get { return languages; }
-        }
-
         public void Add(Language language)
         {
             Func<string> message = () => "Cannot add language";

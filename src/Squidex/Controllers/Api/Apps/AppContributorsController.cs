@@ -66,7 +66,7 @@ namespace Squidex.Controllers.Api.Apps
         /// Assign contributor to app.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="model">Contributor object that needs to be added to the app.</param>
+        /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
         /// 204 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
@@ -74,10 +74,10 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ErrorDto[]), 400)]
-        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto model)
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(model, new AssignContributor()));
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new AssignContributor()));
 
             return NoContent();
         }
@@ -93,7 +93,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
-        [ProducesResponseType(typeof(ErrorDto[]), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {
             await CommandBus.PublishAsync(new RemoveContributor { ContributorId = id });

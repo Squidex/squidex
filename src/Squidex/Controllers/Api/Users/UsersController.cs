@@ -61,7 +61,7 @@ namespace Squidex.Controllers.Api.Users
         /// <param name="id">The id of the user (GUID).</param>
         /// <returns>
         /// 200 => User found.
-        /// 400 => User not found.
+        /// 404 => User not found.
         /// </returns>
         [HttpGet]
         [Route("users/{id}/")]

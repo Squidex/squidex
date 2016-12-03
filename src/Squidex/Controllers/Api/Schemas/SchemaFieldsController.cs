@@ -36,21 +36,21 @@ namespace Squidex.Controllers.Api.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="model">The field object that needs to be added to the schema.</param>
+        /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
-        /// 201 => Field created.
-        /// 409 => Field name already in use.
+        /// 201 => Schema field created.
+        /// 409 => Schema field name already in use.
         /// 404 => App or schema not found.
-        /// 404 => Field properties not valid.
+        /// 404 => Schema field properties not valid.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto model)
+        public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var command = new AddField { Name = model.Name, Properties = model.Properties.ToProperties() };
+            var command = new AddField { Name = request.Name, Properties = request.Properties.ToProperties() };
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<long>();
@@ -63,20 +63,20 @@ namespace Squidex.Controllers.Api.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="model">The field object that needs to be added to the schema.</param>
+        /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
-        /// 204 => Field created.
-        /// 409 => Field name already in use.
+        /// 204 => Schema field created.
+        /// 409 => Schema field name already in use.
         /// 404 => App, schema or field not found.
-        /// 404 => Field properties not valid.
+        /// 404 => Schema field properties not valid.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto model)
+        public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
-            var command = new UpdateField { FieldId = id, Properties = model.Properties.ToProperties() };
+            var command = new UpdateField { FieldId = id, Properties = request.Properties.ToProperties() };
 
             await CommandBus.PublishAsync(command);
 
@@ -90,7 +90,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
-        /// 400 => Field already hidden.
+        /// 400 => Schema field already hidden.
         /// 204 => Schema field hidden.
         /// 404 => App, schema or field not found.
         /// </returns>
@@ -116,7 +116,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to shows.</param>
         /// <returns>
-        /// 400 => Field already visible.
+        /// 400 => Schema field already visible.
         /// 204 => Schema field shown.
         /// 404 => App, schema or field not found.
         /// </returns>
@@ -142,7 +142,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
-        /// 400 => Field already enabled.
+        /// 400 => Schema field already enabled.
         /// 204 => Schema field enabled.
         /// 404 => App, schema or field not found.
         /// </returns>
@@ -169,7 +169,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 400 => Field already disabled.
+        /// 400 => Schema field already disabled.
         /// 204 => Schema field disabled.
         /// 404 => App, schema or field not found.
         /// </returns>

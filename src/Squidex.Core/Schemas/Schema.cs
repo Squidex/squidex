@@ -129,7 +129,7 @@ namespace Squidex.Core.Schemas
 
             if (!fieldsById.TryGetValue(fieldId, out field))
             {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), typeof(Field));
+                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
             }
 
             var newField = updater(field);

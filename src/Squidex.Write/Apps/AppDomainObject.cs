@@ -7,21 +7,21 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Core.Apps;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
-using Squidex.Write.Apps.Commands;
-using System.Collections.Generic;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Write.Apps.Commands;
 // ReSharper disable InvertIf
 
 namespace Squidex.Write.Apps
 {
-    public sealed class AppDomainObject : DomainObject
+    public class AppDomainObject : DomainObject
     {
         private static readonly Language DefaultLanguage = Language.GetLanguage("en");
         private readonly AppContributors contributors = new AppContributors();
@@ -44,47 +44,47 @@ namespace Squidex.Write.Apps
         {
         }
 
-        public void On(AppCreated @event)
+        protected void On(AppCreated @event)
         {
             name = @event.Name;
         }
 
-        public void On(AppContributorAssigned @event)
+        protected void On(AppContributorAssigned @event)
         {
             contributors.Assign(@event.ContributorId, @event.Permission);
         }
 
-        public void On(AppContributorRemoved @event)
+        protected void On(AppContributorRemoved @event)
         {
             contributors.Remove(@event.ContributorId);
         }
 
-        public void On(AppClientAttached @event)
+        protected void On(AppClientAttached @event)
         {
             clients.Add(@event.Id, @event.Secret, @event.ExpiresUtc);
         }
 
-        public void On(AppClientRenamed @event)
+        protected void On(AppClientRenamed @event)
         {
             clients.Rename(@event.Id, @event.Name);
         }
 
-        public void On(AppClientRevoked @event)
+        protected void On(AppClientRevoked @event)
         {
             clients.Revoke(@event.Id);
         }
 
-        public void On(AppLanguageAdded @event)
+        protected void On(AppLanguageAdded @event)
         {
             languages.Add(@event.Language);
         }
 
-        public void On(AppLanguageRemoved @event)
+        protected void On(AppLanguageRemoved @event)
         {
             languages.Remove(@event.Language);
         }
 
-        public void On(AppMasterLanguageSet @event)
+        protected void On(AppMasterLanguageSet @event)
         {
             languages.SetMasterLanguage(@event.Language);
         }

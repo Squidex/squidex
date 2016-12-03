@@ -164,7 +164,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AttachClient_should_throw_if_name_already_exists()
+        public void AttachClient_should_throw_if_id_already_exists()
         {
             CreateApp();
 
@@ -191,7 +191,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RevokeKey_should_throw_if_not_created()
+        public void RevokeClient_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() => sut.RevokeClient(new RevokeClient { Id = "not-found" }));
         }
@@ -230,7 +230,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RenameKey_should_throw_if_not_created()
+        public void RenameClient_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() => sut.RenameClient(new RenameClient { Id = "not-found", Name = clientNewName }));
         }
@@ -265,6 +265,135 @@ namespace Squidex.Write.Apps
                     new IEvent[]
                     {
                         new AppClientRenamed { Id = clientId, Name = clientNewName }
+                    });
+        }
+
+        [Fact]
+        public void AddLanguage_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") }));
+        }
+
+        [Fact]
+        public void AddLanguage_should_throw_if_command_is_not_valid()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage()));
+        }
+
+        [Fact]
+        public void AddLanguage_should_throw_if_language_already_exists()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("en") }));
+        }
+
+        [Fact]
+        public void AddLanguage_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new AppLanguageAdded { Language = Language.GetLanguage("de") }
+                    });
+        }
+
+        [Fact]
+        public void RemoveLanguage_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("en") }));
+        }
+
+        [Fact]
+        public void RemoveLanguage_should_throw_if_command_is_not_valid()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage()));
+        }
+
+        [Fact]
+        public void RemoveLanguage_should_throw_if_language_not_found()
+        {
+            CreateApp();
+
+            Assert.Throws<DomainObjectNotFoundException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("de") }));
+        }
+
+        [Fact]
+        public void RemoveLanguage_should_throw_if_master_language()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("en") }));
+        }
+
+        [Fact]
+        public void RemoveLanguage_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
+            sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("de") });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new AppLanguageRemoved { Language = Language.GetLanguage("de") }
+                    });
+        }
+
+        [Fact]
+        public void SetMasterLanguage_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("en") }));
+        }
+
+        [Fact]
+        public void SetMasterLanguage_should_throw_if_command_is_not_valid()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage()));
+        }
+
+        [Fact]
+        public void SetMasterLanguage_should_throw_if_language_not_found()
+        {
+            CreateApp();
+
+            Assert.Throws<DomainObjectNotFoundException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("de") }));
+        }
+
+        [Fact]
+        public void SetMasterLanguage_should_throw_if_already_master_language()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("en") }));
+        }
+
+        [Fact]
+        public void SetMasterLanguage_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
+            sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("de") });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new AppMasterLanguageSet { Language = Language.GetLanguage("de") }
                     });
         }
 

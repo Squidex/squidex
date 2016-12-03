@@ -71,7 +71,7 @@ namespace Squidex.Controllers.Api.Apps
         /// <summary>
         /// Create a new app.
         /// </summary>
-        /// <param name="model">The app object that needs to be added to squidex.</param>
+        /// <param name="request">The app object that needs to be added to squidex.</param>
         /// <returns>
         /// 201 => App created.
         /// 400 => App object is not valid.
@@ -86,9 +86,9 @@ namespace Squidex.Controllers.Api.Apps
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
-        public async Task<IActionResult> PostApp([FromBody] CreateAppDto model)
+        public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
-            var command = SimpleMapper.Map(model, new CreateApp());
+            var command = SimpleMapper.Map(request, new CreateApp());
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<Guid>();

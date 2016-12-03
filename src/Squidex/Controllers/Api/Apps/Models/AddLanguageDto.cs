@@ -1,21 +1,22 @@
 ﻿// ==========================================================================
-//  ConfigureLanguagesDto.cs
+//  AddLanguageDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public sealed class ConfigureLanguagesDto
+    public class AddLanguageDto
     {
         /// <summary>
-        /// The list of languages to configure the app.
+        /// The language to add.
         /// </summary>
-        public List<Language> Languages { get; set; }
+        [Required]
+        public Language Language { get; set; }
     }
 }
