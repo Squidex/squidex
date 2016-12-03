@@ -69,7 +69,7 @@ namespace Squidex.Read.Apps.Services.Implementations
                 @event.Payload is AppClientAttached || 
                 @event.Payload is AppClientRevoked ||
                 @event.Payload is AppClientRenamed ||
-                @event.Payload is AppLanguagesConfigured)
+                @event.Payload is AppLanguageAdded)
             {
                 var appName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
 

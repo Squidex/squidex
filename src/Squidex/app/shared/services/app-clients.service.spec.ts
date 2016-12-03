@@ -34,12 +34,14 @@ describe('AppClientsService', () => {
                 new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
                         body: [{
-                            clientName: 'client1',
-                            clientSecret: 'secret1',
+                            id: 'client1',
+                            name: 'Client1',
+                            secret: 'secret1',
                             expiresUtc: '2016-12-12T10:10'
                         }, {
-                            clientName: 'client2',
-                            clientSecret: 'secret2',
+                            id: 'client2',
+                            name: 'Client2',
+                            secret: 'secret2',
                             expiresUtc: '2016-11-11T10:10'
                         }]
                     })
@@ -55,8 +57,8 @@ describe('AppClientsService', () => {
 
         expect(clients).toEqual(
             [
-                new AppClientDto('client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')),
-                new AppClientDto('client2', 'secret2', DateTime.parseISO_UTC('2016-11-11T10:10')),
+                new AppClientDto('client1', 'Client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')),
+                new AppClientDto('client2', 'Client2', 'secret2', DateTime.parseISO_UTC('2016-11-11T10:10')),
             ]);
 
         authService.verifyAll();
@@ -70,8 +72,9 @@ describe('AppClientsService', () => {
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
                         body: {
-                            clientName: 'client1',
-                            clientSecret: 'secret1',
+                            id: 'client1',
+                            name: 'Client1',
+                            secret: 'secret1',
                             expiresUtc: '2016-12-12T10:10'
                         }
                     })
@@ -86,7 +89,7 @@ describe('AppClientsService', () => {
         });
 
         expect(client).toEqual(
-            new AppClientDto('client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')));
+            new AppClientDto('client1', 'Client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')));
 
         authService.verifyAll();
     });

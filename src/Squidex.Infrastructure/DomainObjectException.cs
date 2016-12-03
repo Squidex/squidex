@@ -17,18 +17,12 @@ namespace Squidex.Infrastructure
 
         public string TypeName
         {
-            get
-            {
-                return typeName;
-            }
+            get { return typeName; }
         }
 
         public string Id
         {
-            get
-            {
-                return id;
-            }
+            get { return id; }
         }
 
         protected DomainObjectException(string message, string id, Type type)
@@ -41,10 +35,7 @@ namespace Squidex.Infrastructure
         {
             this.id = id;
 
-            if (type != null)
-            {
-                typeName = type.Name;
-            }
+            typeName = type?.Name;
         }
     }
 }

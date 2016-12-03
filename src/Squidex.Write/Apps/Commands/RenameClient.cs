@@ -13,7 +13,7 @@ namespace Squidex.Write.Apps.Commands
 {
     public class RenameClient : AppAggregateCommand, IValidatable
     {
-        public string ClientId { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -24,9 +24,9 @@ namespace Squidex.Write.Apps.Commands
                 errors.Add(new ValidationError("Name cannot be null or empty", nameof(Name)));
             }
 
-            if (!ClientId.IsSlug())
+            if (!Id.IsSlug())
             {
-                errors.Add(new ValidationError("Client id must be a valid slug", nameof(ClientId)));
+                errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
             }
         }
     }

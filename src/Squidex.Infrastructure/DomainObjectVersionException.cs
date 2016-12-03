@@ -17,18 +17,12 @@ namespace Squidex.Infrastructure
 
         public int CurrentVersion
         {
-            get
-            {
-                return currentVersion;
-            }
+            get { return currentVersion; }
         }
 
         public int ExpectedVersion
         {
-            get
-            {
-                return expectedVersion;
-            }
+            get { return expectedVersion; }
         }
 
         public DomainObjectVersionException(string id, Type type, int currentVersion, int expectedVersion)

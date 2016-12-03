@@ -15,9 +15,9 @@ namespace Squidex.Events.Apps
     [TypeName("AppClientAttachedEvent")]
     public sealed class AppClientAttached : IEvent
     {
-        public string ClientId { get; set; }
+        public string Id { get; set; }
 
-        public string ClientSecret { get; set; }
+        public string Secret { get; set; }
 
         public DateTime ExpiresUtc { get; set; }
     }

@@ -82,11 +82,11 @@ export class ClientsPageComponent implements Ng2.OnInit {
     }
 
     public fullAppName(client: AppClientDto): string {
-        return this.appName + ':' + client.clientName;
+        return this.appName + ':' + client.id;
     }
 
     public revokeClient(client: AppClientDto) {
-        this.appClientsService.deleteClient(this.appName, client.clientName)
+        this.appClientsService.deleteClient(this.appName, client.id)
             .subscribe(() => {
                 this.appClients.splice(this.appClients.indexOf(client), 1);
             }, error => {

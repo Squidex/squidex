@@ -96,7 +96,7 @@ namespace Squidex.Controllers.Api.Apps
         /// Updates an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="client">The id of the client that must be updated.</param>
+        /// <param name="clientId">The id of the client that must be updated.</param>
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Client key generated.
@@ -105,7 +105,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPut]
         [Route("apps/{app}/clients/{client}/")]
         [ProducesResponseType(typeof(ClientDto[]), 201)]
-        public async Task<IActionResult> PutClient(string app, string client, [FromBody] RenameClientDto request)
+        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] RenameClientDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient()));
 
@@ -116,16 +116,16 @@ namespace Squidex.Controllers.Api.Apps
         /// Revoke an app client
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="client">The id of the client that must be deleted.</param>
+        /// <param name="clientId">The id of the client that must be deleted.</param>
         /// <returns>
         /// 404 => App not found or client not found.
         /// 204 => Client revoked.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/clients/{client}/")]
-        public async Task<IActionResult> DeleteClient(string app, string client)
+        public async Task<IActionResult> DeleteClient(string app, string clientId)
         {
-            await CommandBus.PublishAsync(new RevokeClient { ClientId = client });
+            await CommandBus.PublishAsync(new RevokeClient { Id = clientId });
 
             return NoContent();
         }

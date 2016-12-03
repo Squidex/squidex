@@ -16,11 +16,11 @@ namespace Squidex.Store.MongoDb.Apps
     {
         [BsonRequired]
         [BsonElement]
-        public string ClientId { get; set; }
+        public string Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string ClientSecret { get; set; }
+        public string Secret { get; set; }
 
         [BsonRequired]
         [BsonElement]

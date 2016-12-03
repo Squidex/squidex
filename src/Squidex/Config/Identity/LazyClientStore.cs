@@ -52,7 +52,7 @@ namespace Squidex.Config.Identity
 
             var app = await appProvider.FindAppByNameAsync(token[0]);
 
-            var appClient = app?.Clients.FirstOrDefault(x => x.ClientId == token[1]);
+            var appClient = app?.Clients.FirstOrDefault(x => x.Id == token[1]);
 
             if (appClient == null)
             {
@@ -71,7 +71,7 @@ namespace Squidex.Config.Identity
             {
                 ClientId = id,
                 ClientName = id,
-                ClientSecrets = new List<Secret> { new Secret(appClient.ClientSecret.Sha512(), appClient.ExpiresUtc) },
+                ClientSecrets = new List<Secret> { new Secret(appClient.Secret.Sha512(), appClient.ExpiresUtc) },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = new List<string>

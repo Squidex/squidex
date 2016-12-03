@@ -13,33 +13,45 @@ namespace Squidex.Write.Apps
 {
     public sealed class AppClient
     {
-        private string name;
+        private readonly string name;
+        private readonly string id;
+        private readonly string secret;
+        private readonly DateTime expiresUtc;
 
-        public string ClientId { get; }
-
-        public string ClientSecret { get; }
-
-        public DateTime ExpiresUtc { get; }
+        public string Id
+        {
+            get { return id; }
+        }
 
         public string Name
         {
-            get { return name ?? ClientId; }
+            get { return name ?? Id; }
         }
 
-        public AppClient(string id, string secret, DateTime expiresUtc)
+        public string Secret
+        {
+            get { return secret; }
+        }
+
+        public DateTime ExpiresUtc
+        {
+            get { return expiresUtc; }
+        }
+
+        public AppClient(string id, string secret, DateTime expiresUtc, string name = null)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(secret, nameof(secret));
 
-            ClientId = id;
-            ClientSecret = secret;
-
-            ExpiresUtc = expiresUtc;
+            this.id = id;
+            this.name = name;
+            this.secret = secret;
+            this.expiresUtc = expiresUtc;
         }
 
-        public void Rename(string newName)
+        public AppClient Rename(string newName)
         {
-            name = newName;
+            return new AppClient(Id, Secret, ExpiresUtc, newName);
         }
     }
 }

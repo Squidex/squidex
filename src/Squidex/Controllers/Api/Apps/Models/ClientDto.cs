@@ -17,24 +17,24 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// The client id. 
         /// </summary>
         [Required]
-        public string ClientId { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// The client secret. 
         /// </summary>
         [Required]
-        public string ClientSecret { get; set; }
-
-        /// <summary>
-        /// The date and time when the client key expires.
-        /// </summary>
-        [Required]
-        public DateTime ExpiresUtc { get; set; }
+        public string Secret { get; set; }
 
         /// <summary>
         /// The client name.
         /// </summary>
         [Required]
         public string Name { get; set; }
+
+        /// <summary>
+        /// The date and time when the client key expires.
+        /// </summary>
+        [Required]
+        public DateTime ExpiresUtc { get; set; }
     }
 }

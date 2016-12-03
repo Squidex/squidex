@@ -17,9 +17,19 @@ namespace Squidex.Infrastructure
         {
         }
 
+        public DomainObjectNotFoundException(string id, string collection, Type type)
+            : base(FormatMessage(id, collection, type), id, type)
+        {
+        }
+
         private static string FormatMessage(string id, Type type)
         {
             return $"Domain object \'{id}\' (type {type}) not found.";
+        }
+
+        private static string FormatMessage(string id, string collection, Type type)
+        {
+            return $"Domain object \'{id}\' not found on {type}.{collection}";
         }
     }
 }

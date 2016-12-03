@@ -80,9 +80,9 @@ namespace Squidex.Write.Apps
         {
             return handler.UpdateAsync<AppDomainObject>(command, x =>
             {
-                x.AttachClient(command, keyGenerator.GenerateKey());
+                x.AttachClient(command, keyGenerator.GenerateKey(), command.Timestamp.AddYears(1));
 
-                context.Succeed(x.Clients[command.ClientId]);
+                context.Succeed(x.Clients[command.Id]);
             });
         }
 
@@ -100,12 +100,7 @@ namespace Squidex.Write.Apps
         {
             return handler.UpdateAsync<AppDomainObject>(command, x => x.RevokeClient(command));
         }
-
-        protected Task On(ConfigureLanguages command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.ConfigureLanguages(command));
-        }
-
+        
         public Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);

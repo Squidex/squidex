@@ -15,8 +15,9 @@ import { AuthService } from './auth.service';
 
 export class AppClientDto {
     constructor(
-        public readonly clientName: string,
-        public readonly clientSecret: string,
+        public readonly id: string,
+        public readonly name: string,
+        public readonly secret: string,
         public readonly expiresUtc: DateTime
     ) {
     }
@@ -24,7 +25,7 @@ export class AppClientDto {
 
 export class AppClientCreateDto {
     constructor(
-        public readonly clientName: string
+        public readonly id: string
     ) {
     }
 }
@@ -53,7 +54,7 @@ export class AppClientsService {
                     const items: any[] = response;
 
                     return items.map(item => {
-                        return new AppClientDto(item.clientName, item.clientSecret, DateTime.parseISO_UTC(item.expiresUtc));
+                        return new AppClientDto(item.id, item.name, item.secret, DateTime.parseISO_UTC(item.expiresUtc));
                     });
                 });
     }
@@ -61,7 +62,7 @@ export class AppClientsService {
     public postClient(appName: string, client: AppClientCreateDto): Observable<AppClientDto> {
         return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/clients`), client)
                 .map(response => response.json())
-                .map(response => new AppClientDto(response.clientName, response.clientSecret, DateTime.parseISO_UTC(response.expiresUtc)))
+                .map(response => new AppClientDto(response.id, response.name, response.secret, DateTime.parseISO_UTC(response.expiresUtc)))
                 .catch(response => {
                     if (response.status === 400) {
                         return Observable.throw('A client with the same name already exists.');
@@ -82,7 +83,7 @@ export class AppClientsService {
             })
         });
 
-        const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.clientName}&client_secret=${client.clientSecret}`;
+        const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.id}&client_secret=${client.secret}`;
 
         return this.http.post(this.apiUrl.buildUrl('identity-server/connect/token'), body, options)
                 .map(response => response.json())

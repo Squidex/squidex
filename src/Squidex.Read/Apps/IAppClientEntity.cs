@@ -12,11 +12,11 @@ namespace Squidex.Read.Apps
 {
     public interface IAppClientEntity
     {
+        string Id { get; }
+
         string Name { get; }
 
-        string ClientId { get; }
-
-        string ClientSecret { get; }
+        string Secret { get; }
 
         DateTime ExpiresUtc { get; }
     }

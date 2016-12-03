@@ -15,7 +15,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Write.Apps.Commands;
 using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 // ReSharper disable InvertIf
@@ -24,9 +23,10 @@ namespace Squidex.Write.Apps
 {
     public sealed class AppDomainObject : DomainObject
     {
-        private static readonly List<Language> DefaultLanguages = new List<Language> { Language.GetLanguage("en") };
-        private readonly Dictionary<string, AppClient> clients = new Dictionary<string, AppClient>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, PermissionLevel> contributors = new Dictionary<string, PermissionLevel>();
+        private static readonly Language DefaultLanguage = Language.GetLanguage("en");
+        private readonly AppContributors contributors = new AppContributors();
+        private readonly AppLanguages languages = new AppLanguages();
+        private readonly AppClients clients = new AppClients();
         private string name;
 
         public string Name
@@ -34,14 +34,9 @@ namespace Squidex.Write.Apps
             get { return name; }
         }
 
-        public IReadOnlyDictionary<string, PermissionLevel> Contributors
-        {
-            get { return contributors; }
-        }
-
         public IReadOnlyDictionary<string, AppClient> Clients
         {
-            get { return clients; }
+            get { return clients.Clients; }
         }
 
         public AppDomainObject(Guid id, int version) 
@@ -56,7 +51,7 @@ namespace Squidex.Write.Apps
 
         public void On(AppContributorAssigned @event)
         {
-            contributors[@event.ContributorId] = @event.Permission;
+            contributors.Assign(@event.ContributorId, @event.Permission);
         }
 
         public void On(AppContributorRemoved @event)
@@ -66,17 +61,32 @@ namespace Squidex.Write.Apps
 
         public void On(AppClientAttached @event)
         {
-            clients.Add(@event.ClientId, new AppClient(@event.ClientId, @event.ClientSecret, @event.ExpiresUtc));
-        }
-
-        public void On(AppClientRevoked @event)
-        {
-            clients.Remove(@event.ClientId);
+            clients.Add(@event.Id, @event.Secret, @event.ExpiresUtc);
         }
 
         public void On(AppClientRenamed @event)
         {
-            clients[@event.ClientId].Rename(@event.Name);
+            clients.Rename(@event.Id, @event.Name);
+        }
+
+        public void On(AppClientRevoked @event)
+        {
+            clients.Revoke(@event.Id);
+        }
+
+        public void On(AppLanguageAdded @event)
+        {
+            languages.Add(@event.Language);
+        }
+
+        public void On(AppLanguageRemoved @event)
+        {
+            languages.Remove(@event.Language);
+        }
+
+        public void On(AppMasterLanguageSet @event)
+        {
+            languages.SetMasterLanguage(@event.Language);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -86,9 +96,7 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject Create(CreateApp command)
         {
-            Func<string> message = () => "Cannot create app";
-
-            Guard.Valid(command, nameof(command), message);
+            Guard.Valid(command, nameof(command), () => "Cannot create app");
 
             ThrowIfCreated();
 
@@ -96,32 +104,49 @@ namespace Squidex.Write.Apps
 
             RaiseEvent(CreateInitialOwner(command));
             RaiseEvent(CreateInitialLanguage());
+            RaiseEvent(CreateInitialMasterLanguage());
 
             return this;
         }
 
         public AppDomainObject AssignContributor(AssignContributor command)
         {
-            Func<string> message = () => "Cannot assign contributor";
-
-            Guard.Valid(command, nameof(command), message);
+            Guard.Valid(command, nameof(command), () => "Cannot assign contributor");
 
             ThrowIfNotCreated();
-            ThrowIfNoOwner(c => c[command.ContributorId] = command.Permission, message);
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
 
             return this;
         }
 
-        public AppDomainObject RenameClient(RenameClient command)
+        public AppDomainObject RemoveContributor(RemoveContributor command)
         {
-            Func<string> message = () => "Cannot rename client";
-
-            Guard.Valid(command, nameof(command), message);
+            Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
 
             ThrowIfNotCreated();
-            ThrowIfClientNotFound(command.ClientId, message);
+
+            RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
+
+            return this;
+        }
+
+        public AppDomainObject AttachClient(AttachClient command, string secret, DateTime expiresUtc)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot attach client");
+
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { Secret = secret, ExpiresUtc = expiresUtc }));
+
+            return this;
+        }
+
+        public AppDomainObject RenameClient(RenameClient command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot rename client");
+
+            ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
 
@@ -130,66 +155,56 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject RevokeClient(RevokeClient command)
         {
-            Func<string> message = () => "Cannot revoke client";
-
-            Guard.Valid(command, nameof(command), message);
+            Guard.Valid(command, nameof(command), () => "Cannot revoke client");
 
             ThrowIfNotCreated();
-            ThrowIfClientNotFound(command.ClientId, message);
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
 
             return this;
         }
 
-        public AppDomainObject AttachClient(AttachClient command, string secret)
+        public AppDomainObject AddLanguage(AddLanguage command)
         {
-            Func<string> message = () => "Cannot attach client";
-
-            Guard.Valid(command, nameof(command), () => "Cannot attach client");
+            Guard.Valid(command, nameof(command), () => "Cannot add language");
 
             ThrowIfNotCreated();
-            ThrowIfClientFound(command.ClientId, message);
 
-            var expire = command.Timestamp.AddYears(1);
-
-            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { ClientSecret = secret, ExpiresUtc = expire }));
+            RaiseEvent(SimpleMapper.Map(command, new AppLanguageAdded()));
 
             return this;
         }
 
-        public AppDomainObject RemoveContributor(RemoveContributor command)
+        public AppDomainObject RemoveLanguage(RemoveLanguage command)
         {
-            Func<string> message = () => "Cannot remove contributor";
-
-            Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
+            Guard.Valid(command, nameof(command), () => "Cannot remove language");
 
             ThrowIfNotCreated();
-            ThrowIfContributorNotFound(command.ContributorId, message);
 
-            ThrowIfNoOwner(c => c.Remove(command.ContributorId), message);
-
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
+            RaiseEvent(SimpleMapper.Map(command, new AppLanguageRemoved()));
 
             return this;
         }
 
-        public AppDomainObject ConfigureLanguages(ConfigureLanguages command)
+        public AppDomainObject SetMasterLanguage(SetMasterLanguage command)
         {
-            Func<string> message = () => "Cannot configure languages";
-
-            Guard.Valid(command, nameof(command), message);
+            Guard.Valid(command, nameof(command), () => "Cannot set master language");
 
             ThrowIfNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AppLanguagesConfigured()));
+            RaiseEvent(SimpleMapper.Map(command, new AppMasterLanguageSet()));
 
             return this;
         }
 
-        private static AppLanguagesConfigured CreateInitialLanguage()
+        private static AppLanguageAdded CreateInitialLanguage()
         {
-            return new AppLanguagesConfigured { Languages = DefaultLanguages };
+            return new AppLanguageAdded { Language = DefaultLanguage };
+        }
+
+        private static AppMasterLanguageSet CreateInitialMasterLanguage()
+        {
+            return new AppMasterLanguageSet { Language = DefaultLanguage };
         }
 
         private static AppContributorAssigned CreateInitialOwner(IUserCommand command)
@@ -210,50 +225,6 @@ namespace Squidex.Write.Apps
             if (!string.IsNullOrWhiteSpace(name))
             {
                 throw new DomainException("App has already been created.");
-            }
-        }
-
-        private void ThrowIfClientFound(string clientId, Func<string> message)
-        {
-            if (clients.ContainsKey(clientId))
-            {
-                var error = new ValidationError("Client id is alreay part of the app", "ClientName");
-
-                throw new ValidationException(message(), error);
-            }
-        }
-
-        private void ThrowIfClientNotFound(string clientId, Func<string> message)
-        {
-            if (!clients.ContainsKey(clientId))
-            {
-                var error = new ValidationError("Client is not part of the app", "ClientName");
-
-                throw new ValidationException(message(), error);
-            }
-        }
-
-        private void ThrowIfContributorNotFound(string contributorId, Func<string> message)
-        {
-            if (!contributors.ContainsKey(contributorId))
-            {
-                var error = new ValidationError("Contributor is not part of the app", "ContributorId");
-
-                throw new ValidationException(message(), error);
-            }
-        }
-
-        private void ThrowIfNoOwner(Action<Dictionary<string, PermissionLevel>> change, Func<string> message)
-        {
-            var contributorsCopy = new Dictionary<string, PermissionLevel>(contributors);
-
-            change(contributorsCopy);
-
-            if (contributorsCopy.All(x => x.Value != PermissionLevel.Owner))
-            {
-                var error = new ValidationError("Contributor is the last owner", "ContributorId");
-
-                throw new ValidationException(message(), error);
             }
         }
     }

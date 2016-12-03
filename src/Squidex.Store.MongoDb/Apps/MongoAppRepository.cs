@@ -71,19 +71,11 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
-        protected Task On(AppLanguagesConfigured @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(headers, a =>
-            {
-                a.Languages = @event.Languages.Select(x => x.Iso2Code).ToList();
-            });
-        }
-
         protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
             {
-                a.Clients.Add(@event.ClientId, SimpleMapper.Map(@event, new MongoAppClientEntity()));
+                a.Clients.Add(@event.Id, SimpleMapper.Map(@event, new MongoAppClientEntity()));
             });
         }
 
@@ -91,7 +83,7 @@ namespace Squidex.Store.MongoDb.Apps
         {
             return Collection.UpdateAsync(headers, a =>
             {
-                a.Clients.Remove(@event.ClientId);
+                a.Clients.Remove(@event.Id);
             });
         }
 
@@ -99,7 +91,7 @@ namespace Squidex.Store.MongoDb.Apps
         {
             return Collection.UpdateAsync(headers, a =>
             {
-                a.Clients[@event.ClientId].Name = @event.Name;
+                a.Clients[@event.Id].Name = @event.Name;
             });
         }
 

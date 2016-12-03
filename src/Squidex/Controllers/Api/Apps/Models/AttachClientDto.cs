@@ -17,6 +17,6 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// </summary>
         [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
-        public string ClientId { get; set; }
+        public string Id { get; set; }
     }
 }

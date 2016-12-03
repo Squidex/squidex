@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id, Type type)
         {
-            return $"Domain object \'{id}\' (type {type}) not deleted.";
+            return $"Domain object \'{id}\' (type {type}) already deleted.";
         }
     }
 }

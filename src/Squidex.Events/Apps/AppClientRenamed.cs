@@ -14,7 +14,7 @@ namespace Squidex.Events.Apps
     [TypeName("AppClientRenamedEvent")]
     public sealed class AppClientRenamed : IEvent
     {
-        public string ClientId { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
     }

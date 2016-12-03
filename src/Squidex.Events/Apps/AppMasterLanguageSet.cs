@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppClientRevoked.cs
+//  AppMasterLanguageSet.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,9 +11,9 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
-    [TypeName("AppClientRevokedEvent")]
-    public sealed class AppClientRevoked : IEvent
+    [TypeName("AppMasterLanguageSetEvent")]
+    public sealed class AppMasterLanguageSet : IEvent
     {
-        public string Id { get; set; }
+        public Language Language { get; set; }
     }
 }

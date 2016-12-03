@@ -34,6 +34,7 @@ namespace Squidex.Write.Apps
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
         private readonly UserToken subjectId = new UserToken("subject", Guid.NewGuid().ToString());
+        private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
@@ -76,20 +77,6 @@ namespace Squidex.Write.Apps
             });
 
             Assert.Equal(command.AggregateId, context.Result<Guid>());
-        }
-        
-        [Fact]
-        public async Task ConfigureLanguages_should_update_domain_object()
-        {
-            CreateApp();
-
-            var command = new ConfigureLanguages { AggregateId = Id, Languages = new List<Language> { Language.GetLanguage("de") } };
-            var context = new CommandContext(command);
-
-            await TestUpdate(app, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
         }
 
         [Fact]
@@ -164,7 +151,7 @@ namespace Squidex.Write.Apps
 
             var timestamp = DateTime.Today;
 
-            var command = new AttachClient { ClientId = clientName, AggregateId = Id, Timestamp = timestamp };
+            var command = new AttachClient { Id = clientName, AggregateId = Id, Timestamp = timestamp };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>
@@ -182,9 +169,9 @@ namespace Squidex.Write.Apps
         public async Task RenameClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(new AttachClient { ClientId = clientName }, clientSecret);
+                .AttachClient(new AttachClient { Id = clientName }, clientSecret, expiresUtc);
 
-            var command = new RenameClient { AggregateId = Id, ClientId = clientName, Name = "New Name" };
+            var command = new RenameClient { AggregateId = Id, Id = clientName, Name = "New Name" };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>
@@ -197,9 +184,9 @@ namespace Squidex.Write.Apps
         public async Task RevokeClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(new AttachClient { ClientId = clientName }, clientSecret);
+                .AttachClient(new AttachClient { Id = clientName }, clientSecret, expiresUtc);
 
-            var command = new RevokeClient { AggregateId = Id, ClientId = clientName };
+            var command = new RevokeClient { AggregateId = Id, Id = clientName };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>

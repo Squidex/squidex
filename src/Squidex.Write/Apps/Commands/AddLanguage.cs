@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RevokeClient.cs
+//  AddLanguage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,15 +11,15 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Apps.Commands
 {
-    public class RevokeClient : AppAggregateCommand, IValidatable
+    public sealed class AddLanguage : AppAggregateCommand, IValidatable
     {
-        public string Id { get; set; }
+        public Language Language { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!Id.IsSlug())
+            if (Language == null)
             {
-                errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
+                errors.Add(new ValidationError("Language cannot be null", nameof(Language)));
             }
         }
     }
