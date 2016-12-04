@@ -26,7 +26,7 @@ describe('AppContributorsService', () => {
         appContributorsService = new AppContributorsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service to get app contributors', () => {
+    it('should make get request to get app contributors', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/contributors'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(

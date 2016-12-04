@@ -28,7 +28,7 @@ describe('AppClientsService', () => {
         appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'), null);
     });
 
-    it('should make get request with auth service to get app clients', () => {
+    it('should make get request to get app clients', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/clients'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(

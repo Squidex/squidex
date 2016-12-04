@@ -26,7 +26,7 @@ describe('LanguageService', () => {
         languageService = new LanguageService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service to get languages', () => {
+    it('should make get request to get languages', () => {
         authService.setup(x => x.authGet('http://service/p/api/languages'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(

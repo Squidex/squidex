@@ -26,7 +26,7 @@ describe('AppLanguagesService', () => {
         appLanguagesService = new AppLanguagesService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service to get app languages', () => {
+    it('should make get request to get app languages', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/languages'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(

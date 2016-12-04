@@ -26,7 +26,7 @@ describe('UsersService', () => {
         usersService = new UsersService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request with auth service to get many users', () => {
+    it('should make get request to get many users', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/?query='))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
@@ -62,7 +62,7 @@ describe('UsersService', () => {
         authService.verifyAll();
     });
 
-    it('should make get request with auth service and query to get many users', () => {
+    it('should make get request and query to get many users', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/?query=my-query'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
@@ -98,7 +98,7 @@ describe('UsersService', () => {
         authService.verifyAll();
     });
 
-    it('should make get request with auth service to get single user', () => {
+    it('should make get request to get single user', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/123'))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
