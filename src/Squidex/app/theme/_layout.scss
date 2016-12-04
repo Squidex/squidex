@@ -21,7 +21,7 @@ h1 {
 
 .layout {
     & {
-        @include fixed(54px, 0, 0, 0);
+        @include absolute(54px, 0, 0, 0);
         @include flex-box;
         @include flex-flow(row);
     }

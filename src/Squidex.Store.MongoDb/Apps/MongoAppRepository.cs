@@ -94,6 +94,30 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
+        protected Task On(AppLanguageAdded @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Languages.Add(@event.Language.Iso2Code);
+            });
+        }
+
+        protected Task On(AppLanguageRemoved @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.Languages.Remove(@event.Language.Iso2Code);
+            });
+        }
+
+        protected Task On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a =>
+            {
+                a.MasterLanguage = @event.Language.Iso2Code;
+            });
+        }
+
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>

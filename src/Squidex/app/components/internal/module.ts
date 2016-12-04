@@ -9,14 +9,13 @@ import * as Ng2 from '@angular/core';
 
 import { Ng2CompleterModule } from 'ng2-completer';
 
-import { DndModule } from 'ng2-dnd';
-
 import { SqxFrameworkModule } from 'shared';
 import { SqxLayoutModule } from 'components/layout';
 
 import {
     AppAreaComponent,
     AppsPageComponent,
+    ClientComponent,
     ClientsPageComponent,
     ContributorsPageComponent,
     DashboardPageComponent,
@@ -28,7 +27,6 @@ import {
 
 @Ng2.NgModule({
     imports: [
-        DndModule,
         Ng2CompleterModule,
         SqxFrameworkModule,
         SqxLayoutModule
@@ -39,6 +37,7 @@ import {
     declarations: [
         AppAreaComponent,
         AppsPageComponent,
+        ClientComponent,
         ClientsPageComponent,
         ContributorsPageComponent,
         DashboardPageComponent,

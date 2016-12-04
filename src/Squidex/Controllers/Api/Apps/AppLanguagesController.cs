@@ -58,7 +58,12 @@ namespace Squidex.Controllers.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.Languages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
+            var model = entity.Languages.Select(x =>
+            {
+                var isMasterLanguage = x.Equals(entity.MasterLanguage);
+
+                return SimpleMapper.Map(x, new AppLanguageDto { IsMasterLanguage = isMasterLanguage });
+            }).ToList();
 
             return Ok(model);
         }
@@ -75,13 +80,13 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(LanguageDto), 201)]
+        [ProducesResponseType(typeof(AppLanguageDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AddLanguage()));
 
-            var response = SimpleMapper.Map(request.Language, new LanguageDto());
+            var response = SimpleMapper.Map(request.Language, new AppLanguageDto());
 
             return StatusCode(201, response);
         }

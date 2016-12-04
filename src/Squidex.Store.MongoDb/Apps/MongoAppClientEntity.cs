@@ -29,5 +29,10 @@ namespace Squidex.Store.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public string Name { get; set; }
+
+        string IAppClientEntity.Name
+        {
+            get { return Name ?? Id; }
+        }
     }
 }

@@ -13,11 +13,13 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig, DateTime } from 'framework';
 import { AuthService } from './auth.service';
 
+import { handleError } from './errors';
+
 export class AppClientDto {
     constructor(
         public readonly id: string,
-        public readonly name: string,
         public readonly secret: string,
+        public name: string,
         public readonly expiresUtc: DateTime
     ) {
     }
@@ -48,32 +50,51 @@ export class AppClientsService {
     }
 
     public getClients(appName: string): Observable<AppClientDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl(`api/apps/${appName}/clients`))
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
+
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {                    
                     const items: any[] = response;
 
                     return items.map(item => {
-                        return new AppClientDto(item.id, item.name, item.secret, DateTime.parseISO_UTC(item.expiresUtc));
+                        return new AppClientDto(
+                            item.id, 
+                            item.secret,
+                            item.name,
+                            DateTime.parseISO_UTC(item.expiresUtc));
                     });
-                });
+                })
+                .catch(response => handleError('Failed to load clients. Please reload.', response));
     }
 
     public postClient(appName: string, client: AppClientCreateDto): Observable<AppClientDto> {
-        return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/clients`), client)
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
+
+        return this.authService.authPost(url, client)
                 .map(response => response.json())
-                .map(response => new AppClientDto(response.id, response.name, response.secret, DateTime.parseISO_UTC(response.expiresUtc)))
-                .catch(response => {
-                    if (response.status === 400) {
-                        return Observable.throw('A client with the same name already exists.');
-                    } else {
-                        return Observable.throw('A new client could not be created.');
-                    }
-                });
+                .map(response => {
+                    return new AppClientDto(
+                        response.id, 
+                        response.secret,
+                        response.name, 
+                        DateTime.parseISO_UTC(response.expiresUtc));
+                })
+                .catch(response => handleError('Failed to add client. Please reload.', response));
     }
 
-    public deleteClient(appName: string, name: string): Observable<any> {
-        return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/clients/${name}`));
+    public renameClient(appName: string, id: string, name: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
+
+        return this.authService.authPut(url, { name: name })
+                .catch(response => handleError('Failed to revoke client. Please reload.', response));
+    }
+
+    public deleteClient(appName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
+
+        return this.authService.authDelete(url)
+                .catch(response => handleError('Failed to revoke client. Please reload.', response));
     }
 
     public createToken(appName: string, client: AppClientDto): Observable<AccessTokenDto> {
@@ -84,8 +105,9 @@ export class AppClientsService {
         });
 
         const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.id}&client_secret=${client.secret}`;
+        const url = this.apiUrl.buildUrl('identity-server/connect/token');
 
-        return this.http.post(this.apiUrl.buildUrl('identity-server/connect/token'), body, options)
+        return this.http.post(url, body, options)
                 .map(response => response.json())
                 .map(response => new AccessTokenDto(response.access_token, response.token_type));
     }

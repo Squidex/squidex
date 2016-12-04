@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  LanguageDto.cs
+//  AppLanguageDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,9 +8,9 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api
+namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class LanguageDto
+    public class AppLanguageDto
     {
         /// <summary>
         /// The iso code of the language.
@@ -23,5 +23,10 @@ namespace Squidex.Controllers.Api
         /// </summary>
         [Required]
         public string EnglishName { get; set; }
+
+        /// <summary>
+        /// Indicates if the language is the master language.
+        /// </summary>
+        public bool IsMasterLanguage { get; set; }
     }
 }

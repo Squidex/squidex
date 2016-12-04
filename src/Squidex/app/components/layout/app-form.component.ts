@@ -73,7 +73,7 @@ export class AppFormComponent implements Ng2.OnInit {
                     this.created.emit(app);
                 }, error => {
                     this.reset();
-                    this.creationError = error;
+                    this.creationError = error.displayMessage;
                 });
         }
     }

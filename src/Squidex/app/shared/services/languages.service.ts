@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
+import { handleError } from './errors';
+
 export class LanguageDto {
     constructor(
         public readonly iso2Code: string,
@@ -28,7 +30,9 @@ export class LanguageService {
     }
 
     public getLanguages(): Observable<LanguageDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl('api/languages'))
+        const url = this.apiUrl.buildUrl('api/languages');
+
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {                    
                     const items: any[] = response;
@@ -38,6 +42,7 @@ export class LanguageService {
                             item.iso2Code, 
                             item.englishName);
                     });
-                });
+                })
+                .catch(response => handleError('Failed to load languages. Please reload', response));
     }
 }

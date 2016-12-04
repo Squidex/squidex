@@ -75,7 +75,7 @@ export class ContributorsPageComponent implements Ng2.OnInit {
     private appSubscription: any | null = null;
     private appName: string;
 
-    public appContributors: AppContributorDto[];
+    public appContributors: AppContributorDto[] = [];
 
     public selectedUserName: string | null = null;
     public selectedUser: UserDto | null = null;
@@ -101,6 +101,10 @@ export class ContributorsPageComponent implements Ng2.OnInit {
         this.usersDataSource = new UsersDataSource(usersService, this);
     }
 
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.currrentUserId = this.authService.user.id;
 
@@ -111,18 +115,18 @@ export class ContributorsPageComponent implements Ng2.OnInit {
 
                     this.titles.setTitle('{appName} | Settings | Contributors', { appName: app.name });
 
-                    this.appContributorsService.getContributors(app.name).retry(2)
-                        .subscribe(contributors => {
-                            this.appContributors = contributors;
-                        }, error => {
-                            this.notifications.notify(Notification.error('Failed to load app contributors. Please reload squidex portal.'));
-                        });
+                    this.load();
                 }
             });
     }
 
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+    public load() {
+        this.appContributorsService.getContributors(this.appName).retry(2)
+            .subscribe(contributors => {
+                this.appContributors = contributors;
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 
     public assignContributor() {
@@ -132,34 +136,30 @@ export class ContributorsPageComponent implements Ng2.OnInit {
 
         const contributor = new AppContributorDto(this.selectedUser.id, 'Editor');
 
-        this.appContributorsService.postContributor(this.appName, contributor)
-            .catch(error => {
-                this.notifications.notify(Notification.error('Failed to assign contributors. Please retry.'));
-
-                return Observable.of(true);
-            }).subscribe();
-
-        this.appContributors.push(contributor);
-
         this.selectedUser = null;
         this.selectedUserName = null;
+
+        this.appContributorsService.postContributor(this.appName, contributor)
+            .subscribe(() => {
+                this.appContributors.push(contributor);
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 
     public removeContributor(contributor: AppContributorDto) {
         this.appContributorsService.deleteContributor(this.appName, contributor.contributorId)
-            .catch(error => {
-                this.notifications.notify(Notification.error('Failed to remove contributors. Please retry.'));
-
-                return Observable.of(true);
-            }).subscribe();
-
-        this.appContributors.splice(this.appContributors.indexOf(contributor), 1);
+            .subscribe(() => {
+                this.appContributors.splice(this.appContributors.indexOf(contributor), 1);
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 
-    public saveContributor(contributor: AppContributorDto) {
+    public changePermission(contributor: AppContributorDto) {
         this.appContributorsService.postContributor(this.appName, contributor)
             .catch(error => {
-                this.notifications.notify(Notification.error('Failed to update contributors. Please retry.'));
+                this.notifications.notify(Notification.error(error.displayMessage));
 
                 return Observable.of(true);
             }).subscribe();

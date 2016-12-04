@@ -71,7 +71,7 @@ namespace Squidex.Config.Identity
             {
                 ClientId = id,
                 ClientName = id,
-                ClientSecrets = new List<Secret> { new Secret(appClient.Secret.Sha512(), appClient.ExpiresUtc) },
+                ClientSecrets = new List<Secret> { new Secret(appClient.Secret.Sha256(), appClient.ExpiresUtc) },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = new List<string>

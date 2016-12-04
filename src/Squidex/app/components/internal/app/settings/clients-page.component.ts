@@ -9,13 +9,10 @@ import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
 import {
-    AccessTokenDto,
     AppsStoreService,
     AppClientDto,
     AppClientCreateDto,
     AppClientsService,
-    fadeAnimation,
-    ModalView,
     Notification,
     NotificationService,
     TitleService 
@@ -24,21 +21,14 @@ import {
 @Ng2.Component({
     selector: 'sqx-clients-page',
     styles,
-    template,
-    animations: [
-        fadeAnimation
-    ]
+    template
 })
 export class ClientsPageComponent implements Ng2.OnInit {
     private appSubscription: any | null = null;
     private appName: string | null = null;
 
-    public modalDialog = new ModalView();
-
     public appClients: AppClientDto[];
-    public appClientToken: AccessTokenDto;
     
-    public creationError = '';
     public createForm =
         this.formBuilder.group({
             name: ['',
@@ -58,6 +48,10 @@ export class ClientsPageComponent implements Ng2.OnInit {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
@@ -66,23 +60,19 @@ export class ClientsPageComponent implements Ng2.OnInit {
 
                     this.titles.setTitle('{appName} | Settings | Clients', { appName: app.name });
 
-                    this.appClientsService.getClients(app.name)
-                        .subscribe(clients => {
-                            this.appClients = clients;
-                        }, () => {
-                            this.notifications.notify(Notification.error('Failed to load clients. Please reload squidex portal.'));
-                            this.appClients = [];
-                        });
+                    this.load();
                 }
             });
     }
 
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
-    }
-
-    public fullAppName(client: AppClientDto): string {
-        return this.appName + ':' + client.id;
+    public load() {
+        this.appClientsService.getClients(this.appName)
+            .subscribe(clients => {
+                this.appClients = clients;
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+                this.appClients = [];
+            });
     }
 
     public revokeClient(client: AppClientDto) {
@@ -90,17 +80,7 @@ export class ClientsPageComponent implements Ng2.OnInit {
             .subscribe(() => {
                 this.appClients.splice(this.appClients.indexOf(client), 1);
             }, error => {
-                this.notifications.notify(Notification.error('Failed to revoke client. Please retry.'));
-            });
-    }
-
-    public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.appName, client)
-            .subscribe(token => {
-                this.appClientToken = token;
-                this.modalDialog.show();
-            }, error => {
-                this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
+                this.notifications.notify(Notification.error(error.displayMessage));
             });
     }
 
@@ -114,11 +94,11 @@ export class ClientsPageComponent implements Ng2.OnInit {
 
             this.appClientsService.postClient(this.appName, dto)
                 .subscribe(client => {
-                    this.reset();
                     this.appClients.push(client);
-                }, error => {
                     this.reset();
-                    this.creationError = error;
+                }, error => {
+                    this.notifications.notify(Notification.error(error.displayMessage));
+                    this.reset();
                 });
         }
     }
@@ -126,7 +106,6 @@ export class ClientsPageComponent implements Ng2.OnInit {
     private reset() {
         this.createForm.reset();
         this.createForm.enable();
-        this.creationError = '';
     }
 }
 

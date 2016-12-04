@@ -12,6 +12,8 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
+import { handleError } from './errors';
+
 export class AppContributorDto {
     constructor(
         public readonly contributorId: string,
@@ -29,7 +31,9 @@ export class AppContributorsService {
     }
 
     public getContributors(appName: string): Observable<AppContributorDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl(`api/apps/${appName}/contributors`))
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
+
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {                    
                     const items: any[] = response;
@@ -39,14 +43,21 @@ export class AppContributorsService {
                             item.contributorId, 
                             item.permission);
                     });
-                });
+                })
+                .catch(response => handleError('Failed to load contributors. Please reload.', response));
     }
 
     public postContributor(appName: string, contributor: AppContributorDto): Observable<any> {
-        return this.authService.authPost(this.apiUrl.buildUrl(`api/apps/${appName}/contributors`), contributor);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
+
+        return this.authService.authPost(url, contributor)
+                .catch(response => handleError('Failed to add contributors. Please reload.', response));
     }
 
     public deleteContributor(appName: string, contributorId: string): Observable<any> {
-        return this.authService.authDelete(this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`));
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
+        
+        return this.authService.authDelete(url)
+                .catch(response => handleError('Failed to delete contributors. Please reload.', response));
     }
 }

@@ -69,7 +69,7 @@ describe('AppsService', () => {
         const createApp = new AppCreateDto('new-app');
         const now = DateTime.now();
 
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
+        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isValue(createApp)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -78,8 +78,9 @@ describe('AppsService', () => {
                         }
                     })
                 )
-            ));
-
+            ))
+            .verifiable(TypeMoq.Times.once());
+            
         let newApp: AppDto = null;
 
         appsService.postApp(createApp, now).subscribe(result => {
@@ -87,52 +88,6 @@ describe('AppsService', () => {
         }).unsubscribe();
 
         expect(newApp).toEqual(new AppDto('123', 'new-app', now, now, 'Owner'));
-
-        authService.verifyAll();
-    });
-
-    it('should throw fallback error on 500 when creating app failed', () => {
-        const createApp = new AppCreateDto('new-app');
-        
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
-            .returns(() => Observable.throw(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
-                        status: 500
-                    })
-                )
-            ));
-
-        let error = '';
-
-        appsService.postApp(createApp).subscribe(x => {}, result => {
-            error = result;
-        }).unsubscribe();
-
-        expect(error).toBe('A new app could not be created.');
-
-        authService.verifyAll();
-    });
-
-    it('should throw duplicate error on 400 when creating app failed', () => {
-        const createApp = new AppCreateDto('new-app');
-        
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.is(a => a === createApp)))
-            .returns(() => Observable.throw(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
-                        status: 400
-                    })
-                )
-            ));
-
-        let error = '';
-
-        appsService.postApp(createApp).subscribe(x => {}, result => {
-            error = result;
-        }).unsubscribe();
-
-        expect(error).toBe('An app with the same name already exists.');
 
         authService.verifyAll();
     });

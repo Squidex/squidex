@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
@@ -23,7 +24,11 @@ namespace Squidex.Store.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public List<string> Languages { get; set; }
+        public string MasterLanguage { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public HashSet<string> Languages { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -32,11 +37,6 @@ namespace Squidex.Store.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; }
-
-        IEnumerable<Language> IAppEntity.Languages
-        {
-            get { return Languages.Select(Language.GetLanguage); }
-        }
 
         IEnumerable<IAppClientEntity> IAppEntity.Clients
         {
@@ -48,11 +48,23 @@ namespace Squidex.Store.MongoDb.Apps
             get { return Contributors.Values; }
         }
 
+        IEnumerable<Language> IAppEntity.Languages
+        {
+            get { return Languages.Select(Language.GetLanguage); }
+        }
+
+        Language IAppEntity.MasterLanguage
+        {
+            get { return Language.GetLanguage(MasterLanguage); }
+        }
+
         public MongoAppEntity()
         {
             Contributors = new Dictionary<string, MongoAppContributorEntity>();
 
             Clients = new Dictionary<string, MongoAppClientEntity>();
+
+            Languages = new HashSet<string>();
         }
     }
 }

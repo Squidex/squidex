@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig, DateTime } from 'framework';
 import { AuthService } from './auth.service';
 
+import { handleError } from './errors';
+
 export class AppDto {
     constructor(
         public readonly id: string,
@@ -38,7 +40,9 @@ export class AppsService {
     }
 
     public getApps(): Observable<AppDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl('/api/apps'))
+        const url = this.apiUrl.buildUrl('/api/apps');
+
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {
                     const items: any[] = response;
@@ -52,21 +56,25 @@ export class AppsService {
                             item.permission
                         );
                     });
-                });
+                })
+                .catch(response => handleError('Failed to load apps. Please reload.', response));
     }
 
     public postApp(app: AppCreateDto, now?: DateTime): Observable<AppDto> {
         now = now || DateTime.now();
 
-        return this.authService.authPost(this.apiUrl.buildUrl('api/apps'), app)
+        const url = this.apiUrl.buildUrl('api/apps');
+
+        return this.authService.authPost(url, app)
                 .map(response => response.json())
-                .map(response => new AppDto(response.id, app.name, now, now, 'Owner'))
-                .catch(response => {
-                    if (response.status === 400) {
-                        return Observable.throw('An app with the same name already exists.');
-                    } else {
-                        return Observable.throw('A new app could not be created.');
-                    }
-                });
+                .map(response => {
+                    return new AppDto(
+                        response.id, 
+                        app.name, 
+                        now, 
+                        now, 
+                        'Owner');
+                })
+                .catch(response => handleError('Failed to create app. Please reload.', response));
     }
 }

@@ -5,16 +5,6 @@
     color: $color-section-settings;
 }
 
-.card {
-    max-width: 700px;
-}
-
-.languages {
-    &-table {
-        margin: 0;
-    }
-}
-
 .language {
     &-select {
         max-width: 200px;
@@ -22,5 +12,9 @@
 
     &-name {
         @include truncate;
+    }
+
+    &-default {
+        margin: 0;
     }
 }

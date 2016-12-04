@@ -31,7 +31,9 @@ export class UsersService {
     }
 
     public getUsers(query?: string): Observable<UserDto[]> {
-        return this.authService.authGet(this.apiUrl.buildUrl(`api/users/?query=${query || ''}`))
+        const url = this.apiUrl.buildUrl(`api/users/?query=${query || ''}`);
+
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {                    
                     const items: any[] = response;
@@ -47,7 +49,9 @@ export class UsersService {
     }
 
     public getUser(id: string): Observable<UserDto> {
-        return this.authService.authGet(this.apiUrl.buildUrl(`api/users/${id}`))
+        const url = this.apiUrl.buildUrl(`api/users/${id}`);
+        
+        return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {                    
                     return new UserDto(

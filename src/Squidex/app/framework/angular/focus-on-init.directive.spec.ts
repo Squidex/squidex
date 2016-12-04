@@ -7,9 +7,9 @@
 
 import * as Ng2 from '@angular/core';
 
-import { FocusOnChangeDirective } from './focus-on-change.directive';
+import { FocusOnInitDirective } from './focus-on-init.directive';
 
-describe('FocusOnChangeDirective', () => {
+describe('FocusOnInitDirective', () => {
     let originalTimeout = 0;
 
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('FocusOnChangeDirective', () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 800;
     });
 
-    it('should call focus on element when value changes', (done: any) => {
+    it('should call focus on element when init', (done: any) => {
         const calledMethods: string[] = [];
         const calledElements: any[] = [];
 
@@ -33,7 +33,7 @@ describe('FocusOnChangeDirective', () => {
             nativeElement: {}
         };
 
-        new FocusOnChangeDirective(element, renderer as Ng2.Renderer).ngOnChanges({});
+        new FocusOnInitDirective(element, renderer as Ng2.Renderer).ngOnInit();
 
         expect(calledMethods).toEqual([]);
 

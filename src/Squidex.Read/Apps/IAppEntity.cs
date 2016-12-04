@@ -15,10 +15,12 @@ namespace Squidex.Read.Apps
     {
         string Name { get; }
 
-        IEnumerable<Language> Languages { get; }
+        Language MasterLanguage { get; }
 
         IEnumerable<IAppClientEntity> Clients { get; }
 
         IEnumerable<IAppContributorEntity> Contributors { get; }
+
+        IEnumerable<Language> Languages { get; }
     }
 }

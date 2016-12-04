@@ -4,25 +4,36 @@
     </div>
     <div class="layout-middle">
         <div class="layout-middle-header">
-            <div class="float-xs-right">
-                <button class="btn btn-primary" (click)="saveLanguages()" [disabled]="isSaving">{{isSaving ? 'Saving...' : 'Save Changes'}}</button>
-            </div>
-
             <h1>
                 <i class="layout-title-icon icon-settings"></i> Languages
             </h1>
         </div>
         <div class="layout-middle-content">
-            <div class="card">
-                <div class="card-block">
-                    <table class="table table-borderless-top table-fixed languages-table" dnd-sortable-container [sortableData]="appLanguages">
-                        <colgroup>
-                            <col style="width: 60px" />
-                            <col style="width: 100%" />
-                            <col style="width: 110px" />
-                        </colgroup>
+            <table class="table table-items table-fixed">
+                <colgroup>
+                    <col style="width: 60px" />
+                    <col style="width: 100%" />
+                    <col style="width: 200px" />
+                    <col style="width: 80px" />
+                </colgroup>
 
-                        <tr *ngFor="let language of appLanguages; let i = index" dnd-sortable [sortableIndex]="i">
+                <thead>
+                    <tr>
+                        <th>
+                            Code
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Options
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template ngFor let-language [ngForOf]="appLanguages">
+                        <tr>
                             <td>
                                 <span class="language-code">
                                     {{language.iso2Code}}
@@ -34,22 +45,31 @@
                                 </span>
                             </td>
                             <td>
-                                <button class="btn btn-block btn-sm btn-danger" [disabled]="i === 0" (click)="removeLanguage(language)">Remove</button>
+                                <label class="language-default">
+                                    <input type="radio" [value]="true" [ngModel]="language.isMasterLanguage" (ngModelChange)="setMasterLanguage(language)"> Master Language
+                                </label>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-danger" [disabled]="language.isMasterLanguage" (click)="removeLanguage(language)">
+                                    <i class="icon-bin"></i>
+                                </button>
                             </td>
                         </tr>
-                    </table>
-                </div>
-                <div class="card-footer">
-                    <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
-                        <div class="form-group">
-                            <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
-                                <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
-                            </select>
-                        </div>
+                        <tr class="spacer"></tr>
+                    </template>
+                </tbody>
+            </table>
 
-                        <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add</button>
-                    </form>
-                </div>
+            <div class="table-items-footer">
+                <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
+                    <div class="form-group">
+                        <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
+                            <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add Language</button>
+                </form>
             </div>
         </div>
     </div>

@@ -11,7 +11,7 @@ import { DragService } from './../services/drag.service';
 import { Vec2 } from './../utils/vec2';
 
 @Ng2.Directive({
-    selector: '[gpDragModel]'
+    selector: '[sqxDragModel]'
 })
 export class DragModelDirective {
     private startOffset: Vec2;

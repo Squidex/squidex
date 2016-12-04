@@ -35,12 +35,12 @@ describe('AppClientsService', () => {
                     new Ng2Http.ResponseOptions({
                         body: [{
                             id: 'client1',
-                            name: 'Client1',
+                            name: 'Client 1',
                             secret: 'secret1',
                             expiresUtc: '2016-12-12T10:10'
                         }, {
                             id: 'client2',
-                            name: 'Client2',
+                            name: 'Client 2',
                             secret: 'secret2',
                             expiresUtc: '2016-11-11T10:10'
                         }]
@@ -57,8 +57,8 @@ describe('AppClientsService', () => {
 
         expect(clients).toEqual(
             [
-                new AppClientDto('client1', 'Client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')),
-                new AppClientDto('client2', 'Client2', 'secret2', DateTime.parseISO_UTC('2016-11-11T10:10')),
+                new AppClientDto('client1', 'secret1', 'Client 1', DateTime.parseISO_UTC('2016-12-12T10:10')),
+                new AppClientDto('client2', 'secret2', 'Client 2', DateTime.parseISO_UTC('2016-11-11T10:10')),
             ]);
 
         authService.verifyAll();
@@ -67,13 +67,13 @@ describe('AppClientsService', () => {
     it('should make post request to create client', () => {
         const createClient = new AppClientCreateDto('client1');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.is(c => c === createClient)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.isValue(createClient)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
                         body: {
                             id: 'client1',
-                            name: 'Client1',
+                            name: 'Client 1',
                             secret: 'secret1',
                             expiresUtc: '2016-12-12T10:10'
                         }
@@ -89,53 +89,21 @@ describe('AppClientsService', () => {
         });
 
         expect(client).toEqual(
-            new AppClientDto('client1', 'Client1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')));
+            new AppClientDto('client1', 'secret1', 'Client 1', DateTime.parseISO_UTC('2016-12-12T10:10')));
 
         authService.verifyAll();
     });
 
-    it('should throw fallback error on 500 when creating client failed', () => {
-        const createClient = new AppClientCreateDto('client1');
-
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.is(c => c === createClient)))
-            .returns(() => Observable.throw(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
-                        status: 500
-                    })
+    it('should make put request to rename client', () => {
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', TypeMoq.It.isValue({ name: 'Client 1' })))
+            .returns(() => Observable.of(
+               new Ng2Http.Response(
+                    new Ng2Http.ResponseOptions()
                 )
-            ));
+            ))
+            .verifiable(TypeMoq.Times.once());
 
-        let error = '';
-
-        appClientsService.postClient('my-app', createClient).subscribe(x => {}, result => {
-            error = result;
-        }).unsubscribe();
-
-        expect(error).toBe('A new client could not be created.');
-
-        authService.verifyAll();
-    });
-
-    it('should throw duplicate error on 400 when creating client failed', () => {
-        const createClient = new AppClientCreateDto('client1');
-
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.is(c => c === createClient)))
-            .returns(() => Observable.throw(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
-                        status: 400
-                    })
-                )
-            ));
-
-        let error = '';
-
-        appClientsService.postClient('my-app', createClient).subscribe(x => {}, result => {
-            error = result;
-        }).unsubscribe();
-
-        expect(error).toBe('A client with the same name already exists.');
+        appClientsService.renameClient('my-app', 'client1', 'Client 1');
 
         authService.verifyAll();
     });

@@ -59,7 +59,7 @@ namespace Squidex.Write.Apps
         {
             if (languages.Contains(language))
             {
-                var error = new ValidationError("Language id is alreay part of the app", "Language");
+                var error = new ValidationError("Language is already part of the app", "Language");
 
                 throw new ValidationException(message(), error);
             }

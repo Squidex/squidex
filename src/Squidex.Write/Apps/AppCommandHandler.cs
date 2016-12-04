@@ -45,7 +45,7 @@ namespace Squidex.Write.Apps
             if (await appRepository.FindAppByNameAsync(command.Name) != null)
             {
                 var error =
-                    new ValidationError($"A app with name '{command.Name}' already exists",
+                    new ValidationError($"An app with name '{command.Name}' already exists",
                         nameof(CreateApp.Name));
 
                 throw new ValidationException("Cannot create a new app", error);
@@ -64,7 +64,7 @@ namespace Squidex.Write.Apps
             if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
             {
                 var error =
-                    new ValidationError($"Cannot find contributor '{command.ContributorId ?? "UNKNOWN"}'",
+                    new ValidationError($"Cannot find contributor the contributor",
                         nameof(AssignContributor.ContributorId));
 
                 throw new ValidationException("Cannot assign contributor to app", error);
@@ -100,7 +100,22 @@ namespace Squidex.Write.Apps
         {
             return handler.UpdateAsync<AppDomainObject>(command, x => x.RevokeClient(command));
         }
-        
+
+        protected Task On(AddLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.AddLanguage(command));
+        }
+
+        protected Task On(RemoveLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.RemoveLanguage(command));
+        }
+
+        protected Task On(SetMasterLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(command, x => x.SetMasterLanguage(command));
+        }
+
         public Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);

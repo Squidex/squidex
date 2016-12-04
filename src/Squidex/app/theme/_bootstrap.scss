@@ -33,27 +33,61 @@
             margin-bottom: .25rem;
         }
 
+        th,
         td {
-            padding: 10px 12px;
-            margin: 0;
-            margin-bottom: 10px;
-            vertical-align: middle;
+            & {
+                padding: 15px;
+            }
+
+            &:first-child {
+                padding-left: 20px;
+            }
+
+            &:last-child {
+                padding-right: 20px;
+            }
         }
 
-        tr {
-            padding: 10px 12px;
+        thead {
+            th {
+                color: $color-table-header;
+                font-size: .8rem;
+                font-weight: normal;
+                border: 0;
+                padding-top: 0;
+            }
+        }
+
+        tbody {
+            td {
+                margin: 0;
+                margin-bottom: 10px;
+                vertical-align: middle;
+            }
+
+            tr {
+                background: $color-table;
+                border: 1px solid $color-border;
+                border-bottom: 3px solid $color-border;
+                margin-bottom: 10px;
+            }
+        }
+
+        &-row,
+        &-footer {
+            padding: 15px 20px;
+            background: $color-table-footer;
+            border: 1px solid $color-table-border;
+            border-bottom-width: 3px;
+        }
+
+        &-row {
             background: $color-table;
-            border: 1px solid $color-border;
-            border-bottom: 2px solid $color-border;
-            margin-bottom: 10px;
+            margin-bottom: .25rem;
         }
 
         &-footer {
-            @include border-radius(.25rem);
-            padding: 10px 12px;
-            background: $color-table;
-            border: 1px solid $color-border;
-            border-bottom: 2px solid $color-border;
+            background: $color-table-footer;
         }
 
         .spacer {
@@ -154,8 +188,35 @@
     border: 0;
 }
 
+@mixin link-button($color) {
+    & {
+        color: $color;
+    }
+
+    &:focus {
+        outline-color: transparent;
+    }
+
+    &:disabled {
+        @include opacity(.4);
+    }
+
+    &:focus,
+    &:active,
+    &:hover {
+        color: darken($color, 8%);
+        border-color: transparent;
+        background: transparent;
+        text-decoration: none;
+    }
+}
+
 .btn-link {
     &.btn-danger {
-        color: $color-theme-error;
+        @include link-button($color-theme-error);
+    }
+
+    &.btn-primary {
+        @include link-button($color-theme-blue);
     }
 }

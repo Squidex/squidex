@@ -184,6 +184,7 @@ export class AuthService {
 
     public authDelete(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
         options = this.setRequestOptions(options);
+        
         return this.checkResponse(this.http.delete(url, options));
     }
 

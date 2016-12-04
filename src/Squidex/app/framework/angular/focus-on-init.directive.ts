@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  * 
  * @license
@@ -8,9 +8,9 @@
 import * as Ng2 from '@angular/core';
 
 @Ng2.Directive({
-    selector: '[sqxFocusOnChange]'
+    selector: '[sqxFocusOnInit]'
 })
-export class FocusOnChangeDirective implements Ng2.OnChanges {
+export class FocusOnInitDirective implements Ng2.OnInit {
     @Ng2.Input()
     public gpFocusOnChange: any;
 
@@ -20,10 +20,10 @@ export class FocusOnChangeDirective implements Ng2.OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: { [key: string]: Ng2.SimpleChange }) {
+    public ngOnInit() {
         setTimeout(() => {
             this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'focus', []);
             this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
-        }, 100);
+        });
     }
 }

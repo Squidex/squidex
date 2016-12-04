@@ -34,6 +34,7 @@ namespace Squidex.Write.Apps
         private readonly AppDomainObject app;
         private readonly UserToken subjectId = new UserToken("subject", Guid.NewGuid().ToString());
         private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
+        private readonly Language language = Language.GetLanguage("de");
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
@@ -186,6 +187,50 @@ namespace Squidex.Write.Apps
                 .AttachClient(new AttachClient { Id = clientName }, clientSecret, expiresUtc);
 
             var command = new RevokeClient { AggregateId = Id, Id = clientName };
+            var context = new CommandContext(command);
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task AddLanguage_should_update_domain_object()
+        {
+            CreateApp();
+
+            var command = new AddLanguage { AggregateId = Id, Language = language };
+            var context = new CommandContext(command);
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task RemoveLanguage_should_update_domain_object()
+        {
+            CreateApp()
+                .AddLanguage(new AddLanguage { AggregateId = Id, Language = language });
+
+            var command = new RemoveLanguage { AggregateId = Id, Language = language };
+            var context = new CommandContext(command);
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task SetMasterLanguage_should_update_domain_object()
+        {
+            CreateApp()
+                .AddLanguage(new AddLanguage { AggregateId = Id, Language = language });
+
+            var command = new SetMasterLanguage { AggregateId = Id, Language = language };
             var context = new CommandContext(command);
 
             await TestUpdate(app, async _ =>

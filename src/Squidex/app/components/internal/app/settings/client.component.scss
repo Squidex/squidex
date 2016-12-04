@@ -1,0 +1,42 @@
+@import '_vars';
+@import '_mixins';
+
+.client {
+    &-info {
+        margin: 0;
+    }
+
+    &-delete {
+        vertical-align: top;
+    }
+
+    &-expires {
+        font-size: .8rem;
+    }
+
+    &-edit {
+        color: darken($color-border, 20%);
+        display: none;
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .3rem;
+        background: transparent;
+    }
+
+    &-name {
+        & {
+            height: 40px;
+        }
+
+        &:hover {
+            .client-edit {
+                display: inline-block;
+            }
+        }
+    }
+}
+
+.access-token {
+    resize: none;
+    height: 300px;
+}

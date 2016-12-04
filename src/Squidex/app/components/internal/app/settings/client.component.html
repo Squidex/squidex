@@ -1,0 +1,80 @@
+<div class="table-items-row">
+    <table class="table table-middle table-sm table-borderless table-fixed client-info">
+        <colgroup>
+            <col style="width: 160px; text-align: right;" />
+            <col style="width: 100%" />
+            <col style="width: 40px" />
+        </colgroup>
+
+        <tr>
+            <td colspan="2">
+                <div class="float-xs-right">
+                    <button class="btn btn-default" (click)="createToken(client)">Create Token</button>
+                </div>
+
+                <div class="client-name">
+                    <form *ngIf="isRenaming" class="form-inline" (submit)="rename()">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="client-name" id="client-name" sqxFocusOnInit [(ngModel)]="client.name" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save</button>
+
+                        <a class="btn btn-default" (click)="cancelRename()">Cancel</a>
+                    </form>
+
+                    <h3 *ngIf="!isRenaming">
+                        {{client.name}} <i class="client-edit icon-pencil" (click)="startRename()"></i>
+                    </h3>
+                </div>
+                    
+                <div class="client-expires">Expires: {{client.expiresUtc}}</div>
+            </td>
+            <td class="client-delete">
+                <button type="button" class="btn btn-link btn-danger" (click)="revokeClient(client)">
+                    <i class="icon-bin"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>Client Id:</td>
+            <td>
+                <input readonly class="form-control" #inputId [attr.value]="appName + ':' + client.id" />
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary btn-link" (click)="copyId()">
+                    <i class="icon-copy"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>Client Secret:</td>
+            <td>
+                <input readonly class="form-control" name="inputSecret" [attr.value]="client.secret" />
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary btn-link" (click)="copySecret()">
+                    <i class="icon-copy"></i>
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="modal" *sqxModalView="modalDialog" [@fade]>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+				<h4 class="modal-title">Access Token</h4>
+			</div>
+
+			<div class="modal-body">
+                <textarea class="form-control access-token">{{appClientToken.tokenType}} {{appClientToken.accessToken}}</textarea>
+			</div>
+		</div>
+	</div>
+</div>

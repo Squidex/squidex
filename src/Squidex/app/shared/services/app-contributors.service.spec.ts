@@ -61,7 +61,7 @@ describe('AppContributorsService', () => {
     it('should make post request to assign contributor', () => {
         const contributor = new AppContributorDto('123', 'Owner');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', TypeMoq.It.is(c => c === contributor)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', TypeMoq.It.isValue(contributor)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions()

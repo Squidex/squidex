@@ -103,11 +103,11 @@ namespace Squidex.Controllers.Api.Apps
         /// 404 => App not found or client not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/clients/{client}/")]
+        [Route("apps/{app}/clients/{clientId}/")]
         [ProducesResponseType(typeof(ClientDto[]), 201)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] RenameClientDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient()));
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));
 
             return NoContent();
         }
@@ -122,7 +122,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 204 => Client revoked.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/clients/{client}/")]
+        [Route("apps/{app}/clients/{clientId}/")]
         public async Task<IActionResult> DeleteClient(string app, string clientId)
         {
             await CommandBus.PublishAsync(new RevokeClient { Id = clientId });

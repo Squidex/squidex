@@ -8,6 +8,7 @@
 import * as Ng2 from '@angular/core';
 
 import {
+    AppLanguageDto,
     AppLanguagesService,
     AppsStoreService,
     LanguageDto, 
@@ -26,11 +27,10 @@ export class LanguagesPageComponent implements Ng2.OnInit {
     private appSubscription: any | null = null;
     private appName: string;
 
-    public allLanguages: LanguageDto[] = null;
-    public appLanguages: LanguageDto[] = [];
-    public selectedLanguage: LanguageDto | null = null;
+    public allLanguages: LanguageDto[] = [];
+    public appLanguages: AppLanguageDto[] = [];
 
-    public isSaving: boolean;
+    public selectedLanguage: LanguageDto | null = null;
 
     public get newLanguages() {
         return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
@@ -45,12 +45,16 @@ export class LanguagesPageComponent implements Ng2.OnInit {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.languagesService.getLanguages().retry(2)
             .subscribe(languages => {
                 this.allLanguages = languages;
             }, error => {
-                this.notifications.notify(Notification.error('Failed to load languages. Please reload squidex portal.'));
+                this.notifications.notify(Notification.error(error.displayMessage));
             });
 
         this.appSubscription =
@@ -60,42 +64,51 @@ export class LanguagesPageComponent implements Ng2.OnInit {
 
                     this.titles.setTitle('{appName} | Settings | Languages', { appName: app.name });
 
-                    this.appLanguagesService.getLanguages(app.name).retry(2)
-                        .subscribe(appLanguages => {
-                            this.appLanguages = appLanguages;
-                        }, error => {
-                            this.notifications.notify(Notification.error('Failed to load app languages. Please reload squidex portal.'));
-                        });
+                    this.load();
                 }
             });
     }
 
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+    public load() {
+        this.appLanguagesService.getLanguages(this.appName).retry(2)
+            .subscribe(appLanguages => {
+                this.appLanguages = appLanguages;
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 
-    public removeLanguage(language: LanguageDto) {
-        this.appLanguages.splice(this.appLanguages.indexOf(language), 1);
+    public setMasterLanguage(selectedLanguage: AppLanguageDto) {
+        for (let language of this.appLanguages) {
+            language.isMasterLanguage = false;
+        }
+
+        this.appLanguagesService.makeMasterLanguage(this.appName, selectedLanguage.iso2Code)
+            .subscribe(() => {
+                selectedLanguage.isMasterLanguage = true;
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 
     public addLanguage() {
-        this.appLanguages.push(this.selectedLanguage);
+        this.appLanguagesService.postLanguages(this.appName, this.selectedLanguage.iso2Code)
+            .subscribe(appLanguage => {
+                this.appLanguages.push(appLanguage);
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
 
         this.selectedLanguage = null;
     }
 
-    public saveLanguages() {
-        this.isSaving = true;
-
-        this.appLanguagesService.postLanguages(this.appName, this.appLanguages.map(l => l.iso2Code))
-            .delay(500)
-            .subscribe(() => { 
-                    this.isSaving = false;
-                }, error => {
-                    this.isSaving = false;
-
-                    this.notifications.notify(Notification.error('Failed to save app languages. Please retry.'));
-                });
+    public removeLanguage(selectedLanguage: AppLanguageDto) {
+        this.appLanguagesService.deleteLanguage(this.appName, selectedLanguage.iso2Code)
+            .subscribe(appLanguage => {
+                this.appLanguages.splice(this.appLanguages.indexOf(appLanguage), 1);
+            }, error => {
+                this.notifications.notify(Notification.error(error.displayMessage));
+            });
     }
 }
 

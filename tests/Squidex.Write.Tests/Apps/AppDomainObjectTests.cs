@@ -253,6 +253,17 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
+        public void RenameClient_should_throw_if_same_client_name()
+        {
+            CreateApp();
+
+            sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc);
+            sut.RenameClient(new RenameClient { Id = clientId, Name = clientNewName });
+
+            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient { Id = clientId, Name = clientNewName }));
+        }
+
+        [Fact]
         public void RenameClient_should_create_events()
         {
             CreateApp();
