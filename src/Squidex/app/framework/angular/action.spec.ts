@@ -30,7 +30,7 @@ class MockupObject {
 }
 
 describe('Action', () => {
-    it('should test complete flow to subscribe and unsubscribe and to trigger actions', () => {
+    it('should make complete flow to subscribe and unsubscribe and to trigger actions', () => {
         let dispatchCount = 0;
 
         const state = {
