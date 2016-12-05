@@ -59,7 +59,6 @@ export class ClientsPageComponent implements Ng2.OnInit {
                     this.appName = app.name;
 
                     this.titles.setTitle('{appName} | Settings | Clients', { appName: app.name });
-
                     this.load();
                 }
             });

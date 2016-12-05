@@ -67,8 +67,6 @@ export class AuthService {
             return;
         }
 
-        Log.logger = console;
-
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
                            scope: 'squidex-api openid profile squidex-profile',

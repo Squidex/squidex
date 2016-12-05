@@ -63,7 +63,6 @@ export class LanguagesPageComponent implements Ng2.OnInit {
                     this.appName = app.name;
 
                     this.titles.setTitle('{appName} | Settings | Languages', { appName: app.name });
-
                     this.load();
                 }
             });

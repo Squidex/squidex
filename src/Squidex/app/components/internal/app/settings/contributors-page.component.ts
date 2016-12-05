@@ -9,13 +9,13 @@ import * as Ng2 from '@angular/core';
 
 import { Observable, Subscription } from 'rxjs';
 
-import { CompleterBaseData, CompleterItem } from 'ng2-completer';
-
 import {
     AppContributorDto,
     AppContributorsService,
     AppsStoreService,
     AuthService,
+    AutocompleteItem,
+    AutocompleteSource,
     Notification,
     NotificationService,
     TitleService,
@@ -24,45 +24,30 @@ import {
     UsersProviderService
 } from 'shared';
 
-class UsersDataSource extends CompleterBaseData {
-    private remoteSearch: Subscription;
-
+class UsersDataSource implements AutocompleteSource {
     constructor(
         private readonly usersService: UsersService,
         private readonly component: ContributorsPageComponent
     ) {
-        super();
     }
 
-    public search(term: string): void {
-        this.cancel();
+    public find(query: string): Observable<AutocompleteItem[]> {
+        return this.usersService.getUsers(query)
+            .map(users => {
+                const results: AutocompleteItem[] = [];
 
-        this.remoteSearch = 
-            this.usersService.getUsers(term)
-                .map(users => {
-                    const results: CompleterItem[] = [];
-
-                    for (let u of users) {
-                        if (!this.component.appContributors || !this.component.appContributors.find(t => t.contributorId === u.id)) {
-                            results.push({ title: u.displayName, image: u.pictureUrl, originalObject: u, description: u.email });
-                        }
+                for (let user of users) {
+                    if (!this.component.appContributors || !this.component.appContributors.find(t => t.contributorId === user.id)) {
+                        results.push(
+                            new AutocompleteItem(
+                                user.displayName,
+                                user.email,
+                                user.pictureUrl,
+                                user));
                     }
-
-                    this.next(results);
-
-                    return results;
-                })
-                .catch(err => {
-                    this.error(err);
-
-                    return null;
-                }).subscribe();
-    }
-
-    public cancel() {
-        if (this.remoteSearch) {
-            this.remoteSearch.unsubscribe();
-        }
+                }
+                return results;
+            });
     }
 }
 
@@ -114,7 +99,6 @@ export class ContributorsPageComponent implements Ng2.OnInit {
                     this.appName = app.name;
 
                     this.titles.setTitle('{appName} | Settings | Contributors', { appName: app.name });
-
                     this.load();
                 }
             });
@@ -165,8 +149,8 @@ export class ContributorsPageComponent implements Ng2.OnInit {
             }).subscribe();
     }
 
-    public selectUser(selection: CompleterItem | null) {
-        this.selectedUser = selection ? selection.originalObject : null;
+    public selectUser(selection: UserDto) {
+        this.selectedUser = selection;
     }
 
     public email(contributor: AppContributorDto): Observable<string> {

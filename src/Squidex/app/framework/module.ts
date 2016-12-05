@@ -12,6 +12,7 @@ import * as Ng2Common from '@angular/common';
 import * as Ng2Router from '@angular/router';
 
 import {
+    AutocompleteComponent,
     CloakDirective,
     ColorPickerComponent,
     DayOfWeekPipe,
@@ -24,6 +25,7 @@ import {
     ModalViewDirective,
     MoneyPipe,
     MonthPipe,
+    ScrollActiveDirective,
     ShortcutComponent,
     ShortDatePipe,
     ShortTimePipe,
@@ -41,6 +43,7 @@ import {
         Ng2Router.RouterModule
     ],
     declarations: [
+        AutocompleteComponent,
         CloakDirective,
         ColorPickerComponent,
         DayOfWeekPipe,
@@ -53,6 +56,7 @@ import {
         ModalViewDirective,
         MoneyPipe,
         MonthPipe,
+        ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
         ShortTimePipe,
@@ -61,6 +65,7 @@ import {
         UserReportComponent,
     ],
     exports: [
+        AutocompleteComponent,
         CloakDirective,
         ColorPickerComponent,
         DayOfWeekPipe,
@@ -73,6 +78,7 @@ import {
         ModalViewDirective,
         MoneyPipe,
         MonthPipe,
+        ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
         ShortTimePipe,

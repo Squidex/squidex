@@ -1,0 +1,18 @@
+<span>
+    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="keyDown($event)"
+        [formControl]="queryInput"
+        autocomplete="off" 
+        autocorrect="off"
+        autocapitalize="off">
+
+    <div class="items-container" *ngIf="items.length > 0">
+        <div class="items" #container>
+            <div *ngFor="let item of items; let i = index;" class="item" [class.active]="i === itemSelection" (mousedown)="chooseItem(item)" (mouseover)="selectIndex(i)" [sqxScrollActive]="i === itemSelection" [container]="container">
+                <img class="item-image" [attr.src]="item.image" />
+
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-description">{{item.description}}</span>
+            </div>
+        </div>
+    </div>
+</span>

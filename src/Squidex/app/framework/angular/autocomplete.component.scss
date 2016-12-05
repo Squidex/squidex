@@ -1,0 +1,51 @@
+@import '_mixins';
+@import '_vars';
+
+$color-input-border: rgba(0, 0, 0, .15);
+
+.items {
+    &-container {
+        position: relative;
+    }
+
+    & {
+        @include absolute(2px, auto, auto, 0);
+        @include border-radius(.25em);
+        @include box-shadow;
+        width: 300px;
+        max-height: 200px;
+        border: 1px solid $color-input-border;
+        background: $color-accent-dark;
+        padding: .3rem 0;
+        overflow-y: auto;
+    }
+}
+
+.item {
+    & {
+        padding: .3rem .8rem;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    &.active {
+        color: $color-accent-dark;
+        background: $color-theme-blue;
+    }
+
+    &-image {
+        @include circle(40px);
+        float: left;
+    }
+
+    &-title,
+    &-description {
+        @include truncate;
+        margin-left: 45px;
+    }
+
+    &-description {
+        font-size: .8rem;
+        font-style: italic;
+    }
+}

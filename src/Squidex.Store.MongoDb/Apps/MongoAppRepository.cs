@@ -62,6 +62,16 @@ namespace Squidex.Store.MongoDb.Apps
             });
         }
 
+        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(headers, a =>
+            {
+                var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
+
+                SimpleMapper.Map(@event, contributor);
+            });
+        }
+
         protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(headers, a =>
@@ -115,16 +125,6 @@ namespace Squidex.Store.MongoDb.Apps
             return Collection.UpdateAsync(headers, a =>
             {
                 a.MasterLanguage = @event.Language.Iso2Code;
-            });
-        }
-
-        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(headers, a =>
-            {
-                var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
-
-                SimpleMapper.Map(@event, contributor);
             });
         }
 

@@ -7,6 +7,7 @@
 
 export * from './angular/action';
 export * from './angular/animations';
+export * from './angular/autocomplete.component';
 export * from './angular/validators';
 export * from './angular/cloak.directive';
 export * from './angular/color-picker.component';
@@ -17,6 +18,7 @@ export * from './angular/focus-on-init.directive';
 export * from './angular/image-drop.directive';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
+export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
 export * from './angular/spinner.component';

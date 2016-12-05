@@ -49,19 +49,12 @@
             <div class="table-items-footer">
                 <form class="form-inline" (submit)="assignContributor()" >
                     <div class="form-group">
-                        <ng2-completer 
-                            [autoMatch]="true"
-                            [dataService]="usersDataSource" 
-                            [minSearchLength]="3" 
-                            [placeholder]="'Search user by e-mail'"
-                            [pause]="300"
-                            [clearSelected]="false"
-                            [textSearching]="'Searching...'"
-                            [inputName]="contributor"
-                            [ngModel]="selectedUserName"
+                        <sqx-autocomplete [source]="usersDataSource"
+                            (ngModelChange)="selectUser($event.model)"
+                            [ngModel]="selectedUser"
                             [ngModelOptions]="{standalone: true}"
-                            (selected)="selectUser($event)">
-                        </ng2-completer>
+                            [inputName]="contributor">
+                        </sqx-autocomplete>
                     </div>
 
                     <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
