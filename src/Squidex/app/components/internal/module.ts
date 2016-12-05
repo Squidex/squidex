@@ -7,8 +7,6 @@
 
 import * as Ng2 from '@angular/core';
 
-import { Ng2CompleterModule } from 'ng2-completer';
-
 import { SqxFrameworkModule } from 'shared';
 import { SqxLayoutModule } from 'components/layout';
 
@@ -27,7 +25,6 @@ import {
 
 @Ng2.NgModule({
     imports: [
-        Ng2CompleterModule,
         SqxFrameworkModule,
         SqxLayoutModule
     ],

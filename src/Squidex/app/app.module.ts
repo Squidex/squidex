@@ -10,8 +10,6 @@ import * as Ng2Browser from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import { DndModule } from 'ng2-dnd';
-
 import {
     ApiUrlConfig,
     AppClientsService,
@@ -64,7 +62,6 @@ export function configCurrency() {
 
 @Ng2.NgModule({
     imports: [
-        DndModule.forRoot(),
         Ng2Browser.BrowserModule,
         SqxAppModule,
         SqxAuthModule,
