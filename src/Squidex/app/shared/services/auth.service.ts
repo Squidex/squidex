@@ -108,19 +108,19 @@ export class AuthService {
         }
     }
 
-    public logout(): Observable<any> {
+    public logoutRedirect(): Observable<any> {
         return Observable.fromPromise(this.userManager.signoutRedirect());
     }
 
-    public logoutComplete(): Observable<any> {
+    public logoutRedirectComplete(): Observable<any> {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
-    public login(): Observable<any> {
+    public loginRedirect(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirect());
     }
 
-    public loginComplete(): Observable<any> {
+    public loginRedirectComplete(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirectCallback());
     }
 
@@ -195,7 +195,7 @@ export class AuthService {
     private checkResponse(response: Observable<Ng2Http.Response>) {
         return response.catch((error: Ng2Http.Response) => {
             if (error.status === 401) {
-                this.login();
+                this.loginRedirect();
             } else if (error.status === 403) {
                 this.router.navigate(['/404']);
             }

@@ -51,6 +51,6 @@ export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
     }
 
     public logout() {
-        this.auth.logout();
+        this.auth.logoutRedirect();
     }
 }

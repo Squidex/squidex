@@ -22,7 +22,7 @@ export class LogoutPageComponent implements Ng2.OnInit {
     }
 
     public ngOnInit() {
-        this.auth.logoutComplete().subscribe(
+        this.auth.logoutRedirectComplete().subscribe(
             () => {
                 this.router.navigate(['/'], { replaceUrl: true });
             },
