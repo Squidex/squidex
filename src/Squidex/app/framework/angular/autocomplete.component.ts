@@ -30,19 +30,19 @@ const KEY_DOWN = 40;
 
 const NOOP = () => { };
 
-export function AutocompleteFunction () {
-    return Ng2.forwardRef(() => AutocompleteComponent);
-}
+export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
+    provide: Ng2Forms.NG_VALUE_ACCESSOR,
+    useExisting: Ng2.forwardRef(() => {
+        return AutocompleteComponent;
+    }),
+    multi: true
+};
 
 @Ng2.Component({
     selector: 'sqx-autocomplete',
     styles,
     template,
-    providers: [{
-        provide: Ng2Forms.NG_VALUE_ACCESSOR, 
-        useExisting: AutocompleteFunction,
-        multi: true
-    }]
+    providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
 })
 export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor  {
     private subscription: Subscription | null = null;
