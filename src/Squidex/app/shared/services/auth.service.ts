@@ -98,11 +98,7 @@ export class AuthService {
         } else if (this.loginCache) {
             return this.loginCache;
         } else {
-            this.loginCache =
-                this.checkState(this.userManager.signinSilent())
-                    .then(result => {
-                        return result || this.checkState(this.userManager.signinSilent());
-                    });
+            this.loginCache = this.checkState(this.userManager.signinSilent());
 
             return this.loginCache;
         }
@@ -125,11 +121,7 @@ export class AuthService {
     }
 
     public loginPopup(): Observable<boolean> {
-        const promise =
-            this.checkState(this.userManager.signinPopup())
-                .then(result => {
-                    return result || this.checkState(this.userManager.signinSilent());
-                });
+        const promise = this.checkState(this.userManager.signinPopup());
 
         return Observable.fromPromise(promise);
     }
