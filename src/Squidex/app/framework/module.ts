@@ -66,7 +66,7 @@ import {
         SliderComponent,
         SpinnerComponent,
         TitleComponent,
-        UserReportComponent,
+        UserReportComponent
     ],
     exports: [
         AutocompleteComponent,

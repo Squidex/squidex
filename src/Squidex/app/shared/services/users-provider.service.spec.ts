@@ -34,7 +34,7 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
             .verifiable(TypeMoq.Times.once());
-            
+
         let resultingUser: UserDto = null;
 
         usersProviderService.getUser('123').subscribe(result => {
@@ -52,9 +52,9 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
             .verifiable(TypeMoq.Times.once());
-            
+
         usersProviderService.getUser('123');
-        
+
         let resultingUser: UserDto = null;
 
         usersProviderService.getUser('123').subscribe(result => {
@@ -75,7 +75,7 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
             .verifiable(TypeMoq.Times.once());
-            
+
         let resultingUser: UserDto = null;
 
         usersProviderService.getUser('123').subscribe(result => {

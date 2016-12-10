@@ -38,7 +38,7 @@
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-variable": true,
-    "no-empty": false,
+    "no-empty": true,
     "no-eval": true,
     "no-inferrable-types": [
       true, 
@@ -48,6 +48,7 @@
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
+    
     "no-unused-expression": true,
     "no-unused-variable": true,
     "no-use-before-declare": true,
@@ -61,11 +62,13 @@
       "check-whitespace"
     ],
     "only-arrow-functions": [
-      true, 
-      "allow-declarations"],
+      true,
+      "allow-declarations"
+    ],
     "ordered-imports": [
       true
     ],
+    "prefer-for-of": true,
     "quotemark": [
       true,
       "single"
@@ -73,6 +76,13 @@
     "radix": true,
     "semicolon": [
       "always"
+    ],
+    "trailing-comma": [
+      true, 
+      {
+        "multiline": "never", 
+        "singleline": "never"
+      }
     ],
     "triple-equals": [
       true,

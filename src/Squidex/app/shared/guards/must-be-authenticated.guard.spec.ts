@@ -21,10 +21,10 @@ describe('MustBeAuthenticatedGuard', () => {
     it('should navigate to default page if not authenticated', (done) => {
         authService.setup(x => x.checkLogin())
             .returns(() => Promise.resolve(false));
-        
+
         const router = new RouterMockup();
         const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
-        
+
         guard.canActivate(null, null)
             .then(result => {
                 expect(result).toBeFalsy();
@@ -37,10 +37,10 @@ describe('MustBeAuthenticatedGuard', () => {
     it('should return true if authenticated', (done) => {
         authService.setup(x => x.checkLogin())
             .returns(() => Promise.resolve(true));
-        
+
         const router = new RouterMockup();
         const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
-        
+
         guard.canActivate(null, null)
             .then(result => {
                 expect(result).toBeTruthy();

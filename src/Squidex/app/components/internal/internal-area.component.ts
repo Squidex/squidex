@@ -9,8 +9,8 @@ import * as Ng2 from '@angular/core';
 
 import {
     fadeAnimation,
-    Notification, 
-    NotificationService 
+    Notification,
+    NotificationService
 } from 'shared';
 
 @Ng2.Component({
@@ -32,7 +32,7 @@ export class InternalAreaComponent implements Ng2.OnInit, Ng2.OnDestroy {
     }
 
     public ngOnInit() {
-        this.notificationsSubscription = 
+        this.notificationsSubscription =
             this.notificationService.notifications.subscribe(notification => {
                 this.notifications.push(notification);
 

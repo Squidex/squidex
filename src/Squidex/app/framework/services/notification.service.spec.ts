@@ -5,10 +5,10 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { 
+import {
     Notification,
     NotificationService,
-    NotificationServiceFactory 
+    NotificationServiceFactory
 } from './../';
 
 describe('NotificationService', () => {

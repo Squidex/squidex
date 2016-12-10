@@ -27,7 +27,7 @@ export class AppsPageComponent implements Ng2.OnInit {
 
     constructor(
         private readonly title: TitleService,
-        private readonly appsStore: AppsStoreService,
+        private readonly appsStore: AppsStoreService
     ) {
     }
 

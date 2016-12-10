@@ -53,7 +53,7 @@ describe('AppsService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let apps: AppDto[] = null;
-        
+
         appsService.getApps().subscribe(result => {
             apps = result;
         }).unsubscribe();
@@ -80,7 +80,7 @@ describe('AppsService', () => {
                 )
             ))
             .verifiable(TypeMoq.Times.once());
-            
+
         let newCreated: EntityCreatedDto = null;
 
         appsService.postApp(createApp).subscribe(result => {

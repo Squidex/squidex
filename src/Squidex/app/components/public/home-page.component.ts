@@ -21,7 +21,7 @@ export class HomePageComponent implements Ng2.OnInit {
     constructor(
         private readonly auth: AuthService,
         private readonly title: TitleService,
-        private readonly router: Ng2Router.Router,
+        private readonly router: Ng2Router.Router
     ) {
     }
 

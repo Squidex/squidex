@@ -35,7 +35,7 @@ export class UsersService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
@@ -50,10 +50,10 @@ export class UsersService {
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
-        
+
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     return new UserDto(
                         response.id,
                         response.email,

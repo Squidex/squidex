@@ -35,12 +35,12 @@ export class LanguageService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
                         return new LanguageDto(
-                            item.iso2Code, 
+                            item.iso2Code,
                             item.englishName);
                     });
                 })

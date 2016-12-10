@@ -24,13 +24,13 @@ import {
         AppFormComponent,
         AppsMenuComponent,
         ProfileMenuComponent,
-        SearchFormComponent,
+        SearchFormComponent
     ],
     exports: [
         AppFormComponent,
         AppsMenuComponent,
         ProfileMenuComponent,
-        SearchFormComponent,
+        SearchFormComponent
     ]
 })
 export class SqxLayoutModule { }

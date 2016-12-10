@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+/* tslint:disable:no-empty */
+
 export abstract class ImmutableObject {
     public abstract clone(): ImmutableObject;
 

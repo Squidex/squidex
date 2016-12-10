@@ -14,7 +14,7 @@ import {
     AppLanguagesService,
     AppsStoreService,
     ArrayHelper,
-    LanguageDto, 
+    LanguageDto,
     LanguageService,
     NotificationService,
     UpdateAppLanguageDto,

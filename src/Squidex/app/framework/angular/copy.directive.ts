@@ -29,7 +29,7 @@ export class CopyDirective {
 
         element.focus();
         element.setSelectionRange(0, element.value.length);
-        
+
         try {
             document.execCommand('copy');
         } catch (e) {
@@ -39,7 +39,7 @@ export class CopyDirective {
         if (currentFocus && typeof currentFocus.focus === 'function') {
             currentFocus.focus();
         }
-        
+
         element.setSelectionRange(prevSelectionStart, prevSelectionEnd);
     }
 }

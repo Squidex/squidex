@@ -25,7 +25,7 @@ export class AppLanguageDto {
 
 export class AddAppLanguageDto {
     constructor(
-        public readonly name: string,
+        public readonly name: string
     ) {
     }
 }
@@ -50,12 +50,12 @@ export class AppLanguagesService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
                         return new AppLanguageDto(
-                            item.iso2Code, 
+                            item.iso2Code,
                             item.englishName,
                             item.isMasterLanguage === true);
                     });
@@ -68,9 +68,9 @@ export class AppLanguagesService {
 
         return this.authService.authPost(url, dto)
                 .map(response => response.json())
-                .map(response => {               
+                .map(response => {
                     return new AppLanguageDto(
-                        response.iso2Code, 
+                        response.iso2Code,
                         response.englishName,
                         response.isMasterLanguage === true);
                 })
@@ -82,7 +82,7 @@ export class AppLanguagesService {
 
         return this.authService.authPut(url, dto)
                 .catch(response => handleError('Failed to change language. Please reload.', response));
-    } 
+    }
 
     public deleteLanguage(appName: string, languageCode: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);

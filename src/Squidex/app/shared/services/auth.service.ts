@@ -61,7 +61,7 @@ export class AuthService {
 
     constructor(apiUrl: ApiUrlConfig,
         private readonly http: Ng2Http.Http,
-        private readonly router: Ng2Router.Router,
+        private readonly router: Ng2Router.Router
     ) {
         if (!apiUrl) {
             return;

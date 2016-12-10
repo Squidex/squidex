@@ -47,7 +47,7 @@ describe('AppLanguagesService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let languages: AppLanguageDto[] = null;
-        
+
         appLanguagesService.getLanguages('my-app').subscribe(result => {
             languages = result;
         }).unsubscribe();

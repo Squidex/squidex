@@ -5,9 +5,10 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-const EMPTY_FUNC = () => { };
-
+/* tslint:disable:no-empty */
 /* tslint:disable:only-arrow-functions */
+
+const EMPTY_FUNC = () => {};
 
 export function Action() {
     return function (target: any, key: string) {

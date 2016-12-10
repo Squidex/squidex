@@ -51,7 +51,7 @@ describe('AppClientsService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let clients: AppClientDto[] = null;
-        
+
         appClientsService.getClients('my-app').subscribe(result => {
             clients = result;
         }).unsubscribe();
@@ -82,7 +82,7 @@ describe('AppClientsService', () => {
                 )
             ))
             .verifiable(TypeMoq.Times.once());
-        
+
         let client: AppClientDto = null;
 
         appClientsService.postClient('my-app', dto).subscribe(result => {

@@ -48,7 +48,7 @@ describe('UsersService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let user: UserDto[] = null;
-        
+
         usersService.getUsers().subscribe(result => {
             user = result;
         }).unsubscribe();
@@ -84,7 +84,7 @@ describe('UsersService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let user: UserDto[] = null;
-        
+
         usersService.getUsers('my-query').subscribe(result => {
             user = result;
         }).unsubscribe();
@@ -115,7 +115,7 @@ describe('UsersService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let user: UserDto = null;
-        
+
         usersService.getUser('123').subscribe(result => {
             user = result;
         }).unsubscribe();

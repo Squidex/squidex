@@ -118,12 +118,12 @@ export class SchemasService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
                         return new SchemaDto(
-                            item.id, 
+                            item.id,
                             item.name,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified));
@@ -155,7 +155,7 @@ export class SchemasService {
                                 properties.patternMessage,
                                 properties.minLength,
                                 properties.maxLength,
-                                properties.allowedValues); 
+                                properties.allowedValues);
                         } else {
                             propertiesDto = new NumberFieldPropertiesDto(
                                 properties.label,
@@ -165,7 +165,7 @@ export class SchemasService {
                                 properties.defaultValue,
                                 properties.minValue,
                                 properties.maxValue,
-                                properties.allowedValues); 
+                                properties.allowedValues);
                         }
 
                         return new FieldDto(
@@ -174,12 +174,12 @@ export class SchemasService {
                             item.isDisabled,
                             propertiesDto);
                     });
-                    
+
                     return new SchemaDetailsDto(
-                        response.id, 
+                        response.id,
                         response.name,
                         DateTime.parseISO_UTC(response.created),
-                        DateTime.parseISO_UTC(response.lastModified), 
+                        DateTime.parseISO_UTC(response.lastModified),
                         fields);
                 })
                 .catch(response => handleError('Failed to load schema. Please reload.', response));

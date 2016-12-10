@@ -21,7 +21,7 @@ describe('AppMustExistGuard', () => {
     it('should navigate to 404 page if app is not found', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
             .returns(() => Promise.resolve(false));
-        
+
         const router = new RouterMockup();
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
@@ -37,7 +37,7 @@ describe('AppMustExistGuard', () => {
     it('should navigate to 404 page if app loading fails', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
             .returns(() => Promise.reject<boolean>('error'));
-        
+
         const router = new RouterMockup();
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
@@ -53,7 +53,7 @@ describe('AppMustExistGuard', () => {
     it('should return true if app is found', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
             .returns(() => Promise.resolve(true));
-        
+
         const router = new RouterMockup();
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 

@@ -28,6 +28,8 @@ const KEY_ENTER = 13;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
 
+/* tslint:disable:no-empty */
+
 const NOOP = () => { };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {

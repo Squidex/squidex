@@ -44,7 +44,7 @@ describe('AppContributorsService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let contributors: AppContributorDto[] = null;
-        
+
         appContributorsService.getContributors('my-app').subscribe(result => {
             contributors = result;
         }).unsubscribe();

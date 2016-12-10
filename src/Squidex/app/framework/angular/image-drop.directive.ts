@@ -95,6 +95,7 @@ export class ImageDropDirective {
     private findImage(event: DragDropEvent): File | null {
         let image: File | null = null;
 
+        /* tslint:disable:prefer-for-of */
         for (let i = 0; i < event.dataTransfer.files.length; i++) {
             const file = event.dataTransfer.files[i];
 

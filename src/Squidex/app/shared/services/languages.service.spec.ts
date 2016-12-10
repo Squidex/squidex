@@ -44,7 +44,7 @@ describe('LanguageService', () => {
             .verifiable(TypeMoq.Times.once());
 
         let languages: LanguageDto[] = null;
-        
+
         languageService.getLanguages().subscribe(result => {
             languages = result;
         }).unsubscribe();
