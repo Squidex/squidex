@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
 import * as Ng2Http from '@angular/http';
+import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
 

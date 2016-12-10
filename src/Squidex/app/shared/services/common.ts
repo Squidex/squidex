@@ -9,6 +9,13 @@ import * as Ng2Http from '@angular/http';
 
 import { Observable } from 'rxjs';
 
+export class EntityCreatedDto {
+    constructor(
+        public readonly id: string
+    ) {
+    }
+}
+
 export class ErrorDto {
     public get displayMessage(): string {
         let result = this.message;

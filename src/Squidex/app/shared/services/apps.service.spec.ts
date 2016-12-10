@@ -5,18 +5,19 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
 import * as Ng2Http from '@angular/http';
+import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
 
 import {
     ApiUrlConfig,
-    AppCreateDto,
     AppDto,
     AppsService,
     AuthService,
-    DateTime
+    CreateAppDto,
+    DateTime,
+    EntityCreatedDto
 } from './../';
 
 describe('AppsService', () => {
@@ -66,8 +67,7 @@ describe('AppsService', () => {
     });
 
     it('should make post request to create app', () => {
-        const createApp = new AppCreateDto('new-app');
-        const now = DateTime.now();
+        const createApp = new CreateAppDto('new-app');
 
         authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isValue(createApp)))
             .returns(() => Observable.of(
@@ -81,13 +81,13 @@ describe('AppsService', () => {
             ))
             .verifiable(TypeMoq.Times.once());
             
-        let newApp: AppDto = null;
+        let newCreated: EntityCreatedDto = null;
 
-        appsService.postApp(createApp, now).subscribe(result => {
-            newApp = result;
+        appsService.postApp(createApp).subscribe(result => {
+            newCreated = result;
         }).unsubscribe();
 
-        expect(newApp).toEqual(new AppDto('123', 'new-app', now, now, 'Owner'));
+        expect(newCreated).toEqual(new EntityCreatedDto('123'));
 
         authService.verifyAll();
     });

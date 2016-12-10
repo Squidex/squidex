@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RenameClientDto.cs
+//  UpdateAppClientDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class RenameClientDto
+    public class UpdateAppClientDto
     {
         /// <summary>
         /// The new display name of the client.

@@ -7,8 +7,8 @@
 
 import * as Ng2 from '@angular/core';
 
-import { SqxFrameworkModule } from 'shared';
 import { SqxLayoutModule } from 'components/layout';
+import { SqxFrameworkModule } from 'shared';
 
 import {
     AppAreaComponent,
@@ -18,8 +18,8 @@ import {
     ContributorsPageComponent,
     DashboardPageComponent,
     InternalAreaComponent,
-    LeftMenuComponent,
     LanguagesPageComponent,
+    LeftMenuComponent,
     SchemasPageComponent
 } from './declarations';
 

@@ -6,12 +6,13 @@
  */
 
 import * as Ng2 from '@angular/core';
+
 import { Observable } from 'rxjs';
 
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
-import { handleError } from './errors';
+import { handleError } from './common';
 
 export class LanguageDto {
     constructor(

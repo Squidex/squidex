@@ -10,16 +10,19 @@ import * as TypeMoq from 'typemoq';
 import { Observable } from 'rxjs';
 
 import {
-    AppCreateDto,
     AppDto,
-    AppsStoreService,
     AppsService,
-    AuthService
+    AppsStoreService,
+    AuthService,
+    CreateAppDto,
+    DateTime
 } from './../';
 
 describe('AppsStoreService', () => {
-    const oldApps = [new AppDto('id', 'old-name', null, null, 'Owner')];
-    const newApp =   new AppDto('id', 'new-name', null, null, 'Owner');
+    const now = DateTime.now();
+
+    const oldApps = [new AppDto('id', 'old-name', now, now, 'Owner')];
+    const newApp =   new AppDto('id', 'new-name', now, now, 'Owner');
 
     let appsService: TypeMoq.Mock<AppsService>;
     let authService: TypeMoq.Mock<AuthService>;
@@ -109,7 +112,7 @@ describe('AppsStoreService', () => {
             result1 = x;
         }).unsubscribe();
 
-        store.createApp(new AppCreateDto('new-name')).subscribe(x => { });
+        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { });
 
         store.apps.subscribe(x => {
             result2 = x;
@@ -134,7 +137,7 @@ describe('AppsStoreService', () => {
 
         let result: AppDto[] = null;
 
-        store.createApp(new AppCreateDto('new-name')).subscribe(x => { });
+        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { });
 
         store.apps.subscribe(x => {
             result = x;

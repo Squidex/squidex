@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
 import * as Ng2Http from '@angular/http';
+import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
 
@@ -15,8 +15,9 @@ import {
     AppClientDto,
     AppClientsService,
     AuthService,
-    AppClientCreateDto,
-    DateTime
+    CreateAppClientDto,
+    DateTime,
+    UpdateAppClientDto
 } from './../';
 
 describe('AppClientsService', () => {
@@ -65,9 +66,9 @@ describe('AppClientsService', () => {
     });
 
     it('should make post request to create client', () => {
-        const createClient = new AppClientCreateDto('client1');
+        const dto = new CreateAppClientDto('client1');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.isValue(createClient)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', TypeMoq.It.isValue(dto)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -84,7 +85,7 @@ describe('AppClientsService', () => {
         
         let client: AppClientDto = null;
 
-        appClientsService.postClient('my-app', createClient).subscribe(result => {
+        appClientsService.postClient('my-app', dto).subscribe(result => {
             client = result;
         });
 
@@ -95,7 +96,9 @@ describe('AppClientsService', () => {
     });
 
     it('should make put request to rename client', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', TypeMoq.It.isValue({ name: 'Client 1' })))
+        const dto = new UpdateAppClientDto('Client 1 New');
+
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', TypeMoq.It.isValue(dto)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions()
@@ -103,7 +106,7 @@ describe('AppClientsService', () => {
             ))
             .verifiable(TypeMoq.Times.once());
 
-        appClientsService.renameClient('my-app', 'client1', 'Client 1');
+        appClientsService.updateClient('my-app', 'client1', dto);
 
         authService.verifyAll();
     });

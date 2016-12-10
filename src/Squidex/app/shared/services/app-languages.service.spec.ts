@@ -5,16 +5,18 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
 import * as Ng2Http from '@angular/http';
+import * as TypeMoq from 'typemoq';
 
 import { Observable } from 'rxjs';
 
 import {
+    AddAppLanguageDto,
     ApiUrlConfig,
     AppLanguageDto,
     AppLanguagesService,
     AuthService,
+    UpdateAppLanguageDto
 } from './../';
 
 describe('AppLanguagesService', () => {
@@ -60,9 +62,9 @@ describe('AppLanguagesService', () => {
     });
 
     it('should make post request to add language', () => {
-        const newLanguage = 'de';
+        const dto = new AddAppLanguageDto('de');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', TypeMoq.It.is(y => y['language'] === newLanguage)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', TypeMoq.It.isValue(dto)))
             .returns(() => Observable.of(
                 new Ng2Http.Response(
                     new Ng2Http.ResponseOptions({
@@ -77,7 +79,7 @@ describe('AppLanguagesService', () => {
 
         let language: AppLanguageDto;
 
-        appLanguagesService.postLanguages('my-app', newLanguage).subscribe(result => {
+        appLanguagesService.postLanguages('my-app', dto).subscribe(result => {
             language = result;
         });
 
@@ -88,7 +90,9 @@ describe('AppLanguagesService', () => {
     });
 
     it('should make put request to make master language', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', TypeMoq.It.isValue({ isMasterLanguage: true })))
+        const dto = new UpdateAppLanguageDto(true);
+
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', TypeMoq.It.isValue(dto)))
             .returns(() => Observable.of(
                new Ng2Http.Response(
                     new Ng2Http.ResponseOptions()
@@ -96,7 +100,7 @@ describe('AppLanguagesService', () => {
             ))
             .verifiable(TypeMoq.Times.once());
 
-        appLanguagesService.makeMasterLanguage('my-app', 'de');
+        appLanguagesService.updateLanguage('my-app', 'de', dto);
 
         authService.verifyAll();
     });

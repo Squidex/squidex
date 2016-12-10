@@ -75,7 +75,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPost]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
+        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AssignContributor()));
 

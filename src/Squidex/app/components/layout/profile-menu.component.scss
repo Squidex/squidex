@@ -5,7 +5,13 @@ $size-avatar: 2.2rem;
 
 .user {
     &-picture {
-        @include circle(2.2rem);
+        & {
+            @include circle(2.2rem);
+        }
+
+        &:not([src]) {
+            @include opacity(0);
+        }
     }
 }
 

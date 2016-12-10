@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AddLanguageDto.cs
+//  AssignAppContributorDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,16 +7,24 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Squidex.Core.Apps;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class AddLanguageDto
+    public sealed class AssignAppContributorDto
     {
         /// <summary>
-        /// The language to add.
+        /// The id of the user to add to the app (GUID).
         /// </summary>
         [Required]
-        public Language Language { get; set; }
+        public string ContributorId { get; set; }
+
+        /// <summary>
+        /// The permission level as a contributor.
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PermissionLevel Permission { get; set; }
     }
 }

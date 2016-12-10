@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
-import { handleError } from './errors';
+import { handleError } from './common';
 
 export class AppContributorDto {
     constructor(
@@ -47,10 +47,10 @@ export class AppContributorsService {
                 .catch(response => handleError('Failed to load contributors. Please reload.', response));
     }
 
-    public postContributor(appName: string, contributor: AppContributorDto): Observable<any> {
+    public postContributor(appName: string, dto: AppContributorDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return this.authService.authPost(url, contributor)
+        return this.authService.authPost(url, dto)
                 .catch(response => handleError('Failed to add contributors. Please reload.', response));
     }
 

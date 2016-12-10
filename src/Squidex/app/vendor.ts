@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+// tslint:disable ordered-imports
+
 // Angular 2
 import '@angular/platform-browser';
 import '@angular/platform-browser-dynamic';

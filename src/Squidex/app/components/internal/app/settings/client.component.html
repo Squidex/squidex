@@ -13,9 +13,9 @@
                 </div>
 
                 <div class="client-name">
-                    <form *ngIf="isRenaming" class="form-inline" (submit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (submit)="rename()">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="client-name" id="client-name" sqxFocusOnInit [(ngModel)]="client.name" />
+                            <input type="text" class="form-control" formControlName="name" sqxFocusOnInit />
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -39,10 +39,10 @@
         <tr>
             <td>Client Id:</td>
             <td>
-                <input readonly class="form-control" #inputId [attr.value]="appName + ':' + client.id" />
+                <input readonly class="form-control" #inputId [attr.value]="clientName" #inputName />
             </td>
             <td>
-                <button type="button" class="btn btn-primary btn-link" (click)="copyId()">
+                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
                     <i class="icon-copy"></i>
                 </button>
             </td>
@@ -50,10 +50,10 @@
         <tr>
             <td>Client Secret:</td>
             <td>
-                <input readonly class="form-control" name="inputSecret" [attr.value]="client.secret" />
+                <input readonly class="form-control" name="inputSecret" [attr.value]="clientSecret" #inputSecret />
             </td>
             <td>
-                <button type="button" class="btn btn-primary btn-link" (click)="copySecret()">
+                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
                     <i class="icon-copy"></i>
                 </button>
             </td>

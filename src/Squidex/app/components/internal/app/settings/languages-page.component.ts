@@ -8,14 +8,17 @@
 import * as Ng2 from '@angular/core';
 
 import {
+    AddAppLanguageDto,
+    AppComponentBase,
     AppLanguageDto,
     AppLanguagesService,
     AppsStoreService,
+    ArrayHelper,
     LanguageDto, 
     LanguageService,
-    Notification,
     NotificationService,
-    TitleService 
+    UpdateAppLanguageDto,
+    UsersProviderService
 } from 'shared';
 
 @Ng2.Component({
@@ -23,10 +26,7 @@ import {
     styles,
     template
 })
-export class LanguagesPageComponent implements Ng2.OnInit {
-    private appSubscription: any | null = null;
-    private appName: string;
-
+export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnInit {
     public allLanguages: LanguageDto[] = [];
     public appLanguages: AppLanguageDto[] = [];
 
@@ -36,17 +36,11 @@ export class LanguagesPageComponent implements Ng2.OnInit {
         return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
     }
 
-    constructor(
-        private readonly titles: TitleService,
-        private readonly appsStore: AppsStoreService,
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguageService,
-        private readonly notifications: NotificationService
+        private readonly languagesService: LanguageService
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+        super(apps, notifications, users);
     }
 
     public ngOnInit() {
@@ -54,59 +48,59 @@ export class LanguagesPageComponent implements Ng2.OnInit {
             .subscribe(languages => {
                 this.allLanguages = languages;
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
             });
 
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                if (app) {
-                    this.appName = app.name;
-
-                    this.titles.setTitle('{appName} | Settings | Languages', { appName: app.name });
-                    this.load();
-                }
-            });
+        this.load();
     }
 
     public load() {
-        this.appLanguagesService.getLanguages(this.appName).retry(2)
-            .subscribe(appLanguages => {
-                this.appLanguages = appLanguages;
+        this.appName()
+            .switchMap(app => this.appLanguagesService.getLanguages(app).retry(2))
+            .subscribe(dtos => {
+                this.appLanguages = dtos;
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
-            });
-    }
-
-    public setMasterLanguage(selectedLanguage: AppLanguageDto) {
-        for (let language of this.appLanguages) {
-            language.isMasterLanguage = false;
-        }
-
-        this.appLanguagesService.makeMasterLanguage(this.appName, selectedLanguage.iso2Code)
-            .subscribe(() => {
-                selectedLanguage.isMasterLanguage = true;
-            }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
             });
     }
 
     public addLanguage() {
-        this.appLanguagesService.postLanguages(this.appName, this.selectedLanguage.iso2Code)
-            .subscribe(appLanguage => {
-                this.appLanguages.push(appLanguage);
+        this.appName()
+            .switchMap(app => this.appLanguagesService.postLanguages(app, new AddAppLanguageDto(this.selectedLanguage.iso2Code)))
+            .subscribe(dto => {
+                this.appLanguages = ArrayHelper.push(this.appLanguages, dto);
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
             });
 
         this.selectedLanguage = null;
     }
 
-    public removeLanguage(selectedLanguage: AppLanguageDto) {
-        this.appLanguagesService.deleteLanguage(this.appName, selectedLanguage.iso2Code)
-            .subscribe(appLanguage => {
-                this.appLanguages.splice(this.appLanguages.indexOf(appLanguage), 1);
+    public removeLanguage(language: AppLanguageDto) {
+        this.appName()
+            .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code))
+            .subscribe(dto => {
+                this.appLanguages = ArrayHelper.push(this.appLanguages, language);
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
+            });
+    }
+
+    public setMasterLanguage(language: AppLanguageDto) {
+        this.appName()
+            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, new UpdateAppLanguageDto(true)))
+            .subscribe(() => {
+                this.appLanguages = this.appLanguages.map(l => {
+                    const isMasterLanguage = l === language;
+
+                    if (isMasterLanguage !== l.isMasterLanguage) {
+                        return new AppLanguageDto(l.iso2Code, l.englishName, isMasterLanguage);
+                    } else {
+                        return l;
+                    }
+                });
+            }, error => {
+                this.notifyError(error);
             });
     }
 }

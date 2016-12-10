@@ -14,19 +14,21 @@ import {
 } from 'rxjs';
 
 import {
-    AppCreateDto,
     AppDto,
-    AppsService
+    AppsService,
+    CreateAppDto
 } from './apps.service';
+
+import { DateTime } from 'framework';
 
 import { AuthService } from './auth.service';
 
 @Ng2.Injectable()
 export class AppsStoreService {
-    private lastApps: AppDto[] | null = null;
-    private isAuthenticated = false;
     private readonly apps$ = new Subject<AppDto[]>();
     private readonly appName$ = new BehaviorSubject<string | null>(null);
+    private lastApps: AppDto[] | null = null;
+    private isAuthenticated = false;
 
     private readonly appsPublished$ =
         this.apps$
@@ -88,11 +90,19 @@ export class AppsStoreService {
         return this.selectedApp.take(1).map(app => app !== null).toPromise();
     }
 
-    public createApp(appToCreate: AppCreateDto): Observable<AppDto> {
-        return this.appService.postApp(appToCreate).do(app => {
-            if (this.lastApps && app) {
-                this.apps$.next(this.lastApps.concat([app]));
-            }
-        });
+    public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
+        return this.appService.postApp(dto)
+            .map(created => {
+                now = now || DateTime.now();
+
+                const app = new AppDto(created.id, dto.name, now, now, 'Owner');
+
+                return app;
+            })
+            .do(app => {
+                if (this.lastApps && app) {
+                    this.apps$.next(this.lastApps.concat([app]));
+                }
+            });
     }
 }

@@ -9,24 +9,27 @@ import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
 import {
-    AppsStoreService,
     AppClientDto,
-    AppClientCreateDto,
     AppClientsService,
-    Notification,
+    AppComponentBase,
+    AppsStoreService,
+    ArrayHelper,
+    CreateAppClientDto,
     NotificationService,
-    TitleService 
+    UpdateAppClientDto,
+    UsersProviderService
 } from 'shared';
+
+function rename(client: AppClientDto, name: string) {
+    return new AppClientDto(client.id, client.secret, name, client.expiresUtc);
+};
 
 @Ng2.Component({
     selector: 'sqx-clients-page',
     styles,
     template
 })
-export class ClientsPageComponent implements Ng2.OnInit {
-    private appSubscription: any | null = null;
-    private appName: string | null = null;
-
+export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit {
     public appClients: AppClientDto[];
     
     public createForm =
@@ -39,47 +42,44 @@ export class ClientsPageComponent implements Ng2.OnInit {
                 ]]
         });
 
-    constructor(
-        private readonly titles: TitleService,
-        private readonly appsStore: AppsStoreService,
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: Ng2Forms.FormBuilder,
-        private readonly notifications: NotificationService
+        private readonly formBuilder: Ng2Forms.FormBuilder
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+        super(apps, notifications, users);
     }
 
     public ngOnInit() {
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                if (app) {
-                    this.appName = app.name;
-
-                    this.titles.setTitle('{appName} | Settings | Clients', { appName: app.name });
-                    this.load();
-                }
-            });
+        this.load();
     }
 
     public load() {
-        this.appClientsService.getClients(this.appName)
-            .subscribe(clients => {
-                this.appClients = clients;
+        this.appName()
+            .switchMap(app => this.appClientsService.getClients(app).retry(2))
+            .subscribe(dtos => {
+                this.appClients = dtos;
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
-                this.appClients = [];
+                this.notifyError(error);
             });
     }
 
     public revokeClient(client: AppClientDto) {
-        this.appClientsService.deleteClient(this.appName, client.id)
+        this.appName()
+            .switchMap(app => this.appClientsService.deleteClient(app, client.id))
             .subscribe(() => {
-                this.appClients.splice(this.appClients.indexOf(client), 1);
+                this.appClients = ArrayHelper.remove(this.appClients, client);
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
+            });
+    }
+
+    public renameClient(client: AppClientDto, name: string) {
+        this.appName()
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, new UpdateAppClientDto(name)))
+            .subscribe(() => {
+                this.appClients = ArrayHelper.replace(this.appClients, client, rename(client, name));
+            }, error => {
+                this.notifyError(error);
             });
     }
 
@@ -89,14 +89,15 @@ export class ClientsPageComponent implements Ng2.OnInit {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const dto = new AppClientCreateDto(this.createForm.controls['name'].value);
+            const dto = new CreateAppClientDto(this.createForm.controls['name'].value);
 
-            this.appClientsService.postClient(this.appName, dto)
-                .subscribe(client => {
-                    this.appClients.push(client);
+            this.appName()
+                .switchMap(app => this.appClientsService.postClient(app, dto))
+                .subscribe(dto => {
+                    this.appClients = ArrayHelper.push(this.appClients, dto);
                     this.reset();
                 }, error => {
-                    this.notifications.notify(Notification.error(error.displayMessage));
+                    this.notifyError(error);
                     this.reset();
                 });
         }

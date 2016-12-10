@@ -12,13 +12,27 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
-import { handleError } from './errors';
+import { handleError } from './common';
 
 export class AppLanguageDto {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string,
-        public isMasterLanguage: boolean
+        public readonly isMasterLanguage: boolean
+    ) {
+    }
+}
+
+export class AddAppLanguageDto {
+    constructor(
+        public readonly name: string,
+    ) {
+    }
+}
+
+export class UpdateAppLanguageDto {
+    constructor(
+        public readonly isMasterLanguage: boolean
     ) {
     }
 }
@@ -49,10 +63,10 @@ export class AppLanguagesService {
                 .catch(response => handleError('Failed to load languages. Please reload', response));
     }
 
-    public postLanguages(appName: string, languageCode: string): Observable<AppLanguageDto> {
+    public postLanguages(appName: string, dto: AddAppLanguageDto): Observable<AppLanguageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return this.authService.authPost(url, { language: languageCode })
+        return this.authService.authPost(url, dto)
                 .map(response => response.json())
                 .map(response => {               
                     return new AppLanguageDto(
@@ -63,14 +77,14 @@ export class AppLanguagesService {
                 .catch(response => handleError('Failed to add language. Please reload.', response));
     }
 
-    public makeMasterLanguage(appName: string, languageCode: string): Observable<any> {
+    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
-        return this.authService.authPut(url, { isMasterLanguage: true })
+        return this.authService.authPut(url, dto)
                 .catch(response => handleError('Failed to change language. Please reload.', response));
     } 
 
-    public deleteLanguage(appName: string, languageCode: string): Observable<AppLanguageDto> {
+    public deleteLanguage(appName: string, languageCode: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return this.authService.authDelete(url)

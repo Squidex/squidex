@@ -13,21 +13,28 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig, DateTime } from 'framework';
 import { AuthService } from './auth.service';
 
-import { handleError } from './errors';
+import { handleError } from './common';
 
 export class AppClientDto {
     constructor(
         public readonly id: string,
         public readonly secret: string,
-        public name: string,
+        public readonly name: string,
         public readonly expiresUtc: DateTime
     ) {
     }
 }
 
-export class AppClientCreateDto {
+export class CreateAppClientDto {
     constructor(
         public readonly id: string
+    ) {
+    }
+}
+
+export class UpdateAppClientDto {
+    constructor(
+        public readonly name: string
     ) {
     }
 }
@@ -68,10 +75,10 @@ export class AppClientsService {
                 .catch(response => handleError('Failed to load clients. Please reload.', response));
     }
 
-    public postClient(appName: string, client: AppClientCreateDto): Observable<AppClientDto> {
+    public postClient(appName: string, dto: CreateAppClientDto): Observable<AppClientDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return this.authService.authPost(url, client)
+        return this.authService.authPost(url, dto)
                 .map(response => response.json())
                 .map(response => {
                     return new AppClientDto(
@@ -83,10 +90,10 @@ export class AppClientsService {
                 .catch(response => handleError('Failed to add client. Please reload.', response));
     }
 
-    public renameClient(appName: string, id: string, name: string): Observable<any> {
+    public updateClient(appName: string, id: string, dto: UpdateAppClientDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
-        return this.authService.authPut(url, { name: name })
+        return this.authService.authPut(url, dto)
                 .catch(response => handleError('Failed to revoke client. Please reload.', response));
     }
 
@@ -105,6 +112,7 @@ export class AppClientsService {
         });
 
         const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.id}&client_secret=${client.secret}`;
+
         const url = this.apiUrl.buildUrl('identity-server/connect/token');
 
         return this.http.post(url, body, options)

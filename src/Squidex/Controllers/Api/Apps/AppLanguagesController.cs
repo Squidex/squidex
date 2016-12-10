@@ -82,7 +82,7 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguageDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)
+        public async Task<IActionResult> PostLanguage(string app, [FromBody] AddAppLanguageDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AddLanguage()));
 
@@ -104,7 +104,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/languages/{language}")]
-        public async Task<IActionResult> Update(string app, string language, [FromBody] SetMasterLanguageDto model)
+        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
         {
             if (model.IsMasterLanguage)
             {

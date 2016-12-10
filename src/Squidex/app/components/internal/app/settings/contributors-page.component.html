@@ -1,3 +1,5 @@
+<sqx-title message="{app} | Contributors | Settings" parameter="app" value="{{appName() | async}}"></sqx-title>
+
 <div class="layout">
     <div class="layout-left">
         <sqx-left-menu></sqx-left-menu>
@@ -22,16 +24,16 @@
                     <template ngFor let-contributor [ngForOf]="appContributors">
                         <tr>
                             <td>
-                                <img class="user-picture" [attr.src]="pictureUrl(contributor) | async" />
+                                <img class="user-picture" [attr.src]="userPicture(contributor.contributorId) | async" />
                             </td>
                             <td>
-                                <span class="user-name">{{displayName(contributor) | async}}</span>
+                                <span class="user-name">{{userName(contributor.contributorId) | async}}</span>
                             </td>
                             <td>
-                                <span class="user-email">{{email(contributor) | async}}</span>
+                                <span class="user-email">{{userEmail(contributor.contributorId) | async}}</span>
                             </td>
                             <td>
-                                <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="changePermission(contributor)" [disabled]="currrentUserId === contributor.contributorId">
+                                <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
                                     <option *ngFor="let permission of usersPermissions">{{permission}}</option>
                                 </select>
                             </td>

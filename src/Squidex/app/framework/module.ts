@@ -5,16 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Http from '@angular/http';
-import * as Ng2Forms from '@angular/forms';
 import * as Ng2Common from '@angular/common';
+import * as Ng2 from '@angular/core';
+import * as Ng2Forms from '@angular/forms';
+import * as Ng2Http from '@angular/http';
 import * as Ng2Router from '@angular/router';
 
 import {
     AutocompleteComponent,
     CloakDirective,
     ColorPickerComponent,
+    CopyDirective,
     DayOfWeekPipe,
     DayPipe,
     DragModelDirective,
@@ -31,6 +32,7 @@ import {
     ShortTimePipe,
     SliderComponent,
     SpinnerComponent,
+    TitleComponent,
     UserReportComponent
 } from './declarations';
 
@@ -46,6 +48,7 @@ import {
         AutocompleteComponent,
         CloakDirective,
         ColorPickerComponent,
+        CopyDirective,
         DayOfWeekPipe,
         DayPipe,
         DragModelDirective,
@@ -62,12 +65,14 @@ import {
         ShortTimePipe,
         SliderComponent,
         SpinnerComponent,
+        TitleComponent,
         UserReportComponent,
     ],
     exports: [
         AutocompleteComponent,
         CloakDirective,
         ColorPickerComponent,
+        CopyDirective,
         DayOfWeekPipe,
         DayPipe,
         DragModelDirective,
@@ -84,6 +89,7 @@ import {
         ShortTimePipe,
         SliderComponent,
         SpinnerComponent,
+        TitleComponent,
         UserReportComponent,
         Ng2Http.HttpModule,
         Ng2Forms.FormsModule,

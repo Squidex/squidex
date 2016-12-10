@@ -29,6 +29,9 @@ export class UsersProviderService {
         if (!result) {
             const request = 
                 this.usersService.getUser(id).retry(2)
+                    .catch(err => {
+                        return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));
+                    })
                     .map(u => {
                         if (this.authService.user && u.id === this.authService.user.id) {
                             return new UserDto(u.id, u.email, 'Me', u.pictureUrl);

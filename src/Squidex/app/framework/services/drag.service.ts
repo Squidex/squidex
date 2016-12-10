@@ -7,7 +7,7 @@
 
 import * as Ng2 from '@angular/core';
 
-import { Subject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { Vec2 } from './../utils/vec2';
 

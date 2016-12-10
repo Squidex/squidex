@@ -82,7 +82,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPost]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto[]), 201)]
-        public async Task<IActionResult> PostClient(string app, [FromBody] AttachClientDto request)
+        public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
             var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new AttachClient()));
             var result = context.Result<AppClient>();
@@ -105,7 +105,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
         [ProducesResponseType(typeof(ClientDto[]), 201)]
-        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] RenameClientDto request)
+        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));
 

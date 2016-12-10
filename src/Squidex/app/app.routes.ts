@@ -9,13 +9,13 @@ import * as Ng2 from '@angular/core';
 import * as Ng2Router from '@angular/router';
 
 import {
-    AppsPageComponent,
     AppAreaComponent,
+    AppsPageComponent,
     ClientsPageComponent,
     ContributorsPageComponent,
     DashboardPageComponent,
-    InternalAreaComponent,
     HomePageComponent,
+    InternalAreaComponent,
     LanguagesPageComponent,
     LogoutPageComponent,
     NotFoundPageComponent,

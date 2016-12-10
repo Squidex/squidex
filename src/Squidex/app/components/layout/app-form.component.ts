@@ -10,8 +10,8 @@ import * as Ng2Forms from '@angular/forms';
 
 import {
     AppDto,
-    AppCreateDto,
     AppsStoreService,
+    CreateAppDto,
     fadeAnimation
 } from 'shared';
 
@@ -65,7 +65,7 @@ export class AppFormComponent implements Ng2.OnInit {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const dto = new AppCreateDto(this.createForm.controls['name'].value);
+            const dto = new CreateAppDto(this.createForm.controls['name'].value);
 
             this.appsStore.createApp(dto)
                 .subscribe(app => {

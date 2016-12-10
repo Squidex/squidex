@@ -11,6 +11,7 @@ export * from './angular/autocomplete.component';
 export * from './angular/validators';
 export * from './angular/cloak.directive';
 export * from './angular/color-picker.component';
+export * from './angular/copy.directive';
 export * from './angular/date-time.pipes';
 export * from './angular/drag-model.directive';
 export * from './angular/focus-on-change.directive';
@@ -22,6 +23,7 @@ export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
 export * from './angular/spinner.component';
+export * from './angular/title.component';
 export * from './angular/user-report.component';
 export * from './configurations';
 
@@ -34,6 +36,7 @@ export * from './services/title.service';
 
 export * from './plattform';
 
+export * from './utils/array-helper';
 export * from './utils/color';
 export * from './utils/color-palette';
 export * from './utils/date-helper';

@@ -7,8 +7,8 @@
 
 import * as TypeMoq from 'typemoq';
 
-import { AppMustExistGuard } from './app-must-exist.guard';
 import { AppsStoreService } from 'shared';
+import { AppMustExistGuard } from './app-must-exist.guard';
 import { RouterMockup } from './router-mockup';
 
 describe('AppMustExistGuard', () => {

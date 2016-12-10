@@ -10,15 +10,9 @@ import * as Ng2Forms from '@angular/forms';
 
 import {
     AccessTokenDto,
-    AppsStoreService,
     AppClientDto,
-    AppClientCreateDto,
-    AppClientsService,
     fadeAnimation,
-    ModalView,
-    Notification,
-    NotificationService,
-    TitleService 
+    ModalView
 } from 'shared';
 
 @Ng2.Component({
@@ -29,99 +23,59 @@ import {
         fadeAnimation
     ]
 })
-export class ClientComponent {
-    private oldName: string;
-
+export class ClientComponent implements Ng2.OnChanges {
     public isRenaming = false;
 
     public appClientToken: AccessTokenDto;
 
-    @Ng2.Input('appName')
-    public appName: string;
+    @Ng2.Output()
+    public renamed = new Ng2.EventEmitter<string>();
 
-    @Ng2.Input('client')
+    @Ng2.Input()
     public client: AppClientDto;
-
-    @Ng2.ViewChild('inputId')
-    public inputId: Ng2.ElementRef;
-
-    @Ng2.ViewChild('inputSecret')
-    public inputSecret: Ng2.ElementRef;
 
     public modalDialog = new ModalView();
 
+    public get clientName() {
+        return this.client.name || this.client.id;
+    }
+
+    public get clientId() {
+        return this.client.id + ':' + this.client.secret;
+    }
+
+    public get clientSecret() {
+        return this.client.secret;
+    }
+
+    public renameForm =
+        this.formBuilder.group({
+            name: ['']
+        });
+
     constructor(
-        private readonly appClientsService: AppClientsService,
-        private readonly notifications: NotificationService
+        private readonly formBuilder: Ng2Forms.FormBuilder
     ) {
     }
 
-    public rename() {
-        this.appClientsService.renameClient(this.appName, this.client.id, this.client.name)
-            .subscribe(() => {
-                this.stopRename();
-            }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
-                this.cancelRename();
-            });
+    public ngOnChanges() {
+        this.renameForm.controls['name'].setValue(this.clientName);
     }
 
     public cancelRename() {
-        this.client.name = this.oldName;
-
-        this.isRenaming = false;
-    }
-
-    public stopRename() {
-        this.client.name = this.client.name || this.client.id;
-
         this.isRenaming = false;
     }
 
     public startRename() {
-        this.oldName = this.client.name;
-
         this.isRenaming = true;
     }
 
-    public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.appName, client)
-            .subscribe(token => {
-                this.appClientToken = token;
-                this.modalDialog.show();
-            }, error => {
-                this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
-            });
-    }
-
-    public copyId() {
-        this.copyToClipbord(this.inputId.nativeElement);
-    }
-
-    public copySecret() {
-        this.copyToClipbord(this.inputSecret.nativeElement);
-    }
-
-    private copyToClipbord(element: HTMLInputElement | HTMLTextAreaElement) {
-        const  currentFocus: any = document.activeElement;
-
-        const prevSelectionStart = element.selectionStart;
-        const prevSelectionEnd = element.selectionEnd;
-
-        element.focus();
-        element.setSelectionRange(0, element.value.length);
-        
+    public rename() {
         try {
-            document.execCommand('copy');
-        } catch (e) {
-            console.log('Copy failed');
+            this.renamed.emit(this.renameForm.controls['name'].value);
+        } finally {
+            this.isRenaming = false;
         }
-
-        if (currentFocus && typeof currentFocus.focus === 'function') {
-            currentFocus.focus();
-        }
-        
-        element.setSelectionRange(prevSelectionStart, prevSelectionEnd);
     }
 }
 

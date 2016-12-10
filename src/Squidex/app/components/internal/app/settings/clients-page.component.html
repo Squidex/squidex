@@ -1,3 +1,5 @@
+<sqx-title message="{app} | Clients | Settings" parameter="app" value="{{appName() | async}}"></sqx-title>
+
 <div class="layout">
     <div class="layout-left">
         <sqx-left-menu></sqx-left-menu>
@@ -14,7 +16,7 @@
             </div>
 
             <div *ngFor="let client of appClients">
-                <sqx-client [client]="client" [appName]="appName"></sqx-client>
+                <sqx-client [client]="client" (renamed)="renameClient(client, $event)"></sqx-client>
             </div>
 
             <div class="table-items-footer">

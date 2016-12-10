@@ -7,21 +7,21 @@
 
 import * as Ng2 from '@angular/core';
 
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import {
+    AppComponentBase,
     AppContributorDto,
     AppContributorsService,
     AppsStoreService,
+    ArrayHelper,
     AuthService,
     AutocompleteItem,
     AutocompleteSource,
-    Notification,
     NotificationService,
-    TitleService,
     UserDto,
-    UsersService,
-    UsersProviderService
+    UsersProviderService,
+    UsersService
 } from 'shared';
 
 class UsersDataSource implements AutocompleteSource {
@@ -51,21 +51,22 @@ class UsersDataSource implements AutocompleteSource {
     }
 }
 
+function changePermission(contributor: AppContributorDto, permission: string): AppContributorDto {
+    return new AppContributorDto(contributor.contributorId, permission);
+}
+
 @Ng2.Component({
     selector: 'sqx-contributor-page',
     styles,
     template
 })
-export class ContributorsPageComponent implements Ng2.OnInit {
-    private appSubscription: any | null = null;
-    private appName: string;
-
+export class ContributorsPageComponent extends AppComponentBase implements Ng2.OnInit {
     public appContributors: AppContributorDto[] = [];
+
+    public currentUserId: string;
 
     public selectedUserName: string | null = null;
     public selectedUser: UserDto | null = null;
-
-    public currrentUserId: string;
 
     public usersDataSource: UsersDataSource;
     public usersPermissions = [
@@ -74,42 +75,29 @@ export class ContributorsPageComponent implements Ng2.OnInit {
         'Editor'
     ];
 
-    constructor(
-        private readonly titles: TitleService,
-        private readonly authService: AuthService,
-        private readonly appsStore: AppsStoreService,
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appContributorsService: AppContributorsService,
-        private readonly usersProvider: UsersProviderService,
         private readonly usersService: UsersService,
-        private readonly notifications: NotificationService
+        private readonly authService: AuthService
     ) {
+        super(apps, notifications, users);
+
         this.usersDataSource = new UsersDataSource(usersService, this);
     }
 
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.currrentUserId = this.authService.user.id;
+        this.currentUserId = this.authService.user.id;
 
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                if (app) {
-                    this.appName = app.name;
-
-                    this.titles.setTitle('{appName} | Settings | Contributors', { appName: app.name });
-                    this.load();
-                }
-            });
+        this.load();
     }
 
     public load() {
-        this.appContributorsService.getContributors(this.appName).retry(2)
-            .subscribe(contributors => {
-                this.appContributors = contributors;
+        this.appName()
+            .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
+            .subscribe(dtos => {
+                this.appContributors = dtos;
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
             });
     }
 
@@ -122,47 +110,40 @@ export class ContributorsPageComponent implements Ng2.OnInit {
 
         this.selectedUser = null;
         this.selectedUserName = null;
-
-        this.appContributorsService.postContributor(this.appName, contributor)
+        
+        this.appName()
+            .switchMap(app => this.appContributorsService.postContributor(app, contributor))
             .subscribe(() => {
-                this.appContributors.push(contributor);
+                this.appContributors = ArrayHelper.push(this.appContributors, contributor);
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
+            });
+    }
+
+    public changePermission(contributor: AppContributorDto, permission: string) {
+        const newContributor = changePermission(contributor, permission);
+
+        this.appName()
+            .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
+            .subscribe(() => {
+                this.appContributors = ArrayHelper.replace(this.appContributors, contributor, newContributor);
+            }, error => {
+                this.notifyError(error);
             });
     }
 
     public removeContributor(contributor: AppContributorDto) {
-        this.appContributorsService.deleteContributor(this.appName, contributor.contributorId)
+        this.appName()
+            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId))
             .subscribe(() => {
-                this.appContributors.splice(this.appContributors.indexOf(contributor), 1);
+                this.appContributors = ArrayHelper.push(this.appContributors, contributor);
             }, error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
+                this.notifyError(error);
             });
-    }
-
-    public changePermission(contributor: AppContributorDto) {
-        this.appContributorsService.postContributor(this.appName, contributor)
-            .catch(error => {
-                this.notifications.notify(Notification.error(error.displayMessage));
-
-                return Observable.of(true);
-            }).subscribe();
     }
 
     public selectUser(selection: UserDto) {
         this.selectedUser = selection;
-    }
-
-    public email(contributor: AppContributorDto): Observable<string> {
-        return this.usersProvider.getUser(contributor.contributorId).map(u => u.email);
-    }
-
-    public displayName(contributor: AppContributorDto): Observable<string> {
-        return this.usersProvider.getUser(contributor.contributorId).map(u => u.displayName);
-    }
-
-    public pictureUrl(contributor: AppContributorDto): Observable<string> {
-        return this.usersProvider.getUser(contributor.contributorId).map(u => u.pictureUrl);
     }
 }
 

@@ -30,6 +30,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
         private readonly IStreamPositionStorage positions;
         private readonly List<EventStoreCatchUpSubscription> catchSubscriptions = new List<EventStoreCatchUpSubscription>();
         private EventStoreSubscription liveSubscription;
+        private string streamName;
         private bool isSubscribed;
 
         public EventStoreBus(
@@ -71,22 +72,24 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             }
         }
 
-        public void Subscribe(string streamName = "$all")
+        public void Subscribe(string streamToConnect = "$all")
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamToConnect, nameof(streamToConnect));
 
             if (isSubscribed)
             {
                 return;
             }
 
-            SubscribeLive(streamName);
-            SubscribeCatch(streamName);
+            this.streamName = streamToConnect;
+
+            SubscribeLive();
+            SubscribeCatch();
 
             isSubscribed = true;
         }
 
-        private void SubscribeLive(string streamName)
+        private void SubscribeLive()
         {
             Task.Run(async () =>
             {
@@ -94,20 +97,37 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                     await connection.SubscribeToStreamAsync(streamName, true,
                         (subscription, resolvedEvent) =>
                         {
-                            OnLiveEvent(streamName, resolvedEvent);
-                        }, userCredentials: credentials);
+                            OnLiveEvent(resolvedEvent);
+                        }, (subscription, dropped, ex) =>
+                        {
+                            OnConnectionDropped();
+                        }, credentials);
             }).Wait();
         }
 
-        private void SubscribeCatch(string streamName)
+        private void OnConnectionDropped()
         {
-            foreach (var catchConsumer in catchConsumers)
+            try
             {
-                SubscribeCatchFor(catchConsumer, streamName);
+                liveSubscription.Close();
+
+                logger.LogError("Subscription closed");
+            }
+            finally
+            {
+                SubscribeLive();
             }
         }
 
-        private void SubscribeCatchFor(IEventConsumer consumer, string streamName)
+        private void SubscribeCatch()
+        {
+            foreach (var catchConsumer in catchConsumers)
+            {
+                SubscribeCatchFor(catchConsumer);
+            }
+        }
+
+        private void SubscribeCatchFor(IEventConsumer consumer)
         {
             var subscriptionName = consumer.GetType().GetTypeInfo().Name;
 
@@ -134,7 +154,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             }
         }
 
-        private void OnLiveEvent(string streamName, ResolvedEvent resolvedEvent)
+        private void OnLiveEvent(ResolvedEvent resolvedEvent)
         {
             Envelope<IEvent> @event = null;
 

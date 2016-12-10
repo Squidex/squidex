@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AttachClientDto.cs
+//  CreateAppClientDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public sealed class AttachClientDto
+    public sealed class CreateAppClientDto
     {
         /// <summary>
         /// The id of the client.

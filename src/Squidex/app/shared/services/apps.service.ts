@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { ApiUrlConfig, DateTime } from 'framework';
 import { AuthService } from './auth.service';
 
-import { handleError } from './errors';
+import { EntityCreatedDto, handleError } from './common';
 
 export class AppDto {
     constructor(
@@ -24,7 +24,7 @@ export class AppDto {
     }
 }
 
-export class AppCreateDto {
+export class CreateAppDto {
     constructor(
         public readonly name: string
     ) {
@@ -60,20 +60,13 @@ export class AppsService {
                 .catch(response => handleError('Failed to load apps. Please reload.', response));
     }
 
-    public postApp(app: AppCreateDto, now?: DateTime): Observable<AppDto> {
-        now = now || DateTime.now();
-
+    public postApp(dto: CreateAppDto): Observable<EntityCreatedDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.authService.authPost(url, app)
+        return this.authService.authPost(url, dto)
                 .map(response => response.json())
                 .map(response => {
-                    return new AppDto(
-                        response.id, 
-                        app.name, 
-                        now, 
-                        now, 
-                        'Owner');
+                    return new EntityCreatedDto(response.id);
                 })
                 .catch(response => handleError('Failed to create app. Please reload.', response));
     }

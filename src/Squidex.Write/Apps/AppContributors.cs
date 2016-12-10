@@ -24,7 +24,7 @@ namespace Squidex.Write.Apps
         {
             Func<string> message = () => "Cannot assign contributor";
 
-            ThrowIfFound(contributorId, message);
+            ThrowIfFound(contributorId, permission, message);
             ThrowIfNoOwner(c => c[contributorId] = permission, message);
 
             contributors[contributorId] = permission;
@@ -48,11 +48,11 @@ namespace Squidex.Write.Apps
             }
         }
 
-        private void ThrowIfFound(string contributorId, Func<string> message)
+        private void ThrowIfFound(string contributorId, PermissionLevel permission, Func<string> message)
         {
             PermissionLevel currentPermission;
 
-            if (contributors.TryGetValue(contributorId, out currentPermission))
+            if (contributors.TryGetValue(contributorId, out currentPermission) && currentPermission == permission)
             {
                 var error = new ValidationError("Contributor is already part of the app with same permissions", "ContributorId");
 

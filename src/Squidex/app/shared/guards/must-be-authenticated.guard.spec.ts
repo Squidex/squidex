@@ -7,9 +7,9 @@
 
 import * as TypeMoq from 'typemoq';
 
+import { AuthService } from 'shared';
 import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 import { RouterMockup } from './router-mockup';
-import { AuthService } from 'shared';
 
 describe('MustBeAuthenticatedGuard', () => {
     let authService: TypeMoq.Mock<AuthService>;

@@ -1,18 +1,22 @@
 ﻿// ==========================================================================
-//  SetMasterLanguageDto.cs
+//  AddAppLanguageDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure;
+
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class SetMasterLanguageDto
+    public class AddAppLanguageDto
     {
         /// <summary>
-        /// Set the value to true to make the language to the master language.
+        /// The language to add.
         /// </summary>
-        public bool IsMasterLanguage { get; set; }
+        [Required]
+        public Language Language { get; set; }
     }
 }
