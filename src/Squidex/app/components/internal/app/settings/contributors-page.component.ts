@@ -110,7 +110,7 @@ export class ContributorsPageComponent extends AppComponentBase implements Ng2.O
 
         this.selectedUser = null;
         this.selectedUserName = null;
-        
+
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, contributor))
             .subscribe(() => {

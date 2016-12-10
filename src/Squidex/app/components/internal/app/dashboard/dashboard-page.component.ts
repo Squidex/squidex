@@ -7,33 +7,21 @@
 
 import * as Ng2 from '@angular/core';
 
-import { AppsStoreService, TitleService } from 'shared';
+import {
+    AppComponentBase,
+    AppsStoreService,
+    NotificationService,
+    UsersProviderService
+ } from 'shared';
 
 @Ng2.Component({
     selector: 'sqx-dashboard-page',
     styles,
     template
 })
-export class DashboardPageComponent implements Ng2.OnInit {
-    private appSubscription: any | null = null;
-
-    constructor(
-        private readonly titles: TitleService,
-        private readonly appsStore: AppsStoreService
-    ) {
-    }
-
-    public ngOnInit() {
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                if (app) {
-                    this.titles.setTitle('{appName} | Dashboard', { appName: app.name });
-                }
-            });
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+export class DashboardPageComponent extends AppComponentBase {
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {
+        super(apps, notifications, users);
     }
 }
 

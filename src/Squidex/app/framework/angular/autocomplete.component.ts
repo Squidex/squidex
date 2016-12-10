@@ -44,7 +44,7 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     template,
     providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
 })
-export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor  {
+export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor, Ng2.OnDestroy {
     private subscription: Subscription | null = null;
     private lastQuery: string | null;
     private changeCallback: (value: any) => void = NOOP;
@@ -76,7 +76,7 @@ export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor  {
             } else {
                 item = this.items.find(i => i.model === value);
             }
-                
+
             if (item) {
                 this.queryInput.setValue(value.title || '');
             }
@@ -93,6 +93,10 @@ export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor  {
         this.touchedCallback = fn;
     }
 
+    public ngOnDestroy() {
+        this.cancelRequest();
+    }
+
     public setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.reset();
@@ -102,14 +106,18 @@ export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor  {
         }
     }
 
-    private loadItems(query: string) {
-        const source = this.source;
-
+    private cancelRequest() {
         if (this.subscription != null) {
             this.subscription.unsubscribe();
             this.subscription = null;
         }
-        
+    }
+
+    private loadItems(query: string) {
+        const source = this.source;
+
+        this.cancelRequest();
+
         if (!source) {
             return;
         }

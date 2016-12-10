@@ -61,12 +61,12 @@ export class AppClientsService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
                         return new AppClientDto(
-                            item.id, 
+                            item.id,
                             item.secret,
                             item.name,
                             DateTime.parseISO_UTC(item.expiresUtc));
@@ -82,9 +82,9 @@ export class AppClientsService {
                 .map(response => response.json())
                 .map(response => {
                     return new AppClientDto(
-                        response.id, 
+                        response.id,
                         response.secret,
-                        response.name, 
+                        response.name,
                         DateTime.parseISO_UTC(response.expiresUtc));
                 })
                 .catch(response => handleError('Failed to add client. Please reload.', response));

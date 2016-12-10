@@ -31,7 +31,7 @@ function rename(client: AppClientDto, name: string) {
 })
 export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit {
     public appClients: AppClientDto[];
-    
+
     public createForm =
         this.formBuilder.group({
             name: ['',

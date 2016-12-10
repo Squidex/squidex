@@ -27,7 +27,7 @@ export class UsersProviderService {
         let result = this.caches[id];
 
         if (!result) {
-            const request = 
+            const request =
                 this.usersService.getUser(id).retry(2)
                     .catch(err => {
                         return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));

@@ -35,12 +35,12 @@ export class AppContributorsService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => {                    
+                .map(response => {
                     const items: any[] = response;
 
                     return items.map(item => {
                         return new AppContributorDto(
-                            item.contributorId, 
+                            item.contributorId,
                             item.permission);
                     });
                 })
@@ -56,7 +56,7 @@ export class AppContributorsService {
 
     public deleteContributor(appName: string, contributorId: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
-        
+
         return this.authService.authDelete(url)
                 .catch(response => handleError('Failed to delete contributors. Please reload.', response));
     }
