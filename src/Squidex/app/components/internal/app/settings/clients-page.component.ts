@@ -13,8 +13,8 @@ import {
     AppClientsService,
     AppComponentBase,
     AppsStoreService,
-    ArrayHelper,
     CreateAppClientDto,
+    ImmutableList,
     NotificationService,
     UpdateAppClientDto,
     UsersProviderService
@@ -30,7 +30,7 @@ function rename(client: AppClientDto, name: string) {
     template
 })
 export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit {
-    public appClients: AppClientDto[];
+    public appClients: ImmutableList<AppClientDto>;
 
     public createForm =
         this.formBuilder.group({
@@ -57,7 +57,7 @@ export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit
         this.appName()
             .switchMap(app => this.appClientsService.getClients(app).retry(2))
             .subscribe(dtos => {
-                this.appClients = dtos;
+                this.appClients = new ImmutableList<AppClientDto>(dtos);
             }, error => {
                 this.notifyError(error);
             });
@@ -67,7 +67,7 @@ export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit
         this.appName()
             .switchMap(app => this.appClientsService.deleteClient(app, client.id))
             .subscribe(() => {
-                this.appClients = ArrayHelper.remove(this.appClients, client);
+                this.appClients = this.appClients.remove(client);
             }, error => {
                 this.notifyError(error);
             });
@@ -77,7 +77,7 @@ export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit
         this.appName()
             .switchMap(app => this.appClientsService.updateClient(app, client.id, new UpdateAppClientDto(name)))
             .subscribe(() => {
-                this.appClients = ArrayHelper.replace(this.appClients, client, rename(client, name));
+                this.appClients = this.appClients.update(client, c => rename(c, name));
             }, error => {
                 this.notifyError(error);
             });
@@ -94,7 +94,7 @@ export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit
             this.appName()
                 .switchMap(app => this.appClientsService.postClient(app, dto))
                 .subscribe(dto => {
-                    this.appClients = ArrayHelper.push(this.appClients, dto);
+                    this.appClients = this.appClients.add(dto);
                     this.reset();
                 }, error => {
                     this.notifyError(error);

@@ -7,11 +7,15 @@
 
 import * as Immutable from 'immutable';
 
-export class ImmutableSet<T> {
+export class ImmutableSet<T> implements Iterable<T> {
     private readonly items: Immutable.Set<T>;
 
     public get size(): number {
         return this.items.size;
+    }
+
+    public [Symbol.iterator](): Iterator<T> {
+        return this.items.values();
     }
 
     constructor(items?: T[] | Immutable.Set<T>) {

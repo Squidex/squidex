@@ -7,8 +7,12 @@
 
 import * as Immutable from 'immutable';
 
-export class ImmutableList<T> {
+export class ImmutableList<T> implements Iterable<T> {
     private readonly items: Immutable.List<T>;
+
+    public [Symbol.iterator](): Iterator<T> {
+        return this.items.values();
+    }
 
     public get size(): number {
         return this.items.size;
@@ -17,7 +21,7 @@ export class ImmutableList<T> {
     constructor(items?: T[] | Immutable.List<T>) {
         if (Array.isArray(items)) {
             this.items = Immutable.List<T>(items);
-        } else {
+        } else if (items) {
             this.items = items || Immutable.List<T>();
         }
 
@@ -32,8 +36,8 @@ export class ImmutableList<T> {
         return this.items.toArray();
     }
 
-    public map<R>(projection: (item: T) => R): R[] {
-        return this.items.map(v => projection(v!)).toArray();
+    public map<R>(projection: (item: T) => R): ImmutableList<R> {
+        return new ImmutableList<R>(this.items.map(v => projection(v!)).toArray());
     }
 
     public filter(projection: (item: T) => boolean): T[] {

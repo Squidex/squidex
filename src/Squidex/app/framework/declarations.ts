@@ -44,7 +44,6 @@ export * from './utils/date-time';
 export * from './utils/duration';
 export * from './utils/immutable-id-map';
 export * from './utils/immutable-list';
-export * from './utils/immutable-object';
 export * from './utils/immutable-set';
 export * from './utils/math-helper';
 export * from './utils/modal-view';

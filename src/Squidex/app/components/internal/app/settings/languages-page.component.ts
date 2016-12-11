@@ -13,9 +13,9 @@ import {
     AppLanguageDto,
     AppLanguagesService,
     AppsStoreService,
-    ArrayHelper,
     LanguageDto,
     LanguageService,
+    ImmutableList,
     NotificationService,
     UpdateAppLanguageDto,
     UsersProviderService
@@ -28,7 +28,7 @@ import {
 })
 export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnInit {
     public allLanguages: LanguageDto[] = [];
-    public appLanguages: AppLanguageDto[] = [];
+    public appLanguages = new ImmutableList<AppLanguageDto>();
 
     public selectedLanguage: LanguageDto | null = null;
 
@@ -58,7 +58,7 @@ export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnIn
         this.appName()
             .switchMap(app => this.appLanguagesService.getLanguages(app).retry(2))
             .subscribe(dtos => {
-                this.appLanguages = dtos;
+                this.appLanguages = new ImmutableList<AppLanguageDto>();
             }, error => {
                 this.notifyError(error);
             });
@@ -68,7 +68,7 @@ export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnIn
         this.appName()
             .switchMap(app => this.appLanguagesService.postLanguages(app, new AddAppLanguageDto(this.selectedLanguage.iso2Code)))
             .subscribe(dto => {
-                this.appLanguages = ArrayHelper.push(this.appLanguages, dto);
+                this.appLanguages = this.appLanguages.add(dto);
             }, error => {
                 this.notifyError(error);
             });
@@ -80,7 +80,7 @@ export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnIn
         this.appName()
             .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code))
             .subscribe(dto => {
-                this.appLanguages = ArrayHelper.push(this.appLanguages, language);
+                this.appLanguages = this.appLanguages.remove(dto);
             }, error => {
                 this.notifyError(error);
             });
