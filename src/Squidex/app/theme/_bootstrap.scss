@@ -270,6 +270,7 @@
                 & {
                     @include border-radius(0);
                     background: $color-dark-selected;
+                    pointer-events: none;
                 }
 
                 &:hover {
