@@ -10,17 +10,11 @@ import * as Ng2Router from '@angular/router';
 
 import {
     AppAreaComponent,
-    AppsPageComponent,
-    ClientsPageComponent,
-    ContributorsPageComponent,
-    DashboardPageComponent,
     HomePageComponent,
     InternalAreaComponent,
-    LanguagesPageComponent,
     LogoutPageComponent,
-    NotFoundPageComponent,
-    SchemasPageComponent
-} from './components';
+    NotFoundPageComponent
+} from './shell';
 
 import {
     AppMustExistGuard,
@@ -28,50 +22,46 @@ import {
     MustBeNotAuthenticatedGuard
 } from './shared';
 
+import { SqxFeatureAppsModule } from './features/apps';
+import { SqxFeatureContentModule } from './features/content';
+import { SqxFeatureDashboardModule } from './features/dashboard';
+import { SqxFeatureMediaModule } from './features/media';
+import { SqxFeatureSchemasModule } from './features/schemas';
+import { SqxFeatureSettingsModule } from './features/settings';
+
 export const routes: Ng2Router.Routes = [
     {
         path: '',
         component: HomePageComponent,
         canActivate: [MustBeNotAuthenticatedGuard]
-    },
-    {
+    }, {
         path: 'app',
         component: InternalAreaComponent,
         canActivate: [MustBeAuthenticatedGuard],
         children: [
             {
                 path: '',
-                component: AppsPageComponent
-            },
-            {
+                loadChildren: () => SqxFeatureAppsModule
+            }, {
                 path: ':appName',
                 component: AppAreaComponent,
                 canActivate: [AppMustExistGuard],
                 children: [
                     {
                         path: '',
-                        redirectTo: 'dashboard',
-                        pathMatch: 'full'
-                    },
-                    {
-                        path: 'dashboard',
-                        component: DashboardPageComponent
-                    },
-                    {
+                        loadChildren: () => SqxFeatureDashboardModule
+                    }, {
+                        path: 'content',
+                        loadChildren: () => SqxFeatureContentModule
+                    }, {
+                        path: 'media',
+                        loadChildren: () => SqxFeatureMediaModule
+                    }, {
                         path: 'schemas',
-                        component: SchemasPageComponent
-                    },
-                    {
-                        path: 'contributors',
-                        component: ContributorsPageComponent
-                    },
-                    {
-                        path: 'clients',
-                        component: ClientsPageComponent
-                    },
-                    {
-                        path: 'languages',
-                        component: LanguagesPageComponent
+                        loadChildren: () => SqxFeatureSchemasModule
+                    }, {
+                        path: 'settings',
+                        loadChildren: () => SqxFeatureSettingsModule
                     }
                 ]
             }

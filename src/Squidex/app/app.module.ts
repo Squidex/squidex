@@ -27,19 +27,16 @@ import {
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
     NotificationService,
+    PanelService,
     SqxFrameworkModule,
+    SqxSharedModule,
     TitlesConfig,
     TitleService,
     UsersProviderService,
     UsersService
 } from './shared';
 
-import {
-    SqxAppModule,
-    SqxAuthModule,
-    SqxLayoutModule,
-    SqxPublicModule
-} from './components';
+import { SqxShellModule } from './shell';
 
 import { routing } from './app.routes';
 
@@ -62,11 +59,9 @@ export function configCurrency() {
 @Ng2.NgModule({
     imports: [
         Ng2Browser.BrowserModule,
-        SqxAppModule,
-        SqxAuthModule,
-        SqxLayoutModule,
         SqxFrameworkModule,
-        SqxPublicModule,
+        SqxSharedModule,
+        SqxShellModule,
         routing
     ],
     declarations: [
@@ -86,6 +81,7 @@ export function configCurrency() {
         MustBeAuthenticatedGuard,
         MustBeNotAuthenticatedGuard,
         NotificationService,
+        PanelService,
         TitleService,
         UsersProviderService,
         UsersService,

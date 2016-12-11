@@ -1,0 +1,105 @@
+@import '_mixins';
+@import '_vars';
+
+$panel-padding: 15px;
+$panel-header: 60px;
+
+.panel-container {
+    @include absolute($size-navbar-height, 0, 0, $size-sidebar-width);
+    overflow-x: auto;
+}
+
+.panel {
+    & {
+        @include flex-box;
+        @include absolute(0, auto, 0, auto);
+        height: 100%;
+        flex-direction: column;
+    }
+
+    &-content,
+    &-header {
+        padding: 15px;
+    }
+
+    &-content {
+        overflow-y: auto;
+    }
+
+    &-title {
+        font-size: 1.5rem;
+        font-weight: 400;
+    }
+
+    &-header {
+        height: $panel-header;
+        position: relative;
+        padding-right: 60px;
+    }
+
+    &-close {
+        & {
+            @include absolute($panel-padding, $panel-padding, auto, auto);
+            font-size: 1.5rem;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+
+    &-dark {
+        & {
+            @include box-shadow(2px, 0, 1px, .3);
+            background: $color-dark-background;
+            border-right: 1px solid darken($color-dark-foreground, 15%);
+            color: $color-dark-foreground;
+        }
+
+        .panel-close {
+            & {
+                color: $color-dark-foreground;
+            }
+
+            &:hover {
+                color: lighten($color-dark-foreground, 15%);
+            }
+        }
+    }
+
+    &-light {
+        & {
+            border-right: 1px solid $color-border;
+        }
+
+        .panel-header {
+            background: $color-card-footer;
+            border-bottom: 1px solid $color-border;
+        }
+
+        .panel-close {
+            & {
+                color: $color-dark-foreground;
+            }
+
+            &:hover {
+                color: darken($color-dark-foreground, 15%);
+            }
+        }
+    }
+
+    & .nav-stacked {
+        margin-left: -$panel-padding;
+        margin-right: -$panel-padding;
+    }
+}
+
+.panel-menu {
+    & {
+        margin-left: -$panel-padding;
+        margin-right: -$panel-padding;
+    }
+}

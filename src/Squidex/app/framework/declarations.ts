@@ -19,6 +19,8 @@ export * from './angular/focus-on-init.directive';
 export * from './angular/image-drop.directive';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
+export * from './angular/panel.directive';
+export * from './angular/panel-container.directive';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
@@ -31,6 +33,7 @@ export * from './services/clipboard.service';
 export * from './services/drag.service';
 export * from './services/local-store.service';
 export * from './services/notification.service';
+export * from './services/panel.service';
 export * from './services/shortcut.service';
 export * from './services/title.service';
 

@@ -1,0 +1,45 @@
+<sqx-title message="{app} | Clients | Settings" parameter="app" value="{{appName() | async}}"></sqx-title>
+
+<div class="panel panel-light">
+    <div class="panel-header">
+        <h3 class="panel-title">Clients</h3>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-content">
+        <div class="table-items-row" *ngIf="appClients && appClients.length === 0">
+            No client created yet.
+        </div>
+
+        <div *ngFor="let client of appClients">
+            <sqx-client [client]="client" [appName]="appName() | async" (renamed)="renameClient(client, $event)"></sqx-client>
+        </div>
+
+        <div class="table-items-footer">
+            <form class="form-inline" [formGroup]="createForm" (submit)="attachClient()">
+                <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty">
+                    <div class="errors">
+                        <span *ngIf="createForm.get('name').hasError('required')">
+                            Name is required.
+                        </span>
+                        <span *ngIf="createForm.get('name').hasError('maxlength')">
+                            Name can not have more than 40 characters.
+                        </span>
+                        <span *ngIf="createForm.get('name').hasError('pattern')">
+                            Name can contain lower case letters (a-z), numbers and dashes (not at the end).
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" id="app-name" formControlName="name" maxlength="40" placeholder="Enter client name" />
+                </div>
+
+                <button type="submit" class="btn btn-success" [disabled]="createForm.invalid">Add Client</button>
+            </form>
+        </div>
+    </div>
+</div>

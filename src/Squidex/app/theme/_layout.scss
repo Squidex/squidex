@@ -1,10 +1,10 @@
 @import '_mixins';
 @import '_vars';
 
-$sidebar-color: #fff;
-
 body {
     background: $color-background;
+    padding-top: $size-navbar-height;
+    padding-left: $size-sidebar-width;
 }
 
 h1 {
@@ -17,61 +17,4 @@ h1 {
 
 .card {
     @include box-shadow(0, 2px, 2px, .1);
-}
-
-.layout {
-    & {
-        @include absolute(54px, 0, 0, 0);
-        @include flex-box;
-        @include flex-flow(row);
-    }
-
-    &-title-icon {
-        margin-right: .6rem;
-        font-size: 1.7rem;
-        font-weight: normal;
-    }
-
-    &-left,
-    &-right,
-    &-middle-header,
-    &-middle-content {
-        padding: $padding-layout-v $padding-layout-h;
-    }
-
-    &-left,
-    &-right {
-        background: $sidebar-color;
-        position: relative;
-        min-width: 220px;
-        max-width: 220px;
-    }
-
-    &-right {
-        border-left: 1px solid $color-border;
-    }
-
-    &-left {
-        border-right: 1px solid $color-border;
-    }
-
-    &-middle {
-        & {
-            @include flex-grow(1);
-            @include flex-box;
-            @include flex-flow(column);
-        }
-
-        &-header {
-            @include box-shadow(0, 2px, 2px, .1);
-            background: $sidebar-color;
-            border-bottom: 1px solid $color-border;
-        }
-
-        &-content {
-            @include flex-grow(1);
-            padding: $padding-layout-v;
-            overflow-y: scroll;
-        }
-    }
 }

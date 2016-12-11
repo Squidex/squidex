@@ -1,0 +1,27 @@
+<nav class="navbar navbar-fixed-top navbar-dark bg-primary bg-faded">
+    <span class="navbar-brand">
+        <i class="icon-logo"></i>
+    </span>
+
+    <div class="float-xs-left apps-menu">
+        <sqx-apps-menu></sqx-apps-menu>
+    </div>
+
+    <div class="float-xs-left search-form">
+        <sqx-search-form></sqx-search-form>
+    </div>
+
+    <div class="float-xs-right profile-menu">
+        <sqx-profile-menu></sqx-profile-menu>
+    </div>
+</nav>
+
+<div class="main">
+    <router-outlet></router-outlet>
+</div>
+
+<div class="notification-container">
+    <div class="notification-item notification-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)">
+        {{notification.message}}
+    </div>
+</div>

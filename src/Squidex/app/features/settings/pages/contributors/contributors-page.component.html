@@ -1,0 +1,65 @@
+<sqx-title message="{app} | Contributors | Settings" parameter="app" value="{{appName() | async}}"></sqx-title>
+
+<div class="panel panel-light">
+    <div class="panel-header">
+        <h3 class="panel-title">Contributors</h3>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-content">
+        <table class="table table-items table-fixed">
+            <colgroup>
+                <col style="width: 50px" />
+                <col style="width: 50%" />
+                <col style="width: 50%" />
+                <col style="width: 150px" />
+                <col style="width: 80px" />
+            </colgroup>
+
+            <tbody>
+                <template ngFor let-contributor [ngForOf]="appContributors">
+                    <tr>
+                        <td>
+                            <img class="user-picture" [attr.src]="userPicture(contributor.contributorId) | async" />
+                        </td>
+                        <td>
+                            <span class="user-name">{{userName(contributor.contributorId) | async}}</span>
+                        </td>
+                        <td>
+                            <span class="user-email">{{userEmail(contributor.contributorId) | async}}</span>
+                        </td>
+                        <td>
+                            <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
+                                <option *ngFor="let permission of usersPermissions">{{permission}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="removeContributor(contributor)">
+                                <i class="icon-bin"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="spacer"></tr>
+                </template>
+            </tbody>
+        </table>
+        
+        <div class="table-items-footer">
+            <form class="form-inline" (submit)="assignContributor()" >
+                <div class="form-group">
+                    <sqx-autocomplete [source]="usersDataSource"
+                        (ngModelChange)="selectUser($event.model)"
+                        [ngModel]="selectedUser"
+                        [ngModelOptions]="{standalone: true}"
+                        [inputName]="contributor">
+                    </sqx-autocomplete>
+                </div>
+
+                <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
+            </form>
+        </div>
+    </div>
+</div>

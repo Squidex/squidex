@@ -1,0 +1,43 @@
+@import '_vars';
+@import '_mixins';
+
+.navbar {
+    @include box-shadow(0, 4px, 4px, .2px);
+}
+
+.navbar-brand {
+    text-align: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -.2rem;
+    margin-bottom: -.2rem;
+    margin-right: 40px;
+    font-size: 1.8rem;
+    width: 70px;
+}
+
+.search-form {
+    margin-left: 15px;
+}
+
+.notification {
+    &-container {
+        @include fixed(auto, 10px, 10px, auto);
+        width: 260px;
+    }
+
+    &-item {
+        @include border-radius;
+        @include box-shadow;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: .8rem;
+        font-weight: normal;
+        color: $color-accent-dark;
+        cursor: pointer;
+    }
+
+    &-error {
+        background: $color-theme-error;
+    }
+}

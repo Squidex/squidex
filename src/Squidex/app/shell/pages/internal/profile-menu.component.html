@@ -1,0 +1,15 @@
+<ul class="nav navbar-nav">
+    <li class="nav-item dropdown">
+        <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
+            <span class="user">
+                <img class="user-picture" [attr.src]="profilePictureUrl" />
+
+                <span class="user-name">{{profileDisplayName}}</span>
+            </span>
+        </span>
+
+        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true">
+            <a class="dropdown-item" (click)="logout()">Logout</a>
+        </div>
+    </li>
+</ul>

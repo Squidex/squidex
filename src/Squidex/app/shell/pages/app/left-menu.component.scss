@@ -1,0 +1,72 @@
+@import '_vars';
+@import '_mixins';
+
+.sidebar {
+    @include fixed($size-navbar-height, auto, 0, 0);
+    min-width: $size-sidebar-width;
+    max-width: $size-sidebar-width;
+    z-index: 100;
+}
+
+
+@mixin build-item($color) {
+    .nav-link {
+        &.active {
+            & {
+                background: $color-dark-selected;
+            }
+
+            i {
+                color: $color;
+            }
+        }
+    }
+
+    &:hover {
+        i {
+            color: $color;
+        }
+    }
+}
+
+.nav {
+    &-link {
+        padding: 20px;
+    }
+
+    &-icon {
+        font-size: 30px;
+    }
+
+    &-text {
+        display: block;
+    }
+
+    &-item {
+        & {
+            color: $color-dark-foreground;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        &--media {
+            @include build-item($color-section-media);
+        }
+
+        &--content {
+            @include build-item($color-section-content);
+        }
+
+        &--dashboard {
+            @include build-item($color-section-dashboard);
+        }
+
+        &--schemas {
+            @include build-item($color-section-schemas);
+        }
+
+        &--settings {
+            @include build-item($color-section-settings);
+        }
+    }
+}

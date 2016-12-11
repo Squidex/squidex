@@ -30,7 +30,7 @@
 
     &-items {
         & {
-            margin-bottom: .25rem;
+            margin-bottom: -4px;
         }
 
         th,
@@ -83,15 +83,16 @@
 
         &-row {
             background: $color-table;
-            margin-bottom: .25rem;
+            margin-bottom: 4px;
         }
 
         &-footer {
             background: $color-table-footer;
+            margin-top: 12px;
         }
 
         .spacer {
-            height: .25rem;
+            height: 6px;
         }
     }
 }
@@ -224,5 +225,41 @@
 
     &.btn-primary {
         @include link-button($color-theme-blue);
+    }
+}
+
+.nav-dark {
+    & {
+        background: $color-dark-background;
+    }
+
+    .nav-item + .nav-item {
+        margin: 0;
+    }
+
+    &.nav-pills {
+        .nav-link {
+            &,
+            &.active {
+                color: $color-dark-foreground;
+            }
+
+            &:hover {
+                color: lighten($color-dark-foreground, 15%);
+                border: 0;
+                background: $color-dark-background;
+            }
+
+            &.active {
+                & {
+                    @include border-radius(0);
+                    background: $color-dark-selected;
+                }
+
+                &:hover {
+                    background: $color-dark-selected;
+                }
+            }
+        }
     }
 }
