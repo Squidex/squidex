@@ -59,7 +59,7 @@ describe('AppClientsService', () => {
         expect(clients).toEqual(
             [
                 new AppClientDto('client1', 'secret1', 'Client 1', DateTime.parseISO_UTC('2016-12-12T10:10')),
-                new AppClientDto('client2', 'secret2', 'Client 2', DateTime.parseISO_UTC('2016-11-11T10:10')),
+                new AppClientDto('client2', 'secret2', 'Client 2', DateTime.parseISO_UTC('2016-11-11T10:10'))
             ]);
 
         authService.verifyAll();

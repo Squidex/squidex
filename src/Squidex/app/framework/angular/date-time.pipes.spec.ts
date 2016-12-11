@@ -13,7 +13,7 @@ import {
     DurationPipe,
     MonthPipe,
     ShortDatePipe,
-    ShortTimePipe,
+    ShortTimePipe
 } from './date-time.pipes';
 
 const dateTime = DateTime.parse('2013-10-03T12:13:14.125', DateTime.iso8601());

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
+/* tslint:disable ordered-imports */
 import { RouterModule, provideRoutes } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 

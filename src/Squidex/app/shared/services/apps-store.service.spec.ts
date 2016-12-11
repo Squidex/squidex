@@ -112,7 +112,7 @@ describe('AppsStoreService', () => {
             result1 = x;
         }).unsubscribe();
 
-        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { });
+        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { /* Do Nothing */ });
 
         store.apps.subscribe(x => {
             result2 = x;
@@ -137,7 +137,7 @@ describe('AppsStoreService', () => {
 
         let result: AppDto[] = null;
 
-        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { });
+        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { /* Do Nothing */ });
 
         store.apps.subscribe(x => {
             result = x;

@@ -17,7 +17,7 @@ import {
     AuthService,
     AutocompleteItem,
     AutocompleteSource,
-    ImmutableList,
+    ImmutableArray,
     NotificationService,
     UserDto,
     UsersProviderService,
@@ -61,7 +61,7 @@ function changePermission(contributor: AppContributorDto, permission: string): A
     template
 })
 export class ContributorsPageComponent extends AppComponentBase implements Ng2.OnInit {
-    public appContributors = new ImmutableList<AppContributorDto>();
+    public appContributors = ImmutableArray.empty<AppContributorDto>();
 
     public currentUserId: string;
 
@@ -95,7 +95,7 @@ export class ContributorsPageComponent extends AppComponentBase implements Ng2.O
         this.appName()
             .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
             .subscribe(dtos => {
-                this.appContributors = new ImmutableList<AppContributorDto>(dtos);
+                this.appContributors = ImmutableArray.of(dtos);
             }, error => {
                 this.notifyError(error);
             });
@@ -114,7 +114,7 @@ export class ContributorsPageComponent extends AppComponentBase implements Ng2.O
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, contributor))
             .subscribe(() => {
-                this.appContributors = this.appContributors.add(contributor);
+                this.appContributors = this.appContributors.push(contributor);
             }, error => {
                 this.notifyError(error);
             });
@@ -126,7 +126,7 @@ export class ContributorsPageComponent extends AppComponentBase implements Ng2.O
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
             .subscribe(() => {
-                this.appContributors = this.appContributors.update(contributor, c => newContributor);
+                this.appContributors = this.appContributors.replace(contributor, newContributor);
             }, error => {
                 this.notifyError(error);
             });
@@ -136,7 +136,7 @@ export class ContributorsPageComponent extends AppComponentBase implements Ng2.O
         this.appName()
             .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId))
             .subscribe(() => {
-                this.appContributors = this.appContributors.add(contributor);
+                this.appContributors = this.appContributors.remove(contributor);
             }, error => {
                 this.notifyError(error);
             });

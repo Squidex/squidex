@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-// tslint:disable ordered-imports
+/* tslint:disable ordered-imports */
 
 // Angular 2
 import '@angular/platform-browser';
@@ -18,11 +18,8 @@ import '@angular/router';
 
 // Additional libs
 import 'rxjs';
-
-import 'oidc-client';
-
 import 'moment';
-import 'immutable';
+import 'oidc-client';
 
 // Bootstrap
 import 'theme/vendor.scss';

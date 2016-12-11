@@ -14,7 +14,7 @@ import {
     Profile,
     UserDto,
     UsersProviderService,
-    UsersService,
+    UsersService
 } from './../';
 
 describe('UsersProviderService', () => {
@@ -29,7 +29,7 @@ describe('UsersProviderService', () => {
     });
 
     it('Should return users service when user not cached', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', );
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
@@ -47,7 +47,7 @@ describe('UsersProviderService', () => {
     });
 
     it('Should return provide user from cache', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', );
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
@@ -67,7 +67,7 @@ describe('UsersProviderService', () => {
     });
 
     it('Should return Me when user is current user', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', );
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
 
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
@@ -82,7 +82,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image', ));
+        expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image'));
 
         usersService.verifyAll();
     });

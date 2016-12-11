@@ -52,7 +52,7 @@ describe('LanguageService', () => {
         expect(languages).toEqual(
             [
                 new LanguageDto('de', 'German'),
-                new LanguageDto('en', 'English'),
+                new LanguageDto('en', 'English')
             ]);
 
         authService.verifyAll();

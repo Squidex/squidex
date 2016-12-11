@@ -14,7 +14,7 @@ import {
     ApiUrlConfig,
     AuthService,
     UserDto,
-    UsersService,
+    UsersService
 } from './../';
 
 describe('UsersService', () => {

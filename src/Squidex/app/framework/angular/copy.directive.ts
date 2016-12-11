@@ -12,12 +12,12 @@ import * as Ng2 from '@angular/core';
 })
 export class CopyDirective {
     @Ng2.Input('sqxCopy')
-    public inputElement: Ng2.ElementRef;
+    public inputElement: any;
 
     @Ng2.HostListener('click')
     public onClick() {
         if (this.inputElement) {
-            this.copyToClipbord(this.inputElement.nativeElement);
+            this.copyToClipbord(this.inputElement);
         }
     }
 

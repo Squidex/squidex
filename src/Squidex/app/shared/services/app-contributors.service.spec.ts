@@ -52,7 +52,7 @@ describe('AppContributorsService', () => {
         expect(contributors).toEqual(
             [
                 new AppContributorDto('123', 'Owner'),
-                new AppContributorDto('456', 'Editor'),
+                new AppContributorDto('456', 'Editor')
             ]);
 
         authService.verifyAll();

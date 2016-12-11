@@ -1,0 +1,136 @@
+
+function freeze<T>(items: T[]): T[] {
+    for (let item of items) {
+        Object.freeze(item);
+    }
+
+    return items;
+}
+
+export class ImmutableArray<T> implements Iterable<T> {
+    private static readonly EMPTY = new ImmutableArray<any>([]);
+    private readonly items: T[];
+
+    public [Symbol.iterator](): Iterator<T> {
+        return this.items.values();
+    }
+
+    public get length() {
+        return this.items.length;
+    }
+
+    public get values(): T[] {
+        return [...this.items];
+    }
+
+    private constructor(items: T[]) {
+        this.items = items;
+    }
+
+    public static empty<T>(): ImmutableArray<T> {
+        return ImmutableArray.EMPTY;
+    }
+
+    public static of<T>(items?: T[]): ImmutableArray<T> {
+        if (!items || items.length === 0) {
+            return ImmutableArray.EMPTY;
+        } else {
+            return new ImmutableArray<T>(freeze([...items]));
+        }
+    }
+
+    public map<R>(projection: (item: T) => R): ImmutableArray<R> {
+        return new ImmutableArray<R>(freeze(this.items.map(v => projection(v!))));
+    }
+
+    public filter(predicate: (item: T) => boolean): ImmutableArray<T> {
+        return new ImmutableArray<T>(this.items.filter(v => predicate(v!)));
+    }
+
+    public find(predicate: (item: T, index: number) => boolean): T {
+        return this.items.find(predicate);
+    }
+
+    public push(...items: T[]): ImmutableArray<T> {
+        if (!items || items.length === 0) {
+            return this;
+        }
+        return new ImmutableArray<T>([...this.items, ...freeze(items)]);
+    }
+
+    public remove(...items: T[]): ImmutableArray<T> {
+        if (!items || items.length === 0) {
+            return this;
+        }
+
+        const copy = this.items.slice();
+
+        for (let item of items) {
+            const index = copy.indexOf(item);
+
+            if (index >= 0) {
+                copy.splice(index, 1);
+            }
+        }
+
+        return new ImmutableArray<T>(copy);
+    }
+
+    public removeAll(predicate: (item: T, index: number) => boolean): ImmutableArray<T> {
+        const copy = this.items.slice();
+
+        let hasChange = false;
+
+        for (let i = 0; i < copy.length; ) {
+            if (predicate(copy[i], i)) {
+                copy.splice(i, 1);
+
+                hasChange = true;
+            } else {
+                ++i;
+            }
+        }
+
+        return hasChange ? new ImmutableArray<T>(copy) : this;
+    }
+
+    public replace(oldItem: T, newItem: T): ImmutableArray<T> {
+        const index = this.items.indexOf(oldItem);
+
+        if (index >= 0) {
+            if (newItem) {
+                Object.freeze(newItem);
+            }
+
+            const copy = [...this.items.slice(0, index), newItem, ...this.items.slice(index + 1)];
+
+            return new ImmutableArray<T>(copy);
+        } else {
+            return this;
+        }
+    }
+
+    public replaceAll(predicate: (item: T, index: number) => boolean, replacer: (item: T) => T): ImmutableArray<T> {
+        const copy = this.items.slice();
+
+        let hasChange = false;
+
+        for (let i = 0; i < copy.length; i++) {
+            if (predicate(copy[i], i)) {
+                const newItem = replacer(copy[i]);
+
+                if (newItem) {
+                    Object.freeze(newItem);
+                }
+
+                if (copy[i] !== newItem) {
+                    copy[i] = newItem;
+
+                    hasChange = true;
+                }
+            }
+        }
+
+        return hasChange ? new ImmutableArray<T>(copy) : this;
+    }
+}

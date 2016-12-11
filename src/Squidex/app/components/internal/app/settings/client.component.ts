@@ -34,6 +34,9 @@ export class ClientComponent implements Ng2.OnChanges {
     @Ng2.Input()
     public client: AppClientDto;
 
+    @Ng2.Input()
+    public appName: string;
+
     public modalDialog = new ModalView();
 
     public get clientName() {
@@ -41,7 +44,7 @@ export class ClientComponent implements Ng2.OnChanges {
     }
 
     public get clientId() {
-        return this.client.id + ':' + this.client.secret;
+        return this.appName + ':' + this.client.id;
     }
 
     public get clientSecret() {
