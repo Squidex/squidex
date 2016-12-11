@@ -11,7 +11,11 @@ import * as Ng2Forms from '@angular/forms';
 import {
     AccessTokenDto,
     AppClientDto,
-    ModalView
+    AppClientsService,
+    fadeAnimation,
+    ModalView,
+    Notification,
+    NotificationService
 } from 'shared';
 
 const ESCAPE_KEY = 27;
@@ -19,7 +23,10 @@ const ESCAPE_KEY = 27;
 @Ng2.Component({
     selector: 'sqx-client',
     styles,
-    template
+    template,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ClientComponent {
     public isRenaming = false;
@@ -55,7 +62,9 @@ export class ClientComponent {
         });
 
     constructor(
-        private readonly formBuilder: Ng2Forms.FormBuilder
+        private readonly appClientsService: AppClientsService,
+        private readonly formBuilder: Ng2Forms.FormBuilder,
+        private readonly notifications: NotificationService
     ) {
     }
 
@@ -89,6 +98,16 @@ export class ClientComponent {
         } finally {
             this.isRenaming = false;
         }
+    }
+
+    public createToken(client: AppClientDto) {
+        this.appClientsService.createToken(this.appName, client)
+            .subscribe(token => {
+                this.appClientToken = token;
+                this.modalDialog.show();
+            }, error => {
+                this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
+            });
     }
 }
 

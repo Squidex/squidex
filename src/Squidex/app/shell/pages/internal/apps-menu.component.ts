@@ -11,6 +11,7 @@ import * as Ng2Router from '@angular/router';
 import {
     AppDto,
     AppsStoreService,
+    fadeAnimation,
     ModalView
 } from 'shared';
 
@@ -19,7 +20,10 @@ const FALLBACK_NAME = 'Apps Overview';
 @Ng2.Component({
     selector: 'sqx-apps-menu',
     styles,
-    template
+    template,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
     private appsSubscription: any | null = null;

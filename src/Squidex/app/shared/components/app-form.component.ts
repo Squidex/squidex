@@ -11,11 +11,16 @@ import * as Ng2Forms from '@angular/forms';
 import { AppsStoreService } from './../services/apps-store.service';
 import { AppDto, CreateAppDto } from './../services/apps.service';
 
+import { fadeAnimation } from 'framework';
+
 const FALLBACK_NAME = 'my-app';
 
 @Ng2.Component({
     selector: 'sqx-app-form',
-    template
+    template,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class AppFormComponent implements Ng2.OnInit {
     @Ng2.Input()

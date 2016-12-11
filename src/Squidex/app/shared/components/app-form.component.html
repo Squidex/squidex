@@ -8,7 +8,7 @@
 	<div class="form-group">
 		<label for="app-name">Name</label>
         
-        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty">
+        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty" [@fade]>
             <div class="errors">
                 <span *ngIf="createForm.get('name').hasError('required')">
                     Name is required.

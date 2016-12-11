@@ -175,12 +175,28 @@
         }
 
         .close {
-            color: $color-modal-header-foreground;
+            & {
+                @include opacity(1);
+                @include text-shadow-none;
+                color: $color-modal-header-foreground;
+                font-size: 1.6rem;
+                font-weight: 400;
+            }
+
+            &:hover {
+                color: lighten($color-modal-header-foreground, 15%);
+            }
         }
     }
 
     &-content {
-        @include box-shadow(0, 6px, 16px, .2px);
+        @include box-shadow(0, 6px, 16px, .4);
+    }
+
+    &-dialog {
+        @media (min-width: 576px) {
+            margin-top: 70px;
+        }
     }
 }
 

@@ -9,13 +9,17 @@ import * as Ng2 from '@angular/core';
 
 import {
     AuthService,
+    fadeAnimation,
     ModalView
 } from 'shared';
 
 @Ng2.Component({
     selector: 'sqx-profile-menu',
     styles,
-    template
+    template,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
     private authenticationSubscription: any | null = null;
