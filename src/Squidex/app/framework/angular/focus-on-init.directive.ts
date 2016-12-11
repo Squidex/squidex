@@ -12,7 +12,7 @@ import * as Ng2 from '@angular/core';
 })
 export class FocusOnInitDirective implements Ng2.OnInit {
     @Ng2.Input()
-    public gpFocusOnChange: any;
+    public select: boolean;
 
     constructor(
         private readonly elementRef: Ng2.ElementRef,
@@ -23,7 +23,10 @@ export class FocusOnInitDirective implements Ng2.OnInit {
     public ngOnInit() {
         setTimeout(() => {
             this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'focus', []);
-            this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
+
+            if (this.select) {
+                this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
+            }
         });
     }
 }

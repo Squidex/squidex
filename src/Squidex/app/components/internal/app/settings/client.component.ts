@@ -15,6 +15,8 @@ import {
     ModalView
 } from 'shared';
 
+const ESCAPE_KEY = 27;
+
 @Ng2.Component({
     selector: 'sqx-client',
     styles,
@@ -23,7 +25,7 @@ import {
         fadeAnimation
     ]
 })
-export class ClientComponent implements Ng2.OnChanges {
+export class ClientComponent {
     public isRenaming = false;
 
     public appClientToken: AccessTokenDto;
@@ -61,7 +63,7 @@ export class ClientComponent implements Ng2.OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
+    public resetForm() {
         this.renameForm.controls['name'].setValue(this.clientName);
     }
 
@@ -70,12 +72,24 @@ export class ClientComponent implements Ng2.OnChanges {
     }
 
     public startRename() {
+        this.resetForm();
+
         this.isRenaming = true;
+    }
+
+    public onKeyDown(keyCode: number) {
+        if (keyCode === ESCAPE_KEY) {
+            this.cancelRename();
+        }
     }
 
     public rename() {
         try {
-            this.renamed.emit(this.renameForm.controls['name'].value);
+            const newName = this.renameForm.controls['name'].value;
+
+            if (newName !== this.clientName) {
+                this.renamed.emit();
+            }
         } finally {
             this.isRenaming = false;
         }

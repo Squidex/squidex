@@ -211,6 +211,12 @@
     }
 }
 
+.btn-cancel {
+    padding: .2rem;
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+
 .btn-link {
     &.btn-danger {
         @include link-button($color-theme-error);

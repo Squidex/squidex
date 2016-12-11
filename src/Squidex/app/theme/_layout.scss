@@ -43,7 +43,8 @@ h1 {
     &-right {
         background: $sidebar-color;
         position: relative;
-        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
     }
 
     &-right {

@@ -12,7 +12,10 @@ import * as Ng2 from '@angular/core';
 })
 export class FocusOnChangeDirective implements Ng2.OnChanges {
     @Ng2.Input()
-    public gpFocusOnChange: any;
+    public sqxFocusOnChange: any;
+
+    @Ng2.Input()
+    public select: boolean;
 
     constructor(
         private readonly elementRef: Ng2.ElementRef,
@@ -23,7 +26,10 @@ export class FocusOnChangeDirective implements Ng2.OnChanges {
     public ngOnChanges(changes: { [key: string]: Ng2.SimpleChange }) {
         setTimeout(() => {
             this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'focus', []);
-            this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
+
+            if (this.select) {
+                this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
+            }
         }, 100);
     }
 }
