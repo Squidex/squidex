@@ -20,7 +20,7 @@ export class DragModelDirective {
     private mouseUpSubscription: Function | null;
     private clonedElement: HTMLElement | null;
 
-    @Ng2.Input('gpDragModel')
+    @Ng2.Input('gpDragMsqxDragModelodel')
     public model: any;
 
     constructor(
