@@ -57,10 +57,6 @@
             @include build-item($color-section-content);
         }
 
-        &--dashboard {
-            @include build-item($color-section-dashboard);
-        }
-
         &--schemas {
             @include build-item($color-section-schemas);
         }
