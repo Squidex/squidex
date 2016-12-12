@@ -255,8 +255,7 @@
 
     &.nav-pills {
         .nav-link {
-            &,
-            &.active {
+            & {
                 color: $color-dark-foreground;
             }
 
@@ -271,10 +270,23 @@
                     @include border-radius(0);
                     background: $color-dark-selected;
                     pointer-events: none;
+                    color: lighten($color-dark-foreground, 30%);
                 }
 
                 &:hover {
                     background: $color-dark-selected;
+                }
+            }
+        }
+    }
+}
+
+.nav-light {
+    &.nav-pills {
+        .nav-link {
+            &.active {
+                & {
+                    @include border-radius(0);
                 }
             }
         }

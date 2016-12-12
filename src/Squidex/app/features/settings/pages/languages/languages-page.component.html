@@ -9,68 +9,79 @@
         </a>
     </div>
 
-    <div class="panel-content">
-        <table class="table table-items table-fixed">
-            <colgroup>
-                <col style="width: 60px" />
-                <col style="width: 100%" />
-                <col style="width: 200px" />
-                <col style="width: 80px" />
-            </colgroup>
+    <div class="panel-main">
+        <div class="panel-content">
+            <table class="table table-items table-fixed">
+                <colgroup>
+                    <col style="width: 60px" />
+                    <col style="width: 100%" />
+                    <col style="width: 200px" />
+                    <col style="width: 80px" />
+                </colgroup>
 
-            <thead>
-                <tr>
-                    <th>
-                        Code
-                    </th>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Options
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <template ngFor let-language [ngForOf]="appLanguages">
+                <thead>
                     <tr>
-                        <td>
-                            <span class="language-code">
-                                {{language.iso2Code}}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="language-name">
-                                {{language.englishName}}
-                            </span>
-                        </td>
-                        <td>
-                            <label class="language-default">
-                                <input type="radio" [value]="true" [ngModel]="language.isMasterLanguage" (ngModelChange)="setMasterLanguage(language)"> Master Language
-                            </label>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-link btn-danger" [disabled]="language.isMasterLanguage" (click)="removeLanguage(language)">
-                                <i class="icon-bin"></i>
-                            </button>
-                        </td>
+                        <th>
+                            Code
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Options
+                        </th>
                     </tr>
-                    <tr class="spacer"></tr>
-                </template>
-            </tbody>
-        </table>
+                </thead>
 
-        <div class="table-items-footer">
-            <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
-                <div class="form-group">
-                    <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
-                        <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
-                    </select>
-                </div>
+                <tbody>
+                    <template ngFor let-language [ngForOf]="appLanguages">
+                        <tr>
+                            <td>
+                                <span class="language-code">
+                                    {{language.iso2Code}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="language-name">
+                                    {{language.englishName}}
+                                </span>
+                            </td>
+                            <td>
+                                <label class="language-default">
+                                    <input type="radio" [value]="true" [ngModel]="language.isMasterLanguage" (ngModelChange)="setMasterLanguage(language)"> Master Language
+                                </label>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-danger" [disabled]="language.isMasterLanguage" (click)="removeLanguage(language)">
+                                    <i class="icon-bin"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </template>
+                </tbody>
+            </table>
 
-                <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add Language</button>
-            </form>
+            <div class="table-items-footer">
+                <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
+                    <div class="form-group">
+                        <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
+                            <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add Language</button>
+                </form>
+            </div>
+        </div>
+        <div class="panel-sidebar">
+            <div class="nav nav-pills nav-stacked nav-light">
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <i class="icon-filter"></i>
+                    </a>
+                </li>
+            </div>
         </div>
     </div>
 </div>

@@ -26,6 +26,7 @@ using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Pipeline;
 using Squidex.Store.MongoDb;
+// ReSharper disable InvertIf
 
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
@@ -179,14 +180,19 @@ namespace Squidex
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                OnPrepareResponse = (context) =>
+                OnPrepareResponse = context =>
                 {
-                    var headers = context.Context.Response.GetTypedHeaders();
+                    var response = context.Context.Response;
 
-                    headers.CacheControl = new CacheControlHeaderValue
+                    if (!string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
                     {
-                        MaxAge = TimeSpan.FromDays(60)
-                    };
+                        var headers = response.GetTypedHeaders();
+
+                        headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            MaxAge = TimeSpan.FromDays(60)
+                        };
+                    }
                 }
             });
         }

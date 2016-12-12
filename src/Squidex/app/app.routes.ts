@@ -23,11 +23,6 @@ import {
 } from './shared';
 
 import { SqxFeatureAppsModule } from './features/apps';
-import { SqxFeatureContentModule } from './features/content';
-import { SqxFeatureDashboardModule } from './features/dashboard';
-import { SqxFeatureMediaModule } from './features/media';
-import { SqxFeatureSchemasModule } from './features/schemas';
-import { SqxFeatureSettingsModule } from './features/settings';
 
 export const routes: Ng2Router.Routes = [
     {
@@ -49,19 +44,19 @@ export const routes: Ng2Router.Routes = [
                 children: [
                     {
                         path: '',
-                        loadChildren: () => SqxFeatureDashboardModule
+                        loadChildren: './features/dashboard/module#SqxFeatureDashboardModule'
                     }, {
                         path: 'content',
-                        loadChildren: () => SqxFeatureContentModule
+                        loadChildren: './features/content/module#SqxFeatureContentModule'
                     }, {
                         path: 'media',
-                        loadChildren: () => SqxFeatureMediaModule
+                        loadChildren: './features/media/module#SqxFeatureMediaModule'
                     }, {
                         path: 'schemas',
-                        loadChildren: () => SqxFeatureSchemasModule
+                        loadChildren: './features/schemas/module#SqxFeatureSchemaModule'
                     }, {
                         path: 'settings',
-                        loadChildren: () => SqxFeatureSettingsModule
+                        loadChildren: './features/settings/module#SqxFeatureSettingsModule'
                     }
                 ]
             }

@@ -1,8 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
-$panel-padding: 15px;
-$panel-header: 60px;
+$panel-padding: 20px;
+$panel-header: 70px;
+$panel-sidebar: 60px;
 
 .panel-container {
     @include absolute($size-navbar-height, 0, 0, $size-sidebar-width);
@@ -17,13 +18,19 @@ $panel-header: 60px;
         flex-direction: column;
     }
 
-    &-content,
-    &-header {
-        padding: 15px;
+    &-header,
+    &-content {
+        padding: $panel-padding;
     }
 
+    &-main,
     &-content {
-        overflow-y: auto;
+        @include flex-grow(1);
+    }
+
+    &-main {
+        @include flex-box;
+        flex-direction: row;
     }
 
     &-title {
@@ -32,9 +39,36 @@ $panel-header: 60px;
     }
 
     &-header {
-        height: $panel-header;
+        min-height: $panel-header;
+        max-height: $panel-header;
         position: relative;
         padding-right: 60px;
+    }
+
+    &-content {
+        & {
+            overflow-y: auto;
+        }
+
+        & .nav-stacked {
+            margin-left: -$panel-padding;
+            margin-right: -$panel-padding;
+        }
+
+        & .nav-link {
+            padding-left: $panel-padding;
+        }
+    }
+
+    &-sidebar {
+        & {
+            min-width: $panel-sidebar;
+            max-width: $panel-sidebar;
+        }
+
+        & .nav-link {
+            text-align: center;
+        }
     }
 
     &-close {
@@ -77,23 +111,27 @@ $panel-header: 60px;
 
         .panel-header {
             background: $color-card-footer;
-            border-bottom: 1px solid $color-border;
+        }
+
+        .panel-content {
+            border-top: 1px solid $color-border;
+        }
+
+        .panel-sidebar {
+            background: $color-card-footer;
+            border-left: 1px solid $color-border;
+            color: lighten($color-dark-foreground, 20%);
         }
 
         .panel-close {
             & {
-                color: $color-dark-foreground;
+                color: lighten($color-dark-foreground, 20%);
             }
 
             &:hover {
                 color: darken($color-dark-foreground, 15%);
             }
         }
-    }
-
-    & .nav-stacked {
-        margin-left: -$panel-padding;
-        margin-right: -$panel-padding;
     }
 }
 

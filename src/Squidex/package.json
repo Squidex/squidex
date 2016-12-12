@@ -39,6 +39,7 @@
     "@types/jasmine": "^2.5.38",
     "@types/mousetrap": "^1.5.32",
     "@types/node": "^6.0.51",
+    "angular2-router-loader": "^0.3.4",
     "awesome-typescript-loader": "^2.2.4",
     "cpx": "^1.5.0",
     "css-loader": "^0.26.0",

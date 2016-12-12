@@ -188,7 +188,7 @@ export class AuthService {
 
     private checkResponse(response: Observable<Ng2Http.Response>) {
         return response.catch((error: Ng2Http.Response) => {
-            if (error.status === 401) {
+            if (error.status === 401 || error.status === 404) {
                 this.loginRedirect();
             } else if (error.status === 403) {
                 this.router.navigate(['/404']);
