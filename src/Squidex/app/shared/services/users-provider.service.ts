@@ -6,7 +6,6 @@
  */
 
 import * as Ng2 from '@angular/core';
-
 import { Observable } from 'rxjs';
 
 import { UserDto, UsersService } from './users.service';

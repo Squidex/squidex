@@ -8,10 +8,10 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
 
+import { fadeAnimation } from 'framework';
+
 import { AppsStoreService } from './../services/apps-store.service';
 import { AppDto, CreateAppDto } from './../services/apps.service';
-
-import { fadeAnimation } from 'framework';
 
 const FALLBACK_NAME = 'my-app';
 

@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.EventStore;
@@ -26,8 +25,6 @@ using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Pipeline;
 using Squidex.Store.MongoDb;
-// ReSharper disable InvertIf
-
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
 
@@ -178,23 +175,7 @@ namespace Squidex
                 });
             }
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = context =>
-                {
-                    var response = context.Context.Response;
-
-                    if (!string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var headers = response.GetTypedHeaders();
-
-                        headers.CacheControl = new CacheControlHeaderValue
-                        {
-                            MaxAge = TimeSpan.FromDays(60)
-                        };
-                    }
-                }
-            });
+            app.UseMyCachedStaticFiles();
         }
 
         private static bool IsIdentityRequest(HttpContext context)

@@ -14,7 +14,6 @@ namespace Squidex.Config.Web
 {
     public static class WebpackExtensions
     {
-
         public static IApplicationBuilder UseWebpackBuilder(this IApplicationBuilder app)
         {
             app.ApplicationServices.GetRequiredService<WebpackRunner>().Execute();

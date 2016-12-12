@@ -8,14 +8,13 @@
 import * as Ng2 from '@angular/core';
 import * as Ng2Http from '@angular/http';
 import * as Ng2Router from '@angular/router';
+import { Observable, Subject } from 'rxjs';
 
 import {
     Log,
     User,
     UserManager
 } from 'oidc-client';
-
-import { Observable, Subject } from 'rxjs';
 
 import { ApiUrlConfig } from 'framework';
 

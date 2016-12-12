@@ -7,7 +7,6 @@
 
 import * as Ng2 from '@angular/core';
 import * as Ng2Forms from '@angular/forms';
-
 import { Observable, Subscription } from 'rxjs';
 
 export interface AutocompleteSource {

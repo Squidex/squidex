@@ -6,13 +6,11 @@
  */
 
 import * as Ng2 from '@angular/core';
-
 import { Observable } from 'rxjs';
 
-import { ApiUrlConfig } from 'framework';
-import { AuthService } from './auth.service';
+import { ApiUrlConfig, handleError } from 'framework';
 
-import { handleError } from './common';
+import { AuthService } from './auth.service';
 
 export class AppContributorDto {
     constructor(

@@ -8,6 +8,7 @@
 import * as TypeMoq from 'typemoq';
 
 import { AuthService } from 'shared';
+
 import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 import { RouterMockup } from './router-mockup';
 

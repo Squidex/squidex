@@ -8,6 +8,7 @@
 import * as TypeMoq from 'typemoq';
 
 import { AppsStoreService } from 'shared';
+
 import { AppMustExistGuard } from './app-must-exist.guard';
 import { RouterMockup } from './router-mockup';
 

@@ -6,13 +6,15 @@
  */
 
 import * as Ng2 from '@angular/core';
-
 import { Observable } from 'rxjs';
 
-import { ApiUrlConfig, DateTime } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    DateTime,
+    handleError
+} from 'framework';
 
-import { handleError } from './common';
+import { AuthService } from './auth.service';
 
 export class SchemaDto {
     constructor(
@@ -50,7 +52,7 @@ export abstract class FieldPropertiesDto {
         public readonly label: string,
         public readonly hints: string,
         public readonly placeholder: string,
-        public readonly isRequired: boolean,
+        public readonly isRequired: boolean
     ) {
     }
 }

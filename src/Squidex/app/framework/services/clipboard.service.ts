@@ -6,7 +6,6 @@
  */
 
 import * as Ng2 from '@angular/core';
-
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export const ClipboardServiceFactory = () => {

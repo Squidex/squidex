@@ -16,6 +16,7 @@ export * from './angular/date-time.pipes';
 export * from './angular/drag-model.directive';
 export * from './angular/focus-on-change.directive';
 export * from './angular/focus-on-init.directive';
+export * from './angular/http-utils';
 export * from './angular/image-drop.directive';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
