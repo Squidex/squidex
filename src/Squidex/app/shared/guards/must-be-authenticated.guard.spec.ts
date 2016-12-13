@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
+import { Mock } from 'typemoq';
 
 import { AuthService } from 'shared';
 
@@ -13,10 +13,10 @@ import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 import { RouterMockup } from './router-mockup';
 
 describe('MustBeAuthenticatedGuard', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
     });
 
     it('should navigate to default page if not authenticated', (done) => {

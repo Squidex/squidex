@@ -5,26 +5,26 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, Renderer, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import { ModalView } from './../utils/modal-view';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxModalView]'
 })
-export class ModalViewDirective implements Ng2.OnChanges, Ng2.OnInit, Ng2.OnDestroy {
+export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
     private subscription: any | null;
     private isEnabled = true;
     private clickHandler: Function | null;
-    private renderedView: Ng2.EmbeddedViewRef<any> | null;
+    private renderedView: EmbeddedViewRef<any> | null;
 
-    @Ng2.Input('sqxModalView')
+    @Input('sqxModalView')
     public modalView: ModalView;
 
     constructor(
-        private readonly templateRef: Ng2.TemplateRef<any>,
-        private readonly renderer: Ng2.Renderer,
-        private readonly viewContainer: Ng2.ViewContainerRef
+        private readonly templateRef: TemplateRef<any>,
+        private readonly renderer: Renderer,
+        private readonly viewContainer: ViewContainerRef
     ) {
     }
 

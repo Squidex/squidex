@@ -5,12 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer }from '@angular/core';
 
 import { DragService } from './../services/drag.service';
 import { Vec2 } from './../utils/vec2';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxDragModel]'
 })
 export class DragModelDirective {
@@ -20,17 +20,17 @@ export class DragModelDirective {
     private mouseUpSubscription: Function | null;
     private clonedElement: HTMLElement | null;
 
-    @Ng2.Input('sqxDragModel')
+    @Input('sqxDragModel')
     public model: any;
 
     constructor(
-        private readonly element: Ng2.ElementRef,
-        private readonly renderer: Ng2.Renderer,
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer,
         private readonly dragService: DragService
     ) {
     }
 
-    @Ng2.HostListener('mousedown', ['$event'])
+    @HostListener('mousedown', ['$event'])
     public onMouseDown(event: MouseEvent) {
         this.startOffset = new Vec2(event.offsetX, event.offsetY);
         this.startPosition = new Vec2(event.clientX, event.clientY);

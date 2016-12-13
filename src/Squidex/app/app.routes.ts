@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { ModuleWithProviders } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
 import {
     AppAreaComponent,
@@ -24,7 +24,7 @@ import {
 
 import { SqxFeatureAppsModule } from './features/apps';
 
-export const routes: Ng2Router.Routes = [
+export const routes: Routes = [
     {
         path: '',
         component: HomePageComponent,
@@ -72,4 +72,4 @@ export const routes: Ng2Router.Routes = [
     }
 ];
 
-export const routing: Ng2.ModuleWithProviders = Ng2Router.RouterModule.forRoot(routes, { useHash: false });
+export const routing: ModuleWithProviders = RouterModule.forRoot(routes, { useHash: false });

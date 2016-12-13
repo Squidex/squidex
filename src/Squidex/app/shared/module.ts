@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { NgModule } from '@angular/core';
 
 import { SqxFrameworkModule } from 'shared';
 
@@ -14,7 +14,7 @@ import {
     DashboardLinkDirective
 } from './declarations';
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
         SqxFrameworkModule
     ],

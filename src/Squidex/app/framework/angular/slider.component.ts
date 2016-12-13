@@ -5,40 +5,40 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, Renderer, ViewChild } from '@angular/core';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-slider',
-    styles,
-    template
+    styleUrls: ['./slider.component.scss'],
+    templateUrl: './slider.component.html'
 })
-export class SliderComponent implements Ng2.OnChanges {
+export class SliderComponent implements OnChanges {
     private mouseMoveSubscription: Function | null;
     private mouseUpSubscription: Function | null;
     private centerStartOffset = 0;
     private startValue: number;
 
-    @Ng2.ViewChild('bar')
-    public bar: Ng2.ElementRef;
+    @ViewChild('bar')
+    public bar: ElementRef;
 
-    @Ng2.ViewChild('thumb')
-    public thumb: Ng2.ElementRef;
+    @ViewChild('thumb')
+    public thumb: ElementRef;
 
-    @Ng2.Input()
+    @Input()
     public min = 0;
 
-    @Ng2.Input()
+    @Input()
     public max = 100;
 
-    @Ng2.Input()
+    @Input()
     public value: number;
 
-    @Ng2.Output()
-    public valueChange = new Ng2.EventEmitter();
+    @Output()
+    public valueChange = new EventEmitter();
 
-    constructor(private readonly renderer: Ng2.Renderer) { }
+    constructor(private readonly renderer: Renderer) { }
 
-    public ngOnChanges(changes: Ng2.SimpleChanges) {
+    public ngOnChanges() {
         const relativeValue = (this.value - this.min) / (this.max - this.min);
 
         this.setThumbPosition(relativeValue);

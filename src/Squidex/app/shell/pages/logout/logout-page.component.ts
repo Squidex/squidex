@@ -5,19 +5,19 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AuthService } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'logout',
     template: ''
 })
-export class LogoutPageComponent implements Ng2.OnInit {
+export class LogoutPageComponent implements OnInit {
     constructor(
         private readonly auth: AuthService,
-        private readonly router: Ng2Router.Router
+        private readonly router: Router
     ) {
     }
 

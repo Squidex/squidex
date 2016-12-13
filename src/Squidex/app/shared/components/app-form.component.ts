@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Forms from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import { fadeAnimation } from 'framework';
 
@@ -15,31 +15,32 @@ import { AppDto, CreateAppDto } from './../services/apps.service';
 
 const FALLBACK_NAME = 'my-app';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-app-form',
-    template,
+    styleUrls: ['./app-form.component.scss'],
+    templateUrl: './app-form.component.html',
     animations: [
         fadeAnimation
     ]
 })
-export class AppFormComponent implements Ng2.OnInit {
-    @Ng2.Input()
+export class AppFormComponent implements OnInit {
+    @Input()
     public showClose = false;
 
-    @Ng2.Output()
-    public created = new Ng2.EventEmitter<AppDto>();
+    @Output()
+    public created = new EventEmitter<AppDto>();
 
-    @Ng2.Output()
-    public cancelled = new Ng2.EventEmitter();
+    @Output()
+    public cancelled = new EventEmitter();
 
     public creationError = '';
     public createForm =
         this.formBuilder.group({
             name: ['',
                 [
-                    Ng2Forms.Validators.required,
-                    Ng2Forms.Validators.maxLength(40),
-                    Ng2Forms.Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    Validators.required,
+                    Validators.maxLength(40),
+                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
                 ]]
         });
 
@@ -47,7 +48,7 @@ export class AppFormComponent implements Ng2.OnInit {
 
     constructor(
         private readonly appsStore: AppsStoreService,
-        private readonly formBuilder: Ng2Forms.FormBuilder
+        private readonly formBuilder: FormBuilder
     ) {
     }
 

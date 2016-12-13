@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
@@ -35,7 +35,7 @@ export class CreateAppDto {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class AppsService {
     constructor(
         private readonly authService: AuthService,

@@ -5,12 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Pipe } from '@angular/core';
 
 import { DateTime } from './../utils/date-time';
 import { Duration } from './../utils/duration';
 
-@Ng2.Pipe({
+@Pipe({
     name: 'shortDate'
 })
 export class ShortDatePipe {
@@ -19,7 +19,7 @@ export class ShortDatePipe {
     }
 }
 
-@Ng2.Pipe({
+@Pipe({
     name: 'month'
 })
 export class MonthPipe {
@@ -28,7 +28,7 @@ export class MonthPipe {
     }
 }
 
-@Ng2.Pipe({
+@Pipe({
     name: 'dayOfWeek'
 })
 export class DayOfWeekPipe {
@@ -37,7 +37,7 @@ export class DayOfWeekPipe {
     }
 }
 
-@Ng2.Pipe({
+@Pipe({
     name: 'day'
 })
 export class DayPipe {
@@ -46,7 +46,7 @@ export class DayPipe {
     }
 }
 
-@Ng2.Pipe({
+@Pipe({
     name: 'shortTime'
 })
 export class ShortTimePipe {
@@ -55,7 +55,7 @@ export class ShortTimePipe {
     }
 }
 
-@Ng2.Pipe({
+@Pipe({
     name: 'duration'
 })
 export class DurationPipe {

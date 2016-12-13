@@ -5,40 +5,40 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output } from '@angular/core';
 
 import { Color } from './../utils/color';
 import { ColorPalette } from './../utils/color-palette';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-color-picker',
-    styles,
-    template
+    styleUrls: ['./color-picker.component.scss'],
+    templateUrl: './color-picker.component.html'
 })
-export class ColorPickerComponent implements Ng2.OnChanges {
+export class ColorPickerComponent implements OnChanges {
     private selectedColorValue = new Color(0, 0, 0);
 
-    @Ng2.Output()
-    public colorChange = new Ng2.EventEmitter();
+    @Output()
+    public colorChange = new EventEmitter();
 
-    @Ng2.Input()
+    @Input()
     public color: string | number | Color;
 
-    @Ng2.Input()
+    @Input()
     public palette = ColorPalette.colors();
 
-    @Ng2.Input()
+    @Input()
     public isOpen = false;
 
     public get selectedColor(): Color {
         return this.selectedColorValue;
     }
 
-    constructor(private readonly element: Ng2.ElementRef) {
+    constructor(private readonly element: ElementRef) {
         this.updateColor();
     }
 
-    @Ng2.HostListener('document:click', ['$event.target'])
+    @HostListener('document:click', ['$event.target'])
     public onClick(targetElement: any) {
         const clickedInside = this.element.nativeElement.contains(targetElement);
 
@@ -47,7 +47,7 @@ export class ColorPickerComponent implements Ng2.OnChanges {
         }
     }
 
-    public ngOnChanges(changes: Ng2.SimpleChanges) {
+    public ngOnChanges() {
         this.updateColor();
     }
 

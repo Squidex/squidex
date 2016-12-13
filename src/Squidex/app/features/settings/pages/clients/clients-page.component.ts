@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Forms from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppClientDto,
@@ -24,27 +24,27 @@ function rename(client: AppClientDto, name: string) {
     return new AppClientDto(client.id, client.secret, name, client.expiresUtc);
 };
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-clients-page',
-    styles,
-    template
+    styleUrls: ['./clients-page.component.scss'],
+    templateUrl: './clients-page.component.html'
 })
-export class ClientsPageComponent extends AppComponentBase implements Ng2.OnInit {
+export class ClientsPageComponent extends AppComponentBase implements OnInit {
     public appClients: ImmutableArray<AppClientDto>;
 
     public createForm =
         this.formBuilder.group({
             name: ['',
                 [
-                    Ng2Forms.Validators.required,
-                    Ng2Forms.Validators.maxLength(40),
-                    Ng2Forms.Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    Validators.required,
+                    Validators.maxLength(40),
+                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
                 ]]
         });
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: Ng2Forms.FormBuilder
+        private readonly formBuilder: FormBuilder
     ) {
         super(apps, notifications, users);
     }

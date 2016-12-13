@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     AppDto,
@@ -17,15 +17,15 @@ import {
 
 const FALLBACK_NAME = 'Apps Overview';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-apps-menu',
-    styles,
-    template,
+    styleUrls: ['./apps-menu.component.scss'],
+    templateUrl: './apps-menu.component.html',
     animations: [
         fadeAnimation
     ]
 })
-export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
+export class AppsMenuComponent implements OnInit, OnDestroy {
     private appsSubscription: any | null = null;
     private appSubscription: any | null = null;
 
@@ -38,8 +38,8 @@ export class AppsMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
 
     constructor(
         private readonly appsStore: AppsStoreService,
-        private readonly router: Ng2Router.Router,
-        private readonly route: Ng2Router.ActivatedRoute
+        private readonly router: Router,
+        private readonly route: ActivatedRoute
     ) {
     }
 

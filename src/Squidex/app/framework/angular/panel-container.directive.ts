@@ -5,24 +5,24 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 
 import { PanelService } from './../services/panel.service';
 
-@Ng2.Directive({
+@Directive({
     selector: '.panel-container'
 })
-export class PanelContainerDirective implements Ng2.OnInit, Ng2.OnDestroy {
+export class PanelContainerDirective implements OnInit, OnDestroy {
     private subscription: any;
     private panelsSize: number | null = null;
 
     constructor(
-        private readonly element: Ng2.ElementRef,
+        private readonly element: ElementRef,
         private readonly panels: PanelService
     ) {
     }
 
-    @Ng2.HostListener('window:resize')
+    @HostListener('window:resize')
     public onResize() {
         this.resize();
     }

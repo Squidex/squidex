@@ -5,9 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
-
 import { Observable } from 'rxjs';
+import { Mock, Times } from 'typemoq';
 
 import {
     AuthService,
@@ -18,13 +17,13 @@ import {
 } from './../';
 
 describe('UsersProviderService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
-    let usersService: TypeMoq.Mock<UsersService>;
+    let authService: Mock<AuthService>;
+    let usersService: Mock<UsersService>;
     let usersProviderService: UsersProviderService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
-        usersService = TypeMoq.Mock.ofType(UsersService);
+        authService = Mock.ofType(AuthService);
+        usersService = Mock.ofType(UsersService);
         usersProviderService = new UsersProviderService(usersService.object, authService.object);
     });
 
@@ -33,7 +32,7 @@ describe('UsersProviderService', () => {
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let resultingUser: UserDto = null;
 
@@ -51,7 +50,7 @@ describe('UsersProviderService', () => {
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         usersProviderService.getUser('123');
 
@@ -74,7 +73,7 @@ describe('UsersProviderService', () => {
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let resultingUser: UserDto = null;
 

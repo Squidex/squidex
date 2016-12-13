@@ -5,20 +5,20 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxScrollActive]'
 })
-export class ScrollActiveDirective implements Ng2.OnChanges {
-    @Ng2.Input('sqxScrollActive')
+export class ScrollActiveDirective implements OnChanges {
+    @Input('sqxScrollActive')
     public isActive = false;
 
-    @Ng2.Input()
+    @Input()
     public container: HTMLElement;
 
     constructor(
-        private readonly element: Ng2.ElementRef
+        private readonly element: ElementRef
     ) {
     }
 

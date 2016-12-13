@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Forms from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -20,10 +20,10 @@ import {
 
 const ESCAPE_KEY = 27;
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-client',
-    styles,
-    template,
+    styleUrls: ['./client.component.scss'],
+    templateUrl: './client.component.html',
     animations: [
         fadeAnimation
     ]
@@ -33,13 +33,13 @@ export class ClientComponent {
 
     public appClientToken: AccessTokenDto;
 
-    @Ng2.Output()
-    public renamed = new Ng2.EventEmitter<string>();
+    @Output()
+    public renamed = new EventEmitter<string>();
 
-    @Ng2.Input()
+    @Input()
     public client: AppClientDto;
 
-    @Ng2.Input()
+    @Input()
     public appName: string;
 
     public modalDialog = new ModalView();
@@ -63,7 +63,7 @@ export class ClientComponent {
 
     constructor(
         private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: Ng2Forms.FormBuilder,
+        private readonly formBuilder: FormBuilder,
         private readonly notifications: NotificationService
     ) {
     }

@@ -5,17 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnInit, Renderer } from '@angular/core';
 
 import { UserReportConfig } from './../configurations';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-user-report',
     template: ''
 })
-export class UserReportComponent implements Ng2.OnInit {
+export class UserReportComponent implements OnInit {
     constructor(config: UserReportConfig,
-        private readonly renderer: Ng2.Renderer
+        private readonly renderer: Renderer
     ) {
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', config.siteId]);

@@ -5,19 +5,19 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import {
     Notification,
     NotificationService
 } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-internal-area',
-    styles,
-    template
+    styleUrls: ['./internal-area.component.scss'],
+    templateUrl: './internal-area.component.html'
 })
-export class InternalAreaComponent implements Ng2.OnInit, Ng2.OnDestroy {
+export class InternalAreaComponent implements OnInit, OnDestroy {
     private notificationsSubscription: any;
 
     public notifications: Notification[] = [];

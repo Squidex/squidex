@@ -5,16 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 
 declare var Spinner: any;
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-spinner',
     template: ''
 })
 export class SpinnerComponent {
-    constructor(element: Ng2.ElementRef) {
+    constructor(element: ElementRef) {
         const mediumOptions = {
             lines: 12,
             length: 5,

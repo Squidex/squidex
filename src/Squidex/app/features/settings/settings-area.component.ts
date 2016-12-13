@@ -5,12 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component } from '@angular/core';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-settings-area',
-    styles,
-    template
+    styleUrls: ['./settings-area.component.scss'],
+    templateUrl: './settings-area.component.html'
 })
 export class SettingsAreaComponent {
 

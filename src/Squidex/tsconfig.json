@@ -8,6 +8,8 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "baseUrl": ".",

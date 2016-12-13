@@ -5,14 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable, Renderer } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 export const PanelServiceFactory = () => {
     return new PanelService();
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class PanelService {
     private readonly elements: any[] = [];
     private readonly changed$ = new Subject<number>();
@@ -21,17 +21,17 @@ export class PanelService {
         return this.changed$;
     }
 
-    public push(element: any, renderer: Ng2.Renderer) {
+    public push(element: any, renderer: Renderer) {
         this.elements.push(element);
         this.update(renderer);
     }
 
-    public pop(element: any, renderer: Ng2.Renderer) {
+    public pop(element: any, renderer: Renderer) {
         this.elements.splice(-1, 1);
         this.update(renderer);
     }
 
-    private update(renderer: Ng2.Renderer) {
+    private update(renderer: Renderer) {
         let currentPosition = 0;
         let currentLayer = this.elements.length * 10;
 

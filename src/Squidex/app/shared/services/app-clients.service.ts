@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Http from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Headers, Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs';
 
 import {
@@ -49,12 +49,12 @@ export class AccessTokenDto {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class AppClientsService {
     constructor(
         private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly http: Ng2Http.Http
+        private readonly http: Http
     ) {
     }
 
@@ -107,8 +107,8 @@ export class AppClientsService {
     }
 
     public createToken(appName: string, client: AppClientDto): Observable<AccessTokenDto> {
-        const options = new Ng2Http.RequestOptions({
-            headers: new Ng2Http.Headers({
+        const options = new RequestOptions({
+            headers: new Headers({
                 'Content-Type': 'application/x-www-form-urlencoded'
             })
         });

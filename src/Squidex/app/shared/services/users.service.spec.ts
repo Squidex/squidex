@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
-import * as TypeMoq from 'typemoq';
-
+import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
+import { Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -18,19 +17,19 @@ import {
 } from './../';
 
 describe('UsersService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
     let usersService: UsersService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
         usersService = new UsersService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
     it('should make get request to get many users', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/?query='))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             id: '123',
                             email: 'mail1@domain.com',
@@ -45,7 +44,7 @@ describe('UsersService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let user: UserDto[] = null;
 
@@ -65,8 +64,8 @@ describe('UsersService', () => {
     it('should make get request and query to get many users', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/?query=my-query'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             id: '123',
                             email: 'mail1@domain.com',
@@ -81,7 +80,7 @@ describe('UsersService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let user: UserDto[] = null;
 
@@ -101,8 +100,8 @@ describe('UsersService', () => {
     it('should make get request to get single user', () => {
         authService.setup(x => x.authGet('http://service/p/api/users/123'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: {
                             id: '123',
                             email: 'mail1@domain.com',
@@ -112,7 +111,7 @@ describe('UsersService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let user: UserDto = null;
 

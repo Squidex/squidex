@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 export const NotificationServiceFactory = () => {
@@ -29,7 +29,7 @@ export class Notification {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class NotificationService {
     private readonly notificationsStream$ = new Subject<Notification>();
 

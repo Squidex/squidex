@@ -5,14 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { UserDto, UsersService } from './users.service';
 
 import { AuthService } from './auth.service';
 
-@Ng2.Injectable()
+@Injectable()
 export class UsersProviderService {
     private readonly caches: { [id: string]: Observable<UserDto> } = {};
 

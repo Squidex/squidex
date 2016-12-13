@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiUrlConfig, handleError } from 'framework';
@@ -20,7 +20,7 @@ export class AppContributorDto {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class AppContributorsService {
     constructor(
         private readonly authService: AuthService,

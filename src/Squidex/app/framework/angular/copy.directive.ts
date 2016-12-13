@@ -5,16 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, HostListener, Input } from '@angular/core';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxCopy]'
 })
 export class CopyDirective {
-    @Ng2.Input('sqxCopy')
+    @Input('sqxCopy')
     public inputElement: any;
 
-    @Ng2.HostListener('click')
+    @HostListener('click')
     public onClick() {
         if (this.inputElement) {
             this.copyToClipbord(this.inputElement);

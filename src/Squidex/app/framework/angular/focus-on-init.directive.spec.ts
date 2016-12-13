@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { ElementRef, Renderer } from '@angular/core';
 
 import { FocusOnInitDirective } from './focus-on-init.directive';
 
@@ -29,11 +29,11 @@ describe('FocusOnInitDirective', () => {
             }
         };
 
-        const element: Ng2.ElementRef = {
+        const element: ElementRef = {
             nativeElement: {}
         };
 
-        new FocusOnInitDirective(element, renderer as Ng2.Renderer).ngOnInit();
+        new FocusOnInitDirective(element, renderer as Renderer).ngOnInit();
 
         expect(calledMethods).toEqual([]);
 

@@ -5,10 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component } from '@angular/core';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-app-area',
-    template
+    styleUrls: ['./app-area.component.scss'],
+    templateUrl: './app-area.component.html'
 })
 export class AppAreaComponent { }

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Forms from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 import { Validators } from './../';
 
@@ -17,7 +17,7 @@ describe('Validators', () => {
     });
 
     it('should return error when not a number', () => {
-        const input = new Ng2Forms.FormControl('text');
+        const input = new FormControl('text');
 
         const error = validateBetween(input);
 
@@ -25,7 +25,7 @@ describe('Validators', () => {
     });
 
     it('should return error if less than minimum setting', () => {
-        const input = new Ng2Forms.FormControl(5);
+        const input = new FormControl(5);
 
         const error = validateBetween(input);
 
@@ -33,7 +33,7 @@ describe('Validators', () => {
     });
 
     it('should return error if greater than maximum setting', () => {
-        const input = new Ng2Forms.FormControl(300);
+        const input = new FormControl(300);
 
         const error = validateBetween(input);
 
@@ -41,7 +41,7 @@ describe('Validators', () => {
     });
 
     it('should return empty value when value is valid', () => {
-        const input = new Ng2Forms.FormControl(50);
+        const input = new FormControl(50);
 
         const error = validateBetween(input);
 

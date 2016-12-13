@@ -5,50 +5,57 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import {
+    animate,
+    AnimationEntryMetadata,
+    state,
+    style,
+    transition,
+    trigger
+} from '@angular/core';
 
-export function buildFadeAnimation(name = 'fade', timing = '200ms'): Ng2.AnimationEntryMetadata {
-    return Ng2.trigger(
+export function buildFadeAnimation(name = 'fade', timing = '200ms'): AnimationEntryMetadata {
+    return trigger(
         name, [
-            Ng2.transition(':enter', [
-                Ng2.style({ opacity: 0 }),
-                Ng2.animate(timing, Ng2.style({ opacity: 1 }))
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate(timing, style({ opacity: 1 }))
             ]),
-            Ng2.transition(':leave', [
-                Ng2.style({ opacity: 1 }),
-                Ng2.animate(timing, Ng2.style({ opacity: 0 }))
+            transition(':leave', [
+                style({ opacity: 1 }),
+                animate(timing, style({ opacity: 0 }))
             ]),
-            Ng2.state('true',
-                Ng2.style({ opacity: 1 })
+            state('true',
+                style({ opacity: 1 })
             ),
-            Ng2.state('false',
-                Ng2.style({ opacity: 0 })
+            state('false',
+                style({ opacity: 0 })
             ),
-            Ng2.transition('1 => 0', Ng2.animate(timing)),
-            Ng2.transition('0 => 1', Ng2.animate(timing))
+            transition('1 => 0', animate(timing)),
+            transition('0 => 1', animate(timing))
         ]
     );
 };
 
-export function buildHeightAnimation(name = 'height', timing = '200ms'): Ng2.AnimationEntryMetadata {
-    return Ng2.trigger(
+export function buildHeightAnimation(name = 'height', timing = '200ms'): AnimationEntryMetadata {
+    return trigger(
         name, [
-            Ng2.transition(':enter', [
-                Ng2.style({ height: '0px' }),
-                Ng2.animate(timing, Ng2.style({ height: '*' }))
+            transition(':enter', [
+                style({ height: '0px' }),
+                animate(timing, style({ height: '*' }))
             ]),
-            Ng2.transition(':leave', [
-                Ng2.style({ height: '*' }),
-                Ng2.animate(timing, Ng2.style({ height: '0px' }))
+            transition(':leave', [
+                style({ height: '*' }),
+                animate(timing, style({ height: '0px' }))
             ]),
-            Ng2.state('true',
-                Ng2.style({ height: '*' })
+            state('true',
+                style({ height: '*' })
             ),
-            Ng2.state('false',
-                Ng2.style({ height: '0px' })
+            state('false',
+                style({ height: '0px' })
             ),
-            Ng2.transition('1 => 0', Ng2.animate(timing)),
-            Ng2.transition('0 => 1', Ng2.animate(timing))
+            transition('1 => 0', animate(timing)),
+            transition('0 => 1', animate(timing))
         ]
     );
 };

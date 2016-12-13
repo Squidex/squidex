@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
 import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
@@ -18,7 +18,7 @@ import {
     SettingsAreaComponent
 } from './declarations';
 
-const routes: Ng2Router.Routes = [
+const routes: Routes = [
     {
         path: '',
         component: SettingsAreaComponent,
@@ -40,11 +40,11 @@ const routes: Ng2Router.Routes = [
     }
 ];
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
-        Ng2Router.RouterModule.forChild(routes)
+        RouterModule.forChild(routes)
     ],
     declarations: [
         ClientComponent,

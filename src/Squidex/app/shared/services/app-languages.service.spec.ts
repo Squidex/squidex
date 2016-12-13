@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
-import * as TypeMoq from 'typemoq';
-
+import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
+import { It, Mock, Times } from 'typemoq';
 
 import {
     AddAppLanguageDto,
@@ -20,19 +19,19 @@ import {
 } from './../';
 
 describe('AppLanguagesService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
     let appLanguagesService: AppLanguagesService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
         appLanguagesService = new AppLanguagesService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
     it('should make get request to get app languages', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/languages'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             iso2Code: 'de',
                             englishName: 'German',
@@ -44,7 +43,7 @@ describe('AppLanguagesService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let languages: AppLanguageDto[] = null;
 
@@ -64,10 +63,10 @@ describe('AppLanguagesService', () => {
     it('should make post request to add language', () => {
         const dto = new AddAppLanguageDto('de');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', TypeMoq.It.isValue(dto)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', It.isValue(dto)))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: {
                             iso2Code: 'de',
                             englishName: 'German'
@@ -75,7 +74,7 @@ describe('AppLanguagesService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let language: AppLanguageDto;
 
@@ -92,13 +91,13 @@ describe('AppLanguagesService', () => {
     it('should make put request to make master language', () => {
         const dto = new UpdateAppLanguageDto(true);
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', TypeMoq.It.isValue(dto)))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', It.isValue(dto)))
             .returns(() => Observable.of(
-               new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions()
+               new Response(
+                    new ResponseOptions()
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appLanguagesService.updateLanguage('my-app', 'de', dto);
 
@@ -108,11 +107,11 @@ describe('AppLanguagesService', () => {
     it('should make delete request to remove language', () => {
         authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/languages/de'))
             .returns(() => Observable.of(
-               new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions()
+               new Response(
+                    new ResponseOptions()
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appLanguagesService.deleteLanguage('my-app', 'de');
 

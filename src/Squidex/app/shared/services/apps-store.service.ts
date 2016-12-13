@@ -5,13 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-
-import {
-    BehaviorSubject,
-    Observable,
-    Subject
-} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { DateTime } from 'framework';
 
@@ -23,7 +18,7 @@ import {
 
 import { AuthService } from './auth.service';
 
-@Ng2.Injectable()
+@Injectable()
 export class AppsStoreService {
     private readonly apps$ = new Subject<AppDto[]>();
     private readonly appName$ = new BehaviorSubject<string | null>(null);

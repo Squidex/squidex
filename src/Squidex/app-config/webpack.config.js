@@ -45,7 +45,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.ts$/,
-                loaders: ['awesome-typescript', 'angular2-router-loader', helpers.root('app-config', 'auto-loader') + '?[file].html=template&[file].scss=styles', 'tslint']
+                loaders: ['awesome-typescript', 'angular2-router-loader', 'angular2-template-loader', 'tslint']
             }, {
                 test: /\.html$/,
                 loader: 'html'

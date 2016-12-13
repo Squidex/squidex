@@ -5,23 +5,23 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { Directive, ElementRef, HostListener, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AppsStoreService } from './../services/apps-store.service';
 
-@Ng2.Directive({
+@Directive({
     selector: '[dashboardLink]'
 })
-export class DashboardLinkDirective implements Ng2.OnInit, Ng2.OnDestroy {
+export class DashboardLinkDirective implements OnInit, OnDestroy {
     private appSubscription: any;
     private url: string;
 
     constructor(
         private readonly appsStore: AppsStoreService,
-        private readonly router: Ng2Router.Router,
-        private readonly element: Ng2.ElementRef,
-        private readonly renderer: Ng2.Renderer
+        private readonly router: Router,
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer
     ) {
     }
 
@@ -38,7 +38,7 @@ export class DashboardLinkDirective implements Ng2.OnInit, Ng2.OnDestroy {
         this.appSubscription.unsubscribe();
     }
 
-    @Ng2.HostListener('click')
+    @HostListener('click')
     public onClick() {
         this.router.navigateByUrl(this.url);
 

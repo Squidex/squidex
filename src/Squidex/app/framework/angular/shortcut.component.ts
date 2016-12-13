@@ -5,29 +5,29 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { ShortcutService } from './../services/shortcut.service';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-shortcut',
     template: ''
 })
-export class ShortcutComponent implements Ng2.OnInit, Ng2.OnDestroy {
-    @Ng2.Input()
+export class ShortcutComponent implements OnInit, OnDestroy {
+    @Input()
     public keys: string;
 
-    @Ng2.Input()
+    @Input()
     public disabled: boolean;
 
-    @Ng2.Output()
-    public trigger = new Ng2.EventEmitter();
+    @Output()
+    public trigger = new EventEmitter();
 
     private lastKeys: string;
 
     constructor(
         private readonly shortcutService: ShortcutService,
-        private readonly zone: Ng2.NgZone
+        private readonly zone: NgZone
     ) {
     }
 

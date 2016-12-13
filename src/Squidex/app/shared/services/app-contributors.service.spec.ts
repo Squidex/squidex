@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
-import * as TypeMoq from 'typemoq';
-
+import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
+import { It, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -18,19 +17,19 @@ import {
 } from './../';
 
 describe('AppContributorsService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
     let appContributorsService: AppContributorsService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
         appContributorsService = new AppContributorsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
     it('should make get request to get app contributors', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps/my-app/contributors'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             contributorId: '123',
                             permission: 'Owner'
@@ -41,7 +40,7 @@ describe('AppContributorsService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let contributors: AppContributorDto[] = null;
 
@@ -61,13 +60,13 @@ describe('AppContributorsService', () => {
     it('should make post request to assign contributor', () => {
         const contributor = new AppContributorDto('123', 'Owner');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', TypeMoq.It.isValue(contributor)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', It.isValue(contributor)))
             .returns(() => Observable.of(
-               new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions()
+               new Response(
+                    new ResponseOptions()
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appContributorsService.postContributor('my-app', contributor);
 
@@ -77,11 +76,11 @@ describe('AppContributorsService', () => {
     it('should make delete request to remove contributor', () => {
         authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/contributors/123'))
             .returns(() => Observable.of(
-               new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions()
+               new Response(
+                    new ResponseOptions()
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appContributorsService.deleteContributor('my-app', '123');
 

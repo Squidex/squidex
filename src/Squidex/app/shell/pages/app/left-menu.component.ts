@@ -5,16 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { AppsStoreService, LocalStoreService } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-left-menu',
-    styles,
-    template
+    styleUrls: ['./left-menu.component.scss'],
+    templateUrl: './left-menu.component.html'
 })
-export class LeftMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
+export class LeftMenuComponent implements OnInit, OnDestroy {
     private appSubscription: any | null = null;
 
     public get showSettingsMenu(): boolean {

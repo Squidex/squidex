@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Http from '@angular/http';
-import * as Ng2Router from '@angular/router';
+import { Injectable } from '@angular/core';
+import { Headers, Http, RequestOptions, Response } from '@angular/http';
+import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -37,7 +37,7 @@ export class Profile {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly isAuthenticatedChanged$ = new Subject<boolean>();
@@ -59,8 +59,8 @@ export class AuthService {
     }
 
     constructor(apiUrl: ApiUrlConfig,
-        private readonly http: Ng2Http.Http,
-        private readonly router: Ng2Router.Router
+        private readonly http: Http,
+        private readonly router: Router
     ) {
         if (!apiUrl) {
             return;
@@ -161,32 +161,32 @@ export class AuthService {
         return resultPromise;
     }
 
-    public authGet(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+    public authGet(url: string, options?: RequestOptions): Observable<Response> {
         options = this.setRequestOptions(options);
 
         return this.checkResponse(this.http.get(url, options));
     }
 
-    public authPut(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+    public authPut(url: string, data: any, options?: RequestOptions): Observable<Response> {
         options = this.setRequestOptions(options);
 
         return this.checkResponse(this.http.put(url, data, options));
     }
 
-    public authDelete(url: string, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+    public authDelete(url: string, options?: RequestOptions): Observable<Response> {
         options = this.setRequestOptions(options);
 
         return this.checkResponse(this.http.delete(url, options));
     }
 
-    public authPost(url: string, data: any, options?: Ng2Http.RequestOptions): Observable<Ng2Http.Response> {
+    public authPost(url: string, data: any, options?: RequestOptions): Observable<Response> {
         options = this.setRequestOptions(options);
 
         return this.checkResponse(this.http.post(url, data, options));
     }
 
-    private checkResponse(response: Observable<Ng2Http.Response>) {
-        return response.catch((error: Ng2Http.Response) => {
+    private checkResponse(response: Observable<Response>) {
+        return response.catch((error: Response) => {
             if (error.status === 401 || error.status === 404) {
                 this.loginRedirect();
             } else if (error.status === 403) {
@@ -197,13 +197,13 @@ export class AuthService {
         });
     }
 
-    private setRequestOptions(options?: Ng2Http.RequestOptions) {
+    private setRequestOptions(options?: RequestOptions) {
         if (!options) {
-            options = new Ng2Http.RequestOptions();
+            options = new RequestOptions();
         }
 
         if (!options.headers) {
-            options.headers = new Ng2Http.Headers();
+            options.headers = new Headers();
             options.headers.append('Content-Type', 'application/json');
         }
 

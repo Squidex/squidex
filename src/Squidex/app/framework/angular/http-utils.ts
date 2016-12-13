@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
+import { Response } from '@angular/http';
 import { Observable } from 'rxjs';
 
 export class EntityCreatedDto {
@@ -49,10 +49,10 @@ export class ErrorDto {
     }
 }
 
-export function handleError(message: string, error: Ng2Http.Response | any) {
+export function handleError(message: string, error: Response | any) {
     let result = new ErrorDto(500, message);
 
-    if (error instanceof Ng2Http.Response && error.status !== 500) {
+    if (error instanceof Response && error.status !== 500) {
         const body = error.json();
 
         result = new ErrorDto(error.status, body.message, body.details);

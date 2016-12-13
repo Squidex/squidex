@@ -5,11 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Pipe } from '@angular/core';
 
 import { CurrencyConfig, DecimalSeparatorConfig } from './../configurations';
 
-@Ng2.Pipe({
+@Pipe({
     name: 'money'
 })
 export class MoneyPipe {

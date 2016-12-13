@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 
-@Ng2.Injectable()
+@Injectable()
 export class TitlesConfig {
     constructor(
         public readonly value: { [key: string]: string },
@@ -19,7 +19,7 @@ export const TitleServiceFactory = (titles: TitlesConfig) => {
     return new TitleService(titles);
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class TitleService {
     constructor(private readonly titles: TitlesConfig) { }
 

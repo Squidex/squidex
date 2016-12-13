@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, OnInit } from '@angular/core';
 
-@Ng2.Directive({
+@Directive({
     selector: '.sqx-cloak'
 })
-export class CloakDirective implements Ng2.OnInit {
-    constructor(private readonly element: Ng2.ElementRef) { }
+export class CloakDirective implements OnInit {
+    constructor(private readonly element: ElementRef) { }
 
     public ngOnInit() {
         this.element.nativeElement.classList.remove('sqx-cloak');

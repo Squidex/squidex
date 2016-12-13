@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 import { Vec2 } from './../utils/vec2';
@@ -16,7 +16,7 @@ export const DragServiceFactory = () => {
     return new DragService();
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class DragService {
     private readonly dropEvent = new Subject<DropEvent>();
 

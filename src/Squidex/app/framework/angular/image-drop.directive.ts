@@ -5,33 +5,33 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer } from '@angular/core';
 
 import { DragService } from './../services/drag.service';
 import { Vec2 } from './../utils/vec2';
 
-@Ng2.Directive({
+@Directive({
     selector: '.sqx-image-drop'
 })
 export class ImageDropDirective {
     constructor(
-        private readonly element: Ng2.ElementRef,
-        private readonly renderer: Ng2.Renderer,
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer,
         private readonly dragService: DragService
     ) {
     }
 
-    @Ng2.HostListener('dragenter', ['$event'])
+    @HostListener('dragenter', ['$event'])
     public onDragEnter(event: DragDropEvent) {
         this.tryStopEvent(event);
     }
 
-    @Ng2.HostListener('dragover', ['$event'])
+    @HostListener('dragover', ['$event'])
     public onDragOver(event: DragDropEvent) {
         this.tryStopEvent(event);
     }
 
-    @Ng2.HostListener('drop', ['$event'])
+    @HostListener('drop', ['$event'])
     public onDrop(event: DragDropEvent) {
         const image = this.findImage(event);
 

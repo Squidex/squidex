@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 
 export const ShortcutServiceFactory = () => {
     return new ShortcutService();
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class ShortcutService {
     public on(keys: string, callback: (e: KeyboardEvent, combo: string) => void) {
         return Mousetrap.bind(keys, (event, combo) => {

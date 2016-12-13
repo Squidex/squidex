@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import {
     AuthService,
@@ -13,15 +13,15 @@ import {
     ModalView
 } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-profile-menu',
-    styles,
-    template,
+    styleUrls: ['./profile-menu.component.scss'],
+    templateUrl: './profile-menu.component.html',
     animations: [
         fadeAnimation
     ]
 })
-export class ProfileMenuComponent implements Ng2.OnInit, Ng2.OnDestroy {
+export class ProfileMenuComponent implements OnInit, OnDestroy {
     private authenticationSubscription: any | null = null;
 
     public modalMenu = new ModalView(false, true);

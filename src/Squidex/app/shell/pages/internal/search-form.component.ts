@@ -5,11 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component } from '@angular/core';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-search-form',
-    styles,
-    template
+    styleUrls: ['./search-form.component.scss'],
+    templateUrl: './search-form.component.html'
 })
 export class SearchFormComponent { }

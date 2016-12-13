@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
-import * as TypeMoq from 'typemoq';
-
+import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
+import { It, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -21,19 +20,19 @@ import {
 } from './../';
 
 describe('AppsService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
     let appsService: AppsService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
         appsService = new AppsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
     it('should make get request to get apps', () => {
         authService.setup(x => x.authGet('http://service/p/api/apps'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             id: '123',
                             name: 'name1',
@@ -50,7 +49,7 @@ describe('AppsService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let apps: AppDto[] = null;
 
@@ -69,17 +68,17 @@ describe('AppsService', () => {
     it('should make post request to create app', () => {
         const createApp = new CreateAppDto('new-app');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps', TypeMoq.It.isValue(createApp)))
+        authService.setup(x => x.authPost('http://service/p/api/apps', It.isValue(createApp)))
             .returns(() => Observable.of(
-               new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+               new Response(
+                    new ResponseOptions({
                         body: {
                             id: '123'
                         }
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let newCreated: EntityCreatedDto = null;
 

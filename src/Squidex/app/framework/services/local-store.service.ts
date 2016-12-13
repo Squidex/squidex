@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 
 export const LocalStoreServiceFactory = () => {
     return new LocalStoreService();
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class LocalStoreService {
     private readonly fallback = {};
     private store: any = localStorage;

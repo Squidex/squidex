@@ -5,25 +5,25 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, Renderer }from '@angular/core';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxFocusOnChange]'
 })
-export class FocusOnChangeDirective implements Ng2.OnChanges {
-    @Ng2.Input()
+export class FocusOnChangeDirective implements OnChanges {
+    @Input()
     public sqxFocusOnChange: any;
 
-    @Ng2.Input()
+    @Input()
     public select: boolean;
 
     constructor(
-        private readonly elementRef: Ng2.ElementRef,
-        private readonly renderer: Ng2.Renderer
+        private readonly elementRef: ElementRef,
+        private readonly renderer: Renderer
     ) {
     }
 
-    public ngOnChanges(changes: { [key: string]: Ng2.SimpleChange }) {
+    public ngOnChanges() {
         setTimeout(() => {
             this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'focus', []);
 

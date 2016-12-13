@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { ElementRef, Renderer } from '@angular/core';
 
 import { FocusOnChangeDirective } from './focus-on-change.directive';
 
@@ -29,11 +29,11 @@ describe('FocusOnChangeDirective', () => {
             }
         };
 
-        const element: Ng2.ElementRef = {
+        const element: ElementRef = {
             nativeElement: {}
         };
 
-        new FocusOnChangeDirective(element, renderer as Ng2.Renderer).ngOnChanges({});
+        new FocusOnChangeDirective(element, renderer as Renderer).ngOnChanges({});
 
         expect(calledMethods).toEqual([]);
 

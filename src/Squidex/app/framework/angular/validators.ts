@@ -5,11 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Forms from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 
 export class Validators {
     public static between(minValue: number, maxValue: number) {
-        return (control: Ng2Forms.AbstractControl): { [key: string]: any } => {
+        return (control: AbstractControl): { [key: string]: any } => {
             const n: number = control.value;
 
             if (typeof n !== 'number') {

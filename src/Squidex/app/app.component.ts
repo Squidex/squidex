@@ -5,11 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component } from '@angular/core';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-app',
-    template
+    styleUrls: ['./app.component.scss'],
+    templateUrl: './app.component.html'
 })
 export class AppComponent {
     public isLoaded = false;

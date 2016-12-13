@@ -5,9 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
-
 import { Observable } from 'rxjs';
+import { It, Mock, Times } from 'typemoq';
 
 import {
     AppDto,
@@ -24,22 +23,22 @@ describe('AppsStoreService', () => {
     const oldApps = [new AppDto('id', 'old-name', now, now, 'Owner')];
     const newApp =   new AppDto('id', 'new-name', now, now, 'Owner');
 
-    let appsService: TypeMoq.Mock<AppsService>;
-    let authService: TypeMoq.Mock<AuthService>;
+    let appsService: Mock<AppsService>;
+    let authService: Mock<AuthService>;
 
     beforeEach(() => {
-        appsService = TypeMoq.Mock.ofType(AppsService);
-        authService = TypeMoq.Mock.ofType(AuthService);
+        appsService = Mock.ofType(AppsService);
+        authService = Mock.ofType(AuthService);
     });
 
     it('should load when authenticated once', () => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
@@ -63,11 +62,11 @@ describe('AppsStoreService', () => {
     it('should reload value from apps-service when called', () => {
          authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
-            .verifiable(TypeMoq.Times.exactly(2));
+            .verifiable(Times.exactly(2));
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
@@ -93,15 +92,15 @@ describe('AppsStoreService', () => {
     it('should add app to cache when created', () => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
-        appsService.setup(x => x.postApp(TypeMoq.It.isAny()))
+        appsService.setup(x => x.postApp(It.isAny()))
             .returns(() => Observable.of(newApp))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
@@ -127,11 +126,11 @@ describe('AppsStoreService', () => {
     it('should not add app to cache when cache is null', () => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(false))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
-        appsService.setup(x => x.postApp(TypeMoq.It.isAny()))
+        appsService.setup(x => x.postApp(It.isAny()))
             .returns(() => Observable.of(newApp))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
@@ -151,11 +150,11 @@ describe('AppsStoreService', () => {
     it('should select app', (done) => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         const store = new AppsStoreService(authService.object, appsService.object);
 

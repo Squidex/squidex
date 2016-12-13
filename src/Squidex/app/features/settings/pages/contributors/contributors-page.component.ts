@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
@@ -54,12 +54,12 @@ function changePermission(contributor: AppContributorDto, permission: string): A
     return new AppContributorDto(contributor.contributorId, permission);
 }
 
-@Ng2.Component({
-    selector: 'sqx-contributor-page',
-    styles,
-    template
+@Component({
+    selector: 'sqx-contributors-page',
+    styleUrls: ['./contributors-page.component.scss'],
+    templateUrl: './contributors-page.component.html'
 })
-export class ContributorsPageComponent extends AppComponentBase implements Ng2.OnInit {
+export class ContributorsPageComponent extends AppComponentBase implements OnInit {
     public appContributors = ImmutableArray.empty<AppContributorDto>();
 
     public currentUserId: string;

@@ -5,23 +5,23 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AuthService, TitleService } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'home-page',
-    styles,
-    template
+    styleUrls: ['./home-page.component.scss'],
+    templateUrl: './home-page.component.html'
 })
-export class HomePageComponent implements Ng2.OnInit {
+export class HomePageComponent implements OnInit {
     public showLoginError = false;
 
     constructor(
         private readonly auth: AuthService,
         private readonly title: TitleService,
-        private readonly router: Ng2Router.Router
+        private readonly router: Router
     ) {
     }
 

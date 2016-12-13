@@ -5,14 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export const ClipboardServiceFactory = () => {
     return new ClipboardService();
 };
 
-@Ng2.Injectable()
+@Injectable()
 export class ClipboardService {
     private readonly text$ = new BehaviorSubject<string>('');
 

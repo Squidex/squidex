@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Browser from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
@@ -56,9 +56,9 @@ export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
-        Ng2Browser.BrowserModule,
+        BrowserModule,
         SqxFrameworkModule,
         SqxSharedModule,
         SqxShellModule,

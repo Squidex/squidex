@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Http from '@angular/http';
-import * as TypeMoq from 'typemoq';
-
+import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
+import { Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -18,19 +17,19 @@ import {
 } from './../';
 
 describe('LanguageService', () => {
-    let authService: TypeMoq.Mock<AuthService>;
+    let authService: Mock<AuthService>;
     let languageService: LanguageService;
 
     beforeEach(() => {
-        authService = TypeMoq.Mock.ofType(AuthService);
+        authService = Mock.ofType(AuthService);
         languageService = new LanguageService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
     it('should make get request to get languages', () => {
         authService.setup(x => x.authGet('http://service/p/api/languages'))
             .returns(() => Observable.of(
-                new Ng2Http.Response(
-                    new Ng2Http.ResponseOptions({
+                new Response(
+                    new ResponseOptions({
                         body: [{
                             iso2Code: 'de',
                             englishName: 'German'
@@ -41,7 +40,7 @@ describe('LanguageService', () => {
                     })
                 )
             ))
-            .verifiable(TypeMoq.Times.once());
+            .verifiable(Times.once());
 
         let languages: LanguageDto[] = null;
 

@@ -5,18 +5,18 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, Renderer } from '@angular/core';
 
-@Ng2.Directive({
+@Directive({
     selector: '[sqxFocusOnInit]'
 })
-export class FocusOnInitDirective implements Ng2.OnInit {
-    @Ng2.Input()
+export class FocusOnInitDirective implements OnInit {
+    @Input()
     public select: boolean;
 
     constructor(
-        private readonly elementRef: Ng2.ElementRef,
-        private readonly renderer: Ng2.Renderer
+        private readonly elementRef: ElementRef,
+        private readonly renderer: Renderer
     ) {
     }
 

@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Forms from '@angular/forms';
+import { Component, forwardRef, Input, OnDestroy } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
 export interface AutocompleteSource {
@@ -32,35 +32,35 @@ const KEY_DOWN = 40;
 const NOOP = () => { };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
-    provide: Ng2Forms.NG_VALUE_ACCESSOR,
-    useExisting: Ng2.forwardRef(() => {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => {
         return AutocompleteComponent;
     }),
     multi: true
 };
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-autocomplete',
-    styles,
-    template,
+    styleUrls: ['./autocomplete.component.scss'],
+    templateUrl: './autocomplete.component.html',
     providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
 })
-export class AutocompleteComponent implements Ng2Forms.ControlValueAccessor, Ng2.OnDestroy {
+export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
     private subscription: Subscription | null = null;
     private lastQuery: string | null;
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
-    @Ng2.Input()
+    @Input()
     public source: AutocompleteSource;
 
-    @Ng2.Input()
+    @Input()
     public inputName: string;
 
     public items: AutocompleteItem[] = [];
     public itemSelection = -1;
 
-    public queryInput = new Ng2Forms.FormControl();
+    public queryInput = new FormControl();
 
     constructor() {
         this.queryInput.valueChanges.delay(100).subscribe(query => this.loadItems(query));

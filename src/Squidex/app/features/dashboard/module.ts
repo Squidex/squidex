@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
-import * as Ng2Router from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
 import { SqxFrameworkModule } from 'shared';
 
@@ -14,17 +14,17 @@ import {
     DashboardPageComponent
 } from './declarations';
 
-const routes: Ng2Router.Routes = [
+const routes: Routes = [
     {
         path: '',
         component: DashboardPageComponent
     }
 ];
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
         SqxFrameworkModule,
-        Ng2Router.RouterModule.forChild(routes)
+        RouterModule.forChild(routes)
     ],
     declarations: [
         DashboardPageComponent

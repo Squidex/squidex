@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import {
     AppsStoreService,
@@ -13,12 +13,12 @@ import {
     TitleService
 } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-apps-page',
-    styles,
-    template
+    styleUrls: ['./apps-page.component.scss'],
+    templateUrl: './apps-page.component.html'
 })
-export class AppsPageComponent implements Ng2.OnInit {
+export class AppsPageComponent implements OnInit {
     public modalDialog = new ModalView();
 
     constructor(

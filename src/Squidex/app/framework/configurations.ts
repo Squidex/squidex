@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Injectable } from '@angular/core';
 
-@Ng2.Injectable()
+@Injectable()
 export class ApiUrlConfig {
     public readonly value: string;
 
@@ -28,22 +28,22 @@ export class ApiUrlConfig {
     }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class DecimalSeparatorConfig {
     constructor(public readonly value: string) { }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class ProductionModeConfig {
     constructor(public readonly isProductionMode: boolean) { }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class UserReportConfig {
     constructor(public readonly siteId: string) { }
 }
 
-@Ng2.Injectable()
+@Injectable()
 export class CurrencyConfig {
     constructor(
         public readonly code: string,

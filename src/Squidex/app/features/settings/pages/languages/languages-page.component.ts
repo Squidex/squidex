@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import {
     AddAppLanguageDto,
@@ -21,12 +21,12 @@ import {
     UsersProviderService
 } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-languages-page',
-    styles,
-    template
+    styleUrls: ['./languages-page.component.scss'],
+    templateUrl: './languages-page.component.html'
 })
-export class LanguagesPageComponent extends AppComponentBase implements Ng2.OnInit {
+export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     public allLanguages: LanguageDto[] = [];
     public appLanguages = ImmutableArray.empty<AppLanguageDto>();
 

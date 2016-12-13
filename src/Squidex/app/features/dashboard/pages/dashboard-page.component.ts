@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -14,10 +14,10 @@ import {
     UsersProviderService
  } from 'shared';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-dashboard-page',
-    styles,
-    template
+    styleUrls: ['./dashboard-page.component.scss'],
+    templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent extends AppComponentBase {
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {

@@ -5,22 +5,22 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 
 import { TitleService } from './../services/title.service';
 
-@Ng2.Component({
+@Component({
     selector: 'sqx-title',
     template: ''
 })
-export class TitleComponent implements Ng2.OnChanges {
-    @Ng2.Input()
+export class TitleComponent implements OnChanges {
+    @Input()
     public message: any;
 
-    @Ng2.Input()
+    @Input()
     public parameter: string;
 
-    @Ng2.Input()
+    @Input()
     public value: any;
 
     constructor(

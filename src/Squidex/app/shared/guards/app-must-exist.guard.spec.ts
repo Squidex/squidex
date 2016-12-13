@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as TypeMoq from 'typemoq';
+import { Mock } from 'typemoq';
 
 import { AppsStoreService } from 'shared';
 
@@ -13,10 +13,10 @@ import { AppMustExistGuard } from './app-must-exist.guard';
 import { RouterMockup } from './router-mockup';
 
 describe('AppMustExistGuard', () => {
-    let appsStore: TypeMoq.Mock<AppsStoreService>;
+    let appsStore: Mock<AppsStoreService>;
 
     beforeEach(() => {
-        appsStore = TypeMoq.Mock.ofType(AppsStoreService);
+        appsStore = Mock.ofType(AppsStoreService);
     });
 
     it('should navigate to 404 page if app is not found', (done) => {

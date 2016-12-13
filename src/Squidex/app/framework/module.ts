@@ -5,11 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2Common from '@angular/common';
-import * as Ng2 from '@angular/core';
-import * as Ng2Forms from '@angular/forms';
-import * as Ng2Http from '@angular/http';
-import * as Ng2Router from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { RouterModule } from '@angular/router';
 
 import {
     AutocompleteComponent,
@@ -38,13 +38,13 @@ import {
     UserReportComponent
 } from './declarations';
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
-        Ng2Http.HttpModule,
-        Ng2Forms.FormsModule,
-        Ng2Forms.ReactiveFormsModule,
-        Ng2Common.CommonModule,
-        Ng2Router.RouterModule
+        HttpModule,
+        FormsModule,
+        CommonModule,
+        ReactiveFormsModule,
+        RouterModule
     ],
     declarations: [
         AutocompleteComponent,
@@ -97,11 +97,11 @@ import {
         SpinnerComponent,
         TitleComponent,
         UserReportComponent,
-        Ng2Http.HttpModule,
-        Ng2Forms.FormsModule,
-        Ng2Forms.ReactiveFormsModule,
-        Ng2Common.CommonModule,
-        Ng2Router.RouterModule
+        HttpModule,
+        FormsModule,
+        CommonModule,
+        ReactiveFormsModule,
+        RouterModule
     ]
 })
 export class SqxFrameworkModule { }

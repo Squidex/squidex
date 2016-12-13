@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as Ng2 from '@angular/core';
+import { NgModule } from '@angular/core';
 
 import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
@@ -21,7 +21,7 @@ import {
     SearchFormComponent
 } from './declarations';
 
-@Ng2.NgModule({
+@NgModule({
     imports: [
         SqxFrameworkModule,
         SqxSharedModule
