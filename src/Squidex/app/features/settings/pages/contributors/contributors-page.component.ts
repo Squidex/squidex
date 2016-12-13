@@ -23,7 +23,7 @@ import {
     UsersService
 } from 'shared';
 
-class UsersDataSource implements AutocompleteSource {
+export class UsersDataSource implements AutocompleteSource {
     constructor(
         private readonly usersService: UsersService,
         private readonly component: ContributorsPageComponent

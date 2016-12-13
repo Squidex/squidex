@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "es2015",
     "moduleResolution": "node",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
@@ -14,7 +14,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "baseUrl": ".",
     "paths": {
-        "*": ["*", "app/*"]
+        "framework": ["app/framework"],
+        "features": ["app/features"],
+        "shared": ["app/shared"]
     }
   }
 }

@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
     AppClientDto,
@@ -32,7 +32,7 @@ function rename(client: AppClientDto, name: string) {
 export class ClientsPageComponent extends AppComponentBase implements OnInit {
     public appClients: ImmutableArray<AppClientDto>;
 
-    public createForm =
+    public createForm: FormGroup =
         this.formBuilder.group({
             name: ['',
                 [

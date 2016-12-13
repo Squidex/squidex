@@ -33,9 +33,7 @@ const NOOP = () => { };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => {
-        return AutocompleteComponent;
-    }),
+    useExisting: forwardRef(() => AutocompleteComponent),
     multi: true
 };
 

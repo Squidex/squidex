@@ -1,12 +1,13 @@
 ﻿      var webpack = require('webpack'),
      webpackMerge = require('webpack-merge'),
 ExtractTextPlugin = require('extract-text-webpack-plugin'),
+        AotPlugin = require('@ngtools/webpack').AotPlugin,
         runConfig = require('./webpack.run.base.js'),
           helpers = require('./helpers');
 
 var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 
-helpers.removeLoaders(runConfig, ['scss', 'png']);
+helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
 module.exports = webpackMerge(runConfig, {
     devtool: 'source-map',
@@ -61,9 +62,9 @@ module.exports = webpackMerge(runConfig, {
                 test: /\.scss$/,
                 exclude: helpers.root('app', 'theme'),
                 loaders: ['raw', helpers.root('app-config', 'clean-css-loader'), 'sass']
-            }, {
-                test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                loaders: ['file?hash=sha512&digest=hex&name=assets/[name].[hash].[ext]', 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false']
+            }, { 
+                test: /\.ts/, 
+                loaders: ['@ngtools/webpack'] 
             }
         ]
     },
@@ -79,10 +80,22 @@ module.exports = webpackMerge(runConfig, {
          */
         new ExtractTextPlugin('[name].[hash].css'),
 
-        new webpack.optimize.UglifyJsPlugin({ 
-            mangle: { 
-                screw_ie8: true, keep_fnames: true 
-            } 
+        new webpack.optimize.UglifyJsPlugin({
+            beautify: false,
+            mangle: {
+                screw_ie8: true,
+                keep_fnames: true
+            },
+            compress: {
+                warnings: false,
+                screw_ie8: true
+            },
+            comments: false
+        }),
+
+        new AotPlugin({
+            tsConfigPath: './tsconfig.json',
+            entryModule: 'app/app.module#AppModule'
         }),
     ]
 });

@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -56,7 +56,7 @@ export class ClientComponent {
         return this.client.secret;
     }
 
-    public renameForm =
+    public renameForm: FormGroup =
         this.formBuilder.group({
             name: ['']
         });

@@ -48,7 +48,7 @@ module.exports = {
                 loaders: ['awesome-typescript', 'angular2-router-loader', 'angular2-template-loader', 'tslint']
             }, {
                 test: /\.html$/,
-                loader: 'html'
+                loader: 'raw'
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 loader: 'file?name=assets/[name].[hash].[ext]'

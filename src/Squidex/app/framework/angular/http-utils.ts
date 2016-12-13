@@ -49,7 +49,7 @@ export class ErrorDto {
     }
 }
 
-export function handleError(message: string, error: Response | any) {
+export function handleError(message: string, error: Response | any): Observable<any> {
     let result = new ErrorDto(500, message);
 
     if (error instanceof Response && error.status !== 500) {

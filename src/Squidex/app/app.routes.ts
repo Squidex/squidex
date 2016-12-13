@@ -22,8 +22,6 @@ import {
     MustBeNotAuthenticatedGuard
 } from './shared';
 
-import { SqxFeatureAppsModule } from './features/apps';
-
 export const routes: Routes = [
     {
         path: '',
@@ -36,7 +34,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: () => SqxFeatureAppsModule
+                loadChildren: './features/apps/module#SqxFeatureAppsModule'
             }, {
                 path: ':appName',
                 component: AppAreaComponent,
@@ -53,7 +51,7 @@ export const routes: Routes = [
                         loadChildren: './features/media/module#SqxFeatureMediaModule'
                     }, {
                         path: 'schemas',
-                        loadChildren: './features/schemas/module#SqxFeatureSchemaModule'
+                        loadChildren: './features/schemas/module#SqxFeatureSchemasModule'
                     }, {
                         path: 'settings',
                         loadChildren: './features/settings/module#SqxFeatureSettingsModule'

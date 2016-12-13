@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { fadeAnimation } from 'framework';
 
@@ -34,7 +34,7 @@ export class AppFormComponent implements OnInit {
     public cancelled = new EventEmitter();
 
     public creationError = '';
-    public createForm =
+    public createForm: FormGroup =
         this.formBuilder.group({
             name: ['',
                 [
