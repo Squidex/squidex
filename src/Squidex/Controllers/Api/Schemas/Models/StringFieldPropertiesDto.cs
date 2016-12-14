@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  StringField.cs
+//  StringFieldPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,10 +10,10 @@ using NJsonSchema.Annotations;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models.Fields
+namespace Squidex.Controllers.Api.Schemas.Models
 {
     [JsonSchema("String")]
-    public sealed class StringField : FieldPropertiesDto
+    public sealed class StringFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
         /// The default value for the field value.

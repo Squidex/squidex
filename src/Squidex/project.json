@@ -22,10 +22,6 @@
     "Microsoft.Extensions.Logging.Console": "1.1.0",
     "Microsoft.Extensions.Logging.Debug": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
-    "Microsoft.NETCore.App": {
-      "version": "1.0.1",
-      "type": "platform"
-    },
     "MongoDB.Driver": "2.4.0",
     "NJsonSchema": "6.3.6185.19861",
     "NSwag.AspNetCore": "8.0.0",
@@ -44,11 +40,13 @@
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
-      "imports": [
-        "dotnet5.6",
-        "portable-net45+win8"
-      ]
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform", "version": "1.1.0"
+        }
+      },
+      "imports": "dnxcore50"
     }
   },
 
@@ -63,7 +61,7 @@
       "include": [
         "Config/Identity/Cert/*.*"
       ]
-    } 
+    }
   },
 
   "runtimeOptions": {

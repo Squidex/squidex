@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  NumberField.cs
+//  NumberFieldPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,10 +10,10 @@ using NJsonSchema.Annotations;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models.Fields
+namespace Squidex.Controllers.Api.Schemas.Models
 {
     [JsonSchema("Number")]
-    public sealed class NumberField : FieldPropertiesDto
+    public sealed class NumberFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
         /// The default value for the field value.

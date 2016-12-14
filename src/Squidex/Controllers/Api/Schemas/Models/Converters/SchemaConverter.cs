@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Schemas.Repositories;
-using Dtos = Squidex.Controllers.Api.Schemas.Models.Fields;
 
 namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
@@ -21,11 +20,11 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         {
             {
                 typeof(NumberFieldProperties),
-                p => SimpleMapper.Map((NumberFieldProperties)p, new Dtos.NumberField())
+                p => SimpleMapper.Map((NumberFieldProperties)p, new NumberFieldPropertiesDto())
             },
             {
                 typeof(StringFieldProperties),
-                p => SimpleMapper.Map((StringFieldProperties)p, new Dtos.StringField())
+                p => SimpleMapper.Map((StringFieldProperties)p, new StringFieldPropertiesDto())
             }
         };
 

@@ -11,13 +11,12 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
 using Squidex.Core.Schemas;
-using Dtos = Squidex.Controllers.Api.Schemas.Models.Fields;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
-    [KnownType(typeof(Dtos.NumberField))]
-    [KnownType(typeof(Dtos.StringField))]
+    [KnownType(typeof(NumberFieldPropertiesDto))]
+    [KnownType(typeof(StringFieldPropertiesDto))]
     public abstract class FieldPropertiesDto
     {
         /// <summary>
