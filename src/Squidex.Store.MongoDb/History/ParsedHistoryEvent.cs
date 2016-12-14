@@ -22,6 +22,11 @@ namespace Squidex.Store.MongoDb.History
             get { return inner.Id; }
         }
 
+        public Guid EventId
+        {
+            get { return inner.Id; }
+        }
+
         public DateTime Created
         {
             get { return inner.Created; }

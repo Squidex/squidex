@@ -15,9 +15,11 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.CQRS.EventStore;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.History.Repositories;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Users.Repositories;
 using Squidex.Store.MongoDb.Apps;
+using Squidex.Store.MongoDb.History;
 using Squidex.Store.MongoDb.Infrastructure;
 using Squidex.Store.MongoDb.Schemas;
 using Squidex.Store.MongoDb.Users;
@@ -63,6 +65,10 @@ namespace Squidex.Store.MongoDb
 
             builder.RegisterType<MongoStreamPositionStorage>()
                 .As<IStreamPositionStorage>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoHistoryEventRepository>()
+                .As<IHistoryEventRepository>()
                 .SingleInstance();
 
             builder.RegisterType<MongoUserRepository>()

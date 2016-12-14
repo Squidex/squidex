@@ -4,6 +4,7 @@
     "Autofac": "4.2.1",
     "EventStore.ClientAPI.NetCore": "0.0.1-alpha",
     "Microsoft.Extensions.Logging": "1.1.0",
+    "Microsoft.NETCore.App": "1.1.0",
     "NETStandard.Library": "1.6.1",
     "Newtonsoft.Json": "9.0.2-beta1",
     "NodaTime": "2.0.0-alpha20160729",
@@ -15,10 +16,6 @@
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.1"
-        }
       }
     }
   },

@@ -6,11 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Read.History
 {
     public interface IHistoryEventEntity : IEntity
     {
-        string Channel { get; }
+        Guid EventId { get; }
 
         string Message { get; }
     }

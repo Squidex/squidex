@@ -4,6 +4,7 @@
     "IdentityServer4": "1.0.0-rc5",
     "Microsoft.AspNetCore.Identity": "1.1.0",
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",
+    "Microsoft.NETCore.App": "1.1.0",
     "MongoDB.Driver": "2.4.0",
     "NETStandard.Library": "1.6.1",
     "Squidex.Core": "1.0.0-*",
@@ -14,10 +15,6 @@
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.1"
-        }
       }
     }
   },

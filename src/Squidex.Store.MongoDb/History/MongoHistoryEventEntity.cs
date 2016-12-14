@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
@@ -16,6 +17,10 @@ namespace Squidex.Store.MongoDb.History
 {
     public sealed class MongoHistoryEventEntity : MongoEntity
     {
+        [BsonRequired]
+        [BsonElement]
+        public Guid AppId { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public string Channel { get; set; }

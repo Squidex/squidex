@@ -36,14 +36,15 @@ namespace Squidex.Store.MongoDb.History
         protected override Task SetupCollectionAsync(IMongoCollection<MongoHistoryEventEntity> collection)
         {
             return Task.WhenAll(
+                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId)),
                 collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Channel)),
                 collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
         }
 
-        public async Task<List<IHistoryEventEntity>> FindHistoryByChannel(string channelPrefix, int count)
+        public async Task<List<IHistoryEventEntity>> QueryEventsByChannel(Guid appId, string channelPrefix, int count)
         {
             var entities =
-                await Collection.Find(x => x.Channel.StartsWith(channelPrefix)).Limit(count).ToListAsync();
+                await Collection.Find(x => x.AppId == appId && x.Channel.StartsWith(channelPrefix)).Limit(count).ToListAsync();
 
             return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, MessagesEN.Texts)).ToList();
         }

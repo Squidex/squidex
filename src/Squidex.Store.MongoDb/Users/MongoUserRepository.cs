@@ -28,7 +28,7 @@ namespace Squidex.Store.MongoDb.Users
             this.userManager = userManager;
         }
 
-        public Task<List<IUserEntity>> FindUsersByQuery(string query)
+        public Task<List<IUserEntity>> QueryUsersByQuery(string query)
         {
             var users = userManager.Users.Where(x => x.NormalizedEmail.Contains(query.ToUpper())).Take(10).ToList();
             

@@ -2,6 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
+    "Microsoft.NETCore.App": "1.1.0",
     "NETStandard.Library": "1.6.1",
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Core": "1.0.0-*",
@@ -11,10 +12,6 @@
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.1"
-        }
       }
     }
   },
