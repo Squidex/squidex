@@ -10,7 +10,7 @@
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "Moq": "4.6.38-alpha",
     "Squidex.Infrastructure": "1.0.0-*",
-    "xunit": "2.2.0-beta3-build3402"
+    "xunit": "2.2.0-beta4-build3444"
   },
   "frameworks": {
     "netcoreapp1.0": {

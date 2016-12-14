@@ -1,16 +1,16 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Autofac": "4.1.0",
+    "Autofac": "4.2.1",
     "EventStore.ClientAPI.NetCore": "0.0.1-alpha",
-    "Microsoft.Extensions.Logging": "1.0.0",
+    "Microsoft.Extensions.Logging": "1.1.0",
     "NETStandard.Library": "1.6.0",
     "Newtonsoft.Json": "9.0.2-beta1",
     "NodaTime": "2.0.0-alpha20160729",
     "protobuf-net": "2.1.0",
-    "System.Linq": "4.1.0",
-    "System.Reflection.TypeExtensions": "4.1.0",
-    "System.Security.Claims": "4.0.1"
+    "System.Linq": "4.3.0",
+    "System.Reflection.TypeExtensions": "4.3.0",
+    "System.Security.Claims": "4.3.0"
   },
   "frameworks": {
     "netcoreapp1.0": {

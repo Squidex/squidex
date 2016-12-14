@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "Autofac": "4.1.1",
-    "IdentityServer4": "1.0.0-rc2",
-    "Microsoft.AspNetCore.Identity": "1.0.0",
+    "Autofac": "4.2.1",
+    "IdentityServer4": "1.0.0-rc5",
+    "Microsoft.AspNetCore.Identity": "1.1.0",
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",
-    "MongoDB.Driver": "2.4.0-beta1",
+    "MongoDB.Driver": "2.4.0",
     "NETStandard.Library": "1.6.0",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
