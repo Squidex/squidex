@@ -188,7 +188,7 @@ export class AuthService {
     private checkResponse(response: Observable<Response>) {
         return response.catch((error: Response) => {
             if (error.status === 401 || error.status === 404) {
-                this.loginRedirect();
+                this.logoutRedirect();
             } else if (error.status === 403) {
                 this.router.navigate(['/404']);
             }
