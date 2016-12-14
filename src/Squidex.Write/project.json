@@ -3,7 +3,7 @@
 
   "dependencies": {
     "Microsoft.AspNetCore.Identity": "1.1.0",
-    "NETStandard.Library": "1.6.0",
+    "NETStandard.Library": "1.6.1",
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",

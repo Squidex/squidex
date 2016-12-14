@@ -27,7 +27,7 @@
       "type": "platform"
     },
     "MongoDB.Driver": "2.4.0",
-"NJsonSchema": "6.5.6190.16910",
+    "NJsonSchema": "6.3.6185.19861",
     "NSwag.AspNetCore": "8.0.0",
     "OpenCover": "4.6.519",
     "ReportGenerator": "2.5.2-beta2",

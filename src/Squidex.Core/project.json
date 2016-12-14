@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Infrastructure": "1.0.0-*",
-    "protobuf-net": "2.1.0"
+    "protobuf-net": "2.1.0",
+    "NETStandard.Library": "1.6.1"
   },
   "frameworks": {
     "netcoreapp1.0": {

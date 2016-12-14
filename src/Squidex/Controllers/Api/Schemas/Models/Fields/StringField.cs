@@ -6,11 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
+using NJsonSchema.Annotations;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
+    [JsonSchema("String")]
     public sealed class StringField : FieldPropertiesDto
     {
         /// <summary>

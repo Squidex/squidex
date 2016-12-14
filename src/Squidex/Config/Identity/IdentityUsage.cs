@@ -100,8 +100,8 @@ namespace Squidex.Config.Identity
                 app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
                 {
                     Authority = apiAuthorityUrl,
-                    ScopeName = apiScope,
-                    ScopeSecret = null,
+                    ApiName = apiScope,
+                    ApiSecret = null,
                     RequireHttpsMetadata = identityOptions.RequiresHttps
                 });
             }

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
@@ -111,8 +112,8 @@ namespace Squidex.Config.Identity
                 AllowedGrantTypes = GrantTypes.Implicit,
                 AllowedScopes = new List<string>
                 {
-                    StandardScopes.OpenId.Name,
-                    StandardScopes.Profile.Name,
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
                     Constants.ApiScope,
                     Constants.ProfileScope
                 },

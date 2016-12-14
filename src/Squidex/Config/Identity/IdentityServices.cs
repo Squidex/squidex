@@ -40,17 +40,21 @@ namespace Squidex.Config.Identity
             }
 
             services.AddSingleton(
-                GetScopes());
+                GetApiResources());
+            services.AddSingleton(
+                GetIdentityResources());
             services.AddSingleton<IClientStore,
                 LazyClientStore>();
-            services.AddSingleton<IScopeStore,
-                InMemoryScopeStore>();
+            services.AddSingleton<IResourceStore,
+                InMemoryResourcesStore>();
 
             services.AddIdentityServer(options =>
                 {
                     options.UserInteractionOptions.ErrorUrl = "/account/error/";
                 })
-                .SetSigningCredential(certificate)
+                .AddInMemoryApiResources(GetApiResources())
+                .AddInMemoryIdentityResources(GetIdentityResources())
+                .AddSigningCredential(certificate)
                 .AddAspNetIdentity<IdentityUser>();
 
             return services;
@@ -64,26 +68,21 @@ namespace Squidex.Config.Identity
             return services;
         }
 
-        public static IEnumerable<Scope> GetScopes()
+        private static IEnumerable<ApiResource> GetApiResources()
         {
-            return new List<Scope>
-            {
-                StandardScopes.OpenId,
-                StandardScopes.Profile,
-                new Scope
+            yield return new ApiResource(Constants.ApiScope);
+        }
+
+        private static IEnumerable<IdentityResource> GetIdentityResources()
+        {
+            yield return new IdentityResources.OpenId();
+            yield return new IdentityResources.Profile();
+            yield return new IdentityResource(Constants.ProfileScope,
+                new[]
                 {
-                    Name = Constants.ProfileScope, Type = ScopeType.Identity,
-                    Claims = new List<ScopeClaim>
-                    {
-                        new ScopeClaim(ExtendedClaimTypes.SquidexDisplayName, true),
-                        new ScopeClaim(ExtendedClaimTypes.SquidexPictureUrl, true)
-                    }
-                },
-                new Scope
-                {
-                    Name = Constants.ApiScope, Type = ScopeType.Resource
-                }
-            };
+                    ExtendedClaimTypes.SquidexDisplayName,
+                    ExtendedClaimTypes.SquidexPictureUrl
+                });
         }
     }
 }
