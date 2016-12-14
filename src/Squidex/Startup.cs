@@ -150,7 +150,7 @@ namespace Squidex
 
         private void MapAndUseFrontend(IApplicationBuilder app)
         {
-            if (!Environment.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackProxy();
