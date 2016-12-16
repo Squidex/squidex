@@ -221,6 +221,10 @@ export class DateTime {
         return new DateTime(clone);
     }
 
+    public toLocal(): DateTime {
+        return new DateTime(new Date(this.value.getTime() - this.value.getTimezoneOffset() * 60 * 1000));
+    }
+
     public toUTCString(): string {
         return this.value.toUTCString();
     }

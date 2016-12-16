@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  IUserCommand.cs
+//  IAppRefEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Commands
+using System;
+
+namespace Squidex.Read
 {
-    public interface IUserCommand : ICommand
+    public interface IAppRefEntity : IEntity
     {
-        UserToken User { get; set; }
+        Guid AppId { get; set; }
     }
 }

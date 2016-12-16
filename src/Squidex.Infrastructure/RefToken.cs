@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  UserToken.cs
+//  RefToken.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,13 +11,13 @@ using System.Linq;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class UserToken : IEquatable<UserToken>
+    public sealed class RefToken : IEquatable<RefToken>
     {
         public string Type { get; }
 
         public string Identifier { get; }
 
-        public UserToken(string type, string identifier)
+        public RefToken(string type, string identifier)
         {
             Guard.NotNullOrEmpty(type, nameof(type));
             Guard.NotNullOrEmpty(identifier, nameof(identifier));
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure
             Identifier = identifier;
         }
 
-        public static UserToken Parse(string input)
+        public static RefToken Parse(string input)
         {
             Guard.NotNullOrEmpty(input, nameof(input));
 
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure
                 throw new ArgumentException("Input must have more than 2 parts divided by colon", nameof(input));
             }
 
-            return new UserToken(parts[0], string.Join(":", parts.Skip(1)));
+            return new RefToken(parts[0], string.Join(":", parts.Skip(1)));
         }
 
         public override string ToString()
@@ -48,10 +48,10 @@ namespace Squidex.Infrastructure
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as UserToken);
+            return Equals(obj as RefToken);
         }
 
-        public bool Equals(UserToken other)
+        public bool Equals(RefToken other)
         {
             return other != null && (ReferenceEquals(this, other) || (Type.Equals(other.Type) && Identifier.Equals(other.Identifier)));
         }

@@ -12,11 +12,11 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class EnrichWithUserProcessorTests
+    public class EnrichWithActorProcessorTests
     {
-        public sealed class MyUserCommand : IUserCommand
+        public sealed class MyActorCommand : IActorCommand
         {
-            public UserToken User { get; set; }
+            public RefToken Actor { get; set; }
         }
 
         public sealed class MyNormalCommand : ICommand
@@ -27,10 +27,10 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
         }
 
-        private readonly EnrichWithUserProcessor sut = new EnrichWithUserProcessor();
+        private readonly EnrichWithActorProcessor sut = new EnrichWithActorProcessor();
 
         [Fact]
-        public async Task Should_not_do_anything_if_not_user_command()
+        public async Task Should_not_do_anything_if_not_actor_command()
         {
             var envelope = new Envelope<IEvent>(new MyEvent());
 
@@ -42,14 +42,14 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public async Task Should_attach_user_to_event_envelope()
         {
-            var user = new UserToken("subject", "123");
-            var userCommand = new MyUserCommand { User = user };
+            var actorToken = new RefToken("subject", "123");
+            var actorCommand = new MyActorCommand { Actor = actorToken };
 
             var envelope = new Envelope<IEvent>(new MyEvent());
 
-            await sut.ProcessEventAsync(envelope, null, userCommand);
+            await sut.ProcessEventAsync(envelope, null, actorCommand);
 
-            Assert.Equal(user, envelope.Headers.User());
+            Assert.Equal(actorToken, envelope.Headers.Actor());
         }
     }
 }

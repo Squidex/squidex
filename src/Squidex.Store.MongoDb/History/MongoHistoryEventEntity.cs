@@ -11,11 +11,12 @@ using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
+using Squidex.Read;
 using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.History
 {
-    public sealed class MongoHistoryEventEntity : MongoEntity
+    public sealed class MongoHistoryEventEntity : MongoEntity, IAppRefEntity, ITrackCreatedByEntity
     {
         [BsonRequired]
         [BsonElement]
@@ -31,11 +32,23 @@ namespace Squidex.Store.MongoDb.History
 
         [BsonRequired]
         [BsonElement]
-        public UserToken User { get; set; }
+        public RefToken Actor { get; set; }
 
         [BsonRequired]
         [BsonElement]
         public Dictionary<string, string> Parameters { get; set; }
+
+        RefToken ITrackCreatedByEntity.CreatedBy
+        {
+            get
+            {
+                return Actor;
+            }
+            set
+            {
+                Actor = value;
+            }
+        }
 
         public MongoHistoryEventEntity()
         {
@@ -45,11 +58,6 @@ namespace Squidex.Store.MongoDb.History
         public MongoHistoryEventEntity Setup<T>(EnvelopeHeaders headers, string channel)
         {
             Channel = channel;
-
-            if (headers.Contains(CommonHeaders.User))
-            {
-                AddParameter("User", headers[CommonHeaders.User].ToString());
-            }
 
             Message = TypeNameRegistry.GetName<T>();
 

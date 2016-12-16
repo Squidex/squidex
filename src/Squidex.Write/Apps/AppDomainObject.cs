@@ -207,9 +207,9 @@ namespace Squidex.Write.Apps
             return new AppMasterLanguageSet { Language = DefaultLanguage };
         }
 
-        private static AppContributorAssigned CreateInitialOwner(IUserCommand command)
+        private static AppContributorAssigned CreateInitialOwner(IActorCommand command)
         {
-            return new AppContributorAssigned { ContributorId = command.User.Identifier, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
         }
 
         private void ThrowIfNotCreated()

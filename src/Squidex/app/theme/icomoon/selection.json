@@ -4,6 +4,33 @@
     {
       "icon": {
         "paths": [
+          "M534 298v224l192 114-32 54-224-136v-256h64zM512 854c188 0 342-154 342-342s-154-342-342-342-342 154-342 342 154 342 342 342zM512 86c236 0 426 190 426 426s-190 426-426 426-426-190-426-426 190-426 426-426z"
+        ],
+        "attrs": [],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "tags": [
+          "schedule"
+        ],
+        "defaultCode": 59573,
+        "grid": 24
+      },
+      "attrs": [],
+      "properties": {
+        "order": 17,
+        "ligatures": "access_time, query_builder, schedule",
+        "id": 4,
+        "prevSize": 24,
+        "code": 59573,
+        "name": "time"
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 4
+    },
+    {
+      "icon": {
+        "paths": [
           "M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"
         ],
         "attrs": [],

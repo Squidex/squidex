@@ -63,14 +63,14 @@ namespace Squidex.Infrastructure.CQRS
         }
 
         [Fact]
-        public void Should_set_and_get_user()
+        public void Should_set_and_get_actor()
         {
-            var user = new UserToken("subject", "123");
+            var actor = new RefToken("subject", "123");
 
-            sut.SetUser(user);
+            sut.SetActor(actor);
 
-            Assert.Equal(user, sut.Headers.User());
-            Assert.Equal(user, UserToken.Parse(sut.Headers["User"].ToString()));
+            Assert.Equal(actor, sut.Headers.Actor());
+            Assert.Equal(actor, RefToken.Parse(sut.Headers["User"].ToString()));
         }
 
         [Fact]

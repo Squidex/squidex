@@ -14,25 +14,83 @@ using Newtonsoft.Json.Linq;
 using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Read;
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
+// ReSharper disable SuspiciousTypeConversion.Global
 
 namespace Squidex.Store.MongoDb.Utils
 {
     public static class EntityMapper
     {
-        public static T Create<T>(EnvelopeHeaders headers) where T : MongoEntity, new()
+        public static T Create<T>(EnvelopeHeaders headers, bool useAggregateId = true) where T : MongoEntity, new()
         {
-            var timestamp = headers.Timestamp().ToDateTimeUtc();
+            var entity = new T();
 
-            var entity = new T { Id = headers.AggregateId(), Created = timestamp };
+            AssignId(headers, entity, useAggregateId);
+            AssignAppId(headers, entity);
+            AssignCreated(headers, entity);
+            AssignCreatedBy(headers, entity);
 
-            var appEntity = entity as IAppEntity;
+            return Update(entity, headers);
+        }
+
+        public static T Update<T>(T entity, EnvelopeHeaders headers) where T : MongoEntity
+        {
+            AssignLastModified(headers, entity);
+            AssignLastModifiedBy(headers, entity);
+
+            return entity;
+        }
+
+        private static void AssignCreated(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            entity.Created = headers.Timestamp().ToDateTimeUtc();
+        }
+
+        private static void AssignLastModified(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            entity.LastModified = headers.Timestamp().ToDateTimeUtc();
+        }
+
+        private static void AssignCreatedBy(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            var createdBy = entity as ITrackCreatedByEntity;
+
+            if (createdBy != null)
+            {
+                createdBy.CreatedBy = headers.Actor();
+            }
+        }
+
+        private static void AssignLastModifiedBy(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            var modifiedBy = entity as ITrackLastModifiedByEntity;
+
+            if (modifiedBy != null)
+            {
+                modifiedBy.LastModifiedBy = headers.Actor();
+            }
+        }
+
+        private static void AssignAppId(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            var appEntity = entity as IAppRefEntity;
 
             if (appEntity != null)
             {
                 appEntity.AppId = headers.AppId();
             }
-            
-            return Update(entity, headers);
+        }
+
+        private static void AssignId(EnvelopeHeaders headers, MongoEntity entity, bool useAggregateId)
+        {
+            if (useAggregateId)
+            {
+                entity.Id = headers.AggregateId();
+            }
+            else
+            {
+                entity.Id = Guid.NewGuid();
+            }
         }
 
         public static BsonDocument ToBsonDocument(this JToken value)
@@ -49,18 +107,9 @@ namespace Squidex.Store.MongoDb.Utils
             return JToken.Parse(json);
         }
 
-        public static T Update<T>(T entity, EnvelopeHeaders headers) where T : MongoEntity
+        public static Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater, bool useAggregateId = true) where T : MongoEntity, new()
         {
-            var timestamp = headers.Timestamp().ToDateTimeUtc();
-
-            entity.LastModified = timestamp;
-
-            return entity;
-        }
-
-        public static Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : MongoEntity, new()
-        {
-            var entity = Create<T>(headers);
+            var entity = Create<T>(headers, useAggregateId);
 
             updater(entity);
 

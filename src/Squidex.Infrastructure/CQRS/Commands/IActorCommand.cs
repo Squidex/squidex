@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  IAppEntity.cs
+//  IActorCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Read
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public interface IAppEntity : IEntity
+    public interface IActorCommand : ICommand
     {
-        Guid AppId { get; set; }
+        RefToken Actor { get; set; }
     }
 }

@@ -44,7 +44,7 @@ namespace Squidex.Store.MongoDb.History
         public async Task<List<IHistoryEventEntity>> QueryEventsByChannel(Guid appId, string channelPrefix, int count)
         {
             var entities =
-                await Collection.Find(x => x.AppId == appId && x.Channel.StartsWith(channelPrefix)).Limit(count).ToListAsync();
+                await Collection.Find(x => x.AppId == appId && x.Channel.StartsWith(channelPrefix)).SortByDescending(x => x.Created).Limit(count).ToListAsync();
 
             return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, MessagesEN.Texts)).ToList();
         }
@@ -53,23 +53,23 @@ namespace Squidex.Store.MongoDb.History
         {
             return Collection.CreateAsync(headers, x =>
             {
-                var channel = $"Apps.{headers.AggregateId()}.Contributors";
+                const string channel = "settings.contributors";
 
                 x.Setup<AppContributorAssigned>(headers, channel)
                     .AddParameter("Contributor", @event.ContributorId)
                     .AddParameter("Permission", @event.Permission.ToString());
-            });
+            }, false);
         }
 
         protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
             return Collection.CreateAsync(headers, x =>
             {
-                var channel = $"Apps.{headers.AggregateId()}.Contributors";
+                const string channel = "settings.contributors";
 
                 x.Setup<AppContributorRemoved>(headers, channel)
                     .AddParameter("Contributor", @event.ContributorId);
-            });
+            }, false);
         }
 
         public Task On(Envelope<IEvent> @event)

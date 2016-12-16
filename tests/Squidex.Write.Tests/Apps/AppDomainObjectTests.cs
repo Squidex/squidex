@@ -25,7 +25,7 @@ namespace Squidex.Write.Apps
     {
         private const string TestName = "app";
         private readonly AppDomainObject sut;
-        private readonly UserToken user = new UserToken("subject", Guid.NewGuid().ToString());
+        private readonly RefToken user = new RefToken("subject", Guid.NewGuid().ToString());
         private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
@@ -54,7 +54,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(new CreateApp { Name = TestName, User = user });
+            sut.Create(new CreateApp { Name = TestName, Actor = user });
 
             Assert.Equal(TestName, sut.Name);
 
@@ -410,7 +410,7 @@ namespace Squidex.Write.Apps
 
         private void CreateApp()
         {
-            sut.Create(new CreateApp { Name = TestName, User = user });
+            sut.Create(new CreateApp { Name = TestName, Actor = user });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

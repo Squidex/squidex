@@ -2,6 +2,22 @@
 @import '_mixins';
 
 .panel {
-    min-width: 220px;
-    max-width: 1220px80px;
+    min-width: 250px;
+    max-width: 250px;
+}
+
+.event {
+    & {
+        margin-bottom: .8rem;
+    }
+
+    &-message {
+        font-size: .9rem;
+    }
+
+    &-created {
+        font-size: .65rem;
+        font-weight: normal;
+        color: $color-empty;
+    }
 }

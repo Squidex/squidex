@@ -62,14 +62,14 @@ namespace Squidex.Infrastructure.CQRS
             return envelope;
         }
 
-        public static UserToken User(this EnvelopeHeaders headers)
+        public static RefToken Actor(this EnvelopeHeaders headers)
         {
-            return UserToken.Parse(headers[CommonHeaders.User].ToString());
+            return RefToken.Parse(headers[CommonHeaders.Actor].ToString());
         }
 
-        public static Envelope<T> SetUser<T>(this Envelope<T> envelope, UserToken value) where T : class
+        public static Envelope<T> SetActor<T>(this Envelope<T> envelope, RefToken value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.User, value.ToString());
+            envelope.Headers.Set(CommonHeaders.Actor, value.ToString());
 
             return envelope;
         }

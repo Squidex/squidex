@@ -11,8 +11,8 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write
 {
-    public abstract class SquidexCommand : AggregateCommand, IUserCommand
+    public abstract class SquidexCommand : AggregateCommand, IActorCommand
     {
-        public UserToken User { get; set; }
+        public RefToken Actor { get; set; }
     }
 }

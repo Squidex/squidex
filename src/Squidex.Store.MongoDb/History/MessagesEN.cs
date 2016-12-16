@@ -19,11 +19,11 @@ namespace Squidex.Store.MongoDb.History
             {
                 {
                     TypeNameRegistry.GetName<AppContributorAssigned>(),
-                    "[User] assigned [Contributor] to app with permission [Permission]"
+                    "assigned {user:[Contributor]} to app with permission [Permission]"
                 },
                 {
                     TypeNameRegistry.GetName<AppContributorRemoved>(),
-                    "[User] removed [Contributor] from app"
+                    "removed {user:[Contributor]} from app"
                 }
             };
     }

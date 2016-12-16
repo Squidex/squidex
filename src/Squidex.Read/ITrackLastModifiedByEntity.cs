@@ -1,14 +1,17 @@
 ﻿// ==========================================================================
-//  ISchemaEntity.cs
+//  ITrackLastModifiedByEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace Squidex.Read.Schemas.Repositories
+
+using Squidex.Infrastructure;
+
+namespace Squidex.Read
 {
-    public interface ISchemaEntity : IAppRefEntity
+    public interface ITrackLastModifiedByEntity
     {
-        string Name { get; }
+        RefToken LastModifiedBy { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace Squidex.Write.Apps
         private readonly Mock<IUserRepository> userRepository = new Mock<IUserRepository>();
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
-        private readonly UserToken subjectId = new UserToken("subject", Guid.NewGuid().ToString());
+        private readonly RefToken subjectId = new RefToken("subject", Guid.NewGuid().ToString());
         private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly Language language = Language.GetLanguage("de");
         private readonly string contributorId = Guid.NewGuid().ToString();
@@ -50,7 +50,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task Create_should_throw_if_a_name_with_same_name_already_exists()
         {
-            var command = new CreateApp { Name = appName, AggregateId = Id, User = subjectId };
+            var command = new CreateApp { Name = appName, AggregateId = Id, Actor = subjectId };
             var context = new CommandContext(command);
 
             appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
@@ -66,7 +66,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task Create_should_create_app_if_name_is_free()
         {
-            var command = new CreateApp { Name = appName, AggregateId = Id, User = subjectId };
+            var command = new CreateApp { Name = appName, AggregateId = Id, Actor = subjectId };
             var context = new CommandContext(command);
 
             appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
@@ -241,7 +241,7 @@ namespace Squidex.Write.Apps
 
         private AppDomainObject CreateApp()
         {
-            app.Create(new CreateApp { Name = appName, User = subjectId });
+            app.Create(new CreateApp { Name = appName, Actor = subjectId });
 
             return app;
         }

@@ -1,5 +1,5 @@
 // ==========================================================================
-//  UserTokenConverter.cs
+//  RefTokenConverter.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class UserTokenConverter : JsonConverter
+    public sealed class RefTokenConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -20,12 +20,12 @@ namespace Squidex.Infrastructure.Json
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return reader.TokenType == JsonToken.Null ? null : UserToken.Parse((string)reader.Value);
+            return reader.TokenType == JsonToken.Null ? null : RefToken.Parse((string)reader.Value);
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(UserToken);
+            return objectType == typeof(RefToken);
         }
     }
 }

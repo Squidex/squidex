@@ -20,6 +20,6 @@ namespace Squidex.Infrastructure.CQRS
 
         public const string Timestamp = "Timestamp";
 
-        public const string User = "User";
+        public const string Actor = "Actor";
     }
 }

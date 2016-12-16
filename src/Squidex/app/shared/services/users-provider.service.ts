@@ -31,12 +31,11 @@ export class UsersProviderService {
                     .catch(err => {
                         return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));
                     })
-                    .map(u => {
-                        if (this.authService.user && u.id === this.authService.user.id) {
-                            return new UserDto(u.id, u.email, 'Me', u.pictureUrl);
-                        } else {
-                            return u;
+                    .map(dto => {
+                        if (this.authService.user && dto.id === this.authService.user.id) {
+                            dto = new UserDto(dto.id, dto.email, 'Me', dto.pictureUrl);
                         }
+                        return dto;
                     })
                     .publishLast();
 

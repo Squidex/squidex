@@ -1,5 +1,5 @@
 // ==========================================================================
-//  EnrichWithUserProcessor.cs
+//  EnrichWithActorProcessor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,15 +12,15 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class EnrichWithUserProcessor : IEventProcessor
+    public sealed class EnrichWithActorProcessor : IEventProcessor
     {
         public Task ProcessEventAsync(Envelope<IEvent> @event, IAggregate aggregate, ICommand command)
         {
-            var userCommand = command as IUserCommand;
+            var userCommand = command as IActorCommand;
 
             if (userCommand != null)
             {
-                @event.SetUser(userCommand.User);
+                @event.SetActor(userCommand.Actor);
             }
 
             return TaskHelper.Done;

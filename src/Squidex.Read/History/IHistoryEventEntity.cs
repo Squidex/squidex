@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Read.History
 {
@@ -15,5 +16,7 @@ namespace Squidex.Read.History
         Guid EventId { get; }
 
         string Message { get; }
+
+        RefToken Actor { get; }
     }
 }

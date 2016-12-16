@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Infrastructure;
 using Squidex.Read.History;
 
 namespace Squidex.Store.MongoDb.History
@@ -25,6 +26,11 @@ namespace Squidex.Store.MongoDb.History
         public Guid EventId
         {
             get { return inner.Id; }
+        }
+
+        public RefToken Actor
+        {
+            get { return inner.Actor; }
         }
 
         public DateTime Created

@@ -7,6 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { ImmutableArray, NotificationService } from 'framework';
 
@@ -16,6 +17,8 @@ import { HistoryEventDto, HistoryService } from './../services/history.service';
 import { UsersProviderService } from './../services/users-provider.service';
 
 const FALLBACK_NAME = 'my-app';
+const REPLACEMENT_REGEXP = new RegExp('{([^\s:]*):([^}]*)}');
+const REPLACEMENT_TEMP = '$TEMP$';
 
 @Component({
     selector: 'sqx-history',
@@ -55,5 +58,34 @@ export class HistoryComponent extends AppComponentBase implements OnDestroy, OnI
             .subscribe(dtos => {
                 this.events = ImmutableArray.of(dtos);
             });
+    }
+
+    public actorName(actor: string): Observable<string> {
+        const parts = actor.split(':');
+
+        if (parts[0] === 'subject') {
+            return this.userName(parts[1]).map(n => n === 'Me' ? 'I' : n);
+        }
+
+        return Observable.of(parts[1]);
+    }
+
+    public format(message: string): Observable<string> {
+        let foundUserId: string;
+
+        message = message.replace(/{([^\s:]*):([^}]*)}/, (match: string, type: string, id: string) => {
+            if (type === 'user') {
+                foundUserId = id;
+                return REPLACEMENT_TEMP;
+            } else {
+                return id;
+            }
+        });
+
+        if (foundUserId) {
+            return this.userName(foundUserId).map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`));
+        }
+
+        return Observable.of(message);
     }
 }

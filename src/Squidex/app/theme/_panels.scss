@@ -3,7 +3,7 @@
 
 $panel-padding: 20px;
 $panel-header: 70px;
-$panel-sidebar: 60px;
+$panel-sidebar: 61px;
 
 .panel-container {
     @include absolute($size-navbar-height, 0, 0, $size-sidebar-width);
@@ -68,12 +68,13 @@ $panel-sidebar: 60px;
 
         & .nav-link {
             text-align: center;
+            color: $color-text;
         }
     }
 
     &-close {
         & {
-            @include absolute($panel-padding, $panel-padding, auto, auto);
+            @include absolute($panel-padding, $panel-padding - 2px, auto, auto);
             font-size: 1.5rem;
             font-weight: 400;
             cursor: pointer;

@@ -59,7 +59,7 @@ export class AppFormComponent implements OnInit {
     }
 
     public createApp() {
-        this.createForm.markAsDirty();
+        this.createForm.markAsTouched();
 
         if (this.createForm.valid) {
             this.createForm.disable();

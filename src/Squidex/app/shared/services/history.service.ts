@@ -19,7 +19,7 @@ import { AuthService } from './auth.service';
 export class HistoryEventDto {
     constructor(
         public readonly eventId: string,
-        public readonly user: string,
+        public readonly actor: string,
         public readonly message: string,
         public readonly created: DateTime
     ) {
@@ -45,7 +45,7 @@ export class HistoryService {
                     return items.map(item => {
                         return new HistoryEventDto(
                             item.eventId,
-                            item.user,
+                            item.actor,
                             item.message,
                             DateTime.parseISO_UTC(item.created));
                     });

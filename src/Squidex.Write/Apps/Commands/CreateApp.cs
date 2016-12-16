@@ -13,11 +13,11 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write.Apps.Commands
 {
-    public sealed class CreateApp : AggregateCommand, IUserCommand, IValidatable
+    public sealed class CreateApp : AggregateCommand, IActorCommand, IValidatable
     {
         public string Name { get; set; }
 
-        public UserToken User { get; set; }
+        public RefToken Actor { get; set; }
 
         public CreateApp()
         {

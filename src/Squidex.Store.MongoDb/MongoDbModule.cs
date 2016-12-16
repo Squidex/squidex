@@ -23,6 +23,7 @@ using Squidex.Store.MongoDb.History;
 using Squidex.Store.MongoDb.Infrastructure;
 using Squidex.Store.MongoDb.Schemas;
 using Squidex.Store.MongoDb.Users;
+using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb
 {
@@ -30,6 +31,8 @@ namespace Squidex.Store.MongoDb
     {
         protected override void Load(ContainerBuilder builder)
         {
+            RefTokenSerializer.Register();
+
             builder.Register(context =>
             {
                 var options = context.Resolve<IOptions<MyMongoDbOptions>>().Value;
@@ -67,12 +70,13 @@ namespace Squidex.Store.MongoDb
                 .As<IStreamPositionStorage>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoHistoryEventRepository>()
-                .As<IHistoryEventRepository>()
-                .SingleInstance();
-
             builder.RegisterType<MongoUserRepository>()
                 .As<IUserRepository>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<MongoHistoryEventRepository>()
+                .As<IHistoryEventRepository>()
+                .As<ICatchEventConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<MongoSchemaRepository>()

@@ -8,7 +8,7 @@
 	<div class="form-group">
 		<label for="app-name">Name</label>
         
-        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').dirty" [@fade]>
+        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').touched" [@fade]>
             <div class="errors">
                 <span *ngIf="createForm.get('name').hasError('required')">
                     Name is required.
@@ -33,6 +33,6 @@
 
     <div class="form-group clearfix">
         <button type="reset" class="float-xs-left btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="float-xs-right btn btn-primary" [disabled]="createForm.invalid">Create</button>
+        <button type="submit" class="float-xs-right btn btn-primary" >Create</button>
     </div>
 </form>
