@@ -16,10 +16,6 @@
     width: 70px;
 }
 
-.search-form {
-    margin-left: 15px;
-}
-
 .notification {
     &-container {
         @include fixed(auto, 10px, 10px, auto);

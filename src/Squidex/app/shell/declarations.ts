@@ -13,7 +13,6 @@ export * from './pages/home/home-page.component';
 export * from './pages/internal/apps-menu.component';
 export * from './pages/internal/internal-area.component';
 export * from './pages/internal/profile-menu.component';
-export * from './pages/internal/search-form.component';
 
 export * from './pages/logout/logout-page.component';
 
