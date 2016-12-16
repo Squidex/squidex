@@ -47,7 +47,7 @@ export class HistoryComponent extends AppComponentBase implements OnDestroy, OnI
         this.interval =
             setInterval(() => {
                 this.load();
-            }, 10000);
+            }, 5000);
     }
 
     public load() {
@@ -80,6 +80,10 @@ export class HistoryComponent extends AppComponentBase implements OnDestroy, OnI
             } else {
                 return id;
             }
+        });
+
+        message = message.replace(/{([^\s:]*)}/, (match: string, marker: string) => {
+            return `<span class="marker-ref">${marker}</span>`;
         });
 
         if (foundUserId) {

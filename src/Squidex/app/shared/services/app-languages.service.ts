@@ -23,7 +23,7 @@ export class AppLanguageDto {
 
 export class AddAppLanguageDto {
     constructor(
-        public readonly name: string
+        public readonly language: string
     ) {
     }
 }

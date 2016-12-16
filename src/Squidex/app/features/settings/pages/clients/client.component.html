@@ -26,14 +26,14 @@
                     </form>
 
                     <h3 *ngIf="!isRenaming">
-                        {{client.name}} <i class="client-edit icon-pencil" (click)="startRename()"></i>
+                        <span (dblclick)="startRename()">{{client.name}}</span> <i class="client-edit icon-pencil" (click)="startRename()"></i>
                     </h3>
                 </div>
                     
                 <div class="client-expires">Expires: {{client.expiresUtc}}</div>
             </td>
             <td class="client-delete">
-                <button type="button" class="btn btn-link btn-danger" (click)="revokeClient(client)">
+                <button type="button" class="btn btn-link btn-danger" (click)="revoked.emit()">
                     <i class="icon-bin"></i>
                 </button>
             </td>

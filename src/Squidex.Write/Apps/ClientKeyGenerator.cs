@@ -26,7 +26,7 @@ namespace Squidex.Write.Apps
                 var bytes = Encoding.UTF8.GetBytes(input);
                 var hash = sha.ComputeHash(bytes);
 
-                return Convert.ToBase64String(hash);
+                return Convert.ToBase64String(hash).Replace("+", "x");
             }
         }
     }

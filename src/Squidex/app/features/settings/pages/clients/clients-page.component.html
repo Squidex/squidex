@@ -16,7 +16,7 @@
             </div>
 
             <div *ngFor="let client of appClients">
-                <sqx-client [client]="client" [appName]="appName() | async" (renamed)="renameClient(client, $event)"></sqx-client>
+                <sqx-client [client]="client" [appName]="appName() | async" (renamed)="renameClient(client, $event)" (revoked)="revokeClient(client)"></sqx-client>
             </div>
 
             <div class="table-items-footer">

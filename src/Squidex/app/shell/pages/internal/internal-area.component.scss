@@ -24,6 +24,7 @@
     &-container {
         @include fixed(auto, 10px, 10px, auto);
         width: 260px;
+        z-index: 100000;
     }
 
     &-item {

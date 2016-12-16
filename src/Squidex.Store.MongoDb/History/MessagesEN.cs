@@ -19,11 +19,35 @@ namespace Squidex.Store.MongoDb.History
             {
                 {
                     TypeNameRegistry.GetName<AppContributorAssigned>(),
-                    "assigned {user:[Contributor]} to app with permission [Permission]"
+                    "assigned {user:[Contributor]} as [Permission]"
                 },
                 {
                     TypeNameRegistry.GetName<AppContributorRemoved>(),
                     "removed {user:[Contributor]} from app"
+                },
+                {
+                    TypeNameRegistry.GetName<AppClientAttached>(),
+                    "added client {[Id]} to app"
+                },
+                {
+                    TypeNameRegistry.GetName<AppClientRevoked>(),
+                    "revoked client {[Id]}"
+                },
+                {
+                    TypeNameRegistry.GetName<AppClientRenamed>(),
+                    "renamed client {[Id]} to {[Name]}"
+                },
+                {
+                    TypeNameRegistry.GetName<AppLanguageAdded>(),
+                    "added language {[Language]}"
+                },
+                {
+                    TypeNameRegistry.GetName<AppLanguageRemoved>(),
+                    "removed language {[Language]}"
+                },
+                {
+                    TypeNameRegistry.GetName<AppMasterLanguageSet>(),
+                    "changed master language to {[Language]}"
                 }
             };
     }

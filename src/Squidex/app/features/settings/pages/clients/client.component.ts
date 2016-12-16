@@ -36,6 +36,9 @@ export class ClientComponent {
     @Output()
     public renamed = new EventEmitter<string>();
 
+    @Output()
+    public revoked = new EventEmitter();
+
     @Input()
     public client: AppClientDto;
 
@@ -93,7 +96,7 @@ export class ClientComponent {
             const newName = this.renameForm.controls['name'].value;
 
             if (newName !== this.clientName) {
-                this.renamed.emit();
+                this.renamed.emit(newName);
             }
         } finally {
             this.isRenaming = false;

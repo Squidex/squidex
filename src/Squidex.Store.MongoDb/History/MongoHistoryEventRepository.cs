@@ -72,6 +72,73 @@ namespace Squidex.Store.MongoDb.History
             }, false);
         }
 
+        protected Task On(AppClientRenamed @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.clients";
+
+                x.Setup<AppClientRenamed>(headers, channel)
+                    .AddParameter("Id", @event.Id)
+                    .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id);
+            }, false);
+        }
+
+        protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.clients";
+
+                x.Setup<AppClientAttached>(headers, channel)
+                    .AddParameter("Id", @event.Id);
+            }, false);
+        }
+
+        protected Task On(AppClientRevoked @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.clients";
+
+                x.Setup<AppClientRevoked>(headers, channel)
+                    .AddParameter("Id", @event.Id);
+            }, false);
+        }
+
+        protected Task On(AppLanguageAdded @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.languages";
+
+                x.Setup<AppLanguageAdded>(headers, channel)
+                    .AddParameter("Language", @event.Language.EnglishName);
+            }, false);
+        }
+
+        protected Task On(AppLanguageRemoved @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.languages";
+
+                x.Setup<AppLanguageRemoved>(headers, channel)
+                    .AddParameter("Language", @event.Language.EnglishName);
+            }, false);
+        }
+
+        protected Task On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
+        {
+            return Collection.CreateAsync(headers, x =>
+            {
+                const string channel = "settings.languages";
+
+                x.Setup<AppMasterLanguageSet>(headers, channel)
+                    .AddParameter("Language", @event.Language.EnglishName);
+            }, false);
+        }
+
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
