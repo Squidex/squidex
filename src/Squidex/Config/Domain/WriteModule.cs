@@ -23,7 +23,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithUserHandler>()
+            builder.RegisterType<EnrichWithActorHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
@@ -43,7 +43,7 @@ namespace Squidex.Config.Domain
                 .As<IEventProcessor>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithUserProcessor>()
+            builder.RegisterType<EnrichWithActorProcessor>()
                 .As<IEventProcessor>()
                 .SingleInstance();
 

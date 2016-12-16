@@ -87,7 +87,7 @@ describe('ColorPickerComponent', () => {
 
         colorPicker.color = selectedColor;
 
-        colorPicker.ngOnChanges({});
+        colorPicker.ngOnChanges();
 
         expect(colorPicker.selectedColor).toBe(selectedColor);
     });
@@ -97,7 +97,7 @@ describe('ColorPickerComponent', () => {
 
         colorPicker.color = 'invalid';
 
-        colorPicker.ngOnChanges({});
+        colorPicker.ngOnChanges();
 
         expect(colorPicker.selectedColor).toBe(colorPicker.palette.defaultColor);
     });
@@ -108,7 +108,7 @@ describe('ColorPickerComponent', () => {
         colorPicker.palette = undefined!;
         colorPicker.color = 'invalid';
 
-        colorPicker.ngOnChanges({});
+        colorPicker.ngOnChanges();
 
         expect(colorPicker.selectedColor).toBe(Color.BLACK);
     });

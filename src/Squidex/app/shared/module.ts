@@ -11,7 +11,8 @@ import { SqxFrameworkModule } from 'framework';
 
 import {
     AppFormComponent,
-    DashboardLinkDirective
+    DashboardLinkDirective,
+    HistoryComponent
 } from './declarations';
 
 @NgModule({
@@ -20,11 +21,13 @@ import {
     ],
     declarations: [
         AppFormComponent,
-        DashboardLinkDirective
+        DashboardLinkDirective,
+        HistoryComponent
     ],
     exports: [
         AppFormComponent,
-        DashboardLinkDirective
+        DashboardLinkDirective,
+        HistoryComponent
     ]
 })
 export class SqxSharedModule { }

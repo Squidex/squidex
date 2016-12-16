@@ -33,7 +33,9 @@ describe('FocusOnInitDirective', () => {
             nativeElement: {}
         };
 
-        new FocusOnInitDirective(element, renderer as Renderer).ngOnInit();
+        const directive = new FocusOnInitDirective(element, renderer as Renderer);
+        directive.select = true;
+        directive.ngOnInit();
 
         expect(calledMethods).toEqual([]);
 

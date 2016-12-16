@@ -55,7 +55,8 @@ namespace Squidex.Config.Swagger
 
             settings.TypeMappers = new List<ITypeMapper>
             {
-                new PrimitiveTypeMapper(typeof(Language), s => s.Type = JsonObjectType.String)
+                new PrimitiveTypeMapper(typeof(Language), s => s.Type = JsonObjectType.String),
+                new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
             };
 
             settings.DocumentProcessors.Add(new XmlTagProcessor());

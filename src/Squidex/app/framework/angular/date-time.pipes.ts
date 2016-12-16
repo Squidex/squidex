@@ -29,6 +29,15 @@ export class MonthPipe {
 }
 
 @Pipe({
+    name: 'fromNow'
+})
+export class FromNowPipe {
+    public transform(value: DateTime, args: string[]): any {
+        return value.toFromNow();
+    }
+}
+
+@Pipe({
     name: 'dayOfWeek'
 })
 export class DayOfWeekPipe {

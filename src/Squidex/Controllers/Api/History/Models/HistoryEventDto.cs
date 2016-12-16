@@ -20,6 +20,12 @@ namespace Squidex.Controllers.Api.History.Models
         public string Message { get; set; }
 
         /// <summary>
+        /// The user who called the action.
+        /// </summary>
+        [Required]
+        public string Actor { get; set; }
+
+        /// <summary>
         /// Gets a unique id for the event.
         /// </summary>
         public Guid EventId { get; set; }

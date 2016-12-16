@@ -8,7 +8,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SqxFrameworkModule, SqxSharedModule } from 'shared';
+import {
+    HistoryComponent,
+    SqxFrameworkModule,
+    SqxSharedModule
+} from 'shared';
 
 import {
     ClientComponent,
@@ -28,13 +32,40 @@ const routes: Routes = [
             },
             {
                 path: 'clients',
-                component: ClientsPageComponent
+                component: ClientsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.clients'
+                        }
+                    }
+                ]
             }, {
                 path: 'contributors',
-                component: ContributorsPageComponent
+                component: ContributorsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.contributors'
+                        }
+                    }
+                ]
             }, {
                 path: 'languages',
-                component: LanguagesPageComponent
+                component: LanguagesPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.languages'
+                        }
+                    }
+                ]
             }
         ]
     }

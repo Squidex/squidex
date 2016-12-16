@@ -52,10 +52,10 @@ namespace Squidex.Config.Identity
                 {
                     options.UserInteractionOptions.ErrorUrl = "/account/error/";
                 })
+                .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources())
-                .AddSigningCredential(certificate)
-                .AddAspNetIdentity<IdentityUser>();
+                .AddSigningCredential(certificate);
 
             return services;
         }

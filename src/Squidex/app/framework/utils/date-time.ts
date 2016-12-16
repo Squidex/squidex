@@ -232,4 +232,8 @@ export class DateTime {
     public toStringFormat(format: string): string {
         return moment(this.value).format(format);
     }
+
+    public toFromNow(): string {
+        return moment(this.value).fromNow();
+    }
 }

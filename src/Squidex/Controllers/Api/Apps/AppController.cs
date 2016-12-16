@@ -54,6 +54,7 @@ namespace Squidex.Controllers.Api.Apps
         public async Task<IActionResult> GetApps()
         {
             var subject = HttpContext.User.OpenIdSubject();
+
             var schemas = await appRepository.QueryAllAsync(subject);
 
             var response = schemas.Select(s =>

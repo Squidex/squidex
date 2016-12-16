@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Config.EventStore
 {
     public sealed class MyEventStoreOptions

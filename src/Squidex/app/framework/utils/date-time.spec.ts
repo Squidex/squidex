@@ -97,6 +97,12 @@ describe('DateTime', () => {
         expect(actual).toEqual(expected);
     });
 
+    it('should print to from now string', () => {
+        const value = DateTime.now().addMinutes(-4);
+
+        expect(value.toFromNow()).toBe('4 minutes ago');
+    });
+
     it('should print to valid utc string', () => {
         const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
 

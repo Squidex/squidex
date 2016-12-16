@@ -117,6 +117,11 @@ $panel-sidebar: 60px;
             border-top: 1px solid $color-border;
         }
 
+        .panel-content-blank {
+            border: 0;
+            background: $color-card-footer;
+        }
+
         .panel-sidebar {
             background: $color-card-footer;
             border-left: 1px solid $color-border;

@@ -11,6 +11,7 @@ import {
     DayOfWeekPipe,
     DayPipe,
     DurationPipe,
+    FromNowPipe,
     MonthPipe,
     ShortDatePipe,
     ShortTimePipe
@@ -48,6 +49,17 @@ describe('MonthPipe', () => {
 
         const actual = pipe.transform(dateTime, []);
         const expected = 'October';
+
+        expect(actual).toBe(expected);
+    });
+});
+
+describe('FromNowPipe', () => {
+    it('should format to from now string', () => {
+        const pipe = new FromNowPipe();
+
+        const actual = pipe.transform(DateTime.now().addMinutes(-4), []);
+        const expected = '4 minutes ago';
 
         expect(actual).toBe(expected);
     });

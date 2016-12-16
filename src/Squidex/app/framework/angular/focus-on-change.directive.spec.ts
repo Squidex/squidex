@@ -33,7 +33,9 @@ describe('FocusOnChangeDirective', () => {
             nativeElement: {}
         };
 
-        new FocusOnChangeDirective(element, renderer as Renderer).ngOnChanges({});
+        const directive = new FocusOnChangeDirective(element, renderer as Renderer);
+        directive.select = true;
+        directive.ngOnChanges();
 
         expect(calledMethods).toEqual([]);
 

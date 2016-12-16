@@ -57,8 +57,7 @@ export class AppsService {
                             item.name,
                             DateTime.parseISO(item.created),
                             DateTime.parseISO(item.lastModified),
-                            item.permission
-                        );
+                            item.permission);
                     });
                 })
                 .catch(response => handleError('Failed to load apps. Please reload.', response));

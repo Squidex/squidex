@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithSubjectHandler.cs
+//  EnrichWithActorHandler.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,52 +12,53 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Security;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public class EnrichWithUserHandler : ICommandHandler
+    public class EnrichWithActorHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithUserHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithActorHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var subjectCommand = context.Command as IUserCommand;
+            var subjectCommand = context.Command as IActorCommand;
 
             if (subjectCommand != null)
             {
-                var userToken = 
-                    FindUserFromSubject() ?? 
-                    FindUserFromClient();
+                var actorToken = 
+                    FindActorFromSubject() ?? 
+                    FindActorFromClient();
 
-                if (userToken == null)
+                if (actorToken == null)
                 {
-                    throw new SecurityException("No user with subject or client id available");
+                    throw new SecurityException("No actor with subject or client id available");
                 }
 
-                subjectCommand.User = userToken;
+                subjectCommand.Actor = actorToken;
             }
 
             return Task.FromResult(false);
         }
 
-        private UserToken FindUserFromSubject()
+        private RefToken FindActorFromSubject()
         {
             var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
 
-            return subjectId == null ? null : new UserToken("subject", subjectId);
+            return subjectId == null ? null : new RefToken("subject", subjectId);
         }
 
-        private UserToken FindUserFromClient()
+        private RefToken FindActorFromClient()
         {
             var clientId = httpContextAccessor.HttpContext.User.OpenIdClientId();
 
-            return clientId == null ? null : new UserToken("client", clientId);
+            return clientId == null ? null : new RefToken("client", clientId);
         }
     }
 }
