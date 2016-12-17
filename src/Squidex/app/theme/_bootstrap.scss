@@ -127,10 +127,11 @@
     }
 
     & {
-        @include absolute(-2.4rem, 0, auto, 0);
+        @include absolute(-2.4rem, auto, auto, 0);
         @include border-radius(2px);
         color: $color-accent-dark;
         cursor: none;
+        display: inline-block;
         font-size: .9rem;
         font-weight: normal;
         line-height: 2rem;

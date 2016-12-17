@@ -189,11 +189,15 @@ export class AuthService {
         return response.catch((error: Response) => {
             if (error.status === 401 || error.status === 404) {
                 this.logoutRedirect();
+
+                return Observable.empty<Response>();
             } else if (error.status === 403) {
                 this.router.navigate(['/404']);
+
+                return Observable.empty<Response>();
             }
 
-            return Observable.throw(error);
+            return Observable.throw(response);
         });
     }
 

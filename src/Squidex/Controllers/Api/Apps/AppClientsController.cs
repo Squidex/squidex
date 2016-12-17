@@ -54,6 +54,7 @@ namespace Squidex.Controllers.Api.Apps
         [ProducesResponseType(typeof(ClientDto[]), 200)]
         public async Task<IActionResult> GetClients(string app)
         {
+            return StatusCode(401);
             var entity = await appProvider.FindAppByNameAsync(app);
 
             if (entity == null)

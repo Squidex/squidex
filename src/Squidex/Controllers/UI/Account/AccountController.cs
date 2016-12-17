@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure.Security;
+using Microsoft.Extensions.Options;
+using Squidex.Config;
 
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertIfStatementToReturnStatement
@@ -27,14 +29,17 @@ namespace Squidex.Controllers.UI.Account
     {
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IOptions<MyUrlsOptions> urlOptions;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
             SignInManager<IdentityUser> signInManager, 
-            UserManager<IdentityUser> userManager, 
+            UserManager<IdentityUser> userManager,
+            IOptions<MyUrlsOptions> urlOptions,
             IIdentityServerInteractionService interactions)
         {
             this.signInManager = signInManager;
+            this.urlOptions = urlOptions;
             this.userManager = userManager;
             this.interactions = interactions;
         }
@@ -76,7 +81,14 @@ namespace Squidex.Controllers.UI.Account
             
             await signInManager.SignOutAsync();
 
-            return context.PostLogoutRedirectUri != null ? (IActionResult)Redirect(context.PostLogoutRedirectUri) : StatusCode(201);
+            var logoutUrl = context.PostLogoutRedirectUri;
+
+            if (string.IsNullOrWhiteSpace(logoutUrl))
+            {
+                logoutUrl = urlOptions.Value.BuildUrl("logout");
+            }
+
+            return Redirect(logoutUrl);
         }
 
         [HttpGet]

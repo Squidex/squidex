@@ -15,6 +15,13 @@
                 <div class="client-name">
                     <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (submit)="rename()">
                         <div class="form-group">
+                            <div class="errors-box" *ngIf="renameForm.get('name').invalid" [@fade]>
+                                <div class="errors">
+                                    <span *ngIf="renameForm.get('name').hasError('required')">
+                                        Name is required.
+                                    </span>
+                                </div>
+                            </div>
                             <input type="text" class="form-control" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                         </div>
 

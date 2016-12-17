@@ -9,15 +9,16 @@
 
 .logo {
     height: 60px;
-    display: display-block;
 }
 
-.login-button {
-    margin: 40px 0;
-}
+.login {
+    &-button {
+        margin: 40px 0;
+    }
 
-.login-hint {
-    font-style: italic;
+    &-hint {
+        font-style: italic;
+    }
 }
 
 .proudly-made {
