@@ -141,7 +141,14 @@
 }
 
 .form-hint {
-    font-size: .8rem;
+    & {
+        font-size: .8rem;
+    }
+
+    p {
+        margin-top: .4rem;
+        margin-bottom: 0;
+    }
 }
 
 .form-error {
@@ -164,13 +171,13 @@
     & {
         @include transition(background-color .3s ease);
         @include placeholder-color(darken($color-accent-dark, 30%));
-        background: lighten($color-dark-background, 5%);
+        background: $color-dark-background-accent;
         border: 0;
         color: darken($color-accent-dark, 20%);
     }
 
     &:focus {
-        background: lighten($color-dark-background, 7%);
+        background: lighten($color-dark-background-accent, 2%);
         border: 0;
         color: $color-accent-dark;
     }
@@ -259,7 +266,7 @@
                     @include border-radius(0);
                     background: $color-dark-background-selected;
                     border: 0;
-                    color: lighten($color-dark-foreground, 30%);
+                    color: $color-dark-foreground-selected;
                 }
 
                 &:hover {

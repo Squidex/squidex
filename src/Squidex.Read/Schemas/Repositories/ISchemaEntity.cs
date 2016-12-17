@@ -7,7 +7,7 @@
 // ==========================================================================
 namespace Squidex.Read.Schemas.Repositories
 {
-    public interface ISchemaEntity : IAppRefEntity
+    public interface ISchemaEntity : IAppRefEntity, ITrackCreatedByEntity, ITrackLastModifiedByEntity
     {
         string Name { get; }
     }

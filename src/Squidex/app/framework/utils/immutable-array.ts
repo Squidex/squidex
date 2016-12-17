@@ -51,6 +51,14 @@ export class ImmutableArray<T> implements Iterable<T> {
         return this.items.find(predicate);
     }
 
+    public sort(compareFn?: (a: T, b: T) => number): ImmutableArray<T> {
+        const clone = [...this.items];
+
+        clone.sort(compareFn);
+
+        return new ImmutableArray<T>(clone);
+    }
+
     public push(...items: T[]): ImmutableArray<T> {
         if (!items || items.length === 0) {
             return this;

@@ -16,7 +16,9 @@ $color-theme-error: #f00;
 $color-theme-error-dark: darken($color-theme-error, 5%);
 
 $color-dark-foreground: #6a7681;
+$color-dark-foreground-selected: lighten($color-dark-foreground, 40%);
 $color-dark-background: #2e3842;
+$color-dark-background-accent: lighten($color-dark-background, 5%);
 $color-dark-background-selected: #273039;
 
 $color-modal-header-background: #2e3842;
@@ -33,3 +35,7 @@ $color-card-footer: #fff;
 
 $size-navbar-height: 52px;
 $size-sidebar-width: 100px;
+
+$panel-padding: 20px;
+$panel-header: 70px;
+$panel-sidebar: 61px;

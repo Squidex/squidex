@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -24,12 +25,24 @@ namespace Squidex.Controllers.Api.Schemas.Models
         [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
-        
+
+        /// <summary>
+        /// The user that has created the schema.
+        /// </summary>
+        [Required]
+        public RefToken CreatedBy { get; set; }
+
+        /// <summary>
+        /// The user that has updated the schema.
+        /// </summary>
+        [Required]
+        public RefToken LastModifiedBy { get; set; }
+
         /// <summary>
         /// The date and time when the schema has been creaed.
         /// </summary>
         public DateTime Created { get; set; }
-        
+
         /// <summary>
         /// The date and time when the schema has been modified last.
         /// </summary>

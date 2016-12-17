@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,6 +44,18 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// </summary>
         [StringLength(1000)]
         public string Hints { get; set; }
+
+        /// <summary>
+        /// The user that has created the schema.
+        /// </summary>
+        [Required]
+        public RefToken CreatedBy { get; set; }
+
+        /// <summary>
+        /// The user that has updated the schema.
+        /// </summary>
+        [Required]
+        public RefToken LastModifiedBy { get; set; }
 
         /// <summary>
         /// The date and time when the schema has been creaed.

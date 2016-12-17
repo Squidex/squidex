@@ -8,27 +8,34 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { fadeAnimation } from 'framework';
+import {
+    AuthService,
+    CreateSchemaDto,
+    DateTime,
+    fadeAnimation,
+    SchemaDto,
+    SchemasService
+} from 'shared';
 
-import { AppsStoreService } from './../services/apps-store.service';
-import { AppDto, CreateAppDto } from './../services/apps.service';
-
-const FALLBACK_NAME = 'my-app';
+const FALLBACK_NAME = 'my-schema';
 
 @Component({
-    selector: 'sqx-app-form',
-    styleUrls: ['./app-form.component.scss'],
-    templateUrl: './app-form.component.html',
+    selector: 'sqx-schema-form',
+    styleUrls: ['./schema-form.component.scss'],
+    templateUrl: './schema-form.component.html',
     animations: [
         fadeAnimation
     ]
 })
-export class AppFormComponent implements OnInit {
+export class SchemaFormComponent implements OnInit {
     @Input()
     public showClose = false;
 
+    @Input()
+    public appName: string;
+
     @Output()
-    public created = new EventEmitter<AppDto>();
+    public created = new EventEmitter<SchemaDto>();
 
     @Output()
     public cancelled = new EventEmitter();
@@ -44,32 +51,37 @@ export class AppFormComponent implements OnInit {
                 ]]
         });
 
-    public appName = FALLBACK_NAME;
+    public schemaName = FALLBACK_NAME;
 
     constructor(
-        private readonly appsStore: AppsStoreService,
-        private readonly formBuilder: FormBuilder
+        private readonly schemas: SchemasService,
+        private readonly formBuilder: FormBuilder,
+        private readonly authService: AuthService
     ) {
     }
 
     public ngOnInit() {
         this.createForm.controls['name'].valueChanges.subscribe(value => {
-            this.appName = value || FALLBACK_NAME;
+            this.schemaName = value || FALLBACK_NAME;
         });
     }
 
-    public createApp() {
+    public createSchema() {
         this.createForm.markAsTouched();
 
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const dto = new CreateAppDto(this.createForm.controls['name'].value);
+            const name = this.createForm.controls['name'].value;
+            const dto = new CreateSchemaDto(name);
+            const now = DateTime.now();
 
-            this.appsStore.createApp(dto)
+            const me = `subject:${this.authService.user.id}`;
+
+            this.schemas.postSchema(this.appName, dto)
                 .subscribe(dto => {
                     this.createForm.reset();
-                    this.created.emit(dto);
+                    this.created.emit(new SchemaDto(dto.id, name, now, now, me, me));
                 }, error => {
                     this.reset();
                     this.creationError = error.displayMessage;

@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 import {
     ApiUrlConfig,
     DateTime,
+    EntityCreatedDto,
     handleError
 } from 'framework';
 
@@ -21,7 +22,9 @@ export class SchemaDto {
         public readonly id: string,
         public readonly name: string,
         public readonly created: DateTime,
-        public readonly lastModified: DateTime
+        public readonly lastModified: DateTime,
+        public readonly createdBy: string,
+        public readonly lastModifiedBy: string
     ) {
     }
 }
@@ -32,6 +35,8 @@ export class SchemaDetailsDto {
         public readonly name: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
+        public readonly createdBy: string,
+        public readonly lastModifiedBy: string,
         public readonly fields: FieldDto[]
     ) {
     }
@@ -128,7 +133,9 @@ export class SchemasService {
                             item.id,
                             item.name,
                             DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified));
+                            DateTime.parseISO_UTC(item.lastModified),
+                            item.createdBy,
+                            item.lastModifiedBy);
                     });
                 })
                 .catch(response => handleError('Failed to load schemas. Please reload.', response));
@@ -182,8 +189,21 @@ export class SchemasService {
                         response.name,
                         DateTime.parseISO_UTC(response.created),
                         DateTime.parseISO_UTC(response.lastModified),
+                        response.createdBy,
+                        response.lastModifiedBy,
                         fields);
                 })
                 .catch(response => handleError('Failed to load schema. Please reload.', response));
+    }
+
+    public postSchema(appName: string, dto: CreateSchemaDto): Observable<EntityCreatedDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/`);
+
+        return this.authService.authPost(url, dto)
+                .map(response => response.json())
+                .map(response => {
+                    return new EntityCreatedDto(response.id);
+                })
+                .catch(response => handleError('Failed to create schema. Please reload.', response));
     }
 }

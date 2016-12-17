@@ -1,0 +1,155 @@
+@import '_vars';
+@import '_mixins';
+
+.panel {
+    min-width: 450px;
+    max-width: 450px;
+}
+
+.panel-header {
+    min-height: 170px;
+    max-height: 170px;
+}
+
+.subheader {
+    margin-top: 1rem;
+    margin-right: -40px;
+}
+
+.search-form {
+    & {
+        position: relative;
+        margin-top: .5rem;
+    }
+
+    .form-control {
+        padding-left: 50px;
+    }
+
+    .icon-search {
+        @include absolute(8px, auto, auto, 12px);
+        color: $color-dark-foreground-selected;
+        font-size: 1.3rem;
+        font-weight: lighter;
+    }
+}
+
+.btn-new {
+    & {
+        padding-left: 0;
+        background: transparent;
+        border: 0;
+        color: $color-dark-foreground-selected;
+        font-size: 1.05rem;
+    }
+
+    &:hover {
+        color: lighten($color-dark-foreground-selected, 5%);
+        outline: 0;
+    }
+
+    &:focus {
+        color: lighten($color-dark-foreground-selected, 10%);
+        outline: 0;
+    }
+
+    .icon-plus {
+        & {
+            @include circle(24px);
+            display: inline-block;
+            background: transparent;
+            border: 2px solid $color-dark-foreground-selected;
+            margin-right: .5rem;
+            font-size: .8rem;
+            font-weight: bold;
+            vertical-align: baseline;
+            line-height: 20px;
+        }
+
+        &:hover {
+            border-color: lighten($color-dark-foreground-selected, 5%);
+        }
+
+        &:focus {
+            border-color: lighten($color-dark-foreground-selected, 10%);
+        }
+    }
+}
+
+.schemas {
+    margin-left: -$panel-padding;
+    margin-right: -$panel-padding;
+}
+
+.schema {
+    & {
+        padding-left: $panel-padding;
+        padding-right: $panel-padding;
+    }
+
+    &:hover,
+    &.active {
+        & {
+            background: $color-dark-background-selected;
+        }
+
+        & + .schema > .schema-inner {
+            border-color: transparent;
+        }
+
+        .schema-inner {
+            border-color: transparent;
+        }
+    }
+
+    &-inner {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-top: 1px solid darken($color-dark-foreground, 10%);
+    }
+
+    &-col-left {
+        @include truncate;
+    }
+
+    &-col-right {
+        text-align: right;
+    }
+
+    &-modified {
+        font-size: .8rem;
+    }
+
+    &-name {
+        @include truncate;
+        color: $color-dark-foreground-selected;
+        font-size: 1rem;
+        font-weight: normal;
+    }
+
+    &-user {
+        & {
+            @include border-radius(1px);
+            display: inline-block;
+            background: $color-dark-background-accent;
+            padding: .1rem .3rem;
+            font-size: .8rem;
+            font-weight: normal;
+            margin-left: 10px;
+            max-width: 100%;
+            vertical-align: baseline;
+        }
+
+        &-text {
+            @include truncate;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+    }
+
+    &:first-child {
+        .schema-inner {
+            border: 0;
+        }
+    }
+}

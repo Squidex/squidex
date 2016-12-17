@@ -1,10 +1,6 @@
 @import '_mixins';
 @import '_vars';
 
-$panel-padding: 20px;
-$panel-header: 70px;
-$panel-sidebar: 61px;
-
 .panel-container {
     @include absolute($size-navbar-height, 0, 0, $size-sidebar-width);
     overflow-x: auto;

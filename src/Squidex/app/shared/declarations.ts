@@ -21,6 +21,7 @@ export * from './services/apps.service';
 export * from './services/auth.service';
 export * from './services/history.service';
 export * from './services/languages.service';
+export * from './services/schemas.service';
 export * from './services/users-provider.service';
 export * from './services/users.service';
 

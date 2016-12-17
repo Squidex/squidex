@@ -11,13 +11,23 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
 import {
+    SchemaFormComponent,
+    SchemaPageComponent,
     SchemasPageComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
-        component: SchemasPageComponent
+        component: SchemasPageComponent,
+        children: [
+            {
+                path: ''
+            },
+            {
+                path: ':schemaName',
+                component: SchemaPageComponent
+            }]
     }
 ];
 
@@ -28,6 +38,8 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        SchemaFormComponent,
+        SchemaPageComponent,
         SchemasPageComponent
     ]
 })

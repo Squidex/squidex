@@ -18,10 +18,16 @@ export class TitleComponent implements OnChanges {
     public message: any;
 
     @Input()
-    public parameter: string;
+    public parameter1: string;
 
     @Input()
-    public value: any;
+    public parameter2: string;
+
+    @Input()
+    public value1: any;
+
+    @Input()
+    public value2: any;
 
     constructor(
         private readonly titleService: TitleService
@@ -31,12 +37,20 @@ export class TitleComponent implements OnChanges {
     public ngOnChanges() {
         const parameters = {};
 
-        if (this.parameter) {
-            if (!this.value) {
+        if (this.parameter1) {
+            if (!this.value1) {
                 return;
             }
 
-            parameters[this.parameter] = this.value;
+            parameters[this.parameter1] = this.value1;
+        }
+
+        if (this.parameter2) {
+            if (!this.value2) {
+                return;
+            }
+
+            parameters[this.parameter2] = this.value2;
         }
 
         this.titleService.setTitle(this.message, parameters);

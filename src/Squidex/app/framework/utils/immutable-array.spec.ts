@@ -131,4 +131,11 @@ describe('ImmutableArray', () => {
 
         expect(result).toBeUndefined();
     });
+
+    it('should sort items', () => {
+        const array_1 = ImmutableArray.of([3, 1, 4, 2]);
+        const array_2 = array_1.sort((x, y) => x - y);
+
+        expect(array_2.values).toEqual([1, 2, 3, 4]);
+    });
 });

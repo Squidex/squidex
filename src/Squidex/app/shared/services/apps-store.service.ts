@@ -45,9 +45,9 @@ export class AppsStoreService {
 
     constructor(
         private readonly auth: AuthService,
-        private readonly appService: AppsService
+        private readonly appsService: AppsService
     ) {
-        if (!auth || !appService) {
+        if (!auth || !appsService) {
             return;
         }
 
@@ -74,7 +74,7 @@ export class AppsStoreService {
     }
 
     private load() {
-        this.appService.getApps().subscribe(apps => {
+        this.appsService.getApps().subscribe(apps => {
             this.apps$.next(apps);
         });
     }
@@ -86,7 +86,7 @@ export class AppsStoreService {
     }
 
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
-        return this.appService.postApp(dto)
+        return this.appsService.postApp(dto)
             .map(created => {
                 now = now || DateTime.now();
 

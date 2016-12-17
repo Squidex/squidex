@@ -31,12 +31,22 @@ export abstract class AppComponentBase {
         return this.usersProvider.getUser(userId).map(u => u.email);
     }
 
-    public userName(userId: string): Observable<string> {
-        return this.usersProvider.getUser(userId).map(u => u.displayName);
-    }
-
     public userPicture(userId: string): Observable<string> {
         return this.usersProvider.getUser(userId).map(u => u.pictureUrl);
+    }
+
+    public userName(userId: string, isRef: boolean = false): Observable<string> {
+        if (isRef) {
+            const parts = userId.split(':');
+
+            if (parts[0] === 'subject') {
+                return this.usersProvider.getUser(parts[1]).map(u => u.displayName);
+            } else {
+                return Observable.of(parts[1]);
+            }
+        } else {
+                return this.usersProvider.getUser(userId).map(u => u.displayName);
+        }
     }
 
     public notifyError(error: string | ErrorDto) {

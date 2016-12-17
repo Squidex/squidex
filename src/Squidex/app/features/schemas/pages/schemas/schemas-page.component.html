@@ -1,0 +1,70 @@
+<sqx-title message="{app} | Schemas" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<div class="panel panel-dark">
+    <div class="panel-header">
+        <div>
+            <h3 class="panel-title">Schemas</h3>
+
+            <a class="panel-close" dashboardLink>
+                <i class="icon-close"></i>
+            </a>
+        </div>
+        <div class="subheader">
+            <div class="clearfix">
+                <button class="btn btn-new" (click)="modalDialog.show()">
+                    <i class="icon-plus"></i> New Schema            
+                </button>
+            </div>
+            <div class="search-form">
+                <input class="form-control form-control-dark" [(ngModel)]="schemasFilter" [ngModelOptions]="{standalone: true}" placeholder="Search for schemas..." />
+
+                <i class="icon-search"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-content">
+        <div class="schemas">
+            <div class="schema" *ngFor="let schema of filteredSchemas" [routerLink]="[schema.name]" routerLinkActive="active">
+                <div class="schema-inner">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <span class="schema-name">{{schema.name}}</span> 
+                        </div>
+                        <div class="col-xs-4">
+                            <span class="schema-user">
+                                <i class="icon-person"></i> <span class="schema-user-text">{{userName(schema.lastModifiedBy, true) | async}}</span>
+                            </span>
+                        </div>
+                        <div class="col-xs-4 schema-col-right">
+                            <span class="schema-modified">{{schema.lastModified.toLocal() | fromNow}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="modalDialog" [@fade]>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+				<h4 class="modal-title">Create Schema</h4>
+			</div>
+
+			<div class="modal-body">
+                <sqx-schema-form
+                    [appName]="appName() | async"
+                    (created)="onSchemaCreationCompleted($event)"
+                    (cancelled)="modalDialog.hide()"></sqx-schema-form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<router-outlet></router-outlet>
