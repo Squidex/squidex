@@ -32,7 +32,7 @@ namespace Squidex.Store.MongoDb.Apps
 
         string IAppClientEntity.Name
         {
-            get { return Name ?? Id; }
+            get { return !string.IsNullOrWhiteSpace(Name) ? Name : Id; }
         }
     }
 }

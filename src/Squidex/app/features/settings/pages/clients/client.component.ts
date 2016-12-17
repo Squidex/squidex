@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -61,7 +61,9 @@ export class ClientComponent {
 
     public renameForm: FormGroup =
         this.formBuilder.group({
-            name: ['']
+            name: ['',
+                Validators.required
+            ]
         });
 
     constructor(

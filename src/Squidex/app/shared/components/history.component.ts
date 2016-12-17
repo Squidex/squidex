@@ -82,7 +82,7 @@ export class HistoryComponent extends AppComponentBase implements OnDestroy, OnI
             }
         });
 
-        message = message.replace(/{([^\s:]*)}/, (match: string, marker: string) => {
+        message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
             return `<span class="marker-ref">${marker}</span>`;
         });
 

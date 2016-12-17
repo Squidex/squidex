@@ -35,7 +35,7 @@ namespace Squidex.Store.MongoDb.History
                 },
                 {
                     TypeNameRegistry.GetName<AppClientRenamed>(),
-                    "renamed client {[Id]} to {[Name]}"
+                    "named client {[Id]} as {[Name]}"
                 },
                 {
                     TypeNameRegistry.GetName<AppLanguageAdded>(),
