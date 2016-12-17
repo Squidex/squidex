@@ -8,30 +8,9 @@
     z-index: 100;
 }
 
-
-@mixin build-item($color) {
-    .nav-link {
-        &.active {
-            & {
-                background: $color-dark-selected;
-            }
-
-            i {
-                color: $color;
-            }
-        }
-    }
-
-    &:hover {
-        i {
-            color: $color;
-        }
-    }
-}
-
 .nav {
-    &-link {
-        padding: 20px;
+    & {
+        text-align: center;
     }
 
     &-icon {
@@ -45,23 +24,28 @@
     &-item {
         & {
             color: $color-dark-foreground;
-            text-align: center;
         }
 
-        &--media {
-            @include build-item($color-section-media);
+        &:hover {
+            i {
+                color: $color-theme-blue;
+            }
+        }
+    }
+
+    &-link {
+        & {
+            padding: 20px;
         }
 
-        &--content {
-            @include build-item($color-section-content);
-        }
+        &.active {
+            & {
+                background: $color-theme-blue-dark;
+            }
 
-        &--schemas {
-            @include build-item($color-section-schemas);
-        }
-
-        &--settings {
-            @include build-item($color-section-settings);
+            i {
+                color: $color-theme-blue;
+            }
         }
     }
 }

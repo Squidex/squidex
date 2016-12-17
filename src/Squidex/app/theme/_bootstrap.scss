@@ -98,20 +98,6 @@
     }
 }
 
-.form-hint {
-    font-size: .8rem;
-}
-
-.form-error {
-    @include border-radius(3px);
-    @include truncate;
-    color: $color-accent-dark;
-    margin-top: 4px;
-    margin-bottom: 10px;
-    padding: 6px;
-    background: $color-theme-error;
-}
-
 .ng-invalid {
     &.ng-dirty {
         & {
@@ -153,45 +139,46 @@
     }
 }
 
+.form-hint {
+    font-size: .8rem;
+}
+
+.form-error {
+    @include border-radius(3px);
+    @include truncate;
+    color: $color-accent-dark;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    padding: 6px;
+    background: $color-theme-error;
+}
+
 .form-group {
     &:last-child {
         margin: 0;
     }
 }
 
-.modal {
-    &-content,
-    &-header {
+.form-control-dark {
+    & {
+        @include transition(background-color .3s ease);
+        @include placeholder-color(darken($color-accent-dark, 30%));
+        background: lighten($color-dark-background, 5%);
         border: 0;
+        color: darken($color-accent-dark, 20%);
     }
 
-    &-header {
-        @include border-radius-top(.3rem);
-        background: $color-modal-header-background;
-
-        h4 {
-            color: $color-modal-header-foreground;
-            font-size: 1rem;
-            font-weight: normal;
-        }
-
-        .close {
-            & {
-                @include opacity(1);
-                @include text-shadow-none;
-                color: $color-modal-header-foreground;
-                font-size: 1.6rem;
-                font-weight: 400;
-            }
-
-            &:hover {
-                color: lighten($color-modal-header-foreground, 15%);
-            }
-        }
+    &:focus {
+        background: lighten($color-dark-background, 7%);
+        border: 0;
+        color: $color-accent-dark;
     }
+}
 
+.modal {
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
+        border: 0;
     }
 
     &-dialog {
@@ -269,13 +256,13 @@
             &.active {
                 & {
                     @include border-radius(0);
-                    background: $color-dark-selected;
-                    pointer-events: none;
+                    background: $color-dark-background-selected;
+                    border: 0;
                     color: lighten($color-dark-foreground, 30%);
                 }
 
                 &:hover {
-                    background: $color-dark-selected;
+                    background: $color-dark-background-selected;
                 }
             }
         }

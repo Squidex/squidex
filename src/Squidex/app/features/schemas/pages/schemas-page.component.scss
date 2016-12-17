@@ -2,6 +2,75 @@
 @import '_mixins';
 
 .panel {
-    min-width: 600px;
-    max-width: 600px;
+    min-width: 450px;
+    max-width: 450px;
+}
+
+.panel-header {
+    min-height: 150px;
+    max-height: 150px;
+}
+
+.subheader {
+    margin-top: 1rem;
+    margin-right: -40px;
+}
+
+.search-form {
+    & {
+        position: relative;
+        margin-top: .5rem;
+    }
+
+    .form-control {
+        padding-left: 50px;
+    }
+
+    .icon-search {
+        @include absolute(8px, auto, auto, 12px);
+        color: $color-accent-dark;
+        font-size: 1.3rem;
+        font-weight: lighter;
+    }
+}
+
+.btn-new {
+    & {
+        padding-left: 0;
+        background: transparent;
+        border: 0;
+        color: darken($color-accent-dark, 15%);
+        font-size: 1.05rem;
+    }
+
+    &:hover {
+        color: darken($color-accent-dark, 5%);
+        outline: 0;
+    }
+
+    &:focus {
+        color: $color-accent-dark;
+        outline: 0;
+    }
+
+    .icon-plus {
+        & {
+            @include circle(24px);
+            background: transparent;
+            border: 2px solid darken($color-accent-dark, 15%);
+            font-size: .8rem;
+            font-weight: bold;
+            vertical-align: baseline;
+            line-height: 20px;
+            display: inline-block;
+        }
+
+        &:hover {
+            border-color: darken($color-accent-dark, 5%);
+        }
+
+        &:focus {
+            border-color: $color-accent-dark;
+        }
+    }
 }

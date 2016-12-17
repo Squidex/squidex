@@ -1,14 +1,46 @@
 <sqx-title message="{app} | Schemas" parameter="app" value="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-light">
+<div class="panel panel-dark">
     <div class="panel-header">
-        <h3 class="panel-title">Schemas</h3>
+        <div>
+            <h3 class="panel-title">Schemas</h3>
 
-        <a class="panel-close" dashboardLink>
-            <i class="icon-close"></i>
-        </a>
+            <a class="panel-close" dashboardLink>
+                <i class="icon-close"></i>
+            </a>
+        </div>
+        <div class="subheader">
+            <div class="clearfix">
+                <button class="btn btn-new" (click)="createSchema()">
+                    <i class="icon-plus"></i> New Schema            
+                </button>
+            </div>
+            <div class="search-form">
+                <input class="form-control form-control-dark" placeholder="Search for schemas..." />
+
+                <i class="icon-search"></i>
+            </div>
+        </div>
     </div>
 
     <div class="panel-content">
+        asdasd
     </div>
+</div>
+
+<div class="modal" *sqxModalView="modalDialog" [@fade]>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+				<h4 class="modal-title">Create Schema</h4>
+			</div>
+
+			<div class="modal-body">
+			</div>
+		</div>
+	</div>
 </div>

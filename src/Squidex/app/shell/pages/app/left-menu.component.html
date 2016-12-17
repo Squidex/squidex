@@ -1,21 +1,21 @@
 <div class="sidebar panel-dark">
     <ul class="nav nav-pills nav-stacked nav-dark">
-        <li class="nav-item nav-item--schemas" *ngIf="permission !== 'Editor'">
+        <li class="nav-item" *ngIf="permission !== 'Editor'">
             <a class="nav-link" routerLink="schemas" routerLinkActive="active">
                 <i class="nav-icon icon-schemas"></i> <span class="nav-text">Schemas</span>
             </a>
         </li>
-        <li class="nav-item nav-item--content">
+        <li class="nav-item">
             <a class="nav-link" routerLink="content" routerLinkActive="active">
                 <i class="nav-icon icon-content"></i> <span class="nav-text">Content</span>
             </a>
         </li>
-        <li class="nav-item nav-item--media">
+        <li class="nav-item">
             <a class="nav-link" routerLink="media" routerLinkActive="active">
                 <i class="nav-icon icon-media"></i> <span class="nav-text">Media</span>
             </a>
         </li>
-        <li class="nav-item nav-item--settings" *ngIf="permission === 'Owner'">
+        <li class="nav-item" *ngIf="permission === 'Owner'">
             <a class="nav-link" routerLink="settings" routerLinkActive="active">
                 <i class="nav-icon icon-settings"></i> <span class="nav-text">Settings</span>
             </a>

@@ -1,15 +1,8 @@
-$color-nav-text: #333;
-
 $color-background: #f4f8f9;
 $color-border: #dbe4eb;
 
 $color-text: #373a3c;
 $color-empty: #777;
-
-$color-section-media: #ab6eee;
-$color-section-settings: #ff5800;
-$color-section-content: #07a6ff;
-$color-section-schemas: #00e200;
 
 $color-theme-blue: #438cef;
 $color-theme-blue-dark: #3f83df;
@@ -22,9 +15,9 @@ $color-theme-green-dark: #47b353;
 $color-theme-error: #f00;
 $color-theme-error-dark: darken($color-theme-error, 5%);
 
-$color-dark-background: #2e3842;
-$color-dark-selected: #273039;
 $color-dark-foreground: #6a7681;
+$color-dark-background: #2e3842;
+$color-dark-background-selected: #273039;
 
 $color-modal-header-background: #2e3842;
 $color-modal-header-foreground: #6a7681;
@@ -37,9 +30,6 @@ $color-table-header: #a0a0a0;
 $color-accent-dark: #fff;
 
 $color-card-footer: #fff;
-
-$padding-layout-h: 30px;
-$padding-layout-v: 20px;
 
 $size-navbar-height: 52px;
 $size-sidebar-width: 100px;
