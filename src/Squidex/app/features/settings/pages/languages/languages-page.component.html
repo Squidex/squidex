@@ -47,8 +47,8 @@
                                 </span>
                             </td>
                             <td>
-                                <label class="language-default">
-                                    <input type="radio" [value]="true" [ngModel]="language.isMasterLanguage" (ngModelChange)="setMasterLanguage(language)"> Master Language
+                                <label class="language-default" (click)="setMasterLanguage(language)">
+                                    <input type="radio" [value]="true" [checked]="language.isMasterLanguage"> Master Language
                                 </label>
                             </td>
                             <td>
@@ -63,14 +63,14 @@
             </table>
 
             <div class="table-items-footer">
-                <form class="form-inline" (submit)="addLanguage()" name="addLanguageForm">
+                <form class="form-inline" [formGroup]="addLanguageForm" (ngSubmit)="createSchema()" (submit)="addLanguage()">
                     <div class="form-group">
-                        <select class="form-control language-select" [(ngModel)]="selectedLanguage" name="newLanguage">
-                            <option *ngFor="let language of allLanguages" [ngValue]="language">{{language.englishName}}</option>
+                        <select class="form-control language-select" formControlName="language">
+                            <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success" [disabled]="!selectedLanguage">Add Language</button>
+                    <button type="submit" class="btn btn-success" [disabled]="!addLanguageForm.valid">Add Language</button>
                 </form>
             </div>
         </div>

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
     AddAppLanguageDto,
@@ -30,7 +31,12 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     public allLanguages: LanguageDto[] = [];
     public appLanguages = ImmutableArray.empty<AppLanguageDto>();
 
-    public selectedLanguage: LanguageDto | null = null;
+    public addLanguageForm: FormGroup =
+        this.formBuilder.group({
+            language: [null,
+                Validators.required
+            ]
+        });
 
     public get newLanguages() {
         return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
@@ -38,7 +44,8 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguageService
+        private readonly languagesService: LanguageService,
+        private readonly formBuilder: FormBuilder
     ) {
         super(apps, notifications, users);
     }
@@ -66,14 +73,14 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     public addLanguage() {
         this.appName()
-            .switchMap(app => this.appLanguagesService.postLanguages(app, new AddAppLanguageDto(this.selectedLanguage.iso2Code)))
+            .switchMap(app => this.appLanguagesService.postLanguages(app, new AddAppLanguageDto(this.addLanguageForm.get('language').value.iso2Code)))
             .subscribe(dto => {
                 this.appLanguages = this.appLanguages.push(dto);
             }, error => {
                 this.notifyError(error);
             });
 
-        this.selectedLanguage = null;
+        this.addLanguageForm.reset();
     }
 
     public removeLanguage(language: AppLanguageDto) {

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
@@ -62,11 +63,6 @@ function changePermission(contributor: AppContributorDto, permission: string): A
 export class ContributorsPageComponent extends AppComponentBase implements OnInit {
     public appContributors = ImmutableArray.empty<AppContributorDto>();
 
-    public currentUserId: string;
-
-    public selectedUserName: string | null = null;
-    public selectedUser: UserDto | null = null;
-
     public usersDataSource: UsersDataSource;
     public usersPermissions = [
         'Owner',
@@ -74,10 +70,19 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         'Editor'
     ];
 
+    public addContributorForm: FormGroup =
+        this.formBuilder.group({
+            user: [null,
+                [
+                    Validators.required
+                ]]
+        });
+
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appContributorsService: AppContributorsService,
         private readonly usersService: UsersService,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly formBuilder: FormBuilder
     ) {
         super(apps, notifications, users);
 
@@ -85,8 +90,6 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public ngOnInit() {
-        this.currentUserId = this.authService.user.id;
-
         this.load();
     }
 
@@ -101,14 +104,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public assignContributor() {
-        if (!this.selectedUser) {
-            return;
-        }
-
-        const contributor = new AppContributorDto(this.selectedUser.id, 'Editor');
-
-        this.selectedUser = null;
-        this.selectedUserName = null;
+        const contributor = new AppContributorDto(this.addContributorForm.get('user').value.model.id, 'Editor');
 
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, contributor))
@@ -117,6 +113,8 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
             }, error => {
                 this.notifyError(error);
             });
+
+        this.addContributorForm.reset();
     }
 
     public changePermission(contributor: AppContributorDto, permission: string) {
@@ -139,10 +137,6 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
             }, error => {
                 this.notifyError(error);
             });
-    }
-
-    public selectUser(selection: UserDto) {
-        this.selectedUser = selection;
     }
 }
 

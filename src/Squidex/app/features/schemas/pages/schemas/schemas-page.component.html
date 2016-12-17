@@ -16,7 +16,7 @@
                 </button>
             </div>
             <div class="search-form">
-                <input class="form-control form-control-dark" [(ngModel)]="schemasFilter" [ngModelOptions]="{standalone: true}" placeholder="Search for schemas..." />
+                <input class="form-control form-control-dark" [formControl]="schemasFilter" placeholder="Search for schemas..." />
 
                 <i class="icon-search"></i>
             </div>
@@ -25,7 +25,7 @@
 
     <div class="panel-content">
         <div class="schemas">
-            <div class="schema" *ngFor="let schema of filteredSchemas" [routerLink]="[schema.name]" routerLinkActive="active">
+            <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
                 <div class="schema-inner">
                     <div class="row">
                         <div class="col-xs-4">

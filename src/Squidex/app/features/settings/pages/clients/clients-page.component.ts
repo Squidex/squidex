@@ -32,7 +32,7 @@ function rename(client: AppClientDto, name: string) {
 export class ClientsPageComponent extends AppComponentBase implements OnInit {
     public appClients: ImmutableArray<AppClientDto>;
 
-    public createForm: FormGroup =
+    public addClientForm: FormGroup =
         this.formBuilder.group({
             name: ['',
                 [
@@ -84,12 +84,12 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public attachClient() {
-        this.createForm.markAsDirty();
+        this.addClientForm.markAsDirty();
 
-        if (this.createForm.valid) {
-            this.createForm.disable();
+        if (this.addClientForm.valid) {
+            this.addClientForm.disable();
 
-            const dto = new CreateAppClientDto(this.createForm.controls['name'].value);
+            const dto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
 
             this.appName()
                 .switchMap(app => this.appClientsService.postClient(app, dto))
@@ -104,8 +104,8 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     private reset() {
-        this.createForm.reset();
-        this.createForm.enable();
+        this.addClientForm.reset();
+        this.addClientForm.enable();
     }
 }
 

@@ -6,7 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import {
     AppComponentBase,
@@ -33,29 +34,29 @@ const FALLBACK_NAME = 'my-schema';
 export class SchemasPageComponent extends AppComponentBase {
     public modalDialog = new ModalView();
 
-    public schemasFilter: string;
-    public schemas = ImmutableArray.empty<SchemaDto>();
+    public schemas = new BehaviorSubject(ImmutableArray.empty<SchemaDto>());
+    public schemasFilter = new FormControl();
+    public schemasFiltered =
+        Observable.of(null).merge(this.schemasFilter.valueChanges.debounceTime(100)).combineLatest(this.schemas,
+            (query, schemas) => {
 
-    public get filteredSchemas() {
-        let result = this.schemas;
+            if (query && query.length > 0) {
+                schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+            }
 
-        if (this.schemasFilter && this.schemasFilter.length > 0) {
-            result = result.filter(t => t.name.indexOf(this.schemasFilter) >= 0);
-        }
+            schemas =
+                schemas.sort((a, b) => {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                });
 
-        result =
-            result.sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
-
-        return result;
-    }
+            return schemas;
+        });
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly formBuilder: FormBuilder,
@@ -72,14 +73,14 @@ export class SchemasPageComponent extends AppComponentBase {
         this.appName()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
             .subscribe(dtos => {
-                this.schemas = ImmutableArray.of(dtos);
+                this.schemas.next(ImmutableArray.of(dtos));
             }, error => {
                 this.notifyError(error);
             });
     }
 
     public onSchemaCreationCompleted(dto: SchemaDto) {
-        this.schemas = this.schemas.push(dto);
+        this.schemas.next(this.schemas.getValue().push(dto));
 
         this.modalDialog.hide();
     }

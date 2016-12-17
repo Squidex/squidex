@@ -13,12 +13,29 @@
         <div class="panel-content">
             <table class="table table-items table-fixed">
                 <colgroup>
-                    <col style="width: 50px" />
+                    <col style="width: 70px" />
                     <col style="width: 50%" />
                     <col style="width: 50%" />
                     <col style="width: 150px" />
                     <col style="width: 80px" />
                 </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>
+                            &nbsp;
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Options
+                        </th>
+                    </tr>
+                </thead>
 
                 <tbody>
                     <template ngFor let-contributor [ngForOf]="appContributors">
@@ -49,17 +66,12 @@
             </table>
             
             <div class="table-items-footer">
-                <form class="form-inline" (submit)="assignContributor()" >
+                <form class="form-inline" [formGroup]="addContributorForm" (submit)="assignContributor()" >
                     <div class="form-group">
-                        <sqx-autocomplete [source]="usersDataSource"
-                            (ngModelChange)="selectUser($event.model)"
-                            [ngModel]="selectedUser"
-                            [ngModelOptions]="{standalone: true}"
-                            [inputName]="contributor">
-                        </sqx-autocomplete>
+                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="contributor"></sqx-autocomplete>
                     </div>
 
-                    <button type="submit" class="btn btn-success" [disabled]="!selectedUser">Add Contributor</button>
+                    <button type="submit" class="btn btn-success" [disabled]="!addContributorForm.valid">Add Contributor</button>
                 </form>
             </div>
         </div>

@@ -61,7 +61,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
     public queryInput = new FormControl();
 
     constructor() {
-        this.queryInput.valueChanges.delay(100).subscribe(query => this.loadItems(query));
+        this.queryInput.valueChanges.debounceTime(100).subscribe(query => this.loadItems(query));
     }
 
     public writeValue(value: any) {

@@ -44,8 +44,8 @@ import {
         HttpModule,
         FormsModule,
         CommonModule,
-        ReactiveFormsModule,
-        RouterModule
+        RouterModule,
+        ReactiveFormsModule
     ],
     declarations: [
         AutocompleteComponent,
@@ -103,8 +103,8 @@ import {
         HttpModule,
         FormsModule,
         CommonModule,
-        ReactiveFormsModule,
-        RouterModule
+        RouterModule,
+        ReactiveFormsModule
     ]
 })
 export class SqxFrameworkModule { }
