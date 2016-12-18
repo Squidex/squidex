@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, forwardRef, Input, OnDestroy } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
@@ -43,7 +43,7 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './autocomplete.component.html',
     providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
 })
-export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
+export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription | null = null;
     private lastQuery: string | null;
     private changeCallback: (value: any) => void = NOOP;
@@ -59,10 +59,6 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
     public itemSelection = -1;
 
     public queryInput = new FormControl();
-
-    constructor() {
-        this.queryInput.valueChanges.debounceTime(100).subscribe(query => this.loadItems(query));
-    }
 
     public writeValue(value: any) {
         if (!value) {
@@ -84,18 +80,6 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
         this.reset();
     }
 
-    public registerOnChange(fn: any) {
-        this.changeCallback = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
-    }
-
-    public ngOnDestroy() {
-        this.cancelRequest();
-    }
-
     public setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.reset();
@@ -105,63 +89,50 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy {
         }
     }
 
-    private cancelRequest() {
-        if (this.subscription != null) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
+    public registerOnChange(fn: any) {
+        this.changeCallback = fn;
     }
 
-    private loadItems(query: string) {
-        const source = this.source;
+    public registerOnTouched(fn: any) {
+        this.touchedCallback = fn;
+    }
 
-        this.cancelRequest();
+    public ngOnInit() {
+        this.subscription =
+            this.queryInput.valueChanges
+                .map(q => <string>q)
+                .map(q => q ? q.trim() : q)
+                .distinctUntilChanged()
+                .debounceTime(200)
+                .do(q => {
+                    if (!q) {
+                        this.reset();
+                    }
+                })
+                .filter(q => !!q && !!this.source)
+                .switchMap(q => this.source.find(q)).catch(error => Observable.of([]))
+                .subscribe(r => {
+                    this.reset();
+                    this.items = r || [];
+                });
+    }
 
-        if (!source) {
-            return;
-        }
-
-        let isInvalidQuery = this.lastQuery === query || !query || query.trim() === '';
-
-        this.lastQuery = query;
-
-        if (isInvalidQuery) {
-            this.reset();
-            return;
-        }
-
-        this.lastQuery = query;
-
-        this.subscription = source.find(query)
-            .catch(error => {
-                return Observable.of([]);
-            })
-            .subscribe(result => {
-                this.reset();
-                this.items = result || [];
-            });
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
     }
 
     public keyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case KEY_UP:
                 this.up();
-
-                event.stopPropagation();
-                event.preventDefault();
-                break;
+                return false;
             case KEY_DOWN:
                 this.down();
-
-                event.stopPropagation();
-                event.preventDefault();
-                break;
+                return false;
             case KEY_ENTER:
                 if (this.items.length > 0) {
                     this.chooseItem();
-
-                    event.stopPropagation();
-                    event.preventDefault();
+                    return false;
                 }
                 break;
         }

@@ -50,12 +50,12 @@
                                 <span class="user-email">{{userEmail(contributor.contributorId) | async}}</span>
                             </td>
                             <td>
-                                <select class="form-control" [(ngModel)]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
+                                <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
                                     <option *ngFor="let permission of usersPermissions">{{permission}}</option>
                                 </select>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-danger" [disabled]="currrentUserId === contributor.contributorId" (click)="removeContributor(contributor)">
+                                <button type="button" class="btn btn-link btn-danger" [disabled]="currentUserId === contributor.contributorId" (click)="removeContributor(contributor)">
                                     <i class="icon-bin"></i>
                                 </button>
                             </td>

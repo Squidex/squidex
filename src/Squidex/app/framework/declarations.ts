@@ -33,6 +33,7 @@ export * from './configurations';
 export * from './services/clipboard.service';
 export * from './services/drag.service';
 export * from './services/local-store.service';
+export * from './services/message-bus';
 export * from './services/notification.service';
 export * from './services/panel.service';
 export * from './services/shortcut.service';

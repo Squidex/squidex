@@ -11,7 +11,7 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-blank">
-            <div *ngFor="let event of events" class="event">
+            <div *ngFor="let event of events | async" class="event">
                 <div class="event-created">{{event.created.toLocal() | fromNow}}</div>
                 <div class="event-message">
                     <span class="event-actor">{{actorName(event.actor) | async}}</span> <span [innerHTML]="format(event.message) | async"></span>

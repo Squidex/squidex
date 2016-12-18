@@ -17,7 +17,9 @@ import {
     AuthService,
     AutocompleteItem,
     AutocompleteSource,
+    HistoryChannelUpdated,
     ImmutableArray,
+    MessageBus,
     NotificationService,
     UserDto,
     UsersProviderService,
@@ -63,6 +65,8 @@ function changePermission(contributor: AppContributorDto, permission: string): A
 export class ContributorsPageComponent extends AppComponentBase implements OnInit {
     public appContributors = ImmutableArray.empty<AppContributorDto>();
 
+    public currentUserId: string;
+
     public usersDataSource: UsersDataSource;
     public usersPermissions = [
         'Owner',
@@ -80,6 +84,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appContributorsService: AppContributorsService,
+        private readonly messageBus: MessageBus,
         private readonly usersService: UsersService,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
@@ -90,6 +95,8 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public ngOnInit() {
+        this.currentUserId = this.authService.user.id;
+
         this.load();
     }
 
@@ -97,19 +104,29 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         this.appName()
             .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
             .subscribe(dtos => {
-                this.appContributors = ImmutableArray.of(dtos);
+                this.updateContributors(ImmutableArray.of(dtos));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public removeContributor(contributor: AppContributorDto) {
+        this.appName()
+            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId))
+            .subscribe(() => {
+                this.updateContributors(this.appContributors.remove(contributor));
             }, error => {
                 this.notifyError(error);
             });
     }
 
     public assignContributor() {
-        const contributor = new AppContributorDto(this.addContributorForm.get('user').value.model.id, 'Editor');
+        const newContributor = new AppContributorDto(this.addContributorForm.get('user').value.model.id, 'Editor');
 
         this.appName()
-            .switchMap(app => this.appContributorsService.postContributor(app, contributor))
+            .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
             .subscribe(() => {
-                this.appContributors = this.appContributors.push(contributor);
+                this.updateContributors(this.appContributors.push(newContributor));
             }, error => {
                 this.notifyError(error);
             });
@@ -123,20 +140,16 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
             .subscribe(() => {
-                this.appContributors = this.appContributors.replace(contributor, newContributor);
+                this.updateContributors(this.appContributors.replace(contributor, newContributor));
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public removeContributor(contributor: AppContributorDto) {
-        this.appName()
-            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId))
-            .subscribe(() => {
-                this.appContributors = this.appContributors.remove(contributor);
-            }, error => {
-                this.notifyError(error);
-            });
+    private updateContributors(contributors: ImmutableArray<AppContributorDto>) {
+        this.appContributors = contributors;
+
+        this.messageBus.publish(new HistoryChannelUpdated());
     }
 }
 

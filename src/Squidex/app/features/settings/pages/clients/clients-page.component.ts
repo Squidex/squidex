@@ -14,7 +14,9 @@ import {
     AppComponentBase,
     AppsStoreService,
     CreateAppClientDto,
+    HistoryChannelUpdated,
     ImmutableArray,
+    MessageBus,
     NotificationService,
     UpdateAppClientDto,
     UsersProviderService
@@ -44,6 +46,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appClientsService: AppClientsService,
+        private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
         super(apps, notifications, users);
@@ -57,7 +60,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         this.appName()
             .switchMap(app => this.appClientsService.getClients(app).retry(2))
             .subscribe(dtos => {
-                this.appClients = ImmutableArray.of(dtos);
+                this.updateClients(ImmutableArray.of(dtos));
             }, error => {
                 this.notifyError(error);
             });
@@ -67,17 +70,19 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         this.appName()
             .switchMap(app => this.appClientsService.deleteClient(app, client.id))
             .subscribe(() => {
-                this.appClients = this.appClients.remove(client);
+                this.updateClients(this.appClients.remove(client));
             }, error => {
                 this.notifyError(error);
             });
     }
 
     public renameClient(client: AppClientDto, name: string) {
+        const request = new UpdateAppClientDto(name);
+
         this.appName()
-            .switchMap(app => this.appClientsService.updateClient(app, client.id, new UpdateAppClientDto(name)))
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, request))
             .subscribe(() => {
-                this.appClients = this.appClients.replace(client, rename(client, name));
+                this.updateClients(this.appClients.replace(client, rename(client, name)));
             }, error => {
                 this.notifyError(error);
             });
@@ -91,21 +96,27 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
             const dto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
 
+            const reset = () => {
+                this.addClientForm.reset();
+                this.addClientForm.enable();
+            };
+
             this.appName()
                 .switchMap(app => this.appClientsService.postClient(app, dto))
                 .subscribe(dto => {
-                    this.appClients = this.appClients.push(dto);
-                    this.reset();
+                    this.updateClients(this.appClients.push(dto));
+                    reset();
                 }, error => {
                     this.notifyError(error);
-                    this.reset();
+                    reset();
                 });
         }
     }
 
-    private reset() {
-        this.addClientForm.reset();
-        this.addClientForm.enable();
+    private updateClients(clients: ImmutableArray<AppClientDto>) {
+        this.appClients = clients;
+
+        this.messageBus.publish(new HistoryChannelUpdated());
     }
 }
 

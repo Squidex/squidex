@@ -47,8 +47,8 @@
                                 </span>
                             </td>
                             <td>
-                                <label class="language-default" (click)="setMasterLanguage(language)">
-                                    <input type="radio" [value]="true" [checked]="language.isMasterLanguage"> Master Language
+                                <label class="language-default">
+                                    <input type="radio" [value]="true" [checked]="language.isMasterLanguage" (click)="setMasterLanguage(language)"> Master Language
                                 </label>
                             </td>
                             <td>

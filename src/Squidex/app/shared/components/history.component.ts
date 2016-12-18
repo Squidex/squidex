@@ -7,12 +7,17 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
-import { ImmutableArray, NotificationService } from 'framework';
+import {
+    ImmutableArray,
+    MessageBus,
+    NotificationService
+} from 'framework';
 
 import { AppComponentBase } from './../app-component-base';
 import { AppsStoreService } from './../services/apps-store.service';
+import { HistoryChannelUpdated } from './../utils/messages';
 import { HistoryEventDto, HistoryService } from './../services/history.service';
 import { UsersProviderService } from './../services/users-provider.service';
 
@@ -25,39 +30,23 @@ const REPLACEMENT_TEMP = '$TEMP$';
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html'
 })
-export class HistoryComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private interval: any;
+export class HistoryComponent extends AppComponentBase {
+    public get channel(): string {
+        return this.route.snapshot.data['channel'];
+    }
 
-    public events = ImmutableArray.empty();
+    public events =
+        Observable.timer(0, 10000)
+            .merge(this.messageBus.of(HistoryChannelUpdated).delay(1000))
+            .switchMap(() => this.appName())
+            .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
     constructor(appsStore: AppsStoreService, notifications: NotificationService, usersProvider: UsersProviderService,
         private readonly historyService: HistoryService,
+        private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
         super(appsStore, notifications, usersProvider);
-    }
-
-    public ngOnDestroy() {
-        clearInterval(this.interval);
-    }
-
-    public ngOnInit() {
-        this.load();
-
-        this.interval =
-            setInterval(() => {
-                this.load();
-            }, 5000);
-    }
-
-    public load() {
-        const channel = this.route.snapshot.data['channel'];
-
-        this.appName()
-            .switchMap(app => this.historyService.getHistory(app, channel).retry(2))
-            .subscribe(dtos => {
-                this.events = ImmutableArray.of(dtos);
-            });
     }
 
     public actorName(actor: string): Observable<string> {
