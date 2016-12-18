@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                 return;
             }
 
-            this.streamName = streamToConnect;
+            streamName = streamToConnect;
 
             SubscribeLive();
             SubscribeCatch();
@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                 connection.SubscribeToStreamFrom(streamName, position, settings,
                     (subscription, resolvedEvent) =>
                     {
-                        OnCatchEvent(consumer, streamName, resolvedEvent, subscriptionName, subscription);
+                        OnCatchEvent(consumer, resolvedEvent, subscriptionName, subscription);
                     }, userCredentials: credentials);
 
             lock (catchSubscriptions)
@@ -175,7 +175,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             }
         }
 
-        private void OnCatchEvent(IEventConsumer consumer, string streamName, ResolvedEvent resolvedEvent, string subscriptionName, EventStoreCatchUpSubscription subscription)
+        private void OnCatchEvent(IEventConsumer consumer, ResolvedEvent resolvedEvent, string subscriptionName, EventStoreCatchUpSubscription subscription)
         {
             if (resolvedEvent.OriginalEvent.EventStreamId.StartsWith("$", StringComparison.OrdinalIgnoreCase))
             {

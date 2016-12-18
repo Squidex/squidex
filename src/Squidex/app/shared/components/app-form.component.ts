@@ -53,7 +53,7 @@ export class AppFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.createForm.controls['name'].valueChanges.subscribe(value => {
+        this.createForm.get('name').valueChanges.subscribe(value => {
             this.appName = value || FALLBACK_NAME;
         });
     }
@@ -64,7 +64,7 @@ export class AppFormComponent implements OnInit {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const dto = new CreateAppDto(this.createForm.controls['name'].value);
+            const dto = new CreateAppDto(this.createForm.get('name').value);
 
             this.appsStore.createApp(dto)
                 .subscribe(dto => {

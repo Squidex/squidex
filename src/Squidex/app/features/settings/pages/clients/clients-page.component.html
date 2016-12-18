@@ -21,22 +21,22 @@
 
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addClientForm" (submit)="attachClient()">
-                    <div class="errors-box" *ngIf="addClientForm.get('name').invalid && addClientForm.get('name').dirty">
-                        <div class="errors">
-                            <span *ngIf="addClientForm.get('name').hasError('required')">
-                                Name is required.
-                            </span>
-                            <span *ngIf="addClientForm.get('name').hasError('maxlength')">
-                                Name can not have more than 40 characters.
-                            </span>
-                            <span *ngIf="addClientForm.get('name').hasError('pattern')">
-                                Name can contain lower case letters (a-z), numbers and dashes (not at the end).
-                            </span>
-                        </div>
-                    </div>
-
                     <div class="form-group">
-                        <input type="text" class="form-control" id="app-name" formControlName="name" maxlength="40" placeholder="Enter client name" />
+                        <div class="errors-box" *ngIf="addClientForm.get('name').invalid && addClientForm.get('name').dirty">
+                            <div class="errors">
+                                <span *ngIf="addClientForm.get('name').hasError('required')">
+                                    Name is required.
+                                </span>
+                                <span *ngIf="addClientForm.get('name').hasError('maxlength')">
+                                    Name can not have more than 40 characters.
+                                </span>
+                                <span *ngIf="addClientForm.get('name').hasError('pattern')">
+                                    Name can contain lower case letters (a-z), numbers and dashes (not at the end).
+                                </span>
+                            </div>
+                        </div>
+
+                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" />
                     </div>
 
                     <button type="submit" class="btn btn-success" [disabled]="addClientForm.invalid">Add Client</button>

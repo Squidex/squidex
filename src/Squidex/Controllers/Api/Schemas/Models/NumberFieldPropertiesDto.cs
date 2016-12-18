@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonSchema("Number")]
+    [JsonSchema("number")]
     public sealed class NumberFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>

@@ -61,7 +61,7 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.createForm.controls['name'].valueChanges.subscribe(value => {
+        this.createForm.get('name').valueChanges.subscribe(value => {
             this.schemaName = value || FALLBACK_NAME;
         });
     }
@@ -72,7 +72,7 @@ export class SchemaFormComponent implements OnInit {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const name = this.createForm.controls['name'].value;
+            const name = this.createForm.get('name').value;
             const dto = new CreateSchemaDto(name);
             const now = DateTime.now();
 

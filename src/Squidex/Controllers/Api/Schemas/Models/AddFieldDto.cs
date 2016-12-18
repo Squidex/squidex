@@ -8,6 +8,8 @@
 
 using System.ComponentModel.DataAnnotations;
 
+// ReSharper disable ConvertIfStatementToReturnStatement
+
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     public sealed class AddFieldDto
@@ -26,3 +28,4 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public FieldPropertiesDto Properties { get; set; }
     }
 }
+

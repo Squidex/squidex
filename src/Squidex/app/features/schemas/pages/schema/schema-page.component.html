@@ -1,9 +1,9 @@
-<sqx-title message="{app} | Schema" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter="schema" value2="{{schemaName | async}}"></sqx-title>
 
 <div class="panel panel-light">
     <div class="panel-header">
         <div>
-            <h3 class="panel-title">Schema</h3>
+            <h3 class="panel-title">{{schemaName | async}}</h3>
 
             <a class="panel-close" routerLink="../">
                 <i class="icon-close"></i>
@@ -12,5 +12,33 @@
     </div>
 
     <div class="panel-content">
+        <div class="table-items-footer">
+            <form class="form-inline" [formGroup]="addFieldForm" (submit)="addField()">
+                <div class="form-group">
+                    <select class="form-control" formControlName="type">
+                        <option *ngFor="let type of fieldTypes">{{type}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="errors-box" *ngIf="addFieldForm.get('name').invalid && addFieldForm.get('name').dirty">
+                        <div class="errors">
+                            <span *ngIf="addFieldForm.get('name').hasError('required')">
+                                Name is required.
+                            </span>
+                            <span *ngIf="addFieldForm.get('name').hasError('maxlength')">
+                                Name can not have more than 40 characters.
+                            </span>
+                            <span *ngIf="addFieldForm.get('name').hasError('pattern')">
+                                Name can contain lower case letters (a-z), numbers and dashes (not at the end).
+                            </span>
+                        </div>
+                    </div>
+
+                    <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" />
+                </div>
+
+                <button type="submit" class="btn btn-success" [disabled]="addFieldForm.invalid">Add Field</button>
+            </form>
+        </div>
     </div>
 </div>

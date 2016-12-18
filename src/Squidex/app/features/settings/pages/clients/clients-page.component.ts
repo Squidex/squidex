@@ -94,7 +94,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         if (this.addClientForm.valid) {
             this.addClientForm.disable();
 
-            const dto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
+            const dto = new CreateAppClientDto(this.addClientForm.get('name').value);
 
             const reset = () => {
                 this.addClientForm.reset();

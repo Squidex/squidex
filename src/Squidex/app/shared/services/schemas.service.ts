@@ -63,30 +63,30 @@ export abstract class FieldPropertiesDto {
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
-        public readonly defaultValue: number | null,
-        public readonly maxValue: number | null,
-        public readonly minValue: number | null,
-        public readonly allowedValues: number[]
+    constructor(label?: string, hints?: string, placeholder?: string, isRequired: boolean = false,
+        public readonly defaultValue?: number | null,
+        public readonly maxValue?: number | null,
+        public readonly minValue?: number | null,
+        public readonly allowedValues?: number[]
     ) {
         super(label, hints, placeholder, isRequired);
 
-        this['$type'] = 'Number';
+        this['fieldType'] = 'number';
     }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
-        public readonly defaultValue: string,
-        public readonly pattern: string,
-        public readonly patternMessage: string,
-        public readonly minLength: number | null,
-        public readonly maxLength: number | null,
-        public readonly allowedValues: number[]
+    constructor(label?: string, hints?: string, placeholder?: string, isRequired: boolean = false,
+        public readonly defaultValue?: string,
+        public readonly pattern?: string,
+        public readonly patternMessage?: string,
+        public readonly minLength?: number | null,
+        public readonly maxLength?: number | null,
+        public readonly allowedValues?: string[]
     ) {
         super(label, hints, placeholder, isRequired);
 
-        this['$type'] = 'String';
+        this['fieldType'] = 'string';
     }
 }
 
@@ -94,6 +94,14 @@ export class UpdateSchemaDto {
     constructor(
         public readonly label: string,
         public readonly hints: string
+    ) {
+    }
+}
+
+export class AddFieldDto {
+    constructor(
+        public readonly name: string,
+        public readonly properties: FieldPropertiesDto
     ) {
     }
 }
@@ -142,7 +150,7 @@ export class SchemasService {
     }
 
     public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/{id}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -205,5 +213,16 @@ export class SchemasService {
                     return new EntityCreatedDto(response.id);
                 })
                 .catch(response => handleError('Failed to create schema. Please reload.', response));
+    }
+
+    public postField(appName: string, schemaName: string, dto: AddFieldDto): Observable<EntityCreatedDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/`);
+
+        return this.authService.authPost(url, dto)
+                .map(response => response.json())
+                .map(response => {
+                    return new EntityCreatedDto(response.id);
+                })
+                .catch(response => handleError('Failed to add field. Please reload.', response));
     }
 }
