@@ -11,9 +11,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
 import {
+    FieldComponent,
     SchemaFormComponent,
     SchemaPageComponent,
-    SchemasPageComponent
+    SchemasPageComponent,
+    StringUIComponent,
+    StringValidationComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -38,9 +41,12 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        FieldComponent,
         SchemaFormComponent,
         SchemaPageComponent,
-        SchemasPageComponent
+        SchemasPageComponent,
+        StringUIComponent,
+        StringValidationComponent
     ]
 })
 export class SqxFeatureSchemasModule { }

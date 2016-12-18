@@ -1,0 +1,106 @@
+<div class="table-items-row"> 
+    <div class="field-summary">
+        <div class="row">
+            <div class="col-xs-8">
+                {{field.name}}
+            </div>
+            <div class="col-xs-4">
+                <div class="float-xs-right">
+                    <button type="button" class="btn btn-secondary field-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
+                        <i class="icon-settings"></i>
+                    </button>
+                    <button type="button" class="btn btn-simple">
+                        <i class="icon-dots"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="field-details" *ngIf="isEditing">
+        <form [formGroup]="editForm" (submit)="save()">
+            <div class="field-details-tabs clearfix">
+                <ul class="nav nav-inline nav-field-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">User Interface</a>
+                    </li>
+                </ul>
+
+                <div class="float-xs-right">
+                    <button type="reset" class="btn btn-link" (click)="cancel()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+
+            <div class="field-details-tab" *ngIf="selectedTab == 0">
+                <div class="form-group row">
+                    <label for="field-label" class="col-xs-3 col-form-label">Label</label>
+
+                    <div class="col-xs-6">
+                        <div class="errors-box" *ngIf="editForm.get('label').invalid && editForm.get('label').touched" [@fade]>
+                            <div class="errors">
+                                <span *ngIf="editForm.get('label').hasError('maxlength')">
+                                    Label can not have more than 100 characters.
+                                </span>
+                            </div>
+                        </div>
+
+                        <input type="text" class="form-control" id="field-label" maxlength="100" formControlName="label" />
+
+                        <span class="form-hint">
+                            Define the display name for the field for documentation and user interfaces.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="field-hints" class="col-xs-3 col-form-label">Hints</label>
+
+                    <div class="col-xs-6">
+                        <div class="errors-box" *ngIf="editForm.get('hints').invalid && editForm.get('hints').touched" [@fade]>
+                            <div class="errors">
+                                <span *ngIf="editForm.get('hints').hasError('maxlength')">
+                                    Hints can not have more than 100 characters.
+                                </span>
+                            </div>
+                        </div>
+
+                        <input type="text" class="form-control" id="field-hints" maxlength="100" formControlName="hints" />
+
+                        <span class="form-hint">
+                            Define some hints for the user and editor for the field for documentation and user interfaces.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-details-tab" *ngIf="selectedTab == 1">
+                <div [ngSwitch]="field.properties.fieldType">
+                    <div *ngSwitchCase="'number'">
+                        asdsad
+                    </div>
+                    <div *ngSwitchCase="'string'">
+                        <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-details-tab" *ngIf="selectedTab == 2">
+                <div [ngSwitch]="field.properties.fieldType">
+                    <div *ngSwitchCase="'number'">
+                        asdsad
+                    </div>
+                    <div *ngSwitchCase="'string'">
+                        <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
+                    </div>
+                </div>
+            </div>
+        </form> 
+    </div>
+</div>

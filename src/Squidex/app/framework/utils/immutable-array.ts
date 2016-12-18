@@ -15,7 +15,7 @@ export class ImmutableArray<T> implements Iterable<T> {
         return this.items.values();
     }
 
-    public get length() {
+    public get length(): number {
         return this.items.length;
     }
 

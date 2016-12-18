@@ -40,7 +40,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             ]
         });
 
-    public get newLanguages() {
+    public get newLanguages(): LanguageDto[] {
         return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
     }
 

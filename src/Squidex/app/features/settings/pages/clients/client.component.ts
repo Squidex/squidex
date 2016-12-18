@@ -47,15 +47,15 @@ export class ClientComponent {
 
     public modalDialog = new ModalView();
 
-    public get clientName() {
+    public get clientName(): string {
         return this.client.name || this.client.id;
     }
 
-    public get clientId() {
+    public get clientId(): string {
         return this.appName + ':' + this.client.id;
     }
 
-    public get clientSecret() {
+    public get clientSecret(): string {
         return this.client.secret;
     }
 

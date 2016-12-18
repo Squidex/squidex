@@ -73,12 +73,17 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     public load() {
         this.schemaName.combineLatest(this.appName(), (schemaName, appName) => { return { schemaName, appName }; })
+            .do(() => this.reset())
             .switchMap(p => this.schemasService.getSchema(p.appName, p.schemaName)).retry(2)
             .subscribe(dto => {
                 this.schemaFields = ImmutableArray.of(dto.fields);
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public updateField(field: FieldDto, newField: FieldDto) {
+        this.updateFields(this.schemaFields.replace(field, newField));
     }
 
     public addField() {
@@ -100,7 +105,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             const dto = new AddFieldDto(this.addFieldForm.get('name').value, properties);
 
             const reset = () => {
-                this.addFieldForm.reset();
+                this.addFieldForm.get('name').reset();
                 this.addFieldForm.enable();
             };
 
@@ -114,6 +119,10 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                     reset();
                 });
         }
+    }
+
+    private reset() {
+        this.schemaFields = ImmutableArray.empty<FieldDto>();
     }
 
     private updateFields(fields: ImmutableArray<FieldDto>) {

@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter="schema" value2="{{schemaName | async}}"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schemaName | async}}"></sqx-title>
 
 <div class="panel panel-light">
     <div class="panel-header">
@@ -12,6 +12,10 @@
     </div>
 
     <div class="panel-content">
+        <div *ngFor="let field of schemaFields">
+            <sqx-field [field]="field" (saved)="updateField(field, $event)"></sqx-field>
+        </div>
+        
         <div class="table-items-footer">
             <form class="form-inline" [formGroup]="addFieldForm" (submit)="addField()">
                 <div class="form-group">

@@ -196,8 +196,7 @@ export class AuthService {
 
                 return Observable.empty<Response>();
             }
-
-            return Observable.throw(response);
+            return Observable.throw(error);
         });
     }
 

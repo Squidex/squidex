@@ -1,0 +1,21 @@
+<div [formGroup]="editForm">
+    <div class="form-group row">
+        <label for="field-input-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
+
+        <div class="col-xs-6">
+            <div class="errors-box" *ngIf="editForm.get('placeholder').invalid && editForm.get('placeholder').touched" [@fade]>
+                <div class="errors">
+                    <span *ngIf="editForm.get('placeholder').hasError('maxlength')">
+                        Placeholder can not have more than 100 characters.
+                    </span>
+                </div>
+            </div>
+
+            <input type="text" class="form-control" id="field-input-placeholder" maxlength="100" formControlName="placeholder" />
+
+            <span class="form-hint">
+                Define the placeholder for the input control.
+            </span>
+        </div>
+    </div>
+</div>

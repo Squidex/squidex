@@ -17,6 +17,23 @@ import {
 
 import { AuthService } from './auth.service';
 
+export function createProperties(fieldType: string, values: {}): FieldPropertiesDto {
+    let properties: FieldPropertiesDto;
+
+    switch (fieldType) {
+        case 'number':
+            properties = new NumberFieldPropertiesDto();
+            break;
+        case 'string':
+            properties = new StringFieldPropertiesDto();
+            break;
+    }
+
+    Object.assign(properties, values);
+
+    return properties;
+}
+
 export class SchemaDto {
     constructor(
         public readonly id: string,
@@ -156,34 +173,10 @@ export class SchemasService {
                 .map(response => response.json())
                 .map(response => {
                     const fields = response.fields.map((item: any) => {
-                        const typeName = item['$type'];
-
-                        let properties = item.properties;
-                        let propertiesDto: FieldPropertiesDto;
-
-                        if (typeName === 'String') {
-                            propertiesDto = new StringFieldPropertiesDto(
-                                properties.label,
-                                properties.hints,
-                                properties.placeholder,
-                                properties.isRequired,
-                                properties.defaultValue,
-                                properties.pattern,
-                                properties.patternMessage,
-                                properties.minLength,
-                                properties.maxLength,
-                                properties.allowedValues);
-                        } else {
-                            propertiesDto = new NumberFieldPropertiesDto(
-                                properties.label,
-                                properties.hints,
-                                properties.placeholder,
-                                properties.isRequired,
-                                properties.defaultValue,
-                                properties.minValue,
-                                properties.maxValue,
-                                properties.allowedValues);
-                        }
+                        const propertiesDto =
+                            createProperties(
+                                item.properties.fieldType,
+                                item.properties);
 
                         return new FieldDto(
                             item.name,

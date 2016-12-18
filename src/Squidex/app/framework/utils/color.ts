@@ -48,7 +48,7 @@ export class Color {
     public readonly g: number;
     public readonly b: number;
 
-    public get luminance() {
+    public get luminance(): number {
         return (this.r + this.r + this.b + this.g + this.g + this.g) / 6;
     }
 

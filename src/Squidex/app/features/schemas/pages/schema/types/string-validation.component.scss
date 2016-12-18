@@ -1,0 +1,16 @@
+@import '_vars';
+@import '_mixins';
+
+.minlength {
+    &-col {
+        position: relative;
+    }
+
+    &-label {
+        @include absolute(0, -4px, auto, auto);
+    }
+}
+
+.form-check-input {
+    margin: 0;
+}
