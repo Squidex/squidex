@@ -18,7 +18,7 @@
     </div>
 
     <div class="field-details" *ngIf="isEditing">
-        <form [formGroup]="editForm" (submit)="save()">
+        <form [formGroup]="editForm" (ngSubmit)="save()">
             <div class="field-details-tabs clearfix">
                 <ul class="nav nav-inline nav-field-tabs">
                     <li class="nav-item">

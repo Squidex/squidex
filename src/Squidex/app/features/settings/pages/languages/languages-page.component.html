@@ -63,7 +63,7 @@
             </table>
 
             <div class="table-items-footer">
-                <form class="form-inline" [formGroup]="addLanguageForm" (ngSubmit)="createSchema()" (submit)="addLanguage()">
+                <form class="form-inline" [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()">
                     <div class="form-group">
                         <select class="form-control language-select" formControlName="language">
                             <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>

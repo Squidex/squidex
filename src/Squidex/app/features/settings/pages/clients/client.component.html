@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="client-name">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (submit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
                         <div class="form-group">
                             <div class="errors-box" *ngIf="renameForm.get('name').invalid" [@fade]>
                                 <div class="errors">

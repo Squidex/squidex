@@ -12,6 +12,7 @@ using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Write.Apps;
 
 namespace Squidex.Write
 {
@@ -19,11 +20,21 @@ namespace Squidex.Write
     {
         public Task ProcessEventAsync(Envelope<IEvent> @event, IAggregate aggregate, ICommand command)
         {
-            var appCommand = command as IAppCommand;
+            var appDomainObject = aggregate as AppDomainObject;
 
-            if (appCommand != null)
+            if (appDomainObject != null)
             {
-                @event.SetAppId(appCommand.AppId);
+                @event.SetAppId(aggregate.Id);
+
+            }
+            else
+            {
+                var appCommand = command as IAppCommand;
+
+                if (appCommand != null)
+                {
+                    @event.SetAppId(appCommand.AppId);
+                }
             }
 
             return TaskHelper.Done;

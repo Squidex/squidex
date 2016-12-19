@@ -17,7 +17,7 @@
         </div>
         
         <div class="table-items-footer">
-            <form class="form-inline" [formGroup]="addFieldForm" (submit)="addField()">
+            <form class="form-inline" [formGroup]="addFieldForm" (ngSubmit)="addField()">
                 <div class="form-group">
                     <select class="form-control" formControlName="type">
                         <option *ngFor="let type of fieldTypes">{{type}}</option>
