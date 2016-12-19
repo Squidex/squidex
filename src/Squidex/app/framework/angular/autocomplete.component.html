@@ -1,5 +1,5 @@
 <span>
-    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="keyDown($event)"
+    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="onKeyDown($event)" (blur)="onBlur()"
         [formControl]="queryInput"
         autocomplete="off" 
         autocorrect="off"

@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+export * from './pages/schema/types/number-ui.component';
+export * from './pages/schema/types/number-validation.component';
 export * from './pages/schema/types/string-ui.component';
 export * from './pages/schema/types/string-validation.component';
 export * from './pages/schema/field.component';

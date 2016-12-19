@@ -7,15 +7,12 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable} from 'rxjs';
+
 import {
     createProperties,
     fadeAnimation,
-    FieldDto,
-    FieldPropertiesDto
+    FieldDto
 } from 'shared';
-
-const ESCAPE_KEY = 27;
 
 @Component({
     selector: 'sqx-field',
@@ -34,8 +31,8 @@ export class FieldComponent implements OnInit {
     @Output()
     public saved = new EventEmitter<FieldDto>();
 
-    public isEditing: boolean = false;
-    public selectedTab = 0;
+    public isEditing: boolean = true;
+    public selectedTab = 2;
 
     public editForm: FormGroup =
         this.formBuilder.group({
@@ -102,8 +99,6 @@ export class FieldComponent implements OnInit {
         }
 
         this.oldValue = Object.assign({}, this.editForm.value);
-
-        this.isEditing = false;
     }
 }
 

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?sp5644');
-  src:  url('fonts/icomoon.eot?sp5644#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?sp5644') format('truetype'),
-    url('fonts/icomoon.woff?sp5644') format('woff'),
-    url('fonts/icomoon.svg?sp5644#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?pmbjza');
+  src:  url('fonts/icomoon.eot?pmbjza#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?pmbjza') format('truetype'),
+    url('fonts/icomoon.woff?pmbjza') format('woff'),
+    url('fonts/icomoon.svg?pmbjza#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,36 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-control-radio:before {
+  content: "\e90d";
+}
+.icon-type-boolean:before {
+  content: "\e904";
+}
+.icon-control-checkbox:before {
+  content: "\e906";
+}
+.icon-control-dropdown:before {
+  content: "\e907";
+}
+.icon-control-input:before {
+  content: "\e908";
+}
+.icon-type-number:before {
+  content: "\e909";
+}
+.icon-control-textarea:before {
+  content: "\e90a";
+}
+.icon-type-string:before {
+  content: "\e90b";
+}
+.icon-control-toggle:before {
+  content: "\e90c";
+}
+.icon-logo:before {
+  content: "\e900";
+}
 .icon-dots:before {
   content: "\e903";
 }
@@ -77,8 +107,5 @@
 }
 .icon-filter:before {
   content: "\ea5b";
-}
-.icon-logo:before {
-  content: "\e900";
 }
 

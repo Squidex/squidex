@@ -23,6 +23,7 @@ namespace Squidex.Core.Schemas
         private string pattern;
         private string patternMessage;
         private ImmutableList<string> allowedValues;
+        private StringFieldEditor editor;
 
         public int? MinLength
         {
@@ -79,8 +80,29 @@ namespace Squidex.Core.Schemas
             }
         }
 
+        public StringFieldEditor Editor
+        {
+            get { return editor; }
+            set
+            {
+                ThrowIfFrozen();
+
+                editor = value;
+            }
+        }
+
         protected override IEnumerable<ValidationError> ValidateCore()
         {
+            if (!Editor.IsEnumValue())
+            {
+                yield return new ValidationError("Editor ist not a valid value", nameof(Editor));
+            }
+
+            if ((Editor == StringFieldEditor.Radio || Editor == StringFieldEditor.Dropdown) && (AllowedValues == null || AllowedValues.Count == 0))
+            {
+                yield return new ValidationError("Radio buttons or dropdown list need allowed values", nameof(AllowedValues));
+            }
+
             if (MaxLength.HasValue && MinLength.HasValue && MinLength.Value >= MaxLength.Value)
             {
                 yield return new ValidationError("Max length must be greater than min length", nameof(MinLength), nameof(MaxLength));

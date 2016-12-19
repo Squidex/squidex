@@ -21,7 +21,6 @@ import {
     ImmutableArray,
     MessageBus,
     NotificationService,
-    UserDto,
     UsersProviderService,
     UsersService
 } from 'shared';

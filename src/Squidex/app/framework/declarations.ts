@@ -26,6 +26,7 @@ export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
 export * from './angular/spinner.component';
+export * from './angular/tag-editor.component';
 export * from './angular/title.component';
 export * from './angular/user-report.component';
 export * from './configurations';

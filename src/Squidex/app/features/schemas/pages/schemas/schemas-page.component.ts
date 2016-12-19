@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import {
@@ -20,8 +20,6 @@ import {
     SchemasService,
     UsersProviderService
 } from 'shared';
-
-const FALLBACK_NAME = 'my-schema';
 
 @Component({
     selector: 'sqx-schemas-page',

@@ -45,7 +45,6 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription | null = null;
-    private lastQuery: string | null;
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
@@ -53,7 +52,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public source: AutocompleteSource;
 
     @Input()
-    public inputName: string;
+    public inputName: string = 'autocompletion';
 
     public items: AutocompleteItem[] = [];
     public itemSelection = -1;
@@ -121,7 +120,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.subscription.unsubscribe();
     }
 
-    public keyDown(event: KeyboardEvent) {
+    public onBlur() {
+        this.touchedCallback();
+    }
+
+    public onKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case KEY_UP:
                 this.up();

@@ -13,6 +13,14 @@ $field-header: #e7ebef;
         line-height: 40px;
     }
 
+    &-icon {
+        color: darken($color-border, 15%);
+        font-size: 1.2rem;
+        font-weight: normal;
+        vertical-align: middle;
+        margin-right: 1rem;
+    }
+
     &-edit-button {
         & {
             color: $color-theme-blue;

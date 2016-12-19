@@ -45,6 +45,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// </summary>
         public string[] AllowedValues { get; set; }
 
+        /// <summary>
+        /// The editor that is used to manage this field.
+        /// </summary>
+        public StringFieldEditor Editor { get; set; }
+
         public override FieldProperties ToProperties()
         {
             return SimpleMapper.Map(this, new StringFieldProperties());

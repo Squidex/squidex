@@ -107,6 +107,34 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public void Should_add_error_if_radio_button_has_no_allowed_values()
+        {
+            var sut = new NumberFieldProperties { Editor = NumberFieldEditor.Radio };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Radio buttons or dropdown list need allowed values", "AllowedValues")
+                });
+        }
+
+        [Fact]
+        public void Should_add_error_if_editor_is_not_valid()
+        {
+            var sut = new NumberFieldProperties { Editor = (NumberFieldEditor)123 };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Editor ist not a valid value", "Editor")
+                });
+        }
+
+        [Fact]
         public void Should_set_or_freeze_sut()
         {
             var sut = new NumberFieldProperties();

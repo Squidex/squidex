@@ -5,18 +5,37 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, Renderer, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, Renderer, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+/* tslint:disable:no-empty */
+
+const NOOP = () => { };
+
+export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => SliderComponent),
+    multi: true
+};
 
 @Component({
     selector: 'sqx-slider',
     styleUrls: ['./slider.component.scss'],
-    templateUrl: './slider.component.html'
+    templateUrl: './slider.component.html',
+    providers: [SQX_SLIDER_CONTROL_VALUE_ACCESSOR]
 })
-export class SliderComponent implements OnChanges {
+export class SliderComponent implements ControlValueAccessor {
+    private changeCallback: (value: any) => void = NOOP;
+    private touchedCallback: () => void = NOOP;
     private mouseMoveSubscription: Function | null;
     private mouseUpSubscription: Function | null;
     private centerStartOffset = 0;
     private startValue: number;
+    private lastValue: number;
+    private value: number;
+    private isDragging = false;
+
+    public isDisabled: boolean = false;
 
     @ViewChild('bar')
     public bar: ElementRef;
@@ -31,31 +50,42 @@ export class SliderComponent implements OnChanges {
     public max = 100;
 
     @Input()
-    public value: number;
-
-    @Output()
-    public valueChange = new EventEmitter();
+    public step = 1;
 
     constructor(private readonly renderer: Renderer) { }
 
-    public ngOnChanges() {
-        const relativeValue = (this.value - this.min) / (this.max - this.min);
+    public writeValue(value: any) {
+        this.lastValue = this.value = value;
 
-        this.setThumbPosition(relativeValue);
+        this.updateThumbPosition();
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
+    }
+
+    public registerOnChange(fn: any) {
+        this.changeCallback = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.touchedCallback = fn;
     }
 
     public onBarMouseClick(event: MouseEvent) {
-        const relativeValue = this.getRelativeX(event);
-
-        this.setThumbPosition(relativeValue);
-
-        const newValue = Math.round(relativeValue * (this.max - this.min) + this.min);
-
-        if (newValue !== this.value) {
-            this.valueChange.emit(newValue);
+        if (this.mouseMoveSubscription) {
+            return;
         }
 
-        this.stopEvent(event);
+        const relativeValue = this.getRelativeX(event);
+
+        this.value = Math.round((relativeValue * (this.max - this.min) + this.min) / this.step) * this.step;
+
+        this.updateThumbPosition();
+        this.updateTouched();
+        this.updateValue();
+
+        return false;
     }
 
     public onThumbMouseDown(event: MouseEvent) {
@@ -75,32 +105,39 @@ export class SliderComponent implements OnChanges {
 
         this.renderer.setElementClass(this.thumb.nativeElement, 'focused', true);
 
-        this.stopEvent(event);
+        this.isDragging = true;
+
+        return false;
     }
 
     private onMouseMove(event: MouseEvent) {
+        if (!this.isDragging) {
+            return;
+        }
+
         const relativeValue = this.getRelativeX(event);
 
-        this.setThumbPosition(relativeValue);
+        this.value = Math.round((relativeValue * (this.max - this.min) + this.min) / this.step) * this.step;
 
-        this.stopEvent(event);
+        this.updateThumbPosition();
+        this.updateTouched();
+
+        return false;
     }
 
     private onMouseUp(event: MouseEvent) {
-        const relativeValue = this.getRelativeX(event);
+        this.updateValue();
 
-        const newValue = Math.round(relativeValue * (this.max - this.min) + this.min);
-
-        if (newValue !== this.startValue) {
-            this.valueChange.emit(newValue);
-        }
-
-        this.releaseMouseHandlers();
-        this.renderer.setElementClass(this.thumb.nativeElement, 'focused', false);
+        setTimeout(() => {
+            this.releaseMouseHandlers();
+            this.renderer.setElementClass(this.thumb.nativeElement, 'focused', false);
+        }, 10);
 
         this.centerStartOffset = 0;
 
-        this.stopEvent(event);
+        this.isDragging = false;
+
+        return false;
     }
 
     private getRelativeX(event: MouseEvent): number {
@@ -115,20 +152,30 @@ export class SliderComponent implements OnChanges {
     private getParentX(e: any, container: any): number {
         const rect = container.getBoundingClientRect();
 
-        const x = !!e.touches ? e.touches[0].pageX : e.pageX;
+        const x =
+            !!e.touches ?
+                e.touches[0].pageX :
+                e.pageX;
 
         return x - rect.left;
     }
 
-    private setThumbPosition(relativeValue: number) {
-        relativeValue = Math.min(1, Math.max(0, relativeValue));
-
-        this.renderer.setElementStyle(this.thumb.nativeElement, 'left', relativeValue * 100 + '%');
+    private updateTouched() {
+        this.touchedCallback();
     }
 
-    private stopEvent(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
+    private updateValue() {
+        if (this.lastValue !== this.value) {
+            this.lastValue = this.value;
+
+            this.changeCallback(this.value);
+        }
+    }
+
+    private updateThumbPosition() {
+        const relativeValue = Math.min(1, Math.max(0, (this.value - this.min) / (this.max - this.min)));
+
+        this.renderer.setElementStyle(this.thumb.nativeElement, 'left', relativeValue * 100 + '%');
     }
 
     private releaseMouseHandlers() {
@@ -141,5 +188,7 @@ export class SliderComponent implements OnChanges {
             this.mouseUpSubscription();
             this.mouseUpSubscription = null;
         }
+
+        this.isDragging = false;
     }
 }

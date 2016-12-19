@@ -144,6 +144,11 @@
     }
 }
 
+.col-form-label,
+.col-form-checkbox-label {
+    text-align: right;
+}
+
 .form-hint {
     & {
         font-size: .8rem;
@@ -237,6 +242,50 @@
         padding: .2rem;
         font-size: 1.5rem;
         font-weight: normal;
+    }
+
+    &-radio {
+        & {
+            color: darken($color-border, 20%);
+            cursor: pointer;
+            border: 1px solid $color-border;
+            background: transparent;
+            margin-right: .5rem;
+            font-size: 1.5rem;
+            font-weight: normal;
+            text-align: center;
+            width: 4.5rem;
+        }
+
+        .radio-label {
+            display: block;
+            font-size: .7rem;
+            font-weight: bold;
+            margin-left: -.5rem;
+            margin-right: -.5rem;
+            line-height: 1.5rem;
+        }
+
+        &.active {
+            & {
+                @include box-shadow(0, 0, 10px, .5);
+                background: $color-theme-blue;
+                border: 0;
+                color: $color-accent-dark;
+            }
+
+            &:hover {
+                color: $color-accent-dark;
+            }
+        }
+
+        &:hover {
+            color: $color-theme-blue;
+        }
+
+        .radio-input {
+            display: none;
+        }
     }
 
     &-link {

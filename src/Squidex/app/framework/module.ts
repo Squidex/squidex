@@ -35,6 +35,7 @@ import {
     ShortTimePipe,
     SliderComponent,
     SpinnerComponent,
+    TagEditorComponent,
     TitleComponent,
     UserReportComponent
 } from './declarations';
@@ -71,6 +72,7 @@ import {
         ShortTimePipe,
         SliderComponent,
         SpinnerComponent,
+        TagEditorComponent,
         TitleComponent,
         UserReportComponent
     ],
@@ -98,6 +100,7 @@ import {
         ShortTimePipe,
         SliderComponent,
         SpinnerComponent,
+        TagEditorComponent,
         TitleComponent,
         UserReportComponent,
         HttpModule,

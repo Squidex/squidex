@@ -15,9 +15,9 @@
                 <div class="client-name">
                     <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
                         <div class="form-group">
-                            <div class="errors-box" *ngIf="renameForm.get('name').invalid" [@fade]>
+                            <div class="errors-box" *ngIf="renameForm.controls.name.invalid" [@fade]>
                                 <div class="errors">
-                                    <span *ngIf="renameForm.get('name').hasError('required')">
+                                    <span *ngIf="renameForm.controls.name.hasError('required')">
                                         Name is required.
                                     </span>
                                 </div>

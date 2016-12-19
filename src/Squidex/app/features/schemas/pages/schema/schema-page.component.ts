@@ -21,7 +21,6 @@ import {
     MessageBus,
     NotificationService,
     NumberFieldPropertiesDto,
-    SchemaDetailsDto,
     SchemasService,
     StringFieldPropertiesDto,
     UsersProviderService

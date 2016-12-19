@@ -22,15 +22,15 @@
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addClientForm" (ngSubmit)="attachClient()">
                     <div class="form-group">
-                        <div class="errors-box" *ngIf="addClientForm.get('name').invalid && addClientForm.get('name').dirty">
+                        <div class="errors-box" *ngIf="addClientForm.controls.name.invalid && addClientForm.controls.name.dirty">
                             <div class="errors">
-                                <span *ngIf="addClientForm.get('name').hasError('required')">
+                                <span *ngIf="addClientForm.controls.name.hasError('required')">
                                     Name is required.
                                 </span>
-                                <span *ngIf="addClientForm.get('name').hasError('maxlength')">
+                                <span *ngIf="addClientForm.controls.name.hasError('maxlength')">
                                     Name can not have more than 40 characters.
                                 </span>
-                                <span *ngIf="addClientForm.get('name').hasError('pattern')">
+                                <span *ngIf="addClientForm.controls.name.hasError('pattern')">
                                     Name can contain lower case letters (a-z), numbers and dashes (not at the end).
                                 </span>
                             </div>

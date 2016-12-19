@@ -8,15 +8,15 @@
 	<div class="form-group">
 		<label for="schema-name">Name</label>
         
-        <div class="errors-box" *ngIf="createForm.get('name').invalid && createForm.get('name').touched" [@fade]>
+        <div class="errors-box" *ngIf="createForm.controls.name.invalid && createForm.controls.name.touched" [@fade]>
             <div class="errors">
-                <span *ngIf="createForm.get('name').hasError('required')">
+                <span *ngIf="createForm.controls.name.hasError('required')">
                     Name is required.
                 </span>
-                <span *ngIf="createForm.get('name').hasError('maxlength')">
+                <span *ngIf="createForm.controls.name.hasError('maxlength')">
                     Name can not have more than 40 characters.
                 </span>
-                <span *ngIf="createForm.get('name').hasError('pattern')">
+                <span *ngIf="createForm.controls.name.hasError('pattern')">
                     Name can contain lower case letters (a-z), numbers and dashes only (not at the end).
                 </span>
             </div>

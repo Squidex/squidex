@@ -10,21 +10,20 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-string-validation',
-    styleUrls: ['string-validation.component.scss'],
-    templateUrl: 'string-validation.component.html'
+    selector: 'sqx-number-validation',
+    styleUrls: ['number-validation.component.scss'],
+    templateUrl: 'number-validation.component.html'
 })
-export class StringValidationComponent implements OnInit {
+export class NumberValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
-    public hidePatternMessage: Observable<boolean>;
     public hideDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.addControl('maxLength',
+        this.editForm.addControl('maxValue',
             new FormControl());
-        this.editForm.addControl('minLength',
+        this.editForm.addControl('minValue',
             new FormControl());
         this.editForm.addControl('pattern',
             new FormControl());
@@ -37,10 +36,5 @@ export class StringValidationComponent implements OnInit {
             Observable.of(false)
                 .merge(this.editForm.get('isRequired').valueChanges)
                 .map(x => !!x);
-
-        this.hidePatternMessage =
-            Observable.of(false)
-                .merge(this.editForm.get('pattern').valueChanges)
-                .map(x => !x || x.trim().length === 0);
     }
 }

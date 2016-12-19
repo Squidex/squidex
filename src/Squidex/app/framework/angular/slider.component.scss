@@ -1,23 +1,27 @@
 @import '_mixins';
+@import '_vars';
 
 $bar-height: 12px;
 
 $thumb-size: 20px;
 $thumb-margin: ($thumb-size - $bar-height) * .5;
 
-$color-border: #ccc;
-$color-focus: #66afe9;
-
 .slider {
     &-bar {
-        @include border-radius($bar-height * .5);
-        position: relative;
-        border: 1px solid $color-border;
-        margin-bottom: 20px;
-        margin-top: 5px;
-        margin-right: $thumb-size * .5;
-        background: $color-border;
-        height: $bar-height;
+        & {
+            @include border-radius($bar-height * .5);
+            position: relative;
+            border: 1px solid $color-control;
+            margin-bottom: 20px;
+            margin-top: 5px;
+            margin-right: $thumb-size * .5;
+            background: $color-accent-dark;
+            height: $bar-height;
+        }
+
+        &.disabled {
+            background: lighten($color-border, 5%);
+        }
     }
 
     &-thumb {
@@ -26,14 +30,22 @@ $color-focus: #66afe9;
             position: absolute;
             width: $thumb-size;
             height: $thumb-size;
-            border: 1px solid $color-border;
-            background: $color-border;
+            border: 1px solid $color-control;
+            background: $color-accent-dark;
             margin-top: -$thumb-margin;
             margin-left: -$thumb-size * .5;
         }
 
+        &.disabled {
+            background: lighten($color-border, 5%);
+        }
+
         &.focused {
-            border-color: $color-focus;
+            border-color: $color-theme-blue;
         }
     }
+}
+
+.disabled {
+    pointer-events: none;
 }

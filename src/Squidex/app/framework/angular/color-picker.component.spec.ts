@@ -53,7 +53,7 @@ describe('ColorPickerComponent', () => {
 
         let lastColor: Color | null = null;
 
-        colorPicker.colorChange.subscribe((c: Color) => {
+        colorPicker.registerOnChange((c: Color) => {
             lastColor = c;
         });
 
@@ -72,7 +72,7 @@ describe('ColorPickerComponent', () => {
 
         let lastColor: Color | null = null;
 
-        colorPicker.colorChange.subscribe((c: Color) => {
+        colorPicker.registerOnChange((c: Color) => {
             lastColor = c;
         });
 
@@ -81,13 +81,11 @@ describe('ColorPickerComponent', () => {
         expect(lastColor).toBeNull();
     });
 
-    it('should update selected color when component changes', () => {
+    it('should update selected color when writing value', () => {
         const colorPicker = new ColorPickerComponent({ nativeElement: {} });
         const selectedColor = Color.RED;
 
-        colorPicker.color = selectedColor;
-
-        colorPicker.ngOnChanges();
+        colorPicker.writeValue(selectedColor);
 
         expect(colorPicker.selectedColor).toBe(selectedColor);
     });
@@ -95,9 +93,7 @@ describe('ColorPickerComponent', () => {
     it('should update selected color with palette default if setting invalid color', () => {
         const colorPicker = new ColorPickerComponent({ nativeElement: {} });
 
-        colorPicker.color = 'invalid';
-
-        colorPicker.ngOnChanges();
+        colorPicker.writeValue('invalid');
 
         expect(colorPicker.selectedColor).toBe(colorPicker.palette.defaultColor);
     });
@@ -106,9 +102,7 @@ describe('ColorPickerComponent', () => {
         const colorPicker = new ColorPickerComponent({ nativeElement: {} });
 
         colorPicker.palette = undefined!;
-        colorPicker.color = 'invalid';
-
-        colorPicker.ngOnChanges();
+        colorPicker.writeValue('invalid');
 
         expect(colorPicker.selectedColor).toBe(Color.BLACK);
     });

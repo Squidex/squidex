@@ -12,6 +12,8 @@ import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
 import {
     FieldComponent,
+    NumberUIComponent,
+    NumberValidationComponent,
     SchemaFormComponent,
     SchemaPageComponent,
     SchemasPageComponent,
@@ -42,6 +44,8 @@ const routes: Routes = [
     ],
     declarations: [
         FieldComponent,
+        NumberUIComponent,
+        NumberValidationComponent,
         SchemaFormComponent,
         SchemaPageComponent,
         SchemasPageComponent,

@@ -9,19 +9,21 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { fadeAnimation } from 'shared';
+import { fadeAnimation, FloatConverter } from 'shared';
 
 @Component({
-    selector: 'sqx-string-ui',
-    styleUrls: ['string-ui.component.scss'],
-    templateUrl: 'string-ui.component.html',
+    selector: 'sqx-number-ui',
+    styleUrls: ['number-ui.component.scss'],
+    templateUrl: 'number-ui.component.html',
     animations: [
         fadeAnimation
     ]
 })
-export class StringUIComponent implements OnInit {
+export class NumberUIComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    public converter = new FloatConverter();
 
     public hideAllowedValues: Observable<boolean>;
 
@@ -35,7 +37,7 @@ export class StringUIComponent implements OnInit {
                 Validators.maxLength(100)
             ]));
         this.editForm.addControl('allowedValues',
-            new FormControl(10, []));
+            new FormControl(undefined, []));
 
         this.hideAllowedValues =
             Observable.of(false)

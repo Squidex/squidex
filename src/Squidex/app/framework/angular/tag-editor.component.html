@@ -1,0 +1,11 @@
+    <input type="text" class="form-control" [attr.name]="inputName" (keydown)="onKeyDown($event)" (blur)="onBlur()"
+        [formControl]="addInput"
+        autocomplete="off" 
+        autocorrect="off"
+        autocapitalize="off">
+
+    <div class="items">
+        <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
+            {{item}} <i class="icon-close" (click)="remove(i)"></i>
+        </span>
+    </div>

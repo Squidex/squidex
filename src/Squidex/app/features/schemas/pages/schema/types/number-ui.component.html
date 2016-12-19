@@ -1,6 +1,6 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <label for="field-input-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
+        <label for="field-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
 
         <div class="col-xs-6">
             <div class="errors-box" *ngIf="editForm.controls.placeholder.invalid && editForm.controls.placeholder.touched" [@fade]>
@@ -11,7 +11,7 @@
                 </div>
             </div>
 
-            <input type="text" class="form-control" id="field-input-placeholder" maxlength="100" formControlName="placeholder" />
+            <input type="text" class="form-control" id="field-placeholder" maxlength="100" formControlName="placeholder" />
 
             <span class="form-hint">
                 Define the placeholder for the input control.
@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="field-input-editor" class="col-xs-3 col-form-label">Editor</label>
+        <label for="field-editor" class="col-xs-3 col-form-label">Editor</label>
 
         <div class="col-xs-9">
             <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Input'">
@@ -28,13 +28,6 @@
                 <i class="icon-control-input"></i>
 
                 <span class="radio-label">Input</span>
-            </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Textarea'">
-                <input type="radio" class="radio-input" formControlName="editor" value="Textarea" />
-
-                <i class="icon-control-textarea"></i>
-
-                <span class="radio-label">Textarea</span>
             </label>
             <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Dropdown'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />
@@ -52,11 +45,11 @@
             </label>
         </div>
     </div>
-    <div class="form-group row" [class.hide]="hideAllowedValues | async">
+    <div class="form-group row">
         <label for="field-allowed-values" class="col-xs-3 col-form-label">Allowed Values</label>
 
         <div class="col-xs-6">
-            <sqx-tag-editor formControlName="allowedValues"></sqx-tag-editor>
+            <sqx-tag-editor formControlName="allowedValues" [converter]="converter"></sqx-tag-editor>
         </div>
     </div>
 </div>

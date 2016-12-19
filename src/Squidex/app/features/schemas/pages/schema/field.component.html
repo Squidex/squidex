@@ -2,7 +2,7 @@
     <div class="field-summary">
         <div class="row">
             <div class="col-xs-8">
-                {{field.name}}
+                <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> {{field.name}}
             </div>
             <div class="col-xs-4">
                 <div class="float-xs-right">
@@ -28,7 +28,7 @@
                         <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">User Interface</a>
+                        <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
                     </li>
                 </ul>
 
@@ -43,9 +43,9 @@
                     <label for="field-label" class="col-xs-3 col-form-label">Label</label>
 
                     <div class="col-xs-6">
-                        <div class="errors-box" *ngIf="editForm.get('label').invalid && editForm.get('label').touched" [@fade]>
+                        <div class="errors-box" *ngIf="editForm.controls.label.invalid && editForm.controls.label.touched" [@fade]>
                             <div class="errors">
-                                <span *ngIf="editForm.get('label').hasError('maxlength')">
+                                <span *ngIf="editForm.controls.label.hasError('maxlength')">
                                     Label can not have more than 100 characters.
                                 </span>
                             </div>
@@ -63,9 +63,9 @@
                     <label for="field-hints" class="col-xs-3 col-form-label">Hints</label>
 
                     <div class="col-xs-6">
-                        <div class="errors-box" *ngIf="editForm.get('hints').invalid && editForm.get('hints').touched" [@fade]>
+                        <div class="errors-box" *ngIf="editForm.controls.hints.invalid && editForm.controls.hints.touched" [@fade]>
                             <div class="errors">
-                                <span *ngIf="editForm.get('hints').hasError('maxlength')">
+                                <span *ngIf="editForm.controls.hints.hasError('maxlength')">
                                     Hints can not have more than 100 characters.
                                 </span>
                             </div>
@@ -83,10 +83,10 @@
             <div class="field-details-tab" *ngIf="selectedTab == 1">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'number'">
-                        asdsad
+                        <sqx-number-validation [editForm]="editForm"></sqx-number-validation>
                     </div>
                     <div *ngSwitchCase="'string'">
-                        <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
+                        <sqx-string-validation [editForm]="editForm"></sqx-string-validation>
                     </div>
                 </div>
             </div>
@@ -94,10 +94,10 @@
             <div class="field-details-tab" *ngIf="selectedTab == 2">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'number'">
-                        asdsad
+                        <sqx-number-ui [editForm]="editForm"></sqx-number-ui>
                     </div>
                     <div *ngSwitchCase="'string'">
-                        <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
+                        <sqx-string-ui [editForm]="editForm"></sqx-string-ui>
                     </div>
                 </div>
             </div>

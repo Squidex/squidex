@@ -24,15 +24,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <div class="errors-box" *ngIf="addFieldForm.get('name').invalid && addFieldForm.get('name').dirty">
+                    <div class="errors-box" *ngIf="addFieldForm.controls.name.invalid && addFieldForm.controls.name.dirty">
                         <div class="errors">
-                            <span *ngIf="addFieldForm.get('name').hasError('required')">
+                            <span *ngIf="addFieldForm.controls.name.hasError('required')">
                                 Name is required.
                             </span>
-                            <span *ngIf="addFieldForm.get('name').hasError('maxlength')">
+                            <span *ngIf="addFieldForm.controls.name.hasError('maxlength')">
                                 Name can not have more than 40 characters.
                             </span>
-                            <span *ngIf="addFieldForm.get('name').hasError('pattern')">
+                            <span *ngIf="addFieldForm.controls.name.hasError('pattern')">
                                 Name can contain lower case letters (a-z), numbers and dashes (not at the end).
                             </span>
                         </div>

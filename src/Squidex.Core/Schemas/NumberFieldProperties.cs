@@ -19,6 +19,7 @@ namespace Squidex.Core.Schemas
         private double? minValue;
         private double? defaultValue;
         private ImmutableList<double> allowedValues;
+        private NumberFieldEditor editor;
 
         public double? MaxValue
         {
@@ -64,14 +65,35 @@ namespace Squidex.Core.Schemas
             }
         }
 
+        public NumberFieldEditor Editor
+        {
+            get { return editor; }
+            set
+            {
+                ThrowIfFrozen();
+
+                editor = value;
+            }
+        }
+
         protected override IEnumerable<ValidationError> ValidateCore()
         {
+            if (!Editor.IsEnumValue())
+            {
+                yield return new ValidationError("Editor ist not a valid value", nameof(Editor));
+            }
+
+            if ((Editor == NumberFieldEditor.Radio || Editor == NumberFieldEditor.Dropdown) && (AllowedValues == null || AllowedValues.Count == 0))
+            {
+                yield return new ValidationError("Radio buttons or dropdown list need allowed values", nameof(AllowedValues));
+            }
+
             if (MaxValue.HasValue && MinValue.HasValue && MinValue.Value >= MaxValue.Value)
             {
                 yield return new ValidationError("Max value must be greater than min value", nameof(MinValue), nameof(MaxValue));
             }
 
-            if (AllowedValues != null && (MinValue.HasValue || MaxValue.HasValue))
+            if (AllowedValues != null && AllowedValues.Count > 0 && (MinValue.HasValue || MaxValue.HasValue))
             {
                 yield return new ValidationError("Either or allowed values or range can be defined",
                     nameof(AllowedValues),

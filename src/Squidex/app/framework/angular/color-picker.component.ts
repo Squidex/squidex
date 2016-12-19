@@ -5,37 +5,60 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, Input } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Color } from './../utils/color';
 import { ColorPalette } from './../utils/color-palette';
 
+/* tslint:disable:no-empty */
+
+const NOOP = () => { };
+
+export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => ColorPickerComponent),
+    multi: true
+};
+
 @Component({
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
-    templateUrl: './color-picker.component.html'
+    templateUrl: './color-picker.component.html',
+    providers: [SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR]
 })
-export class ColorPickerComponent implements OnChanges {
-    private selectedColorValue = new Color(0, 0, 0);
+export class ColorPickerComponent implements ControlValueAccessor {
+    private changeCallback: (value: any) => void = NOOP;
+    private touchedCallback: () => void = NOOP;
 
-    @Output()
-    public colorChange = new EventEmitter();
-
-    @Input()
-    public color: string | number | Color;
+    public selectedColor: Color = Color.BLACK;
 
     @Input()
     public palette = ColorPalette.colors();
 
     @Input()
-    public isOpen = false;
+    public dropdownSide: 'left';
 
-    public get selectedColor(): Color {
-        return this.selectedColorValue;
-    }
+    @Input()
+    public isOpen = false;
 
     constructor(private readonly element: ElementRef) {
         this.updateColor();
+    }
+
+    public writeValue(value: any) {
+        this.updateColor(value);
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+    }
+
+    public registerOnChange(fn: any) {
+        this.changeCallback = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.touchedCallback = fn;
     }
 
     @HostListener('document:click', ['$event.target'])
@@ -47,20 +70,22 @@ export class ColorPickerComponent implements OnChanges {
         }
     }
 
-    public ngOnChanges() {
-        this.updateColor();
-    }
-
     public toggleOpen() {
-        this.isOpen = !this.isOpen;
-    }
-
-    public close() {
-        this.isOpen = false;
+        if (this.isOpen) {
+            this.close();
+        } else {
+            this.open();
+        }
     }
 
     public open() {
         this.isOpen = true;
+    }
+
+    public close() {
+        this.isOpen = false;
+
+        this.touchedCallback();
     }
 
     public selectColor(color: Color) {
@@ -70,26 +95,26 @@ export class ColorPickerComponent implements OnChanges {
     }
 
     private updateParent(color: Color) {
-        if (this.selectedColorValue.ne(color)) {
-            this.colorChange.emit(color);
+        if (this.selectedColor.ne(color)) {
+            this.changeCallback(color);
         }
     }
 
     private updateColor(color?: Color) {
         let hasColor = false;
         try {
-            this.selectedColorValue = Color.fromValue(color || this.color);
+            this.selectedColor = Color.fromValue(color);
 
             hasColor = true;
         } catch (e) {
             hasColor = false;
         }
 
-        if (!hasColor || !this.selectedColorValue) {
+        if (!hasColor || !this.selectedColor) {
             if (this.palette) {
-                this.selectedColorValue = this.palette.defaultColor;
+                this.selectedColor = this.palette.defaultColor;
             } else {
-                this.selectedColorValue = Color.BLACK;
+                this.selectedColor = Color.BLACK;
             }
         }
     }

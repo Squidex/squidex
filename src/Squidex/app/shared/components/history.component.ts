@@ -5,24 +5,18 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import {
-    ImmutableArray,
-    MessageBus,
-    NotificationService
-} from 'framework';
+import { MessageBus, NotificationService } from 'framework';
 
 import { AppComponentBase } from './../app-component-base';
 import { AppsStoreService } from './../services/apps-store.service';
 import { HistoryChannelUpdated } from './../utils/messages';
-import { HistoryEventDto, HistoryService } from './../services/history.service';
+import { HistoryService } from './../services/history.service';
 import { UsersProviderService } from './../services/users-provider.service';
 
-const FALLBACK_NAME = 'my-app';
-const REPLACEMENT_REGEXP = new RegExp('{([^\s:]*):([^}]*)}');
 const REPLACEMENT_TEMP = '$TEMP$';
 
 @Component({
