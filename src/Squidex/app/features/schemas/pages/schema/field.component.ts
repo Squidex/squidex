@@ -31,8 +31,8 @@ export class FieldComponent implements OnInit {
     @Output()
     public saved = new EventEmitter<FieldDto>();
 
-    public isEditing: boolean = true;
-    public selectedTab = 2;
+    public isEditing: boolean = false;
+    public selectedTab = 0;
 
     public editForm: FormGroup =
         this.formBuilder.group({
@@ -78,7 +78,7 @@ export class FieldComponent implements OnInit {
     }
 
     public toggleEditing() {
-        this.isEditing = true;
+        this.isEditing = !this.isEditing;
     }
 
     public selectTab(tab: number) {
@@ -99,6 +99,8 @@ export class FieldComponent implements OnInit {
         }
 
         this.oldValue = Object.assign({}, this.editForm.value);
+
+        this.isEditing = false;
     }
 }
 

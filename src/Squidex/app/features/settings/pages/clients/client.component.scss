@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+$color-editor: #eceeef;
+
 .client {
     &-info {
         margin: 0;
@@ -21,22 +23,41 @@
         font-weight: normal;
         padding: .6rem .3rem;
         background: transparent;
-        vertical-align: top;
+        vertical-align: baseline;
     }
 
     &-name {
         & {
-            height: 40px;
+            @include border-radius(.25rem);
+            margin: 0;
+            margin-left: -.6rem;
+            height: 38px;
+            padding: 0 .6rem;
+            border: 0;
+            background: transparent;
+            font-size: 1.2rem;
+            font-weight: normal;
+            display: inline-block;
+            line-height: 38px;
         }
 
+        &.enabled,
         &:hover {
-            .client-edit {
-                display: inline-block;
+            & {
+                background: $color-editor;
             }
         }
 
         h3 {
             font-size: 1.6rem;
+        }
+    }
+
+    &-header {
+        &:hover {
+            .client-edit {
+                display: inline-block;
+            }
         }
     }
 }

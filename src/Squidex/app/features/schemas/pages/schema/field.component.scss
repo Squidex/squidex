@@ -72,6 +72,8 @@ $field-header: #e7ebef;
             cursor: pointer;
             padding: 18px 10px;
             border-bottom: 4px solid transparent;
+            width: 100px;
+            text-align: center;
         }
 
         &.active {

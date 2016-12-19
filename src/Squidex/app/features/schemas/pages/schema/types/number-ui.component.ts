@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { fadeAnimation, FloatConverter } from 'shared';
 
@@ -19,7 +19,9 @@ import { fadeAnimation, FloatConverter } from 'shared';
         fadeAnimation
     ]
 })
-export class NumberUIComponent implements OnInit {
+export class NumberUIComponent implements OnDestroy, OnInit {
+    private editorSubscription: Subscription;
+
     @Input()
     public editForm: FormGroup;
 
@@ -43,5 +45,16 @@ export class NumberUIComponent implements OnInit {
             Observable.of(false)
                 .merge(this.editForm.get('editor').valueChanges)
                 .map(x => !x || x === 'Input' || x === 'Textarea');
+
+        this.editorSubscription =
+            this.hideAllowedValues.subscribe(isSelection => {
+                if (isSelection) {
+                    this.editForm.get('allowedValues').setValue(undefined);
+                }
+            });
+    }
+
+    public ngOnDestroy() {
+        this.editorSubscription.unsubscribe();
     }
 }

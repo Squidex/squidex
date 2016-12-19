@@ -5,16 +5,18 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html'
 })
-export class StringValidationComponent implements OnInit {
+export class StringValidationComponent implements OnDestroy, OnInit {
+    private patternSubscription: Subscription;
+
     @Input()
     public editForm: FormGroup;
 
@@ -42,5 +44,16 @@ export class StringValidationComponent implements OnInit {
             Observable.of(false)
                 .merge(this.editForm.get('pattern').valueChanges)
                 .map(x => !x || x.trim().length === 0);
+
+        this.patternSubscription =
+            this.editForm.get('pattern').valueChanges.subscribe((value: string) => {
+                if (!value || value.length === 0) {
+                    this.editForm.get('patternMessage').setValue(undefined);
+                }
+            });
+    }
+
+    public ngOnDestroy() {
+        this.patternSubscription.unsubscribe();
     }
 }
