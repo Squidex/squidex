@@ -22,21 +22,23 @@
         </div>
     </div>
 
-    <div class="panel-content">
-        <div class="schemas">
-            <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
-                <div class="schema-inner">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <span class="schema-name">{{schema.name}}</span> 
-                        </div>
-                        <div class="col-xs-4">
-                            <span class="schema-user">
-                                <i class="icon-person"></i> <span class="schema-user-text">{{userName(schema.lastModifiedBy, true) | async}}</span>
-                            </span>
-                        </div>
-                        <div class="col-xs-4 schema-col-right">
-                            <span class="schema-modified">{{schema.lastModified.toLocal() | fromNow}}</span>
+    <div class="panel-main">
+        <div class="panel-content">
+            <div class="schemas">
+                <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
+                    <div class="schema-inner">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <span class="schema-name">{{schema.name}}</span> 
+                            </div>
+                            <div class="col-xs-4">
+                                <span class="schema-user">
+                                    <i class="icon-person"></i> <span class="schema-user-text">{{userName(schema.lastModifiedBy, true) | async}}</span>
+                                </span>
+                            </div>
+                            <div class="col-xs-4 schema-col-right">
+                                <span class="schema-modified">{{schema.lastModified.toLocal() | fromNow}}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

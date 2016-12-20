@@ -8,7 +8,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SqxFrameworkModule, SqxSharedModule } from 'shared';
+import {
+    HistoryComponent,
+    SqxFrameworkModule,
+    SqxSharedModule
+} from 'shared';
 
 import {
     FieldComponent,
@@ -31,7 +35,16 @@ const routes: Routes = [
             },
             {
                 path: ':schemaName',
-                component: SchemaPageComponent
+                component: SchemaPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'schemas.{schemaName}'
+                        }
+                    }
+                ]
             }]
     }
 ];

@@ -47,9 +47,6 @@ export const routes: Routes = [
                         path: 'content',
                         loadChildren: './features/content/module#SqxFeatureContentModule'
                     }, {
-                        path: 'media',
-                        loadChildren: './features/media/module#SqxFeatureMediaModule'
-                    }, {
                         path: 'schemas',
                         loadChildren: './features/schemas/module#SqxFeatureSchemasModule'
                     }, {

@@ -26,7 +26,18 @@ const REPLACEMENT_TEMP = '$TEMP$';
 })
 export class HistoryComponent extends AppComponentBase {
     public get channel(): string {
-        return this.route.snapshot.data['channel'];
+        let result = this.route.snapshot.data['channel'];
+        let params = this.route.parent.snapshot.params;
+
+        for (let key in params) {
+            if (params.hasOwnProperty(key)) {
+                 const value = params[key];
+
+                 result = result.replace('{' + key + '}', value);
+            }
+        }
+
+        return result;
     }
 
     public events =

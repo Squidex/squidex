@@ -11,44 +11,57 @@
         </div>
     </div>
 
-    <div class="panel-content">
-        <div *ngFor="let field of schemaFields">
-            <sqx-field [field]="field"
-                (disabled)="disableField(field)"
-                (deleted)="deleteField(field)"
-                (enabled)="enableField(field)"
-                (hidden)="hideField(field)"
-                (saved)="saveField(field, $event)"
-                (shown)="showField(field)"></sqx-field>
-        </div>
-        
-        <div class="table-items-footer">
-            <form class="form-inline" [formGroup]="addFieldForm" (ngSubmit)="addField()">
-                <div class="form-group">
-                    <select class="form-control" formControlName="type">
-                        <option *ngFor="let type of fieldTypes">{{type}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <div class="errors-box" *ngIf="addFieldForm.controls.name.invalid && addFieldForm.controls.name.dirty">
-                        <div class="errors">
-                            <span *ngIf="addFieldForm.controls.name.hasError('required')">
-                                Name is required.
-                            </span>
-                            <span *ngIf="addFieldForm.controls.name.hasError('maxlength')">
-                                Name can not have more than 40 characters.
-                            </span>
-                            <span *ngIf="addFieldForm.controls.name.hasError('pattern')">
-                                Name can contain lower case letters (a-z), numbers and dashes (not at the end).
-                            </span>
+    <div class="panel-main">
+        <div class="panel-content">
+            <div *ngFor="let field of schemaFields">
+                <sqx-field [field]="field"
+                    (disabled)="disableField(field)"
+                    (deleted)="deleteField(field)"
+                    (enabled)="enableField(field)"
+                    (hidden)="hideField(field)"
+                    (saved)="saveField(field, $event)"
+                    (shown)="showField(field)"></sqx-field>
+            </div>
+            
+            <div class="table-items-footer">
+                <form class="form-inline" [formGroup]="addFieldForm" (ngSubmit)="addField()">
+                    <div class="form-group">
+                        <select class="form-control" formControlName="type">
+                            <option *ngFor="let type of fieldTypes">{{type}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="errors-box" *ngIf="addFieldForm.controls.name.invalid && addFieldForm.controls.name.dirty">
+                            <div class="errors">
+                                <span *ngIf="addFieldForm.controls.name.hasError('required')">
+                                    Name is required.
+                                </span>
+                                <span *ngIf="addFieldForm.controls.name.hasError('maxlength')">
+                                    Name can not have more than 40 characters.
+                                </span>
+                                <span *ngIf="addFieldForm.controls.name.hasError('pattern')">
+                                    Name can contain lower case letters (a-z), numbers and dashes (not at the end).
+                                </span>
+                            </div>
                         </div>
+
+                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" />
                     </div>
 
-                    <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" />
-                </div>
-
-                <button type="submit" class="btn btn-success" [disabled]="addFieldForm.invalid">Add Field</button>
-            </form>
+                    <button type="submit" class="btn btn-success" [disabled]="addFieldForm.invalid">Add Field</button>
+                </form>
+            </div>
+        </div>
+        <div class="panel-sidebar">
+            <div class="nav nav-pills nav-stacked nav-light">
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="history" routerLinkActive="active">
+                        <i class="icon-time"></i>
+                    </a>
+                </li>
+            </div>
         </div>
     </div>
 </div>
+
+<router-outlet></router-outlet>
