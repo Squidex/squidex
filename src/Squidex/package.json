@@ -9,7 +9,7 @@
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
     "dev": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ & webpack-dev-server --config app-config/webpack.run.dev.js --inline --hot --port 3000",
-    "build": "webpack --config app-config/webpack.run.prod.js --display-error-details",
+    "build": "webpack --config app-config/webpack.run.prod.js --bail",
     "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
     "build:clean": "rimraf wwwroot/build"
   },
