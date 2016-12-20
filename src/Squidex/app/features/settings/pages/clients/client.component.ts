@@ -110,7 +110,7 @@ export class ClientComponent {
             .subscribe(token => {
                 this.appClientToken = token;
                 this.modalDialog.show();
-            }, error => {
+            }, _ => {
                 this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
             });
     }

@@ -13,15 +13,19 @@ class MockupObject {
     public isDestroyCalled = false;
 
     @Action()
-    public event1 = new Subject<string>().map(x => { return { type: 'MOCK_ACTION' }; });
+    public event1 = new Subject<string>().map(_ => { return { type: 'MOCK_ACTION' }; });
 
     @Action()
-    public event2 = new Subject<string>().map(x => { return { type: 'MOCK_ACTION' }; });
+    public event2 = new Subject<string>().map(_ => { return { type: 'MOCK_ACTION' }; });
 
     constructor(private readonly store: any) { }
 
+    public log() {
+        this.store.log();
+    }
+
     public init() {
-        this.event2 = new Subject<string>().map(x => { return { type: 'MOCK_ACTION' }; });
+        this.event2 = new Subject<string>().map(_ => { return { type: 'MOCK_ACTION' }; });
     }
 
     public ngOnDestroy() {

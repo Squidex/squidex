@@ -60,11 +60,11 @@ export class HistoryComponent extends AppComponentBase {
             return this.userPicture(parts[1]);
         }
 
-        return Observable.of(null);
+        return Observable.of('');
     }
 
     public format(message: string): Observable<string> {
-        let foundUserId: string;
+        let foundUserId: string | null = null;
 
         message = message.replace(/{([^\s:]*):([^}]*)}/, (match: string, type: string, id: string) => {
             if (type === 'user') {

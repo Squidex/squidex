@@ -1,17 +1,48 @@
-<div class="table-items-row"> 
+<div class="table-items-row field"> 
     <div class="field-summary">
         <div class="row">
-            <div class="col-xs-8">
-                <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> {{field.name}}
+            <div class="col-xs-6">
+                <span class="field-name">
+                    <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
+
+                    <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{displayName}}</span>
+                    <span class="field-hints">{{field.properties.hints}}</span>
+                </span>
             </div>
-            <div class="col-xs-4">
+            <div class="col-xs-3">
+                <div class="float-xs-right">
+                    <span class="tag tag-success" *ngIf="!field.isDisabled">Enabled</span>
+                    <span class="tag tag-danger" *ngIf="field.isDisabled">Disabled</span>
+                </div>
+            </div>
+            <div class="col-xs-3">
                 <div class="float-xs-right">
                     <button type="button" class="btn btn-secondary field-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
-                    <button type="button" class="btn btn-simple">
-                        <i class="icon-dots"></i>
-                    </button>
+
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-simple" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async">
+                            <i class="icon-dots"></i>
+                        </button>
+                        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [@fade]>
+                            <a class="dropdown-item" (click)="enabled.emit()" *ngIf="field.isDisabled">
+                                Enable
+                            </a>
+                            <a class="dropdown-item" (click)="disabled.emit()" *ngIf="!field.isDisabled">
+                                Disable
+                            </a>
+                            <a class="dropdown-item" (click)="hidden.emit()" *ngIf="!field.isHidden">
+                                Hide
+                            </a>
+                            <a class="dropdown-item" (click)="shown.emit()" *ngIf="field.isHidden">
+                                Show
+                            </a>
+                            <a class="dropdown-item" (click)="deleted.emit()">
+                                Delete
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="field-details-tab" *ngIf="selectedTab == 0">
+            <div class="field-details-tab" [class.hidden]="selectedTab !== 0">
                 <div class="form-group row">
                     <label for="field-label" class="col-xs-3 col-form-label">Label</label>
 
@@ -80,24 +111,24 @@
                 </div>
             </div>
 
-            <div class="field-details-tab" *ngIf="selectedTab == 1">
+            <div class="field-details-tab" [class.hidden]="selectedTab !== 1">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'number'">
-                        <sqx-number-validation [editForm]="editForm"></sqx-number-validation>
+                        <sqx-number-validation [editForm]="editForm" [properties]="field.properties"></sqx-number-validation>
                     </div>
                     <div *ngSwitchCase="'string'">
-                        <sqx-string-validation [editForm]="editForm"></sqx-string-validation>
+                        <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
                     </div>
                 </div>
             </div>
 
-            <div class="field-details-tab" *ngIf="selectedTab == 2">
+            <div class="field-details-tab" [class.hidden]="selectedTab !== 2">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'number'">
-                        <sqx-number-ui [editForm]="editForm"></sqx-number-ui>
+                        <sqx-number-ui [editForm]="editForm" [properties]="field.properties"></sqx-number-ui>
                     </div>
                     <div *ngSwitchCase="'string'">
-                        <sqx-string-ui [editForm]="editForm"></sqx-string-ui>
+                        <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
                     </div>
                 </div>
             </div>

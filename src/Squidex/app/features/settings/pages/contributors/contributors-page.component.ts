@@ -81,10 +81,9 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
                 ]]
         });
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService, usersService: UsersService,
         private readonly appContributorsService: AppContributorsService,
         private readonly messageBus: MessageBus,
-        private readonly usersService: UsersService,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
@@ -94,7 +93,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public ngOnInit() {
-        this.currentUserId = this.authService.user.id;
+        this.currentUserId = this.authService.user!.id;
 
         this.load();
     }

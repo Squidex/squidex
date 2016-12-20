@@ -9,6 +9,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
+import { NumberFieldPropertiesDto } from 'shared';
+
 @Component({
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
@@ -18,22 +20,23 @@ export class NumberValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
+    @Input()
+    public properties: NumberFieldPropertiesDto;
+
     public hideDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
         this.editForm.addControl('maxValue',
-            new FormControl());
+            new FormControl(this.properties.maxValue));
+
         this.editForm.addControl('minValue',
-            new FormControl());
-        this.editForm.addControl('pattern',
-            new FormControl());
-        this.editForm.addControl('patternMessage',
-            new FormControl());
+            new FormControl(this.properties.minValue));
+
         this.editForm.addControl('defaultValue',
-            new FormControl());
+            new FormControl(this.properties.defaultValue));
 
         this.hideDefaultValue =
-            Observable.of(false)
+            Observable.of(this.properties.isRequired)
                 .merge(this.editForm.get('isRequired').valueChanges)
                 .map(x => !!x);
     }

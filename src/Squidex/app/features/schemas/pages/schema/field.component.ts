@@ -11,7 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     createProperties,
     fadeAnimation,
-    FieldDto
+    FieldDto,
+    ModalView
 } from 'shared';
 
 @Component({
@@ -23,16 +24,35 @@ import {
     ]
 })
 export class FieldComponent implements OnInit {
-    private oldValue: any;
+    public dropdown = new ModalView(false, true);
 
     @Input()
     public field: FieldDto;
 
     @Output()
+    public hidden = new EventEmitter<FieldDto>();
+
+    @Output()
+    public shown = new EventEmitter<FieldDto>();
+
+    @Output()
     public saved = new EventEmitter<FieldDto>();
+
+    @Output()
+    public enabled = new EventEmitter<FieldDto>();
+
+    @Output()
+    public disabled = new EventEmitter<FieldDto>();
+
+    @Output()
+    public deleted = new EventEmitter<FieldDto>();
 
     public isEditing: boolean = false;
     public selectedTab = 0;
+
+    public get displayName() {
+        return this.field.properties.label && this.field.properties.label.length > 0 ? this.field.properties.label : this.field.name;
+    }
 
     public editForm: FormGroup =
         this.formBuilder.group({
@@ -53,7 +73,7 @@ export class FieldComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.resetForm(this.field.properties);
+        this.resetForm();
     }
 
     public save() {
@@ -64,6 +84,7 @@ export class FieldComponent implements OnInit {
 
             const field =
                 new FieldDto(
+                    this.field.fieldId,
                     this.field.name,
                     this.field.isHidden,
                     this.field.isHidden,
@@ -74,7 +95,7 @@ export class FieldComponent implements OnInit {
     }
 
     public cancel() {
-        this.resetForm(this.oldValue);
+        this.resetForm();
     }
 
     public toggleEditing() {
@@ -85,20 +106,8 @@ export class FieldComponent implements OnInit {
         this.selectedTab = tab;
     }
 
-    private resetForm(properties: any) {
-        this.editForm.reset();
-
-        for (let property in properties) {
-            if (properties.hasOwnProperty(property)) {
-                const controlName = property + '';
-
-                if (this.editForm.contains(controlName)) {
-                    this.editForm.get(controlName).setValue(properties[property]);
-                }
-            }
-        }
-
-        this.oldValue = Object.assign({}, this.editForm.value);
+    private resetForm() {
+        this.editForm.reset(this.field.properties);
 
         this.isEditing = false;
     }

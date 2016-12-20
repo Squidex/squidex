@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Schemas.Repositories;
@@ -20,11 +21,11 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         {
             {
                 typeof(NumberFieldProperties),
-                p => SimpleMapper.Map((NumberFieldProperties)p, new NumberFieldPropertiesDto())
+                p => Convert((NumberFieldProperties)p)
             },
             {
                 typeof(StringFieldProperties),
-                p => SimpleMapper.Map((StringFieldProperties)p, new StringFieldPropertiesDto())
+                p => Convert((StringFieldProperties)p)
             }
         };
 
@@ -38,22 +39,41 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 
             dto.Fields = new List<FieldDto>();
 
-            foreach (var field in entity.Schema.Fields.Values)
+            foreach (var kvp in entity.Schema.Fields)
             {
-                var fieldPropertiesDto = Factories[field.RawProperties.GetType()](field.RawProperties);
+                var fieldPropertiesDto = 
+                    Factories[kvp.Value.RawProperties.GetType()](kvp.Value.RawProperties);
 
-                var fieldDto = new FieldDto
-                {
-                    Name = field.Name,
-                    IsHidden = field.IsHidden,
-                    IsDisabled = field.IsDisabled,
-                    Properties = fieldPropertiesDto
-                };
+                var fieldDto = SimpleMapper.Map(kvp.Value, new FieldDto { FieldId = kvp.Key, Properties = fieldPropertiesDto });
 
                 dto.Fields.Add(fieldDto);
             }
 
             return dto;
+        }
+
+        private static FieldPropertiesDto Convert(StringFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new StringFieldPropertiesDto());
+
+            if (source.AllowedValues != null)
+            {
+                result.AllowedValues = source.AllowedValues.ToArray();
+            }
+
+            return result;
+        }
+
+        private static FieldPropertiesDto Convert(NumberFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new NumberFieldPropertiesDto());
+
+            if (source.AllowedValues != null)
+            {
+                result.AllowedValues = source.AllowedValues.ToArray();
+            }
+
+            return result;
         }
     }
 }

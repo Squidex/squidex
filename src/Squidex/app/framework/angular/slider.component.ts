@@ -100,7 +100,7 @@ export class SliderComponent implements ControlValueAccessor {
 
         this.mouseUpSubscription =
             this.renderer.listenGlobal('window', 'mouseup', (e: MouseEvent) => {
-                this.onMouseUp(e);
+                this.onMouseUp();
             });
 
         this.renderer.setElementClass(this.thumb.nativeElement, 'focused', true);
@@ -125,7 +125,7 @@ export class SliderComponent implements ControlValueAccessor {
         return false;
     }
 
-    private onMouseUp(event: MouseEvent) {
+    private onMouseUp() {
         this.updateValue();
 
         setTimeout(() => {

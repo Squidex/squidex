@@ -5,24 +5,23 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
     AddFieldDto,
     AppComponentBase,
     AppsStoreService,
+    createProperties,
     FieldDto,
-    FieldPropertiesDto,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
     NotificationService,
-    NumberFieldPropertiesDto,
     SchemasService,
-    StringFieldPropertiesDto,
+    UpdateFieldDto,
     UsersProviderService
 } from 'shared';
 
@@ -31,12 +30,15 @@ import {
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html'
 })
-export class SchemaPageComponent extends AppComponentBase implements OnInit {
+export class SchemaPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private routerSubscription: Subscription;
+
     public fieldTypes: string[] = [
         'string',
         'number'
     ];
 
+    public schemaName: string;
     public schemaFields = ImmutableArray.empty<FieldDto>();
 
     public addFieldForm: FormGroup =
@@ -53,10 +55,6 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 ]]
         });
 
-    public get schemaName(): Observable<string> {
-        return this.route.params.map(p => p['schemaName']);
-    }
-
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
@@ -66,14 +64,23 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         super(apps, notifications, users);
     }
 
+    public ngOnDestroy() {
+        this.routerSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
-        this.load();
+        this.routerSubscription =
+            this.route.params.map(p => p['schemaName']).subscribe(name => {
+                this.schemaName = name;
+
+                this.reset();
+                this.load();
+            });
     }
 
     public load() {
-        this.schemaName.combineLatest(this.appName(), (schemaName, appName) => { return { schemaName, appName }; })
-            .do(() => this.reset())
-            .switchMap(p => this.schemasService.getSchema(p.appName, p.schemaName)).retry(2)
+        this.appName()
+            .switchMap(app => this.schemasService.getSchema(app, this.schemaName)).retry(2)
             .subscribe(dto => {
                 this.schemaFields = ImmutableArray.of(dto.fields);
             }, error => {
@@ -81,8 +88,66 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public updateField(field: FieldDto, newField: FieldDto) {
-        this.updateFields(this.schemaFields.replace(field, newField));
+    public enableField(field: FieldDto) {
+        this.appName()
+            .switchMap(app => this.schemasService.enableField(app, this.schemaName, field.fieldId)).retry(2)
+            .subscribe(() => {
+                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, false, field.properties));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public disableField(field: FieldDto) {
+        this.appName()
+            .switchMap(app => this.schemasService.disableField(app, this.schemaName, field.fieldId)).retry(2)
+            .subscribe(() => {
+                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, true, field.properties));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public showField(field: FieldDto) {
+        this.appName()
+            .switchMap(app => this.schemasService.showField(app, this.schemaName, field.fieldId)).retry(2)
+            .subscribe(() => {
+                this.updateField(field, new FieldDto(field.fieldId, field.name, false, field.isDisabled, field.properties));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public hideField(field: FieldDto) {
+        this.appName()
+            .switchMap(app => this.schemasService.hideField(app, this.schemaName, field.fieldId)).retry(2)
+            .subscribe(() => {
+                this.updateField(field, new FieldDto(field.fieldId, field.name, true, field.isDisabled, field.properties));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public deleteField(field: FieldDto) {
+        this.appName()
+            .switchMap(app => this.schemasService.deleteField(app, this.schemaName, field.fieldId)).retry(2)
+            .subscribe(() => {
+                this.updateFields(this.schemaFields.remove(field));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public saveField(field: FieldDto, newField: FieldDto) {
+        const request = new UpdateFieldDto(newField.properties);
+
+        this.appName()
+            .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, request)).retry(2)
+            .subscribe(() => {
+                this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, newField.properties));
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public addField() {
@@ -91,15 +156,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         if (this.addFieldForm.valid) {
             this.addFieldForm.disable();
 
-            let properties: FieldPropertiesDto;
-
-            switch (this.addFieldForm.get('type').value) {
-                case 'string':
-                    properties = new StringFieldPropertiesDto();
-                    break;
-                case 'number':
-                    properties = new NumberFieldPropertiesDto();
-            }
+            const properties = createProperties(this.addFieldForm.get('type').value);
 
             const dto = new AddFieldDto(this.addFieldForm.get('name').value, properties);
 
@@ -108,10 +165,17 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 this.addFieldForm.enable();
             };
 
-            this.schemaName.combineLatest(this.appName(), (schemaName, appName) => { return { schemaName, appName }; })
-                .switchMap(p => this.schemasService.postField(p.appName, p.schemaName, dto))
+            this.appName()
+                .switchMap(app => this.schemasService.postField(app, this.schemaName, dto))
                 .subscribe(dto => {
-                    this.updateFields(this.schemaFields.push(new FieldDto(this.addFieldForm.get('name').value, false, false, properties)));
+                    const newField =
+                        new FieldDto(parseInt(dto.id, 10),
+                            this.addFieldForm.get('name').value,
+                            false,
+                            false,
+                            properties);
+
+                    this.updateFields(this.schemaFields.push(newField));
                     reset();
                 }, error => {
                     this.notifyError(error);
@@ -122,6 +186,10 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     private reset() {
         this.schemaFields = ImmutableArray.empty<FieldDto>();
+    }
+
+    public updateField(field: FieldDto, newField: FieldDto) {
+        this.updateFields(this.schemaFields.replace(field, newField));
     }
 
     private updateFields(fields: ImmutableArray<FieldDto>) {

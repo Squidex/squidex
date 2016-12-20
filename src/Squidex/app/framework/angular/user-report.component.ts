@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit, Renderer } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { UserReportConfig } from './../configurations';
 
@@ -14,9 +14,7 @@ import { UserReportConfig } from './../configurations';
     template: ''
 })
 export class UserReportComponent implements OnInit {
-    constructor(config: UserReportConfig,
-        private readonly renderer: Renderer
-    ) {
+    constructor(config: UserReportConfig) {
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', config.siteId]);
     }

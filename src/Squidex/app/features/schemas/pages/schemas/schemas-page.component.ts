@@ -6,7 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import {
@@ -57,7 +57,6 @@ export class SchemasPageComponent extends AppComponentBase {
         });
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
-        private readonly formBuilder: FormBuilder,
         private readonly schemasService: SchemasService
     ) {
         super(apps, notifications, users);

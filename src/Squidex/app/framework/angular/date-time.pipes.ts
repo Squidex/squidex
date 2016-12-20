@@ -14,7 +14,7 @@ import { Duration } from './../utils/duration';
     name: 'shortDate'
 })
 export class ShortDatePipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toStringFormat('DD.MMM');
     }
 }
@@ -23,7 +23,7 @@ export class ShortDatePipe {
     name: 'month'
 })
 export class MonthPipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toStringFormat('MMMM');
     }
 }
@@ -32,7 +32,7 @@ export class MonthPipe {
     name: 'fromNow'
 })
 export class FromNowPipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toFromNow();
     }
 }
@@ -41,7 +41,7 @@ export class FromNowPipe {
     name: 'dayOfWeek'
 })
 export class DayOfWeekPipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toStringFormat('dd');
     }
 }
@@ -50,7 +50,7 @@ export class DayOfWeekPipe {
     name: 'day'
 })
 export class DayPipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toStringFormat('DD');
     }
 }
@@ -59,7 +59,7 @@ export class DayPipe {
     name: 'shortTime'
 })
 export class ShortTimePipe {
-    public transform(value: DateTime, args: string[]): any {
+    public transform(value: DateTime): any {
         return value.toStringFormat('HH:mm');
     }
 }
@@ -68,7 +68,7 @@ export class ShortTimePipe {
     name: 'duration'
 })
 export class DurationPipe {
-    public transform(value: Duration, args: string[]): any {
+    public transform(value: Duration): any {
         return value.toString();
     }
 }

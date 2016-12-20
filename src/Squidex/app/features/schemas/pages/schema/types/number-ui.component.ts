@@ -9,7 +9,11 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { fadeAnimation, FloatConverter } from 'shared';
+import {
+    fadeAnimation,
+    FloatConverter,
+    NumberFieldPropertiesDto
+} from 'shared';
 
 @Component({
     selector: 'sqx-number-ui',
@@ -25,24 +29,27 @@ export class NumberUIComponent implements OnDestroy, OnInit {
     @Input()
     public editForm: FormGroup;
 
+    @Input()
+    public properties: NumberFieldPropertiesDto;
+
     public converter = new FloatConverter();
 
     public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
         this.editForm.addControl('editor',
-            new FormControl('Input', [
+            new FormControl(this.properties.editor, [
                 Validators.required
             ]));
         this.editForm.addControl('placeholder',
-            new FormControl('', [
+            new FormControl(this.properties.placeholder, [
                 Validators.maxLength(100)
             ]));
         this.editForm.addControl('allowedValues',
-            new FormControl(undefined, []));
+            new FormControl(this.properties.allowedValues, []));
 
         this.hideAllowedValues =
-            Observable.of(false)
+            Observable.of(this.properties.editor)
                 .merge(this.editForm.get('editor').valueChanges)
                 .map(x => !x || x === 'Input' || x === 'Textarea');
 

@@ -6,7 +6,6 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     AppDto,
@@ -37,9 +36,7 @@ export class AppsMenuComponent implements OnInit, OnDestroy {
     public appName = FALLBACK_NAME;
 
     constructor(
-        private readonly appsStore: AppsStoreService,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute
+        private readonly appsStore: AppsStoreService
     ) {
     }
 

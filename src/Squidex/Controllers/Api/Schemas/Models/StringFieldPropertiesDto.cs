@@ -6,6 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Immutable;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
@@ -48,11 +51,19 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         public StringFieldEditor Editor { get; set; }
 
         public override FieldProperties ToProperties()
         {
-            return SimpleMapper.Map(this, new StringFieldProperties());
+            var result = SimpleMapper.Map(this, new StringFieldProperties());
+
+            if (AllowedValues != null)
+            {
+                result.AllowedValues = ImmutableList.Create(AllowedValues);
+            }
+
+            return result;
         }
     }
 }

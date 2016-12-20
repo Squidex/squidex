@@ -44,7 +44,7 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
-    private subscription: Subscription | null = null;
+    private subscription: Subscription;
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
@@ -109,7 +109,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                     }
                 })
                 .filter(q => !!q && !!this.source)
-                .switchMap(q => this.source.find(q)).catch(error => Observable.of([]))
+                .switchMap(q => this.source.find(q)).catch(_ => Observable.of([]))
                 .subscribe(r => {
                     this.reset();
                     this.items = r || [];
@@ -158,7 +158,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.selectIndex(this.itemSelection + 1);
     }
 
-    public chooseItem(selection: AutocompleteItem = null) {
+    public chooseItem(selection: AutocompleteItem | null = null) {
         if (!selection) {
             selection = this.items[this.itemSelection];
         }

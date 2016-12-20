@@ -28,7 +28,7 @@ export class DashboardLinkDirective implements OnInit, OnDestroy {
     public ngOnInit() {
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
-                this.url = this.router.createUrlTree(['app', app.name]).toString();
+                this.url = this.router.createUrlTree(['app', app!.name]).toString();
 
                 this.renderer.setElementAttribute(this.element.nativeElement, 'href', this.url);
             });

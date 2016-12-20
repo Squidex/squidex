@@ -9,7 +9,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { fadeAnimation } from 'shared';
+import { fadeAnimation, StringFieldPropertiesDto } from 'shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -25,24 +25,29 @@ export class StringUIComponent implements OnDestroy, OnInit {
     @Input()
     public editForm: FormGroup;
 
+    @Input()
+    public properties: StringFieldPropertiesDto;
+
     public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.addControl('editor',
-            new FormControl('Input', [
+        this.editForm.setControl('editor',
+            new FormControl(this.properties.editor, [
                 Validators.required
             ]));
-        this.editForm.addControl('placeholder',
-            new FormControl('', [
+
+        this.editForm.setControl('placeholder',
+            new FormControl(this.properties.placeholder, [
                 Validators.maxLength(100)
             ]));
-        this.editForm.addControl('allowedValues',
-            new FormControl(10, []));
+
+        this.editForm.setControl('allowedValues',
+            new FormControl(this.properties.allowedValues));
 
         this.hideAllowedValues =
-            Observable.of(false)
+            Observable.of(this.properties.editor)
                 .merge(this.editForm.get('editor').valueChanges)
-                .map(x => !x || x === 'Input' || x === 'Textarea');
+                .map(x => !x || x === 'Input' || x === 'TextArea');
 
         this.editorSubscription =
             this.hideAllowedValues.subscribe(isSelection => {

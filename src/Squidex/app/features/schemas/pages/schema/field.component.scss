@@ -7,6 +7,31 @@ $field-header: #e7ebef;
     padding: 0;
 }
 
+.dropdown {
+    & {
+        display: inline-block;
+    }
+
+    &-menu {
+        @include absolute(100%, 0, auto, auto);
+    }
+
+    &-item {
+        cursor: pointer;
+    }
+}
+
+.btn-simple {
+    & {
+        color: $color-border-dark;
+    }
+
+    &:hover,
+    &.active {
+        color: $color-text;
+    }
+}
+
 .field {
     &-summary {
         padding: 15px 20px;
@@ -14,11 +39,11 @@ $field-header: #e7ebef;
     }
 
     &-icon {
-        color: darken($color-border, 15%);
+        margin-right: 1rem;
+        color: $color-border-dark;
         font-size: 1.2rem;
         font-weight: normal;
         vertical-align: middle;
-        margin-right: 1rem;
     }
 
     &-edit-button {
@@ -35,6 +60,21 @@ $field-header: #e7ebef;
             border: 0;
             color: $color-accent-dark;
         }
+    }
+
+    &-name {
+        @include truncate;
+    }
+
+    &-hidden {
+        color: $color-border-dark;
+    }
+
+    &-hints {
+        color: lighten($color-text, 50%);
+        font-weight: normal;
+        font-size: .95rem;
+        margin-left: .3rem;
     }
 
     &-details {
@@ -58,6 +98,12 @@ $field-header: #e7ebef;
             position: relative;
             padding: 15px 20px;
         }
+    }
+
+    .tag {
+        @include opacity(.9);
+        min-width: 60px;
+        max-width: 90px;
     }
 }
 

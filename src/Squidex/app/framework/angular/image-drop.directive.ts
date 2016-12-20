@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, HostListener, Renderer } from '@angular/core';
+import { Directive, ElementRef, HostListener } from '@angular/core';
 
 import { DragService } from './../services/drag.service';
 import { Vec2 } from './../utils/vec2';
@@ -16,7 +16,6 @@ import { Vec2 } from './../utils/vec2';
 export class ImageDropDirective {
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer,
         private readonly dragService: DragService
     ) {
     }

@@ -246,7 +246,7 @@
 
     &-radio {
         & {
-            color: darken($color-border, 20%);
+            color: $color-border-dark;
             cursor: pointer;
             border: 1px solid $color-border;
             background: transparent;

@@ -19,7 +19,7 @@ export class MoneyPipe {
     ) {
     }
 
-    public transform(value: number, args: string[]): any {
+    public transform(value: number): any {
         const money = value.toFixed(2).toString();
 
         let result = money.substr(0, money.length - 3) + this.separator.value + '<span class="decimal">' + money.substr(money.length - 2, 2) + '</span>';

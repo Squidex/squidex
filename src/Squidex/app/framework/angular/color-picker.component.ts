@@ -42,8 +42,11 @@ export class ColorPickerComponent implements ControlValueAccessor {
     @Input()
     public isOpen = false;
 
+    @Input()
+    public isDisabled = false;
+
     constructor(private readonly element: ElementRef) {
-        this.updateColor();
+        this.updateColor(Color.BLACK);
     }
 
     public writeValue(value: any) {
@@ -51,6 +54,7 @@ export class ColorPickerComponent implements ControlValueAccessor {
     }
 
     public setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
     }
 
     public registerOnChange(fn: any) {
@@ -100,7 +104,7 @@ export class ColorPickerComponent implements ControlValueAccessor {
         }
     }
 
-    private updateColor(color?: Color) {
+    private updateColor(color: Color) {
         let hasColor = false;
         try {
             this.selectedColor = Color.fromValue(color);

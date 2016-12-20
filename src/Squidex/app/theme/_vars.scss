@@ -1,7 +1,7 @@
 $color-background: #f4f8f9;
 
 $color-border: #dbe4eb;
-$color-border-dark: darken($color-border);
+$color-border-dark: darken($color-border, 20%);
 
 $color-text: #373a3c;
 $color-empty: #777;

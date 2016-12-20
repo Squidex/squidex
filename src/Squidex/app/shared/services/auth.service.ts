@@ -41,7 +41,7 @@ export class Profile {
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly isAuthenticatedChanged$ = new Subject<boolean>();
-    private loginCompleted = false;
+    private loginCompleted: boolean | null = false;
     private loginCache: Promise<boolean> | null = null;
     private currentUser: Profile | null = null;
 
@@ -153,7 +153,7 @@ export class AuthService {
                     this.loginCache = null;
                     this.loginCompleted = null;
 
-                    this.onAuthenticated(null);
+                    this.onDeauthenticated();
 
                     return false;
                 });

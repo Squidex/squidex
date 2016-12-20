@@ -24,7 +24,7 @@ export abstract class AppComponentBase {
     }
 
     public appName(): Observable<string> {
-        return this.appsStore.selectedApp.map(a => a.name);
+        return this.appsStore.selectedApp.map(a => a!.name);
     }
 
     public userEmail(userId: string): Observable<string> {

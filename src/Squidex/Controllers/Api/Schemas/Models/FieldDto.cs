@@ -13,6 +13,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
     public sealed class FieldDto
     {
         /// <summary>
+        /// The id of the field.
+        /// </summary>
+        public long FieldId { get; set; }
+
+        /// <summary>
         /// The name of the field. Must be unique within the schema.
         /// </summary>
         [Required]

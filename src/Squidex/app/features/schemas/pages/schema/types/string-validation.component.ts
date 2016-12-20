@@ -9,6 +9,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
+import { StringFieldPropertiesDto } from 'shared';
+
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
@@ -20,20 +22,27 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     @Input()
     public editForm: FormGroup;
 
+    @Input()
+    public properties: StringFieldPropertiesDto;
+
     public hidePatternMessage: Observable<boolean>;
     public hideDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.addControl('maxLength',
-            new FormControl());
-        this.editForm.addControl('minLength',
-            new FormControl());
-        this.editForm.addControl('pattern',
-            new FormControl());
-        this.editForm.addControl('patternMessage',
-            new FormControl());
-        this.editForm.addControl('defaultValue',
-            new FormControl());
+        this.editForm.setControl('maxLength',
+            new FormControl(this.properties.maxLength));
+
+        this.editForm.setControl('minLength',
+            new FormControl(this.properties.minLength));
+
+        this.editForm.setControl('pattern',
+            new FormControl(this.properties.pattern));
+
+        this.editForm.setControl('patternMessage',
+            new FormControl(this.properties.patternMessage));
+
+        this.editForm.setControl('defaultValue',
+            new FormControl(this.properties.defaultValue));
 
         this.hideDefaultValue =
             Observable.of(false)

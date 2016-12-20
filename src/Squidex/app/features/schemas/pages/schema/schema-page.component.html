@@ -1,9 +1,9 @@
-<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schemaName | async}}"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schemaName}}"></sqx-title>
 
 <div class="panel panel-light">
     <div class="panel-header">
         <div>
-            <h3 class="panel-title">{{schemaName | async}}</h3>
+            <h3 class="panel-title">{{schemaName}}</h3>
 
             <a class="panel-close" routerLink="../">
                 <i class="icon-close"></i>
@@ -13,7 +13,13 @@
 
     <div class="panel-content">
         <div *ngFor="let field of schemaFields">
-            <sqx-field [field]="field" (saved)="updateField(field, $event)"></sqx-field>
+            <sqx-field [field]="field"
+                (disabled)="disableField(field)"
+                (deleted)="deleteField(field)"
+                (enabled)="enableField(field)"
+                (hidden)="hideField(field)"
+                (saved)="saveField(field, $event)"
+                (shown)="showField(field)"></sqx-field>
         </div>
         
         <div class="table-items-footer">

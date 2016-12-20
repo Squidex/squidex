@@ -69,7 +69,7 @@ export class SchemaFormComponent implements OnInit {
     public createSchema() {
         this.createForm.markAsTouched();
 
-        if (this.createForm.valid) {
+        if (this.createForm.valid && this.authService.user) {
             this.createForm.disable();
 
             const name = this.createForm.get('name').value;
