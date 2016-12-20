@@ -181,13 +181,13 @@
         @include transition(background-color .3s ease);
         @include placeholder-color(darken($color-accent-dark, 30%));
         background: $color-dark-background-accent;
-        border: 0;
+        border: 1px solid $color-dark-background-accent;
         color: darken($color-accent-dark, 20%);
     }
 
     &:focus {
         background: lighten($color-dark-background-accent, 2%);
-        border: 0;
+        border-color: lighten($color-dark-background-accent, 2%);
         color: $color-accent-dark;
     }
 }

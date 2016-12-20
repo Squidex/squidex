@@ -22,7 +22,7 @@ export class UsersProviderService {
     ) {
     }
 
-    public getUser(id: string): Observable<UserDto> {
+    public getUser(id: string, me = 'Me'): Observable<UserDto> {
         let result = this.caches[id];
 
         if (!result) {
@@ -33,7 +33,7 @@ export class UsersProviderService {
                     })
                     .map(dto => {
                         if (this.authService.user && dto.id === this.authService.user.id) {
-                            dto = new UserDto(dto.id, dto.email, 'Me', dto.pictureUrl);
+                            dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl);
                         }
                         return dto;
                     })

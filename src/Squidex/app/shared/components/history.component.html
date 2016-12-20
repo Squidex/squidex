@@ -2,7 +2,7 @@
 
 <div class="panel panel-light">
     <div class="panel-header">
-        <h3 class="panel-title">History</h3>
+        <h3 class="panel-title">Activity</h3>
 
         <a class="panel-close" routerLink="../">
             <i class="icon-close"></i>
@@ -12,9 +12,14 @@
     <div class="panel-main">
         <div class="panel-content panel-content-blank">
             <div *ngFor="let event of events | async" class="event">
-                <div class="event-created">{{event.created.toLocal() | fromNow}}</div>
-                <div class="event-message">
-                    <span class="event-actor">{{actorName(event.actor) | async}}</span> <span [innerHTML]="format(event.message) | async"></span>
+                <div class="event-left">
+                    <img class="event-picture" [attr.src]="actorProfile(event.actor) | async" />
+                </div>
+                <div class="event-main">
+                    <div class="event-message">
+                        <span class="event-actor user-ref">{{actorName(event.actor) | async}}</span> <span [innerHTML]="format(event.message) | async"></span>
+                    </div>
+                    <div class="event-created">{{event.created.toLocal() | fromNow}}</div>
                 </div>
             </div>            
         </div>

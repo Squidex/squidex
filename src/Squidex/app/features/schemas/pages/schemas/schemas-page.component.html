@@ -10,11 +10,10 @@
             </a>
         </div>
         <div class="subheader">
-            <div class="clearfix">
-                <button class="btn btn-new" (click)="modalDialog.show()">
-                    <i class="icon-plus"></i> New Schema            
-                </button>
-            </div>
+            <button class="btn btn-success subheader-button" (click)="modalDialog.show()">
+                <i class="icon-plus"></i>          
+            </button>
+            
             <div class="search-form">
                 <input class="form-control form-control-dark" [formControl]="schemasFilter" placeholder="Search for schemas..." />
 

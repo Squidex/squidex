@@ -35,17 +35,17 @@ export abstract class AppComponentBase {
         return this.usersProvider.getUser(userId).map(u => u.pictureUrl);
     }
 
-    public userName(userId: string, isRef: boolean = false): Observable<string> {
+    public userName(userId: string, isRef: boolean = false, placeholder = 'Me'): Observable<string> {
         if (isRef) {
             const parts = userId.split(':');
 
             if (parts[0] === 'subject') {
-                return this.usersProvider.getUser(parts[1]).map(u => u.displayName);
+                return this.usersProvider.getUser(parts[1], placeholder).map(u => u.displayName);
             } else {
                 return Observable.of(parts[1]);
             }
         } else {
-                return this.usersProvider.getUser(userId).map(u => u.displayName);
+            return this.usersProvider.getUser(userId, placeholder).map(u => u.displayName);
         }
     }
 

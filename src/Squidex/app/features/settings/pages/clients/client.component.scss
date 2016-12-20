@@ -17,11 +17,12 @@ $color-editor: #eceeef;
     }
 
     &-edit {
-        color: darken($color-border, 20%);
+        color: $color-border-dark;
         display: none;
         font-size: .9rem;
         font-weight: normal;
         padding: .6rem .3rem;
+        border: 0;
         background: transparent;
         vertical-align: baseline;
     }

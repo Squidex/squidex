@@ -2,17 +2,32 @@
 @import '_mixins';
 
 .panel {
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 270px;
+    max-width: 270px;
 }
 
 .event {
     & {
+        @include flex-box;
         margin-bottom: .8rem;
+    }
+
+    &-picture {
+        @include circle(2.2rem);
     }
 
     &-message {
         font-size: .9rem;
+    }
+
+    &-main {
+        @include flex-grow(1);
+    }
+
+    &-left {
+        min-width: 2.8rem;
+        max-width: 2.8rem;
+        margin-top: .3rem;
     }
 
     &-created {

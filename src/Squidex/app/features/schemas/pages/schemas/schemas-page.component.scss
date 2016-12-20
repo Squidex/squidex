@@ -7,19 +7,33 @@
 }
 
 .panel-header {
-    min-height: 170px;
-    max-height: 170px;
+    min-height: 140px;
+    max-height: 140px;
 }
 
 .subheader {
-    margin-top: 1rem;
-    margin-right: -40px;
+    & {
+        @include flex-box;
+        @include flex-flow(row);
+        margin-top: 2rem;
+        margin-right: -40px;
+    }
+
+    &-button {
+        height: 38px;
+        margin-right: .4rem;
+        min-width: 38px;
+        max-width: 38px;
+        padding-left: 0;
+        padding-right: 0;
+        font-size: 1.1rem;
+    }
 }
 
 .search-form {
     & {
+        @include flex-grow(1);
         position: relative;
-        margin-top: .5rem;
     }
 
     .form-control {
