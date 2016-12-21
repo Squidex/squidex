@@ -14,7 +14,7 @@ import { MessageBus, NotificationService } from 'framework';
 import { AppComponentBase } from './../app-component-base';
 import { AppsStoreService } from './../services/apps-store.service';
 import { HistoryChannelUpdated } from './../utils/messages';
-import { HistoryService } from './../services/history.service';
+import { HistoryEventDto, HistoryService } from './../services/history.service';
 import { UsersProviderService } from './../services/users-provider.service';
 
 const REPLACEMENT_TEMP = '$TEMP$';
@@ -40,7 +40,7 @@ export class HistoryComponent extends AppComponentBase {
         return result;
     }
 
-    public events =
+    public events: Observable<HistoryEventDto[]> =
         Observable.timer(0, 10000)
             .merge(this.messageBus.of(HistoryChannelUpdated).delay(1000))
             .switchMap(() => this.appName())
