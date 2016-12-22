@@ -19,7 +19,7 @@
                     <div class="event-message">
                         <span class="event-actor user-ref">{{actorName(event.actor) | async}}</span> <span [innerHTML]="format(event.message) | async"></span>
                     </div>
-                    <div class="event-created">{{event.created.toLocal() | fromNow}}</div>
+                    <div class="event-created">{{event.created | fromNow}}</div>
                 </div>
             </div>            
         </div>

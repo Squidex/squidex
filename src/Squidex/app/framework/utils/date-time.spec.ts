@@ -82,31 +82,24 @@ describe('DateTime', () => {
     });
 
     it('should print to formatted string', () => {
-        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
-        const actual = value.toStringFormat('hh:mm');
+        const value = DateTime.parseISO('2013-10-16T12:13:14');
         const expected = '12:13';
 
-        expect(actual).toEqual(expected);
+        expect(value.toStringFormat('HH:mm')).toEqual(expected);
     });
 
     it('should print to iso string', () => {
         const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
-        const actual = value.toString().substr(0, 19);
-        const expected = '2013-10-16T12:13:14';
+        const expected = '2013-10-16T12:13:14.000Z';
 
-        expect(actual).toEqual(expected);
+        expect(value.toISOString()).toEqual(expected);
     });
 
     it('should print to from now string', () => {
         const value = DateTime.now().addMinutes(-4);
+        const expected = '4 minutes ago';
 
-        expect(value.toFromNow()).toBe('4 minutes ago');
-    });
-
-    it('should print to valid utc string', () => {
-        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
-
-        expect(value.toUTCString()).toBeDefined();
+        expect(value.toFromNow()).toBe(expected);
     });
 
     it('should print from format with underscore', () => {
@@ -127,7 +120,7 @@ describe('DateTime', () => {
         const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').date.firstOfMonth();
         const expected = DateTime.parseISO_UTC('2013-10-01');
 
-        expect(actual).toEqual(expected);
+        expect(actual.toISOString()).toEqual(expected.toISOString());
     });
 
     it('should add various offsets to date time', () => {

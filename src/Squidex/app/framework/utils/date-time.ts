@@ -51,7 +51,7 @@ export class DateTime {
     public get date(): DateTime {
         const clone = this.cloneDate();
 
-        clone.setHours(0, 0, 0, 0);
+        clone.setUTCHours(0, 0, 0, 0);
 
         return new DateTime(clone);
     }
@@ -119,7 +119,7 @@ export class DateTime {
         const parsedMoment = moment.utc(value, format);
 
         if (parsedMoment.isValid()) {
-            return new DateTime(new Date(parsedMoment.valueOf() - parsedMoment.local().utcOffset() * 60 * 1000));
+            return new DateTime(new Date(parsedMoment.valueOf()));
         } else {
             throw `${value} is not a valid date time string`;
         }
@@ -160,7 +160,7 @@ export class DateTime {
     }
 
     public firstOfMonth(): DateTime {
-        const monthStart = new Date(this.year, this.month - 1, 1);
+        const monthStart = new Date(Date.UTC(this.year, this.month - 1, 1));
 
         return new DateTime(monthStart);
     }
@@ -168,7 +168,7 @@ export class DateTime {
     public addYears(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setFullYear(clone.getFullYear() + value, clone.getMonth(), clone.getDay());
+        clone.setFullYear(clone.getUTCFullYear() + value, clone.getUTCMonth(), clone.getUTCDay());
 
         return new DateTime(clone);
     }
@@ -176,7 +176,7 @@ export class DateTime {
     public addMonths(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setMonth(clone.getMonth() + value, clone.getDate());
+        clone.setMonth(clone.getUTCMonth() + value, clone.getUTCDate());
 
         return new DateTime(clone);
     }
@@ -184,7 +184,7 @@ export class DateTime {
     public addDays(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setDate(clone.getDate() + value);
+        clone.setDate(clone.getUTCDate() + value);
 
         return new DateTime(clone);
     }
@@ -221,12 +221,8 @@ export class DateTime {
         return new DateTime(clone);
     }
 
-    public toUTCString(): string {
-        return this.value.toUTCString();
-    }
-
-    public toString(): string {
-        return moment(this.value).format();
+    public toISOString(): string {
+        return moment(this.value).toISOString();
     }
 
     public toStringFormat(format: string): string {
@@ -234,6 +230,6 @@ export class DateTime {
     }
 
     public toFromNow(): string {
-        return moment(this.value).fromNow();
+        return moment.utc(this.value).fromNow();
     }
 }
