@@ -94,7 +94,7 @@
  
 @mixin circle($size) {
     @include border-radius($size * .5);
-     width: $size;
+    width: $size;
     height: $size;
 }
 

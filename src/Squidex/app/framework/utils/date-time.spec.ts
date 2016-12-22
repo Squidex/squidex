@@ -81,12 +81,6 @@ describe('DateTime', () => {
         expect(actual).toEqual(expected);
     });
 
-    it('should convert to local time', () => {
-        const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
-
-        expect(value.toLocal().ne(value)).toBeTruthy();
-    });
-
     it('should print to formatted string', () => {
         const value = DateTime.parseISO_UTC('2013-10-16T12:13:14');
         const actual = value.toStringFormat('hh:mm');
