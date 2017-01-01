@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 using Squidex.Read.History;
+// ReSharper disable LoopCanBeConvertedToQuery
 
 namespace Squidex.Store.MongoDb.History
 {

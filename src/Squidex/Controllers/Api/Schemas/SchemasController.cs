@@ -127,7 +127,7 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
-        /// Publishs a schema.
+        /// Publish a schema.
         /// </summary>
         /// <param name="app">The app where the schema is a part of.</param>
         /// <param name="name">The name of the schema to publish.</param>
@@ -137,6 +137,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/publish")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PublishSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new PublishSchema());
@@ -145,7 +146,7 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
-        /// Unpublishs a schema.
+        /// Unpublish a schema.
         /// </summary>
         /// <param name="app">The app where the schema is a part of.</param>
         /// <param name="name">The name of the schema to unpublish.</param>
@@ -154,7 +155,8 @@ namespace Squidex.Controllers.Api.Schemas
         /// 204 => Schema has been deleted.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/publish")]
+        [Route("apps/{app}/schemas/{name}/unpublish")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> UnpublishSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new UnpublishSchema());

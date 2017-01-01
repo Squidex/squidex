@@ -267,6 +267,37 @@ namespace Squidex.Core.Schemas
                 });
         }
 
+        [Fact]
+        public void Should_publish_schema()
+        {
+            sut = sut.Publish();
+
+            Assert.True(sut.IsPublished);
+        }
+
+        [Fact]
+        public void Should_throw_if_schema_is_already_published()
+        {
+            sut = sut.Publish();
+
+            Assert.Throws<DomainException>(() => sut.Publish());
+        }
+
+        [Fact]
+        public void Should_unpublish_schema()
+        {
+            sut = sut.Publish();
+            sut = sut.Unpublish();
+
+            Assert.False(sut.IsPublished);
+        }
+
+        [Fact]
+        public void Should_throw_if_schema_is_not_published()
+        {
+            Assert.Throws<DomainException>(() => sut.Unpublish());
+        }
+
         private NumberField AddField()
         {
             var field = new NumberField(1, "my-field", new NumberFieldProperties());

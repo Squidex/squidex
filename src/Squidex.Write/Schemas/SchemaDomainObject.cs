@@ -90,6 +90,16 @@ namespace Squidex.Write.Schemas
             schema = schema.DeleteField(@event.FieldId);
         }
 
+        protected void On(SchemaPublished @event)
+        {
+            schema = schema.Publish();
+        }
+
+        protected void On(SchemaUnpublished @event)
+        {
+            schema = schema.Unpublish();
+        }
+
         protected void On(SchemaDeleted @event)
         {
             isDeleted = true;
@@ -190,6 +200,24 @@ namespace Squidex.Write.Schemas
             VerifyCreatedAndNotDeleted();
             
             RaiseEvent(new FieldDeleted { FieldId = command.FieldId });
+
+            return this;
+        }
+
+        public SchemaDomainObject Publish(PublishSchema command)
+        {
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(new SchemaPublished());
+
+            return this;
+        }
+
+        public SchemaDomainObject Unpublish(UnpublishSchema command)
+        {
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(new SchemaUnpublished());
 
             return this;
         }

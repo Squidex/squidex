@@ -91,6 +91,35 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
+        public async Task PublishSchema_should_update_domain_object()
+        {
+            CreateSchema();
+
+            var command = new PublishSchema { AggregateId = Id };
+            var context = new CommandContext(command);
+
+            await TestUpdate(schema, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task UnpublishSchema_should_update_domain_object()
+        {
+            CreateSchema();
+            PublishSchema();
+
+            var command = new UnpublishSchema { AggregateId = Id };
+            var context = new CommandContext(command);
+
+            await TestUpdate(schema, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
         public async Task DeleteSchema_should_update_domain_object()
         {
             CreateSchema();
@@ -213,6 +242,11 @@ namespace Squidex.Write.Schemas
         private void CreateSchema()
         {
             schema.Create(new CreateSchema { Name = schemaName });
+        }
+
+        private void PublishSchema()
+        {
+            schema.Publish(new PublishSchema());
         }
 
         private void CreateField()

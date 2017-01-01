@@ -99,6 +99,16 @@ namespace Squidex.Write.Schemas
             return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.UpdateField(command); });
         }
 
+        protected Task On(PublishSchema command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.Publish(command); });
+        }
+
+        protected Task On(UnpublishSchema command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.Unpublish(command); });
+        }
+
         public Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);

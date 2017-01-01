@@ -20,6 +20,7 @@ namespace Squidex.Core.Schemas
     public sealed class Schema
     {
         private readonly string name;
+        private readonly bool isPublished;
         private readonly SchemaProperties properties;
         private readonly ImmutableDictionary<long, Field> fieldsById;
         private readonly Dictionary<string, Field> fieldsByName;
@@ -27,6 +28,11 @@ namespace Squidex.Core.Schemas
         public string Name
         {
             get { return name; }
+        }
+
+        public bool IsPublished
+        {
+            get { return isPublished; }
         }
 
         public ImmutableDictionary<long, Field> Fields
@@ -39,7 +45,7 @@ namespace Squidex.Core.Schemas
             get { return properties; }
         }
 
-        public Schema(string name, SchemaProperties properties, ImmutableDictionary<long, Field> fields)
+        public Schema(string name, SchemaProperties properties, bool isPublished, ImmutableDictionary<long, Field> fields)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
@@ -48,6 +54,7 @@ namespace Squidex.Core.Schemas
             this.name = name;
 
             this.properties = properties;
+            this.isPublished = isPublished;
 
             fieldsById = fields;
             fieldsByName = fields.Values.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
@@ -64,14 +71,14 @@ namespace Squidex.Core.Schemas
                 throw new ValidationException("Cannot create a new schema", error);
             }
 
-            return new Schema(name, newProperties, ImmutableDictionary<long, Field>.Empty);
+            return new Schema(name, newProperties, false, ImmutableDictionary<long, Field>.Empty);
         }
 
         public Schema Update(SchemaProperties newProperties)
         {
             Guard.NotNull(newProperties, nameof(newProperties));
 
-            return new Schema(name, newProperties, fieldsById);
+            return new Schema(name, newProperties, isPublished, fieldsById);
         }
 
         public Schema AddOrUpdateField(Field field)
@@ -83,7 +90,7 @@ namespace Squidex.Core.Schemas
                 throw new ValidationException($"A field with name '{field.Name}' already exists.");
             }
 
-            return new Schema(name, properties, fieldsById.SetItem(field.Id, field));
+            return new Schema(name, properties, isPublished, fieldsById.SetItem(field.Id, field));
         }
 
         public Schema UpdateField(long fieldId, FieldProperties newProperties)
@@ -118,7 +125,27 @@ namespace Squidex.Core.Schemas
 
         public Schema DeleteField(long fieldId)
         {
-            return new Schema(name, properties, fieldsById.Remove(fieldId));
+            return new Schema(name, properties, isPublished, fieldsById.Remove(fieldId));
+        }
+
+        public Schema Publish()
+        {
+            if (isPublished)
+            {
+                throw new DomainException("Schema is already published");
+            }
+
+            return new Schema(name, properties, true, fieldsById);
+        }
+
+        public Schema Unpublish()
+        {
+            if (!isPublished)
+            {
+                throw new DomainException("Schema is not published");
+            }
+
+            return new Schema(name, properties, false, fieldsById);
         }
 
         public Schema UpdateField(long fieldId, Func<Field, Field> updater)

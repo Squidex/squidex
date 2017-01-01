@@ -27,6 +27,7 @@ namespace Squidex.Core.Schemas
 
         static FieldRegistryTests()
         {
+            TypeNameRegistry.Map(typeof(BooleanFieldProperties), "BooleanField");
             TypeNameRegistry.Map(typeof(NumberFieldProperties), "NumberField");
             TypeNameRegistry.Map(typeof(StringFieldProperties), "StringField");
             TypeNameRegistry.Map(typeof(InvalidProperties), "invalid");

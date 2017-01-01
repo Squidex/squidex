@@ -109,6 +109,71 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
+        public void Publish_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Publish(new PublishSchema()));
+        }
+
+        [Fact]
+        public void Publish_should_throw_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() => sut.Publish(new PublishSchema()));
+        }
+
+        [Fact]
+        public void Publish_should_refresh_properties_and_create_events()
+        {
+            CreateSchema();
+
+            sut.Publish(new PublishSchema());
+
+            Assert.True(sut.Schema.IsPublished);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new SchemaPublished()
+                    });
+        }
+
+        [Fact]
+        public void Unpublish_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishSchema()));
+        }
+
+        [Fact]
+        public void Unpublish_should_throw_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishSchema()));
+        }
+
+        [Fact]
+        public void Unpublish_should_refresh_properties_and_create_events()
+        {
+            CreateSchema();
+            PublishSchema();
+
+            sut.Unpublish(new UnpublishSchema());
+
+            Assert.False(sut.Schema.IsPublished);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new SchemaUnpublished()
+                    });
+        }
+
+        [Fact]
         public void Delete_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() => sut.Delete(new DeleteSchema()));
@@ -438,6 +503,13 @@ namespace Squidex.Write.Schemas
         private void CreateSchema()
         {
             sut.Create(new CreateSchema { Name = appName, AppId = appId });
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void PublishSchema()
+        {
+            sut.Publish(new PublishSchema());
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

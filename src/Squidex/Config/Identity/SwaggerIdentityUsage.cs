@@ -22,7 +22,9 @@ namespace Squidex.Config.Identity
     $ curl
         -X POST '{0}' 
         -H 'Content-Type: application/x-www-form-urlencoded' 
-        -d 'grant_type=client_credentials&client_id=[APP_NAME]:[CLIENT_NAME]&client_secret=[CLIENT_SECRET]'";
+        -d 'grant_type=client_credentials&
+              client_id=[APP_NAME]:[CLIENT_NAME]&
+              client_secret=[CLIENT_SECRET]'";
 
         public static SwaggerOwinSettings ConfigureIdentity(this SwaggerOwinSettings settings, MyUrlsOptions options)
         {

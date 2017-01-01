@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure
 
         public override int GetHashCode()
         {
-            return (Type.GetHashCode() * 397) ^ (Identifier.GetHashCode());
+            return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
         }
     }
 }

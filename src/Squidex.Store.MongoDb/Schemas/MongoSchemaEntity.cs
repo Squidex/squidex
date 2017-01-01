@@ -45,6 +45,10 @@ namespace Squidex.Store.MongoDb.Schemas
         [BsonElement]
         public BsonDocument Schema { get; set; }
 
+        [BsonIgnoreIfDefault]
+        [BsonElement]
+        public bool IsPublished { get; set; }
+
         Schema ISchemaEntityWithSchema.Schema
         {
             get { return schema.Value; }

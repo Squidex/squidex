@@ -128,6 +128,16 @@ namespace Squidex.Store.MongoDb.Schemas
             return UpdateSchema(headers, s => s.Update(@event.Properties));
         }
 
+        protected Task On(SchemaPublished @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(headers, s => s.Publish());
+        }
+
+        protected Task On(SchemaUnpublished @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(headers, s => s.Publish());
+        }
+
         protected Task On(FieldAdded @event, EnvelopeHeaders headers)
         {
             var field = fieldRegistry.CreateField(@event.FieldId, @event.Name, @event.Properties);
@@ -159,6 +169,8 @@ namespace Squidex.Store.MongoDb.Schemas
             currentSchema = updater(currentSchema);
             
             Serialize(entity, currentSchema);
+
+            entity.IsPublished = currentSchema.IsPublished;
         }
 
         private void Serialize(MongoSchemaEntity entity, Schema schema)
