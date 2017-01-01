@@ -28,6 +28,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// Indicates if the schema is published.
+        /// </summary>
+        public bool IsPublished { get; set; }
+
+        /// <summary>
         /// The list of fields.
         /// </summary>
         [Required]

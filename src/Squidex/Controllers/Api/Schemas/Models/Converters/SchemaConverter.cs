@@ -26,6 +26,10 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             {
                 typeof(StringFieldProperties),
                 p => Convert((StringFieldProperties)p)
+            },
+            {
+                typeof(BooleanFieldProperties),
+                p => Convert((BooleanFieldProperties)p)
             }
         };
 
@@ -50,6 +54,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
 
             return dto;
+        }
+
+        private static FieldPropertiesDto Convert(BooleanFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new BooleanFieldPropertiesDto());
+
+            return result;
         }
 
         private static FieldPropertiesDto Convert(StringFieldProperties source)
