@@ -5,9 +5,6 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Injectable } from '@angular/core';
-
-@Injectable()
 export class ApiUrlConfig {
     public readonly value: string;
 
@@ -28,22 +25,6 @@ export class ApiUrlConfig {
     }
 }
 
-@Injectable()
-export class DecimalSeparatorConfig {
-    constructor(public readonly value: string) { }
-}
-
-@Injectable()
-export class ProductionModeConfig {
-    constructor(public readonly isProductionMode: boolean) { }
-}
-
-@Injectable()
-export class UserReportConfig {
-    constructor(public readonly siteId: string) { }
-}
-
-@Injectable()
 export class CurrencyConfig {
     constructor(
         public readonly code: string,
@@ -51,4 +32,16 @@ export class CurrencyConfig {
         public readonly showAfter: boolean = true
     ) {
     }
+}
+
+export class DecimalSeparatorConfig {
+    constructor(public readonly value: string) { }
+}
+
+export class ProductionModeConfig {
+    constructor(public readonly isProductionMode: boolean) { }
+}
+
+export class UserReportConfig {
+    constructor(public readonly siteId: string) { }
 }

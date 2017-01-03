@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import { DateTime } from 'framework';
 
@@ -19,7 +19,7 @@ import {
 } from './../';
 
 describe('HistoryService', () => {
-    let authService: Mock<AuthService>;
+    let authService: IMock<AuthService>;
     let languageService: HistoryService;
 
     beforeEach(() => {

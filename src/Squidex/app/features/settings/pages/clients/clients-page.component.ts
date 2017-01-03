@@ -94,7 +94,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         if (this.addClientForm.valid) {
             this.addClientForm.disable();
 
-            const dto = new CreateAppClientDto(this.addClientForm.get('name').value);
+            const requestDto = new CreateAppClientDto(this.addClientForm.get('name').value);
 
             const reset = () => {
                 this.addClientForm.reset();
@@ -102,7 +102,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             };
 
             this.appName()
-                .switchMap(app => this.appClientsService.postClient(app, dto))
+                .switchMap(app => this.appClientsService.postClient(app, requestDto))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.push(dto));
                     reset();

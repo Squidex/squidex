@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -17,7 +17,7 @@ import {
 } from './../';
 
 describe('UsersService', () => {
-    let authService: Mock<AuthService>;
+    let authService: IMock<AuthService>;
     let usersService: UsersService;
 
     beforeEach(() => {

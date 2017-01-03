@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { It, Mock, Times } from 'typemoq';
+import { It, IMock, Mock, Times } from 'typemoq';
 
 import {
     AddAppLanguageDto,
@@ -19,7 +19,7 @@ import {
 } from './../';
 
 describe('AppLanguagesService', () => {
-    let authService: Mock<AuthService>;
+    let authService: IMock<AuthService>;
     let appLanguagesService: AppLanguagesService;
 
     beforeEach(() => {

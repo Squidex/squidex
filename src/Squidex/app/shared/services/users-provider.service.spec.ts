@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     AuthService,
@@ -17,8 +17,8 @@ import {
 } from './../';
 
 describe('UsersProviderService', () => {
-    let authService: Mock<AuthService>;
-    let usersService: Mock<UsersService>;
+    let authService: IMock<AuthService>;
+    let usersService: IMock<UsersService>;
     let usersProviderService: UsersProviderService;
 
     beforeEach(() => {

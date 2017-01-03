@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { It, Mock, Times } from 'typemoq';
+import { It, IMock, Mock, Times } from 'typemoq';
 
 import {
     AppDto,
@@ -23,8 +23,8 @@ describe('AppsStoreService', () => {
     const oldApps = [new AppDto('id', 'old-name', now, now, 'Owner')];
     const newApp =   new AppDto('id', 'new-name', now, now, 'Owner');
 
-    let appsService: Mock<AppsService>;
-    let authService: Mock<AuthService>;
+    let appsService: IMock<AppsService>;
+    let authService: IMock<AuthService>;
 
     beforeEach(() => {
         appsService = Mock.ofType(AppsService);

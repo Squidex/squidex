@@ -158,7 +158,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
             const properties = createProperties(this.addFieldForm.get('type').value);
 
-            const dto = new AddFieldDto(this.addFieldForm.get('name').value, properties);
+            const requestDto = new AddFieldDto(this.addFieldForm.get('name').value, properties);
 
             const reset = () => {
                 this.addFieldForm.get('name').reset();
@@ -166,7 +166,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             };
 
             this.appName()
-                .switchMap(app => this.schemasService.postField(app, this.schemaName, dto))
+                .switchMap(app => this.schemasService.postField(app, this.schemaName, requestDto))
                 .subscribe(dto => {
                     const newField =
                         new FieldDto(parseInt(dto.id, 10),

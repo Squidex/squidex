@@ -7,12 +7,13 @@
 
 import { Injectable } from '@angular/core';
 
-@Injectable()
 export class TitlesConfig {
     constructor(
         public readonly value: { [key: string]: string },
-        public readonly prefix?: string,
-        public readonly suffix?: string) { }
+        public readonly prefix: string = null,
+        public readonly suffix: string = null
+    ) {
+    }
 }
 
 export const TitleServiceFactory = (titles: TitlesConfig) => {

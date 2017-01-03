@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Mock } from 'typemoq';
+import { IMock, Mock } from 'typemoq';
 
 import { AuthService } from 'shared';
 
@@ -13,7 +13,7 @@ import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 import { RouterMockup } from './router-mockup';
 
 describe('MustBeAuthenticatedGuard', () => {
-    let authService: Mock<AuthService>;
+    let authService: IMock<AuthService>;
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);

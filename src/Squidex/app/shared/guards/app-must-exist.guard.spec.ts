@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Mock } from 'typemoq';
+import { IMock, Mock } from 'typemoq';
 
 import { AppsStoreService } from 'shared';
 
@@ -13,7 +13,7 @@ import { AppMustExistGuard } from './app-must-exist.guard';
 import { RouterMockup } from './router-mockup';
 
 describe('AppMustExistGuard', () => {
-    let appsStore: Mock<AppsStoreService>;
+    let appsStore: IMock<AppsStoreService>;
 
     beforeEach(() => {
         appsStore = Mock.ofType(AppsStoreService);

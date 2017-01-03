@@ -64,9 +64,9 @@ export class AppFormComponent implements OnInit {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const dto = new CreateAppDto(this.createForm.get('name').value);
+            const request = new CreateAppDto(this.createForm.get('name').value);
 
-            this.appsStore.createApp(dto)
+            this.appsStore.createApp(request)
                 .subscribe(dto => {
                     this.createForm.reset();
                     this.created.emit(dto);

@@ -73,12 +73,13 @@ export class SchemaFormComponent implements OnInit {
             this.createForm.disable();
 
             const name = this.createForm.get('name').value;
-            const dto = new CreateSchemaDto(name);
             const now = DateTime.now();
+
+            const requestDto = new CreateSchemaDto(name);
 
             const me = `subject:${this.authService.user.id}`;
 
-            this.schemas.postSchema(this.appName, dto)
+            this.schemas.postSchema(this.appName, requestDto)
                 .subscribe(dto => {
                     this.createForm.reset();
                     this.created.emit(new SchemaDto(dto.id, name, now, now, me, me));
