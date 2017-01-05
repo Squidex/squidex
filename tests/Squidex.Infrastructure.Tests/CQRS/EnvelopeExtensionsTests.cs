@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.CQRS
             sut.SetActor(actor);
 
             Assert.Equal(actor, sut.Headers.Actor());
-            Assert.Equal(actor, RefToken.Parse(sut.Headers["User"].ToString()));
+            Assert.Equal(actor, RefToken.Parse(sut.Headers["Actor"].ToString()));
         }
 
         [Fact]

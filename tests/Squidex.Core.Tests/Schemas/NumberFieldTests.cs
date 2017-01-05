@@ -36,6 +36,16 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_valid()
+        {
+            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name" });
+
+            await sut.ValidateAsync(CreateValue(null), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_errors_if_number_is_required()
         {
             var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name", IsRequired = true });

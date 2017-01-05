@@ -45,7 +45,7 @@ exit /b %errorlevel%
 exit /b %errorlevel%
 
 :RunReportGeneratorOutput
-"%UserProfile%\.nuget\packages\ReportGenerator\2.4.5\tools\ReportGenerator.exe" ^
+"%UserProfile%\.nuget\packages\ReportGenerator\2.5.2\tools\ReportGenerator.exe" ^
 -reports:"%~dp0\GeneratedReports\*.xml" ^
 -targetdir:"%~dp0\GeneratedReports\Output"
 exit /b %errorlevel%

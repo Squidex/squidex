@@ -6,7 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Squidex.Infrastructure;
 using Xunit;
@@ -29,6 +32,48 @@ namespace Squidex.Core.Schemas
                 {
                     new ValidationError("Editor ist not a valid value", "Editor")
                 });
+        }
+
+        [Fact]
+        public void Should_set_or_freeze_sut()
+        {
+            var sut = new BooleanFieldProperties();
+
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            {
+                var value =
+                    property.PropertyType.GetTypeInfo().IsValueType ?
+                        Activator.CreateInstance(property.PropertyType) :
+                        null;
+
+                property.SetValue(sut, value);
+
+                var result = property.GetValue(sut);
+
+                Assert.Equal(value, result);
+            }
+
+            sut.Freeze();
+
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            {
+                var value =
+                    property.PropertyType.GetTypeInfo().IsValueType ?
+                        Activator.CreateInstance(property.PropertyType) :
+                        null;
+
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    try
+                    {
+                        property.SetValue(sut, value);
+                    }
+                    catch (Exception e)
+                    {
+                        throw e.InnerException;
+                    }
+                });
+            }
         }
     }
 }

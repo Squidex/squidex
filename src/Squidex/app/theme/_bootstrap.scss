@@ -149,6 +149,13 @@
     text-align: right;
 }
 
+select {
+    &.form-control {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
 .form-hint {
     & {
         font-size: .8rem;
@@ -192,10 +199,41 @@
     }
 }
 
+
+
 .modal {
+    &-content,
+    &-header {
+        border: 0;
+    }
+
+    &-header {
+        @include border-radius-top(.3rem);
+        background: $color-modal-header-background;
+
+        h4 {
+            color: $color-modal-header-foreground;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .close {
+            & {
+                @include opacity(1);
+                @include text-shadow-none;
+                color: $color-modal-header-foreground;
+                font-size: 1.6rem;
+                font-weight: 400;
+            }
+
+            &:hover {
+                color: lighten($color-modal-header-foreground, 15%);
+            }
+        }
+    }
+
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
-        border: 0;
     }
 
     &-dialog {

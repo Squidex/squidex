@@ -65,7 +65,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
         public Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is SchemaUpdated || 
+            if (@event.Payload is SchemaUpdated ||
                 @event.Payload is SchemaDeleted)
             {
                 var oldName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
@@ -73,6 +73,15 @@ namespace Squidex.Read.Schemas.Services.Implementations
                 if (oldName != null)
                 {
                     Cache.Remove(BuildModelCacheKey(@event.Headers.AppId(), oldName));
+                }
+            }
+            else
+            {
+                var schemaCreated = @event.Payload as SchemaCreated;
+
+                if (schemaCreated != null)
+                {
+                    Cache.Remove(BuildModelCacheKey(@event.Headers.AppId(), schemaCreated.Name));
                 }
             }
 

@@ -35,6 +35,16 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_valid()
+        {
+            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
+
+            await sut.ValidateAsync(CreateValue(null), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_errors_if_boolean_is_required()
         {
             var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name", IsRequired = true });

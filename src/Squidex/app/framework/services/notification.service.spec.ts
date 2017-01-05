@@ -24,6 +24,22 @@ describe('NotificationService', () => {
         expect(notificationService).toBeDefined();
     });
 
+    it('should create error', () => {
+        const notification = Notification.error('MyError');
+
+        expect(notification.displayTime).toBe(10000);
+        expect(notification.message).toBe('MyError');
+        expect(notification.messageType).toBe('error');
+    });
+
+    it('should create info', () => {
+        const notification = Notification.info('MyInfo');
+
+        expect(notification.displayTime).toBe(10000);
+        expect(notification.message).toBe('MyInfo');
+        expect(notification.messageType).toBe('info');
+    });
+
     it('should publish notification', () => {
         const notificationService = new NotificationService();
         const notification = Notification.error('Message');

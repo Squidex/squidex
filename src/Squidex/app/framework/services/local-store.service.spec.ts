@@ -56,4 +56,21 @@ describe('LocalStore', () => {
         expect(passedKey).toBe('mykey');
         expect(returnedVal).toBe('myval');
     });
+
+    it('should set and get from fallback value when local store failed', () => {
+        const localStoreService = new LocalStoreService();
+
+        localStoreService.configureStore({
+            setItem: (k: string, v: string) => {
+                throw 'Not supported';
+            },
+            getItem: (k: string) => {
+                throw 'Not supported';
+            }
+        });
+
+        localStoreService.set('mykey', 'myval');
+
+        expect(localStoreService.get('mykey')).toBe('myval');
+    });
 });
