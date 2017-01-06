@@ -36,6 +36,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Infrastructure.Test
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Core.Tests", "tests\Squidex.Core.Tests\Squidex.Core.Tests.xproj", "{FD0AFD44-7A93-4F9E-B5ED-72582392E435}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Infrastructure.MongoDb", "src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.xproj", "{6A811927-3C37-430A-90F4-503E37123956}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Infrastructure.RabbitMq", "src\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.xproj", "{3C9BA12D-F5F2-4355-8D30-8289E4D0752D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +86,14 @@ Global
 		{FD0AFD44-7A93-4F9E-B5ED-72582392E435}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD0AFD44-7A93-4F9E-B5ED-72582392E435}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD0AFD44-7A93-4F9E-B5ED-72582392E435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A811927-3C37-430A-90F4-503E37123956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A811927-3C37-430A-90F4-503E37123956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A811927-3C37-430A-90F4-503E37123956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A811927-3C37-430A-90F4-503E37123956}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C9BA12D-F5F2-4355-8D30-8289E4D0752D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C9BA12D-F5F2-4355-8D30-8289E4D0752D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C9BA12D-F5F2-4355-8D30-8289E4D0752D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C9BA12D-F5F2-4355-8D30-8289E4D0752D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +109,7 @@ Global
 		{9A3DEA7E-1681-4D48-AC5C-1F0DE421A203} = {4C6B06C2-6D77-4E0E-AE32-D7050236433A}
 		{7FD0A92B-7862-4BB1-932B-B52A9CACB56B} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{FD0AFD44-7A93-4F9E-B5ED-72582392E435} = {4C6B06C2-6D77-4E0E-AE32-D7050236433A}
+		{6A811927-3C37-430A-90F4-503E37123956} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+		{3C9BA12D-F5F2-4355-8D30-8289E4D0752D} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 	EndGlobalSection
 EndGlobal

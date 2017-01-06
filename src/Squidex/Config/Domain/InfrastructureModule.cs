@@ -13,8 +13,7 @@ using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure.CQRS.Autofac;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.EventStore;
-using Squidex.Store.MongoDb.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Config.Domain
 {
@@ -30,15 +29,11 @@ namespace Squidex.Config.Domain
                 .As<IActionContextAccessor>()
                 .SingleInstance();
 
-            builder.RegisterType<MongoStreamPositionStorage>()
-                .As<IStreamPositionStorage>()
-                .SingleInstance();
-
             builder.RegisterType<AutofacDomainObjectFactory>()
                 .As<IDomainObjectFactory>()
                 .SingleInstance();
 
-            builder.RegisterType<EventStoreDomainObjectRepository>()
+            builder.RegisterType<DefaultDomainObjectRepository>()
                 .As<IDomainObjectRepository>()
                 .SingleInstance();
 
@@ -50,7 +45,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<EventStoreBus>()
+            builder.RegisterType<EventBus>()
                 .AsSelf()
                 .SingleInstance();
 

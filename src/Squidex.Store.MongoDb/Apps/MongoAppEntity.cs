@@ -10,8 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps;
-using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Apps
 {

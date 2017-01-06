@@ -26,8 +26,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             Assert.Equal(command, sut.Command);
             Assert.Null(sut.Exception);
-            Assert.False(sut.IsSucceeded);
             Assert.False(sut.IsHandled);
+            Assert.False(sut.IsSucceeded);
+            Assert.False(sut.IsFailed);
         }
 
         [Fact]
@@ -39,8 +40,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             sut.Fail(exc);
 
             Assert.Equal(exc, sut.Exception);
-            Assert.False(sut.IsSucceeded);
             Assert.True(sut.IsHandled);
+            Assert.True(sut.IsFailed);
+            Assert.False(sut.IsSucceeded);
         }
 
         [Fact]
@@ -53,18 +55,20 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Null(sut.Exception);
             Assert.True(sut.IsSucceeded);
             Assert.True(sut.IsHandled);
+            Assert.False(sut.IsFailed);
         }
 
         [Fact]
-        public void Shoud_not_change_status_when_already_succeeded()
+        public void Should_replace_status_when_already_succeeded()
         {
             var sut = new CommandContext(command);
 
             sut.Succeed(Guid.NewGuid());
             sut.Fail(new Exception());
 
-            Assert.Null(sut.Exception);
+            Assert.NotNull(sut.Exception);
             Assert.True(sut.IsHandled);
+            Assert.True(sut.IsFailed);
             Assert.True(sut.IsSucceeded);
         }
 
@@ -77,12 +81,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
             sut.Succeed(guid);
 
             Assert.Equal(guid, sut.Result<Guid>());
-            Assert.True(sut.IsSucceeded);
             Assert.True(sut.IsHandled);
+            Assert.True(sut.IsSucceeded);
+            Assert.False(sut.IsFailed);
         }
 
         [Fact]
-        public void Shoud_not_change_status_when_already_failed()
+        public void Should_not_change_status_when_already_failed()
         {
             var sut = new CommandContext(command);
 
@@ -91,6 +96,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             Assert.NotNull(sut.Exception);
             Assert.True(sut.IsHandled);
+            Assert.True(sut.IsFailed);
             Assert.False(sut.IsSucceeded);
         }
     }

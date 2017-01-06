@@ -1,23 +1,27 @@
 ﻿// ==========================================================================
-//  TypeNameAttributeTest.cs
+//  TaskExtensionsTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public class TypeNameAttributeTest
+    public class TaskExtensionsTests
     {
         [Fact]
-        public void Should_instantiate()
+        public void Should_do_nothing_on_forget()
         {
-            var attribute = new TypeNameAttribute("MyTypeName");
+            var task = Task.FromResult(123);
 
-            Assert.Equal("MyTypeName", attribute.TypeName);
+            task.Forget();
+
+            Assert.Equal(123, task.Result);
         }
     }
 }

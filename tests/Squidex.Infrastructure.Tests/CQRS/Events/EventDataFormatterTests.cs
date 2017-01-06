@@ -10,30 +10,16 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class EventStoreFormatterTests
     {
         public sealed class MyEvent : IEvent
         {
             public string MyProperty { get; set; }
-        }
-
-        public sealed class MyReceivedEvent : IReceivedEvent
-        {
-            public int EventNumber { get; set; }
-
-            public string EventType { get; set; }
-
-            public byte[] Metadata { get; set; }
-
-            public byte[] Payload { get; set; }
-
-            public DateTime Created { get; set; }
         }
 
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
@@ -60,20 +46,11 @@ namespace Squidex.Infrastructure.CQRS.EventStore
             inputEvent.SetEventNumber(1);
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
-            var sut = new EventStoreFormatter(serializerSettings);
+            var sut = new EventDataFormatter(serializerSettings);
 
             var eventData = sut.ToEventData(inputEvent.To<IEvent>(), commitId);
 
-            var receivedEvent = new MyReceivedEvent
-            {
-                Payload = eventData.Data,
-                Created = inputEvent.Headers.Timestamp().ToDateTimeUtc(),
-                EventNumber = 1,
-                EventType = "event",
-                Metadata = eventData.Metadata
-            };
-
-            var outputEvent = sut.Parse(receivedEvent).To<MyEvent>();
+            var outputEvent = sut.Parse(eventData).To<MyEvent>();
 
             CompareHeaders(outputEvent.Headers, inputEvent.Headers);
 

@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
-using IdentityServer4.Stores.InMemory;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +49,7 @@ namespace Squidex.Config.Identity
 
             services.AddIdentityServer(options =>
                 {
-                    options.UserInteractionOptions.ErrorUrl = "/account/error/";
+                    options.UserInteraction.ErrorUrl = "/account/error/";
                 })
                 .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryApiResources(GetApiResources())

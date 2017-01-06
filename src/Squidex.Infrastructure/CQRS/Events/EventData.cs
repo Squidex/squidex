@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IStreamNameResolver.cs
+//  EventData.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,10 +8,16 @@
 
 using System;
 
-namespace Squidex.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface IStreamNameResolver
+    public class EventData
     {
-        string GetStreamName(Type aggregateType, Guid id);
+        public Guid EventId { get; set; }
+
+        public string Payload { get; set; }
+        
+        public string Metadata { get; set; }
+        
+        public string Type { get; set; }
     }
 }

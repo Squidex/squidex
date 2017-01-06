@@ -12,7 +12,7 @@ using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Squidex.Store.MongoDb.Utils;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Store.MongoDb.Infrastructure
 {

@@ -8,7 +8,9 @@
 
 using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using NJsonSchema;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NSwag;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
@@ -22,13 +24,13 @@ namespace Squidex.Config.Swagger
     {
         private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Description>.*)", RegexOptions.Compiled);
 
-        public bool Process(OperationProcessorContext context)
+        public async Task<bool> ProcessAsync(OperationProcessorContext context)
         {
             var hasOkResponse = false;
 
             var operation = context.OperationDescription.Operation;
 
-            var returnsDescription = context.MethodInfo.GetXmlDocumentation("returns") ?? string.Empty;
+            var returnsDescription = await context.MethodInfo.GetXmlDocumentationTagAsync("returns") ?? string.Empty;
 
             foreach (Match match in ResponseRegex.Matches(returnsDescription))
             {
@@ -51,7 +53,7 @@ namespace Squidex.Config.Swagger
                 }
             }
             
-            AddInternalErrorResponse(context, operation);
+            await AddInternalErrorResponseAsync(context, operation);
 
             if (!hasOkResponse)
             {
@@ -61,7 +63,7 @@ namespace Squidex.Config.Swagger
             return true;
         }
 
-        private static void AddInternalErrorResponse(OperationProcessorContext context, SwaggerOperation operation)
+        private static async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
         {
             if (operation.Responses.ContainsKey("500"))
             {
@@ -73,7 +75,7 @@ namespace Squidex.Config.Swagger
 
             var response = new SwaggerResponse { Description = "Operation failed." };
 
-            response.Schema = context.SwaggerGenerator.GenerateAndAppendSchemaFromType(errorType, errorSchema.IsNullable, null);
+            response.Schema = await context.SwaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
 
             operation.Responses.Add("500", response);
         }

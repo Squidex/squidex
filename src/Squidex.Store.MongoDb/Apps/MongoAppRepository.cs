@@ -18,6 +18,7 @@ using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Store.MongoDb.Utils;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Store.MongoDb.Apps
 {

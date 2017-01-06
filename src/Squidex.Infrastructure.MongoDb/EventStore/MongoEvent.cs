@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MongoEntity.cs
+//  MongoEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,25 +7,26 @@
 // ==========================================================================
 
 using System;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Read;
 
-namespace Squidex.Store.MongoDb.Utils
+namespace Squidex.Infrastructure.MongoDb.EventStore
 {
-    public abstract class MongoEntity : IEntity
+    public class MongoEvent
     {
-        [BsonId]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
-
         [BsonRequired]
-        [BsonElement]
-        public DateTime Created { get; set; }
+        public Guid EventId { get; set; }
 
-        [BsonRequired]
         [BsonElement]
-        public DateTime LastModified { get; set; }
+        [BsonRequired]
+        public string Payload { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public string Metadata { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public string Type { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MyEventStoreOptions.cs
+//  MyRabbitMqOptions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,16 +8,8 @@
 
 namespace Squidex.Config.EventStore
 {
-    public sealed class MyEventStoreOptions
+    public sealed class MyRabbitMqOptions
     {
-        public string IPAddress { get; set; }
-
-        public string Username { get; set; }
-
-        public string Password { get; set; }
-
-        public string Prefix { get; set; }
-
-        public int Port { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

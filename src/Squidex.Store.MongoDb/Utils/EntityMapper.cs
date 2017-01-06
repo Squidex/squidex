@@ -13,6 +13,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Read;
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable SuspiciousTypeConversion.Global
@@ -25,33 +26,33 @@ namespace Squidex.Store.MongoDb.Utils
         {
             var entity = new T();
 
-            AssignId(headers, entity, useAggregateId);
-            AssignAppId(headers, entity);
-            AssignCreated(headers, entity);
-            AssignCreatedBy(headers, entity);
+            UpdateWithId(headers, entity, useAggregateId);
+            UpdateWithAppId(headers, entity);
+            UpdateWithCreated(headers, entity);
+            UpdateWithCreatedBy(headers, entity);
 
             return Update(entity, headers);
         }
 
         public static T Update<T>(T entity, EnvelopeHeaders headers) where T : MongoEntity
         {
-            AssignLastModified(headers, entity);
-            AssignLastModifiedBy(headers, entity);
+            UpdateWithLastModified(headers, entity);
+            UpdateWithLastModifiedBy(headers, entity);
 
             return entity;
         }
 
-        private static void AssignCreated(EnvelopeHeaders headers, MongoEntity entity)
+        private static void UpdateWithCreated(EnvelopeHeaders headers, MongoEntity entity)
         {
             entity.Created = headers.Timestamp().ToDateTimeUtc();
         }
 
-        private static void AssignLastModified(EnvelopeHeaders headers, MongoEntity entity)
+        private static void UpdateWithLastModified(EnvelopeHeaders headers, MongoEntity entity)
         {
             entity.LastModified = headers.Timestamp().ToDateTimeUtc();
         }
 
-        private static void AssignCreatedBy(EnvelopeHeaders headers, MongoEntity entity)
+        private static void UpdateWithCreatedBy(EnvelopeHeaders headers, MongoEntity entity)
         {
             var createdBy = entity as ITrackCreatedByEntity;
 
@@ -61,7 +62,7 @@ namespace Squidex.Store.MongoDb.Utils
             }
         }
 
-        private static void AssignLastModifiedBy(EnvelopeHeaders headers, MongoEntity entity)
+        private static void UpdateWithLastModifiedBy(EnvelopeHeaders headers, MongoEntity entity)
         {
             var modifiedBy = entity as ITrackLastModifiedByEntity;
 
@@ -71,7 +72,7 @@ namespace Squidex.Store.MongoDb.Utils
             }
         }
 
-        private static void AssignAppId(EnvelopeHeaders headers, MongoEntity entity)
+        private static void UpdateWithAppId(EnvelopeHeaders headers, MongoEntity entity)
         {
             var appEntity = entity as IAppRefEntity;
 
@@ -81,7 +82,7 @@ namespace Squidex.Store.MongoDb.Utils
             }
         }
 
-        private static void AssignId(EnvelopeHeaders headers, MongoEntity entity, bool useAggregateId)
+        private static void UpdateWithId(EnvelopeHeaders headers, MongoEntity entity, bool useAggregateId)
         {
             if (useAggregateId)
             {

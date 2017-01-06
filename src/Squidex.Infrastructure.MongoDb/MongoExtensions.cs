@@ -9,7 +9,7 @@
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace Squidex.Store.MongoDb.Utils
+namespace Squidex.Infrastructure.MongoDb
 {
     public static class MongoExtensions
     {

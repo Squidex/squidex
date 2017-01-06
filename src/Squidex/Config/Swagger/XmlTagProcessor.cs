@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
 using NSwag.Annotations;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
@@ -31,7 +32,7 @@ namespace Squidex.Config.Swagger
 
                     if (tag != null)
                     {
-                        var description = controllerType.GetXmlSummary();
+                        var description = controllerType.GetXmlSummaryAsync().Result;
 
                         if (description != null)
                         {
@@ -47,7 +48,7 @@ namespace Squidex.Config.Swagger
             }
         }
 
-        public bool Process(OperationProcessorContext context)
+        public Task<bool> ProcessAsync(OperationProcessorContext context)
         {
             var tagAttribute = 
                 context.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
@@ -58,7 +59,7 @@ namespace Squidex.Config.Swagger
                 context.OperationDescription.Operation.Tags.Add(tagAttribute.Name);
             }
 
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

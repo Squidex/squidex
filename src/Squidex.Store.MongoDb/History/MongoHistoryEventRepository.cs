@@ -18,6 +18,7 @@ using Squidex.Read.History;
 using Squidex.Read.History.Repositories;
 using Squidex.Store.MongoDb.Utils;
 using System.Linq;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Store.MongoDb.History
 {

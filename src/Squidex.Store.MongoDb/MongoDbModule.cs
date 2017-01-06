@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.History.Repositories;
 using Squidex.Read.Schemas.Repositories;
@@ -23,7 +23,6 @@ using Squidex.Store.MongoDb.History;
 using Squidex.Store.MongoDb.Infrastructure;
 using Squidex.Store.MongoDb.Schemas;
 using Squidex.Store.MongoDb.Users;
-using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb
 {
@@ -64,10 +63,6 @@ namespace Squidex.Store.MongoDb
 
             builder.RegisterType<MongoPersistedGrantStore>()
                 .As<IPersistedGrantStore>()
-                .SingleInstance();
-
-            builder.RegisterType<MongoStreamPositionStorage>()
-                .As<IStreamPositionStorage>()
                 .SingleInstance();
 
             builder.RegisterType<MongoUserRepository>()

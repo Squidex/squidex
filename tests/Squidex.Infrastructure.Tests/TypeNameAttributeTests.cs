@@ -1,25 +1,23 @@
 ﻿// ==========================================================================
-//  IReceivedEvent.cs
+//  TypeNameAttributeTest.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure
 {
-    public interface IReceivedEvent
+    public class TypeNameAttributeTests
     {
-        int EventNumber { get; }
+        [Fact]
+        public void Should_instantiate()
+        {
+            var attribute = new TypeNameAttribute("MyTypeName");
 
-        string EventType { get; }
-
-        byte[] Metadata { get; }
-
-        byte[] Payload { get; }
-
-        DateTime Created { get; }
+            Assert.Equal("MyTypeName", attribute.TypeName);
+        }
     }
 }

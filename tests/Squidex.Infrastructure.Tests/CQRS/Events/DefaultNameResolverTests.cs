@@ -7,13 +7,14 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class DefaultNameResolverTests
     {
+        private readonly DefaultNameResolver sut = new DefaultNameResolver();
+
         private sealed class MyUser : DomainObject
         {
             public MyUser(Guid id, int version)
@@ -41,23 +42,21 @@ namespace Squidex.Infrastructure.CQRS.EventStore
         [Fact]
         public void Should_calculate_name()
         {
-            var sut = new DefaultNameResolver("Squidex");
             var user = new MyUser(Guid.NewGuid(), 1);
 
             var name = sut.GetStreamName(typeof(MyUser), user.Id);
 
-            Assert.Equal($"squidex-myUser-{user.Id}", name);
+            Assert.Equal($"myUser-{user.Id}", name);
         }
 
         [Fact]
         public void Should_calculate_name_and_remove_suffix()
         {
-            var sut = new DefaultNameResolver("Squidex");
             var user = new MyUserDomainObject(Guid.NewGuid(), 1);
 
             var name = sut.GetStreamName(typeof(MyUserDomainObject), user.Id);
 
-            Assert.Equal($"squidex-myUser-{user.Id}", name);
+            Assert.Equal($"myUser-{user.Id}", name);
         }
     }
 }

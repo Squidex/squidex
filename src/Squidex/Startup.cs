@@ -71,17 +71,18 @@ namespace Squidex
 
             services.Configure<MyMongoDbOptions>(
                 Configuration.GetSection("stores:mongoDb"));
-            services.Configure<MyEventStoreOptions>(
-                Configuration.GetSection("stores:eventStore"));
+            services.Configure<MyRabbitMqOptions>(
+                Configuration.GetSection("stores:rabbitMq"));
             services.Configure<MyUrlsOptions>(
                 Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 Configuration.GetSection("identity"));
 
             var builder = new ContainerBuilder();
-            builder.RegisterModule<EventStoreModule>();
             builder.RegisterModule<InfrastructureModule>();
+            builder.RegisterModule<MongoDbEventStoreModule>();
             builder.RegisterModule<MongoDbModule>();
+            builder.RegisterModule<RabbitMqEventChannelModule>();
             builder.RegisterModule<ReadModule>();
             builder.RegisterModule<WebModule>();
             builder.RegisterModule<WriteModule>();

@@ -23,7 +23,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public bool IsHandled
         {
-            get { return result != null || exception != null; }
+            get { return IsSucceeded || IsFailed; }
+        }
+
+        public bool IsFailed
+        {
+            get { return exception != null; }
         }
 
         public bool IsSucceeded
@@ -55,7 +60,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public void Fail(Exception handlerException)
         {
-            if (IsHandled)
+            if (IsFailed)
             {
                 return;
             }

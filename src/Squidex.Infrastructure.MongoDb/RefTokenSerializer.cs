@@ -8,11 +8,10 @@
 
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Store.MongoDb.Utils
+namespace Squidex.Infrastructure.MongoDb
 {
     public class RefTokenSerializer : SerializerBase<RefToken>
     {

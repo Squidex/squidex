@@ -90,6 +90,15 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
+        public void AssignContributor_should_throw_if_user_already_contributor()
+        {
+            CreateApp();
+            sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor });
+
+            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+        }
+
+        [Fact]
         public void AssignContributor_should_create_events()
         {
             CreateApp();

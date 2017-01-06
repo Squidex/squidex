@@ -7,21 +7,12 @@
 // ==========================================================================
 
 using System;
-using System.Globalization;
 
-namespace Squidex.Infrastructure.CQRS.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class DefaultNameResolver : IStreamNameResolver
     {
         private const string Suffix = "DomainObject";
-        private readonly string prefix;
-        
-        public DefaultNameResolver(string prefix)
-        {
-            Guard.NotNullOrEmpty(prefix, nameof(prefix));
-
-            this.prefix = prefix.ToLowerInvariant();
-        }
 
         public string GetStreamName(Type aggregateType, Guid id)
         {
@@ -32,7 +23,7 @@ namespace Squidex.Infrastructure.CQRS.EventStore
                 typeName = typeName.Substring(0, typeName.Length - Suffix.Length);
             }
 
-            return string.Format(CultureInfo.InvariantCulture, "{0}-{1}-{2}", prefix, typeName, id);
+            return $"{typeName}-{id}";
         }
     }
 }

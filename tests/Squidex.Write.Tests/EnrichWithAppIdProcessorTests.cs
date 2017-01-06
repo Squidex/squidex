@@ -12,6 +12,7 @@ using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Write.Apps;
 using Xunit;
 
 namespace Squidex.Write
@@ -40,6 +41,18 @@ namespace Squidex.Write
             await sut.ProcessEventAsync(envelope, null, new MyNormalCommand());
 
             Assert.False(envelope.Headers.Contains("AppId"));
+        }
+
+        [Fact]
+        public async Task Should_attach_app_id_from_domain_object()
+        {
+            var appId = Guid.NewGuid();
+
+            var envelope = new Envelope<IEvent>(new MyEvent());
+
+            await sut.ProcessEventAsync(envelope, new AppDomainObject(appId, 1), new MyNormalCommand());
+
+            Assert.Equal(appId, envelope.Headers.AppId());
         }
 
         [Fact]

@@ -17,7 +17,7 @@ namespace Squidex.Core.Schemas
     {
         private readonly FieldRegistry sut = new FieldRegistry();
 
-        public sealed class InvalidProperties : FieldProperties
+        private sealed class InvalidProperties : FieldProperties
         {
             protected override IEnumerable<ValidationError> ValidateCore()
             {

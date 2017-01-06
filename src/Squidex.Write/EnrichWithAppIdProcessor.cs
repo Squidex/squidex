@@ -25,7 +25,6 @@ namespace Squidex.Write
             if (appDomainObject != null)
             {
                 @event.SetAppId(aggregate.Id);
-
             }
             else
             {

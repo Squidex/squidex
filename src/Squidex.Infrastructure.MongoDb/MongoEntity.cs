@@ -1,29 +1,30 @@
 ﻿// ==========================================================================
-//  MongoStreamPositionEntity.cs
+//  MongoEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Store.MongoDb.Infrastructure
+namespace Squidex.Infrastructure.MongoDb
 {
-    [DataContract]
-    public class MongoStreamPositionEntity
+    public abstract class MongoEntity
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string SubscriptionName { get; set; }
+        public DateTime Created { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public int? Position { get; set; }
+        public DateTime LastModified { get; set; }
     }
 }

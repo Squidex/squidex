@@ -8,8 +8,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Config.EventStore
 {
@@ -17,9 +16,7 @@ namespace Squidex.Config.EventStore
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            var options = app.ApplicationServices.GetRequiredService<IOptions<MyEventStoreOptions>>().Value;
-
-            app.ApplicationServices.GetService<EventStoreBus>().Subscribe(options.Prefix);
+            app.ApplicationServices.GetService<EventBus>().Subscribe();
 
             return app;
         }

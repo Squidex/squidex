@@ -13,7 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Squidex.Core.Schemas;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.EventStore;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Config.Domain
@@ -52,7 +52,7 @@ namespace Squidex.Config.Domain
 
             services.AddSingleton(t => CreateSettings());
             services.AddSingleton(t => CreateSerializer(t.GetRequiredService<JsonSerializerSettings>()));
-            services.AddSingleton<EventStoreFormatter>();
+            services.AddSingleton<EventDataFormatter>();
 
             return services;
         }

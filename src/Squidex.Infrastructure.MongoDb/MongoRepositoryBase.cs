@@ -9,9 +9,8 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
 
-namespace Squidex.Store.MongoDb.Utils
+namespace Squidex.Infrastructure.MongoDb
 {
     public abstract class MongoRepositoryBase<TEntity>
     {
