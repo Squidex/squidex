@@ -28,6 +28,10 @@ namespace Squidex.Store.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
+        public string Label { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public Guid AppId { get; set; }
         
         [BsonRequired]
@@ -46,7 +50,7 @@ namespace Squidex.Store.MongoDb.Schemas
         [BsonElement]
         public BsonDocument Schema { get; set; }
 
-        [BsonIgnoreIfDefault]
+        [BsonRequired]
         [BsonElement]
         public bool IsPublished { get; set; }
 

@@ -1,20 +1,22 @@
 ﻿// ==========================================================================
-//  ISchemaProvider.cs
+//  IHistoryEventCreator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.Schemas.Services
+namespace Squidex.Read.History
 {
-    public interface ISchemaProvider
+    public interface IHistoryEventsCreator
     {
-        Task<string> FindSchemaNameByIdAsync(Guid schemaId);
+        IReadOnlyDictionary<string, string> Texts { get; }
 
-        Task<Guid?> FindSchemaIdByNameAsync(Guid appId, string name);
+        Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event);
     }
 }

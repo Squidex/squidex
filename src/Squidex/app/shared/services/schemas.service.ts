@@ -57,7 +57,8 @@ export class SchemaDto {
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly createdBy: string,
-        public readonly lastModifiedBy: string
+        public readonly lastModifiedBy: string,
+        public readonly isPublished: boolean
     ) {
     }
 }
@@ -70,7 +71,10 @@ export class SchemaDetailsDto {
         public readonly lastModified: DateTime,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
-        public readonly fields: FieldDto[]
+        public readonly fields: FieldDto[],
+        public readonly label: string,
+        public readonly hints: string,
+        public readonly isPublished: boolean
     ) {
     }
 }
@@ -190,7 +194,8 @@ export class SchemasService {
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
                             item.createdBy,
-                            item.lastModifiedBy);
+                            item.lastModifiedBy,
+                            item.isPublished);
                     });
                 })
                 .catch(response => handleError('Failed to load schemas. Please reload.', response));
@@ -223,7 +228,10 @@ export class SchemasService {
                         DateTime.parseISO_UTC(response.lastModified),
                         response.createdBy,
                         response.lastModifiedBy,
-                        fields);
+                        fields,
+                        response.label,
+                        response.hints,
+                        response.isPublished);
                 })
                 .catch(response => handleError('Failed to load schema. Please reload.', response));
     }
@@ -248,6 +256,27 @@ export class SchemasService {
                     return new EntityCreatedDto(response.id);
                 })
                 .catch(response => handleError('Failed to add field. Please reload.', response));
+    }
+
+    public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/`);
+
+        return this.authService.authPut(url, dto)
+                .catch(response => handleError('Failed to update schema. Please reload.', response));
+    }
+
+    public publishSchema(appName: string, schemaName: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish/`);
+
+        return this.authService.authPut(url, {})
+                .catch(response => handleError('Failed to publish schema. Please reload.', response));
+    }
+
+    public unpublishSchema(appName: string, schemaName: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish/`);
+
+        return this.authService.authPut(url, {})
+                .catch(response => handleError('Failed to unpublish schema. Please reload.', response));
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto): Observable<any> {

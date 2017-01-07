@@ -8,25 +8,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events.Apps;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.History;
 using Squidex.Read.History.Repositories;
 using Squidex.Store.MongoDb.Utils;
-using System.Linq;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Store.MongoDb.History
 {
     public class MongoHistoryEventRepository : MongoRepositoryBase<MongoHistoryEventEntity>, IHistoryEventRepository, ICatchEventConsumer
     {
-        public MongoHistoryEventRepository(IMongoDatabase database) 
+        private readonly List<IHistoryEventsCreator> creators;
+        private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
+
+        public MongoHistoryEventRepository(IMongoDatabase database, IEnumerable<IHistoryEventsCreator> creators) 
             : base(database)
         {
+            this.creators = creators.ToList();
+
+            foreach (var creator in this.creators)
+            {
+                foreach (var text in creator.Texts)
+                {
+                    texts[text.Key] = text.Value;
+                }
+            }
         }
 
         protected override string CollectionName()
@@ -47,102 +57,26 @@ namespace Squidex.Store.MongoDb.History
             var entities =
                 await Collection.Find(x => x.AppId == appId && x.Channel.StartsWith(channelPrefix)).SortByDescending(x => x.Created).Limit(count).ToListAsync();
 
-            return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, MessagesEN.Texts)).ToList();
+            return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
         }
 
-        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        public async Task On(Envelope<IEvent> @event)
         {
-            return Collection.CreateAsync(headers, x =>
+            foreach (var creator in creators)
             {
-                const string channel = "settings.contributors";
+                var message = await creator.CreateEventAsync(@event);
 
-                x.Setup<AppContributorAssigned>(headers, channel)
-                    .AddParameter("Contributor", @event.ContributorId)
-                    .AddParameter("Permission", @event.Permission.ToString());
-            }, false);
-        }
+                if (message != null)
+                {
+                    await Collection.CreateAsync(@event.Headers, x =>
+                    {
+                        x.Channel = message.Channel;
+                        x.Message = message.Message;
 
-        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.contributors";
-
-                x.Setup<AppContributorRemoved>(headers, channel)
-                    .AddParameter("Contributor", @event.ContributorId);
-            }, false);
-        }
-
-        protected Task On(AppClientRenamed @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.clients";
-
-                x.Setup<AppClientRenamed>(headers, channel)
-                    .AddParameter("Id", @event.Id)
-                    .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id);
-            }, false);
-        }
-
-        protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.clients";
-
-                x.Setup<AppClientAttached>(headers, channel)
-                    .AddParameter("Id", @event.Id);
-            }, false);
-        }
-
-        protected Task On(AppClientRevoked @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.clients";
-
-                x.Setup<AppClientRevoked>(headers, channel)
-                    .AddParameter("Id", @event.Id);
-            }, false);
-        }
-
-        protected Task On(AppLanguageAdded @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.languages";
-
-                x.Setup<AppLanguageAdded>(headers, channel)
-                    .AddParameter("Language", @event.Language.EnglishName);
-            }, false);
-        }
-
-        protected Task On(AppLanguageRemoved @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.languages";
-
-                x.Setup<AppLanguageRemoved>(headers, channel)
-                    .AddParameter("Language", @event.Language.EnglishName);
-            }, false);
-        }
-
-        protected Task On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
-        {
-            return Collection.CreateAsync(headers, x =>
-            {
-                const string channel = "settings.languages";
-
-                x.Setup<AppMasterLanguageSet>(headers, channel)
-                    .AddParameter("Language", @event.Language.EnglishName);
-            }, false);
-        }
-
-        public Task On(Envelope<IEvent> @event)
-        {
-            return this.DispatchActionAsync(@event.Payload, @event.Headers);
+                        x.Parameters = message.Parameters.ToDictionary(p => p.Key, p => p.Value);
+                    }, false);
+                }
+            }
         }
     }
 }

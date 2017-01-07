@@ -15,6 +15,7 @@ import {
     AppComponentBase,
     AppsStoreService,
     createProperties,
+    fadeAnimation,
     FieldDto,
     HistoryChannelUpdated,
     ImmutableArray,
@@ -25,10 +26,15 @@ import {
     UsersProviderService
 } from 'shared';
 
+import { SchemaUpdated } from './../messages';
+
 @Component({
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
-    templateUrl: './schema-page.component.html'
+    templateUrl: './schema-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class SchemaPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private routerSubscription: Subscription;
@@ -41,6 +47,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
     public schemaName: string;
     public schemaFields = ImmutableArray.empty<FieldDto>();
+
+    public isPublished: boolean;
 
     public addFieldForm: FormGroup =
         this.formBuilder.group({
@@ -84,6 +92,29 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             .switchMap(app => this.schemasService.getSchema(app, this.schemaName)).retry(2)
             .subscribe(dto => {
                 this.schemaFields = ImmutableArray.of(dto.fields);
+                this.isPublished = dto.isPublished;
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public publish() {
+        this.appName()
+            .switchMap(app => this.schemasService.publishSchema(app, this.schemaName)).retry(2)
+            .subscribe(() => {
+                this.isPublished = true;
+                this.updateAll(this.schemaFields);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public unpublish() {
+        this.appName()
+            .switchMap(app => this.schemasService.unpublishSchema(app, this.schemaName)).retry(2)
+            .subscribe(() => {
+                this.isPublished = false;
+                this.updateAll(this.schemaFields);
             }, error => {
                 this.notifyError(error);
             });
@@ -133,7 +164,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         this.appName()
             .switchMap(app => this.schemasService.deleteField(app, this.schemaName, field.fieldId)).retry(2)
             .subscribe(() => {
-                this.updateFields(this.schemaFields.remove(field));
+                this.updateAll(this.schemaFields.remove(field));
             }, error => {
                 this.notifyError(error);
             });
@@ -176,7 +207,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
                             false,
                             properties);
 
-                    this.updateFields(this.schemaFields.push(newField));
+                    this.updateAll(this.schemaFields.push(newField));
                     reset();
                 }, error => {
                     this.notifyError(error);
@@ -190,13 +221,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public updateField(field: FieldDto, newField: FieldDto) {
-        this.updateFields(this.schemaFields.replace(field, newField));
+        this.updateAll(this.schemaFields.replace(field, newField));
     }
 
-    private updateFields(fields: ImmutableArray<FieldDto>) {
+    private updateAll(fields: ImmutableArray<FieldDto>) {
         this.schemaFields = fields;
 
         this.messageBus.publish(new HistoryChannelUpdated());
+        this.messageBus.publish(new SchemaUpdated(this.schemaName, this.isPublished));
     }
 }
 

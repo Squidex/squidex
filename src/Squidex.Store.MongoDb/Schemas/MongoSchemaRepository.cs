@@ -136,7 +136,7 @@ namespace Squidex.Store.MongoDb.Schemas
 
         protected Task On(SchemaUnpublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.Publish());
+            return UpdateSchema(headers, s => s.Unpublish());
         }
 
         protected Task On(FieldAdded @event, EnvelopeHeaders headers)
@@ -171,6 +171,7 @@ namespace Squidex.Store.MongoDb.Schemas
             
             Serialize(entity, currentSchema);
 
+            entity.Label = currentSchema.Properties.Label;
             entity.IsPublished = currentSchema.IsPublished;
         }
 

@@ -5,21 +5,26 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
+    DateTime,
     fadeAnimation,
     ImmutableArray,
+    MessageBus,
     ModalView,
     NotificationService,
     SchemaDto,
     SchemasService,
     UsersProviderService
 } from 'shared';
+
+import { SchemaUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -29,7 +34,9 @@ import {
         fadeAnimation
     ]
 })
-export class SchemasPageComponent extends AppComponentBase {
+export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private messageSubscription: Subscription;
+
     public modalDialog = new ModalView();
 
     public schemas = new BehaviorSubject(ImmutableArray.empty<SchemaDto>());
@@ -57,13 +64,39 @@ export class SchemasPageComponent extends AppComponentBase {
         });
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
-        private readonly schemasService: SchemasService
+        private readonly schemasService: SchemasService,
+        private readonly messageBus: MessageBus,
+        private readonly authService: AuthService
     ) {
         super(apps, notifications, users);
     }
 
     public ngOnInit() {
         this.load();
+
+        this.messageSubscription =
+            this.messageBus.of(SchemaUpdated).subscribe(message => {
+                const schemas = this.schemas.value;
+                const oldSchema = schemas.find(i => i.name === message.name);
+
+                if (oldSchema) {
+                    const me = `subject:${this.authService.user.id}`;
+
+                    const newSchema =
+                        new SchemaDto(
+                            oldSchema.id,
+                            oldSchema.name,
+                            oldSchema.created,
+                            DateTime.now(),
+                            oldSchema.createdBy, me,
+                            message.isPublished);
+                    this.schemas.next(schemas.replace(oldSchema, newSchema));
+                }
+            });
+    }
+
+    public ngOnDestroy() {
+        this.messageSubscription.unsubscribe();
     }
 
     public load() {

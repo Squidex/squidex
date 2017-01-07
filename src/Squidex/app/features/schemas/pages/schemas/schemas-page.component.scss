@@ -2,8 +2,8 @@
 @import '_mixins';
 
 .panel {
-    min-width: 450px;
-    max-width: 450px;
+    min-width: 480px;
+    max-width: 480px;
 }
 
 .panel-header {
@@ -139,6 +139,20 @@
         color: $color-dark-foreground-selected;
         font-size: 1rem;
         font-weight: normal;
+    }
+
+    &-published {
+        & {
+            @include circle(.5rem);
+            display: inline-block;
+            border: 0;
+            background: $color-theme-green;
+            margin-left: .4rem;
+        }
+
+        &.unpublished {
+            background: $color-theme-error;
+        }
     }
 
     &-user {

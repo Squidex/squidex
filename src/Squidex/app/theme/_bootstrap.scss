@@ -204,6 +204,10 @@
         border: 0;
     }
 
+    &-backdrop {
+        @include opacity(.5);
+    }
+
     &-header {
         @include border-radius-top(.3rem);
         background: $color-modal-header-background;
@@ -231,9 +235,14 @@
 
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
+        @include border-radiusn(.4rem, .35rem, .35rem, .4rem);
     }
 
     &-dialog {
+        & {
+            z-index: 1100;
+        }
+
         @media (min-width: 576px) {
             margin-top: 70px;
         }

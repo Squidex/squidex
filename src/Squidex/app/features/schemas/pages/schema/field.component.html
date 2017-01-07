@@ -71,6 +71,18 @@
 
             <div class="field-details-tab" [class.hidden]="selectedTab !== 0">
                 <div class="form-group row">
+                    <label for="field-label" class="col-xs-3 col-form-label">Name</label>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="form-control" id="field-label" readonly [ngModel]="field.name" [ngModelOptions]="{standalone: true}" />
+                        
+                        <span class="form-hint">
+                            The name of the field in the API response.
+                        </span>
+                    </div>                        
+                </div>
+
+                <div class="form-group row">
                     <label for="field-label" class="col-xs-3 col-form-label">Label</label>
 
                     <div class="col-xs-6">

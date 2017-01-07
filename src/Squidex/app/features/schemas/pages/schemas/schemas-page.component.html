@@ -38,6 +38,8 @@
                             </div>
                             <div class="col-xs-4 schema-col-right">
                                 <span class="schema-modified">{{schema.lastModified | fromNow}}</span>
+
+                                <span class="schema-published" [class.unpublished]="!schema.isPublished"></span>
                             </div>
                         </div>
                     </div>
@@ -48,24 +50,25 @@
 </div>
 
 <div class="modal" *sqxModalView="modalDialog" [@fade]>
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
 
-				<h4 class="modal-title">Create Schema</h4>
-			</div>
+                <h4 class="modal-title">Create Schema</h4>
+            </div>
 
-			<div class="modal-body">
+            <div class="modal-body">
                 <sqx-schema-form
                     [appName]="appName() | async"
                     (created)="onSchemaCreationCompleted($event)"
                     (cancelled)="modalDialog.hide()"></sqx-schema-form>
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <router-outlet></router-outlet>

@@ -35,6 +35,8 @@ namespace Squidex.Core.Schemas.Json
         {
             public string Name;
 
+            public bool IsPublished;
+
             public SchemaProperties Properties;
 
             public Dictionary<long, FieldModel> Fields;
@@ -52,7 +54,7 @@ namespace Squidex.Core.Schemas.Json
 
         public JToken Serialize(Schema schema)
         {
-            var model = new SchemaModel { Name = schema.Name, Properties = schema.Properties };
+            var model = new SchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
 
             model.Fields =
                 schema.Fields
@@ -75,6 +77,11 @@ namespace Squidex.Core.Schemas.Json
             var model = token.ToObject<SchemaModel>(serializer);
 
             var schema = Schema.Create(model.Name, model.Properties);
+
+            if (model.IsPublished)
+            {
+                schema = schema.Publish();
+            }
 
             foreach (var kvp in model.Fields)
             {

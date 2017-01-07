@@ -3,9 +3,16 @@
 
 .panel {
     min-width: 760px;
-    max-width: 700px;
+    max-width: 760px;
 }
 
 .panel-content {
     overflow-y: scroll;
+}
+
+.btn-publishing {
+    &.disabled,
+    &:disabled {
+        @include opacity(1);
+    }
 }

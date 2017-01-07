@@ -117,6 +117,15 @@ namespace Squidex.Store.MongoDb.Utils
             return collection.InsertOneIfNotExistsAsync(entity);
         }
 
+        public static async Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Func<T, Task> updater, bool useAggregateId = true) where T : MongoEntity, new()
+        {
+            var entity = Create<T>(headers, useAggregateId);
+
+            await updater(entity);
+
+            await collection.InsertOneIfNotExistsAsync(entity);
+        }
+
         public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater) where T : MongoEntity
         {
             var entity = await collection.Find(t => t.Id == headers.AggregateId()).FirstOrDefaultAsync();

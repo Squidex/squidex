@@ -11,6 +11,8 @@ namespace Squidex.Read.Schemas.Repositories
     {
         string Name { get; }
 
+        string Label { get; }
+
         bool IsPublished { get; }
     }
 }

@@ -82,7 +82,7 @@ export class SchemaFormComponent implements OnInit {
             this.schemas.postSchema(this.appName, requestDto)
                 .subscribe(dto => {
                     this.createForm.reset();
-                    this.created.emit(new SchemaDto(dto.id, name, now, now, me, me));
+                    this.created.emit(new SchemaDto(dto.id, name, now, now, me, me, false));
                 }, error => {
                     this.reset();
                     this.creationError = error.displayMessage;

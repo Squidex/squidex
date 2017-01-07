@@ -11,13 +11,17 @@ import { Subscription } from 'rxjs';
 import {
     AppDto,
     AppsStoreService,
+    fadeAnimation,
     ModalView
 } from 'shared';
 
 @Component({
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
-    templateUrl: './apps-page.component.html'
+    templateUrl: './apps-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class AppsPageComponent implements OnInit, OnDestroy {
     private appsSubscription: Subscription;

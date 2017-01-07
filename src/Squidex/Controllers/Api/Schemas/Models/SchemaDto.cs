@@ -27,6 +27,12 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// Optional label for the editor.
+        /// </summary>
+        [StringLength(100)]
+        public string Label { get; set; }
+
+        /// <summary>
         /// Indicates if the schema is published.
         /// </summary>
         public bool IsPublished { get; set; }
