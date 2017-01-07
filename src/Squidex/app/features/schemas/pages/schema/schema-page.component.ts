@@ -35,7 +35,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
     public fieldTypes: string[] = [
         'string',
-        'number'
+        'number',
+        'boolean'
     ];
 
     public schemaName: string;

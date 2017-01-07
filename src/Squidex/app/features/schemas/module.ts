@@ -16,6 +16,8 @@ import {
 
 import {
     FieldComponent,
+    BooleanUIComponent,
+    BooleanValidationComponent,
     NumberUIComponent,
     NumberValidationComponent,
     SchemaFormComponent,
@@ -57,6 +59,8 @@ const routes: Routes = [
     ],
     declarations: [
         FieldComponent,
+        BooleanUIComponent,
+        BooleanValidationComponent,
         NumberUIComponent,
         NumberValidationComponent,
         SchemaFormComponent,

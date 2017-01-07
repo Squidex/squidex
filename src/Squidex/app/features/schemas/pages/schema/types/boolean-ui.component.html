@@ -1,0 +1,41 @@
+<div [formGroup]="editForm">
+    <div class="form-group row">
+        <label for="field-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
+
+        <div class="col-xs-6">
+            <div class="errors-box" *ngIf="editForm.controls.placeholder.invalid && editForm.controls.placeholder.touched" [@fade]>
+                <div class="errors">
+                    <span *ngIf="editForm.controls.placeholder.hasError('maxlength')">
+                        Placeholder can not have more than 100 characters.
+                    </span>
+                </div>
+            </div>
+
+            <input type="text" class="form-control" id="field-placeholder" maxlength="100" formControlName="placeholder" />
+
+            <span class="form-hint">
+                Define the placeholder for the input control.
+            </span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="field-editor" class="col-xs-3 col-form-label">Editor</label>
+
+        <div class="col-xs-9">
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Checkbox'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Checkbox" />
+
+                <i class="icon-control-checkbox"></i>
+
+                <span class="radio-label">Checkbox</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Toggle'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Toggle" />
+
+                <i class="icon-control-toggle"></i>
+
+                <span class="radio-label" clas>Toggle</span>
+            </label>
+        </div>
+    </div>
+</div>

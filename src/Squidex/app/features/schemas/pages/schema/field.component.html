@@ -119,6 +119,9 @@
                     <div *ngSwitchCase="'string'">
                         <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
                     </div>
+                    <div *ngSwitchCase="'boolean'">
+                        <sqx-boolean-validation [editForm]="editForm" [properties]="field.properties"></sqx-boolean-validation>
+                    </div>
                 </div>
             </div>
 
@@ -129,6 +132,9 @@
                     </div>
                     <div *ngSwitchCase="'string'">
                         <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
+                    </div>
+                    <div *ngSwitchCase="'boolean'">
+                        <sqx-boolean-ui [editForm]="editForm" [properties]="field.properties"></sqx-boolean-ui>
                     </div>
                 </div>
             </div>

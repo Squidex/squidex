@@ -24,20 +24,20 @@ export function createProperties(fieldType: string, values: {} | null = null): F
         case 'number':
             properties =
                 new NumberFieldPropertiesDto(
-                    undefined, undefined, undefined, false,
-                    undefined, undefined, undefined, undefined, undefined);
+                    undefined, undefined, undefined, false, 'Input',
+                    undefined, undefined, undefined, undefined);
             break;
         case 'string':
             properties =
                 new StringFieldPropertiesDto(
-                    undefined, undefined, undefined, false,
-                    undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+                    undefined, undefined, undefined, false, 'Input',
+                    undefined, undefined, undefined, undefined, undefined, undefined);
             break;
         case 'boolean':
             properties =
                 new BooleanFieldPropertiesDto(
-                    undefined, undefined, undefined, false,
-                    undefined, undefined);
+                    undefined, undefined, undefined, false, 'Checkbox',
+                    undefined);
             break;
         default:
             throw 'Invalid properties type';
