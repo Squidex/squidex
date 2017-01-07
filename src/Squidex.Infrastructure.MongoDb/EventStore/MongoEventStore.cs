@@ -18,6 +18,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
@@ -104,15 +105,11 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
         public async Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events)
         {
-            var allCommits =
-                await Collection.Find(c => c.EventStream == streamName)
-                    .Project<BsonDocument>(Projection.Include(x => x.EventCount))
-                    .ToListAsync();
+            var currentVersion = await GetEventVersionAsync(streamName);
 
-            var currentVersion = allCommits.Sum(x => x["EventCount"].ToInt32()) - 1;
             if (currentVersion != expectedVersion)
             {
-                throw new InvalidOperationException($"Current version: {currentVersion}, expected version: {expectedVersion}");
+                throw new WrongEventVersionException(currentVersion, expectedVersion);
             }
 
             var now = DateTime.UtcNow;
@@ -130,8 +127,37 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             {
                 commit.EventCount = commit.Events.Count;
 
-                await Collection.InsertOneAsync(commit);
+                try
+                {
+                    await Collection.InsertOneAsync(commit);
+                }
+                catch (MongoWriteException e)
+                {
+                    if (e.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+                    {
+                        currentVersion = await GetEventVersionAsync(streamName);
+
+                        if (currentVersion != expectedVersion)
+                        {
+                            throw new WrongEventVersionException(currentVersion, expectedVersion);
+                        }
+                    }
+
+                    throw;
+                }
             }
+        }
+
+        private async Task<int> GetEventVersionAsync(string streamName)
+        {
+            var allCommits =
+                await Collection.Find(c => c.EventStream == streamName)
+                    .Project<BsonDocument>(Projection.Include(x => x.EventCount))
+                    .ToListAsync();
+
+            var currentVersion = allCommits.Sum(x => x["EventCount"].ToInt32()) - 1;
+
+            return currentVersion;
         }
     }
 }

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import {
     AuthService,
@@ -22,7 +23,7 @@ import {
     ]
 })
 export class ProfileMenuComponent implements OnInit, OnDestroy {
-    private authenticationSubscription: any | null = null;
+    private authenticationSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);
 

@@ -6,8 +6,9 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
-import { AppsStoreService, LocalStoreService } from 'shared';
+import { AppsStoreService } from 'shared';
 
 @Component({
     selector: 'sqx-left-menu',
@@ -15,20 +16,11 @@ import { AppsStoreService, LocalStoreService } from 'shared';
     templateUrl: './left-menu.component.html'
 })
 export class LeftMenuComponent implements OnInit, OnDestroy {
-    private appSubscription: any | null = null;
-
-    public get showSettingsMenu(): boolean {
-        return this.localStore.get('squidex:showSettingsMenu') === 'true';
-    }
-
-    public set showSettingsMenu(value: boolean) {
-        this.localStore.set('squidex:showSettingsMenu', value);
-    }
+    private appSubscription: Subscription;
 
     public permission: string | null = null;
 
     constructor(
-        private readonly localStore: LocalStoreService,
         private readonly appsStore: AppsStoreService
     ) {
     }
@@ -44,9 +36,5 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy() {
         this.appSubscription.unsubscribe();
-    }
-
-    public toggleSettingsMenu() {
-        this.showSettingsMenu = !this.showSettingsMenu;
     }
 }

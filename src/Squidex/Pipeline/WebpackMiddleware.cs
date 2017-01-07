@@ -68,7 +68,7 @@ namespace Squidex.Pipeline
                     }
                 }
             }
-            else
+            else if (context.Response.StatusCode != 304)
             {
                 await buffer.CopyToAsync(body);
             }

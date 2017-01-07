@@ -41,7 +41,7 @@
     }
 
     .icon-search {
-        @include absolute(8px, auto, auto, 12px);
+        @include absolute(10px, auto, auto, 12px);
         color: $color-dark-foreground-selected;
         font-size: 1.3rem;
         font-weight: lighter;

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import {
     AppDto,
@@ -25,8 +26,8 @@ const FALLBACK_NAME = 'Apps Overview';
     ]
 })
 export class AppsMenuComponent implements OnInit, OnDestroy {
-    private appsSubscription: any | null = null;
-    private appSubscription: any | null = null;
+    private appsSubscription: Subscription;
+    private appSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);
     public modalDialog = new ModalView();

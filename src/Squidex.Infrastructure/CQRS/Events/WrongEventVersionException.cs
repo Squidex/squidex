@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DomainObjectVersionException.cs
+//  WrongEventVersionException.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,9 +8,9 @@
 
 using System;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class DomainObjectVersionException : DomainObjectException
+    public class WrongEventVersionException : Exception
     {
         private readonly int currentVersion;
         private readonly int expectedVersion;
@@ -25,17 +25,17 @@ namespace Squidex.Infrastructure
             get { return expectedVersion; }
         }
 
-        public DomainObjectVersionException(string id, Type type, int currentVersion, int expectedVersion)
-            : base(FormatMessage(id, type, currentVersion, expectedVersion), id, type)
+        public WrongEventVersionException(int currentVersion, int expectedVersion)
+            : base(FormatMessage(currentVersion, expectedVersion))
         {
             this.currentVersion = currentVersion;
 
             this.expectedVersion = expectedVersion;
         }
 
-        private static string FormatMessage(string id, Type type, int currentVersion, int expectedVersion)
+        private static string FormatMessage(int currentVersion, int expectedVersion)
         {
-            return $"Requested version {expectedVersion} for object '{id}' (type {type}), but found {currentVersion}.";
+            return $"Requested version {expectedVersion}, but found {currentVersion}.";
         }
     }
 }

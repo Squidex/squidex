@@ -85,7 +85,14 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var eventsToSave = events.Select(x => formatter.ToEventData(x, commitId)).ToList();
 
-            await eventStore.AppendEventsAsync(commitId, streamName, versionExpected, eventsToSave);
+            try
+            {
+                await eventStore.AppendEventsAsync(commitId, streamName, versionExpected, eventsToSave);
+            }
+            catch (WrongEventVersionException e)
+            {
+                throw new DomainObjectVersionException(domainObject.Id.ToString(), domainObject.GetType(), versionCurrent, versionExpected);
+            }
 
             foreach (var eventData in eventsToSave)
             {

@@ -7,6 +7,7 @@
 
 import { Directive, ElementRef, HostListener, OnDestroy, OnInit, Renderer } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { AppsStoreService } from './../services/apps-store.service';
 
@@ -14,7 +15,7 @@ import { AppsStoreService } from './../services/apps-store.service';
     selector: '[dashboardLink]'
 })
 export class DashboardLinkDirective implements OnInit, OnDestroy {
-    private appSubscription: any;
+    private appSubscription: Subscription;
     private url: string;
 
     constructor(

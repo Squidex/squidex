@@ -11,7 +11,13 @@ content {
     }
 
     &-headline {
-        margin-bottom: 20px;
+        margin: 20px;
         margin-top: 100px;
     }
+}
+
+.app {
+    float: left;
+    width: 20rem;
+    margin: 10px;
 }

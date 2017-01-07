@@ -6,6 +6,7 @@
  */
 
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, Renderer, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import { ModalView } from './../utils/modal-view';
 
@@ -13,7 +14,7 @@ import { ModalView } from './../utils/modal-view';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
-    private subscription: any | null;
+    private subscription: Subscription;
     private isEnabled = true;
     private clickHandler: Function | null;
     private renderedView: EmbeddedViewRef<any> | null;

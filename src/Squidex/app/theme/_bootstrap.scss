@@ -149,11 +149,10 @@
     text-align: right;
 }
 
-select {
-    &.form-control {
-        padding-top: 0;
-        padding-bottom: 0;
-    }
+.form-control {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: calc(2.5rem - 2px);
 }
 
 .form-hint {
@@ -198,8 +197,6 @@ select {
         color: $color-accent-dark;
     }
 }
-
-
 
 .modal {
     &-content,

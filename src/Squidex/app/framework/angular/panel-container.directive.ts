@@ -6,6 +6,7 @@
  */
 
 import { Directive, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import { PanelService } from './../services/panel.service';
 
@@ -13,7 +14,7 @@ import { PanelService } from './../services/panel.service';
     selector: '.panel-container'
 })
 export class PanelContainerDirective implements OnInit, OnDestroy {
-    private subscription: any;
+    private subscription: Subscription;
     private panelsSize: number | null = null;
 
     constructor(

@@ -1,8 +1,20 @@
-﻿<content>
-    <div class="empty">
+﻿<sqx-title message="Apps"></sqx-title>
+
+<content>
+    <div class="empty" *ngIf="apps && apps.length === 0">
         <h3 class="empty-headline">You are not collaborating to any app yet</h3>
 
         <button class="apps-empty-button btn btn-success" (click)="modalDialog.show()"><i class="icon-plus"></i> Create New App</button>
+    </div>
+
+    <div class="apps">
+        <div class="app card" *ngFor="let app of apps">
+            <div class="card-block">
+                <h4 class="card-title">{{app.name}}</h4>
+
+                <a [routerLink]="['/app', app.name]">Edit</a>
+            </div>
+        </div>
     </div>
 </content>
 

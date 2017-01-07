@@ -33,6 +33,12 @@ export function createProperties(fieldType: string, values: {} | null = null): F
                     undefined, undefined, undefined, false,
                     undefined, undefined, undefined, undefined, undefined, undefined, undefined);
             break;
+        case 'boolean':
+            properties =
+                new BooleanFieldPropertiesDto(
+                    undefined, undefined, undefined, false,
+                    undefined, undefined);
+            break;
         default:
             throw 'Invalid properties type';
     }
@@ -117,6 +123,17 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         super(label, hints, placeholder, isRequired);
 
         this['fieldType'] = 'string';
+    }
+}
+
+export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
+        public readonly editor: string,
+        public readonly defaultValue: boolean | null
+    ) {
+        super(label, hints, placeholder, isRequired);
+
+        this['fieldType'] = 'boolean';
     }
 }
 

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import {
     Notification,
@@ -18,7 +19,7 @@ import {
     templateUrl: './internal-area.component.html'
 })
 export class InternalAreaComponent implements OnInit, OnDestroy {
-    private notificationsSubscription: any;
+    private notificationsSubscription: Subscription;
 
     public notifications: Notification[] = [];
 
