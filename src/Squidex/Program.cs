@@ -8,6 +8,8 @@
 
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.CQRS.Replay;
 
 namespace Squidex
 {
@@ -22,7 +24,14 @@ namespace Squidex
                 .UseStartup<Startup>()
                 .Build();
 
-            host.Run();
+            if (args.Length == 1 && args[0] == "--replay")
+            {
+                host.Services.GetService<ReplayGenerator>().ReplayAllAsync().Wait();
+            }
+            else
+            {
+                host.Run();
+            }
         }
     }
 }

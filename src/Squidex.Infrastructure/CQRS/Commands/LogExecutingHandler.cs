@@ -8,9 +8,8 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class LogExecutingHandler : ICommandHandler
     {
@@ -23,7 +22,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            logger.LogError("Handling {0} command", context.Command);
+            logger.LogInformation("Handling {0} command", context.Command);
 
             return Task.FromResult(false);
         }

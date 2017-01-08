@@ -35,13 +35,13 @@ namespace Squidex.Infrastructure.RabbitMq
             }
         }
 
-        public void Publish(EventData events)
+        public void Publish(EventData eventData)
         {
             ThrowIfDisposed();
 
             var channel = currentChannel.Value;
 
-            channel.BasicPublish(Exchange, string.Empty, null, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(events)));
+            channel.BasicPublish(Exchange, string.Empty, null, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(eventData)));
         }
 
         public void Connect(string queueName, Action<EventData> received)
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.RabbitMq
                 received(eventData);
             };
 
-            channel.BasicConsume(queueName, false, consumer);
+            channel.BasicConsume(queueName, true, consumer);
         }
 
         private static IModel Connect(IConnectionFactory connectionFactory)

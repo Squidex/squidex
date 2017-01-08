@@ -32,7 +32,7 @@ namespace Squidex.Write.Schemas
 
         protected async Task On(CreateSchema command, CommandContext context)
         {
-            if (await schemas.FindSchemaIdByNameAsync(command.AppId, command.Name) != null)
+            if (await schemas.ProvideSchemaByNameAsync(command.AppId, command.Name) != null)
             {
                 var error = 
                     new ValidationError($"A schema with name '{command.Name}' already exists", "DisplayName", 

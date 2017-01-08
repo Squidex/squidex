@@ -24,6 +24,10 @@ namespace Squidex.Store.MongoDb.History
 
         [BsonRequired]
         [BsonElement]
+        public int SessionEventIndex { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public string Channel { get; set; }
 
         [BsonRequired]

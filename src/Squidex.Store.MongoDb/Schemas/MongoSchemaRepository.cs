@@ -14,9 +14,11 @@ using MongoDB.Driver;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Events.Schemas;
+using Squidex.Events.Schemas.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
@@ -25,20 +27,20 @@ using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Schemas
 {
-    public  class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ICatchEventConsumer
+    public  class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ICatchEventConsumer, IReplayableStore
     {
         private readonly SchemaJsonSerializer serializer;
-        private readonly FieldRegistry fieldRegistry;
+        private readonly FieldRegistry registry;
 
-        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry fieldRegistry)
+        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry registry)
             : base(database)
         {
             Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
+            Guard.NotNull(registry, nameof(registry));
 
             this.serializer = serializer;
 
-            this.fieldRegistry = fieldRegistry;
+            this.registry = registry;
         }
 
         protected override string CollectionName()
@@ -49,6 +51,11 @@ namespace Squidex.Store.MongoDb.Schemas
         protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+        }
+
+        public Task ClearAsync()
+        {
+            return TryDropCollectionAsync();
         }
 
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
@@ -96,54 +103,52 @@ namespace Squidex.Store.MongoDb.Schemas
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.DeleteField(@event.FieldId));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.DisableField(@event.FieldId));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.EnableField(@event.FieldId));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldHidden @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.HideField(@event.FieldId));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldShown @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.ShowField(@event.FieldId));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.UpdateField(@event.FieldId, @event.Properties));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.Update(@event.Properties));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaPublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.Publish());
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaUnpublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => s.Unpublish());
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldAdded @event, EnvelopeHeaders headers)
         {
-            var field = fieldRegistry.CreateField(@event.FieldId, @event.Name, @event.Properties);
-
-            return UpdateSchema(headers, s => s.AddOrUpdateField(field));
+            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
         protected Task On(SchemaCreated @event, EnvelopeHeaders headers)

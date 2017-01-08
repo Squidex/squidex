@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -15,7 +16,7 @@ namespace Squidex.Infrastructure.MongoDb
     public abstract class MongoRepositoryBase<TEntity>
     {
         private const string CollectionFormat = "{0}Set";
-        private readonly IMongoCollection<TEntity> mongoCollection;
+        private Lazy<IMongoCollection<TEntity>> mongoCollection;
         private readonly IMongoDatabase mongoDatabase;
         private readonly string typeName;
 
@@ -71,7 +72,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             get
             {
-                return mongoCollection;
+                return mongoCollection.Value;
             }
         }
 
@@ -103,20 +104,39 @@ namespace Squidex.Infrastructure.MongoDb
             return string.Format(CultureInfo.InvariantCulture, CollectionFormat, typeof(TEntity).Name);
         }
 
-        private IMongoCollection<TEntity> CreateCollection()
+        private Lazy<IMongoCollection<TEntity>> CreateCollection()
         {
-            var databaseCollection = mongoDatabase.GetCollection<TEntity>(
-                CollectionName(),
-                CollectionSettings() ?? new MongoCollectionSettings());
+            return new Lazy<IMongoCollection<TEntity>>(() =>
+            {
+                var databaseCollection = mongoDatabase.GetCollection<TEntity>(
+                    CollectionName(),
+                    CollectionSettings() ?? new MongoCollectionSettings());
 
-            SetupCollectionAsync(databaseCollection).Wait();
+                SetupCollectionAsync(databaseCollection).Wait();
 
-            return databaseCollection;
+                return databaseCollection;
+            });
         }
 
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection)
         {
             return Task.FromResult(true);
+        }
+
+        public async Task<bool> TryDropCollectionAsync()
+        {
+            try
+            {
+                await mongoDatabase.DropCollectionAsync(CollectionName());
+
+                mongoCollection = CreateCollection();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

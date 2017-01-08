@@ -14,6 +14,7 @@ using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure.CQRS.Autofac;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Replay;
 
 namespace Squidex.Config.Domain
 {
@@ -45,7 +46,11 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<EventBus>()
+            builder.RegisterType<ReplayGenerator>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<EventReceiver>()
                 .AsSelf()
                 .SingleInstance();
 

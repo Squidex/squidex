@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -76,31 +77,32 @@ namespace Squidex.Core.Schemas.Json
         {
             var model = token.ToObject<SchemaModel>(serializer);
 
-            var schema = Schema.Create(model.Name, model.Properties);
-
-            if (model.IsPublished)
-            {
-                schema = schema.Publish();
-            }
-
-            foreach (var kvp in model.Fields)
-            {
-                var fieldModel = kvp.Value;
-
-                var field = fieldRegistry.CreateField(kvp.Key, fieldModel.Name, fieldModel.Properties);
-
-                if (fieldModel.IsDisabled)
+            var fields =
+                model.Fields.Select(kvp =>
                 {
-                    field = field.Disable();
-                }
+                    var fieldModel = kvp.Value;
 
-                if (fieldModel.IsHidden)
-                {
-                    field = field.Hide();
-                }
+                    var field = fieldRegistry.CreateField(kvp.Key, fieldModel.Name, fieldModel.Properties);
 
-                schema = schema.AddOrUpdateField(field);
-            }
+                    if (fieldModel.IsDisabled)
+                    {
+                        field = field.Disable();
+                    }
+
+                    if (fieldModel.IsHidden)
+                    {
+                        field = field.Hide();
+                    }
+
+                    return field;
+                }).ToDictionary(x => x.Id, x => x).ToImmutableDictionary();
+
+            var schema =
+                new Schema(
+                    model.Name,
+                    model.Properties,
+                    model.IsPublished,
+                    fields);
 
             return schema;
         }

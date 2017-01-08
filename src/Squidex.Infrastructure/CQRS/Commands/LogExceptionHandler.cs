@@ -8,11 +8,10 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Squidex.Infrastructure.CQRS.Commands;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class LogExceptionHandler : ICommandHandler
     {
@@ -29,9 +28,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
             if (exception != null)
             {
-                var eventId = new EventId(9999, "CommandFailed");
-
-                logger.LogError(eventId, exception, "Handling {0} command failed", context.Command);
+                logger.LogError(InfrastructureErrors.CommandFailed, exception, "Handling {0} command failed", context.Command);
             }
 
             return Task.FromResult(false);

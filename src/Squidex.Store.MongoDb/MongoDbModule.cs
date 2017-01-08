@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.History.Repositories;
@@ -72,16 +73,19 @@ namespace Squidex.Store.MongoDb
             builder.RegisterType<MongoHistoryEventRepository>()
                 .As<IHistoryEventRepository>()
                 .As<ICatchEventConsumer>()
+                .As<IReplayableStore>()
                 .SingleInstance();
 
             builder.RegisterType<MongoSchemaRepository>()
                 .As<ISchemaRepository>()
                 .As<ICatchEventConsumer>()
+                .As<IReplayableStore>()
                 .SingleInstance();
 
             builder.RegisterType<MongoAppRepository>()
                 .As<IAppRepository>()
                 .As<ICatchEventConsumer>()
+                .As<IReplayableStore>()
                 .SingleInstance();
         }
     }

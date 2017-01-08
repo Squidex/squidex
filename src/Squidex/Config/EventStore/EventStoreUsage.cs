@@ -16,7 +16,7 @@ namespace Squidex.Config.EventStore
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<EventBus>().Subscribe();
+            app.ApplicationServices.GetService<EventReceiver>().Subscribe();
 
             return app;
         }

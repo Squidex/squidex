@@ -53,14 +53,14 @@ namespace Squidex.Pipeline.CommandHandlers
             {
                 var schemaName = routeValues["name"].ToString();
 
-                var id = await schemaProvider.FindSchemaIdByNameAsync(appCommand.AppId, schemaName);
+                var schema = await schemaProvider.ProvideSchemaByNameAsync(appCommand.AppId, schemaName);
 
-                if (!id.HasValue)
+                if (schema == null)
                 {
                     throw new DomainObjectNotFoundException(schemaName, typeof(SchemaDomainObject));
                 }
 
-                aggregateCommand.AggregateId = id.Value;
+                aggregateCommand.AggregateId = schema.Id;
             }
 
             return false;

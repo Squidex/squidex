@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventBus.cs
+//  EventReceiver.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -18,17 +18,17 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class EventBus
+    public sealed class EventReceiver
     {
         private readonly EventDataFormatter formatter;
         private readonly IEnumerable<ILiveEventConsumer> liveConsumers;
         private readonly IEnumerable<ICatchEventConsumer> catchConsumers;
         private readonly IEventStream eventStream;
-        private readonly ILogger<EventBus> logger;
+        private readonly ILogger<EventReceiver> logger;
         private bool isSubscribed;
 
-        public EventBus(
-            ILogger<EventBus> logger,
+        public EventReceiver(
+            ILogger<EventReceiver> logger,
             IEventStream eventStream,
             IEnumerable<ILiveEventConsumer> liveConsumers,
             IEnumerable<ICatchEventConsumer> catchConsumers,
@@ -69,11 +69,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 if (isLive)
                 {
-                    DispatchConsumers(liveConsumers.OfType<IEventConsumer>().Union(catchConsumers), @event);
+                    DispatchConsumers(catchConsumers.OfType<IEventConsumer>().Union(liveConsumers), @event);
                 }
                 else
                 {
-                    DispatchConsumers(liveConsumers, @event);
+                    DispatchConsumers(catchConsumers, @event);
                 }
             });
 

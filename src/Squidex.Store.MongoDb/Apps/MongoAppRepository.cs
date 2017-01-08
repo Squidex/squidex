@@ -18,11 +18,12 @@ using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Store.MongoDb.Utils;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Store.MongoDb.Apps
 {
-    public class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ICatchEventConsumer
+    public class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ICatchEventConsumer, IReplayableStore
     {
         public MongoAppRepository(IMongoDatabase database) 
             : base(database)
@@ -37,6 +38,11 @@ namespace Squidex.Store.MongoDb.Apps
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+        }
+
+        public Task ClearAsync()
+        {
+            return TryDropCollectionAsync();
         }
 
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId)

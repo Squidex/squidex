@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
-//  ISchemaProvider.cs
+//  IReplayableStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
-using Squidex.Read.Schemas.Repositories;
 
-namespace Squidex.Read.Schemas.Services
+namespace Squidex.Infrastructure.CQRS.Replay
 {
-    public interface ISchemaProvider
+    public interface IReplayableStore
     {
-        Task<ISchemaEntityWithSchema> ProviderSchemaByIdAsync(Guid schemaId);
-
-        Task<ISchemaEntityWithSchema> ProvideSchemaByNameAsync(Guid appId, string name);
+        Task ClearAsync();
     }
 }

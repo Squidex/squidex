@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -103,11 +102,11 @@ namespace Squidex.Read.Schemas
             return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
         }
 
-        private Task<string> FindSchemaNameAsync(EnvelopeHeaders headers)
+        private async Task<string> FindSchemaNameAsync(EnvelopeHeaders headers)
         {
-            var name = schemaProvider.FindSchemaNameByIdAsync(headers.AppId(), headers.AggregateId());
+            var schema = await schemaProvider.ProviderSchemaByIdAsync(headers.AggregateId());
 
-            return name;
+            return schema.Label ?? schema.Name;
         }
     }
 }

@@ -31,12 +31,6 @@ export class UsersProviderService {
                     .catch(err => {
                         return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));
                     })
-                    .map(dto => {
-                        if (this.authService.user && dto.id === this.authService.user.id) {
-                            dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl);
-                        }
-                        return dto;
-                    })
                     .publishLast();
 
             request.connect();
@@ -44,6 +38,12 @@ export class UsersProviderService {
             result = this.caches[id] = request;
         }
 
-        return result;
+        return result
+            .map(dto => {
+                if (this.authService.user && dto.id === this.authService.user.id) {
+                    dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl);
+                }
+                return dto;
+            });
     }
 }

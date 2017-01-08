@@ -9,6 +9,7 @@
 using System;
 using Squidex.Core.Schemas;
 using Squidex.Events.Schemas;
+using Squidex.Events.Schemas.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
@@ -47,57 +48,57 @@ namespace Squidex.Write.Schemas
         {
             totalFields++;
 
-            schema = schema.AddOrUpdateField(registry.CreateField(@event.FieldId, @event.Name, @event.Properties));
+            schema = SchemaEventDispatcher.Dispatch(@event, schema, registry);
         }
 
         protected void On(SchemaCreated @event)
         {
-            schema = Schema.Create(@event.Name, @event.Properties);
+            schema = SchemaEventDispatcher.Dispatch(@event);
         }
 
         protected void On(FieldUpdated @event)
         {
-            schema = schema.UpdateField(@event.FieldId, @event.Properties);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(FieldHidden @event)
         {
-            schema = schema.HideField(@event.FieldId);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(FieldShown @event)
         {
-            schema = schema.ShowField(@event.FieldId);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(FieldDisabled @event)
         {
-            schema = schema.DisableField(@event.FieldId);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(FieldEnabled @event)
         {
-            schema = schema.EnableField(@event.FieldId);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(SchemaUpdated @event)
         {
-            schema = schema.Update(@event.Properties);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(FieldDeleted @event)
         {
-            schema = schema.DeleteField(@event.FieldId);
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(SchemaPublished @event)
         {
-            schema = schema.Publish();
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(SchemaUnpublished @event)
         {
-            schema = schema.Unpublish();
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
         protected void On(SchemaDeleted @event)

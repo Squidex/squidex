@@ -89,7 +89,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 await eventStore.AppendEventsAsync(commitId, streamName, versionExpected, eventsToSave);
             }
-            catch (WrongEventVersionException e)
+            catch (WrongEventVersionException)
             {
                 throw new DomainObjectVersionException(domainObject.Id.ToString(), domainObject.GetType(), versionCurrent, versionExpected);
             }
