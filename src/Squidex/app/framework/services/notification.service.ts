@@ -20,11 +20,11 @@ export class Notification {
     ) {
     }
 
-    public static error(message: string) {
+    public static error(message: string): Notification {
         return new Notification(message, 'error');
     }
 
-    public static info(message: string) {
+    public static info(message: string): Notification {
         return new Notification(message, 'info');
     }
 }

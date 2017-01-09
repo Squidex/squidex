@@ -9,19 +9,17 @@ import { Injectable } from '@angular/core';
 import { Headers, Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs';
 
-import {
-    ApiUrlConfig,
-    DateTime,
-    handleError
-} from 'framework';
+import 'framework/angular/http-extensions';
+
+import { ApiUrlConfig, DateTime } from 'framework';
 
 import { AuthService } from './auth.service';
 
 export class AppClientDto {
     constructor(
         public readonly id: string,
-        public readonly secret: string,
         public readonly name: string,
+        public readonly secret: string,
         public readonly expiresUtc: DateTime
     ) {
     }
@@ -69,12 +67,12 @@ export class AppClientsService {
                     return items.map(item => {
                         return new AppClientDto(
                             item.id,
-                            item.secret,
                             item.name,
+                            item.secret,
                             DateTime.parseISO_UTC(item.expiresUtc));
                     });
                 })
-                .catch(response => handleError('Failed to load clients. Please reload.', response));
+                .catchError('Failed to load clients. Please reload.');
     }
 
     public postClient(appName: string, dto: CreateAppClientDto): Observable<AppClientDto> {
@@ -85,25 +83,25 @@ export class AppClientsService {
                 .map(response => {
                     return new AppClientDto(
                         response.id,
-                        response.secret,
                         response.name,
+                        response.secret,
                         DateTime.parseISO_UTC(response.expiresUtc));
                 })
-                .catch(response => handleError('Failed to add client. Please reload.', response));
+                .catchError('Failed to add client. Please reload.');
     }
 
     public updateClient(appName: string, id: string, dto: UpdateAppClientDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return this.authService.authPut(url, dto)
-                .catch(response => handleError('Failed to revoke client. Please reload.', response));
+                .catchError('Failed to revoke client. Please reload.');
     }
 
     public deleteClient(appName: string, id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return this.authService.authDelete(url)
-                .catch(response => handleError('Failed to revoke client. Please reload.', response));
+                .catchError('Failed to revoke client. Please reload.');
     }
 
     public createToken(appName: string, client: AppClientDto): Observable<AccessTokenDto> {

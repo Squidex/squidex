@@ -36,15 +36,15 @@ describe('AppsService', () => {
                         body: [{
                             id: '123',
                             name: 'name1',
+                            permission: 'Owner',
                             created: '2016-01-01',
-                            lastModified: '2016-02-02',
-                            permission: 'Owner'
+                            lastModified: '2016-02-02'
                         }, {
                             id: '456',
                             name: 'name2',
+                            permission: 'Editor',
                             created: '2017-01-01',
-                            lastModified: '2017-02-02',
-                            permission: 'Editor'
+                            lastModified: '2017-02-02'
                         }]
                     })
                 )
@@ -58,8 +58,8 @@ describe('AppsService', () => {
         }).unsubscribe();
 
         expect(apps).toEqual([
-            new AppDto('123', 'name1', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Owner'),
-            new AppDto('456', 'name2', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Editor')
+            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02')),
+            new AppDto('456', 'name2', 'Editor', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'))
         ]);
 
         authService.verifyAll();

@@ -8,7 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ApiUrlConfig, handleError } from 'framework';
+import 'framework/angular/http-extensions';
+
+import { ApiUrlConfig } from 'framework';
 
 import { AuthService } from './auth.service';
 
@@ -42,6 +44,6 @@ export class LanguageService {
                             item.englishName);
                     });
                 })
-                .catch(response => handleError('Failed to load languages. Please reload', response));
+                .catchError('Failed to load languages. Please reload');
     }
 }

@@ -26,7 +26,7 @@
         
         <span class="form-hint">
             <p>
-                The app name becomes part of the api url,<br /> e.g https://<b>{{appName}}</b>.squidex.io/.
+                The app name becomes part of the api url,<br /> e.g https://<b>{{appName | async}}</b>.squidex.io/.
             </p>
             <p>
                 It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
@@ -36,6 +36,6 @@
 
     <div class="form-group clearfix">
         <button type="reset" class="float-xs-left btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="float-xs-right btn btn-primary" >Create</button>
+        <button type="submit" class="float-xs-right btn btn-success">Create</button>
     </div>
 </form>

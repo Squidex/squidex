@@ -1,14 +1,14 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
 <content>
-    <div class="empty" *ngIf="apps && apps.length === 0">
+    <div class="empty" *ngIf="(apps | async)?.length === 0">
         <h3 class="empty-headline">You are not collaborating to any app yet</h3>
 
-        <button class="apps-empty-button btn btn-success" (click)="modalDialog.show()"><i class="icon-plus"></i> Create New App</button>
+        <button class="apps-empty-button btn btn-success" (click)="addAppDialog.show()"><i class="icon-plus"></i> Create New App</button>
     </div>
 
     <div class="apps">
-        <div class="app card" *ngFor="let app of apps">
+        <div class="app card" *ngFor="let app of (apps | async)">
             <div class="card-block">
                 <h4 class="card-title">{{app.name}}</h4>
 
@@ -18,12 +18,12 @@
     </div>
 </content>
 
-<div class="modal" *sqxModalView="modalDialog" [@fade]>
+<div class="modal" *sqxModalView="addAppDialog" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
 
@@ -32,8 +32,8 @@
 
             <div class="modal-body">
                 <sqx-app-form 
-                    (created)="modalDialog.hide()"
-                    (cancelled)="modalDialog.hide()"></sqx-app-form>
+                    (created)="addAppDialog.hide()"
+                    (cancelled)="addAppDialog.hide()"></sqx-app-form>
             </div>
         </div>
     </div>

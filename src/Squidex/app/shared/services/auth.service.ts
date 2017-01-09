@@ -31,6 +31,10 @@ export class Profile {
         return this.user.profile['urn:squidex:picture'];
     }
 
+    public get token(): string {
+        return `subject:${this.id}`;
+    }
+
     constructor(
         public readonly user: User
     ) {

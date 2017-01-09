@@ -22,7 +22,7 @@ import {
     UsersProviderService
 } from 'shared';
 
-function rename(client: AppClientDto, name: string) {
+function rename(client: AppClientDto, name: string): AppClientDto {
     return new AppClientDto(client.id, client.secret, name, client.expiresUtc);
 };
 

@@ -5,11 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import {
-    AppDto,
     AppsStoreService,
     fadeAnimation,
     ModalView
@@ -23,12 +21,11 @@ import {
         fadeAnimation
     ]
 })
-export class AppsPageComponent implements OnInit, OnDestroy {
-    private appsSubscription: Subscription;
+export class AppsPageComponent implements OnInit {
+    public addAppDialog = new ModalView();
 
-    public modalDialog = new ModalView();
-
-    public apps: AppDto[];
+    public apps =
+        this.appsStore.apps.map(a => a || []);
 
     constructor(
         private readonly appsStore: AppsStoreService
@@ -37,14 +34,5 @@ export class AppsPageComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.appsStore.selectApp(null);
-
-        this.appsSubscription =
-            this.appsStore.apps.subscribe(apps => {
-                this.apps = apps || [];
-            });
-    }
-
-    public ngOnDestroy() {
-        this.appsSubscription.unsubscribe();
     }
 }

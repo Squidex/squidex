@@ -8,11 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import {
-    ApiUrlConfig,
-    DateTime,
-    handleError
-} from 'framework';
+import 'framework/angular/http-extensions';
+
+import { ApiUrlConfig, DateTime } from 'framework';
 
 import { AuthService } from './auth.service';
 
@@ -50,6 +48,6 @@ export class HistoryService {
                             DateTime.parseISO_UTC(item.created));
                     });
                 })
-                .catch(response => handleError('Failed to load history. Please reload', response));
+                .catchError('Failed to load history. Please reload');
     }
 }

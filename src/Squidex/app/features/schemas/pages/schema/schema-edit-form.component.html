@@ -1,0 +1,40 @@
+<form [formGroup]="editForm" (ngSubmit)="saveSchema()">
+	<div class="form-group">
+		<label for="schema-name">Name</label>
+
+		<input type="text" class="form-control" id="schema-name" formControlName="name" readonly />
+	</div>
+
+    <div class="form-group">
+		<label for="schema-label">Label</label>
+        
+        <div class="errors-box" *ngIf="editForm.controls.label.invalid && editForm.controls.label.touched" [@fade]>
+            <div class="errors">
+                <span *ngIf="editForm.controls.label.hasError('maxlength')">
+                    Label can not have more than 100 characters.
+                </span>
+            </div>
+        </div>
+
+		<input type="text" class="form-control" id="schema-label" formControlName="label" />
+	</div>
+
+    <div class="form-group">
+		<label for="schema-hints">Hints</label>
+        
+        <div class="errors-box" *ngIf="editForm.controls.hints.invalid && editForm.controls.hints.touched" [@fade]>
+            <div class="errors">
+                <span *ngIf="editForm.controls.hints.hasError('maxlength')">
+                    Hints can not have more than 1000 characters.
+                </span>
+            </div>
+        </div>
+
+        <textarea type="text" class="form-control" id="schema-hints" formControlName="hints" rows="4"></textarea>
+	</div>
+
+    <div class="form-group clearfix">
+        <button type="reset" class="float-xs-left btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="float-xs-right btn btn-primary">Save</button>
+    </div>
+</form>

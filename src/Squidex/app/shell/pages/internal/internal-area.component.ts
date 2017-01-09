@@ -28,6 +28,10 @@ export class InternalAreaComponent implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.notificationsSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.notificationsSubscription =
             this.notificationService.notifications.subscribe(notification => {
@@ -39,10 +43,6 @@ export class InternalAreaComponent implements OnInit, OnDestroy {
                     }, notification.displayTime);
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.notificationsSubscription.unsubscribe();
     }
 
     public close(notification: Notification) {

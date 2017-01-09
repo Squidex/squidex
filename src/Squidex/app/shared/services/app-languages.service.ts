@@ -8,7 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ApiUrlConfig, handleError } from 'framework';
+import 'framework/angular/http-extensions';
+
+import { ApiUrlConfig } from 'framework';
 
 import { AuthService } from './auth.service';
 
@@ -58,7 +60,7 @@ export class AppLanguagesService {
                             item.isMasterLanguage === true);
                     });
                 })
-                .catch(response => handleError('Failed to load languages. Please reload', response));
+                .catchError('Failed to load languages. Please reload');
     }
 
     public postLanguages(appName: string, dto: AddAppLanguageDto): Observable<AppLanguageDto> {
@@ -72,20 +74,20 @@ export class AppLanguagesService {
                         response.englishName,
                         response.isMasterLanguage === true);
                 })
-                .catch(response => handleError('Failed to add language. Please reload.', response));
+                .catchError('Failed to add language. Please reload.');
     }
 
     public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return this.authService.authPut(url, dto)
-                .catch(response => handleError('Failed to change language. Please reload.', response));
+                .catchError('Failed to change language. Please reload.');
     }
 
     public deleteLanguage(appName: string, languageCode: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return this.authService.authDelete(url)
-                .catch(response => handleError('Failed to add language. Please reload.', response));
+                .catchError('Failed to add language. Please reload.');
     }
 }

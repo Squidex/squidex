@@ -89,7 +89,7 @@ namespace Squidex.Pipeline
 
             foreach (var file in Styles)
             {
-                stylesTag += $"<link href=\"http://{Host}:{Port}/{file}\" rel=\"stylesheet\" >";
+                stylesTag += $"<link href=\"http://{Host}:{Port}/{file}\" rel=\"stylesheet\">";
             }
 
             response = response.Replace("</head>", $"{stylesTag}</head>");

@@ -8,11 +8,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import 'framework/angular/http-extensions';
+
 import {
     ApiUrlConfig,
     DateTime,
-    EntityCreatedDto,
-    handleError
+    EntityCreatedDto
 } from 'framework';
 
 import { AuthService } from './auth.service';
@@ -54,11 +55,12 @@ export class SchemaDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly created: DateTime,
-        public readonly lastModified: DateTime,
+        public readonly label: string,
+        public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
-        public readonly isPublished: boolean
+        public readonly created: DateTime,
+        public readonly lastModified: DateTime
     ) {
     }
 }
@@ -67,14 +69,14 @@ export class SchemaDetailsDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly created: DateTime,
-        public readonly lastModified: DateTime,
-        public readonly createdBy: string,
-        public readonly lastModifiedBy: string,
-        public readonly fields: FieldDto[],
         public readonly label: string,
         public readonly hints: string,
-        public readonly isPublished: boolean
+        public readonly fields: FieldDto[],
+        public readonly isPublished: boolean,
+        public readonly createdBy: string,
+        public readonly lastModifiedBy: string,
+        public readonly created: DateTime,
+        public readonly lastModified: DateTime
     ) {
     }
 }
@@ -191,14 +193,15 @@ export class SchemasService {
                         return new SchemaDto(
                             item.id,
                             item.name,
-                            DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified),
+                            item.label,
+                            item.isPublished,
                             item.createdBy,
                             item.lastModifiedBy,
-                            item.isPublished);
+                            DateTime.parseISO_UTC(item.created),
+                            DateTime.parseISO_UTC(item.lastModified));
                     });
                 })
-                .catch(response => handleError('Failed to load schemas. Please reload.', response));
+                .catchError('Failed to load schemas. Please reload.');
     }
 
     public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
@@ -224,16 +227,16 @@ export class SchemasService {
                     return new SchemaDetailsDto(
                         response.id,
                         response.name,
-                        DateTime.parseISO_UTC(response.created),
-                        DateTime.parseISO_UTC(response.lastModified),
-                        response.createdBy,
-                        response.lastModifiedBy,
-                        fields,
                         response.label,
                         response.hints,
-                        response.isPublished);
+                        fields,
+                        response.isPublished,
+                        response.createdBy,
+                        response.lastModifiedBy,
+                        DateTime.parseISO_UTC(response.created),
+                        DateTime.parseISO_UTC(response.lastModified));
                 })
-                .catch(response => handleError('Failed to load schema. Please reload.', response));
+                .catchError('Failed to load schema. Please reload.');
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto): Observable<EntityCreatedDto> {
@@ -244,7 +247,7 @@ export class SchemasService {
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catch(response => handleError('Failed to create schema. Please reload.', response));
+                .catchError('Failed to create schema. Please reload.');
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto): Observable<EntityCreatedDto> {
@@ -255,69 +258,69 @@ export class SchemasService {
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catch(response => handleError('Failed to add field. Please reload.', response));
+                .catchError('Failed to add field. Please reload.');
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/`);
 
         return this.authService.authPut(url, dto)
-                .catch(response => handleError('Failed to update schema. Please reload.', response));
+                .catchError('Failed to update schema. Please reload.');
     }
 
     public publishSchema(appName: string, schemaName: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to publish schema. Please reload.', response));
+                .catchError('Failed to publish schema. Please reload.');
     }
 
     public unpublishSchema(appName: string, schemaName: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to unpublish schema. Please reload.', response));
+                .catchError('Failed to unpublish schema. Please reload.');
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/`);
 
         return this.authService.authPut(url, dto)
-                .catch(response => handleError('Failed to update field. Please reload.', response));
+                .catchError('Failed to update field. Please reload.');
     }
 
     public enableField(appName: string, schemaName: string, fieldId: number): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to enable field. Please reload.', response));
+                .catchError('Failed to enable field. Please reload.');
     }
 
     public disableField(appName: string, schemaName: string, fieldId: number): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to disable field. Please reload.', response));
+                .catchError('Failed to disable field. Please reload.');
     }
 
     public showField(appName: string, schemaName: string, fieldId: number): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to show field. Please reload.', response));
+                .catchError('Failed to show field. Please reload.');
     }
 
     public hideField(appName: string, schemaName: string, fieldId: number): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide/`);
 
         return this.authService.authPut(url, {})
-                .catch(response => handleError('Failed to hide field. Please reload.', response));
+                .catchError('Failed to hide field. Please reload.');
     }
 
     public deleteField(appName: string, schemaName: string, fieldId: number): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/`);
 
         return this.authService.authDelete(url)
-                .catch(response => handleError('Failed to delete field. Please reload.', response));
+                .catchError('Failed to delete field. Please reload.');
     }
 }

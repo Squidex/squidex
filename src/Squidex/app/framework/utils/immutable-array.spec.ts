@@ -138,4 +138,17 @@ describe('ImmutableArray', () => {
 
         expect(array_2.values).toEqual([1, 2, 3, 4]);
     });
+
+    it('should iterate over array items', () => {
+        const array_1 = ImmutableArray.of([3, 1, 4, 2]);
+
+        const values: number[] = [];
+
+        for (let iter = array_1[Symbol.iterator](), _step: any; !(_step = iter.next()).done; ) {
+            values.push(_step.value);
+        }
+
+        expect(values).toEqual([3, 1, 4, 2]);
+    });
 });
+

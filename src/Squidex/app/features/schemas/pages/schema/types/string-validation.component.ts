@@ -25,8 +25,12 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     @Input()
     public properties: StringFieldPropertiesDto;
 
-    public hidePatternMessage: Observable<boolean>;
     public hideDefaultValue: Observable<boolean>;
+    public hidePatternMessage: Observable<boolean>;
+
+    public ngOnDestroy() {
+        this.patternSubscription.unsubscribe();
+    }
 
     public ngOnInit() {
         this.editForm.setControl('maxLength',
@@ -60,9 +64,5 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                     this.editForm.get('patternMessage').setValue(undefined);
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.patternSubscription.unsubscribe();
     }
 }

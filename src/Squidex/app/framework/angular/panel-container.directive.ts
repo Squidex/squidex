@@ -28,6 +28,10 @@ export class PanelContainerDirective implements OnInit, OnDestroy {
         this.resize();
     }
 
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.subscription =
             this.panels.changed.subscribe(width => {
@@ -35,10 +39,6 @@ export class PanelContainerDirective implements OnInit, OnDestroy {
 
                 this.resize();
             });
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
     }
 
     private resize() {

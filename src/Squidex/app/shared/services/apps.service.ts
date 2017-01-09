@@ -8,11 +8,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import 'framework/angular/http-extensions';
+
 import {
     ApiUrlConfig,
     DateTime,
-    EntityCreatedDto,
-    handleError
+    EntityCreatedDto
 } from 'framework';
 
 import { AuthService } from './auth.service';
@@ -21,9 +22,9 @@ export class AppDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
+        public readonly permission: string,
         public readonly created: DateTime,
-        public readonly lastModified: DateTime,
-        public readonly permission: string
+        public readonly lastModified: DateTime
     ) {
     }
 }
@@ -55,12 +56,12 @@ export class AppsService {
                         return new AppDto(
                             item.id,
                             item.name,
+                            item.permission,
                             DateTime.parseISO(item.created),
-                            DateTime.parseISO(item.lastModified),
-                            item.permission);
+                            DateTime.parseISO(item.lastModified));
                     });
                 })
-                .catch(response => handleError('Failed to load apps. Please reload.', response));
+                .catchError('Failed to load apps. Please reload.');
     }
 
     public postApp(dto: CreateAppDto): Observable<EntityCreatedDto> {
@@ -71,6 +72,6 @@ export class AppsService {
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catch(response => handleError('Failed to create app. Please reload.', response));
+                .catchError('Failed to create app. Please reload.');
     }
 }

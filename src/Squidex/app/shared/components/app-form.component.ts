@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import { fadeAnimation } from 'framework';
 
@@ -23,10 +24,7 @@ const FALLBACK_NAME = 'my-app';
         fadeAnimation
     ]
 })
-export class AppFormComponent implements OnInit {
-    @Input()
-    public showClose = false;
-
+export class AppFormComponent {
     @Output()
     public created = new EventEmitter<AppDto>();
 
@@ -44,18 +42,14 @@ export class AppFormComponent implements OnInit {
                 ]]
         });
 
-    public appName = FALLBACK_NAME;
+    public appName =
+        Observable.of(FALLBACK_NAME)
+            .merge(this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME));
 
     constructor(
         private readonly appsStore: AppsStoreService,
         private readonly formBuilder: FormBuilder
     ) {
-    }
-
-    public ngOnInit() {
-        this.createForm.get('name').valueChanges.subscribe(value => {
-            this.appName = value || FALLBACK_NAME;
-        });
     }
 
     public createApp() {
@@ -68,10 +62,10 @@ export class AppFormComponent implements OnInit {
 
             this.appsStore.createApp(request)
                 .subscribe(dto => {
-                    this.createForm.reset();
+                    this.reset();
                     this.created.emit(dto);
                 }, error => {
-                    this.reset();
+                    this.createForm.enable();
                     this.creationError = error.displayMessage;
                 });
         }

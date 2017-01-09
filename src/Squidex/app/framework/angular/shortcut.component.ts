@@ -31,6 +31,12 @@ export class ShortcutComponent implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        if (this.lastKeys) {
+            this.shortcutService.off(this.lastKeys);
+        }
+    }
+
     public ngOnInit() {
         this.lastKeys = this.keys;
 
@@ -44,11 +50,6 @@ export class ShortcutComponent implements OnInit, OnDestroy {
 
                 return false;
             });
-        }
-    }
-    public ngOnDestroy() {
-        if (this.lastKeys) {
-            this.shortcutService.off(this.lastKeys);
         }
     }
 }

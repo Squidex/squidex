@@ -149,10 +149,13 @@
     text-align: right;
 }
 
-.form-control {
-    padding-top: 0;
-    padding-bottom: 0;
-    height: calc(2.5rem - 2px);
+input,
+select {
+    &.form-control {
+        padding-top: 0;
+        padding-bottom: 0;
+        height: calc(2.5rem - 2px);
+    }
 }
 
 .form-hint {

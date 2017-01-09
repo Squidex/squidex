@@ -96,6 +96,10 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.touchedCallback = fn;
     }
 
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.subscription =
             this.queryInput.valueChanges
@@ -114,10 +118,6 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                     this.reset();
                     this.items = r || [];
                 });
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
     }
 
     public onBlur() {

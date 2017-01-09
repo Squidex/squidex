@@ -5,11 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-export class SchemaUpdated {
+export class SchemaPropertiesDto {
     constructor(
         public readonly name: string,
         public readonly label: string,
-        public readonly isPublished: boolean
+        public readonly hints: string
     ) {
     }
 }

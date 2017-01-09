@@ -14,8 +14,10 @@
                 </div>
             </div>
 
-            <h3 class="panel-title">{{schemaName}}</h3>
-
+            <h3 class="panel-title">
+                {{schemaProperties|displayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
+            </h3> 
+                        
             <a class="panel-close" routerLink="../">
                 <i class="icon-close"></i>
             </a>
@@ -70,6 +72,29 @@
                         <i class="icon-time"></i>
                     </a>
                 </li>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="editSchemaDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="editSchemaDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title">Edit Schema</h4>
+            </div>
+
+            <div class="modal-body">
+                <sqx-schema-edit-form
+                    [appName]="appName() | async"
+                    [schema]="schemaProperties"
+                    (saved)="onSchemaSaved($event)"
+                    (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>
         </div>
     </div>

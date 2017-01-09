@@ -25,6 +25,10 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
@@ -32,9 +36,5 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
                     this.permission = app.permission;
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
     }
 }

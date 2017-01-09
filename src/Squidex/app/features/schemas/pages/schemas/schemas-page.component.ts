@@ -37,31 +37,33 @@ import { SchemaUpdated } from './../messages';
 export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private messageSubscription: Subscription;
 
-    public modalDialog = new ModalView();
+    public addSchemaDialog = new ModalView();
 
     public schemas = new BehaviorSubject(ImmutableArray.empty<SchemaDto>());
     public schemasFilter = new FormControl();
     public schemasFiltered =
-        Observable.of(null).merge(this.schemasFilter.valueChanges.debounceTime(100)).combineLatest(this.schemas,
-            (query, schemas) => {
+        Observable.of(null)
+            .merge(this.schemasFilter.valueChanges.debounceTime(100))
+            .combineLatest(this.schemas,
+                (query, schemas) => {
 
-            if (query && query.length > 0) {
-                schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
-            }
+                if (query && query.length > 0) {
+                    schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+                }
 
-            schemas =
-                schemas.sort((a, b) => {
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                schemas =
+                    schemas.sort((a, b) => {
+                        if (a.name < b.name) {
+                            return -1;
+                        }
+                        if (a.name > b.name) {
+                            return 1;
+                        }
+                        return 0;
+                    });
 
-            return schemas;
-        });
+                return schemas;
+            });
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly schemasService: SchemasService,
@@ -69,6 +71,10 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         private readonly authService: AuthService
     ) {
         super(apps, notifications, users);
+    }
+
+    public ngOnDestroy() {
+        this.messageSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -86,17 +92,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                         new SchemaDto(
                             oldSchema.id,
                             oldSchema.name,
-                            oldSchema.created,
-                            DateTime.now(),
+                            message.label,
+                            message.isPublished,
                             oldSchema.createdBy, me,
-                            message.isPublished);
+                            oldSchema.created, DateTime.now());
                     this.schemas.next(schemas.replace(oldSchema, newSchema));
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.messageSubscription.unsubscribe();
     }
 
     public load() {
@@ -109,10 +111,10 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public onSchemaCreationCompleted(dto: SchemaDto) {
+    public onSchemaCreated(dto: SchemaDto) {
         this.schemas.next(this.schemas.getValue().push(dto));
 
-        this.modalDialog.hide();
+        this.addSchemaDialog.hide();
     }
 }
 

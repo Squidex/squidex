@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import {
     AuthService,
@@ -27,10 +28,7 @@ const FALLBACK_NAME = 'my-schema';
         fadeAnimation
     ]
 })
-export class SchemaFormComponent implements OnInit {
-    @Input()
-    public showClose = false;
-
+export class SchemaFormComponent {
     @Input()
     public appName: string;
 
@@ -51,7 +49,9 @@ export class SchemaFormComponent implements OnInit {
                 ]]
         });
 
-    public schemaName = FALLBACK_NAME;
+    public schemaName =
+        Observable.of(FALLBACK_NAME)
+            .merge(this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME));
 
     constructor(
         private readonly schemas: SchemasService,
@@ -60,43 +60,41 @@ export class SchemaFormComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.createForm.get('name').valueChanges.subscribe(value => {
-            this.schemaName = value || FALLBACK_NAME;
-        });
-    }
-
     public createSchema() {
         this.createForm.markAsTouched();
 
-        if (this.createForm.valid && this.authService.user) {
+        if (this.createForm.valid) {
             this.createForm.disable();
 
             const name = this.createForm.get('name').value;
-            const now = DateTime.now();
 
             const requestDto = new CreateSchemaDto(name);
 
-            const me = `subject:${this.authService.user.id}`;
-
             this.schemas.postSchema(this.appName, requestDto)
                 .subscribe(dto => {
-                    this.createForm.reset();
-                    this.created.emit(new SchemaDto(dto.id, name, now, now, me, me, false));
-                }, error => {
                     this.reset();
+                    this.created.emit(this.createSchemaDto(dto.id, name));
+                }, error => {
+                    this.createForm.enable();
                     this.creationError = error.displayMessage;
                 });
         }
     }
 
-    private reset() {
-        this.createForm.enable();
+    public reset() {
         this.creationError = '';
+        this.createForm.reset();
     }
 
     public cancel() {
         this.reset();
         this.cancelled.emit();
+    }
+
+    private createSchemaDto(id: string, name: string) {
+        const user = this.authService.user!.token;
+        const now = DateTime.now();
+
+        return new SchemaDto(id, name, undefined, false, user, user, now, now);
     }
 }

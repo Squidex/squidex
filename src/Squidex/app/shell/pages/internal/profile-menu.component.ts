@@ -35,6 +35,10 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.authenticationSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.authenticationSubscription =
             this.auth.isAuthenticated.subscribe(() => {
@@ -45,10 +49,6 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
                     this.profileDisplayName = user.displayName;
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.authenticationSubscription.unsubscribe();
     }
 
     public logout() {

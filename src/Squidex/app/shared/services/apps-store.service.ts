@@ -90,7 +90,7 @@ export class AppsStoreService {
             .map(created => {
                 now = now || DateTime.now();
 
-                const app = new AppDto(created.id, dto.name, now, now, 'Owner');
+                const app = new AppDto(created.id, dto.name, 'Owner', now, now);
 
                 return app;
             })

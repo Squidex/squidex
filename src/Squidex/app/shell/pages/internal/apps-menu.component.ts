@@ -41,6 +41,11 @@ export class AppsMenuComponent implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.appsSubscription.unsubscribe();
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.appsSubscription =
             this.appsStore.apps.subscribe(apps => {
@@ -49,11 +54,6 @@ export class AppsMenuComponent implements OnInit, OnDestroy {
 
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(selectedApp => this.appName = selectedApp ? selectedApp.name : FALLBACK_NAME);
-    }
-
-    public ngOnDestroy() {
-        this.appsSubscription.unsubscribe();
-        this.appSubscription.unsubscribe();
     }
 
     public onAppCreationCancelled() {

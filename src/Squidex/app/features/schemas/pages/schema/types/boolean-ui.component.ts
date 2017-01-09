@@ -7,13 +7,8 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
 
-import {
-    fadeAnimation,
-    FloatConverter,
-    BooleanFieldPropertiesDto
-} from 'shared';
+import { fadeAnimation, BooleanFieldPropertiesDto } from 'shared';
 
 @Component({
     selector: 'sqx-boolean-ui',
@@ -29,10 +24,6 @@ export class BooleanUIComponent implements OnInit {
 
     @Input()
     public properties: BooleanFieldPropertiesDto;
-
-    public converter = new FloatConverter();
-
-    public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
         this.editForm.addControl('editor',

@@ -20,11 +20,11 @@ export class PanelDirective implements OnInit, OnDestroy {
     ) {
     }
 
-    public ngOnInit() {
-        this.panels.push(this.element.nativeElement, this.renderer);
-    }
-
     public ngOnDestroy() {
         this.panels.pop(this.element.nativeElement, this.renderer);
+    }
+
+    public ngOnInit() {
+        this.panels.push(this.element.nativeElement, this.renderer);
     }
 }

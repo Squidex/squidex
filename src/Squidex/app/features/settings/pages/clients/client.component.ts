@@ -45,7 +45,7 @@ export class ClientComponent {
     @Input()
     public appName: string;
 
-    public modalDialog = new ModalView();
+    public tokenDialog = new ModalView();
 
     public get clientName(): string {
         return this.client.name || this.client.id;
@@ -109,7 +109,7 @@ export class ClientComponent {
         this.appClientsService.createToken(this.appName, client)
             .subscribe(token => {
                 this.appClientToken = token;
-                this.modalDialog.show();
+                this.tokenDialog.show();
             }, _ => {
                 this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
             });

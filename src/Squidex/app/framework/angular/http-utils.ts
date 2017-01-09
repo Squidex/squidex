@@ -49,14 +49,16 @@ export class ErrorDto {
     }
 }
 
-export function handleError(message: string, error: Response | any): Observable<any> {
-    let result = new ErrorDto(500, message);
+export function catchError(message: string): Observable<any> {
+    return this.catch((error: any | Response) => {
+        let result = new ErrorDto(500, message);
 
-    if (error instanceof Response && error.status !== 500) {
-        const body = error.json();
+        if (error instanceof Response && error.status !== 500) {
+            const body = error.json();
 
-        result = new ErrorDto(error.status, body.message, body.details);
-    }
+            result = new ErrorDto(error.status, body.message, body.details);
+        }
 
-    return Observable.throw(result);
+        return Observable.throw(result);
+    });
 }

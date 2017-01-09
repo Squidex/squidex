@@ -16,3 +16,15 @@
         @include opacity(1);
     }
 }
+
+.schema {
+    &-edit {
+        color: $color-border-dark;
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .6rem .3rem;
+        border: 0;
+        background: transparent;
+        vertical-align: baseline;
+    }
+}

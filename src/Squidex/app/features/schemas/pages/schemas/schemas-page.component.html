@@ -10,7 +10,7 @@
             </a>
         </div>
         <div class="subheader">
-            <button class="btn btn-success subheader-button" (click)="modalDialog.show()">
+            <button class="btn btn-success subheader-button" (click)="addSchemaDialog.show()">
                 <i class="icon-plus"></i>          
             </button>
             
@@ -29,7 +29,7 @@
                     <div class="schema-inner">
                         <div class="row">
                             <div class="col-xs-4">
-                                <span class="schema-name">{{schema.name}}</span> 
+                                <span class="schema-name">{{schema|displayName}}</span> 
                             </div>
                             <div class="col-xs-4">
                                 <span class="schema-user">
@@ -49,12 +49,12 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="modalDialog" [@fade]>
+<div class="modal" *sqxModalView="addSchemaDialog" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addSchemaDialog.hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
 
@@ -64,8 +64,8 @@
             <div class="modal-body">
                 <sqx-schema-form
                     [appName]="appName() | async"
-                    (created)="onSchemaCreationCompleted($event)"
-                    (cancelled)="modalDialog.hide()"></sqx-schema-form>
+                    (created)="onSchemaCreated($event)"
+                    (cancelled)="addSchemaDialog.hide()"></sqx-schema-form>
             </div>
         </div>
     </div>

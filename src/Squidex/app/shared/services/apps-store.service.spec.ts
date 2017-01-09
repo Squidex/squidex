@@ -20,8 +20,8 @@ import {
 describe('AppsStoreService', () => {
     const now = DateTime.now();
 
-    const oldApps = [new AppDto('id', 'old-name', now, now, 'Owner')];
-    const newApp =   new AppDto('id', 'new-name', now, now, 'Owner');
+    const oldApps = [new AppDto('id', 'old-name', 'Owner', now, now)];
+    const newApp =   new AppDto('id', 'new-name', 'Owner', now, now);
 
     let appsService: IMock<AppsService>;
     let authService: IMock<AuthService>;

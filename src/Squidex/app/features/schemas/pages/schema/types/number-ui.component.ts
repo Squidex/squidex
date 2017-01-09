@@ -36,6 +36,10 @@ export class NumberUIComponent implements OnDestroy, OnInit {
 
     public hideAllowedValues: Observable<boolean>;
 
+    public ngOnDestroy() {
+        this.editorSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.editForm.addControl('editor',
             new FormControl(this.properties.editor, [
@@ -59,9 +63,5 @@ export class NumberUIComponent implements OnDestroy, OnInit {
                     this.editForm.get('allowedValues').setValue(undefined);
                 }
             });
-    }
-
-    public ngOnDestroy() {
-        this.editorSubscription.unsubscribe();
     }
 }

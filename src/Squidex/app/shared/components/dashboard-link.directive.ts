@@ -26,6 +26,10 @@ export class DashboardLinkDirective implements OnInit, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.appSubscription =
             this.appsStore.selectedApp.subscribe(app => {
@@ -35,12 +39,8 @@ export class DashboardLinkDirective implements OnInit, OnDestroy {
             });
     }
 
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
-    }
-
     @HostListener('click')
-    public onClick() {
+    public onClick(): boolean {
         this.router.navigateByUrl(this.url);
 
         return false;

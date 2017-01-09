@@ -72,9 +72,9 @@ export class SliderComponent implements ControlValueAccessor {
         this.touchedCallback = fn;
     }
 
-    public onBarMouseClick(event: MouseEvent) {
+    public onBarMouseClick(event: MouseEvent): boolean {
         if (this.mouseMoveSubscription) {
-            return;
+            return true;
         }
 
         const relativeValue = this.getRelativeX(event);
@@ -88,7 +88,7 @@ export class SliderComponent implements ControlValueAccessor {
         return false;
     }
 
-    public onThumbMouseDown(event: MouseEvent) {
+    public onThumbMouseDown(event: MouseEvent): boolean {
         this.centerStartOffset = event.offsetX - this.thumb.nativeElement.clientWidth * 0.5;
 
         this.startValue = this.value;
@@ -110,9 +110,9 @@ export class SliderComponent implements ControlValueAccessor {
         return false;
     }
 
-    private onMouseMove(event: MouseEvent) {
+    private onMouseMove(event: MouseEvent): boolean {
         if (!this.isDragging) {
-            return;
+            return true;
         }
 
         const relativeValue = this.getRelativeX(event);
@@ -125,7 +125,7 @@ export class SliderComponent implements ControlValueAccessor {
         return false;
     }
 
-    private onMouseUp() {
+    private onMouseUp(): boolean {
         this.updateValue();
 
         setTimeout(() => {

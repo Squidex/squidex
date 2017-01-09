@@ -20,12 +20,14 @@ import {
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
+    ModalView,
     NotificationService,
     SchemasService,
     UpdateFieldDto,
     UsersProviderService
 } from 'shared';
 
+import { SchemaPropertiesDto } from './schema-properties';
 import { SchemaUpdated } from './../messages';
 
 @Component({
@@ -47,6 +49,9 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
     public schemaName: string;
     public schemaFields = ImmutableArray.empty<FieldDto>();
+    public schemaProperties: SchemaPropertiesDto;
+
+    public editSchemaDialog = new ModalView();
 
     public isPublished: boolean;
 
@@ -92,6 +97,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             .switchMap(app => this.schemasService.getSchema(app, this.schemaName)).retry(2)
             .subscribe(dto => {
                 this.schemaFields = ImmutableArray.of(dto.fields);
+                this.schemaProperties = new SchemaPropertiesDto(dto.name, dto.label, dto.hints);
                 this.isPublished = dto.isPublished;
             }, error => {
                 this.notifyError(error);
@@ -103,7 +109,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             .switchMap(app => this.schemasService.publishSchema(app, this.schemaName)).retry(2)
             .subscribe(() => {
                 this.isPublished = true;
-                this.updateAll(this.schemaFields);
+                this.notify();
             }, error => {
                 this.notifyError(error);
             });
@@ -114,7 +120,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             .switchMap(app => this.schemasService.unpublishSchema(app, this.schemaName)).retry(2)
             .subscribe(() => {
                 this.isPublished = false;
-                this.updateAll(this.schemaFields);
+                this.notify();
             }, error => {
                 this.notifyError(error);
             });
@@ -164,7 +170,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         this.appName()
             .switchMap(app => this.schemasService.deleteField(app, this.schemaName, field.fieldId)).retry(2)
             .subscribe(() => {
-                this.updateAll(this.schemaFields.remove(field));
+                this.updateFields(this.schemaFields.remove(field));
             }, error => {
                 this.notifyError(error);
             });
@@ -207,7 +213,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
                             false,
                             properties);
 
-                    this.updateAll(this.schemaFields.push(newField));
+                    this.updateFields(this.schemaFields.push(newField));
                     reset();
                 }, error => {
                     this.notifyError(error);
@@ -220,15 +226,33 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         this.schemaFields = ImmutableArray.empty<FieldDto>();
     }
 
-    public updateField(field: FieldDto, newField: FieldDto) {
-        this.updateAll(this.schemaFields.replace(field, newField));
+    public onSchemaSaved(properties: SchemaPropertiesDto) {
+        this.updateProperties(properties);
+
+        this.editSchemaDialog.hide();
     }
 
-    private updateAll(fields: ImmutableArray<FieldDto>) {
+    public updateProperties(properties: SchemaPropertiesDto) {
+        this.schemaProperties = properties;
+
+        this.notify();
+    }
+
+    public updateField(field: FieldDto, newField: FieldDto) {
+        this.schemaFields = this.schemaFields.replace(field, newField);
+
+        this.notify();
+    }
+
+    private updateFields(fields: ImmutableArray<FieldDto>) {
         this.schemaFields = fields;
 
+        this.notify();
+    }
+
+    private notify() {
         this.messageBus.publish(new HistoryChannelUpdated());
-        this.messageBus.publish(new SchemaUpdated(this.schemaName, this.isPublished));
+        this.messageBus.publish(new SchemaUpdated(this.schemaName, this.schemaProperties.label, this.isPublished));
     }
 }
 
