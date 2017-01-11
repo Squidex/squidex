@@ -14,7 +14,7 @@ import {
     trigger
 } from '@angular/core';
 
-export function buildFadeAnimation(name = 'fade', timing = '200ms'): AnimationEntryMetadata {
+export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationEntryMetadata {
     return trigger(
         name, [
             transition(':enter', [
