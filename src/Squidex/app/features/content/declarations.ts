@@ -5,4 +5,6 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-export * from './pages/content-page.component';
+export * from './pages/content/content-page.component';
+export * from './pages/contents/contents-page.component';
+export * from './pages/schemas/schemas-page.component';

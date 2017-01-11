@@ -1,0 +1,33 @@
+<sqx-title message="{app} | Contents" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<div class="panel panel-light">
+    <div class="panel-header">
+        <div class="float-xs-right">
+            <a class="btn btn-success" [routerLink]="['new']">
+                <i class="icon-plus"></i> New
+            </a>
+        </div>
+
+        <h3 class="panel-title">{{schema|displayName}} Contents</h3>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content">
+        </div>
+        <div class="panel-sidebar">
+            <div class="nav nav-pills nav-stacked nav-light">
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="history" routerLinkActive="active">
+                        <i class="icon-time"></i>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

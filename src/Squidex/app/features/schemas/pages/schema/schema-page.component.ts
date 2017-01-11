@@ -5,10 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import {
     AddFieldDto,
@@ -22,6 +21,7 @@ import {
     MessageBus,
     ModalView,
     NotificationService,
+    SchemaDetailsDto,
     SchemasService,
     UpdateFieldDto,
     UsersProviderService
@@ -38,9 +38,7 @@ import { SchemaUpdated } from './../messages';
         fadeAnimation
     ]
 })
-export class SchemaPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private routerSubscription: Subscription;
-
+export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public fieldTypes: string[] = [
         'string',
         'number',
@@ -78,30 +76,13 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         super(apps, notifications, users);
     }
 
-    public ngOnDestroy() {
-        this.routerSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.routerSubscription =
-            this.route.params.map(p => p['schemaName']).subscribe(name => {
-                this.schemaName = name;
-
-                this.reset();
-                this.load();
-            });
-    }
-
-    public load() {
-        this.appName()
-            .switchMap(app => this.schemasService.getSchema(app, this.schemaName)).retry(2)
-            .subscribe(dto => {
-                this.schemaFields = ImmutableArray.of(dto.fields);
-                this.schemaProperties = new SchemaPropertiesDto(dto.name, dto.label, dto.hints);
-                this.isPublished = dto.isPublished;
-            }, error => {
-                this.notifyError(error);
-            });
+        this.route.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
+            this.schemaName = schema.name;
+            this.schemaFields = ImmutableArray.of(schema.fields);
+            this.schemaProperties = new SchemaPropertiesDto(schema.name, schema.label, schema.hints);
+            this.isPublished = schema.isPublished;
+        });
     }
 
     public publish() {
@@ -220,10 +201,6 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
                     reset();
                 });
         }
-    }
-
-    private reset() {
-        this.schemaFields = ImmutableArray.empty<FieldDto>();
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto) {

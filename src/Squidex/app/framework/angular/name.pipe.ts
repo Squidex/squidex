@@ -18,6 +18,25 @@ export class DisplayNamePipe {
             return '';
         }
 
-        return StringHelper.firstNonEmpty(value[field1], value[field2]);
+        return StringHelper.firstNonEmpty(this.valueOf(value, field1), this.valueOf(value, field2));
+    }
+
+    private valueOf(o: any, s: string): any {
+        s = s.replace(/\[(\w+)\]/g, '.$1');
+        s = s.replace(/^\./, '');
+
+        const parts = s.split('.');
+
+        for (let i = 0, n = parts.length; i < n; ++i) {
+            let k = parts[i];
+
+            if (k in o) {
+                o = o[k];
+            } else {
+                return;
+            }
+        }
+
+        return o;
     }
 }

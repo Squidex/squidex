@@ -8,16 +8,67 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SqxFrameworkModule, SqxSharedModule } from 'shared';
+import {
+    HistoryComponent,
+    ResolvePublishedSchemaGuard,
+    SqxFrameworkModule,
+    SqxSharedModule
+} from 'shared';
 
 import {
-    ContentPageComponent
+    ContentPageComponent,
+    ContentsPageComponent,
+    SchemasPageComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
-        component: ContentPageComponent
+        component: SchemasPageComponent,
+        children: [
+            {
+                path: ''
+            },
+            {
+                path: ':schemaName',
+                component: ContentsPageComponent,
+                resolve: {
+                    schema: ResolvePublishedSchemaGuard
+                },
+                children: [
+                    {
+                        path: 'new',
+                        component: ContentPageComponent,
+                        resolve: {
+                            schema: ResolvePublishedSchemaGuard
+                        },
+                        data: {
+                            disableHistory: true
+                        }
+                    }, {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'contents.{schemaName}'
+                        }
+                    }, {
+                        path: ':contentId',
+                        component: ContentPageComponent,
+                        resolve: {
+                            schema: ResolvePublishedSchemaGuard
+                        },
+                        children: [
+                             {
+                                path: 'history',
+                                component: HistoryComponent,
+                                data: {
+                                    channel: 'contents.{schemaName}.{contentId}'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }]
     }
 ];
 
@@ -28,7 +79,9 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        ContentPageComponent
+        ContentPageComponent,
+        ContentsPageComponent,
+        SchemasPageComponent
     ]
 })
 export class SqxFeatureContentModule { }

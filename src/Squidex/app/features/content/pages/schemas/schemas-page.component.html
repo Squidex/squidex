@@ -1,0 +1,35 @@
+<sqx-title message="{app} | Schemas" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<div class="panel panel-dark">
+    <div class="panel-header">
+        <div>
+            <h3 class="panel-title">Schemas</h3>
+
+            <a class="panel-close" dashboardLink>
+                <i class="icon-close"></i>
+            </a>
+        </div>
+
+        <div class="subheader">            
+            <div class="search-form">
+                <input class="form-control form-control-dark" [formControl]="schemasFilter" placeholder="Search for schemas..." />
+
+                <i class="icon-search"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content">
+            <div class="schemas">
+                <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
+                    <div class="schema-inner">
+                        <span class="schema-name">{{schema|displayName}}</span> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

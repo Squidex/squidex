@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import {
     HistoryComponent,
+    ResolveSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
@@ -39,6 +40,9 @@ const routes: Routes = [
             {
                 path: ':schemaName',
                 component: SchemaPageComponent,
+                resolve: {
+                    schema: ResolveSchemaGuard
+                },
                 children: [
                     {
                         path: 'history',

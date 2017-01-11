@@ -15,6 +15,12 @@ describe('DisplayNamePipe', () => {
         expect(pipe.transform(undefined)).toBe('');
     });
 
+    it('should return value from nested object', () => {
+        const pipe = new DisplayNamePipe();
+
+        expect(pipe.transform({ propertes: { label: 'name' } }, 'properties.label')).toBe('name');
+    });
+
     it('should return label if value is valid', () => {
         const pipe = new DisplayNamePipe();
 

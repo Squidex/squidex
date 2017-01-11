@@ -1,0 +1,95 @@
+<sqx-title message="{app} | Content" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<form [formGroup]="contentForm" (ngSubmit)="saveSchema()">
+    <div class="panel panel-light" >
+        <div class="panel-header">
+            <div class="float-xs-right">
+                <button type="submit" class="btn btn-primary">
+                    Save
+                </button>
+            </div>
+            
+            <h3 class="panel-title" *ngIf="isNewMode">New {{schema|displayName}}</h3>
+
+            <a class="panel-close" routerLink="../">
+                <i class="icon-close"></i>
+            </a>
+        </div>
+
+        <div class="panel-main">
+            <div class="panel-content">
+                <div *ngFor="let field of schema.fields">
+                    <div class="table-items-row">
+                        <label>{{field|displayName:'properties.label':'name'}}</label>
+
+                        <div>
+                            <div [ngSwitch]="field.properties.fieldType">
+                                <div *ngSwitchCase="'number'">
+                                    <div [ngSwitch]="field.properties.editor">
+                                        <div *ngSwitchCase="'Input'">
+                                            <input class="form-control" type="number" [formControlName]="field.name">
+                                        </div>
+                                        <div *ngSwitchCase="'Dropdown'">
+                                            <select class="form-control" [formControlName]="field.name">
+                                                <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                            </select>
+                                        </div>
+                                        <div *ngSwitchCase="'Radio'">
+                                            <label *ngFor="let value of field.properties.allowedValues">
+                                                <input type="radio" value="{{value}}" [formControlName]="field.name"> {{value}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngSwitchCase="'string'">
+                                    <div [ngSwitch]="field.properties.editor">
+                                        <div *ngSwitchCase="'Input'">
+                                            <input class="form-control" type="number" [formControlName]="field.name">
+                                        </div>
+                                        <div *ngSwitchCase="'Dropdown'">
+                                            <select class="form-control" [formControlName]="field.name">
+                                                <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                            </select>
+                                        </div>
+                                        <div *ngSwitchCase="'TextArea'">
+                                            <textarea class="form-control" [formControlName]="field.name"></textarea>
+                                        </div>
+                                        <div *ngSwitchCase="'Radio'">
+                                            <label *ngFor="let value of field.properties.allowedValues">
+                                                <input type="radio" value="{{value}}" [formControlName]="field.name"> {{value}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngSwitchCase="'boolean'">
+                                    <div [ngSwitch]="field.properties.editor">
+                                        <div *ngSwitchCase="'Checkbox'">
+                                            <div class="form-check">
+                                                <input type="checkbox" [formControlName]="field.name">
+                                            </div>
+                                        </div>
+                                        <div *ngSwitchCase="'Toggle'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-hint" *ngIf="field.properties.hints && field.properties.hints.length > 0">
+                            {{field.properties.hints}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-sidebar" *ngIf="!isNewMode">
+                <div class="nav nav-pills nav-stacked nav-light">
+                    <li class="nav-item">
+                        <a class="nav-link" routerLink="history" routerLinkActive="active">
+                            <i class="icon-time"></i>
+                        </a>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

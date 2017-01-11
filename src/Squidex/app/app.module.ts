@@ -12,30 +12,11 @@ import { AppComponent } from './app.component';
 
 import {
     ApiUrlConfig,
-    AppClientsService,
-    AppContributorsService,
-    AppLanguagesService,
-    AppMustExistGuard,
-    AppsService,
-    AppsStoreService,
-    AuthService,
     CurrencyConfig,
     DecimalSeparatorConfig,
-    HistoryService,
-    LanguageService,
-    LocalStoreService,
-    MessageBus,
-    MustBeAuthenticatedGuard,
-    MustBeNotAuthenticatedGuard,
-    NotificationService,
-    PanelService,
-    SchemasService,
     SqxFrameworkModule,
     SqxSharedModule,
-    TitlesConfig,
-    TitleService,
-    UsersProviderService,
-    UsersService
+    TitlesConfig
 } from './shared';
 
 import { SqxShellModule } from './shell';
@@ -61,8 +42,8 @@ export function configCurrency() {
 @NgModule({
     imports: [
         BrowserModule,
-        SqxFrameworkModule,
-        SqxSharedModule,
+        SqxFrameworkModule.forRoot(),
+        SqxSharedModule.forRoot(),
         SqxShellModule,
         routing
     ],
@@ -70,25 +51,6 @@ export function configCurrency() {
         AppComponent
     ],
     providers: [
-        AppClientsService,
-        AppContributorsService,
-        AppLanguagesService,
-        AppsStoreService,
-        AppsService,
-        AppMustExistGuard,
-        AuthService,
-        HistoryService,
-        LanguageService,
-        LocalStoreService,
-        MessageBus,
-        MustBeAuthenticatedGuard,
-        MustBeNotAuthenticatedGuard,
-        NotificationService,
-        PanelService,
-        SchemasService,
-        TitleService,
-        UsersProviderService,
-        UsersService,
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },

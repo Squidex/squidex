@@ -6,13 +6,14 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
 import {
     AutocompleteComponent,
+    ClipboardService,
     CloakDirective,
     CopyDirective,
     DayOfWeekPipe,
@@ -22,17 +23,23 @@ import {
     FocusOnChangeDirective,
     FocusOnInitDirective,
     FromNowPipe,
+    LocalStoreService,
+    MessageBus,
     ModalViewDirective,
     MoneyPipe,
     MonthPipe,
+    NotificationService,
     PanelContainerDirective,
     PanelDirective,
+    PanelService,
     ScrollActiveDirective,
     ShortcutComponent,
+    ShortcutService,
     ShortDatePipe,
     ShortTimePipe,
     SliderComponent,
     TagEditorComponent,
+    TitleService,
     TitleComponent,
     UserReportComponent
 } from './declarations';
@@ -101,4 +108,19 @@ import {
         ReactiveFormsModule
     ]
 })
-export class SqxFrameworkModule { }
+export class SqxFrameworkModule {
+    public static forRoot(): ModuleWithProviders {
+        return {
+            ngModule: SqxFrameworkModule,
+            providers: [
+                ClipboardService,
+                LocalStoreService,
+                MessageBus,
+                NotificationService,
+                PanelService,
+                ShortcutService,
+                TitleService
+            ]
+        };
+    }
+ }
