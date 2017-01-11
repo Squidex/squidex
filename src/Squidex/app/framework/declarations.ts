@@ -9,6 +9,7 @@ export * from './angular/animations';
 export * from './angular/autocomplete.component';
 export * from './angular/validators';
 export * from './angular/cloak.directive';
+export * from './angular/control-errors.component';
 export * from './angular/copy.directive';
 export * from './angular/date-time.pipes';
 export * from './angular/focus-on-change.directive';

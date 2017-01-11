@@ -1,0 +1,7 @@
+ <div class="errors-box" *ngIf="errorMessages" [@fade]>
+    <div class="errors">
+        <span *ngFor="let message of errorMessages">
+            {{message}}
+        </span>
+    </div>
+</div>

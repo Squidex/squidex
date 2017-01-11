@@ -8,15 +8,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { fadeAnimation, BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto } from 'shared';
 
 @Component({
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
-    templateUrl: 'boolean-ui.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: 'boolean-ui.component.html'
 })
 export class BooleanUIComponent implements OnInit {
     @Input()

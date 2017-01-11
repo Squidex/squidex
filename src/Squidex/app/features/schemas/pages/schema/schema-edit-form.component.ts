@@ -9,7 +9,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
-    fadeAnimation,
     Notification,
     NotificationService,
     SchemasService
@@ -20,10 +19,7 @@ import { SchemaPropertiesDto } from './schema-properties';
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
-    templateUrl: './schema-edit-form.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './schema-edit-form.component.html'
 })
 export class SchemaEditFormComponent implements OnInit {
     @Output()

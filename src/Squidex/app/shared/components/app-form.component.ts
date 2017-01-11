@@ -9,7 +9,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { fadeAnimation } from 'framework';
+import { ValidatorsEx } from 'framework';
 
 import { AppsStoreService } from './../services/apps-store.service';
 import { AppDto, CreateAppDto } from './../services/apps.service';
@@ -19,10 +19,7 @@ const FALLBACK_NAME = 'my-app';
 @Component({
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
-    templateUrl: './app-form.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './app-form.component.html'
 })
 export class AppFormComponent {
     @Output()
@@ -38,7 +35,7 @@ export class AppFormComponent {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
                 ]]
         });
 

@@ -15,6 +15,7 @@ import {
     AutocompleteComponent,
     ClipboardService,
     CloakDirective,
+    ControlErrorsComponent,
     CopyDirective,
     DayOfWeekPipe,
     DayPipe,
@@ -55,6 +56,7 @@ import {
     declarations: [
         AutocompleteComponent,
         CloakDirective,
+        ControlErrorsComponent,
         CopyDirective,
         DayOfWeekPipe,
         DayPipe,
@@ -80,6 +82,7 @@ import {
     exports: [
         AutocompleteComponent,
         CloakDirective,
+        ControlErrorsComponent,
         CopyDirective,
         DayOfWeekPipe,
         DayPipe,

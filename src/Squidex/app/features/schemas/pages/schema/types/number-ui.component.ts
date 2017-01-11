@@ -9,19 +9,12 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import {
-    fadeAnimation,
-    FloatConverter,
-    NumberFieldPropertiesDto
-} from 'shared';
+import { FloatConverter, NumberFieldPropertiesDto } from 'shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
-    templateUrl: 'number-ui.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: 'number-ui.component.html'
 })
 export class NumberUIComponent implements OnDestroy, OnInit {
     private editorSubscription: Subscription;

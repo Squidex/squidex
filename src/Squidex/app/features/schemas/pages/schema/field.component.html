@@ -86,13 +86,7 @@
                     <label for="field-label" class="col-xs-3 col-form-label">Label</label>
 
                     <div class="col-xs-6">
-                        <div class="errors-box" *ngIf="editForm.controls.label.invalid && editForm.controls.label.touched" [@fade]>
-                            <div class="errors">
-                                <span *ngIf="editForm.controls.label.hasError('maxlength')">
-                                    Label can not have more than 100 characters.
-                                </span>
-                            </div>
-                        </div>
+                        <sqx-control-errors for="label" [submitted]="editForm.touched"></sqx-control-errors>
 
                         <input type="text" class="form-control" id="field-label" maxlength="100" formControlName="label" />
 
@@ -106,13 +100,7 @@
                     <label for="field-hints" class="col-xs-3 col-form-label">Hints</label>
 
                     <div class="col-xs-6">
-                        <div class="errors-box" *ngIf="editForm.controls.hints.invalid && editForm.controls.hints.touched" [@fade]>
-                            <div class="errors">
-                                <span *ngIf="editForm.controls.hints.hasError('maxlength')">
-                                    Hints can not have more than 100 characters.
-                                </span>
-                            </div>
-                        </div>
+                        <sqx-control-errors for="hints" [submitted]="editForm.touched"></sqx-control-errors>
 
                         <input type="text" class="form-control" id="field-hints" maxlength="100" formControlName="hints" />
 

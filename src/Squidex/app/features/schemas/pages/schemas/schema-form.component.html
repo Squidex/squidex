@@ -8,29 +8,15 @@
 	<div class="form-group">
 		<label for="schema-name">Name</label>
         
-        <div class="errors-box" *ngIf="createForm.controls.name.invalid && createForm.controls.name.touched" [@fade]>
-            <div class="errors">
-                <span *ngIf="createForm.controls.name.hasError('required')">
-                    Name is required.
-                </span>
-                <span *ngIf="createForm.controls.name.hasError('maxlength')">
-                    Name can not have more than 40 characters.
-                </span>
-                <span *ngIf="createForm.controls.name.hasError('pattern')">
-                    Name can contain lower case letters (a-z), numbers and dashes only (not at the end).
-                </span>
-            </div>
-        </div>
+        <sqx-control-errors for="name" [submitted]="createForm.touched"></sqx-control-errors>
 
 		<input type="text" class="form-control" id="schema-name" formControlName="name" />
         
         <span class="form-hint">
-            <p>
-                The schema name becomes part of the api url,<br /> e.g https://{{appName}}.squidex.io/<b>{{schemaName | async}}</b>/.
-            </p>
-            <p>
-                It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
-            </p>
+            The schema name becomes part of the api url,<br /> e.g https://{{appName}}.squidex.io/<b>{{schemaName | async}}</b>/.
+        </span>
+        <span class="form-hint">
+            It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
         </span>
 	</div>
 

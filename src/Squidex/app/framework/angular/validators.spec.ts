@@ -7,13 +7,13 @@
 
 import { FormControl } from '@angular/forms';
 
-import { Validators } from './../';
+import { ValidatorsEx } from './../';
 
 describe('Validators', () => {
     let validateBetween: any;
 
     beforeEach(() => {
-        validateBetween = Validators.between(10, 200);
+        validateBetween = ValidatorsEx.between(10, 200);
     });
 
     it('should return error when not a number', () => {

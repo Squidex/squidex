@@ -15,7 +15,8 @@ import {
     DateTime,
     fadeAnimation,
     SchemaDto,
-    SchemasService
+    SchemasService,
+    ValidatorsEx
 } from 'shared';
 
 const FALLBACK_NAME = 'my-schema';
@@ -45,7 +46,7 @@ export class SchemaFormComponent {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes only (not at the end).')
                 ]]
         });
 

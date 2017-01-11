@@ -19,7 +19,8 @@ import {
     MessageBus,
     NotificationService,
     UpdateAppClientDto,
-    UsersProviderService
+    UsersProviderService,
+    ValidatorsEx
 } from 'shared';
 
 function rename(client: AppClientDto, name: string): AppClientDto {
@@ -40,7 +41,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
                 ]]
         });
 
@@ -86,6 +87,10 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public resetClientForm() {
+        this.addClientForm.reset();
     }
 
     public attachClient() {

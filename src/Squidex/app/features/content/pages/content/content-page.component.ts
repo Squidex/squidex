@@ -6,15 +6,18 @@
  */
 
 import { Component } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import {
     AppComponentBase,
     AppsStoreService,
     NotificationService,
+    NumberFieldPropertiesDto,
     SchemaDetailsDto,
-    UsersProviderService
+    StringFieldPropertiesDto,
+    UsersProviderService,
+    ValidatorsEx
 } from 'shared';
 
 @Component({
@@ -51,9 +54,27 @@ export class ContentPageComponent extends AppComponentBase {
         const controls: { [key: string]: AbstractControl } = {};
 
         for (const field of schema.fields) {
-            const formControl = new FormControl();
+            const validators: ValidatorFn[] = [];
 
-            controls[field.name] = formControl;
+            if (field.properties.isRequired) {
+                validators.push(Validators.required);
+            }
+            if (field.properties instanceof NumberFieldPropertiesDto) {
+                validators.push(ValidatorsEx.between(field.properties.minValue, field.properties.maxValue));
+            }
+            if (field.properties instanceof StringFieldPropertiesDto) {
+                if (field.properties.minLength) {
+                    validators.push(Validators.minLength(field.properties.minLength));
+                }
+                if (field.properties.maxLength) {
+                    validators.push(Validators.maxLength(field.properties.maxLength));
+                }
+                if (field.properties.pattern) {
+                    validators.push(ValidatorsEx.pattern(field.properties.pattern, field.properties.patternMessage));
+                }
+            }
+
+            controls[field.name] = new FormControl(validators);
         }
 
         this.contentForm = new FormGroup(controls);

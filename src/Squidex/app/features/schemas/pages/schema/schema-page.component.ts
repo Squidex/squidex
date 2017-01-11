@@ -24,7 +24,8 @@ import {
     SchemaDetailsDto,
     SchemasService,
     UpdateFieldDto,
-    UsersProviderService
+    UsersProviderService,
+    ValidatorsEx
 } from 'shared';
 
 import { SchemaPropertiesDto } from './schema-properties';
@@ -63,7 +64,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    Validators.pattern('[a-z0-9]+(\-[a-z0-9]+)*')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
                 ]]
         });
 
@@ -201,6 +202,10 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                     reset();
                 });
         }
+    }
+
+    public resetFieldForm() {
+        this.addFieldForm.reset();
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto) {

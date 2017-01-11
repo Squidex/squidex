@@ -3,13 +3,7 @@
         <label for="field-input-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
 
         <div class="col-xs-6">
-            <div class="errors-box" *ngIf="editForm.controls.placeholder.invalid && editForm.controls.placeholder.touched" [@fade]>
-                <div class="errors">
-                    <span *ngIf="editForm.controls.placeholder.hasError('maxlength')">
-                        Placeholder can not have more than 100 characters.
-                    </span>
-                </div>
-            </div>
+            <sqx-control-errors for="placeholder" [submitted]="editForm.touched"></sqx-control-errors>
 
             <input type="text" class="form-control" id="field-input-placeholder" maxlength="100" formControlName="placeholder" />
 

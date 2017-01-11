@@ -15,13 +15,7 @@
                 <div class="client-header">
                     <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
                         <div class="form-group">
-                            <div class="errors-box" *ngIf="renameForm.controls.name.invalid" [@fade]>
-                                <div class="errors">
-                                    <span *ngIf="renameForm.controls.name.hasError('required')">
-                                        Name is required.
-                                    </span>
-                                </div>
-                            </div>
+                            <sqx-control-errors for="name" [submitted]="renameForm.touched"></sqx-control-errors>
                             
                             <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                         </div>
