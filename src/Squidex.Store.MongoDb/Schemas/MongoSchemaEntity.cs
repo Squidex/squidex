@@ -32,11 +32,15 @@ namespace Squidex.Store.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public Guid AppId { get; set; }
-        
+        public string Schema { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public bool IsDeleted { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public Guid AppId { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -45,10 +49,6 @@ namespace Squidex.Store.MongoDb.Schemas
         [BsonRequired]
         [BsonElement]
         public RefToken LastModifiedBy { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public BsonDocument Schema { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -61,7 +61,7 @@ namespace Squidex.Store.MongoDb.Schemas
 
         public Lazy<Schema> DeserializeSchema(SchemaJsonSerializer serializer)
         {
-            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(Schema.ToJToken()) : null);
+            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(Schema) : null);
 
             return schema;
         }

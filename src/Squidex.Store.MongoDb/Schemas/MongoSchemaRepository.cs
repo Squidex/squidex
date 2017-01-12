@@ -155,7 +155,7 @@ namespace Squidex.Store.MongoDb.Schemas
         {
             var schema = Schema.Create(@event.Name, @event.Properties);
 
-            return Collection.CreateAsync(headers, s => { Serialize(s, schema); SimpleMapper.Map(@event, s); });
+            return Collection.CreateAsync(headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
         }
 
         public Task On(Envelope<IEvent> @event)
@@ -174,15 +174,20 @@ namespace Squidex.Store.MongoDb.Schemas
 
             currentSchema = updater(currentSchema);
             
-            Serialize(entity, currentSchema);
+            UpdateSchema(entity, currentSchema);
+            UpdateProperties(entity, currentSchema);
+        }
 
+        private static void UpdateProperties(MongoSchemaEntity entity, Schema currentSchema)
+        {
             entity.Label = currentSchema.Properties.Label;
+
             entity.IsPublished = currentSchema.IsPublished;
         }
 
-        private void Serialize(MongoSchemaEntity entity, Schema schema)
+        private void UpdateSchema(MongoSchemaEntity entity, Schema schema)
         {
-            entity.Schema = serializer.Serialize(schema).ToBsonDocument();
+            entity.Schema = serializer.Serialize(schema).ToString();
         }
 
         private Schema Deserialize(MongoSchemaEntity entity)

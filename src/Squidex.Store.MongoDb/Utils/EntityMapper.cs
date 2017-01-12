@@ -8,9 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
 using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.MongoDb;
@@ -92,20 +90,6 @@ namespace Squidex.Store.MongoDb.Utils
             {
                 entity.Id = Guid.NewGuid();
             }
-        }
-
-        public static BsonDocument ToBsonDocument(this JToken value)
-        {
-            var json = value.ToString().Replace("$type", "§type");
-
-            return BsonDocument.Parse(json);
-        }
-
-        public static JToken ToJToken(this BsonDocument document)
-        {
-            var json = document.ToJson().Replace("§type", "$type");
-
-            return JToken.Parse(json);
         }
 
         public static Task CreateAsync<T>(this IMongoCollection<T> collection, EnvelopeHeaders headers, Action<T> updater, bool useAggregateId = true) where T : MongoEntity, new()

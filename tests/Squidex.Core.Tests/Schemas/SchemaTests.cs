@@ -36,8 +36,6 @@ namespace Squidex.Core.Schemas
 
             Assert.Equal("my-name", schema.Name);
             Assert.Equal(properties, schema.Properties);
-
-            Assert.True(properties.IsFrozen);
         }
 
         [Fact]
@@ -54,8 +52,6 @@ namespace Squidex.Core.Schemas
             sut = sut.Update(properties);
             
             Assert.Equal(properties, sut.Properties);
-
-            Assert.True(properties.IsFrozen);
         }
         
         [Fact]

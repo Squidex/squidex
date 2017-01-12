@@ -15,7 +15,7 @@ namespace Squidex.Core.Schemas
         private string label;
         private string hints;
 
-        public bool IsFrozen { get; private set; }
+        protected bool IsFrozen { get; private set; }
 
         public string Label
         {
@@ -45,11 +45,6 @@ namespace Squidex.Core.Schemas
             {
                 throw new InvalidOperationException("Object is frozen");
             }
-        }
-
-        public bool ShouldSerializeIsFrozen()
-        {
-            return false;
         }
 
         public void Freeze()
