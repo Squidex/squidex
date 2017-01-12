@@ -79,7 +79,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_add_error_if_allowed_values_and_max_is_specified()
+        public void Should_add_error_if_allowed_values_and_max_value_is_specified()
         {
             var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
@@ -88,12 +88,12 @@ namespace Squidex.Core.Schemas
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either or allowed values or range can be defined", "AllowedValues", "MinValue", "MaxValue")
+                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
                 });
         }
 
         [Fact]
-        public void Should_add_error_if_allowed_values_and_min_is_specified()
+        public void Should_add_error_if_allowed_values_and_min_value_is_specified()
         {
             var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
@@ -102,7 +102,7 @@ namespace Squidex.Core.Schemas
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either or allowed values or range can be defined", "AllowedValues", "MinValue", "MaxValue")
+                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
                 });
         }
 

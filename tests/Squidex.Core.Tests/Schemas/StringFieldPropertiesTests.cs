@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
@@ -31,6 +32,34 @@ namespace Squidex.Core.Schemas
                 new List<ValidationError>
                 {
                     new ValidationError("Max length must be greater than min length", "MinLength", "MaxLength")
+                });
+        }
+
+        [Fact]
+        public void Should_add_error_if_allowed_values_and_max_value_is_specified()
+        {
+            var sut = new StringFieldProperties { MinLength = 10, AllowedValues = ImmutableList.Create("4") };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Either allowed values or min and max length can be defined", "AllowedValues", "MinLength", "MaxLength")
+                });
+        }
+
+        [Fact]
+        public void Should_add_error_if_allowed_values_and_min_value_is_specified()
+        {
+            var sut = new StringFieldProperties { MaxLength = 10, AllowedValues = ImmutableList.Create("4") };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Either allowed values or min and max length can be defined", "AllowedValues", "MinLength", "MaxLength")
                 });
         }
 

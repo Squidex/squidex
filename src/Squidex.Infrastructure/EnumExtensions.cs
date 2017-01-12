@@ -7,6 +7,8 @@
 // ==========================================================================
 
 using System;
+using System.Text.RegularExpressions;
+// ReSharper disable ObjectCreationAsStatement
 
 namespace Squidex.Infrastructure
 {
@@ -19,6 +21,20 @@ namespace Squidex.Infrastructure
                 return Enum.IsDefined(typeof(TEnum), value);
             }
             catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsValidRegex(this string value)
+        {
+            try
+            {
+                new Regex(value);
+
+                return true;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }

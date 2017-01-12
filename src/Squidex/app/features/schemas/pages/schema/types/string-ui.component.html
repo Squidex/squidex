@@ -3,7 +3,7 @@
         <label for="field-input-placeholder" class="col-xs-3 col-form-label">Placeholder</label>
 
         <div class="col-xs-6">
-            <sqx-control-errors for="placeholder" [submitted]="editForm.touched"></sqx-control-errors>
+            <sqx-control-errors for="placeholder" [submitted]="editFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="field-input-placeholder" maxlength="100" formControlName="placeholder" />
 

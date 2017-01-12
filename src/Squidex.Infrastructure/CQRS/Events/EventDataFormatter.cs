@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
         }
 
-        public Envelope<IEvent> Parse(EventData eventData)
+        public virtual Envelope<IEvent> Parse(EventData eventData)
         {
             var headers = ReadJson<PropertiesBag>(eventData.Metadata);
 
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             return envelope;
         }
 
-        public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId)
+        public virtual EventData ToEventData(Envelope<IEvent> envelope, Guid commitId)
         {
             var eventType = TypeNameRegistry.GetName(envelope.Payload.GetType());
 

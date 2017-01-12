@@ -54,6 +54,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     public isPublished: boolean;
 
+    public addFieldFormSubmitted = false;
     public addFieldForm: FormGroup =
         this.formBuilder.group({
             type: ['string',
@@ -171,7 +172,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public addField() {
-        this.addFieldForm.markAsTouched();
+        this.addFieldFormSubmitted = true;
 
         if (this.addFieldForm.valid) {
             this.addFieldForm.disable();
@@ -183,6 +184,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             const reset = () => {
                 this.addFieldForm.get('name').reset();
                 this.addFieldForm.enable();
+                this.addFieldFormSubmitted = false;
             };
 
             this.appName()
@@ -205,6 +207,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public resetFieldForm() {
+        this.addFieldFormSubmitted = false;
         this.addFieldForm.reset();
     }
 

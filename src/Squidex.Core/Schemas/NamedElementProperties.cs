@@ -47,6 +47,11 @@ namespace Squidex.Core.Schemas
             }
         }
 
+        public bool ShouldSerializeIsFrozen()
+        {
+            return false;
+        }
+
         public void Freeze()
         {
             IsFrozen = true;

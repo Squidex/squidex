@@ -29,6 +29,8 @@ namespace Squidex.Read.Schemas.Services.Implementations
         private sealed class CacheItem
         {
             public ISchemaEntityWithSchema Entity;
+
+            public string Name;
         }
 
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
@@ -48,7 +50,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             {
                 var entity = await repository.FindSchemaAsync(schemaId);
 
-                cacheItem = new CacheItem { Entity = entity };
+                cacheItem = new CacheItem { Entity = entity, Name = entity?.Name };
 
                 Cache.Set(cacheKey, cacheItem, CacheDuration);
 
@@ -72,7 +74,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             {
                 var entity = await repository.FindSchemaAsync(appId, name);
 
-                cacheItem = new CacheItem { Entity = entity };
+                cacheItem = new CacheItem { Entity = entity, Name = name };
 
                 Cache.Set(cacheKey, cacheItem, CacheDuration);
 
@@ -94,9 +96,9 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
                 var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
-                if (cacheItem?.Entity != null)
+                if (cacheItem?.Name != null)
                 {
-                    Cache.Remove(BuildNameCacheKey(@event.Headers.AppId(), cacheItem.Entity.Name));
+                    Cache.Remove(BuildNameCacheKey(@event.Headers.AppId(), cacheItem.Name));
                 }
 
                 Cache.Remove(cacheKey);

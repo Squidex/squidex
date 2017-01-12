@@ -40,6 +40,7 @@ export class SchemaFormComponent {
     public cancelled = new EventEmitter();
 
     public creationError = '';
+    public createFormSubmitted = false;
     public createForm: FormGroup =
         this.formBuilder.group({
             name: ['',
@@ -62,7 +63,7 @@ export class SchemaFormComponent {
     }
 
     public createSchema() {
-        this.createForm.markAsTouched();
+        this.createFormSubmitted = true;
 
         if (this.createForm.valid) {
             this.createForm.disable();
@@ -85,6 +86,7 @@ export class SchemaFormComponent {
     public reset() {
         this.creationError = '';
         this.createForm.reset();
+        this.createFormSubmitted = false;
     }
 
     public cancel() {

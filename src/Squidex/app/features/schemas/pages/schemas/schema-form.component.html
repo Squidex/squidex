@@ -8,7 +8,7 @@
 	<div class="form-group">
 		<label for="schema-name">Name</label>
         
-        <sqx-control-errors for="name" [submitted]="createForm.touched"></sqx-control-errors>
+        <sqx-control-errors for="name" [submitted]="createFormSubmitted"></sqx-control-errors>
 
 		<input type="text" class="form-control" id="schema-name" formControlName="name" />
         

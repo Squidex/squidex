@@ -15,7 +15,7 @@
                 <div class="client-header">
                     <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
                         <div class="form-group">
-                            <sqx-control-errors for="name" [submitted]="renameForm.touched"></sqx-control-errors>
+                            <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
                             
                             <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                         </div>

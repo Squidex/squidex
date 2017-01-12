@@ -54,6 +54,7 @@ export class FieldComponent implements OnInit {
         return this.field.properties.label && this.field.properties.label.length > 0 ? this.field.properties.label : this.field.name;
     }
 
+    public editFormSubmitted = false;
     public editForm: FormGroup =
         this.formBuilder.group({
             label: ['',
@@ -77,7 +78,7 @@ export class FieldComponent implements OnInit {
     }
 
     public save() {
-        this.editForm.markAsTouched();
+        this.editFormSubmitted = true;
 
         if (this.editForm.valid) {
             const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
@@ -107,6 +108,7 @@ export class FieldComponent implements OnInit {
     }
 
     private resetForm() {
+        this.editFormSubmitted = false;
         this.editForm.reset(this.field.properties);
 
         this.isEditing = false;

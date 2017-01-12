@@ -28,6 +28,7 @@ import {
 export class ContentPageComponent extends AppComponentBase {
     public schema: SchemaDetailsDto;
 
+    public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
     public isNewMode = false;
@@ -48,6 +49,10 @@ export class ContentPageComponent extends AppComponentBase {
 
             this.setupForm(schema);
         });
+    }
+
+    public saveContent() {
+        this.contentFormSubmitted = true;
     }
 
     private setupForm(schema: SchemaDetailsDto) {
@@ -74,7 +79,7 @@ export class ContentPageComponent extends AppComponentBase {
                 }
             }
 
-            controls[field.name] = new FormControl(validators);
+            controls[field.name] = new FormControl(undefined, validators);
         }
 
         this.contentForm = new FormGroup(controls);

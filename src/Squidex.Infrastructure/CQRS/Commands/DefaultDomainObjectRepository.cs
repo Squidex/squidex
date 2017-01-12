@@ -49,14 +49,14 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var streamName = nameResolver.GetStreamName(typeof(TDomainObject), id);
 
-            var domainObject = (TDomainObject)factory.CreateNew(typeof(TDomainObject), id);
-
             var events = await eventStore.GetEventsAsync(streamName).ToList();
 
             if (events.Count == 0)
             {
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(TDomainObject));
             }
+
+            var domainObject = (TDomainObject)factory.CreateNew(typeof(TDomainObject), id);
 
             foreach (var eventData in events)
             {

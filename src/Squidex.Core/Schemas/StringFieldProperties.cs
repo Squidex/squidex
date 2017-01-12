@@ -6,9 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Squidex.Infrastructure;
 using System.Collections.Immutable;
 // ReSharper disable ObjectCreationAsStatement
@@ -108,25 +106,17 @@ namespace Squidex.Core.Schemas
                 yield return new ValidationError("Max length must be greater than min length", nameof(MinLength), nameof(MaxLength));
             }
 
-            if (Pattern == null)
-            {
-                yield break;
-            }
-
-            var isValidPattern = true;
-
-            try
-            {
-                new Regex(Pattern);
-            }
-            catch (ArgumentException)
-            {
-                isValidPattern = false;
-            }
-
-            if (!isValidPattern)
+            if (Pattern != null && !Pattern.IsValidRegex())
             {
                 yield return new ValidationError("Pattern is not a valid expression", nameof(Pattern));
+            }
+
+            if (AllowedValues != null && AllowedValues.Count > 0 && (MinLength.HasValue || MaxLength.HasValue))
+            {
+                yield return new ValidationError("Either allowed values or min and max length can be defined",
+                    nameof(AllowedValues),
+                    nameof(MinLength),
+                    nameof(MaxLength));
             }
         }
     }

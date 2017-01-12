@@ -34,6 +34,7 @@ export class SchemaEditFormComponent implements OnInit {
     @Input()
     public appName: string;
 
+    public editFormSubmitted = false;
     public editForm: FormGroup =
         this.formBuilder.group({
             name: '',
@@ -59,7 +60,7 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public saveSchema() {
-        this.editForm.markAsTouched();
+        this.editFormSubmitted = true;
 
         if (this.editForm.valid) {
             this.editForm.disable();
@@ -78,6 +79,7 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public reset() {
+        this.editFormSubmitted = false;
         this.editForm.reset();
     }
 

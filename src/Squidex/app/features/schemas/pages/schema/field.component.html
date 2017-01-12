@@ -86,7 +86,7 @@
                     <label for="field-label" class="col-xs-3 col-form-label">Label</label>
 
                     <div class="col-xs-6">
-                        <sqx-control-errors for="label" [submitted]="editForm.touched"></sqx-control-errors>
+                        <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
 
                         <input type="text" class="form-control" id="field-label" maxlength="100" formControlName="label" />
 
@@ -100,7 +100,7 @@
                     <label for="field-hints" class="col-xs-3 col-form-label">Hints</label>
 
                     <div class="col-xs-6">
-                        <sqx-control-errors for="hints" [submitted]="editForm.touched"></sqx-control-errors>
+                        <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
 
                         <input type="text" class="form-control" id="field-hints" maxlength="100" formControlName="hints" />
 

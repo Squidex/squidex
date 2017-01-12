@@ -29,6 +29,7 @@ export class AppFormComponent {
     public cancelled = new EventEmitter();
 
     public creationError = '';
+    public createFormSubmitted = false;
     public createForm: FormGroup =
         this.formBuilder.group({
             name: ['',
@@ -50,7 +51,7 @@ export class AppFormComponent {
     }
 
     public createApp() {
-        this.createForm.markAsTouched();
+        this.createFormSubmitted = true;
 
         if (this.createForm.valid) {
             this.createForm.disable();
@@ -69,8 +70,9 @@ export class AppFormComponent {
     }
 
     private reset() {
-        this.createForm.enable();
         this.creationError = '';
+        this.createForm.enable();
+        this.createFormSubmitted = false;
     }
 
     public cancel() {

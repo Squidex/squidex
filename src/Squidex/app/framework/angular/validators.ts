@@ -33,7 +33,7 @@ export class ValidatorsEx {
 
             if (!regex.test(n)) {
                 if (message) {
-                    return { patternMessage: { requiredPattern: regexStr, actualValue: n, message } };
+                    return { patternmessage: { requiredPattern: regexStr, actualValue: n, message } };
                 } else {
                     return { pattern: { requiredPattern: regexStr, actualValue: n } };
                 }
@@ -44,15 +44,19 @@ export class ValidatorsEx {
     }
 
     public static between(minValue: number | undefined, maxValue: number | undefined) {
+        if (!minValue || !maxValue) {
+            return Validators.nullValidator;
+        }
+
         return (control: AbstractControl): { [key: string]: any } => {
             const n: number = control.value;
 
             if (typeof n !== 'number') {
-                return { validNumber: false };
+                return { validnumber: false };
             } else if (minValue && n < minValue) {
-                return { minValue: { minValue, actualValue: n } };
+                return { minvalue: { minValue, actualValue: n } };
             } else if (maxValue && n > maxValue) {
-                return { maxValue: { maxValue, actualValue: n } };
+                return { maxvalue: { maxValue, actualValue: n } };
             }
 
             return {};
@@ -64,7 +68,7 @@ export class ValidatorsEx {
             const n: T = control.value;
 
             if (values.indexOf(n) < 0) {
-                return { validValues: false };
+                return { validvalues: false };
             }
 
             return {};

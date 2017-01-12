@@ -93,27 +93,22 @@ namespace Squidex.Core.Schemas
                 yield return new ValidationError("Max value must be greater than min value", nameof(MinValue), nameof(MaxValue));
             }
 
-            if (AllowedValues != null && AllowedValues.Count > 0 && (MinValue.HasValue || MaxValue.HasValue))
-            {
-                yield return new ValidationError("Either or allowed values or range can be defined",
-                    nameof(AllowedValues),
-                    nameof(MinValue),
-                    nameof(MaxValue));
-            }
-
-            if (!DefaultValue.HasValue)
-            {
-                yield break;
-            }
-
-            if (MinValue.HasValue && DefaultValue.Value < MinValue.Value)
+            if (DefaultValue.HasValue && MinValue.HasValue && DefaultValue.Value < MinValue.Value)
             {
                 yield return new ValidationError("Default value must be greater than min value", nameof(DefaultValue));
             }
 
-            if (MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
+            if (DefaultValue.HasValue && MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
             {
                 yield return new ValidationError("Default value must be less than max value", nameof(DefaultValue));
+            }
+
+            if (AllowedValues != null && AllowedValues.Count > 0 && (MinValue.HasValue || MaxValue.HasValue))
+            {
+                yield return new ValidationError("Either allowed values or min and max value can be defined",
+                    nameof(AllowedValues),
+                    nameof(MinValue),
+                    nameof(MaxValue));
             }
         }
     }
