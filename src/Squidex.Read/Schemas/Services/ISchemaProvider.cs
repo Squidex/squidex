@@ -14,8 +14,8 @@ namespace Squidex.Read.Schemas.Services
 {
     public interface ISchemaProvider
     {
-        Task<ISchemaEntityWithSchema> ProviderSchemaByIdAsync(Guid schemaId);
+        Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid schemaId);
 
-        Task<ISchemaEntityWithSchema> ProvideSchemaByNameAsync(Guid appId, string name);
+        Task<ISchemaEntityWithSchema> FindSchemaByNameAsync(Guid appId, string name);
     }
 }

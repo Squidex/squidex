@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  ContentUpdated.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Events.Contents
 {
-    public interface IAppProvider
+    [TypeName("ContentUpdatedEvent")]
+    public class ContentUpdated : IEvent
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
-
-        Task<IAppEntity> FindAppByNameAsync(string name);
+        public JObject Data { get; set; }
     }
 }

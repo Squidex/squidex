@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -53,7 +54,15 @@ namespace Squidex.Store.MongoDb.Apps
             return entities;
         }
 
-        public async Task<IAppEntity> FindAppByNameAsync(string name)
+        public async Task<IAppEntity> FindAppAsync(Guid id)
+        {
+            var entity =
+                await Collection.Find(s => s.Id == id).FirstOrDefaultAsync();
+
+            return entity;
+        }
+
+        public async Task<IAppEntity> FindAppAsync(string name)
         {
             var entity =
                 await Collection.Find(s => s.Name == name).FirstOrDefaultAsync();

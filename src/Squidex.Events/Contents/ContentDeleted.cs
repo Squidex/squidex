@@ -1,20 +1,18 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  ContentDeleted.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Events.Contents
 {
-    public interface IAppProvider
+    [TypeName("ContentDeletedEvent")]
+    public class ContentDeleted : IEvent
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
-
-        Task<IAppEntity> FindAppByNameAsync(string name);
     }
 }

@@ -42,7 +42,7 @@ namespace Squidex.Write.Apps
 
         protected async Task On(CreateApp command, CommandContext context)
         {
-            if (await appRepository.FindAppByNameAsync(command.Name) != null)
+            if (await appRepository.FindAppAsync(command.Name) != null)
             {
                 var error =
                     new ValidationError($"An app with name '{command.Name}' already exists",

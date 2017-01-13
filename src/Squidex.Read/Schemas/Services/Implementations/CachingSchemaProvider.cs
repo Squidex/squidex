@@ -41,7 +41,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             this.repository = repository;
         }
 
-        public async Task<ISchemaEntityWithSchema> ProviderSchemaByIdAsync(Guid schemaId)
+        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid schemaId)
         {
             var cacheKey = BuildIdCacheKey(schemaId);
             var cacheItem = Cache.Get<CacheItem>(cacheKey);
@@ -63,7 +63,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             return cacheItem.Entity;
         }
 
-        public async Task<ISchemaEntityWithSchema> ProvideSchemaByNameAsync(Guid appId, string name)
+        public async Task<ISchemaEntityWithSchema> FindSchemaByNameAsync(Guid appId, string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 

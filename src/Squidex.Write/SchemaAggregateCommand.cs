@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  SchemaAggregateCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,14 +7,21 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Write
 {
-    public interface IAppProvider
+    public abstract class SchemaAggregateCommand : AppCommand, ISchemaCommand
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
-
-        Task<IAppEntity> FindAppByNameAsync(string name);
+        Guid ISchemaCommand.SchemaId
+        {
+            get
+            {
+                return AggregateId;
+            }
+            set
+            {
+                AggregateId = value;
+            }
+        }
     }
 }

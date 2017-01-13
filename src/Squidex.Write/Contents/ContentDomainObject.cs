@@ -1,0 +1,99 @@
+﻿// ==========================================================================
+//  ContentDomainObject.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
+using Squidex.Events.Contents;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Write.Contents.Commands;
+
+namespace Squidex.Write.Contents
+{
+    public class ContentDomainObject : DomainObject
+    {
+        private bool isDeleted;
+        private bool isCreated;
+
+        public bool IsDeleted
+        {
+            get { return isDeleted; }
+        }
+
+        public ContentDomainObject(Guid id, int version) 
+            : base(id, version)
+        {
+        }
+
+        protected void On(ContentCreated @event)
+        {
+            isCreated = true;
+        }
+
+        protected void On(ContentDeleted @event)
+        {
+            isDeleted = true;
+        }
+
+        public ContentDomainObject Create(CreateContent command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot create content");
+
+            VerifyNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentCreated()));
+
+            return this;
+        }
+
+        public ContentDomainObject Update(UpdateContent command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot update content");
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
+
+            return this;
+        }
+
+        public ContentDomainObject Delete(DeleteContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+
+            return this;
+        }
+
+        private void VerifyNotCreated()
+        {
+            if (isCreated)
+            {
+                throw new DomainException("Content has already been created.");
+            }
+        }
+
+        private void VerifyCreatedAndNotDeleted()
+        {
+            if (isDeleted || !isCreated)
+            {
+                throw new DomainException("Content has already been deleted or not created yet.");
+            }
+        }
+
+        protected override void DispatchEvent(Envelope<IEvent> @event)
+        {
+            this.DispatchAction(@event.Payload);
+        }
+    }
+}

@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class AddField : AppCommand, IValidatable
+    public class AddField : SchemaAggregateCommand, IValidatable
     {
         public string Name { get; set; }
 
@@ -20,9 +20,9 @@ namespace Squidex.Write.Schemas.Commands
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!Name.IsSlug())
+            if (!Name.IsPropertyName())
             {
-                errors.Add(new ValidationError("DisplayName must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("DisplayName must be a valid property name", nameof(Name)));
             }
 
             if (Properties == null)

@@ -23,39 +23,63 @@ namespace Squidex.Read.Apps.Services.Implementations
     public class CachingAppProvider : CachingProvider, IAppProvider, ICatchEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
-        private readonly IAppRepository appRepository;
+        private readonly IAppRepository repository;
 
         private sealed class CacheItem
         {
             public IAppEntity Entity;
+
+            public string Name;
         }
 
-        public CachingAppProvider(IMemoryCache cache, IAppRepository appRepository)
+        public CachingAppProvider(IMemoryCache cache, IAppRepository repository)
             : base(cache)
         {
             Guard.NotNull(cache, nameof(cache));
 
-            this.appRepository = appRepository;
+            this.repository = repository;
+        }
+
+        public async Task<IAppEntity> FindAppByIdAsync(Guid appId)
+        {
+            var cacheKey = BuildIdCacheKey(appId);
+            var cacheItem = Cache.Get<CacheItem>(cacheKey);
+
+            if (cacheItem == null)
+            {
+                var entity = await repository.FindAppAsync(appId);
+
+                cacheItem = new CacheItem { Entity = entity, Name = entity?.Name };
+
+                Cache.Set(cacheKey, cacheItem, CacheDuration);
+
+                if (cacheItem.Entity != null)
+                {
+                    Cache.Set(BuildIdCacheKey(cacheItem.Entity.Id), cacheItem, CacheDuration);
+                }
+            }
+
+            return cacheItem.Entity;
         }
 
         public async Task<IAppEntity> FindAppByNameAsync(string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            var cacheKey = BuildModelCacheKey(name);
+            var cacheKey = BuildNameCacheKey(name);
             var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
             if (cacheItem == null)
             {
-                var app = await appRepository.FindAppByNameAsync(name);
+                var entity = await repository.FindAppAsync(name);
 
-                cacheItem = new CacheItem { Entity = app };
+                cacheItem = new CacheItem { Entity = entity, Name = name };
 
-                Cache.Set(cacheKey, cacheItem, new MemoryCacheEntryOptions { SlidingExpiration = CacheDuration });
+                Cache.Set(cacheKey, cacheItem, CacheDuration);
 
                 if (cacheItem.Entity != null)
                 {
-                    Cache.Set(BuildNamesCacheKey(cacheItem.Entity.Id), cacheItem.Entity.Name, CacheDuration);
+                    Cache.Set(BuildIdCacheKey(cacheItem.Entity.Id), cacheItem, CacheDuration);
                 }
             }
 
@@ -73,25 +97,29 @@ namespace Squidex.Read.Apps.Services.Implementations
                 @event.Payload is AppLanguageRemoved ||
                 @event.Payload is AppMasterLanguageSet)
             {
-                var appName = Cache.Get<string>(BuildNamesCacheKey(@event.Headers.AggregateId()));
+                var cacheKey = BuildIdCacheKey(@event.Headers.AggregateId());
 
-                if (appName != null)
+                var cacheItem = Cache.Get<CacheItem>(cacheKey);
+
+                if (cacheItem?.Name != null)
                 {
-                    Cache.Remove(BuildModelCacheKey(appName));
+                    Cache.Remove(BuildNameCacheKey(cacheItem.Name));
                 }
+
+                Cache.Remove(cacheKey);
             }
 
             return Task.FromResult(true);
         }
 
-        private static string BuildNamesCacheKey(Guid schemaId)
+        private static string BuildNameCacheKey(string name)
         {
-            return $"App_Names_{schemaId}";
+            return $"App_Ids_{name}";
         }
 
-        private static string BuildModelCacheKey(string name)
+        private static string BuildIdCacheKey(Guid schemaId)
         {
-            return $"App_{name}";
+            return $"App_Names_{schemaId}";
         }
     }
 }

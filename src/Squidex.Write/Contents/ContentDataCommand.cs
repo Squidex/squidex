@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  UpdateField.cs
+//  ContentDataCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,22 +7,20 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Core.Schemas;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Write.Contents
 {
-    public class UpdateField : SchemaAggregateCommand, IValidatable
+    public class ContentDataCommand : SchemaCommand, IValidatable
     {
-        public long FieldId { get; set; }
-
-        public FieldProperties Properties { get; set; }
+        public JObject Data { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (Properties == null)
+            if (Data == null)
             {
-                errors.Add(new ValidationError("Properties must be defined.", nameof(Properties)));
+                errors.Add(new ValidationError("Data cannot be null", nameof(Data)));
             }
         }
     }

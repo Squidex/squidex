@@ -48,7 +48,7 @@ namespace Squidex.Core.Schemas
 
         protected Field(long id, string name)
         {
-            Guard.ValidSlug(name, nameof(name));
+            Guard.ValidPropertyName(name, nameof(name));
             Guard.GreaterThan(id, 0, nameof(id));
 
             this.id = id;

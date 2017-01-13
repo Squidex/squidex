@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  ContentCreated.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,14 +7,17 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Events.Contents
 {
-    public interface IAppProvider
+    [TypeName("ContentCreatedEvent")]
+    public class ContentCreated : IEvent
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
+        public Guid SchemaId { get; set; }
 
-        Task<IAppEntity> FindAppByNameAsync(string name);
+        public JObject Data { get; set; }
     }
 }

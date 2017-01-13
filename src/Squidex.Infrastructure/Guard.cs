@@ -53,6 +53,18 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ValidPropertyName(string target, string parameterName)
+        {
+            NotNullOrEmpty(target, parameterName);
+
+            if (!target.IsPropertyName())
+            {
+                throw new ArgumentException("Target is not a valid property name.", parameterName);
+            }
+        }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void HasType<T>(object target, string parameterName)
         {
             if (target != null && target.GetType() != typeof(T))

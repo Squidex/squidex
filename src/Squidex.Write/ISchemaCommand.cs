@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  ISchemaCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,14 +7,11 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Write
 {
-    public interface IAppProvider
+    public interface ISchemaCommand : IAppCommand
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
-
-        Task<IAppEntity> FindAppByNameAsync(string name);
+        Guid SchemaId { get; set; }
     }
 }

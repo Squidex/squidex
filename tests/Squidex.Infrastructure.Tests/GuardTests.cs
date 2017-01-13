@@ -150,9 +150,10 @@ namespace Squidex.Infrastructure
         [InlineData(" not-a-slug ")]
         [InlineData("-not-a-slug-")]
         [InlineData("not$-a-slug")]
+        [InlineData("not-a-Slug")]
         public void ValidSlug_should_throw_for_invalid_slugs(string slug)
         {
-            Assert.Throws<ArgumentException>(() => Guard.ValidSlug(slug, "slug"));
+            Assert.Throws<ArgumentException>(() => Guard.ValidSlug(slug, "parameter"));
         }
 
         [Theory]
@@ -163,6 +164,33 @@ namespace Squidex.Infrastructure
         public void ValidSlug_should_do_nothing_for_valid_slugs(string slug)
         {
             Guard.ValidSlug(slug, "parameter");
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(" Not a Property ")]
+        [InlineData(" not--a--property ")]
+        [InlineData(" not-a-property ")]
+        [InlineData("-not-a-property-")]
+        [InlineData("not$-a-property")]
+        public void ValidPropertyName_should_throw_for_invalid_slugs(string slug)
+        {
+            Assert.Throws<ArgumentException>(() => Guard.ValidPropertyName(slug, "property"));
+        }
+
+        [Theory]
+        [InlineData("property")]
+        [InlineData("property23")]
+        [InlineData("other-property")]
+        [InlineData("other-Property")]
+        [InlineData("otherProperty")]
+        [InlineData("just-another-property")]
+        [InlineData("just-Another-Property")]
+        [InlineData("justAnotherProperty")]
+        public void ValidPropertyName_should_do_nothing_for_valid_slugs(string property)
+        {
+            Guard.ValidPropertyName(property, "parameter");
         }
 
         [Theory]

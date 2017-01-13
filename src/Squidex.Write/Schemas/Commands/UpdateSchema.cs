@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class UpdateSchema : AppCommand, IValidatable
+    public class UpdateSchema : SchemaAggregateCommand, IValidatable
     {
         public SchemaProperties Properties { get; set; }
 

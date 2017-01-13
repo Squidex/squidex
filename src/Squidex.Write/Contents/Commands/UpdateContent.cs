@@ -1,20 +1,14 @@
 ﻿// ==========================================================================
-//  IAppProvider.cs
+//  UpdateContent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Write.Contents.Commands
 {
-    public interface IAppProvider
+    public class UpdateContent : ContentDataCommand
     {
-        Task<IAppEntity> FindAppByIdAsync(Guid id);
-
-        Task<IAppEntity> FindAppByNameAsync(string name);
     }
 }

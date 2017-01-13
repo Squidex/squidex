@@ -53,7 +53,7 @@ namespace Squidex.Write.Apps
             var command = new CreateApp { Name = appName, AggregateId = Id, Actor = subjectId };
             var context = new CommandContext(command);
 
-            appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(appName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
 
             await TestCreate(app, async _ =>
             {
@@ -69,7 +69,7 @@ namespace Squidex.Write.Apps
             var command = new CreateApp { Name = appName, AggregateId = Id, Actor = subjectId };
             var context = new CommandContext(command);
 
-            appRepository.Setup(x => x.FindAppByNameAsync(appName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(appName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
 
             await TestCreate(app, async _ =>
             {

@@ -5,9 +5,10 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Write.Schemas.Commands
 {
-    public class DeleteSchema : AppCommand
+    public class DeleteSchema : SchemaAggregateCommand
     {
     }
 }

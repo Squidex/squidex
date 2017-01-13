@@ -51,7 +51,7 @@ namespace Squidex.Write.Schemas
             var command = new CreateSchema { Name = schemaName, AppId = appId, AggregateId = Id };
             var context = new CommandContext(command);
 
-            schemaProvider.Setup(x => x.ProvideSchemaByNameAsync(appId, schemaName)).Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(appId, schemaName)).Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object)).Verifiable();
 
             await TestCreate(schema, async _ =>
             {
@@ -67,7 +67,7 @@ namespace Squidex.Write.Schemas
             var command = new CreateSchema { Name = schemaName, AppId = appId, AggregateId = Id };
             var context = new CommandContext(command);
 
-            schemaProvider.Setup(x => x.ProvideSchemaByNameAsync(Id, schemaName)).Returns(Task.FromResult<ISchemaEntityWithSchema>(null)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(Id, schemaName)).Returns(Task.FromResult<ISchemaEntityWithSchema>(null)).Verifiable();
 
             await TestCreate(schema, async _ =>
             {

@@ -104,7 +104,7 @@ namespace Squidex.Read.Schemas
 
         private async Task<string> FindSchemaNameAsync(EnvelopeHeaders headers)
         {
-            var schema = await schemaProvider.ProviderSchemaByIdAsync(headers.AggregateId());
+            var schema = await schemaProvider.FindSchemaByIdAsync(headers.AggregateId());
 
             return schema.Label ?? schema.Name;
         }

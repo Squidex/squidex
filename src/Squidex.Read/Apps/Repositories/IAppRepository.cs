@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,6 +16,8 @@ namespace Squidex.Read.Apps.Repositories
     {
         Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId);
 
-        Task<IAppEntity> FindAppByNameAsync(string name);
+        Task<IAppEntity> FindAppAsync(Guid appId);
+
+        Task<IAppEntity> FindAppAsync(string name);
     }
 }
