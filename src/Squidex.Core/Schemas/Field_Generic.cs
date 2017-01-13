@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            return Update<Field<T>>(clone => clone.properties = typedProperties);
+            return Clone<Field<T>>(clone => clone.properties = typedProperties);
         }
 
         private T ValidateProperties(FieldProperties newProperties)

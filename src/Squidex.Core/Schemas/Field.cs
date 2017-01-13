@@ -9,13 +9,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 
 namespace Squidex.Core.Schemas
 {
-    public abstract class Field
+    public abstract class Field : Cloneable
     {
         private readonly Lazy<List<IValidator>> validators;
         private readonly long id;
@@ -59,21 +60,21 @@ namespace Squidex.Core.Schemas
 
         public abstract Field Update(FieldProperties newProperties);
 
-        public async Task ValidateAsync(PropertyValue property, ICollection<string> errors)
+        public async Task ValidateAsync(JToken value, ICollection<string> errors, Language language = null)
         {
-            Guard.NotNull(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
 
             var rawErrors = new List<string>();
             try
             {
-                var value = ConvertValue(property);
+                var typedValue = value.Type == JTokenType.Null ? null :  ConvertValue(value);
 
                 foreach (var validator in validators.Value)
                 {
-                    await validator.ValidateAsync(value, rawErrors);
+                    await validator.ValidateAsync(typedValue, rawErrors);
                 }
             }
-            catch (InvalidCastException)
+            catch
             {
                 rawErrors.Add("<FIELD> is not a valid value");
             }
@@ -81,6 +82,11 @@ namespace Squidex.Core.Schemas
             if (rawErrors.Count > 0)
             {
                 var displayName = !string.IsNullOrWhiteSpace(RawProperties.Label) ? RawProperties.Label : name;
+
+                if (language != null)
+                {
+                    displayName += $" ({language.Iso2Code})";
+                }
 
                 foreach (var error in rawErrors)
                 {
@@ -91,22 +97,22 @@ namespace Squidex.Core.Schemas
 
         public Field Hide()
         {
-            return Update<Field>(clone => clone.isHidden = true);
+            return Clone<Field>(clone => clone.isHidden = true);
         }
 
         public Field Show()
         {
-            return Update<Field>(clone => clone.isHidden = false);
+            return Clone<Field>(clone => clone.isHidden = false);
         }
 
         public Field Disable()
         {
-            return Update<Field>(clone => clone.isDisabled = true);
+            return Clone<Field>(clone => clone.isDisabled = true);
         }
 
         public Field Enable()
         {
-            return Update<Field>(clone => clone.isDisabled = false);
+            return Clone<Field>(clone => clone.isDisabled = false);
         }
 
         public Field Rename(string newName)
@@ -118,22 +124,11 @@ namespace Squidex.Core.Schemas
                 throw new ValidationException($"Cannot rename the field '{name}' ({id})", error);
             }
 
-            return Update<Field>(clone => clone.name = newName);
-        }
-
-        protected T Update<T>(Action<T> updater) where T : Field
-        {
-            var clone = (T)Clone();
-
-            updater(clone);
-
-            return clone;
+            return Clone<Field>(clone => clone.name = newName);
         }
 
         protected abstract IEnumerable<IValidator> CreateValidators();
 
-        protected abstract object ConvertValue(PropertyValue property);
-
-        protected abstract Field Clone();
+        protected abstract object ConvertValue(JToken value);
     }
 }

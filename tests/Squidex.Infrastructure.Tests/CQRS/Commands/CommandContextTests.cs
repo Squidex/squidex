@@ -46,6 +46,22 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
+        public void Should_not_update_exception_when_failed()
+        {
+            var exc1 = new InvalidOperationException();
+            var exc2 = new InvalidOperationException();
+            var sut = new CommandContext(command);
+
+            sut.Fail(exc1);
+            sut.Fail(exc2);
+
+            Assert.Equal(exc1, sut.Exception);
+            Assert.True(sut.IsHandled);
+            Assert.True(sut.IsFailed);
+            Assert.False(sut.IsSucceeded);
+        }
+
+        [Fact]
         public void Should_be_handled_when_succeeded()
         {
             var sut = new CommandContext(command);

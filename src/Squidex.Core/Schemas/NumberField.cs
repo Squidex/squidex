@@ -7,10 +7,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Globalization;
-using Squidex.Core.Schemas.Validators;
-using Squidex.Infrastructure;
 using System.Linq;
+using Newtonsoft.Json.Linq;
+using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
 {
@@ -39,14 +38,9 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(PropertyValue property)
+        protected override object ConvertValue(JToken value)
         {
-            return property.ToNullableDouble(CultureInfo.InvariantCulture);
-        }
-
-        protected override Field Clone()
-        {
-            return new NumberField(Id, Name, Properties);
+            return (double?)value;
         }
     }
 }

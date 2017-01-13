@@ -8,8 +8,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas.Validators;
-using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
@@ -43,14 +43,9 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(PropertyValue property)
+        protected override object ConvertValue(JToken value)
         {
-            return property.ToString();
-        }
-
-        protected override Field Clone()
-        {
-            return new StringField(Id, Name, Properties);
+            return value.ToString();
         }
     }
 }

@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Infrastructure;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Squidex.Core.Schemas
@@ -35,11 +35,21 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid()
+        public async Task Should_not_add_error_if_valid_null()
         {
             var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
 
             await sut.ValidateAsync(CreateValue(null), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_valid()
+        {
+            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
+
+            await sut.ValidateAsync(CreateValue(true), errors);
 
             Assert.Empty(errors);
         }
@@ -66,11 +76,9 @@ namespace Squidex.Core.Schemas
                 new[] { "Name is not a valid value" });
         }
 
-        private static PropertyValue CreateValue(object v)
+        private static JValue CreateValue(object v)
         {
-            var bag = new PropertiesBag().Set("value", v);
-
-            return bag["value"];
+            return new JValue(v);
         }
     }
 }

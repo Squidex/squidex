@@ -215,55 +215,6 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_if_validating_bag_with_unknown_field()
-        {
-            var errors = new List<ValidationError>();
-            var bag = new PropertiesBag().Set("unknown", 123);
-
-            await sut.ValidateAsync(bag, errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("unknown is not a known field", "unknown")
-                });
-        }
-
-        [Fact]
-        public async Task Should_add_error_if_validating_bag_with_invalid_field()
-        {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
-
-            var errors = new List<ValidationError>();
-            var bag = new PropertiesBag().Set("my-field", 123);
-
-            await sut.ValidateAsync(bag, errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("my-field must be less than '100'", "my-field")
-                });
-        }
-
-        [Fact]
-        public async Task Should_add_error_if_required_field_is_not_in_bag()
-        {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
-
-            var errors = new List<ValidationError>();
-            var bag = new PropertiesBag();
-
-            await sut.ValidateAsync(bag, errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("my-field is required", "my-field")
-                });
-        }
-
-        [Fact]
         public void Should_publish_schema()
         {
             sut = sut.Publish();

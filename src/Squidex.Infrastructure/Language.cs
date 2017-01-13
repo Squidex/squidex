@@ -54,6 +54,20 @@ namespace Squidex.Infrastructure
             }
         }
 
+        public static bool TryGetLanguage(string iso2Code, out Language language)
+        {
+            Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
+
+            return allLanguages.TryGetValue(iso2Code, out language);
+        }
+
+        public static bool IsValidLanguage(string iso2Code)
+        {
+            Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
+
+            return allLanguages.ContainsKey(iso2Code);
+        }
+
         public static IEnumerable<Language> AllLanguages
         {
             get { return allLanguages.Values; }

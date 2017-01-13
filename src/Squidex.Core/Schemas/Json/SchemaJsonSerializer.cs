@@ -100,9 +100,7 @@ namespace Squidex.Core.Schemas.Json
             var schema =
                 new Schema(
                     model.Name,
-                    model.Properties,
-                    model.IsPublished,
-                    fields);
+                    model.IsPublished, model.Properties, fields);
 
             return schema;
         }
