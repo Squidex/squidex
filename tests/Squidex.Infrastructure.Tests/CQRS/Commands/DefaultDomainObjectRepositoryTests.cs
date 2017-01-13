@@ -14,7 +14,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
-
+// ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace Squidex.Infrastructure.CQRS.Commands

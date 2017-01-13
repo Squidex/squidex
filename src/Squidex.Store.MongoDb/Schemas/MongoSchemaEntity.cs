@@ -7,14 +7,12 @@
 // ==========================================================================
 
 using System;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Schemas
 {

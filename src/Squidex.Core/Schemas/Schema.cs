@@ -230,7 +230,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private void AppendEmptyLanguages(JObject data, IEnumerable<Language> languages)
+        private static void AppendEmptyLanguages(JObject data, IEnumerable<Language> languages)
         {
             var nullJson = JValue.CreateNull();
 

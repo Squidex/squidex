@@ -1,6 +1,12 @@
-﻿using System;
+﻿// ==========================================================================
+//  SchemaValidationTests.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -141,7 +147,7 @@ namespace Squidex.Core.Schemas
                 new List<ValidationError>
                 {
                     new ValidationError("my-field has an unsupported language 'es'", "my-field"),
-                    new ValidationError("my-field has an unsupported language 'it'", "my-field"),
+                    new ValidationError("my-field has an unsupported language 'it'", "my-field")
                 });
         }
     }
