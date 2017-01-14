@@ -7,8 +7,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
@@ -46,6 +48,19 @@ namespace Squidex.Core.Schemas
         protected override object ConvertValue(JToken value)
         {
             return value.ToString();
+        }
+
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        {
+            jsonProperty.Type = JsonObjectType.String;
+
+            jsonProperty.MinLength = Properties.MinLength;
+            jsonProperty.MaxLength = Properties.MaxLength;
+
+            if (Properties.AllowedValues != null)
+            {
+                jsonProperty.EnumerationNames = new Collection<string>(Properties.AllowedValues);
+            }
         }
     }
 }

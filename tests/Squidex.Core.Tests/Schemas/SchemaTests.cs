@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -241,6 +242,25 @@ namespace Squidex.Core.Schemas
         public void Should_throw_if_schema_is_not_published()
         {
             Assert.Throws<DomainException>(() => sut.Unpublish());
+        }
+
+        [Fact]
+        public void Should_build_schema()
+        {
+            var schema = 
+                Schema.Create("user", new SchemaProperties { Hints = "The User" })
+                    .AddOrUpdateField(new StringField(1, "firstName", 
+                        new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new [] { "1", "2" }.ToImmutableList() }))
+                    .AddOrUpdateField(new StringField(2, "lastName",  
+                        new StringFieldProperties { Hints = "Last Name" }))
+                    .AddOrUpdateField(new BooleanField(3, "admin", 
+                        new BooleanFieldProperties()))
+                    .AddOrUpdateField(new NumberField(4, "age",
+                        new NumberFieldProperties()));
+
+            var json = schema.BuildSchema(new HashSet<Language>(new [] { Language.GetLanguage("de"), Language.GetLanguage("en") })).ToJson();
+
+            Assert.NotNull(json);
         }
 
         private NumberField AddField()

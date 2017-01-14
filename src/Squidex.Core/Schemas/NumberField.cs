@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
@@ -35,6 +36,21 @@ namespace Squidex.Core.Schemas
             if (Properties.AllowedValues != null)
             {
                 yield return new AllowedValuesValidator<double>(Properties.AllowedValues.ToArray());
+            }
+        }
+
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        {
+            jsonProperty.Type = JsonObjectType.Number;
+
+            if (Properties.MinValue.HasValue)
+            {
+                jsonProperty.Minimum = (decimal)Properties.MinValue.Value;
+            }
+
+            if (Properties.MaxValue.HasValue)
+            {
+                jsonProperty.Maximum = (decimal)Properties.MaxValue.Value;
             }
         }
 

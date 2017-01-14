@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Infrastructure;
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
@@ -127,7 +128,63 @@ namespace Squidex.Core.Schemas
             return Clone<Field>(clone => clone.name = newName);
         }
 
+        public void AddToSchema(JsonSchema4 schema, HashSet<Language> languages)
+        {
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotEmpty(languages, nameof(languages));
+
+            if (RawProperties.IsLocalizable)
+            {
+                var localizableProperty = new JsonProperty { IsRequired = true, Type = JsonObjectType.Object };
+                var localizableType = new JsonSchema4 { Id = $"{Name}ByLanguage" };
+
+                foreach (var language in languages)
+                {
+                    var languageProperty = CreateProperty();
+
+                    if (!string.IsNullOrWhiteSpace(languageProperty.Title))
+                    {
+                        languageProperty.Title += $" ({language.EnglishName})";
+                    }
+
+                    localizableType.Properties.Add(language.Iso2Code, languageProperty);
+                }
+
+                localizableProperty.OneOf.Add(localizableType);
+
+                schema.Properties.Add(Name, localizableProperty);
+            }
+            else
+            {
+                schema.Properties.Add(Name, CreateProperty());
+            }
+        }
+
+        public JsonProperty CreateProperty()
+        {
+            var jsonProperty = new JsonProperty { IsRequired = RawProperties.IsRequired };
+
+            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
+            {
+                jsonProperty.Title = RawProperties.Hints;
+            }
+            else if (!string.IsNullOrWhiteSpace(RawProperties.Label))
+            {
+                jsonProperty.Title = $"The {RawProperties.Label} field";
+            }
+            else
+            {
+                jsonProperty.Title = $"The {Name} field";
+            }
+
+            PrepareJsonSchema(jsonProperty);
+
+            return jsonProperty;
+        }
+
         protected abstract IEnumerable<IValidator> CreateValidators();
+
+        protected abstract void PrepareJsonSchema(JsonProperty jsonProperty);
 
         protected abstract object ConvertValue(JToken value);
     }

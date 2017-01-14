@@ -4,7 +4,8 @@
     "Squidex.Infrastructure": "1.0.0-*",
     "protobuf-net": "2.1.0",
     "NETStandard.Library": "1.6.1",
-    "Microsoft.NETCore.App": "1.1.0"
+    "Microsoft.NETCore.App": "1.1.0",
+    "NJsonSchema": "7.6.6221.22528"
   },
   "frameworks": {
     "netcoreapp1.0": {

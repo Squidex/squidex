@@ -6,8 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
@@ -30,6 +32,11 @@ namespace Squidex.Core.Schemas
         protected override object ConvertValue(JToken value)
         {
             return (bool?)value;
+        }
+
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        {
+            jsonProperty.Type = JsonObjectType.Boolean;
         }
     }
 }

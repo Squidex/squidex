@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
@@ -163,6 +164,33 @@ namespace Squidex.Core.Schemas
             var newField = updater(field);
 
             return AddOrUpdateField(newField);
+        }
+
+        public JsonSchema4 BuildSchema(HashSet<Language> languages)
+        {
+            Guard.NotEmpty(languages, nameof(languages));
+
+            var schema = new JsonSchema4 { Id = Name };
+
+            if (!string.IsNullOrWhiteSpace(Properties.Hints))
+            {
+                schema.Title = Properties.Hints;
+            }
+            else if (!string.IsNullOrWhiteSpace(Properties.Label))
+            {
+                schema.Title = $"The {Properties.Label} field";
+            }
+            else
+            {
+                schema.Title = $"The {Name} field";
+            }
+
+            foreach (var field in fieldsByName.Values)
+            {
+                field.AddToSchema(schema, languages);
+            }
+
+            return schema;
         }
 
         public async Task ValidateAsync(JObject data, IList<ValidationError> errors, HashSet<Language> languages)
