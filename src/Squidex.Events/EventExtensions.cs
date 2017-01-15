@@ -14,11 +14,6 @@ namespace Squidex.Events
 {
     public static class EventExtensions
     {
-        public static bool HasAppId(this EnvelopeHeaders headers)
-        {
-            return headers.Contains("AppId");
-        }
-
         public static Guid AppId(this EnvelopeHeaders headers)
         {
             return headers["AppId"].ToGuid(CultureInfo.InvariantCulture);
@@ -29,11 +24,6 @@ namespace Squidex.Events
             envelope.Headers.Set("AppId", value);
 
             return envelope;
-        }
-
-        public static bool HasSchemaId(this EnvelopeHeaders headers)
-        {
-            return headers.Contains("SchemaId");
         }
 
         public static Guid SchemaId(this EnvelopeHeaders headers)
