@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IContentRepoitory.cs
+//  IContentRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,10 +12,12 @@ using System.Threading.Tasks;
 
 namespace Squidex.Read.Contents.Repositories
 {
-    public interface IContentRepoitory
+    public interface IContentRepository
     {
-        Task<List<IContentEntity>> QueryAsync();
+        Task<List<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, int? take, int? skip, string query);
 
-        Task<IContentEntity> FindContentAsync(Guid id);
+        Task<long> CountAsync(Guid schemaId, bool nonPublished, string query);
+
+        Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id);
     }
 }

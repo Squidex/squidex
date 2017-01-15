@@ -48,6 +48,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             Guard.NotNull(creator, nameof(creator));
             Guard.NotNull(command, nameof(command));
+            Guard.NotEmpty(command.AggregateId, nameof(command.AggregateId));
 
             var aggregate = domainObjectFactory.CreateNew<T>(command.AggregateId);
 
@@ -60,6 +61,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             Guard.NotNull(updater, nameof(updater));
             Guard.NotNull(command, nameof(command));
+            Guard.NotEmpty(command.AggregateId, nameof(command.AggregateId));
 
             var aggregate = await domainObjectRepository.GetByIdAsync<T>(command.AggregateId);
 

@@ -48,9 +48,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public async Task Should_do_nothing_if_context_has_no_exception()
+        public async Task Should_do_nothing_if_command_is_succeeded()
         {
             var context = new CommandContext(new MyCommand());
+
+            context.Succeed();
 
             var isHandled = await sut.HandleAsync(context);
 
@@ -59,12 +61,25 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public async Task Should_log_if_context_has_exception2()
+        public async Task Should_log_if_command_failed()
         {
             var context = new CommandContext(new MyCommand());
 
             context.Fail(new InvalidOperationException());
             
+            var isHandled = await sut.HandleAsync(context);
+
+            Assert.False(isHandled);
+            Assert.Equal(1, logger.LogCount);
+        }
+
+        [Fact]
+        public async Task Should_log_if_command_is_not_handled()
+        {
+            var context = new CommandContext(new MyCommand());
+
+            context.Fail(new InvalidOperationException());
+
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);

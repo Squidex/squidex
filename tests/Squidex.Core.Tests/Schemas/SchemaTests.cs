@@ -256,7 +256,7 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new BooleanField(3, "admin", 
                         new BooleanFieldProperties()))
                     .AddOrUpdateField(new NumberField(4, "age",
-                        new NumberFieldProperties()));
+                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
 
             var languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
 

@@ -335,7 +335,7 @@ When you change the field to be localizable the value will become the value for 
                     ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content element.", null),
                     ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content element has been modified last.", "date-time"),
                     ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content element.", null),
-                    ["isPublished"] = new JsonProperty
+                    ["nonPublished"] = new JsonProperty
                     {
                         Description = $"Indicates if the {schemaName} content element is publihed.", IsRequired = true, Type = JsonObjectType.Boolean
                     }   

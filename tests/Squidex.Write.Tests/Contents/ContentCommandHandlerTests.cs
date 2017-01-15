@@ -35,13 +35,13 @@ namespace Squidex.Write.Contents
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly ContentData data = ContentData.Empty().AddField("my-field", ContentFieldData.New().AddValue(1));
+        private readonly ContentData data = ContentData.Empty.AddField("my-field", ContentFieldData.Empty.AddValue(1));
 
         public ContentCommandHandlerTests()
         {
             var schema = 
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new NumberField(1, "field", 
+                    .AddOrUpdateField(new NumberField(1, "my-field", 
                         new NumberFieldProperties { IsRequired = true }));
 
             content = new ContentDomainObject(Id, 0);
@@ -58,7 +58,7 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Create_should_throw_exception_if_data_is_not_valid()
         {
-            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty() };
+            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty };
             var context = new CommandContext(command);
 
             await TestCreate(content, async _ =>
@@ -86,7 +86,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty() };
+            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty };
             var context = new CommandContext(command);
 
             await TestUpdate(content, async _ =>

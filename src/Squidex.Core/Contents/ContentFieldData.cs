@@ -17,6 +17,8 @@ namespace Squidex.Core.Contents
     {
         private readonly ImmutableDictionary<string, JToken> valueByLanguage;
 
+        public static readonly ContentFieldData Empty = new ContentFieldData(ImmutableDictionary<string, JToken>.Empty.WithComparers(StringComparer.OrdinalIgnoreCase));
+
         public ImmutableDictionary<string, JToken> ValueByLanguage
         {
             get { return valueByLanguage; }
@@ -27,11 +29,6 @@ namespace Squidex.Core.Contents
             Guard.NotNull(valueByLanguage, nameof(valueByLanguage));
 
             this.valueByLanguage = valueByLanguage;
-        }
-
-        public static ContentFieldData New()
-        {
-            return new ContentFieldData(ImmutableDictionary<string, JToken>.Empty.WithComparers(StringComparer.OrdinalIgnoreCase));
         }
 
         public ContentFieldData AddValue(JToken value)

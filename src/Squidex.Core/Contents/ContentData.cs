@@ -7,7 +7,10 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Contents
@@ -15,6 +18,8 @@ namespace Squidex.Core.Contents
     public sealed class ContentData
     {
         private readonly ImmutableDictionary<string, ContentFieldData> fields;
+
+        public static readonly ContentData Empty = new ContentData(ImmutableDictionary<string, ContentFieldData>.Empty.WithComparers (StringComparer.OrdinalIgnoreCase));
 
         public ImmutableDictionary<string, ContentFieldData> Fields
         {
@@ -28,16 +33,21 @@ namespace Squidex.Core.Contents
             this.fields = fields;
         }
 
-        public static ContentData Empty()
-        {
-            return new ContentData(ImmutableDictionary<string, ContentFieldData>.Empty.WithComparers(StringComparer.OrdinalIgnoreCase));
-        }
-
         public ContentData AddField(string fieldName, ContentFieldData data)
         {
             Guard.ValidPropertyName(fieldName, nameof(fieldName));
 
             return new ContentData(Fields.Add(fieldName, data));
+        }
+
+        public static ContentData Create(Dictionary<string, Dictionary<string, JToken>> raw)
+        {
+            return new ContentData(raw.ToImmutableDictionary(x => x.Key, x => new ContentFieldData(x.Value.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)), StringComparer.OrdinalIgnoreCase));
+        }
+
+        public Dictionary<string, Dictionary<string, JToken>> ToRaw()
+        {
+            return fields.ToDictionary(x => x.Key, x => x.Value.ValueByLanguage.ToDictionary(y => y.Key, y => y.Value));
         }
     }
 }

@@ -31,6 +31,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 logger.LogError(InfrastructureErrors.CommandFailed, exception, "Handling {0} command failed", context.Command);
             }
 
+            if (!context.IsHandled)
+            {
+                logger.LogCritical(InfrastructureErrors.CommandUnknown, exception, "Unknown command {0}", context.Command);
+            }
+
             return Task.FromResult(false);
         }
     }

@@ -6,12 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 
 namespace Squidex.Read.Contents
 {
     public interface IContentEntity : IEntity
     {
-        JToken Data { get; }
+        bool IsPublished { get; }
+
+        ContentData Data { get; }
     }
 }

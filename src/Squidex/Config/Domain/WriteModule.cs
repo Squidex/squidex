@@ -11,6 +11,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline.CommandHandlers;
 using Squidex.Write;
 using Squidex.Write.Apps;
+using Squidex.Write.Contents;
 using Squidex.Write.Schemas;
 
 namespace Squidex.Config.Domain
@@ -39,6 +40,10 @@ namespace Squidex.Config.Domain
                 .As<IEventProcessor>()
                 .SingleInstance();
 
+            builder.RegisterType<EnrichWithSchemaIdProcessor>()
+                .As<IEventProcessor>()
+                .SingleInstance();
+
             builder.RegisterType<EnrichWithAggregateIdProcessor>()
                 .As<IEventProcessor>()
                 .SingleInstance();
@@ -54,6 +59,18 @@ namespace Squidex.Config.Domain
             builder.RegisterType<ClientKeyGenerator>()
                 .AsSelf()
                 .InstancePerDependency();
+
+            builder.RegisterType<ContentCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<ContentDomainObject>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<AppCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
 
             builder.RegisterType<AppDomainObject>()
                 .AsSelf()

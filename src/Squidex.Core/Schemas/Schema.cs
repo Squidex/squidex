@@ -201,7 +201,7 @@ namespace Squidex.Core.Schemas
             {
                 var fieldErrors = new List<string>();
 
-                var fieldData = data.Fields.GetOrDefault(field.Name) ?? ContentFieldData.New();
+                var fieldData = data.Fields.GetOrDefault(field.Name) ?? ContentFieldData.Empty;
                 
                 if (field.RawProperties.IsLocalizable)
                 {

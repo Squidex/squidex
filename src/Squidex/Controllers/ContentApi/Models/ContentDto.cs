@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ContentEntryDto.cs
+//  ContentDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,14 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Core.Contents;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.ContentApi.Models
 {
-    public sealed class ContentEntryDto
+    public sealed class ContentDto
     {
         /// <summary>
         /// The if of the content element.
@@ -36,7 +37,7 @@ namespace Squidex.Controllers.ContentApi.Models
         /// The data of the content item.
         /// </summary>
         [Required]
-        public ContentData Data { get; set; }
+        public Dictionary<string, Dictionary<string, JToken>> Data { get; set; }
 
         /// <summary>
         /// The date and time when the content element has been created.

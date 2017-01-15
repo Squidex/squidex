@@ -22,6 +22,11 @@ namespace Squidex.Controllers
             CommandBus = commandBus;
         }
 
+        protected ControllerBase()
+        {
+            throw new NotImplementedException();
+        }
+
         public Guid AppId
         {
             get

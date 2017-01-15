@@ -16,11 +16,11 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         public Task ProcessEventAsync(Envelope<IEvent> @event, IAggregate aggregate, ICommand command)
         {
-            var userCommand = command as IActorCommand;
+            var actorCommand = command as IActorCommand;
 
-            if (userCommand != null)
+            if (actorCommand != null)
             {
-                @event.SetActor(userCommand.Actor);
+                @event.SetActor(actorCommand.Actor);
             }
 
             return TaskHelper.Done;

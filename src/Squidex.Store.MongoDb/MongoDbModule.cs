@@ -16,10 +16,12 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Contents.Repositories;
 using Squidex.Read.History.Repositories;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Users.Repositories;
 using Squidex.Store.MongoDb.Apps;
+using Squidex.Store.MongoDb.Contents;
 using Squidex.Store.MongoDb.History;
 using Squidex.Store.MongoDb.Infrastructure;
 using Squidex.Store.MongoDb.Schemas;
@@ -69,6 +71,12 @@ namespace Squidex.Store.MongoDb
             builder.RegisterType<MongoUserRepository>()
                 .As<IUserRepository>()
                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<MongoContentRepository>()
+                .As<IContentRepository>()
+                .As<ICatchEventConsumer>()
+                .As<IReplayableStore>()
+                .SingleInstance();
 
             builder.RegisterType<MongoHistoryEventRepository>()
                 .As<IHistoryEventRepository>()

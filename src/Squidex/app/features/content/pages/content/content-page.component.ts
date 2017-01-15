@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
     AppComponentBase,
     AppsStoreService,
+    ContentsService,
     NotificationService,
     NumberFieldPropertiesDto,
     SchemaDetailsDto,
@@ -31,9 +32,12 @@ export class ContentPageComponent extends AppComponentBase {
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
+    public languages = ['iv'];
+
     public isNewMode = false;
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+        private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute
     ) {
         super(apps, notifications, users);
@@ -53,6 +57,25 @@ export class ContentPageComponent extends AppComponentBase {
 
     public saveContent() {
         this.contentFormSubmitted = true;
+
+        if (this.contentForm.valid) {
+            this.contentForm.disable();
+
+            const data = this.contentForm.value;
+
+            this.appName()
+                .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
+                    .subscribe(() => {
+                        this.reset();
+                    }, error => {
+                        this.contentForm.enable();
+                    });
+        }
+    }
+
+    public reset() {
+        this.contentForm.reset();
+        this.contentFormSubmitted = false;
     }
 
     private setupForm(schema: SchemaDetailsDto) {
@@ -79,7 +102,11 @@ export class ContentPageComponent extends AppComponentBase {
                 }
             }
 
-            controls[field.name] = new FormControl(undefined, validators);
+            const group = new FormGroup({
+                'iv': new FormControl(undefined, validators)
+            });
+
+            controls[field.name] = group;
         }
 
         this.contentForm = new FormGroup(controls);
