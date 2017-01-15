@@ -1,17 +1,21 @@
 ﻿// ==========================================================================
-//  IEventStream.cs
+//  JsonFieldModel.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Core.Schemas.Json
 {
-    public interface IEventStream : IDisposable
+    public sealed class JsonFieldModel
     {
-        void Connect(string queueName, Action<EventData> received);
+        public string Name;
+
+        public bool IsHidden;
+
+        public bool IsDisabled;
+
+        public FieldProperties Properties;
     }
 }

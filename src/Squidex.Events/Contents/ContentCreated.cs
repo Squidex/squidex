@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
@@ -18,6 +18,6 @@ namespace Squidex.Events.Contents
     {
         public Guid SchemaId { get; set; }
 
-        public JObject Data { get; set; }
+        public ContentData Data { get; set; }
     }
 }

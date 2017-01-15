@@ -65,6 +65,15 @@ namespace Squidex.Store.MongoDb.Schemas
             return entities.OfType<ISchemaEntity>().ToList();
         }
 
+        public async Task<IReadOnlyList<ISchemaEntityWithSchema>> QueryAllWithSchemaAsync(Guid appId)
+        {
+            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
+
+            entities.ForEach(x => x.DeserializeSchema(serializer));
+
+            return entities.OfType<ISchemaEntityWithSchema>().ToList();
+        }
+
         public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name)
         {
             var entity = 

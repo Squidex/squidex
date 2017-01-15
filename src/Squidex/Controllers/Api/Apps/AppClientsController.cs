@@ -97,7 +97,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="clientId">The id of the client that must be updated.</param>
-        /// <param name="request">Client object that needs to be added to the app.</param>
+        /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
         /// 201 => Client key generated.
         /// 404 => App not found or client not found.

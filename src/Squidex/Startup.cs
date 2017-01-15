@@ -58,6 +58,7 @@ namespace Squidex
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMySwaggerSettings();
             services.AddMyEventFormatter();
             services.AddMyIdentity();
             services.AddMyIdentityServer(Environment);
@@ -88,7 +89,14 @@ namespace Squidex
             builder.RegisterModule<WriteModule>();
             builder.Populate(services);
 
-            return new AutofacServiceProvider(builder.Build());
+            var container = builder.Build();
+
+            container.Resolve<IApplicationLifetime>().ApplicationStopping.Register(() =>
+            {
+                container.Dispose();
+            });
+            
+            return new AutofacServiceProvider(container);
         }
         
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

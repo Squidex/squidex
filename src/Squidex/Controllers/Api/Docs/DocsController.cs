@@ -18,7 +18,9 @@ namespace Squidex.Controllers.Api.Docs
         [Route("docs/")]
         public IActionResult Docs()
         {
-            return View();
+            ViewBag.Specification = "~/swagger/v1/swagger.json";
+
+            return View("Docs");
         }
     }
 }

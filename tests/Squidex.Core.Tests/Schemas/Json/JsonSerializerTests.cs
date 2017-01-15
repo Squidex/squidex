@@ -18,6 +18,7 @@ namespace Squidex.Core.Schemas.Json
     public class JsonSerializerTests
     {
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
+        private readonly SchemaJsonSerializer sut;
 
         static JsonSerializerTests()
         {
@@ -25,6 +26,11 @@ namespace Squidex.Core.Schemas.Json
 
             serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             serializerSettings.SerializationBinder = new TypeNameSerializationBinder();
+        }
+
+        public JsonSerializerTests()
+        {
+            sut = new SchemaJsonSerializer(new FieldRegistry(), serializerSettings);
         }
 
         [Fact]
@@ -36,16 +42,11 @@ namespace Squidex.Core.Schemas.Json
                         new StringFieldProperties { Label = "Field1", Pattern = "[0-9]{3}" })).DisableField(1)
                     .AddOrUpdateField(new NumberField(2, "field2", 
                         new NumberFieldProperties { Hints = "Hints" }))
-                    .AddOrUpdateField(new BooleanField(3, "field2", 
+                    .AddOrUpdateField(new BooleanField(3, "field3", 
                         new BooleanFieldProperties())).HideField(2)
                     .Publish();
 
-
-            var sut = new SchemaJsonSerializer(new FieldRegistry(), serializerSettings);
-
-            var token = sut.Serialize(schema);
-
-            var deserialized = sut.Deserialize(token);
+            var deserialized = sut.Deserialize(sut.Serialize(schema));
 
             deserialized.ShouldBeEquivalentTo(schema);
         }

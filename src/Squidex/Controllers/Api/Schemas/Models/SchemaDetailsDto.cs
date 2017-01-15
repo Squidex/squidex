@@ -63,7 +63,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public RefToken LastModifiedBy { get; set; }
 
         /// <summary>
-        /// The date and time when the schema has been creaed.
+        /// The date and time when the schema has been created.
         /// </summary>
         public DateTime Created { get; set; }
 

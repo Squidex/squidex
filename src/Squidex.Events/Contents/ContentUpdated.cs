@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
@@ -15,6 +15,6 @@ namespace Squidex.Events.Contents
     [TypeName("ContentUpdatedEvent")]
     public class ContentUpdated : IEvent
     {
-        public JObject Data { get; set; }
+        public ContentData Data { get; set; }
     }
 }

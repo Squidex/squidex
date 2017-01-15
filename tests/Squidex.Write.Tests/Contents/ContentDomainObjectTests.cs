@@ -9,7 +9,7 @@
 using System;
 using System.Linq;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -26,7 +26,7 @@ namespace Squidex.Write.Contents
     {
         private readonly Guid appId = Guid.NewGuid();
         private readonly ContentDomainObject sut;
-        private readonly JObject data = new JObject();
+        private readonly ContentData data = ContentData.Empty();
 
         public ContentDomainObjectTests()
         {

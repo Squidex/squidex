@@ -7,14 +7,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Write.Contents
 {
     public class ContentDataCommand : SchemaCommand, IValidatable
     {
-        public JObject Data { get; set; }
+        public ContentData Data { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {

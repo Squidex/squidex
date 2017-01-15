@@ -8,6 +8,7 @@
 
 using System;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure;
@@ -59,7 +60,7 @@ namespace Squidex.Store.MongoDb.Schemas
 
         public Lazy<Schema> DeserializeSchema(SchemaJsonSerializer serializer)
         {
-            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(Schema) : null);
+            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(JObject.Parse(Schema)) : null);
 
             return schema;
         }

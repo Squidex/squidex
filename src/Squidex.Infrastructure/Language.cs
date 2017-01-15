@@ -20,6 +20,8 @@ namespace Squidex.Infrastructure
         private readonly string englishName;
         private static readonly Dictionary<string, Language> allLanguages = new Dictionary<string, Language>();
 
+        public static readonly Language Invariant = new Language("iv", "Invariant");
+
         static Language()
         {
             var resourceAssembly = typeof(Language).GetTypeInfo().Assembly;

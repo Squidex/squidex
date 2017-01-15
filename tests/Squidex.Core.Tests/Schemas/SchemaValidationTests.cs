@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -25,8 +25,9 @@ namespace Squidex.Core.Schemas
         public async Task Should_add_error_if_validating_data_with_unknown_field()
         {
             var data =
-                new JObject(
-                    new JProperty("unknown", 1));
+                ContentData.Empty()
+                    .AddField("unknown",
+                        ContentFieldData.New());
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -43,8 +44,10 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
-                new JObject(
-                    new JProperty("my-field", 1000));
+                ContentData.Empty()
+                    .AddField("my-field",
+                        ContentFieldData.New()
+                            .AddValue(1000));
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -56,12 +59,33 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public async Task Should_add_error_non_localizable_field_contains_language()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
+
+            var data =
+                ContentData.Empty()
+                    .AddField("my-field",
+                        ContentFieldData.New()
+                            .AddValue("es", 1)
+                            .AddValue("it", 1));
+
+            await sut.ValidateAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field can only contain a single entry for invariant language (iv)", "my-field")
+                });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_localizable_field()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
 
             var data =
-                new JObject();
+                ContentData.Empty();
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -79,7 +103,7 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
 
             var data =
-                new JObject();
+                ContentData.Empty();
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -91,34 +115,16 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_if_value_is_not_object_for_localizable_field()
-        {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
-
-            var data =
-                new JObject(
-                    new JProperty("my-field", 1));
-
-            await sut.ValidateAsync(data, errors, languages);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("my-field is localizable and must be an object", "my-field")
-                });
-        }
-
-        [Fact]
         public async Task Should_add_error_if_value_contains_invalid_language()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
-                new JObject(
-                    new JProperty("my-field",
-                        new JObject(
-                            new JProperty("de", 1),
-                            new JProperty("xx", 1))));
+                ContentData.Empty()
+                    .AddField("my-field",
+                        ContentFieldData.New()
+                            .AddValue("de", 1)
+                            .AddValue("xx", 1));
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -135,11 +141,11 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
-                new JObject(
-                    new JProperty("my-field", 
-                        new JObject(
-                            new JProperty("es", 1),
-                            new JProperty("it", 1))));
+                ContentData.Empty()
+                    .AddField("my-field",
+                        ContentFieldData.New()
+                            .AddValue("es", 1)
+                            .AddValue("it", 1));
 
             await sut.ValidateAsync(data, errors, languages);
 

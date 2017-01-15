@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id, Type type)
         {
-            return $"Domain object \'{id}\' (type {type}) not found.";
+            return $"Domain object \'{id}\' (type {type}) is not found.";
         }
 
         private static string FormatMessage(string id, string collection, Type type)

@@ -14,6 +14,7 @@ using NJsonSchema;
 using Squidex.Infrastructure;
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
 namespace Squidex.Core.Schemas
 {
@@ -128,56 +129,51 @@ namespace Squidex.Core.Schemas
             return Clone<Field>(clone => clone.name = newName);
         }
 
-        public void AddToSchema(JsonSchema4 schema, HashSet<Language> languages)
+        public void AddToSchema(JsonSchema4 schema, IEnumerable<Language> languages, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotEmpty(languages, nameof(languages));
+            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
-            if (RawProperties.IsLocalizable)
+            if (!RawProperties.IsLocalizable)
             {
-                var localizableProperty = new JsonProperty { IsRequired = true, Type = JsonObjectType.Object };
-                var localizableType = new JsonSchema4 { Id = $"{Name}ByLanguage" };
-
-                foreach (var language in languages)
-                {
-                    var languageProperty = CreateProperty();
-
-                    if (!string.IsNullOrWhiteSpace(languageProperty.Title))
-                    {
-                        languageProperty.Title += $" ({language.EnglishName})";
-                    }
-
-                    localizableType.Properties.Add(language.Iso2Code, languageProperty);
-                }
-
-                localizableProperty.OneOf.Add(localizableType);
-
-                schema.Properties.Add(Name, localizableProperty);
+                languages = new[] { Language.Invariant };
             }
-            else
+
+            var languagesProperty = CreateProperty();
+            var languagesObject = new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalProperties = false };
+
+            foreach (var language in languages)
             {
-                schema.Properties.Add(Name, CreateProperty());
+                var languageProperty = new JsonProperty { Description = language.EnglishName };
+
+                PrepareJsonSchema(languageProperty);
+
+                languagesObject.Properties.Add(language.Iso2Code, languageProperty);
             }
+
+            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}{Name}Property", languagesObject));
+
+            schema.Properties.Add(Name, languagesProperty);
         }
 
         public JsonProperty CreateProperty()
         {
-            var jsonProperty = new JsonProperty { IsRequired = RawProperties.IsRequired };
+            var jsonProperty = new JsonProperty { IsRequired = RawProperties.IsRequired, Type = JsonObjectType.Object };
 
-            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
+            if (!string.IsNullOrWhiteSpace(RawProperties.Label))
             {
-                jsonProperty.Title = RawProperties.Hints;
-            }
-            else if (!string.IsNullOrWhiteSpace(RawProperties.Label))
-            {
-                jsonProperty.Title = $"The {RawProperties.Label} field";
+                jsonProperty.Description = RawProperties.Label;
             }
             else
             {
-                jsonProperty.Title = $"The {Name} field";
+                jsonProperty.Description = Name;
             }
 
-            PrepareJsonSchema(jsonProperty);
+            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
+            {
+                jsonProperty.Description += $" ({RawProperties.Hints}).";
+            }
 
             return jsonProperty;
         }

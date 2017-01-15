@@ -258,7 +258,9 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new NumberField(4, "age",
                         new NumberFieldProperties()));
 
-            var json = schema.BuildSchema(new HashSet<Language>(new [] { Language.GetLanguage("de"), Language.GetLanguage("en") })).ToJson();
+            var languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
+
+            var json = schema.BuildSchema(languages, (n, s) => s).ToJson();
 
             Assert.NotNull(json);
         }

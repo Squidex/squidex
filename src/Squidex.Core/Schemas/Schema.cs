@@ -13,7 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
 // ReSharper disable InvertIf
 
@@ -166,127 +168,79 @@ namespace Squidex.Core.Schemas
             return AddOrUpdateField(newField);
         }
 
-        public JsonSchema4 BuildSchema(HashSet<Language> languages)
+        public JsonSchema4 BuildSchema(HashSet<Language> languages, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotEmpty(languages, nameof(languages));
+            Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
-            var schema = new JsonSchema4 { Id = Name };
-
-            if (!string.IsNullOrWhiteSpace(Properties.Hints))
-            {
-                schema.Title = Properties.Hints;
-            }
-            else if (!string.IsNullOrWhiteSpace(Properties.Label))
-            {
-                schema.Title = $"The {Properties.Label} field";
-            }
-            else
-            {
-                schema.Title = $"The {Name} field";
-            }
+            var schema = new JsonSchema4 { Id = Name, Type = JsonObjectType.Object };
 
             foreach (var field in fieldsByName.Values)
             {
-                field.AddToSchema(schema, languages);
+                field.AddToSchema(schema, languages, Name, schemaResolver);
             }
 
             return schema;
         }
 
-        public async Task ValidateAsync(JObject data, IList<ValidationError> errors, HashSet<Language> languages)
+        public async Task ValidateAsync(ContentData data, IList<ValidationError> errors, HashSet<Language> languages)
         {
             Guard.NotNull(data, nameof(data));
             Guard.NotNull(errors, nameof(errors));
             Guard.NotEmpty(languages, nameof(languages));
 
-            AppendEmptyFields(data, languages);
+            foreach (var fieldValue in data.Fields)
+            {
+                if (!fieldsByName.ContainsKey(fieldValue.Key))
+                {
+                    errors.Add(new ValidationError($"{fieldValue.Key} is not a known field", fieldValue.Key));
+                }
+            }
 
-            foreach (var property in data.Properties())
+            foreach (var field in fieldsByName.Values)
             {
                 var fieldErrors = new List<string>();
 
-                Field field;
-
-                if (fieldsByName.TryGetValue(property.Name, out field))
+                var fieldData = data.Fields.GetOrDefault(field.Name) ?? ContentFieldData.New();
+                
+                if (field.RawProperties.IsLocalizable)
                 {
-                    if (field.RawProperties.IsLocalizable)
+                    foreach (var valueLanguage in fieldData.ValueByLanguage.Keys)
                     {
-                        var languageObject = property.Value as JObject;
+                        Language language;
 
-                        if (languageObject == null)
+                        if (!Language.TryGetLanguage(valueLanguage, out language))
                         {
-                            fieldErrors.Add($"{property.Name} is localizable and must be an object");
+                            fieldErrors.Add($"{field.Name} has an invalid language '{valueLanguage}'");
                         }
-                        else
+                        else if (!languages.Contains(language))
                         {
-                            AppendEmptyLanguages(languageObject, languages);
-
-                            foreach (var languageProperty in languageObject.Properties())
-                            {
-                                Language language;
-
-                                if (!Language.TryGetLanguage(languageProperty.Name, out language))
-                                {
-                                    fieldErrors.Add($"{property.Name} has an invalid language '{languageProperty.Name}'");
-                                    continue;
-                                }
-
-                                if (!languages.Contains(language))
-                                {
-                                    fieldErrors.Add($"{property.Name} has an unsupported language '{languageProperty.Name}'");
-                                    continue;
-                                }
-
-                                await field.ValidateAsync(languageProperty.Value, fieldErrors, language);
-                            }
+                            fieldErrors.Add($"{field.Name} has an unsupported language '{valueLanguage}'");
                         }
                     }
-                    else
+
+                    foreach (var language in languages)
                     {
-                        await field.ValidateAsync(property.Value, fieldErrors);
+                        var value = fieldData.ValueByLanguage.GetValueOrDefault(language.Iso2Code, JValue.CreateNull());
+
+                        await field.ValidateAsync(value, fieldErrors, language);
                     }
                 }
                 else
                 {
-                    fieldErrors.Add($"{property.Name} is not a known field");
+                    if (fieldData.ValueByLanguage.Keys.Any(x => x != "iv"))
+                    {
+                        fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language (iv)");
+                    }
+
+                    var value = fieldData.ValueByLanguage.GetValueOrDefault("iv", JValue.CreateNull());
+
+                    await field.ValidateAsync(value, fieldErrors);
                 }
 
                 foreach (var error in fieldErrors)
                 {
-                    errors.Add(new ValidationError(error, property.Name));
-                }
-            }
-        }
-
-        private static void AppendEmptyLanguages(JObject data, IEnumerable<Language> languages)
-        {
-            var nullJson = JValue.CreateNull();
-
-            foreach (var language in languages)
-            {
-                if (data.GetValue(language.Iso2Code, StringComparison.OrdinalIgnoreCase) == null)
-                {
-                    data.Add(new JProperty(language.Iso2Code, nullJson));
-                }
-            }
-        }
-
-        private void AppendEmptyFields(JObject data, HashSet<Language> languages)
-        {
-            var nullJson = JValue.CreateNull();
-
-            foreach (var field in fieldsByName.Values)
-            {
-                if (data.GetValue(field.Name, StringComparison.OrdinalIgnoreCase) == null)
-                {
-                    JToken value = nullJson;
-
-                    if (field.RawProperties.IsLocalizable)
-                    {
-                        value = new JObject(languages.Select(x => new JProperty(x.Iso2Code, nullJson)).OfType<object>().ToArray());
-                    }
-
-                    data.Add(new JProperty(field.Name, value));
+                    errors.Add(new ValidationError(error, field.Name));
                 }
             }
         }

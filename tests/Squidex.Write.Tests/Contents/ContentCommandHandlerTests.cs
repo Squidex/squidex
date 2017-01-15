@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -35,13 +35,14 @@ namespace Squidex.Write.Contents
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly JObject data = new JObject(new JProperty("field", 1));
+        private readonly ContentData data = ContentData.Empty().AddField("my-field", ContentFieldData.New().AddValue(1));
 
         public ContentCommandHandlerTests()
         {
             var schema = 
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new NumberField(1, "field", new NumberFieldProperties { IsRequired = true }));
+                    .AddOrUpdateField(new NumberField(1, "field", 
+                        new NumberFieldProperties { IsRequired = true }));
 
             content = new ContentDomainObject(Id, 0);
 
@@ -57,7 +58,7 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Create_should_throw_exception_if_data_is_not_valid()
         {
-            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new JObject() };
+            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty() };
             var context = new CommandContext(command);
 
             await TestCreate(content, async _ =>
@@ -85,7 +86,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new JObject() };
+            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = ContentData.Empty() };
             var context = new CommandContext(command);
 
             await TestUpdate(content, async _ =>

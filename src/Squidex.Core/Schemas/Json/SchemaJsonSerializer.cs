@@ -21,28 +21,6 @@ namespace Squidex.Core.Schemas.Json
         private readonly FieldRegistry fieldRegistry;
         private readonly JsonSerializer serializer;
 
-        public class FieldModel
-        {
-            public string Name;
-
-            public bool IsHidden;
-
-            public bool IsDisabled;
-
-            public FieldProperties Properties;
-        }
-
-        public sealed class SchemaModel
-        {
-            public string Name;
-
-            public bool IsPublished;
-
-            public SchemaProperties Properties;
-
-            public Dictionary<long, FieldModel> Fields;
-        }
-
         public SchemaJsonSerializer(FieldRegistry fieldRegistry, JsonSerializerSettings serializerSettings)
         {
             Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
@@ -55,13 +33,13 @@ namespace Squidex.Core.Schemas.Json
 
         public JToken Serialize(Schema schema)
         {
-            var model = new SchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
+            var model = new JsonSchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
 
             model.Fields =
                 schema.Fields
                     .Select(x =>
-                        new KeyValuePair<long, FieldModel>(x.Key,
-                            new FieldModel
+                        new KeyValuePair<long, JsonFieldModel>(x.Key,
+                            new JsonFieldModel
                             {
                                 Name = x.Value.Name,
                                 IsHidden = x.Value.IsHidden,
@@ -75,7 +53,7 @@ namespace Squidex.Core.Schemas.Json
 
         public Schema Deserialize(JToken token)
         {
-            var model = token.ToObject<SchemaModel>(serializer);
+            var model = token.ToObject<JsonSchemaModel>(serializer);
 
             var fields =
                 model.Fields.Select(kvp =>
