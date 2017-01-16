@@ -44,7 +44,7 @@ describe('NotificationService', () => {
         const notificationService = new NotificationService();
         const notification = Notification.error('Message');
 
-        let publishedNotification: Notification;
+        let publishedNotification: Notification | null = null;
 
         notificationService.notifications.subscribe(result => {
             publishedNotification = result;

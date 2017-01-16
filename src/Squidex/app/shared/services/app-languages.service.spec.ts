@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     AddAppLanguageDto,
@@ -45,7 +45,7 @@ describe('AppLanguagesService', () => {
             ))
             .verifiable(Times.once());
 
-        let languages: AppLanguageDto[] = null;
+        let languages: AppLanguageDto[] | null = null;
 
         appLanguagesService.getLanguages('my-app').subscribe(result => {
             languages = result;
@@ -63,7 +63,7 @@ describe('AppLanguagesService', () => {
     it('should make post request to add language', () => {
         const dto = new AddAppLanguageDto('de');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', It.isValue(dto)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', dto))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -76,7 +76,7 @@ describe('AppLanguagesService', () => {
             ))
             .verifiable(Times.once());
 
-        let language: AppLanguageDto;
+        let language: AppLanguageDto | null = null;
 
         appLanguagesService.postLanguages('my-app', dto).subscribe(result => {
             language = result;
@@ -91,7 +91,7 @@ describe('AppLanguagesService', () => {
     it('should make put request to make master language', () => {
         const dto = new UpdateAppLanguageDto(true);
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', It.isValue(dto)))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()

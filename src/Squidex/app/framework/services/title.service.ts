@@ -10,8 +10,8 @@ import { Injectable } from '@angular/core';
 export class TitlesConfig {
     constructor(
         public readonly value: { [key: string]: string },
-        public readonly prefix: string = null,
-        public readonly suffix: string = null
+        public readonly prefix?: string,
+        public readonly suffix?: string
     ) {
     }
 }

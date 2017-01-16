@@ -44,6 +44,11 @@ namespace Squidex.Core.Schemas
             get { return fieldsById; }
         }
 
+        public ImmutableDictionary<string, Field> FieldsByName
+        {
+            get { return fieldsByName; }
+        }
+
         public SchemaProperties Properties
         {
             get { return properties; }

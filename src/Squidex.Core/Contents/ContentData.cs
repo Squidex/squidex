@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Contents
@@ -40,14 +41,71 @@ namespace Squidex.Core.Contents
             return new ContentData(Fields.Add(fieldName, data));
         }
 
-        public static ContentData Create(Dictionary<string, Dictionary<string, JToken>> raw)
+        public static ContentData FromApiRequest(Dictionary<string, Dictionary<string, JToken>> request)
         {
-            return new ContentData(raw.ToImmutableDictionary(x => x.Key, x => new ContentFieldData(x.Value.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)), StringComparer.OrdinalIgnoreCase));
+            Guard.NotNull(request, nameof(request));
+
+            return new ContentData(request.ToImmutableDictionary(x => x.Key, x => new ContentFieldData(x.Value.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)), StringComparer.OrdinalIgnoreCase));
         }
 
-        public Dictionary<string, Dictionary<string, JToken>> ToRaw()
+        public Dictionary<string, Dictionary<string, JToken>> ToApiResponse(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage)
         {
-            return fields.ToDictionary(x => x.Key, x => x.Value.ValueByLanguage.ToDictionary(y => y.Key, y => y.Value));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(masterLanguage, nameof(masterLanguage));
+
+            var invariantCode = Language.Invariant.Iso2Code;
+
+            var result = new Dictionary<string, Dictionary<string, JToken>>();
+
+            foreach (var fieldValue in fields)
+            {
+                Field field;
+                
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field))
+                {
+                    continue;
+                }
+
+                var fieldResult = new Dictionary<string, JToken>();
+                var fieldValues = fieldValue.Value.ValueByLanguage;
+
+                if (field.RawProperties.IsLocalizable)
+                {
+                    foreach (var language in languages)
+                    {
+                        var languageCode = language.Iso2Code;
+
+                        JToken value;
+
+                        if (fieldValues.TryGetValue(languageCode, out value))
+                        {
+                            fieldResult.Add(languageCode, value);
+                        }
+                    }
+                }
+                else
+                {
+                    JToken value;
+
+                    if (fieldValues.TryGetValue(invariantCode, out value))
+                    {
+                        fieldResult.Add(invariantCode, value);
+                    }
+                    else if (fieldValues.TryGetValue(masterLanguage.Iso2Code, out value))
+                    {
+                        fieldResult.Add(invariantCode, value);
+                    }
+                    else if (fieldValues.Count > 0)
+                    {
+                        fieldResult.Add(invariantCode, fieldValues.Values.First());
+                    }
+                }
+
+                result.Add(field.Name, fieldResult);
+            }
+
+            return result;
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -51,7 +51,7 @@ describe('AppsService', () => {
             ))
             .verifiable(Times.once());
 
-        let apps: AppDto[] = null;
+        let apps: AppDto[] | null = null;
 
         appsService.getApps().subscribe(result => {
             apps = result;
@@ -66,9 +66,9 @@ describe('AppsService', () => {
     });
 
     it('should make post request to create app', () => {
-        const createApp = new CreateAppDto('new-app');
+        const dto = new CreateAppDto('new-app');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps', It.isValue(createApp)))
+        authService.setup(x => x.authPost('http://service/p/api/apps', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -80,13 +80,13 @@ describe('AppsService', () => {
             ))
             .verifiable(Times.once());
 
-        let newCreated: EntityCreatedDto = null;
+        let created: EntityCreatedDto | null = null;
 
-        appsService.postApp(createApp).subscribe(result => {
-            newCreated = result;
+        appsService.postApp(dto).subscribe(result => {
+            created = result;
         }).unsubscribe();
 
-        expect(newCreated).toEqual(new EntityCreatedDto('123'));
+        expect(created).toEqual(new EntityCreatedDto('123'));
 
         authService.verifyAll();
     });

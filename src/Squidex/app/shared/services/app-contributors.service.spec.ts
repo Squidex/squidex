@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -42,7 +42,7 @@ describe('AppContributorsService', () => {
             ))
             .verifiable(Times.once());
 
-        let contributors: AppContributorDto[] = null;
+        let contributors: AppContributorDto[] | null = null;
 
         appContributorsService.getContributors('my-app').subscribe(result => {
             contributors = result;
@@ -58,9 +58,9 @@ describe('AppContributorsService', () => {
     });
 
     it('should make post request to assign contributor', () => {
-        const contributor = new AppContributorDto('123', 'Owner');
+        const dto = new AppContributorDto('123', 'Owner');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', It.isValue(contributor)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -68,7 +68,7 @@ describe('AppContributorsService', () => {
             ))
             .verifiable(Times.once());
 
-        appContributorsService.postContributor('my-app', contributor);
+        appContributorsService.postContributor('my-app', dto);
 
         authService.verifyAll();
     });

@@ -46,7 +46,7 @@ describe('UsersService', () => {
             ))
             .verifiable(Times.once());
 
-        let user: UserDto[] = null;
+        let user: UserDto[] | null = null;
 
         usersService.getUsers().subscribe(result => {
             user = result;
@@ -82,7 +82,7 @@ describe('UsersService', () => {
             ))
             .verifiable(Times.once());
 
-        let user: UserDto[] = null;
+        let user: UserDto[] | null = null;
 
         usersService.getUsers('my-query').subscribe(result => {
             user = result;
@@ -113,7 +113,7 @@ describe('UsersService', () => {
             ))
             .verifiable(Times.once());
 
-        let user: UserDto = null;
+        let user: UserDto | null = null;
 
         usersService.getUser('123').subscribe(result => {
             user = result;

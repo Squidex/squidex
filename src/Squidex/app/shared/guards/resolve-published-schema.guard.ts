@@ -22,6 +22,10 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
         const appName = this.findParameter(route, 'appName');
         const schemaName = this.findParameter(route, 'schemaName');
 
+        if (!appName || !schemaName) {
+            throw 'Route must contain app and schema name.';
+        }
+
         const result =
             this.schemasService.getSchema(appName, schemaName).toPromise()
                 .then(dto => {
@@ -41,8 +45,8 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
         return result;
     }
 
-    private findParameter(route: ActivatedRouteSnapshot, name: string) {
-        let result: string;
+    private findParameter(route: ActivatedRouteSnapshot, name: string): string | null {
+        let result: string | null = null;
 
         while (route) {
             result = route.params[name];

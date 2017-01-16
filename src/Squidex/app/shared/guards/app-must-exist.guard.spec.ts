@@ -27,7 +27,7 @@ describe('AppMustExistGuard', () => {
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
-        guard.canActivate(route, null)
+        guard.canActivate(route, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
@@ -44,7 +44,7 @@ describe('AppMustExistGuard', () => {
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
-        guard.canActivate(route, null)
+        guard.canActivate(route, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
@@ -61,7 +61,7 @@ describe('AppMustExistGuard', () => {
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
-        guard.canActivate(route, null)
+        guard.canActivate(route, <any>{})
             .then(result => {
                 expect(result).toBeTruthy();
                 expect(router.lastNavigation).toBeUndefined();

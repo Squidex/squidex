@@ -42,8 +42,8 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];
-        let result2: AppDto[];
+        let result1: AppDto[] | null = null;
+        let result2: AppDto[] | null = null;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -70,8 +70,8 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];
-        let result2: AppDto[];
+        let result1: AppDto[] | null = null;
+        let result2: AppDto[] | null = null;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -104,8 +104,8 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result1: AppDto[];
-        let result2: AppDto[];
+        let result1: AppDto[] | null = null;
+        let result2: AppDto[] | null = null;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -134,7 +134,7 @@ describe('AppsStoreService', () => {
 
         const store = new AppsStoreService(authService.object, appsService.object);
 
-        let result: AppDto[] = null;
+        let result: AppDto[] | null = null;
 
         store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { /* Do Nothing */ });
 

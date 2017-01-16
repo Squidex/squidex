@@ -28,7 +28,10 @@ export class CopyDirective {
         const prevSelectionEnd = element.selectionEnd;
 
         element.focus();
-        element.setSelectionRange(0, element.value.length);
+
+        if (element instanceof HTMLInputElement) {
+            element.setSelectionRange(0, element.value.length);
+        }
 
         try {
             document.execCommand('copy');
@@ -40,6 +43,8 @@ export class CopyDirective {
             currentFocus.focus();
         }
 
-        element.setSelectionRange(prevSelectionStart, prevSelectionEnd);
+        if (element instanceof HTMLInputElement) {
+            element.setSelectionRange(prevSelectionStart, prevSelectionEnd);
+        }
     }
 }

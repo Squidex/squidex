@@ -46,7 +46,7 @@ export class ControlErrorsComponent implements OnChanges, OnInit {
     @Input()
     public submitted: boolean;
 
-    public get errorMessages(): string[] {
+    public get errorMessages(): string[] | null {
         if (!this.control) {
             return null;
         }

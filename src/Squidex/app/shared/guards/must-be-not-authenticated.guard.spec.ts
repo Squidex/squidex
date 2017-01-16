@@ -26,7 +26,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
 
         const guard = new MustBeNotAuthenticatedGuard(authService.object, <any>router);
 
-        guard.canActivate(null, null)
+        guard.canActivate(<any>{}, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['app']);
@@ -42,7 +42,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
 
         const guard = new MustBeNotAuthenticatedGuard(authService.object, <any>router);
 
-        guard.canActivate(null, null)
+        guard.canActivate(<any>{}, <any>{})
             .then(result => {
                 expect(result).toBeTruthy();
                 expect(router.lastNavigation).toBeUndefined();

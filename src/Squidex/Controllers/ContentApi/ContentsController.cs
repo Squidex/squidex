@@ -65,7 +65,7 @@ namespace Squidex.Controllers.ContentApi
 
                     if (x.Data != null)
                     {
-                        itemModel.Data = x.Data.ToRaw();
+                        itemModel.Data = x.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage);
                     }
 
                     return itemModel;
@@ -97,7 +97,7 @@ namespace Squidex.Controllers.ContentApi
 
             if (content.Data != null)
             {
-                model.Data = content.Data.ToRaw();
+                model.Data = content.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage);
             }
 
             return Ok(model);
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/")]
         public async Task<IActionResult> PostContent([FromBody] Dictionary<string, Dictionary<string, JToken>> request)
         {
-            var command = new CreateContent { Data = ContentData.Create(request), AggregateId = Guid.NewGuid() };
+            var command = new CreateContent { Data = ContentData.FromApiRequest(request), AggregateId = Guid.NewGuid() };
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<Guid>();
@@ -119,7 +119,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PutContent(Guid id, [FromBody] Dictionary<string, Dictionary<string, JToken>> request)
         {
-            var command = new UpdateContent { AggregateId = id, Data = ContentData.Create(request) };
+            var command = new UpdateContent { AggregateId = id, Data = ContentData.FromApiRequest(request) };
 
             await CommandBus.PublishAsync(command);
 

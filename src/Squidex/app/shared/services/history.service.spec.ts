@@ -48,7 +48,7 @@ describe('HistoryService', () => {
             ))
             .verifiable(Times.once());
 
-        let events: HistoryEventDto[] = null;
+        let events: HistoryEventDto[] | null = null;
 
         languageService.getHistory('my-app', 'settings.contributors').subscribe(result => {
             events = result;

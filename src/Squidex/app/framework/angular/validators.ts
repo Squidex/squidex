@@ -11,8 +11,8 @@ import {
     Validators
 } from '@angular/forms';
 
-export class ValidatorsEx {
-    public static pattern(pattern: string | RegExp, message: string | undefined = undefined): ValidatorFn {
+export module ValidatorsEx {
+    export function pattern(pattern: string | RegExp, message?: string): ValidatorFn {
         if (!pattern) {
             return Validators.nullValidator;
         }
@@ -32,7 +32,7 @@ export class ValidatorsEx {
             const n: string = control.value;
 
             if (n == null || n.length === 0) {
-                return null;
+                return {};
             }
 
             if (!regex.test(n)) {
@@ -43,11 +43,11 @@ export class ValidatorsEx {
                 }
             }
 
-            return null;
+            return {};
         };
     }
 
-    public static between(minValue: number | undefined, maxValue: number | undefined) {
+    export function between(minValue?: number, maxValue?: number) {
         if (!minValue || !maxValue) {
             return Validators.nullValidator;
         }
@@ -67,7 +67,11 @@ export class ValidatorsEx {
         };
     }
 
-    public static validValues<T>(values: T[]) {
+    export function validValues<T>(values: T[]) {
+        if (!values) {
+            return Validators.nullValidator;
+        }
+
         return (control: AbstractControl): { [key: string]: any } => {
             const n: T = control.value;
 

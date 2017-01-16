@@ -33,7 +33,7 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
 
-        let resultingUser: UserDto = null;
+        let resultingUser: UserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
@@ -52,7 +52,7 @@ describe('UsersProviderService', () => {
 
         usersProviderService.getUser('123');
 
-        let resultingUser: UserDto = null;
+        let resultingUser: UserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
@@ -72,7 +72,7 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
 
-        let resultingUser: UserDto = null;
+        let resultingUser: UserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
@@ -90,7 +90,7 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.throw('NOT FOUND')).verifiable(Times.once());
 
-        let resultingUser: UserDto = null;
+        let resultingUser: UserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;

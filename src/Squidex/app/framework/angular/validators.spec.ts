@@ -9,31 +9,33 @@ import { FormControl, Validators } from '@angular/forms';
 
 import { ValidatorsEx } from './../';
 
-describe('Validators', () => {
-    let validateBetween: any;
-
-    beforeEach(() => {
-        validateBetween = ValidatorsEx.between(10, 200);
-    });
-
+describe('ValidatorsEx.between', () => {
     it('should return null validator if no min value or max value', () => {
         const validator = ValidatorsEx.between(undefined, undefined);
 
         expect(validator).toBe(Validators.nullValidator);
     });
 
+    it('should return empty value when value is valid', () => {
+        const input = new FormControl(4);
+
+        const error = <any>ValidatorsEx.between(1, 5)(input);
+
+        expect(error).toEqual({});
+    });
+
     it('should return error when not a number', () => {
         const input = new FormControl('text');
 
-        const error = validateBetween(input);
+        const error = <any>ValidatorsEx.between(1, 5)(input);
 
         expect(error.validnumber).toBeFalsy();
     });
 
     it('should return error if less than minimum setting', () => {
-        const input = new FormControl(5);
+        const input = new FormControl(-5);
 
-        const error = validateBetween(input);
+        const error = <any>ValidatorsEx.between(1, 5)(input);
 
         expect(error.minvalue).toBeDefined();
     });
@@ -41,17 +43,17 @@ describe('Validators', () => {
     it('should return error if greater than maximum setting', () => {
         const input = new FormControl(300);
 
-        const error = validateBetween(input);
+        const error = <any>ValidatorsEx.between(1, 5)(input);
 
         expect(error.maxvalue).toBeDefined();
     });
+});
 
-    it('should return empty value when value is valid', () => {
-        const input = new FormControl(50);
+describe('ValidatorsEx.validValues', () => {
+    it('should return null validator if values not defined', () => {
+        const validator = ValidatorsEx.validValues(null!);
 
-        const error = validateBetween(input);
-
-        expect(error).toEqual({});
+        expect(validator).toBe(Validators.nullValidator);
     });
 
     it('should return empty value if value is in allowed values', () => {
@@ -68,5 +70,89 @@ describe('Validators', () => {
         const error = <any>ValidatorsEx.validValues([10, 20, 30])(input);
 
         expect(error.validvalues).toBeDefined();
+    });
+});
+
+describe('ValidatorsEx.pattern', () => {
+    it('should return null validator if pattern not defined', () => {
+        const validator = ValidatorsEx.pattern(undefined!, undefined);
+
+        expect(validator).toBe(Validators.nullValidator);
+    });
+
+    it('should return empty value  when value is valid pattern', () => {
+        const input = new FormControl('1234');
+
+        const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
+
+        expect(error).toEqual({});
+    });
+
+    it('should return empty value when value is null string', () => {
+        const input = new FormControl(null);
+
+        const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
+
+        expect(error).toEqual({});
+    });
+
+    it('should return empty value when value is empty string', () => {
+        const input = new FormControl('');
+
+        const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
+
+        expect(error).toEqual({});
+    });
+
+    it('should return error with message if value does not match pattern string', () => {
+        const input = new FormControl('abc');
+
+        const error = <any>ValidatorsEx.pattern('[0-9]{1,4}', 'My-Message')(input);
+        const expected: any = {
+            patternmessage: {
+                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc', message: 'My-Message'
+            }
+        };
+
+        expect(error).toEqual(expected);
+    });
+
+    it('should return error with message if value does not match pattern', () => {
+        const input = new FormControl('abc');
+
+        const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/, 'My-Message')(input);
+        const expected: any = {
+            patternmessage: {
+                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc', message: 'My-Message'
+            }
+        };
+
+        expect(error).toEqual(expected);
+    });
+
+    it('should return error without message if value does not match pattern string', () => {
+        const input = new FormControl('abc');
+
+        const error = <any>ValidatorsEx.pattern('[0-9]{1,4}')(input);
+        const expected: any = {
+            pattern: {
+                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc'
+            }
+        };
+
+        expect(error).toEqual(expected);
+    });
+
+    it('should return error without message if value does not match pattern', () => {
+        const input = new FormControl('abc');
+
+        const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
+        const expected: any = {
+            pattern: {
+                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc'
+            }
+        };
+
+        expect(error).toEqual(expected);
     });
 });

@@ -53,7 +53,7 @@ describe('AppClientsService', () => {
             ))
             .verifiable(Times.once());
 
-        let clients: AppClientDto[] = null;
+        let clients: AppClientDto[] | null = null;
 
         appClientsService.getClients('my-app').subscribe(result => {
             clients = result;
@@ -71,7 +71,7 @@ describe('AppClientsService', () => {
     it('should make post request to create client', () => {
         const dto = new CreateAppClientDto('client1');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', It.isValue(dto)))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -86,7 +86,7 @@ describe('AppClientsService', () => {
             ))
             .verifiable(Times.once());
 
-        let client: AppClientDto = null;
+        let client: AppClientDto | null = null;
 
         appClientsService.postClient('my-app', dto).subscribe(result => {
             client = result;
@@ -101,7 +101,7 @@ describe('AppClientsService', () => {
     it('should make put request to rename client', () => {
         const dto = new UpdateAppClientDto('Client 1 New');
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', It.isValue(dto)))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -131,7 +131,7 @@ describe('AppClientsService', () => {
     it('should make form request to create token', () => {
         const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
 
-        http.setup(x => x.post('http://service/p/identity-server/connect/token', It.isValue(body), It.isAny()))
+        http.setup(x => x.post('http://service/p/identity-server/connect/token', body, It.isAny()))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -143,9 +143,9 @@ describe('AppClientsService', () => {
             ))
             .verifiable(Times.once());
 
-        let accessTokenDto: AccessTokenDto = null;
+        let accessTokenDto: AccessTokenDto | null = null;
 
-        appClientsService.createToken('my-app', new AppClientDto('myClientId', null, 'mySecret', null)).subscribe(result => {
+        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', DateTime.now())).subscribe(result => {
             accessTokenDto = result;
         });
 

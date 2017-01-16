@@ -45,7 +45,7 @@ describe('TitleService', () => {
     });
 
     it('should append suffix to title', () => {
-        const titleService = new TitleService(new TitlesConfig({}, null, 'myapp'));
+        const titleService = new TitleService(new TitlesConfig({}, undefined, 'myapp'));
 
         titleService.setTitle('my-title', {});
 
@@ -53,9 +53,9 @@ describe('TitleService', () => {
     });
 
     it('should do nothing if title is null', () => {
-        const titleService = new TitleService(new TitlesConfig({}, null, 'myapp'));
+        const titleService = new TitleService(new TitlesConfig({}, undefined, 'myapp'));
 
-        titleService.setTitle(null, {});
+        titleService.setTitle(null!, {});
 
         expect(document.title).toBe('');
     });

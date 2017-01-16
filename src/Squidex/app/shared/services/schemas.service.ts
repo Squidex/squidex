@@ -18,7 +18,7 @@ import {
 
 import { AuthService } from './auth.service';
 
-export function createProperties(fieldType: string, values: {} | null = null): FieldPropertiesDto {
+export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
     let properties: FieldPropertiesDto;
 
     switch (fieldType) {
@@ -55,7 +55,7 @@ export class SchemaDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly label: string,
+        public readonly label: string | undefined,
         public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
@@ -71,12 +71,12 @@ export class SchemaDetailsDto {
         public readonly name: string,
         public readonly label: string,
         public readonly hints: string,
-        public readonly fields: FieldDto[],
         public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
-        public readonly lastModified: DateTime
+        public readonly lastModified: DateTime,
+        public readonly fields: FieldDto[]
     ) {
     }
 }
@@ -103,12 +103,12 @@ export abstract class FieldPropertiesDto {
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
         public readonly editor: string,
-        public readonly defaultValue: number | null,
-        public readonly maxValue: number | null,
-        public readonly minValue: number | null,
-        public readonly allowedValues: number[] | undefined
+        public readonly defaultValue?: number,
+        public readonly maxValue?: number,
+        public readonly minValue?: number,
+        public readonly allowedValues?: number[]
     ) {
         super(label, hints, placeholder, isRequired);
 
@@ -117,14 +117,14 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
         public readonly editor: string,
-        public readonly defaultValue: string,
-        public readonly pattern: string,
-        public readonly patternMessage: string,
-        public readonly minLength: number | null,
-        public readonly maxLength: number | null,
-        public readonly allowedValues: string[]
+        public readonly defaultValue?: string,
+        public readonly pattern?: string,
+        public readonly patternMessage?: string,
+        public readonly minLength?: number | null,
+        public readonly maxLength?: number | null,
+        public readonly allowedValues?: string[]
     ) {
         super(label, hints, placeholder, isRequired);
 
@@ -133,9 +133,9 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string, hints: string, placeholder: string, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
         public readonly editor: string,
-        public readonly defaultValue: boolean | null
+        public readonly defaultValue?: boolean
     ) {
         super(label, hints, placeholder, isRequired);
 
@@ -145,8 +145,8 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
 
 export class UpdateSchemaDto {
     constructor(
-        public readonly label: string,
-        public readonly hints: string
+        public readonly label?: string,
+        public readonly hints?: string
     ) {
     }
 }
@@ -229,18 +229,18 @@ export class SchemasService {
                         response.name,
                         response.label,
                         response.hints,
-                        fields,
                         response.isPublished,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),
-                        DateTime.parseISO_UTC(response.lastModified));
+                        DateTime.parseISO_UTC(response.lastModified),
+                        fields);
                 })
                 .catchError('Failed to load schema. Please reload.');
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto): Observable<EntityCreatedDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return this.authService.authPost(url, dto)
                 .map(response => response.json())
@@ -251,7 +251,7 @@ export class SchemasService {
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto): Observable<EntityCreatedDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields`);
 
         return this.authService.authPost(url, dto)
                 .map(response => response.json())
@@ -262,63 +262,63 @@ export class SchemasService {
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
         return this.authService.authPut(url, dto)
                 .catchError('Failed to update schema. Please reload.');
     }
 
     public publishSchema(appName: string, schemaName: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to publish schema. Please reload.');
     }
 
     public unpublishSchema(appName: string, schemaName: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to unpublish schema. Please reload.');
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return this.authService.authPut(url, dto)
                 .catchError('Failed to update field. Please reload.');
     }
 
     public enableField(appName: string, schemaName: string, fieldId: number): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to enable field. Please reload.');
     }
 
     public disableField(appName: string, schemaName: string, fieldId: number): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to disable field. Please reload.');
     }
 
     public showField(appName: string, schemaName: string, fieldId: number): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to show field. Please reload.');
     }
 
     public hideField(appName: string, schemaName: string, fieldId: number): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide`);
 
         return this.authService.authPut(url, {})
                 .catchError('Failed to hide field. Please reload.');
     }
 
     public deleteField(appName: string, schemaName: string, fieldId: number): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return this.authService.authDelete(url)
                 .catchError('Failed to delete field. Please reload.');

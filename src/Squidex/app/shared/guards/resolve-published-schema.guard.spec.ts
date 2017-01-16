@@ -13,7 +13,7 @@ import { SchemasService } from 'shared';
 import { ResolvePublishedSchemaGuard } from './resolve-published-schema.guard';
 import { RouterMockup } from './router-mockup';
 
-describe('ResolveSchemaGuard', () => {
+describe('ResolvePublishedSchemaGuard', () => {
     const route = {
         params: {
             appName: 'my-app'
@@ -31,14 +31,20 @@ describe('ResolveSchemaGuard', () => {
         appsStore = Mock.ofType(SchemasService);
     });
 
+    it('should throw if route does not contain parameter', () => {
+        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>new RouterMockup());
+
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name.');
+    });
+
     it('should navigate to 404 page if schema is not found', (done) => {
         appsStore.setup(x => x.getSchema('my-app', 'my-schema'))
-            .returns(() => Observable.of(null));
+            .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
         const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
 
-        guard.resolve(<any>route, null)
+        guard.resolve(<any>route, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
@@ -54,7 +60,7 @@ describe('ResolveSchemaGuard', () => {
 
         const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
 
-        guard.resolve(<any>route, null)
+        guard.resolve(<any>route, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
@@ -72,7 +78,7 @@ describe('ResolveSchemaGuard', () => {
 
         const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
 
-        guard.resolve(<any>route, null)
+        guard.resolve(<any>route, <any>{})
             .then(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
@@ -90,7 +96,7 @@ describe('ResolveSchemaGuard', () => {
 
         const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
 
-        guard.resolve(<any>route, null)
+        guard.resolve(<any>route, <any>{})
             .then(result => {
                 expect(result).toBe(schema);
 

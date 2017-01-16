@@ -62,10 +62,7 @@ export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
     }
 
     public ngOnChanges() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
+        this.subscription.unsubscribe();
 
         if (this.modalView) {
             this.subscription = this.modalView.isOpen.subscribe(isOpen => {

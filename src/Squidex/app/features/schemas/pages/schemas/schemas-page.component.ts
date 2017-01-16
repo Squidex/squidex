@@ -86,7 +86,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 const oldSchema = schemas.find(i => i.name === message.name);
 
                 if (oldSchema) {
-                    const me = `subject:${this.authService.user.id}`;
+                    const me = `subject:${this.authService.user!.id}`;
 
                     const newSchema =
                         new SchemaDto(

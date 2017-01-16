@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -27,7 +27,7 @@ describe('ContentsService', () => {
         contentsService = new ContentsService(authService.object, new ApiUrlConfig('http://service/p/'));
     });
 
-    it('should make get request to get content1', () => {
+    it('should make get request to get contents', () => {
         authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?take=17&skip=13&query=my-query&nonPublished=true'))
             .returns(() => Observable.of(
                 new Response(
@@ -54,7 +54,7 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        let contents: ContentDto[] = null;
+        let contents: ContentDto[] | null = null;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
             contents = result;
@@ -87,7 +87,7 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        let content: ContentDto = null;
+        let content: ContentDto | null = null;
 
         contentsService.getContent('my-app', 'my-schema', 'content1').subscribe(result => {
             content = result;
@@ -102,7 +102,7 @@ describe('ContentsService', () => {
     it('should make post request to create content', () => {
         const dto = {};
 
-        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema', It.isValue(dto)))
+        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -114,7 +114,7 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        let created: EntityCreatedDto = null;
+        let created: EntityCreatedDto | null = null;
 
         contentsService.postContent('my-app', 'my-schema', dto).subscribe(result => {
             created = result;
@@ -129,7 +129,7 @@ describe('ContentsService', () => {
     it('should make put request to update content', () => {
         const dto = {};
 
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1', It.isValue(dto)))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1', dto))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()

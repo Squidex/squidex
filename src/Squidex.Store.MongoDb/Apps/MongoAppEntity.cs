@@ -37,19 +37,19 @@ namespace Squidex.Store.MongoDb.Apps
         [BsonElement]
         public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; }
 
-        IEnumerable<IAppClientEntity> IAppEntity.Clients
+        IReadOnlyCollection<IAppClientEntity> IAppEntity.Clients
         {
             get { return Clients.Values; }
         }
 
-        IEnumerable<IAppContributorEntity> IAppEntity.Contributors
+        IReadOnlyCollection<IAppContributorEntity> IAppEntity.Contributors
         {
             get { return Contributors.Values; }
         }
 
-        IEnumerable<Language> IAppEntity.Languages
+        IReadOnlyCollection<Language> IAppEntity.Languages
         {
-            get { return Languages.Select(Language.GetLanguage); }
+            get { return Languages.Select(Language.GetLanguage).ToList(); }
         }
 
         Language IAppEntity.MasterLanguage

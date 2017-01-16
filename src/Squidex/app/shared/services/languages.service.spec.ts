@@ -42,7 +42,7 @@ describe('LanguageService', () => {
             ))
             .verifiable(Times.once());
 
-        let languages: LanguageDto[] = null;
+        let languages: LanguageDto[] | null = null;
 
         languageService.getLanguages().subscribe(result => {
             languages = result;

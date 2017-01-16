@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 
 export class EntityCreatedDto {
     constructor(
-        public readonly id: string
+        public readonly id: any
     ) {
     }
 }

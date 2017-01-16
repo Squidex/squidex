@@ -10,6 +10,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
+using Squidex.Read.Apps;
 
 namespace Squidex.Controllers
 {
@@ -27,7 +28,7 @@ namespace Squidex.Controllers
             throw new NotImplementedException();
         }
 
-        public Guid AppId
+        public IAppEntity App
         {
             get
             {
@@ -38,7 +39,15 @@ namespace Squidex.Controllers
                     throw new InvalidOperationException("Not in a app context");
                 }
 
-                return appFeature.App.Id;
+                return appFeature.App;
+            }
+        }
+
+        public Guid AppId
+        {
+            get
+            {
+                return App.Id;
             }
         }
     }

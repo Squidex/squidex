@@ -9,12 +9,23 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Core.Contents
 {
     public class ContentDataTests
     {
+        private readonly Schema schema =
+            Schema.Create("schema", new SchemaProperties())
+                .AddOrUpdateField(
+                    new NumberField(1, "field1", new NumberFieldProperties { IsLocalizable = true }))
+                .AddOrUpdateField(
+                    new NumberField(2, "field2", new NumberFieldProperties { IsLocalizable = false }));
+        private readonly Language[] languages = { Language.GetLanguage("de"), Language.GetLanguage("en") };
+        private readonly Language masterLanguage = Language.GetLanguage("en");
+
         [Fact]
         public void Should_convert_from_dictionary()
         {
@@ -28,12 +39,11 @@ namespace Squidex.Core.Contents
                     },
                     ["field2"] = new Dictionary<string, JToken>
                     {
-                        ["en"] = 1,
-                        ["de"] = 2
+                        ["iv"] = 3
                     }
                 };
 
-            var actual = ContentData.Create(input);
+            var actual = ContentData.FromApiRequest(input);
 
             var expected =
                 ContentData.Empty
@@ -43,13 +53,114 @@ namespace Squidex.Core.Contents
                             .AddValue("de", "de_string"))
                     .AddField("field2",
                         ContentFieldData.Empty
-                            .AddValue("en", 1)
-                            .AddValue("de", 2));
+                            .AddValue("iv", 3));
 
-            var output = actual.ToRaw();
+            var output = actual.ToApiResponse(schema, languages, masterLanguage);
 
             actual.ShouldBeEquivalentTo(expected);
             output.ShouldBeEquivalentTo(input);
+        }
+
+        [Fact]
+        public void Should_cleanup_old_fields()
+        {
+            var expected =
+                new Dictionary<string, Dictionary<string, JToken>>
+                {
+                    ["field1"] = new Dictionary<string, JToken>
+                    {
+                        ["en"] = "en_string",
+                        ["de"] = "de_string"
+                    }
+                };
+
+            var input =
+                ContentData.Empty
+                    .AddField("field0",
+                        ContentFieldData.Empty
+                            .AddValue("en", "en_string"))
+                    .AddField("field1",
+                        ContentFieldData.Empty
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"));
+
+            var output = input.ToApiResponse(schema, languages, masterLanguage);
+
+            output.ShouldBeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void Should_cleanup_old_languages()
+        {
+            var expected =
+                new Dictionary<string, Dictionary<string, JToken>>
+                {
+                    ["field1"] = new Dictionary<string, JToken>
+                    {
+                        ["en"] = "en_string",
+                        ["de"] = "de_string"
+                    }
+                };
+
+            var input =
+                ContentData.Empty
+                    .AddField("field1",
+                        ContentFieldData.Empty
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string")
+                            .AddValue("it", "it_string"));
+
+            var output = input.ToApiResponse(schema, languages, masterLanguage);
+
+            output.ShouldBeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void Should_provide_invariant_from_master_language()
+        {
+            var expected =
+                new Dictionary<string, Dictionary<string, JToken>>
+                {
+                    ["field2"] = new Dictionary<string, JToken>
+                    {
+                        ["iv"] = 3
+                    }
+                };
+
+            var input =
+                ContentData.Empty
+                    .AddField("field2",
+                        ContentFieldData.Empty
+                            .AddValue("de", 2)
+                            .AddValue("en", 3));
+
+            var output = input.ToApiResponse(schema, languages, masterLanguage);
+
+            output.ShouldBeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void Should_provide_invariant_from_first_language()
+        {
+            var expected =
+                new Dictionary<string, Dictionary<string, JToken>>
+                {
+                    ["field2"] = new Dictionary<string, JToken>
+                    {
+                        ["iv"] = 2
+                    }
+                };
+
+            var input =
+                ContentData.Empty
+                    .AddField("field2",
+                        ContentFieldData.Empty
+                            .AddValue("de", 2)
+                            .AddValue("it", 3));
+
+            var output = input.ToApiResponse(schema, languages, masterLanguage);
+
+            output.ShouldBeEquivalentTo(expected);
         }
     }
 }
