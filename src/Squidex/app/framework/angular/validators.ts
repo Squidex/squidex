@@ -5,7 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    ValidatorFn,
+    Validators
+} from '@angular/forms';
 
 export class ValidatorsEx {
     public static pattern(pattern: string | RegExp, message: string | undefined = undefined): ValidatorFn {

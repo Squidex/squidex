@@ -24,13 +24,20 @@ namespace Squidex.Config.Web
                 {
                     var response = context.Context.Response;
 
+                    var headers = response.GetTypedHeaders();
+
                     if (!string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
                     {
-                        var headers = response.GetTypedHeaders();
-
                         headers.CacheControl = new CacheControlHeaderValue
                         {
                             MaxAge = TimeSpan.FromDays(60)
+                        };
+                    }
+                    else
+                    {
+                        headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            NoCache = true
                         };
                     }
                 }

@@ -42,7 +42,7 @@ describe('AppsService', () => {
                         }, {
                             id: '456',
                             name: 'name2',
-                            permission: 'Editor',
+                            permission: 'Owner',
                             created: '2017-01-01',
                             lastModified: '2017-02-02'
                         }]
@@ -59,7 +59,7 @@ describe('AppsService', () => {
 
         expect(apps).toEqual([
             new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02')),
-            new AppDto('456', 'name2', 'Editor', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'))
+            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'))
         ]);
 
         authService.verifyAll();

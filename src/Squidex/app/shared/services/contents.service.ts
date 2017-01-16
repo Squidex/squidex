@@ -40,7 +40,7 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, take: number, skip: number, query: string): Observable<ContentDto[]> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/?query=${query}&take=${take}&skip=${skip}&query=${query}&nonPublished=true`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?take=${take}&skip=${skip}&query=${query}&nonPublished=true`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -53,8 +53,8 @@ export class ContentsService {
                             item.isPublished,
                             item.createdBy,
                             item.lastModifiedBy,
-                            DateTime.parseISO(item.created),
-                            DateTime.parseISO(item.lastModified),
+                            DateTime.parseISO_UTC(item.created),
+                            DateTime.parseISO_UTC(item.lastModified),
                             item.data);
                     });
                 })
@@ -62,7 +62,7 @@ export class ContentsService {
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -72,15 +72,15 @@ export class ContentsService {
                         response.isPublished,
                         response.createdBy,
                         response.lastModifiedBy,
-                        DateTime.parseISO(response.created),
-                        DateTime.parseISO(response.lastModified),
+                        DateTime.parseISO_UTC(response.created),
+                        DateTime.parseISO_UTC(response.lastModified),
                         response.data);
                 })
                 .catchError('Failed to load content. Please reload.');
     }
 
     public postContent(appName: string, schemaName: string, dto: any): Observable<EntityCreatedDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}`);
 
         return this.authService.authPost(url, dto)
                 .map(response => response.json())
@@ -91,16 +91,16 @@ export class ContentsService {
     }
 
     public putContent(appName: string, schemaName: string, id: string, dto: any): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return this.authService.authPut(url, dto)
                 .catchError('Failed to update Content. Please reload.');
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string, dto: any): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/`);
+    public deleteContent(appName: string, schemaName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return this.authService.authDelete(url, dto)
+        return this.authService.authDelete(url)
                 .catchError('Failed to delete Content. Please reload.');
     }
 }

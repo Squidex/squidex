@@ -35,7 +35,7 @@ describe('AppContributorsService', () => {
                             permission: 'Owner'
                         }, {
                             contributorId: '456',
-                            permission: 'Editor'
+                            permission: 'Owner'
                         }]
                     })
                 )
@@ -51,7 +51,7 @@ describe('AppContributorsService', () => {
         expect(contributors).toEqual(
             [
                 new AppContributorDto('123', 'Owner'),
-                new AppContributorDto('456', 'Editor')
+                new AppContributorDto('456', 'Owner')
             ]);
 
         authService.verifyAll();

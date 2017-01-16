@@ -5,11 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Response, ResponseOptions } from '@angular/http';
+import { Http, Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
 import { It, IMock, Mock, Times } from 'typemoq';
 
 import {
+    AccessTokenDto,
     ApiUrlConfig,
     AppClientDto,
     AppClientsService,
@@ -22,10 +23,13 @@ import {
 describe('AppClientsService', () => {
     let authService: IMock<AuthService>;
     let appClientsService: AppClientsService;
+    let http: IMock<Http>;
 
     beforeEach(() => {
+        http = Mock.ofType(Http);
+
         authService = Mock.ofType(AuthService);
-        appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'), null);
+        appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'), http.object);
     });
 
     it('should make get request to get app clients', () => {
@@ -122,5 +126,32 @@ describe('AppClientsService', () => {
         appClientsService.deleteClient('my-app', 'client1');
 
         authService.verifyAll();
+    });
+
+    it('should make form request to create token', () => {
+        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
+
+        http.setup(x => x.post('http://service/p/identity-server/connect/token', It.isValue(body), It.isAny()))
+            .returns(() => Observable.of(
+               new Response(
+                    new ResponseOptions({
+                        body: {
+                            access_token: 'token1', token_type: 'type1'
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let accessTokenDto: AccessTokenDto = null;
+
+        appClientsService.createToken('my-app', new AppClientDto('myClientId', null, 'mySecret', null)).subscribe(result => {
+            accessTokenDto = result;
+        });
+
+        expect(accessTokenDto).toEqual(
+            new AccessTokenDto('token1', 'type1'));
+
+        http.verifyAll();
     });
 });

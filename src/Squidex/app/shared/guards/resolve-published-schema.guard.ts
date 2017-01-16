@@ -27,11 +27,15 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
                 .then(dto => {
                     if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);
+
+                        return null;
                     }
 
                     return dto;
                 }).catch(() => {
                     this.router.navigate(['/404']);
+
+                    return null;
                 });
 
         return result;

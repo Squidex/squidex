@@ -31,8 +31,7 @@ describe('UsersProviderService', () => {
         const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
 
         usersService.setup(x => x.getUser('123'))
-            .returns(() => Observable.of(user))
-            .verifiable(Times.once());
+            .returns(() => Observable.of(user)).verifiable(Times.once());
 
         let resultingUser: UserDto = null;
 
@@ -49,8 +48,7 @@ describe('UsersProviderService', () => {
         const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
 
         usersService.setup(x => x.getUser('123'))
-            .returns(() => Observable.of(user))
-            .verifiable(Times.once());
+            .returns(() => Observable.of(user)).verifiable(Times.once());
 
         usersProviderService.getUser('123');
 
@@ -72,8 +70,7 @@ describe('UsersProviderService', () => {
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
 
         usersService.setup(x => x.getUser('123'))
-            .returns(() => Observable.of(user))
-            .verifiable(Times.once());
+            .returns(() => Observable.of(user)).verifiable(Times.once());
 
         let resultingUser: UserDto = null;
 
@@ -82,6 +79,24 @@ describe('UsersProviderService', () => {
         }).unsubscribe();
 
         expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image'));
+
+        usersService.verifyAll();
+    });
+
+    it('Should return invalid user when not found', () => {
+        authService.setup(x => x.user)
+            .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
+
+        usersService.setup(x => x.getUser('123'))
+            .returns(() => Observable.throw('NOT FOUND')).verifiable(Times.once());
+
+        let resultingUser: UserDto = null;
+
+        usersProviderService.getUser('123').subscribe(result => {
+            resultingUser = result;
+        }).unsubscribe();
+
+        expect(resultingUser).toEqual(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));
 
         usersService.verifyAll();
     });
