@@ -34,8 +34,8 @@ $field-header: #e7ebef;
 
 .field {
     &-summary {
-        padding: 15px 20px;
-        line-height: 40px;
+        padding: 1rem 1.25rem;
+        line-height: 2.5rem;
     }
 
     &-icon {
@@ -84,41 +84,41 @@ $field-header: #e7ebef;
 
         &::before {
             @include caret-top;
-            @include absolute(-10px, 90px, auto, auto);
+            @include absolute(-.625rem, 6rem, auto, auto);
             border-color: transparent transparent $color-border;
-            border-width: 10px;
+            border-width: .5rem;
         }
 
         &-tab {
-            padding: 15px 20px 20px;
+            padding: 1rem 1.25rem 1.25rem;
         }
 
         &-tabs {
             background: $color-border;
             position: relative;
-            padding: 15px 20px;
+            padding: 1rem 1.25rem;
         }
     }
 
     .tag {
         @include opacity(.9);
-        min-width: 60px;
-        max-width: 90px;
+        min-width: 4rem;
+        max-width: 6rem;
     }
 }
 
 .nav-field-tabs {
     & {
-        @include absolute(auto, auto, 0, 20px);
+        @include absolute(auto, auto, 0, 1.25rem);
     }
 
     & .nav-link {
         & {
             color: $color-text;
             cursor: pointer;
-            padding: 18px 10px;
-            border-bottom: 4px solid transparent;
-            width: 100px;
+            padding: 1rem .625rem;
+            border-bottom: .25rem solid transparent;
+            width: 6.25rem;
             text-align: center;
         }
 

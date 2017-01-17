@@ -34,21 +34,21 @@
 
     &-items {
         & {
-            margin-bottom: -4px;
+            margin-bottom: -.25rem;
         }
 
         th,
         td {
             & {
-                padding: 15px;
+                padding: 1rem;
             }
 
             &:first-child {
-                padding-left: 20px;
+                padding-left: 1.25rem;
             }
 
             &:last-child {
-                padding-right: 20px;
+                padding-right: 1.25rem;
             }
         }
 
@@ -72,32 +72,32 @@
             tr {
                 background: $color-table;
                 border: 1px solid $color-border;
-                border-bottom: 3px solid $color-border;
-                margin-bottom: 10px;
+                border-bottom: 2px solid $color-border;
+                margin-bottom: .5rem;
             }
         }
 
         &-row,
         &-footer {
-            padding: 15px 20px;
+            padding: 1rem 1.25rem;
             background: $color-table-footer;
             border: 1px solid $color-table-border;
-            border-bottom-width: 3px;
+            border-bottom-width: 2px;
         }
 
         &-row {
             background: $color-table;
-            margin-bottom: 4px;
+            margin-bottom: .25rem;
         }
 
         &-footer {
             background: $color-table-footer;
-            margin-top: 12px;
+            margin-top: .8rem;
         }
 
         .spacer {
             border: 0;
-            height: 6px;
+            height: .3rem;
         }
     }
 }
@@ -121,7 +121,7 @@
     }
 
     &::after {
-        @include absolute(auto, auto, -.8rem, 10px);
+        @include absolute(auto, auto, -.8rem, .625rem);
         content: '';
         height: 0;
         border-style: solid;
@@ -171,12 +171,12 @@ select {
 }
 
 .form-error {
-    @include border-radius(3px);
+    @include border-radius(4px);
     @include truncate;
     color: $color-accent-dark;
-    margin-top: 4px;
-    margin-bottom: 10px;
-    padding: 6px;
+    margin-top: .25rem;
+    margin-bottom: .5rem;
+    padding: .5rem;
     background: $color-theme-error;
 }
 
@@ -248,13 +248,13 @@ select {
         }
 
         @media (min-width: 576px) {
-            margin-top: 70px;
+            margin-top: 4.5rem;
         }
     }
 }
 
 .dropdown-menu {
-    @include box-shadow(0, 6px, 16px, .2px);
+    @include box-shadow(0, .3px, 16px, .2px);
     border: 0;
 }
 

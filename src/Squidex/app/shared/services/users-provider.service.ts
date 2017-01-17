@@ -44,6 +44,6 @@ export class UsersProviderService {
                     dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl);
                 }
                 return dto;
-            });
+            }).share();
     }
 }

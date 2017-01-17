@@ -2,7 +2,7 @@
 @import '_mixins';
 
 content {
-    padding: 20px;
+    padding: 1.25rem;
 }
 
 .empty {
@@ -11,13 +11,13 @@ content {
     }
 
     &-headline {
-        margin: 20px;
-        margin-top: 100px;
+        margin: 1.25rem;
+        margin-top: 6.25rem;
     }
 }
 
 .app {
     float: left;
     width: 20rem;
-    margin: 10px;
+    margin: .625rem;
 }

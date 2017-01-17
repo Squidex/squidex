@@ -12,8 +12,8 @@ $color-input-border: rgba(0, 0, 0, .15);
         @include absolute(2px, auto, auto, 0);
         @include border-radius(.25em);
         @include box-shadow;
-        width: 300px;
-        max-height: 200px;
+        width: 18rem;
+        max-height: 12rem;
         border: 1px solid $color-input-border;
         background: $color-accent-dark;
         padding: .3rem 0;
@@ -34,14 +34,14 @@ $color-input-border: rgba(0, 0, 0, .15);
     }
 
     &-image {
-        @include circle(40px);
+        @include circle(2.5rem);
         float: left;
     }
 
     &-title,
     &-description {
         @include truncate;
-        margin-left: 45px;
+        margin-left: 3rem;
     }
 
     &-description {

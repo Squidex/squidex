@@ -1,14 +1,16 @@
 @import '_vars';
 @import '_mixins';
 
+$button-size: 2.5rem;
+
 .panel {
-    min-width: 480px;
-    max-width: 480px;
+    min-width: 30rem;
+    max-width: 30rem;
 }
 
 .panel-header {
-    min-height: 140px;
-    max-height: 140px;
+    min-height: 7rem;
+    max-height: 6.7rem;
 }
 
 .subheader {
@@ -16,14 +18,14 @@
         @include flex-box;
         @include flex-flow(row);
         margin-top: 2rem;
-        margin-right: -40px;
+        margin-right: -2.5rem;
     }
 
     &-button {
-        height: 38px;
+        height: $button-size;
         margin-right: .4rem;
-        min-width: 38px;
-        max-width: 38px;
+        min-width: $button-size;
+        max-width: $button-size;
         padding-left: 0;
         padding-right: 0;
         font-size: 1.1rem;
@@ -37,56 +39,16 @@
     }
 
     .form-control {
-        padding-left: 50px;
+        padding-left: $button-size + 1rem;
+        height: $button-size;
     }
 
     .icon-search {
-        @include absolute(10px, auto, auto, 12px);
+        @include absolute(50%, auto, auto, .8rem);
         color: $color-dark-foreground-selected;
         font-size: 1.3rem;
         font-weight: lighter;
-    }
-}
-
-.btn-new {
-    & {
-        padding-left: 0;
-        background: transparent;
-        border: 0;
-        color: $color-dark-foreground-selected;
-        font-size: 1.05rem;
-    }
-
-    &:hover {
-        color: lighten($color-dark-foreground-selected, 5%);
-        outline: 0;
-    }
-
-    &:focus {
-        color: lighten($color-dark-foreground-selected, 10%);
-        outline: 0;
-    }
-
-    .icon-plus {
-        & {
-            @include circle(24px);
-            display: inline-block;
-            background: transparent;
-            border: 2px solid $color-dark-foreground-selected;
-            margin-right: .5rem;
-            font-size: .8rem;
-            font-weight: bold;
-            vertical-align: baseline;
-            line-height: 20px;
-        }
-
-        &:hover {
-            border-color: lighten($color-dark-foreground-selected, 5%);
-        }
-
-        &:focus {
-            border-color: lighten($color-dark-foreground-selected, 10%);
-        }
+        margin-top: -.6rem;
     }
 }
 
@@ -156,23 +118,16 @@
     }
 
     &-user {
-        & {
-            @include border-radius(1px);
-            display: inline-block;
-            background: $color-dark-background-accent;
-            padding: .1rem .3rem;
-            font-size: .8rem;
-            font-weight: normal;
-            margin-left: 10px;
-            max-width: 100%;
-            vertical-align: baseline;
-        }
-
-        &-text {
-            @include truncate;
-            display: inline-block;
-            vertical-align: bottom;
-        }
+        @include border-radius(1px);
+        @include truncate;
+        display: inline-block;
+        background: $color-dark-background-accent;
+        padding: .1rem .3rem;
+        font-size: .8rem;
+        font-weight: normal;
+        margin-left: 10px;
+        max-width: 100%;
+        vertical-align: baseline;
     }
 
     &:first-child {

@@ -2,18 +2,18 @@
 @import '_vars';
 
 .content {
-    margin: 100px auto;
-    max-width: 500px;
+    margin: 8rem auto;
+    max-width: 32rem;
     text-align: center;
 }
 
 .logo {
-    height: 60px;
+    height: 4rem;
 }
 
 .login {
     &-button {
-        margin: 40px 0;
+        margin: 2.5rem 0;
     }
 
     &-hint {
@@ -22,7 +22,7 @@
 }
 
 .proudly-made {
-    margin-top: 100px;
-    font-size: 11px;
+    margin-top: 16rem;
+    font-size: .8rem;
     font-style: italic;
 }

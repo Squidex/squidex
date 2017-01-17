@@ -1,9 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
-$bar-height: 12px;
+$bar-height: .8rem;
 
-$thumb-size: 20px;
+$thumb-size: 1.25rem;
 $thumb-margin: ($thumb-size - $bar-height) * .5;
 
 .slider {
@@ -12,8 +12,8 @@ $thumb-margin: ($thumb-size - $bar-height) * .5;
             @include border-radius($bar-height * .5);
             position: relative;
             border: 1px solid $color-control;
-            margin-bottom: 20px;
-            margin-top: 5px;
+            margin-bottom: 1.25rem;
+            margin-top: .25rem;
             margin-right: $thumb-size * .5;
             background: $color-accent-dark;
             height: $bar-height;

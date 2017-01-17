@@ -2,13 +2,13 @@
 @import '_mixins';
 
 .panel {
-    min-width: 700px;
-    max-width: 700px;
+    min-width: 44rem;
+    max-width: 44rem;
 }
 
 .card {
     & {
-        max-width: 700px;
+        max-width: 44rem;
     }
 
     &-block {
@@ -28,5 +28,5 @@
 
 .access-token {
     resize: none;
-    height: 300px;
+    height: 18rem;
 }

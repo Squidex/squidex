@@ -2,20 +2,20 @@
 @import '_mixins';
 
 .panel {
-    min-width: 280px;
-    max-width: 280px;
+    min-width: 20rem;
+    max-width: 20rem;
 }
 
 .panel-header {
-    min-height: 120px;
-    max-height: 120px;
+    min-height: 8rem;
+    max-height: 8rem;
 }
 
 .subheader {
     @include flex-box;
     @include flex-flow(row);
     margin-top: 2rem;
-    margin-right: -40px;
+    margin-right: -2.5rem;
 }
 
 .search-form {
@@ -25,11 +25,11 @@
     }
 
     .form-control {
-        padding-left: 50px;
+        padding-left: 3rem;
     }
 
     .icon-search {
-        @include absolute(10px, auto, auto, 12px);
+        @include absolute(.625rem, auto, auto, 1rem);
         color: $color-dark-foreground-selected;
         font-size: 1.3rem;
         font-weight: lighter;

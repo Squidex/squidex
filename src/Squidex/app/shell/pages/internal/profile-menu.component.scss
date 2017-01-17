@@ -2,6 +2,7 @@
 @import '_vars';
 
 $size-avatar: 2.2rem;
+$size-arrow: .6rem;
 
 .user {
     &-picture {
@@ -38,14 +39,14 @@ $size-avatar: 2.2rem;
 
     &-menu {
         & {
-            @include absolute(44px, 0, auto, auto);
+            @include absolute($size-navbar-height - $size-arrow, 0, auto, auto);
         }
 
         &::before {
-            @include absolute(-10px, 10px, auto, auto);
+            @include absolute(-$size-arrow, $size-arrow, auto, auto);
             @include caret-top;
             border-color: transparent transparent $color-accent-dark;
-            border-width: 10px;
+            border-width: $size-arrow;
         }
     }
 }

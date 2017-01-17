@@ -2,13 +2,13 @@
 @import '_mixins';
 
 .panel {
-    min-width: 600px;
-    max-width: 600px;
+    min-width: 36rem;
+    max-width: 36rem;
 }
 
 .language {
     &-select {
-        max-width: 200px;
+        max-width: 12rem;
     }
 
     &-name {

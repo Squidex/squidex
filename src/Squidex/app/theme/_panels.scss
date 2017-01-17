@@ -38,7 +38,7 @@
         min-height: $panel-header;
         max-height: $panel-header;
         position: relative;
-        padding-right: 60px;
+        padding-right: 4rem;
     }
 
     &-content {
@@ -70,7 +70,7 @@
 
     &-close {
         & {
-            @include absolute($panel-padding, $panel-padding - 2px, auto, auto);
+            @include absolute($panel-padding, $panel-padding - .125rem, auto, auto);
             font-size: 1.5rem;
             font-weight: 400;
             cursor: pointer;

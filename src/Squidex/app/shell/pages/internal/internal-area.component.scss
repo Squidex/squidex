@@ -11,23 +11,23 @@
     padding-bottom: 0;
     margin-top: -.2rem;
     margin-bottom: -.2rem;
-    margin-right: 40px;
+    margin-right: 2.5rem;
     font-size: 1.8rem;
-    width: 70px;
+    width: 4.5rem;
 }
 
 .notification {
     &-container {
-        @include fixed(auto, 10px, 10px, auto);
-        width: 260px;
+        @include fixed(auto, .625rem, .625rem, auto);
+        width: 20rem;
         z-index: 100000;
     }
 
     &-item {
         @include border-radius;
         @include box-shadow;
-        padding: 10px;
-        margin-top: 10px;
+        padding: .625rem;
+        margin-top: .625rem;
         font-size: .8rem;
         font-weight: normal;
         color: $color-accent-dark;

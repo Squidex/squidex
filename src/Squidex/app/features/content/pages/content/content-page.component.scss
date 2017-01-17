@@ -2,6 +2,10 @@
 @import '_mixins';
 
 .panel {
-    min-width: 600px;
-    max-width: 600px;
+    min-width: 36rem;
+    max-width: 36rem;
+}
+
+label {
+    margin: .4rem;
 }
