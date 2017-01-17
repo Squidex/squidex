@@ -88,9 +88,9 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is AppContributorAssigned || 
+            if (@event.Payload is AppContributorAssigned ||
                 @event.Payload is AppContributorRemoved ||
-                @event.Payload is AppClientAttached || 
+                @event.Payload is AppClientAttached ||
                 @event.Payload is AppClientRevoked ||
                 @event.Payload is AppClientRenamed ||
                 @event.Payload is AppLanguageAdded ||
@@ -107,6 +107,16 @@ namespace Squidex.Read.Apps.Services.Implementations
                 }
 
                 Cache.Remove(cacheKey);
+            }
+            else
+            {
+                var appCreated = @event.Payload as AppCreated;
+
+                if (appCreated != null)
+                {
+                    Cache.Remove(BuildIdCacheKey(@event.Headers.AggregateId()));
+                    Cache.Remove(BuildNameCacheKey(appCreated.Name));
+                }
             }
 
             return Task.FromResult(true);

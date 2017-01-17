@@ -17,10 +17,10 @@ namespace Squidex.Read.Apps
 
         Language MasterLanguage { get; }
 
-        IEnumerable<IAppClientEntity> Clients { get; }
+        IReadOnlyCollection<IAppClientEntity> Clients { get; }
 
-        IEnumerable<IAppContributorEntity> Contributors { get; }
+        IReadOnlyCollection<IAppContributorEntity> Contributors { get; }
 
-        IEnumerable<Language> Languages { get; }
+        IReadOnlyCollection<Language> Languages { get; }
     }
 }
