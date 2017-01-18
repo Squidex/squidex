@@ -102,13 +102,27 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return this.authService.authPut(url, dto)
-                .catchError('Failed to update Content. Please reload.');
+                .catchError('Failed to update content. Please reload.');
+    }
+
+    public publishContent(appName: string, schemaName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
+
+        return this.authService.authPut(url, {})
+                .catchError('Failed to publish content. Please reload.');
+    }
+
+    public unpublishContent(appName: string, schemaName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
+
+        return this.authService.authPut(url, {})
+                .catchError('Failed to unpublish content. Please reload.');
     }
 
     public deleteContent(appName: string, schemaName: string, id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return this.authService.authDelete(url)
-                .catchError('Failed to delete Content. Please reload.');
+                .catchError('Failed to delete content. Please reload.');
     }
 }

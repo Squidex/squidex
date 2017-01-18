@@ -57,6 +57,16 @@ namespace Squidex.Write.Contents
             await handler.UpdateAsync<ContentDomainObject>(command, s => s.Update(command));
         }
 
+        protected Task On(PublishContent command, CommandContext context)
+        {
+            return handler.UpdateAsync<ContentDomainObject>(command, s => s.Publish(command));
+        }
+
+        protected Task On(UnpublishContent command, CommandContext context)
+        {
+            return handler.UpdateAsync<ContentDomainObject>(command, s => s.Unpublish(command));
+        }
+
         protected Task On(DeleteContent command, CommandContext context)
         {
             return handler.UpdateAsync<ContentDomainObject>(command, s => s.Delete(command));

@@ -110,6 +110,34 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
+        public async Task Publish_should_publish_domain_object()
+        {
+            CreateContent();
+
+            var command = new PublishContent { AggregateId = Id, AppId = appId, SchemaId = schemaId };
+            var context = new CommandContext(command);
+
+            await TestUpdate(content, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task Unpublish_should_unpublish_domain_object()
+        {
+            CreateContent();
+
+            var command = new UnpublishContent { AggregateId = Id, AppId = appId, SchemaId = schemaId };
+            var context = new CommandContext(command);
+
+            await TestUpdate(content, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
         public async Task Delete_should_update_domain_object()
         {
             CreateContent();

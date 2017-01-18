@@ -70,10 +70,22 @@
             }
 
             tr {
-                background: $color-table;
-                border: 1px solid $color-border;
-                border-bottom: 2px solid $color-border;
-                margin-bottom: .5rem;
+                & {
+                    background: $color-table;
+                    border: 1px solid $color-border;
+                    border-bottom: 2px solid $color-border;
+                    margin-bottom: .5rem;
+                }
+
+                &:hover {
+                    background: $color-table-footer;
+                }
+
+                &.active {
+                    background: $color-theme-blue;
+                    border-color: $color-theme-blue;
+                    color: $color-accent-dark;
+                }
             }
         }
 

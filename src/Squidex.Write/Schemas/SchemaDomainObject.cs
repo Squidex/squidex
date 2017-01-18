@@ -207,6 +207,8 @@ namespace Squidex.Write.Schemas
 
         public SchemaDomainObject Publish(PublishSchema command)
         {
+            Guard.NotNull(command, nameof(command));
+
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(new SchemaPublished());
@@ -216,6 +218,8 @@ namespace Squidex.Write.Schemas
 
         public SchemaDomainObject Unpublish(UnpublishSchema command)
         {
+            Guard.NotNull(command, nameof(command));
+
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(new SchemaUnpublished());

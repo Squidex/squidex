@@ -24,6 +24,7 @@ using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Read.Apps;
 using Squidex.Read.Schemas;
+// ReSharper disable InvertIf
 
 // ReSharper disable SuggestBaseTypeForParameter
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
@@ -81,6 +82,7 @@ When you change the field to be localizable the value will become the value for 
             GenerateSchemasOperations(schemas);
             GenerateSecurityDefinitions();
             GenerateSecurityRequirements();
+            GenerateDefaultErrors();
 
             return document;
         }
@@ -152,6 +154,14 @@ When you change the field to be localizable the value will become the value for 
             }
         }
 
+        private void GenerateDefaultErrors()
+        {
+            foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
+            {
+                operation.Responses.Add("500", new SwaggerResponse { Description = "Operations failed with internal server error.", Schema = errorDtoSchema });
+            }
+        }
+
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntityWithSchema> schemas)
         {
             foreach (var schema in schemas.Select(x => x.Schema))
@@ -170,123 +180,135 @@ When you change the field to be localizable the value will become the value for 
                     Name = schemaName, Description = $"API to managed {schemaName} content elements."
                 });
 
-            var noIdItemOperations =
-                document.Paths.GetOrAdd($"{appBasePath}/{schema.Name}/", k => new SwaggerOperations());
+            var schemaOperations = new List<SwaggerOperations>
+            {
+                GenerateSchemaQueryOperation(schema, schemaName),
+                GenerateSchemaCreateOperation(schema, schemaName),
+                GenerateSchemaGetOperation(schema, schemaName),
+                GenerateSchemaUpdateOperation(schema, schemaName),
+                GenerateSchemaPublishOperation(schema, schemaName),
+                GenerateSchemaUnpublishOperation(schema, schemaName),
+                GenerateSchemaDeleteOperation(schema, schemaName)
+            };
 
-            var idItemOperations =
-                document.Paths.GetOrAdd($"{appBasePath}/{schema.Name}/{{id}}/", k => new SwaggerOperations());
-
-            GenerateSchemaQueryOperation(noIdItemOperations, schema, schemaName);
-            GenerateSchemaCreateOperation(noIdItemOperations, schema, schemaName);
-
-            GenerateSchemaGetOperation(idItemOperations, schema, schemaName);
-            GenerateSchemaUpdateOperation(idItemOperations, schema, schemaName);
-            GenerateSchemaDeleteOperation(idItemOperations, schemaName);
-
-            foreach (var operation in idItemOperations.Values.Union(noIdItemOperations.Values))
+            foreach (var operation in schemaOperations.SelectMany(x => x.Values).Distinct())
             {
                 operation.Tags = new List<string> { schemaName };
             }
+        }
 
-            foreach (var operation in idItemOperations.Values)
+        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
             {
+                operation.Summary = $"Queries {schemaName} content elements.";
+
+                operation.Parameters.AddQueryParameter("take", JsonObjectType.Number, "The number of elements to take.");
+                operation.Parameters.AddQueryParameter("skip", JsonObjectType.Number, "The number of elements to skip.");
+
+                operation.Parameters.AddQueryParameter("query", JsonObjectType.String, "Optional full text query skip.");
+
+                var responseSchema = CreateContentsSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
+
+                operation.Responses.Add("200",
+                    new SwaggerResponse { Description = $"{schemaName} content elements retrieved.", Schema = responseSchema });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
+            {
+                operation.Summary = $"Get a {schemaName} content element.";
+
+                var responseSchema = CreateContentSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
+
+                operation.Responses.Add("200",
+                    new SwaggerResponse { Description = $"{schemaName} element found.", Schema = responseSchema });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Post, null, $"{appBasePath}/{schema.Name}", operation =>
+            {
+                operation.Summary = $"Create a {schemaName} content element.";
+
+                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+
+                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
+
+                operation.Responses.Add("201",
+                    new SwaggerResponse { Description = $"{schemaName} created.", Schema = entityCreatedDtoSchema });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
+            {
+                operation.Summary = $"Update a {schemaName} content element.";
+
+                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+
+                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
+
+                operation.Responses.Add("204",
+                    new SwaggerResponse { Description = $"{schemaName} element updated." });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaPublishOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/publish", operation =>
+            {
+                operation.Summary = $"Publish a {schemaName} content element.";
+
+                operation.Responses.Add("204",
+                    new SwaggerResponse { Description = $"{schemaName} element published." });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaUnpublishOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/unpublish", operation =>
+            {
+                operation.Summary = $"Unpublish a {schemaName} content element.";
+
+                operation.Responses.Add("204",
+                    new SwaggerResponse { Description = $"{schemaName} element unpublished." });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaDeleteOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/", operation =>
+            {
+                operation.Summary = $"Delete a {schemaName} content element.";
+
+                operation.Responses.Add("204",
+                    new SwaggerResponse { Description = $"{schemaName} element deleted." });
+            });
+        }
+
+        private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
+        {
+            var operations = document.Paths.GetOrAdd(path, k => new SwaggerOperations());
+            var operation = new SwaggerOperation();
+
+            updater(operation);
+
+            operations[method] = operation;
+
+            if (entityName != null)
+            {
+                operation.Parameters.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
+
                 operation.Responses.Add("404",
-                    new SwaggerResponse { Description = $"App, schema or {schemaName} not found." });
-
-                operation.Parameters.AddPathParameter("id", JsonObjectType.String, $"The id of the {schemaName} (GUID).");
+                    new SwaggerResponse { Description = $"App, schema or {entityName} not found." });
             }
-        }
 
-        private void GenerateSchemaQueryOperation(SwaggerOperations operations, Schema schema, string schemaName)
-        {
-            var operation = new SwaggerOperation
-            {
-                Summary = $"Queries {schemaName} content elements."
-            };
-
-            operation.Parameters.AddQueryParameter("take", JsonObjectType.Number, "The number of elements to take.");
-            operation.Parameters.AddQueryParameter("skip", JsonObjectType.Number, "The number of elements to skip.");
-
-            operation.Parameters.AddQueryParameter("query", JsonObjectType.String, "Optional full text query skip.");
-
-            var responseSchema = CreateContentsSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
-
-            operation.Responses.Add("200",
-                new SwaggerResponse { Description = $"{schemaName} content elements retrieved.", Schema = responseSchema });
-            operation.Responses.Add("500",
-                new SwaggerResponse { Description = $"Querying {schemaName} element failed with internal server error.", Schema = errorDtoSchema });
-
-            operations[SwaggerOperationMethod.Get] = operation;
-        }
-
-        private void GenerateSchemaCreateOperation(SwaggerOperations operations, Schema schema, string schemaName)
-        {
-            var operation = new SwaggerOperation
-            {
-                Summary = $"Create a {schemaName} content element."
-            };
-
-            var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
-
-            operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
-
-            operation.Responses.Add("201",
-                new SwaggerResponse { Description = $"{schemaName} created.", Schema = entityCreatedDtoSchema });
-            operation.Responses.Add("500",
-                new SwaggerResponse { Description = $"Creating {schemaName} element failed with internal server error.", Schema = errorDtoSchema });
-
-            operations[SwaggerOperationMethod.Post] = operation;
-        }
-
-        private void GenerateSchemaGetOperation(SwaggerOperations operations, Schema schema, string schemaName)
-        {
-            var operation = new SwaggerOperation
-            {
-                Summary = $"Gets a {schemaName} content element"
-            };
-
-            var responseSchema = CreateContentSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
-
-            operation.Responses.Add("209",
-                new SwaggerResponse { Description = $"{schemaName} element found.", Schema = responseSchema });
-            operation.Responses.Add("500",
-                new SwaggerResponse { Description = $"Retrieving {schemaName} element failed with internal server error.", Schema = errorDtoSchema });
-
-            operations[SwaggerOperationMethod.Get] = operation;
-        }
-
-        private void GenerateSchemaUpdateOperation(SwaggerOperations operations, Schema schema, string schemaName)
-        {
-            var operation = new SwaggerOperation
-            {
-                Summary = $"Update {schemaName} content element."
-            };
-
-            var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
-
-            operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
-
-            operation.Responses.Add("204",
-                new SwaggerResponse { Description = $"{schemaName} element updated." });
-            operation.Responses.Add("500",
-                new SwaggerResponse { Description = $"Updating {schemaName} element failed with internal server error.", Schema = errorDtoSchema });
-
-            operations[SwaggerOperationMethod.Put] = operation;
-        }
-
-        private void GenerateSchemaDeleteOperation(SwaggerOperations operations, string schemaName)
-        {
-            var operation = new SwaggerOperation
-            {
-                Summary = $"Delete a {schemaName} content element."
-            };
-            
-            operation.Responses.Add("204",
-                new SwaggerResponse { Description = $"{schemaName} element deleted." });
-            operation.Responses.Add("500",
-                new SwaggerResponse { Description = $"Deleting {schemaName} element failed with internal server error.", Schema = errorDtoSchema });
-
-            operations[SwaggerOperationMethod.Delete] = operation;
+            return operations;
         }
 
         private JsonSchema4 CreateContentsSchema(JsonSchema4 dataSchema, string schemaName, string id)

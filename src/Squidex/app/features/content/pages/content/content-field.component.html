@@ -10,14 +10,14 @@
             <div class="btn-group btn-group-sm languages-buttons" role="group">
                 <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName"
                     [class.btn-danger]="fieldForm.controls[language.iso2Code].invalid && (fieldForm.controls[language.iso2Code].touched || contentFormSubmitted)"
-                    [class.active]="language.iso2Code == selectedLanguage" (click)="selectLanguage(language)">
+                    [class.active]="language.iso2Code == fieldLanguage" (click)="selectLanguage(language)">
                     {{language.iso2Code}}
                 </button>
             </div>
         </div>
 
         <div *ngFor="let language of fieldLanguages">
-            <div *ngIf="language == selectedLanguage">
+            <div *ngIf="language == fieldLanguage">
                 <sqx-control-errors [for]="language" fieldName="{{field|displayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
 
                 <div [ngSwitch]="field.properties.fieldType">

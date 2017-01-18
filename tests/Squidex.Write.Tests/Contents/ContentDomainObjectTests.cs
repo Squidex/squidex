@@ -99,6 +99,71 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
+        public void Publish_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Publish(new PublishContent()));
+        }
+
+        [Fact]
+        public void Publish_should_throw_if_schema_is_deleted()
+        {
+            CreateContent();
+            DeleteContent();
+
+            Assert.Throws<DomainException>(() => sut.Publish(new PublishContent()));
+        }
+
+        [Fact]
+        public void Publish_should_refresh_properties_and_create_events()
+        {
+            CreateContent();
+
+            sut.Publish(new PublishContent());
+
+            Assert.True(sut.IsPublished);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new ContentPublished()
+                    });
+        }
+
+        [Fact]
+        public void Unpublish_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishContent()));
+        }
+
+        [Fact]
+        public void Unpublish_should_throw_if_schema_is_deleted()
+        {
+            CreateContent();
+            DeleteContent();
+
+            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishContent()));
+        }
+
+        [Fact]
+        public void Unpublish_should_refresh_properties_and_create_events()
+        {
+            CreateContent();
+            PublishContent();
+
+            sut.Unpublish(new UnpublishContent());
+
+            Assert.False(sut.IsPublished);
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new ContentUnpublished()
+                    });
+        }
+
+        [Fact]
         public void Delete_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() => sut.Delete(new DeleteContent()));
@@ -133,6 +198,13 @@ namespace Squidex.Write.Contents
         private void CreateContent()
         {
             sut.Create(new CreateContent { Data = data, AppId = appId });
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void PublishContent()
+        {
+            sut.Publish(new PublishContent());
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

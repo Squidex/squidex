@@ -5,11 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import { ContentChanged } from './../messages';
+import {
+    ContentCreated,
+    ContentDeleted,
+    ContentUpdated
+} from './../messages';
 
 import {
     AppComponentBase,
@@ -31,17 +36,20 @@ import {
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html'
 })
-export class ContentPageComponent extends AppComponentBase {
+export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private messageSubscription: Subscription;
+
     public schema: SchemaDetailsDto;
 
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
-    public content: ContentDto = null;
+    public contentData: any = null;
+    public contentId: string;
 
     public languages: AppLanguageDto[] = [];
 
     public get isNewMode() {
-        return this.content !== null;
+        return !this.contentData;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
@@ -53,13 +61,24 @@ export class ContentPageComponent extends AppComponentBase {
         super(apps, notifications, users);
     }
 
+    public ngOnDestroy() {
+        this.messageSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
+        this.messageSubscription =
+            this.messageBus.of(ContentDeleted).subscribe(message => {
+                if (message.id === this.contentId) {
+                    this.router.navigate(['../'], { relativeTo: this.route });
+                }
+            });
+
         this.route.parent.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
             this.languages = languages;
         });
 
         this.route.parent.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
-            this.setupForm(schema, this.route.snapshot.data['content']);
+            this.setupForm(schema);
         });
 
         this.route.data.map(p => p['content']).subscribe((content: ContentDto) => {
@@ -75,33 +94,33 @@ export class ContentPageComponent extends AppComponentBase {
 
             const data = this.contentForm.value;
 
-            this.appName()
-                .switchMap(app => {
-                    if (this.isNewMode) {
-                        return this.contentsService.postContent(app, this.schema.name, data);
-                    } else {
-                        return this.contentsService.putContent(app, this.schema.name, data, this.content.id);
-                    }
-                })
-                .subscribe(() => {
-                    this.router.navigate(['../'], { relativeTo: this.route });
+            if (this.isNewMode) {
+                this.appName()
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
+                    .subscribe(created => {
+                        this.messageBus.publish(new ContentCreated(created.id, data));
 
-                    this.messageBus.publish(new ContentChanged());
-                }, error => {
-                    this.notifyError(error);
-                    this.enable();
-                });
+                        this.router.navigate(['../'], { relativeTo: this.route });
+                    }, error => {
+                        this.notifyError(error);
+                        this.enable();
+                    });
+            } else {
+                this.appName()
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data))
+                    .subscribe(() => {
+                        this.messageBus.publish(new ContentUpdated(this.contentId, data));
+
+                        this.router.navigate(['../'], { relativeTo: this.route });
+                    }, error => {
+                        this.notifyError(error);
+                        this.enable();
+                    });
+            }
         }
     }
 
-    public reset() {
-        this.enable();
-
-        this.contentForm.reset();
-        this.contentFormSubmitted = false;
-    }
-
-    public enable() {
+    private enable() {
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
             const fieldForm = this.contentForm.controls[field.name];
 
@@ -109,7 +128,7 @@ export class ContentPageComponent extends AppComponentBase {
         }
     }
 
-    public disable() {
+    private disable() {
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
             const fieldForm = this.contentForm.controls[field.name];
 
@@ -117,7 +136,7 @@ export class ContentPageComponent extends AppComponentBase {
         }
     }
 
-    private setupForm(schema: SchemaDetailsDto, content?: ContentDto) {
+    private setupForm(schema: SchemaDetailsDto) {
         this.schema = schema;
 
         const controls: { [key: string]: AbstractControl } = {};
@@ -160,7 +179,14 @@ export class ContentPageComponent extends AppComponentBase {
     }
 
     private populateForm(content: ContentDto) {
-        this.content = content;
+        if (!content) {
+            this.contentData = undefined;
+            this.contentId = undefined;
+            return;
+        } else {
+            this.contentData = content.data;
+            this.contentId = content.id;
+        }
 
         for (const field of this.schema.fields) {
             const fieldValue = content.data[field.name] || {};

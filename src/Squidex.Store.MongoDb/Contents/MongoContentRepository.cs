@@ -182,6 +182,26 @@ namespace Squidex.Store.MongoDb.Contents
             });
         }
 
+        protected Task On(ContentPublished @event, EnvelopeHeaders headers)
+        {
+            var collection = GetCollection(headers.SchemaId());
+
+            return collection.UpdateAsync(headers, x =>
+            {
+                x.IsPublished = true;
+            });
+        }
+
+        protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
+        {
+            var collection = GetCollection(headers.SchemaId());
+
+            return collection.UpdateAsync(headers, x =>
+            {
+                x.IsPublished = false;
+            });
+        }
+
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
             var collection = GetCollection(headers.SchemaId());

@@ -21,10 +21,16 @@ namespace Squidex.Write.Contents
     {
         private bool isDeleted;
         private bool isCreated;
+        private bool isPublished;
 
         public bool IsDeleted
         {
             get { return isDeleted; }
+        }
+
+        public bool IsPublished
+        {
+            get { return isPublished; }
         }
 
         public ContentDomainObject(Guid id, int version) 
@@ -35,6 +41,16 @@ namespace Squidex.Write.Contents
         protected void On(ContentCreated @event)
         {
             isCreated = true;
+        }
+
+        protected void On(ContentPublished @event)
+        {
+            isPublished = true;
+        }
+
+        protected void On(ContentUnpublished @event)
+        {
+            isPublished = false;
         }
 
         protected void On(ContentDeleted @event)
@@ -71,6 +87,28 @@ namespace Squidex.Write.Contents
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+
+            return this;
+        }
+
+        public ContentDomainObject Publish(PublishContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
+
+            return this;
+        }
+
+        public ContentDomainObject Unpublish(UnpublishContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentUnpublished()));
 
             return this;
         }

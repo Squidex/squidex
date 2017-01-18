@@ -8,10 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import {
-    AppLanguageDto,
-    FieldDto
-} from 'shared';
+import { AppLanguageDto, FieldDto } from 'shared';
 
 @Component({
     selector: 'sqx-content-field',
@@ -32,11 +29,10 @@ export class ContentFieldComponent implements OnInit {
     public contentFormSubmitted: boolean;
 
     public fieldLanguages: string[];
-
-    public selectedLanguage: string;
+    public fieldLanguage: string;
 
     public selectLanguage(language: AppLanguageDto) {
-        this.selectedLanguage = language.iso2Code;
+        this.fieldLanguage = language.iso2Code;
     }
 
     public ngOnInit() {
@@ -46,10 +42,10 @@ export class ContentFieldComponent implements OnInit {
 
         if (this.field.properties.isLocalizable) {
             this.fieldLanguages = this.languages.map(t => t.iso2Code);
-            this.selectedLanguage = this.fieldLanguages[0];
+            this.fieldLanguage = this.fieldLanguages[0];
         } else {
             this.fieldLanguages = ['iv'];
-            this.selectedLanguage = 'iv';
+            this.fieldLanguage = 'iv';
         }
     }
 }

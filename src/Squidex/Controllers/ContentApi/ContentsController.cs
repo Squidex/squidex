@@ -126,6 +126,28 @@ namespace Squidex.Controllers.ContentApi
             return NoContent();
         }
 
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/publish")]
+        public async Task<IActionResult> PublishContent(Guid id)
+        {
+            var command = new PublishContent { AggregateId = id };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/unpublish")]
+        public async Task<IActionResult> UnpublishContent(Guid id)
+        {
+            var command = new UnpublishContent { AggregateId = id };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
         [HttpDelete]
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PutContent(Guid id)

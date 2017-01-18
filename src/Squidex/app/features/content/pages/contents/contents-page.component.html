@@ -5,7 +5,7 @@
         <div class="panel-header-title-row">
             <div class="float-xs-right">
                 <div class="btn-group languages-buttons" role="group">
-                    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
+                    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == languageSelected" (click)="selectLanguage(language)">
                         {{language.iso2Code}}
                     </button>
                 </div>
@@ -25,10 +25,10 @@
 
     <div class="panel-main">
         <div class="panel-content">
-            <table class="table table-items table-fixed" *ngIf="contents">
+            <table class="table table-items table-fixed" *ngIf="contentItems">
                 <colgroup>
                     <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
-                    <col style="width: 170px" />
+                    <col style="width: 190px" />
                     <col style="width: 80px" />
                     <col style="width: 80px" />
                 </colgroup>
@@ -51,25 +51,15 @@
                 </thead>
 
                 <tbody>
-                    <template ngFor let-content [ngForOf]="contents.items">
-                        <tr [routerLink]="[content.id]" class="content">
-                            <td *ngFor="let field of contentFields">
-                                <span class="field">
-                                    {{getFieldContent(content, field)}}
-                                </span>
-                            </td>
-                            <td>
-                                {{content.lastModified|fromNow}}
-                            </td>
-                            <td>
-                                <img class="user-picture" [attr.title]="userName(content.lastModifiedBy) | async" [attr.src]="userPicture(content.lastModifiedBy, true) | async" />
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-simple">
-                                    <i class="icon-dots"></i>
-                                </button>
-                            </td>
-                        </tr>
+                    <template ngFor let-content [ngForOf]="contentItems">
+                        <tr [routerLink]="[content.id]" routerLinkActive="active" class="content" 
+                            [sqxContent]="content" 
+                            [language]="languageSelected"
+                            [fields]="contentFields"
+                            [schema]="schema"
+                            (unpublished)="unpublishContent(content)"
+                            (published)="publishContent(content)"
+                            (deleted)="deleteContent(content)"></tr>
                         <tr class="spacer"></tr>
                     </template>
                 </tbody>

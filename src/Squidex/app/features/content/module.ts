@@ -20,6 +20,7 @@ import {
 import {
     ContentFieldComponent,
     ContentPageComponent,
+    ContentItemComponent,
     ContentsPageComponent,
     SchemasPageComponent
 } from './declarations';
@@ -77,6 +78,7 @@ const routes: Routes = [
     ],
     declarations: [
         ContentFieldComponent,
+        ContentItemComponent,
         ContentPageComponent,
         ContentsPageComponent,
         SchemasPageComponent

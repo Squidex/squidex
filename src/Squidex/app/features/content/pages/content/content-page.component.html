@@ -11,6 +11,7 @@
                 </div>
                 
                 <h3 class="panel-title" *ngIf="isNewMode">New {{schema|displayName}}</h3>
+                <h3 class="panel-title" *ngIf="!isNewMode">Edit {{schema|displayName}}</h3>
 
                 <a class="panel-close" routerLink="../">
                     <i class="icon-close"></i>

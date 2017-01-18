@@ -59,6 +59,13 @@ export class ImmutableArray<T> implements Iterable<T> {
         return new ImmutableArray<T>(clone);
     }
 
+    public pushFront(...items: T[]): ImmutableArray<T> {
+        if (!items || items.length === 0) {
+            return this;
+        }
+        return new ImmutableArray<T>([...freeze(items), ...this.items]);
+    }
+
     public push(...items: T[]): ImmutableArray<T> {
         if (!items || items.length === 0) {
             return this;

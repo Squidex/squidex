@@ -147,6 +147,38 @@ describe('ContentsService', () => {
         authService.verifyAll();
     });
 
+    it('should make put request to publish content', () => {
+        const dto = {};
+
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/publish', dto))
+            .returns(() => Observable.of(
+               new Response(
+                    new ResponseOptions()
+                )
+            ))
+            .verifiable(Times.once());
+
+        contentsService.publishContent('my-app', 'my-schema', 'content1');
+
+        authService.verifyAll();
+    });
+
+    it('should make put request to unpublish content', () => {
+        const dto = {};
+
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/unpublish', dto))
+            .returns(() => Observable.of(
+               new Response(
+                    new ResponseOptions()
+                )
+            ))
+            .verifiable(Times.once());
+
+        contentsService.unpublishContent('my-app', 'my-schema', 'content1');
+
+        authService.verifyAll();
+    });
+
     it('should make delete request to delete content', () => {
         authService.setup(x => x.authDelete('http://service/p/api/content/my-app/my-schema/content1'))
             .returns(() => Observable.of(
