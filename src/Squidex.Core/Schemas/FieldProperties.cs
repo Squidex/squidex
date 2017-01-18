@@ -15,6 +15,7 @@ namespace Squidex.Core.Schemas
     {
         private bool isRequired;
         private bool isLocalizable;
+        private bool isListField;
         private string placeholder;
 
         public bool IsRequired
@@ -36,6 +37,17 @@ namespace Squidex.Core.Schemas
                 ThrowIfFrozen();
 
                 isLocalizable = value;
+            }
+        }
+
+        public bool IsListField
+        {
+            get { return isListField; }
+            set
+            {
+                ThrowIfFrozen();
+
+                isListField = value;
             }
         }
 

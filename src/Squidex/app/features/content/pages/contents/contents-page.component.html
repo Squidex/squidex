@@ -2,21 +2,78 @@
 
 <div class="panel panel-light">
     <div class="panel-header">
-        <div class="float-xs-right">
-            <a class="btn btn-success" [routerLink]="['new']">
-                <i class="icon-plus"></i> New
+        <div class="panel-header-title-row">
+            <div class="float-xs-right">
+                <div class="btn-group languages-buttons" role="group">
+                    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
+                        {{language.iso2Code}}
+                    </button>
+                </div>
+
+                <a class="btn btn-success" [routerLink]="['new']">
+                    <i class="icon-plus"></i> New
+                </a>
+            </div>
+
+            <h3 class="panel-title">{{schema|displayName}} Contents</h3>
+
+            <a class="panel-close" routerLink="../">
+                <i class="icon-close"></i>
             </a>
         </div>
-
-        <h3 class="panel-title">{{schema|displayName}} Contents</h3>
-
-        <a class="panel-close" routerLink="../">
-            <i class="icon-close"></i>
-        </a>
     </div>
 
     <div class="panel-main">
         <div class="panel-content">
+            <table class="table table-items table-fixed" *ngIf="contents">
+                <colgroup>
+                    <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
+                    <col style="width: 170px" />
+                    <col style="width: 80px" />
+                    <col style="width: 80px" />
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th *ngFor="let field of contentFields">
+                            <span class="field">{{field|displayName:'properties.label':'name'}}</span>
+                        </th>
+                        <th>
+                            Updated
+                        </th>
+                        <th>
+                            By
+                        </th>
+                        <th>
+                            Options
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template ngFor let-content [ngForOf]="contents.items">
+                        <tr>
+                            <td *ngFor="let field of contentFields">
+                                <span class="field">
+                                    {{getFieldContent(content, field)}}
+                                </span>
+                            </td>
+                            <td>
+                                {{content.lastModified|fromNow}}
+                            </td>
+                            <td>
+                                <img class="user-picture" [attr.title]="userName(content.lastModifiedBy) | async" [attr.src]="userPicture(content.lastModifiedBy, true) | async" />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-simple">
+                                    <i class="icon-dots"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </template>
+                </tbody>
+            </table>
         </div>
         <div class="panel-sidebar">
             <div class="nav nav-pills nav-stacked nav-light">

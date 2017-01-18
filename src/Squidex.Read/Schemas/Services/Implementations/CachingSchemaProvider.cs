@@ -89,7 +89,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
         public Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is SchemaDeleted)
+            if (@event.Payload is SchemaDeleted || 
+                @event.Payload is SchemaPublished ||
+                @event.Payload is SchemaUnpublished ||
+                @event.Payload is SchemaUpdated ||
+                @event.Payload is FieldEvent)
             {
                 var cacheKey = BuildIdCacheKey(@event.Headers.AggregateId());
 

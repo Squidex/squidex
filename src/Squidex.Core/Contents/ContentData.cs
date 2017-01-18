@@ -62,7 +62,7 @@ namespace Squidex.Core.Contents
             {
                 Field field;
                 
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field))
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field) || field.IsHidden)
                 {
                     continue;
                 }

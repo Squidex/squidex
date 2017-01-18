@@ -8,28 +8,14 @@ $button-size: 2.5rem;
     max-width: 30rem;
 }
 
-.panel-header {
-    min-height: 7rem;
-    max-height: 6.7rem;
-}
-
-.subheader {
-    & {
-        @include flex-box;
-        @include flex-flow(row);
-        margin-top: 2rem;
-        margin-right: -2.5rem;
-    }
-
-    &-button {
-        height: $button-size;
-        margin-right: .4rem;
-        min-width: $button-size;
-        max-width: $button-size;
-        padding-left: 0;
-        padding-right: 0;
-        font-size: 1.1rem;
-    }
+.subheader-button {
+    height: $button-size;
+    margin-right: .4rem;
+    min-width: $button-size;
+    max-width: $button-size;
+    padding-left: 0;
+    padding-right: 0;
+    font-size: 1.1rem;
 }
 
 .search-form {
@@ -61,6 +47,7 @@ $button-size: 2.5rem;
     & {
         padding-left: $panel-padding;
         padding-right: $panel-padding;
+        cursor: pointer;
     }
 
     &:hover,

@@ -18,6 +18,14 @@ import {
 
 import { AuthService } from './auth.service';
 
+export class ContentsDto {
+    constructor(
+        public readonly total: number,
+        public readonly items: ContentDto[]
+    ) {
+    }
+}
+
 export class ContentDto {
     constructor(
         public readonly id: string,
@@ -39,15 +47,15 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query: string): Observable<ContentDto[]> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query: string): Observable<ContentsDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?take=${take}&skip=${skip}&query=${query}&nonPublished=true`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
                 .map(response => {
-                    const items: any[] = response;
+                    const items: any[] = response.items;
 
-                    return items.map(item => {
+                    return new ContentsDto(response.total, items.map(item => {
                         return new ContentDto(
                             item.id,
                             item.isPublished,
@@ -56,7 +64,7 @@ export class ContentsService {
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
                             item.data);
-                    });
+                    }));
                 })
                 .catchError('Failed to load contents. Please reload.');
     }

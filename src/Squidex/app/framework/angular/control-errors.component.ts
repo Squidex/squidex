@@ -2,10 +2,10 @@
  * Squidex Headless CMS
  * 
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Component, Host, Input, OnChanges, OnInit, Optional } from '@angular/core';
+import { Component, Host, Input, OnChanges, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
 
 import { fadeAnimation } from './animations';
@@ -30,7 +30,7 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
         fadeAnimation
     ]
 })
-export class ControlErrorsComponent implements OnChanges, OnInit {
+export class ControlErrorsComponent implements OnChanges {
     private displayFieldName: string;
     private control: AbstractControl;
 
@@ -96,9 +96,7 @@ export class ControlErrorsComponent implements OnChanges, OnInit {
         } else if (this.for) {
             this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
         }
-    }
 
-    public ngOnInit() {
         this.control = this.formGroupDirective.form.controls[this.for];
     }
 }

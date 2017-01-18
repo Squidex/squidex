@@ -9,10 +9,14 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
+import { ContentAdded } from './../messages';
+
 import {
     AppComponentBase,
+    AppLanguageDto,
     AppsStoreService,
     ContentsService,
+    MessageBus,
     NotificationService,
     NumberFieldPropertiesDto,
     SchemaDetailsDto,
@@ -32,13 +36,14 @@ export class ContentPageComponent extends AppComponentBase {
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
-    public languages = ['iv'];
+    public languages: AppLanguageDto[] = [];
 
     public isNewMode = false;
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly contentsService: ContentsService,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        private readonly messageBus: MessageBus
     ) {
         super(apps, notifications, users);
     }
@@ -46,6 +51,10 @@ export class ContentPageComponent extends AppComponentBase {
     public ngOnInit() {
         this.route.params.map(p => p['contentId']).subscribe(contentId => {
             this.isNewMode = !contentId;
+        });
+
+        this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
+            this.languages = languages;
         });
 
         this.route.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
@@ -59,7 +68,7 @@ export class ContentPageComponent extends AppComponentBase {
         this.contentFormSubmitted = true;
 
         if (this.contentForm.valid) {
-            this.contentForm.disable();
+            this.disable();
 
             const data = this.contentForm.value;
 
@@ -67,15 +76,35 @@ export class ContentPageComponent extends AppComponentBase {
                 .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
                     .subscribe(() => {
                         this.reset();
+                        this.messageBus.publish(new ContentAdded());
                     }, error => {
-                        this.contentForm.enable();
+                        this.notifyError(error);
+                        this.enable();
                     });
         }
     }
 
     public reset() {
+        this.enable();
+
         this.contentForm.reset();
         this.contentFormSubmitted = false;
+    }
+
+    public enable() {
+        for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
+            const fieldForm = this.contentForm.controls[field.name];
+
+            fieldForm.enable();
+        }
+    }
+
+    public disable() {
+        for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
+            const fieldForm = this.contentForm.controls[field.name];
+
+            fieldForm.disable();
+        }
     }
 
     private setupForm(schema: SchemaDetailsDto) {
@@ -102,9 +131,15 @@ export class ContentPageComponent extends AppComponentBase {
                 }
             }
 
-            const group = new FormGroup({
-                'iv': new FormControl(undefined, validators)
-            });
+            const group = new FormGroup({});
+
+            if (field.properties.isLocalizable) {
+                for (let language of this.languages) {
+                    group.addControl(language.iso2Code, new FormControl(undefined, validators));
+                }
+            } else {
+                group.addControl('iv', new FormControl(undefined, validators));
+            }
 
             controls[field.name] = group;
         }

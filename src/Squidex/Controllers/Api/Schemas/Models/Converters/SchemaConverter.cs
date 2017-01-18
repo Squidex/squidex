@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas;
 
 namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {

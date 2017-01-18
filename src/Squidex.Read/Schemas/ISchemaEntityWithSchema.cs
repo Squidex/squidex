@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  ISchemaEntity.cs
+//  ISchemaEntityWithSchema.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-namespace Squidex.Read.Schemas.Repositories
+
+using Squidex.Core.Schemas;
+
+namespace Squidex.Read.Schemas
 {
-    public interface ISchemaEntity : IAppRefEntity, ITrackCreatedByEntity, ITrackLastModifiedByEntity
+    public interface ISchemaEntityWithSchema : ISchemaEntity
     {
-        string Name { get; }
-
-        string Label { get; }
-
-        bool IsPublished { get; }
+        Schema Schema { get; }
     }
 }

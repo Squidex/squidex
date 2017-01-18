@@ -2,6 +2,24 @@
 @import '_mixins';
 
 .panel {
-    min-width: 36rem;
-    max-width: 36rem;
+    min-width: 64rem;
+    max-width: 64rem;
+}
+
+.field {
+    @include truncate;
+}
+
+.languages-buttons {
+    margin-right: 1rem;
+}
+
+.user-picture {
+    & {
+        @include circle(2.2rem);
+    }
+
+    &:not([src]) {
+        @include opacity(0);
+    }
 }

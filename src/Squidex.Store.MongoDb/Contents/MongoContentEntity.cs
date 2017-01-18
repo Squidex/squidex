@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Text;
 using MongoDB.Bson;
@@ -13,6 +14,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Contents;
 // ReSharper disable InvertIf
@@ -35,6 +37,18 @@ namespace Squidex.Store.MongoDb.Contents
         [BsonRequired]
         [BsonElement]
         public string Text { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public Guid AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public RefToken CreatedBy { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public RefToken LastModifiedBy { get; set; }
 
         [BsonRequired]
         [BsonElement]

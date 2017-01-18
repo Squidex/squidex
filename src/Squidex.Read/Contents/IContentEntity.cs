@@ -10,7 +10,7 @@ using Squidex.Core.Contents;
 
 namespace Squidex.Read.Contents
 {
-    public interface IContentEntity : IEntity
+    public interface IContentEntity : IAppRefEntity, ITrackCreatedByEntity, ITrackLastModifiedByEntity
     {
         bool IsPublished { get; }
 

@@ -25,19 +25,19 @@ export function createProperties(fieldType: string, values: Object | null = null
         case 'number':
             properties =
                 new NumberFieldPropertiesDto(
-                    undefined, undefined, undefined, false, 'Input',
+                    undefined, undefined, undefined, false, false, false, 'Input',
                     undefined, undefined, undefined, undefined);
             break;
         case 'string':
             properties =
                 new StringFieldPropertiesDto(
-                    undefined, undefined, undefined, false, 'Input',
+                    undefined, undefined, undefined, false, false, false, 'Input',
                     undefined, undefined, undefined, undefined, undefined, undefined);
             break;
         case 'boolean':
             properties =
                 new BooleanFieldPropertiesDto(
-                    undefined, undefined, undefined, false, 'Checkbox',
+                    undefined, undefined, undefined, false, false, false, 'Checkbox',
                     undefined);
             break;
         default:
@@ -97,27 +97,35 @@ export abstract class FieldPropertiesDto {
         public readonly label?: string,
         public readonly hints?: string,
         public readonly placeholder?: string,
-        public readonly isRequired: boolean = false
+        public readonly isRequired: boolean = false,
+        public readonly isListField: boolean = false,
+        public readonly isLocalizable: boolean = false
     ) {
     }
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: number,
         public readonly maxValue?: number,
         public readonly minValue?: number,
         public readonly allowedValues?: number[]
     ) {
-        super(label, hints, placeholder, isRequired);
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
         this['fieldType'] = 'number';
     }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly pattern?: string,
@@ -126,18 +134,21 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         public readonly maxLength?: number | null,
         public readonly allowedValues?: string[]
     ) {
-        super(label, hints, placeholder, isRequired);
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
         this['fieldType'] = 'string';
     }
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined, isRequired: boolean,
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
-        super(label, hints, placeholder, isRequired);
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
         this['fieldType'] = 'boolean';
     }

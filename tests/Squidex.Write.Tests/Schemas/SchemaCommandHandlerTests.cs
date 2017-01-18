@@ -13,7 +13,7 @@ using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Schemas.Commands;
 using Squidex.Write.Utils;

@@ -23,7 +23,7 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Read.Apps;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas;
 
 // ReSharper disable SuggestBaseTypeForParameter
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable

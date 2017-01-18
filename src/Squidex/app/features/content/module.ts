@@ -10,12 +10,14 @@ import { RouterModule, Routes } from '@angular/router';
 
 import {
     HistoryComponent,
+    ResolveAppLanguagesGuard,
     ResolvePublishedSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
 
 import {
+    ContentFieldComponent,
     ContentPageComponent,
     ContentsPageComponent,
     SchemasPageComponent
@@ -33,14 +35,14 @@ const routes: Routes = [
                 path: ':schemaName',
                 component: ContentsPageComponent,
                 resolve: {
-                    schema: ResolvePublishedSchemaGuard
+                    schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
                 },
                 children: [
                     {
                         path: 'new',
                         component: ContentPageComponent,
                         resolve: {
-                            schema: ResolvePublishedSchemaGuard
+                            schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
                         },
                         data: {
                             disableHistory: true
@@ -55,7 +57,7 @@ const routes: Routes = [
                         path: ':contentId',
                         component: ContentPageComponent,
                         resolve: {
-                            schema: ResolvePublishedSchemaGuard
+                            schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
                         },
                         children: [
                              {
@@ -79,6 +81,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        ContentFieldComponent,
         ContentPageComponent,
         ContentsPageComponent,
         SchemasPageComponent

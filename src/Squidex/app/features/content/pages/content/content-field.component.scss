@@ -1,0 +1,22 @@
+@import '_vars';
+@import '_mixins';
+
+.table-items-row {
+    position: relative;
+}
+
+.languages-buttons {
+    @include absolute(1rem, 1.25rem, auto, auto);
+}
+
+.field {
+    &-required {
+        color: $color-theme-error;
+    }
+
+    &-disabled {
+        color: $color-border-dark;
+        font-size: .8rem;
+        font-weight: normal;
+    }
+}

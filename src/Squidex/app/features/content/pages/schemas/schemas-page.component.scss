@@ -6,18 +6,6 @@
     max-width: 20rem;
 }
 
-.panel-header {
-    min-height: 8rem;
-    max-height: 8rem;
-}
-
-.subheader {
-    @include flex-box;
-    @include flex-flow(row);
-    margin-top: 2rem;
-    margin-right: -2.5rem;
-}
-
 .search-form {
     & {
         @include flex-grow(1);
@@ -45,6 +33,7 @@
     & {
         padding-left: $panel-padding;
         padding-right: $panel-padding;
+        cursor: pointer;
     }
 
     &:hover,

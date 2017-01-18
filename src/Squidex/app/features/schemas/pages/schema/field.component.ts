@@ -65,7 +65,9 @@ export class FieldComponent implements OnInit {
                 [
                     Validators.maxLength(100)
                 ]],
-            isRequired: [false]
+            isRequired: [false],
+            isListField: [false],
+            isLocalizable: [false]
         });
 
     constructor(

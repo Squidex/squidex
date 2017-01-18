@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
 using Squidex.Write.Utils;

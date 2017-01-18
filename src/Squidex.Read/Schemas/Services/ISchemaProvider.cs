@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Read.Schemas.Repositories;
 
 namespace Squidex.Read.Schemas.Services
 {

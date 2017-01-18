@@ -13,7 +13,7 @@ using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas;
 
 namespace Squidex.Store.MongoDb.Schemas
 {

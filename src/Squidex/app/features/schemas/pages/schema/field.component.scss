@@ -84,9 +84,9 @@ $field-header: #e7ebef;
 
         &::before {
             @include caret-top;
-            @include absolute(-.625rem, 6rem, auto, auto);
+            @include absolute(-.5rem, 5.5rem, auto, auto);
             border-color: transparent transparent $color-border;
-            border-width: .5rem;
+            border-width: .6rem;
         }
 
         &-tab {

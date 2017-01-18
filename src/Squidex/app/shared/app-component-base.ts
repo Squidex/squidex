@@ -27,12 +27,32 @@ export abstract class AppComponentBase {
         return this.appsStore.selectedApp.map(a => a!.name);
     }
 
-    public userEmail(userId: string): Observable<string> {
-        return this.usersProvider.getUser(userId).map(u => u.email);
+    public userEmail(userId: string, isRef: boolean = false): Observable<string> {
+        if (isRef) {
+            const parts = userId.split(':');
+
+            if (parts[0] === 'subject') {
+                return this.usersProvider.getUser(parts[1]).map(u => u.email);
+            } else {
+                return null;
+            }
+        } else {
+            return this.usersProvider.getUser(userId).map(u => u.email);
+        }
     }
 
-    public userPicture(userId: string): Observable<string> {
-        return this.usersProvider.getUser(userId).map(u => u.pictureUrl);
+    public userPicture(userId: string, isRef: boolean = false): Observable<string> {
+        if (isRef) {
+            const parts = userId.split(':');
+
+            if (parts[0] === 'subject') {
+                return this.usersProvider.getUser(parts[1]).map(u => u.pictureUrl);
+            } else {
+                return null;
+            }
+        } else {
+            return this.usersProvider.getUser(userId).map(u => u.pictureUrl);
+        }
     }
 
     public userName(userId: string, isRef: boolean = false, placeholder = 'Me'): Observable<string> {

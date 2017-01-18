@@ -2,13 +2,13 @@
 
 <div class="panel panel-light">
     <div class="panel-header">
-        <div>
+        <div class="panel-header-title-row">
             <div class="float-xs-right">
                 <div class="btn-group btn-group-sm" data-toggle="buttons">
-                    <button type="button" class="btn btn-publishing btn-default" [class.btn-success]="isPublished" [disabled]="isPublished" (click)="publish()">
+                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="isPublished" [disabled]="isPublished" (click)="publish()">
                         Published
                     </button>
-                    <button type="button" class="btn btn-publishing btn-default" [class.btn-danger]="!isPublished" [disabled]="!isPublished" (click)="unpublish()">
+                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-danger]="!isPublished" [disabled]="!isPublished" (click)="unpublish()">
                         Unpublished
                     </button>
                 </div>

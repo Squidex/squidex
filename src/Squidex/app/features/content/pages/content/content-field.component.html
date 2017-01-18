@@ -1,0 +1,86 @@
+<div class="table-items-row">
+    <label>
+        {{field|displayName:'properties.label':'name'}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+    </label> 
+    
+    <span class="field-disabled" *ngIf="fieldForm.disabled">Disabled</span>
+
+    <div [formGroup]="fieldForm">
+        <div *ngIf="field.properties.isLocalizable">
+            <div class="btn-group btn-group-sm languages-buttons" role="group">
+                <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName"
+                    [class.btn-danger]="fieldForm.controls[language.iso2Code].invalid && (fieldForm.controls[language.iso2Code].touched || contentFormSubmitted)"
+                    [class.active]="language.iso2Code == selectedLanguage" (click)="selectLanguage(language)">
+                    {{language.iso2Code}}
+                </button>
+            </div>
+        </div>
+
+        <div *ngFor="let language of fieldLanguages">
+            <div *ngIf="language == selectedLanguage">
+                <sqx-control-errors [for]="language" fieldName="{{field|displayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
+
+                <div [ngSwitch]="field.properties.fieldType">
+                    <div *ngSwitchCase="'number'">
+                        <div [ngSwitch]="field.properties.editor">
+                            <div *ngSwitchCase="'Input'">
+                                <input class="form-control" type="number" [formControlName]="language">
+                            </div>
+                            <div *ngSwitchCase="'Dropdown'">
+                                <select class="form-control" [formControlName]="language">
+                                    <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                </select>
+                            </div>
+                            <div *ngSwitchCase="'Radio'">
+                                <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="language"> {{value}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngSwitchCase="'string'">
+                        <div [ngSwitch]="field.properties.editor">
+                            <div *ngSwitchCase="'Input'">
+                                <input class="form-control" type="text" [formControlName]="language">
+                            </div>
+                            <div *ngSwitchCase="'Dropdown'">
+                                <select class="form-control" [formControlName]="language">
+                                    <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                </select>
+                            </div>
+                            <div *ngSwitchCase="'TextArea'">
+                                <textarea class="form-control" [formControlName]="language"></textarea>
+                            </div>
+                            <div *ngSwitchCase="'Radio'">
+                                <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="language"> {{value}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngSwitchCase="'boolean'">
+                        <div [ngSwitch]="field.properties.editor">
+                            <div *ngSwitchCase="'Checkbox'">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" [formControlName]="language">
+                                    </label>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'Toggle'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-hint" *ngIf="field.properties.hints && field.properties.hints.length > 0">
+        {{field.properties.hints}}
+    </div>
+</div>

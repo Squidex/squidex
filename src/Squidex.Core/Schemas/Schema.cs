@@ -180,7 +180,7 @@ namespace Squidex.Core.Schemas
 
             var schema = new JsonSchema4 { Id = Name, Type = JsonObjectType.Object };
 
-            foreach (var field in fieldsByName.Values)
+            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
                 field.AddToSchema(schema, languages, Name, schemaResolver);
             }

@@ -43,6 +43,16 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// </summary>
         public bool IsRequired { get; set; }
 
+        /// <summary>
+        /// Determines if the field should be displayed in lists.
+        /// </summary>
+        public bool IsListField { get; set; }
+        
+        /// <summary>
+        /// Determines if the field is localizable.
+        /// </summary>
+        public bool IsLocalizable { get; set; }
+
         public abstract FieldProperties ToProperties();
     }
 }

@@ -22,7 +22,10 @@ namespace Squidex.Core.Contents
                 .AddOrUpdateField(
                     new NumberField(1, "field1", new NumberFieldProperties { IsLocalizable = true }))
                 .AddOrUpdateField(
-                    new NumberField(2, "field2", new NumberFieldProperties { IsLocalizable = false }));
+                    new NumberField(2, "field2", new NumberFieldProperties { IsLocalizable = false }))
+                .AddOrUpdateField(
+                    new NumberField(3, "field3", new NumberFieldProperties { IsLocalizable = false }))
+                .HideField(3);
         private readonly Language[] languages = { Language.GetLanguage("de"), Language.GetLanguage("en") };
         private readonly Language masterLanguage = Language.GetLanguage("en");
 
@@ -157,6 +160,32 @@ namespace Squidex.Core.Contents
                         ContentFieldData.Empty
                             .AddValue("de", 2)
                             .AddValue("it", 3));
+
+            var output = input.ToApiResponse(schema, languages, masterLanguage);
+
+            output.ShouldBeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void Should_not_include_hidden_field()
+        {
+            var expected =
+                new Dictionary<string, Dictionary<string, JToken>>
+                {
+                    ["field2"] = new Dictionary<string, JToken>
+                    {
+                        ["iv"] = 2
+                    }
+                };
+
+            var input =
+                ContentData.Empty
+                    .AddField("field2",
+                        ContentFieldData.Empty
+                            .AddValue("iv", 2))
+                    .AddField("field3",
+                        ContentFieldData.Empty
+                            .AddValue("iv", 2));
 
             var output = input.ToApiResponse(schema, languages, masterLanguage);
 

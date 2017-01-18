@@ -35,10 +35,19 @@
     }
 
     &-header {
-        min-height: $panel-header;
-        max-height: $panel-header;
+        max-height: $panel-header * 3;
+    }
+
+    &-header-row {
+        @include flex-box;
+        @include flex-flow(row);
         position: relative;
-        padding-right: 4rem;
+        margin-top: 1.2rem;
+    }
+
+    &-header-title-row {
+        position: relative;
+        padding-right: $panel-sidebar - $panel-padding;
     }
 
     &-content {
@@ -70,8 +79,8 @@
 
     &-close {
         & {
-            @include absolute($panel-padding, $panel-padding - .125rem, auto, auto);
-            font-size: 1.5rem;
+            @include absolute(0, -.125rem, auto, auto);
+            font-size: 1.3rem;
             font-weight: 400;
             cursor: pointer;
         }

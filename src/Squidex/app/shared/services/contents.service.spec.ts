@@ -14,6 +14,7 @@ import {
     AuthService,
     EntityCreatedDto,
     ContentDto,
+    ContentsDto,
     ContentsService,
     DateTime
 } from './../';
@@ -32,38 +33,42 @@ describe('ContentsService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: 'id1',
-                            isPublished: true,
-                            created: '2016-12-12T10:10',
-                            createdBy: 'Created1',
-                            lastModified: '2017-12-12T10:10',
-                            lastModifiedBy: 'LastModifiedBy1',
-                            data: {}
-                        }, {
-                            id: 'id2',
-                            isPublished: true,
-                            created: '2016-10-12T10:10',
-                            createdBy: 'Created2',
-                            lastModified: '2017-10-12T10:10',
-                            lastModifiedBy: 'LastModifiedBy2',
-                            data: {}
-                        }]
+                        body: {
+                            total: 10,
+                            items: [{
+                                id: 'id1',
+                                isPublished: true,
+                                created: '2016-12-12T10:10',
+                                createdBy: 'Created1',
+                                lastModified: '2017-12-12T10:10',
+                                lastModifiedBy: 'LastModifiedBy1',
+                                data: {}
+                            }, {
+                                id: 'id2',
+                                isPublished: true,
+                                created: '2016-10-12T10:10',
+                                createdBy: 'Created2',
+                                lastModified: '2017-10-12T10:10',
+                                lastModifiedBy: 'LastModifiedBy2',
+                                data: {}
+                            }]
+                        }
                     })
                 )
             ))
             .verifiable(Times.once());
 
-        let contents: ContentDto[] | null = null;
+        let contents: ContentsDto | null = null;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
             contents = result;
         }).unsubscribe();
 
-        expect(contents).toEqual([
-            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1', DateTime.parseISO_UTC('2016-12-12T10:10'), DateTime.parseISO_UTC('2017-12-12T10:10'), {}),
-            new ContentDto('id2', true, 'Created2', 'LastModifiedBy2', DateTime.parseISO_UTC('2016-10-12T10:10'), DateTime.parseISO_UTC('2017-10-12T10:10'), {})
-        ]);
+        expect(contents).toEqual(
+            new ContentsDto(10, [
+                new ContentDto('id1', true, 'Created1', 'LastModifiedBy1', DateTime.parseISO_UTC('2016-12-12T10:10'), DateTime.parseISO_UTC('2017-12-12T10:10'), {}),
+                new ContentDto('id2', true, 'Created2', 'LastModifiedBy2', DateTime.parseISO_UTC('2016-10-12T10:10'), DateTime.parseISO_UTC('2017-10-12T10:10'), {})
+        ]));
 
         authService.verifyAll();
     });
