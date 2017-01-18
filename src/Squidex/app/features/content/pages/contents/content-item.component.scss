@@ -1,0 +1,61 @@
+@import '_vars';
+@import '_mixins';
+
+.field {
+    @include truncate;
+}
+
+.dropdown {
+    & {
+        display: inline-block;
+    }
+
+    &-menu {
+        @include absolute(100%, 0, auto, auto);
+    }
+
+    &-item {
+        cursor: pointer;
+    }
+}
+
+.btn-simple {
+    & {
+        color: $color-border-dark;
+    }
+
+    &:hover,
+    &.active {
+        color: $color-text;
+    }
+}
+
+.user-picture {
+    & {
+        @include circle(2.2rem);
+    }
+
+    &:not([src]) {
+        @include opacity(0);
+    }
+}
+
+.content {
+    & {
+        cursor: pointer;
+    }
+
+    &-published {
+        & {
+            @include circle(.5rem);
+            display: inline-block;
+            border: 0;
+            background: $color-theme-green;
+            margin-left: .4rem;
+        }
+
+        &.unpublished {
+            background: $color-theme-error;
+        }
+    }
+}

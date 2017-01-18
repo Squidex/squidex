@@ -1,0 +1,30 @@
+<td *ngFor="let field of fields">
+    <span class="field">
+        {{getValue(field)}}
+    </span>
+</td>
+<td>
+    <span class="content-published" [class.unpublished]="!content.isPublished"></span>
+    <span class="content-modified">{{content.lastModified | fromNow}}</span>
+</td>
+<td>
+    <img class="user-picture" [attr.title]="userName(content.lastModifiedBy) | async" [attr.src]="userPicture(content.lastModifiedBy, true) | async" />
+</td>
+<td>
+    <div class="dropdown" *ngIf="content">
+        <button type="button" class="btn btn-simple" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async">
+            <i class="icon-dots"></i>
+        </button>
+        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [@fade]>
+            <a class="dropdown-item" (click)="published.emit(); $event.stopPropagation()" *ngIf="!content.isPublished">
+                Publish
+            </a>
+            <a class="dropdown-item" (click)="unpublished.emit(); $event.stopPropagation()" *ngIf="content.isPublished">
+                Unpublish
+            </a>
+            <a class="dropdown-item" (click)="deleted.emit(); $event.stopPropagation()">
+                Delete
+            </a>
+        </div>
+    </div>
+</td>
