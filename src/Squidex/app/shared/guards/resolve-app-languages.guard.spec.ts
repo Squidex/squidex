@@ -29,7 +29,7 @@ describe('ResolveAppLanguagesGuard', () => {
     it('should throw if route does not contain parameter', () => {
         const guard = new ResolveAppLanguagesGuard(appLanguagesService.object, <any>new RouterMockup());
 
-        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app.');
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app name.');
     });
 
     it('should navigate to 404 page if languages are not found', (done) => {

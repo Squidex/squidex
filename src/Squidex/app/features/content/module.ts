@@ -11,6 +11,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {
     HistoryComponent,
     ResolveAppLanguagesGuard,
+    ResolveContentGuard,
     ResolvePublishedSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
@@ -40,13 +41,7 @@ const routes: Routes = [
                 children: [
                     {
                         path: 'new',
-                        component: ContentPageComponent,
-                        resolve: {
-                            schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
-                        },
-                        data: {
-                            disableHistory: true
-                        }
+                        component: ContentPageComponent
                     }, {
                         path: 'history',
                         component: HistoryComponent,
@@ -57,7 +52,7 @@ const routes: Routes = [
                         path: ':contentId',
                         component: ContentPageComponent,
                         resolve: {
-                            schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
+                            content: ResolveContentGuard
                         },
                         children: [
                              {

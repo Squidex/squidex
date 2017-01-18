@@ -5,4 +5,4 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-export class ContentAdded { }
+export class ContentChanged { }

@@ -8,25 +8,27 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
-import { AppLanguageDto, AppLanguagesService } from './../services/app-languages.service';
+import { ContentDto, ContentsService } from './../services/contents.service';
 
 @Injectable()
-export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
+export class ResolveContentGuard implements Resolve<ContentDto> {
     constructor(
-        private readonly appLanguagesService: AppLanguagesService,
+        private readonly contentsService: ContentsService,
         private readonly router: Router
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<AppLanguageDto[]> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<ContentDto> {
         const appName = this.findParameter(route, 'appName');
+        const schemaName = this.findParameter(route, 'schemaName');
+        const contentId = this.findParameter(route, 'contentId');
 
-        if (!appName) {
-            throw 'Route must contain app name.';
+        if (!appName || !schemaName || !contentId) {
+            throw 'Route must contain app and schema name and id.';
         }
 
         const result =
-            this.appLanguagesService.getLanguages(appName).toPromise()
+            this.contentsService.getContent(appName, schemaName, contentId).toPromise()
                 .then(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);

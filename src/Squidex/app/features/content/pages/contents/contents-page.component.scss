@@ -6,12 +6,16 @@
     max-width: 64rem;
 }
 
+.languages-buttons {
+    margin-right: 1rem;
+}
+
 .field {
     @include truncate;
 }
 
-.languages-buttons {
-    margin-right: 1rem;
+.content {
+    cursor: pointer;
 }
 
 .user-picture {

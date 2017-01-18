@@ -42,7 +42,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/{name}")]
-        public async Task<IActionResult> GetContents(string name, [FromQuery] string query = null, [FromQuery] int? take = null, [FromQuery] int? skip = null, [FromQuery] bool nonPublished = false)
+        public async Task<IActionResult> GetContents(string name, [FromQuery] string query = null, [FromQuery] int? take = null, [FromQuery] int? skip = null, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
         {
             var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
 
@@ -77,7 +77,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/{name}/{id}")]
-        public async Task<IActionResult> GetContent(string name, Guid id)
+        public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
         {
             var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
 
@@ -97,7 +97,7 @@ namespace Squidex.Controllers.ContentApi
 
             if (content.Data != null)
             {
-                model.Data = content.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage);
+                model.Data = content.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
             }
 
             return Ok(model);

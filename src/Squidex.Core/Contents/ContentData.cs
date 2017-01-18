@@ -48,7 +48,7 @@ namespace Squidex.Core.Contents
             return new ContentData(request.ToImmutableDictionary(x => x.Key, x => new ContentFieldData(x.Value.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)), StringComparer.OrdinalIgnoreCase));
         }
 
-        public Dictionary<string, Dictionary<string, JToken>> ToApiResponse(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage)
+        public Dictionary<string, Dictionary<string, JToken>> ToApiResponse(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage, bool excludeHidden = true)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(languages, nameof(languages));
@@ -62,7 +62,7 @@ namespace Squidex.Core.Contents
             {
                 Field field;
                 
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field) || field.IsHidden)
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field) || (!excludeHidden && field.IsHidden))
                 {
                     continue;
                 }

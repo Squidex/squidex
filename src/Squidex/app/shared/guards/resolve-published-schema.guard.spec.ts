@@ -25,24 +25,24 @@ describe('ResolvePublishedSchemaGuard', () => {
         }
     };
 
-    let appsStore: IMock<SchemasService>;
+    let schemasService: IMock<SchemasService>;
 
     beforeEach(() => {
-        appsStore = Mock.ofType(SchemasService);
+        schemasService = Mock.ofType(SchemasService);
     });
 
     it('should throw if route does not contain parameter', () => {
-        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>new RouterMockup());
+        const guard = new ResolvePublishedSchemaGuard(schemasService.object, <any>new RouterMockup());
 
         expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name.');
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
-        appsStore.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
-        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
+        const guard = new ResolvePublishedSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
@@ -54,11 +54,11 @@ describe('ResolvePublishedSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema loading fails', (done) => {
-        appsStore.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.throw(null));
         const router = new RouterMockup();
 
-        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
+        const guard = new ResolvePublishedSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
@@ -72,11 +72,11 @@ describe('ResolvePublishedSchemaGuard', () => {
     it('should navigate to 404 page if schema not published', (done) => {
         const schema = { isPublished: false };
 
-        appsStore.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 
-        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
+        const guard = new ResolvePublishedSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
@@ -90,11 +90,11 @@ describe('ResolvePublishedSchemaGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const schema = { isPublished: true };
 
-        appsStore.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 
-        const guard = new ResolvePublishedSchemaGuard(appsStore.object, <any>router);
+        const guard = new ResolvePublishedSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {

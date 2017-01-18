@@ -29,7 +29,7 @@ describe('ContentsService', () => {
     });
 
     it('should make get request to get contents', () => {
-        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?take=17&skip=13&query=my-query&nonPublished=true'))
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?take=17&skip=13&query=my-query&nonPublished=true&hidden=true'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -74,7 +74,7 @@ describe('ContentsService', () => {
     });
 
     it('should make get request to get content', () => {
-        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema/content1'))
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema/content1?hidden=true'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({

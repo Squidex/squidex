@@ -52,7 +52,7 @@
 
                 <tbody>
                     <template ngFor let-content [ngForOf]="contents.items">
-                        <tr>
+                        <tr [routerLink]="[content.id]" class="content">
                             <td *ngFor="let field of contentFields">
                                 <span class="field">
                                     {{getFieldContent(content, field)}}

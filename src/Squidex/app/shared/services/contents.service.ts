@@ -48,7 +48,7 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, take: number, skip: number, query: string): Observable<ContentsDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?take=${take}&skip=${skip}&query=${query}&nonPublished=true`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?take=${take}&skip=${skip}&query=${query}&nonPublished=true&hidden=true`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -70,7 +70,7 @@ export class ContentsService {
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?hidden=true`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())

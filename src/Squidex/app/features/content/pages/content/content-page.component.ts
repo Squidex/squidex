@@ -7,14 +7,15 @@
 
 import { Component } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { ContentAdded } from './../messages';
+import { ContentChanged } from './../messages';
 
 import {
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
+    ContentDto,
     ContentsService,
     MessageBus,
     NotificationService,
@@ -35,32 +36,34 @@ export class ContentPageComponent extends AppComponentBase {
 
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
+    public content: ContentDto = null;
 
     public languages: AppLanguageDto[] = [];
 
-    public isNewMode = false;
+    public get isNewMode() {
+        return this.content !== null;
+    }
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
         super(apps, notifications, users);
     }
 
     public ngOnInit() {
-        this.route.params.map(p => p['contentId']).subscribe(contentId => {
-            this.isNewMode = !contentId;
-        });
-
-        this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
+        this.route.parent.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
             this.languages = languages;
         });
 
-        this.route.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
-            this.schema = schema;
+        this.route.parent.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
+            this.setupForm(schema, this.route.snapshot.data['content']);
+        });
 
-            this.setupForm(schema);
+        this.route.data.map(p => p['content']).subscribe((content: ContentDto) => {
+            this.populateForm(content);
         });
     }
 
@@ -73,14 +76,21 @@ export class ContentPageComponent extends AppComponentBase {
             const data = this.contentForm.value;
 
             this.appName()
-                .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
-                    .subscribe(() => {
-                        this.reset();
-                        this.messageBus.publish(new ContentAdded());
-                    }, error => {
-                        this.notifyError(error);
-                        this.enable();
-                    });
+                .switchMap(app => {
+                    if (this.isNewMode) {
+                        return this.contentsService.postContent(app, this.schema.name, data);
+                    } else {
+                        return this.contentsService.putContent(app, this.schema.name, data, this.content.id);
+                    }
+                })
+                .subscribe(() => {
+                    this.router.navigate(['../'], { relativeTo: this.route });
+
+                    this.messageBus.publish(new ContentChanged());
+                }, error => {
+                    this.notifyError(error);
+                    this.enable();
+                });
         }
     }
 
@@ -107,7 +117,9 @@ export class ContentPageComponent extends AppComponentBase {
         }
     }
 
-    private setupForm(schema: SchemaDetailsDto) {
+    private setupForm(schema: SchemaDetailsDto, content?: ContentDto) {
+        this.schema = schema;
+
         const controls: { [key: string]: AbstractControl } = {};
 
         for (const field of schema.fields) {
@@ -145,6 +157,23 @@ export class ContentPageComponent extends AppComponentBase {
         }
 
         this.contentForm = new FormGroup(controls);
+    }
+
+    private populateForm(content: ContentDto) {
+        this.content = content;
+
+        for (const field of this.schema.fields) {
+            const fieldValue = content.data[field.name] || {};
+            const fieldForm = <FormGroup>this.contentForm.controls[field.name];
+
+             if (field.properties.isLocalizable) {
+                for (let language of this.languages) {
+                    fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
+                }
+            } else {
+                fieldForm.controls['iv'].setValue(fieldValue['iv']);
+            }
+        }
     }
 }
 

@@ -8,12 +8,12 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { SchemasService } from 'shared';
+import { ContentsService } from 'shared';
 
-import { ResolveSchemaGuard } from './resolve-schema.guard';
+import { ResolveContentGuard } from './resolve-content.guard';
 import { RouterMockup } from './router-mockup';
 
-describe('ResolveSchemaGuard', () => {
+describe('ResolveContentGuard', () => {
     const route = {
         params: {
             appName: 'my-app'
@@ -21,28 +21,33 @@ describe('ResolveSchemaGuard', () => {
         parent: {
             params: {
                 schemaName: 'my-schema'
+            },
+            parent: {
+                params: {
+                    contentId: '123'
+                }
             }
         }
     };
 
-    let schemasService: IMock<SchemasService>;
+    let appsStore: IMock<ContentsService>;
 
     beforeEach(() => {
-        schemasService = Mock.ofType(SchemasService);
+        appsStore = Mock.ofType(ContentsService);
     });
 
     it('should throw if route does not contain parameter', () => {
-        const guard = new ResolveSchemaGuard(schemasService.object, <any>new RouterMockup());
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
 
-        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name.');
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name and id.');
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
-        const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
@@ -54,11 +59,11 @@ describe('ResolveSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema loading fails', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
             .returns(() => Observable.throw(null!));
         const router = new RouterMockup();
 
-        const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
@@ -72,11 +77,11 @@ describe('ResolveSchemaGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const schema = {};
 
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 
-        const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {

@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { ContentAdded } from './../messages';
+import { ContentChanged } from './../messages';
 
 import {
     AppComponentBase,
@@ -62,7 +62,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnInit {
 
     public ngOnInit() {
         this.messageSubscription =
-            this.messageBus.of(ContentAdded).delay(2000).subscribe(message => {
+            this.messageBus.of(ContentChanged).delay(2000).subscribe(message => {
                 this.load();
             });
 
