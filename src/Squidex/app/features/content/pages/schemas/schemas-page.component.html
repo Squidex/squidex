@@ -1,16 +1,16 @@
 <sqx-title message="{app} | Schemas" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-dark">
+<sqx-panel theme="dark" panelWidth="16rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <h3 class="panel-title">Schemas</h3>
-
-            <a class="panel-close" dashboardLink>
-                <i class="icon-close"></i>
-            </a>
         </div>
 
-        <div class="panel-header-row">            
+        <a class="panel-close" dashboardLink>
+            <i class="icon-close"></i>
+        </a>
+
+        <div class="panel-row">            
             <div class="search-form">
                 <input class="form-control form-control-dark" [formControl]="schemasFilter" placeholder="Search for schemas..." />
 
@@ -21,15 +21,16 @@
 
     <div class="panel-main">
         <div class="panel-content">
-            <div class="schemas">
-                <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
-                    <div class="schema-inner">
-                        <span class="schema-name">{{schema|displayName}}</span> 
-                    </div>
-                </div>
-            </div>
+            <ul class="nav nav-pills nav-stacked nav-dark nav-dark-bordered">
+                <li class="nav-item" *ngFor="let schema of schemasFiltered | async">
+                    <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
+                        {{schema|displayName}}
+                        <i class="icon-angle-right"></i>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <router-outlet></router-outlet>

@@ -1,8 +1,8 @@
 <sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schemaName}}"></sqx-title>
 
-<div class="panel panel-light">
+<sqx-panel panelWidth="48rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <div class="float-xs-right">
                 <div class="btn-group btn-group-sm" data-toggle="buttons">
                     <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="isPublished" [disabled]="isPublished" (click)="publish()">
@@ -17,11 +17,11 @@
             <h3 class="panel-title">
                 {{schemaProperties|displayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
             </h3>
-
-            <a class="panel-close" routerLink="../">
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
     </div>
 
     <div class="panel-main">
@@ -56,16 +56,12 @@
             </div>
         </div>
         <div class="panel-sidebar">
-            <div class="nav nav-pills nav-stacked nav-light">
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="history" routerLinkActive="active">
-                        <i class="icon-time"></i>
-                    </a>
-                </li>
-            </div>
+            <a class="panel-link" routerLink="history" routerLinkActive="active">
+                <i class="icon-time"></i>
+            </a>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <div class="modal" *sqxModalView="editSchemaDialog" [@fade]>
     <div class="modal-backdrop"></div>

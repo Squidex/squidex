@@ -1,12 +1,7 @@
-@import '_vars';
 @import '_mixins';
+@import '_vars';
 
-$button-size: 2.5rem;
-
-.panel {
-    min-width: 30rem;
-    max-width: 30rem;
-}
+$button-size: calc(2.5rem - 2px);
 
 .subheader-button {
     height: $button-size;
@@ -18,108 +13,26 @@ $button-size: 2.5rem;
     font-size: 1.1rem;
 }
 
-.search-form {
-    & {
-        @include flex-grow(1);
-        position: relative;
-    }
-
-    .form-control {
-        padding-left: $button-size + 1rem;
-        height: $button-size;
-    }
-
-    .icon-search {
-        @include absolute(50%, auto, auto, .8rem);
-        color: $color-dark-foreground-selected;
-        font-size: 1.3rem;
-        font-weight: lighter;
-        margin-top: -.6rem;
-    }
-}
-
-.schemas {
-    margin-left: -$panel-padding;
-    margin-right: -$panel-padding;
-}
-
 .schema {
-    & {
-        padding-left: $panel-padding;
-        padding-right: $panel-padding;
-        cursor: pointer;
-    }
-
-    &:hover,
-    &.active {
-        & {
-            background: $color-dark-background-selected;
-        }
-
-        & + .schema > .schema-inner {
-            border-color: transparent;
-        }
-
-        .schema-inner {
-            border-color: transparent;
-        }
-    }
-
-    &-inner {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        border-top: 1px solid darken($color-dark-foreground, 10%);
-    }
-
-    &-col-left {
+    &-name {
         @include truncate;
-    }
-
-    &-col-right {
-        text-align: right;
     }
 
     &-modified {
-        font-size: .8rem;
-    }
-
-    &-name {
-        @include truncate;
-        color: $color-dark-foreground-selected;
-        font-size: 1rem;
-        font-weight: normal;
-    }
-
-    &-published {
-        & {
-            @include circle(.5rem);
-            display: inline-block;
-            border: 0;
-            background: $color-theme-green;
-            margin-left: .4rem;
-        }
-
-        &.unpublished {
-            background: $color-theme-error;
-        }
+        text-align: right;
     }
 
     &-user {
         @include border-radius(1px);
         @include truncate;
         display: inline-block;
-        background: $color-dark-background-accent;
+        background: $color-dark2-control;
         padding: .1rem .3rem;
         font-size: .8rem;
         font-weight: normal;
         margin-left: 10px;
+        margin-bottom: 2px;
         max-width: 100%;
-        vertical-align: baseline;
-    }
-
-    &:first-child {
-        .schema-inner {
-            border: 0;
-        }
+        vertical-align: middle;
     }
 }

@@ -1,12 +1,12 @@
-<div class="panel panel-dark">
+<sqx-panel theme="dark" panelWidth="16rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <h3 class="panel-title">Settings</h3>
-
-            <a class="panel-close" dashboardLink>
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" dashboardLink>
+            <i class="icon-close"></i>
+        </a>
     </div>
 
     <div class="panel-main">
@@ -15,21 +15,24 @@
                 <li class="nav-item">
                     <a class="nav-link" routerLink="clients" routerLinkActive="active">
                         Clients
+                        <i class="icon-angle-right"></i>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                         Contributors
+                        <i class="icon-angle-right"></i>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="languages" routerLinkActive="active">
                         Languages
+                        <i class="icon-angle-right"></i>
                     </a>
                 </li>
             </ul>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <router-outlet></router-outlet>

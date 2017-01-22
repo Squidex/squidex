@@ -7,7 +7,8 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     AppComponentBase,
@@ -39,33 +40,14 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
 
     public addSchemaDialog = new ModalView();
 
-    public schemas = new BehaviorSubject(ImmutableArray.empty<SchemaDto>());
+    public schemas = ImmutableArray.empty<SchemaDto>();
+    public schemaQuery: string;
     public schemasFilter = new FormControl();
-    public schemasFiltered =
-        Observable.of(null)
-            .merge(this.schemasFilter.valueChanges.debounceTime(100))
-            .combineLatest(this.schemas,
-                (query, schemas) => {
-
-                if (query && query.length > 0) {
-                    schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
-                }
-
-                schemas =
-                    schemas.sort((a, b) => {
-                        if (a.name < b.name) {
-                            return -1;
-                        }
-                        if (a.name > b.name) {
-                            return 1;
-                        }
-                        return 0;
-                    });
-
-                return schemas;
-            });
+    public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly authService: AuthService
@@ -78,43 +60,75 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnInit() {
-        this.load();
+        this.schemasFilter.valueChanges.distinctUntilChanged().debounceTime(100)
+            .subscribe(q => {
+                this.router.navigate([], { queryParams: { schemaQuery: q }});
+            });
+
+        this.route.queryParams.map(q => q['schemaQuery']).distinctUntilChanged()
+            .subscribe(q => {
+                this.updateSchemas(this.schemas, this.schemaQuery = q);
+            });
 
         this.messageSubscription =
-            this.messageBus.of(SchemaUpdated).subscribe(message => {
-                const schemas = this.schemas.value;
-                const oldSchema = schemas.find(i => i.name === message.name);
+            this.messageBus.of(SchemaUpdated)
+                .subscribe(m => {
+                    this.updateSchemas(this.schemas.map(s => s.name === m.name ? updateSchema(s, this.authService, m) : s));
+                });
 
-                if (oldSchema) {
-                    const me = `subject:${this.authService.user!.id}`;
-
-                    const newSchema =
-                        new SchemaDto(
-                            oldSchema.id,
-                            oldSchema.name,
-                            message.label,
-                            message.isPublished,
-                            oldSchema.createdBy, me,
-                            oldSchema.created, DateTime.now());
-                    this.schemas.next(schemas.replace(oldSchema, newSchema));
-                }
-            });
+        this.load();
     }
 
     public load() {
         this.appName()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
             .subscribe(dtos => {
-                this.schemas.next(ImmutableArray.of(dtos));
+                this.updateSchemas(ImmutableArray.of(dtos));
             }, error => {
                 this.notifyError(error);
             });
     }
 
     public onSchemaCreated(dto: SchemaDto) {
-        this.schemas.next(this.schemas.getValue().push(dto));
+        this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
 
         this.addSchemaDialog.hide();
     }
+
+    private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {
+        this.schemas = schemas;
+
+        query = query || this.schemaQuery;
+
+        if (query && query.length > 0) {
+            schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+        }
+
+        schemas =
+            schemas.sort((a, b) => {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
+
+        this.schemasFiltered = schemas;
+    }
 }
+
+function updateSchema(schema: SchemaDto, authService: AuthService, message: SchemaUpdated): SchemaDto {
+    const me = `subject:${authService.user!.id}`;
+
+    return new SchemaDto(
+        schema.id,
+        schema.name,
+        message.label,
+        message.isPublished,
+        schema.createdBy, me,
+        schema.created, DateTime.now());
+}
+
 

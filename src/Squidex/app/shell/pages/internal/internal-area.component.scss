@@ -6,14 +6,14 @@
 }
 
 .navbar-brand {
-    text-align: center;
+    width: $size-sidebar-width - 2rem;
     padding-top: 0;
     padding-bottom: 0;
     margin-top: -.2rem;
     margin-bottom: -.2rem;
-    margin-right: 2.5rem;
+    margin-right: 2rem;
     font-size: 1.8rem;
-    width: 4.5rem;
+    text-align: center;
 }
 
 .notification {

@@ -23,10 +23,6 @@ import {
     ValidatorsEx
 } from 'shared';
 
-function rename(client: AppClientDto, name: string): AppClientDto {
-    return new AppClientDto(client.id, client.secret, name, client.expiresUtc);
-};
-
 @Component({
     selector: 'sqx-clients-page',
     styleUrls: ['./clients-page.component.scss'],
@@ -125,3 +121,6 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 }
 
+function rename(client: AppClientDto, name: string): AppClientDto {
+    return new AppClientDto(client.id, client.secret, name, client.expiresUtc);
+};

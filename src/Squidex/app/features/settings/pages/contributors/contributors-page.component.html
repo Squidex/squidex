@@ -1,14 +1,14 @@
 <sqx-title message="{app} | Contributors | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-light">
+<sqx-panel panelWidth="42rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <h3 class="panel-title">Contributors</h3>
-
-            <a class="panel-close" routerLink="../">
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
     </div>
 
     <div class="panel-main">
@@ -18,8 +18,8 @@
                     <col style="width: 70px" />
                     <col style="width: 50%" />
                     <col style="width: 50%" />
-                    <col style="width: 150px" />
-                    <col style="width: 80px" />
+                    <col style="width: 160px" />
+                    <col style="width: 60px" />
                 </colgroup>
 
                 <thead>
@@ -78,15 +78,11 @@
             </div>
         </div>
         <div class="panel-sidebar">
-            <div class="nav nav-pills nav-stacked nav-light">
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="history" routerLinkActive="active">
-                        <i class="icon-time"></i>
-                    </a>
-                </li>
-            </div>
+            <a class="panel-link" routerLink="history" routerLinkActive="active">
+                <i class="icon-time"></i>
+            </a>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <router-outlet></router-outlet>

@@ -7,31 +7,6 @@ $field-header: #e7ebef;
     padding: 0;
 }
 
-.dropdown {
-    & {
-        display: inline-block;
-    }
-
-    &-menu {
-        @include absolute(100%, 0, auto, auto);
-    }
-
-    &-item {
-        cursor: pointer;
-    }
-}
-
-.btn-simple {
-    & {
-        color: $color-border-dark;
-    }
-
-    &:hover,
-    &.active {
-        color: $color-text;
-    }
-}
-
 .field {
     &-summary {
         padding: 1rem 1.25rem;
@@ -104,31 +79,5 @@ $field-header: #e7ebef;
         @include opacity(.9);
         min-width: 4rem;
         max-width: 6rem;
-    }
-}
-
-.nav-field-tabs {
-    & {
-        @include absolute(auto, auto, 0, 1.25rem);
-    }
-
-    & .nav-link {
-        & {
-            color: $color-text;
-            cursor: pointer;
-            padding: 1rem .625rem;
-            border-bottom: .25rem solid transparent;
-            width: 6.25rem;
-            text-align: center;
-        }
-
-        &.active {
-            font-weight: bold;
-        }
-
-        &.active,
-        &:hover {
-            border-color: $color-theme-blue;
-        }
     }
 }

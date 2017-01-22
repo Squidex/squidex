@@ -1,21 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
-.panel {
-    min-width: 64rem;
-    max-width: 64rem;
-}
-
-.panel-content {
-    overflow-y: scroll;
-}
-
 .languages-buttons {
     margin-right: 1rem;
-}
-
-.field {
-    @include truncate;
 }
 
 .content {

@@ -1,72 +1,12 @@
 @import '_vars';
 @import '_mixins';
 
-.panel {
-    min-width: 20rem;
-    max-width: 20rem;
+.nav-link {
+    position: relative;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
 }
 
-.search-form {
-    & {
-        @include flex-grow(1);
-        position: relative;
-    }
-
-    .form-control {
-        padding-left: 3rem;
-    }
-
-    .icon-search {
-        @include absolute(.625rem, auto, auto, 1rem);
-        color: $color-dark-foreground-selected;
-        font-size: 1.3rem;
-        font-weight: lighter;
-    }
-}
-
-.schemas {
-    margin-left: -$panel-padding;
-    margin-right: -$panel-padding;
-}
-
-.schema {
-    & {
-        padding-left: $panel-padding;
-        padding-right: $panel-padding;
-        cursor: pointer;
-    }
-
-    &:hover,
-    &.active {
-        & {
-            background: $color-dark-background-selected;
-        }
-
-        & + .schema > .schema-inner {
-            border-color: transparent;
-        }
-
-        .schema-inner {
-            border-color: transparent;
-        }
-    }
-
-    &-inner {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        border-top: 1px solid darken($color-dark-foreground, 10%);
-    }
-
-    &-name {
-        @include truncate;
-        color: $color-dark-foreground-selected;
-        font-size: 1rem;
-        font-weight: normal;
-    }
-
-    &:first-child {
-        .schema-inner {
-            border: 0;
-        }
-    }
+.icon-angle-right {
+    @include absolute(14px, 2rem, auto, auto);
 }

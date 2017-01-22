@@ -1,27 +1,2 @@
 @import '_vars';
 @import '_mixins';
-
-.panel {
-    min-width: 44rem;
-    max-width: 44rem;
-}
-
-.card {
-    & {
-        max-width: 44rem;
-    }
-
-    &-block {
-        padding-left: .5rem;
-        padding-right: .5rem;
-    }
-}
-
-.clients {
-    &-empty {
-        color: $color-empty;
-        font-size: 1.2rem;
-        font-weight: lighter;
-        padding: .2rem 1rem;
-    }
-}

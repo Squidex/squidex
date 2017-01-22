@@ -2,57 +2,80 @@
 @import '_vars';
 
 .panel-container {
-    @include absolute($size-navbar-height, 0, 0, $size-sidebar-width);
+    @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
     overflow-x: auto;
+}
+
+@mixin panel-icon {
+    & {
+        color: $color-panel-icon;
+        font-size: 1.2rem;
+        font-weight: 400;
+        text-decoration: none;
+        text-align: center;
+        padding: .6rem;
+        cursor: pointer;
+    }
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+        color: darken($color-panel-icon, 10%);
+    }
+
+    &.active {
+        color: $color-theme-blue;
+    }
 }
 
 .panel {
     & {
         @include flex-box;
-        @include absolute(0, auto, 0, auto);
+        @include flex-flow(column);
         height: 100%;
-        flex-direction: column;
+        background: $color-background;
+        border-right: 1px solid $color-border;
     }
 
-    &-header,
-    &-content {
-        padding: $panel-padding;
-    }
+    &-header {
+        & {
+            background: $panel-light-background;
+            min-height: $panel-header;
+            max-height: $panel-header * 3;
+            padding: $panel-padding;
+            position: relative;
+        }
 
-    &-main,
-    &-content {
-        @include flex-grow(1);
+        &-row {
+            @include flex-box;
+            @include flex-flow(row);
+            margin-top: 1.2rem;
+            position: relative;
+        }
     }
 
     &-main {
         @include flex-box;
-        flex-direction: row;
-    }
-
-    &-title {
-        font-size: 1.5rem;
-        font-weight: 400;
-    }
-
-    &-header {
-        max-height: $panel-header * 3;
-    }
-
-    &-header-row {
-        @include flex-box;
         @include flex-flow(row);
-        position: relative;
-        margin-top: 1.2rem;
-    }
-
-    &-header-title-row {
-        position: relative;
-        padding-right: $panel-sidebar - $panel-padding;
+        @include flex-grow(1);
     }
 
     &-content {
         & {
+            @include flex-grow(1);
+            border-top: 1px solid $color-border;
+            background: $color-background;
+            padding: $panel-padding;
             overflow-y: auto;
+        }
+
+        &-blank {
+            background: $panel-light-background;
+            border: 0;
+        }
+
+        &-scroll {
+            overflow-y: scroll;
         }
 
         & .nav-stacked {
@@ -62,93 +85,84 @@
 
         & .nav-link {
             padding-left: $panel-padding;
+            padding-right: $panel-padding;
         }
     }
 
     &-sidebar {
         & {
+            background: $panel-light-background;
+            border-top: 1px solid $color-border;
+            border-left: 1px solid $color-border;
             min-width: $panel-sidebar;
             max-width: $panel-sidebar;
         }
 
-        & .nav-link {
-            text-align: center;
-            color: $color-text;
+        & .panel-link {
+            & {
+                @include panel-icon;
+                display: block;
+                padding-top: .6rem;
+                padding-bottom: .6rem;
+                margin-top: -1px;
+                margin-right: -1px;
+                border-top: 1px solid transparent;
+                border-bottom: 1px solid transparent;
+                border-right: 1px solid $color-border;
+            }
+
+            &.active {
+                border-top-color: $color-border;
+                border-bottom-color: $color-border;
+                border-right-color: $panel-light-background;
+            }
         }
+    }
+
+    &-title {
+        font-size: 1.5rem;
+        font-weight: 400;
+    }
+
+    &-row {
+        margin-top: 1rem;
+    }
+
+    &-title-row {
+        padding-right: 2rem;
     }
 
     &-close {
-        & {
-            @include absolute(0, -.125rem, auto, auto);
-            font-size: 1.3rem;
-            font-weight: 400;
-            cursor: pointer;
-        }
-
-        &:hover,
-        &:focus {
-            text-decoration: none;
-        }
-    }
-
-    &-dark {
-        & {
-            @include box-shadow(2px, 0, 1px, .3);
-            background: $color-dark-background;
-            border-right: 1px solid darken($color-dark-foreground, 15%);
-            color: $color-dark-foreground;
-        }
-
-        .panel-close {
-            & {
-                color: $color-dark-foreground;
-            }
-
-            &:hover {
-                color: lighten($color-dark-foreground, 15%);
-            }
-        }
-    }
-
-    &-light {
-        & {
-            border-right: 1px solid $color-border;
-        }
-
-        .panel-header {
-            background: $color-card-footer;
-        }
-
-        .panel-content {
-            border-top: 1px solid $color-border;
-        }
-
-        .panel-content-blank {
-            border: 0;
-            background: $color-card-footer;
-        }
-
-        .panel-sidebar {
-            background: $color-card-footer;
-            border-left: 1px solid $color-border;
-            color: lighten($color-dark-foreground, 20%);
-        }
-
-        .panel-close {
-            & {
-                color: lighten($color-dark-foreground, 20%);
-            }
-
-            &:hover {
-                color: darken($color-dark-foreground, 15%);
-            }
-        }
+        @include absolute($panel-padding - .6rem, $panel-padding - .8rem, auto, auto);
+        @include panel-icon;
     }
 }
 
-.panel-menu {
+.panel-dark {
     & {
-        margin-left: -$panel-padding;
-        margin-right: -$panel-padding;
+        @include box-shadow(2px, 0, 1px, .3);
+        border-right: 1px solid darken($color-dark2-foreground, 15%);
+        background: $color-dark2-background;
+        color: $color-dark2-foreground;
+    }
+
+    .panel-content,
+    .panel-header {
+        background: $color-dark2-background;
+        border: 0;
+    }
+
+    .panel-close {
+        & {
+            color: $color-dark2-foreground;
+        }
+
+        &:hover {
+            color: lighten($color-dark2-foreground, 15%);
+        }
+    }
+
+    .nav-link {
+        @include transition(color .4s ease);
     }
 }

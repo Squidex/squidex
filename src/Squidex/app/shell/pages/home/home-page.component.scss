@@ -1,16 +1,6 @@
 @import '_mixins';
 @import '_vars';
 
-.content {
-    margin: 8rem auto;
-    max-width: 32rem;
-    text-align: center;
-}
-
-.logo {
-    height: 4rem;
-}
-
 .login {
     &-button {
         margin: 2.5rem 0;

@@ -1,7 +1,10 @@
-@import '_vendor-overrides.scss';
+@import '_bootstrap-vars.scss';
 
 // Bootstrap
 @import './../../node_modules/bootstrap/scss/bootstrap-flex.scss';
+
+// Bootstrap Overrides
+@import '_bootstrap.scss';
 
 // icomoon
 @import './icomoon/style.css';

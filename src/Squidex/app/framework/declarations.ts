@@ -18,7 +18,7 @@ export * from './angular/http-utils';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
 export * from './angular/name.pipe';
-export * from './angular/panel.directive';
+export * from './angular/panel.component';
 export * from './angular/panel-container.directive';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';

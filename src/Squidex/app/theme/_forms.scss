@@ -1,0 +1,115 @@
+@import '_mixins';
+@import '_vars';
+
+.ng-invalid {
+    &.ng-dirty {
+        & {
+            border-color: $color-theme-error;
+        }
+
+        &:hover,
+        &:focus {
+            border-color: $color-theme-error-dark;
+        }
+    }
+}
+
+.errors {
+    &-box {
+        position: relative;
+    }
+
+    &::after {
+        @include absolute(auto, auto, -.7rem, .625rem);
+        content: '';
+        height: 0;
+        border-style: solid;
+        border-width: .4rem;
+        border-color: $color-theme-error transparent transparent;
+        width: 0;
+    }
+
+    & {
+        @include absolute(auto, auto, .4rem, 0);
+        @include border-radius(2px);
+        color: $color-accent-dark;
+        cursor: none;
+        display: inline-block;
+        font-size: .9rem;
+        font-weight: normal;
+        line-height: 1.1rem;
+        padding: .3rem .4rem;
+        background: $color-theme-error;
+    }
+}
+
+.col-form-label,
+.col-form-checkbox-label {
+    text-align: right;
+}
+
+input,
+select {
+    &.form-control {
+        padding-top: 0;
+        padding-bottom: 0;
+        height: calc(2.5rem - 2px);
+    }
+}
+
+.form-hint {
+    font-size: .8rem;
+    margin-top: .1rem;
+    margin-bottom: 0;
+    color: lighten($color-text, 30%);
+}
+
+.form-error {
+    @include border-radius(4px);
+    @include truncate;
+    color: $color-accent-dark;
+    margin-top: .25rem;
+    margin-bottom: .5rem;
+    padding: .5rem;
+    background: $color-theme-error;
+}
+
+.form-group {
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.search-form {
+    & {
+        @include flex-grow(1);
+        position: relative;
+    }
+
+    .form-control {
+        padding-right: 3rem;
+    }
+
+    .icon-search {
+        @include absolute(.625rem, 1rem, auto, auto);
+        color: $color-dark2-focus-foreground;
+        font-size: 1.3rem;
+        font-weight: lighter;
+    }
+}
+
+.form-control-dark {
+    & {
+        @include transition(background-color .3s ease);
+        @include placeholder-color(darken($color-accent-dark, 30%));
+        background: $color-dark2-control;
+        border: 1px solid $color-dark2-control;
+        color: darken($color-accent-dark, 20%);
+    }
+
+    &:focus {
+        background: lighten($color-dark2-control, 2%);
+        border-color: lighten($color-dark2-control, 2%);
+        color: $color-dark2-focus-foreground;
+    }
+}

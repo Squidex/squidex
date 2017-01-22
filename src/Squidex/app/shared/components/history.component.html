@@ -1,21 +1,21 @@
 <sqx-title message="{app} | Contributors | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-light">
+<sqx-panel panelWidth="16rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <h3 class="panel-title">Activity</h3>
-
-            <a class="panel-close" routerLink="../">
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
     </div>
 
     <div class="panel-main">
         <div class="panel-content panel-content-blank">
             <div *ngFor="let event of events | async" class="event">
                 <div class="event-left">
-                    <img class="event-picture"[attr.title]="actorName(event.actor) | async" [attr.src]="actorProfile(event.actor) | async" />
+                    <img class="user-picture"[attr.title]="actorName(event.actor) | async" [attr.src]="actorProfile(event.actor) | async" />
                 </div>
                 <div class="event-main">
                     <div class="event-message">
@@ -26,4 +26,4 @@
             </div>            
         </div>
     </div>
-</div>
+</sqx-panel>

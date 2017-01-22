@@ -94,8 +94,6 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             }, error => {
                 this.notifyError(error);
             });
-
-        this.addLanguageForm.reset();
     }
 
     public setMasterLanguage(language: AppLanguageDto) {
@@ -119,6 +117,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     private updateLanguages(languages: ImmutableArray<AppLanguageDto>) {
+        this.addLanguageForm.reset();
         this.appLanguages = languages;
 
         this.messageBus.publish(new HistoryChannelUpdated());

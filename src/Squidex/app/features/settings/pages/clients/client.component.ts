@@ -14,7 +14,6 @@ import {
     AppClientsService,
     fadeAnimation,
     ModalView,
-    Notification,
     NotificationService
 } from 'shared';
 
@@ -31,7 +30,7 @@ const ESCAPE_KEY = 27;
 export class ClientComponent {
     public isRenaming = false;
 
-    public appClientToken: AccessTokenDto;
+    public token: AccessTokenDto;
 
     @Output()
     public renamed = new EventEmitter<string>();
@@ -107,11 +106,11 @@ export class ClientComponent {
 
     public createToken(client: AppClientDto) {
         this.appClientsService.createToken(this.appName, client)
-            .subscribe(token => {
-                this.appClientToken = token;
+            .subscribe(dto => {
+                this.token = dto;
                 this.tokenDialog.show();
-            }, _ => {
-                this.notifications.notify(Notification.error('Failed to retrieve access token. Please retry.'));
+            }, error => {
+                this.notifications.notify(error);
             });
     }
 }

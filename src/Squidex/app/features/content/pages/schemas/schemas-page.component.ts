@@ -7,12 +7,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import {
     AppComponentBase,
     AppsStoreService,
-    ImmutableArray,
     NotificationService,
     SchemaDto,
     SchemasService,
@@ -25,51 +25,54 @@ import {
     templateUrl: './schemas-page.component.html'
 })
 export class SchemasPageComponent extends AppComponentBase implements OnInit {
-    public schemas = new BehaviorSubject(ImmutableArray.empty<SchemaDto>());
-    public schemasFilter = new FormControl();
     public schemasFiltered =
-        Observable.of(null)
-            .merge(this.schemasFilter.valueChanges.debounceTime(100))
-            .combineLatest(this.schemas,
+        this.route.queryParams.map(q => q['schemaQuery'])
+            .combineLatest(this.loadSchemas(),
                 (query, schemas) => {
+                    this.schemasFilter.setValue(query);
 
-                schemas = schemas.filter(t => t.isPublished);
+                    schemas = schemas.filter(t => t.isPublished);
 
-                if (query && query.length > 0) {
-                    schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
-                }
+                    if (query && query.length > 0) {
+                        schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+                    }
 
-                schemas =
-                    schemas.sort((a, b) => {
-                        if (a.name < b.name) {
-                            return -1;
-                        }
-                        if (a.name > b.name) {
-                            return 1;
-                        }
-                        return 0;
-                    });
-
-                return schemas;
+                    return schemas;
+            }).map(schemas => {
+                return schemas.sort((a, b) => {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                });
             });
 
+    public schemasFilter = new FormControl();
+
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
         super(apps, notifications, users);
     }
 
     public ngOnInit() {
-        this.load();
+        this.schemasFilter.valueChanges.distinctUntilChanged().debounceTime(100)
+            .subscribe(f => {
+                this.router.navigate([], { queryParams: { schemaQuery: f }});
+            });
     }
 
-    public load() {
-        this.appName()
+    private loadSchemas(): Observable<SchemaDto[]> {
+        return this.appName()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
-            .subscribe(dtos => {
-                this.schemas.next(ImmutableArray.of(dtos));
-            }, error => {
+            .catch(error => {
                 this.notifyError(error);
+                return [];
             });
     }
 }

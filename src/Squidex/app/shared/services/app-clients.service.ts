@@ -117,6 +117,7 @@ export class AppClientsService {
 
         return this.http.post(url, body, options)
                 .map(response => response.json())
-                .map(response => new AccessTokenDto(response.access_token, response.token_type));
+                .map(response => new AccessTokenDto(response.access_token, response.token_type))
+                .catchError('Failed to create token. Please retry.');
     }
 }

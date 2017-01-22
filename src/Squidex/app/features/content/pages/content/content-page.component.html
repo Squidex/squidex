@@ -1,9 +1,9 @@
 <sqx-title message="{app} | Content" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
 <form [formGroup]="contentForm" (ngSubmit)="saveContent()">
-    <div class="panel panel-light" >
+    <sqx-panel panelWidth="36rem">
         <div class="panel-header">
-            <div class="panel-header-title-row">
+            <div class="panel-title-row">
                 <div class="float-xs-right">
                     <button type="submit" class="btn btn-primary">
                         Save
@@ -12,11 +12,11 @@
                 
                 <h3 class="panel-title" *ngIf="isNewMode">New {{schema|displayName}}</h3>
                 <h3 class="panel-title" *ngIf="!isNewMode">Edit {{schema|displayName}}</h3>
-
-                <a class="panel-close" routerLink="../">
-                    <i class="icon-close"></i>
-                </a>
             </div>
+
+            <a class="panel-close" routerLink="../">
+                <i class="icon-close"></i>
+            </a>
         </div>
 
         <div class="panel-main">
@@ -26,16 +26,12 @@
                 </div>
             </div>
             <div class="panel-sidebar" *ngIf="!isNewMode">
-                <div class="nav nav-pills nav-stacked nav-light">
-                    <li class="nav-item">
-                        <a class="nav-link" routerLink="history" routerLinkActive="active">
-                            <i class="icon-time"></i>
-                        </a>
-                    </li>
-                </div>
+                <a class="panel-link" routerLink="history" routerLinkActive="active">
+                    <i class="icon-time"></i>
+                </a>
             </div>
         </div>
-    </div>
+    </sqx-panel>
 </form>
 
 <router-outlet></router-outlet>

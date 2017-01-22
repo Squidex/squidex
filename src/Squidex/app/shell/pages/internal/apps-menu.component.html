@@ -11,7 +11,7 @@
             <div class="dropdown-divider"></div>
 
             <div *ngIf="apps && apps.length > 0">
-                <a class="dropdown-item" *ngFor="let app of apps" [routerLink]="['/app', app.name]">{{app.name}}</a>
+                <a class="dropdown-item" *ngFor="let app of apps" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
 
                 <div class="dropdown-divider"></div>
             </div>

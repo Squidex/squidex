@@ -1,19 +1,18 @@
 @import '_vars';
 @import '_mixins';
 
-.panel {
-    min-width: 16rem;
-    max-width: 16rem;
+.user-ref {
+    color: $color-theme-blue-dark;
+}
+
+.marker-ref {
+    color: $color-theme-blue-dark;
 }
 
 .event {
     & {
         @include flex-box;
         margin-bottom: .8rem;
-    }
-
-    &-picture {
-        @include circle(2.2rem);
     }
 
     &-message {

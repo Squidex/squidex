@@ -1,35 +1,39 @@
 @import '_vars';
 @import '_mixins';
 
-$size-arrow: .6rem;
-
-.navbar-dark {
-    .navbar-nav {
+.nav {
+    .nav-item {
         .nav-link {
-            color: $color-accent-dark;
+            & {
+                @include transition(opacity .4 ease);
+                @include opacity(.95);
+                @include no-selection;
+                @include border-radius;
+                color: $color-accent-dark;
+                cursor: pointer;
+                border: 0;
+                background: $color-theme-blue-dark;
+                padding-top: .25rem;
+                padding-left: 1rem;
+                padding-right: 2rem;
+                padding-bottom: .25rem;
+                margin-top: -.2rem;
+            }
+
+            &:hover {
+                @include opacity(1);
+            }
+
+            &::after {
+                @include absolute(50%, 1rem, auto, auto);
+                color: $color-theme-blue-light;
+            }
         }
     }
 }
 
-.nav-link {
-    @include truncate;
-}
-
 .drodown-button {
-    padding: .25rem 1.5rem;
-}
-
-.dropdown-menu {
-    & {
-        top: $size-navbar-height - $size-arrow;
-    }
-
-    &::before {
-        @include absolute(-$size-arrow, auto, auto, $size-arrow);
-        @include caret-top;
-        border-color: transparent transparent $color-accent-dark;
-        border-width: $size-arrow;
-    }
+    padding: 1rem 1.5rem;
 }
 
 .all-apps {
@@ -42,29 +46,9 @@ $size-arrow: .6rem;
     }
 
     &-pill {
-        @include absolute(.3rem, .625rem, auto, auto);
-        background: $color-theme-blue-lighter;
+        @include absolute(.8rem, .625rem, auto, auto);
+        background: $color-theme-blue-lightest;
         border: 0;
         color: $color-theme-blue;
-    }
-}
-
-#app-name {
-    & {
-        @include transition(opacity .4 ease);
-        @include opacity(.95);
-        @include no-selection;
-        padding-right: 1rem;
-        color: $color-accent-dark;
-        cursor: pointer;
-    }
-
-    &:hover {
-        @include opacity(1);
-    }
-
-    &::after {
-        @include absolute(50%, 0, auto, auto);
-        color: $color-theme-blue-light;
     }
 }

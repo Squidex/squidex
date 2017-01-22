@@ -27,7 +27,7 @@
             <input type="text" class="form-control" id="field-pattern" formControlName="pattern" placeholder="Regex Pattern" />
         </div>
     </div>
-    <div class="form-group row" [class.hide]="hidePatternMessage | async">
+    <div class="form-group row" [class.hidden]="hidePatternMessage | async">
         <label class="col-xs-3 col-form-label" for="field-pattern-message">Pattern Message</label>
 
         <div class="col-xs-6">
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="form-group row" [class.hide]="(hideDefaultValue | async)">
+    <div class="form-group row" [class.hidden]="(hideDefaultValue | async)">
         <label class="col-xs-3 col-form-label" for="field-default-value">Default Value</label>
 
         <div class="col-xs-6">

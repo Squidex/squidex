@@ -1,8 +1,8 @@
 <sqx-title message="{app} | Contents" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-light">
+<sqx-panel panelWidth="61rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <div class="float-xs-right">
                 <div class="btn-group languages-buttons" role="group">
                     <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == languageSelected" (click)="selectLanguage(language)">
@@ -16,15 +16,15 @@
             </div>
 
             <h3 class="panel-title">{{schema|displayName}} Contents</h3>
-
-            <a class="panel-close" routerLink="../">
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
     </div>
 
     <div class="panel-main">
-        <div class="panel-content">
+        <div class="panel-content panel-content-scroll">
             <table class="table table-items table-fixed" *ngIf="contentItems">
                 <colgroup>
                     <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
@@ -66,15 +66,11 @@
             </table>
         </div>
         <div class="panel-sidebar">
-            <div class="nav nav-pills nav-stacked nav-light">
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="history" routerLinkActive="active">
-                        <i class="icon-time"></i>
-                    </a>
-                </li>
-            </div>
+            <a class="panel-link" routerLink="history" routerLinkActive="active">
+                <i class="icon-time"></i>
+            </a>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <router-outlet></router-outlet>

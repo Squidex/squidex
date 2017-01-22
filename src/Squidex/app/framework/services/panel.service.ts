@@ -38,7 +38,10 @@ export class PanelService {
         for (let element of this.elements) {
             const width = element.getBoundingClientRect().width;
 
+            renderer.setElementStyle(element, 'top', '0px');
             renderer.setElementStyle(element, 'left', currentPosition + 'px');
+            renderer.setElementStyle(element, 'bottom', '0px');
+            renderer.setElementStyle(element, 'position', 'absolute');
             renderer.setElementStyle(element, 'z-index', currentLayer.toString());
 
             currentPosition += width;

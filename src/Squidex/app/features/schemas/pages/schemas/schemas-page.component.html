@@ -1,14 +1,14 @@
 <sqx-title message="{app} | Schemas" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-dark">
+<sqx-panel theme="dark" panelWidth="30rem">
     <div class="panel-header">
-        <div class="panel-header-title-row">
+        <div class="panel-title-row">
             <h3 class="panel-title">Schemas</h3>
-
-            <a class="panel-close" dashboardLink>
-                <i class="icon-close"></i>
-            </a>
         </div>
+
+        <a class="panel-close" dashboardLink>
+            <i class="icon-close"></i>
+        </a>
 
         <div class="panel-header-row">
             <button class="btn btn-success subheader-button" (click)="addSchemaDialog.show()">
@@ -25,9 +25,9 @@
 
     <div class="panel-main">
         <div class="panel-content">
-            <div class="schemas">
-                <div class="schema" *ngFor="let schema of schemasFiltered | async" [routerLink]="[schema.name]" routerLinkActive="active">
-                    <div class="schema-inner">
+            <ul class="nav nav-pills nav-stacked nav-dark nav-dark-bordered">
+                <li class="nav-item" *ngFor="let schema of schemasFiltered">
+                    <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
                         <div class="row">
                             <div class="col-xs-4">
                                 <span class="schema-name">{{schema|displayName}}</span> 
@@ -37,17 +37,17 @@
                                     <i class="icon-person"></i> {{userName(schema.lastModifiedBy, true) | async}}
                                 </span>
                             </div>
-                            <div class="col-xs-4 schema-col-right">
-                                <span class="schema-published" [class.unpublished]="!schema.isPublished"></span>
-                                <span class="schema-modified">{{schema.lastModified | fromNow}}</span>
+                            <div class="col-xs-4 schema-modified">
+                                <span class="item-modified">{{schema.lastModified | fromNow}}</span>
+                                <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
+</sqx-panel>
 
 <div class="modal" *sqxModalView="addSchemaDialog" [@fade]>
     <div class="modal-backdrop"></div>

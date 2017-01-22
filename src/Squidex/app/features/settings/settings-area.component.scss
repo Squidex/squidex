@@ -2,6 +2,16 @@
 @import '_mixins';
 
 .panel {
-    min-width: 12rem;
-    max-width: 12rem;
+    min-width: 16rem;
+    max-width: 16rem;
+}
+
+.nav-link {
+    position: relative;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
+}
+
+.icon-angle-right {
+    @include absolute(14px, 2rem, auto, auto);
 }

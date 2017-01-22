@@ -11,9 +11,7 @@ $btn-secondary-border: #dce5e8;
 $input-bg-disabled: #eef1f4;
 $input-border-color: #dbe4eb;
 
-$card-border-color: $color-border;
-$card-cap-bg: $color-card-footer;
+$dropdown-border-color: $color-border;
 
-.completer-input {
-    @extend .form-control;
-}
+$card-border-color: $color-border;
+$card-cap-bg: #fff;

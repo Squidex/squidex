@@ -1,0 +1,84 @@
+@import '_mixins';
+@import '_vars';
+
+.table-items {
+    & {
+        margin-bottom: -.25rem;
+    }
+
+    th,
+    td {
+        & {
+            padding: 1rem;
+        }
+
+        &:first-child {
+            padding-left: 1.25rem;
+        }
+
+        &:last-child {
+            padding-right: 1.25rem;
+        }
+    }
+
+    thead {
+        th {
+            color: $color-table-header;
+            font-size: .8rem;
+            font-weight: normal;
+            border: 0;
+            padding-top: 0;
+        }
+    }
+
+    tbody {
+        td {
+            margin: 0;
+            margin-bottom: 10px;
+            vertical-align: middle;
+        }
+
+        tr {
+            & {
+                @include transition(all .2s ease);
+                background: $color-table;
+                border: 1px solid $color-table-border;
+                border-bottom: 2px solid $color-table-border;
+                margin-bottom: .5rem;
+            }
+
+            &:hover {
+                background: darken($color-table, 1%);
+            }
+
+            &.active {
+                background: $color-theme-blue;
+                border-color: $color-theme-blue;
+                color: $color-accent-dark;
+            }
+        }
+    }
+
+    &-row,
+    &-footer {
+        padding: 1rem 1.25rem;
+        background: $color-table-footer;
+        border: 1px solid $color-border;
+        border-bottom-width: 2px;
+    }
+
+    &-row {
+        background: $color-table;
+        margin-bottom: .25rem;
+    }
+
+    &-footer {
+        background: $color-table-footer;
+        margin-top: .8rem;
+    }
+
+    .spacer {
+        border: 0;
+        height: .3rem;
+    }
+}

@@ -52,10 +52,6 @@ export class UsersDataSource implements AutocompleteSource {
     }
 }
 
-function changePermission(contributor: AppContributorDto, permission: string): AppContributorDto {
-    return new AppContributorDto(contributor.contributorId, permission);
-}
-
 @Component({
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
@@ -149,5 +145,9 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
         this.messageBus.publish(new HistoryChannelUpdated());
     }
+}
+
+function changePermission(contributor: AppContributorDto, permission: string): AppContributorDto {
+    return new AppContributorDto(contributor.contributorId, permission);
 }
 
