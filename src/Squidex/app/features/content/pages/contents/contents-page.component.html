@@ -4,11 +4,11 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-xs-right">
-                <div class="btn-group languages-buttons" role="group">
-                    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == languageSelected" (click)="selectLanguage(language)">
-                        {{language.iso2Code}}
-                    </button>
-                </div>
+                <form class="form-inline">
+                    <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content..." />
+                </form>
+                
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
 
                 <a class="btn btn-success" [routerLink]="['new']">
                     <i class="icon-plus"></i> New
@@ -64,6 +64,19 @@
                     </template>
                 </tbody>
             </table>
+
+            <div class="clearfix" *ngIf="contentTotal > 0">
+                <div class="float-xs-right pagination">
+                    {{itemFirst}}-{{itemLast}} of {{contentTotal}}
+
+                    <button class="btn btn-simple pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
+                        <i class="icon-angle-left"></i>
+                    </button>
+                    <button class="btn btn-simple pagination-button" [disabled]="!canGoNext" (click)="goNext()">
+                        <i class="icon-angle-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="panel-sidebar">
             <a class="panel-link" routerLink="history" routerLinkActive="active">

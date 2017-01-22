@@ -7,7 +7,6 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -46,8 +45,6 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly authService: AuthService
@@ -60,12 +57,9 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnInit() {
-        this.schemasFilter.valueChanges.distinctUntilChanged().debounceTime(100)
-            .subscribe(q => {
-                this.router.navigate([], { queryParams: { schemaQuery: q }});
-            });
-
-        this.route.queryParams.map(q => q['schemaQuery']).distinctUntilChanged()
+        this.schemasFilter.valueChanges
+            .distinctUntilChanged()
+            .debounceTime(100)
             .subscribe(q => {
                 this.updateSchemas(this.schemas, this.schemaQuery = q);
             });

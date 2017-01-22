@@ -11,7 +11,7 @@
     <img class="user-picture" [attr.title]="userName(content.lastModifiedBy) | async" [attr.src]="userPicture(content.lastModifiedBy, true) | async" />
 </td>
 <td>
-    <div class="tooltip-dropdown" *ngIf="content">
+    <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-simple" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async">
             <i class="icon-dots"></i>
         </button>

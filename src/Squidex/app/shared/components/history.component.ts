@@ -11,11 +11,11 @@ import { Observable } from 'rxjs';
 
 import { MessageBus, NotificationService } from 'framework';
 
-import { AppComponentBase } from './../app-component-base';
-import { AppsStoreService } from './../services/apps-store.service';
-import { HistoryChannelUpdated } from './../utils/messages';
-import { HistoryEventDto, HistoryService } from './../services/history.service';
-import { UsersProviderService } from './../services/users-provider.service';
+import { AppComponentBase }                 from './app-component-base';
+import { AppsStoreService }                 from './../services/apps-store.service';
+import { HistoryChannelUpdated }            from './../utils/messages';
+import { HistoryEventDto, HistoryService }  from './../services/history.service';
+import { UsersProviderService }             from './../services/users-provider.service';
 
 const REPLACEMENT_TEMP = '$TEMP$';
 

@@ -1,6 +1,11 @@
 @import '_vars';
 @import '_mixins';
 
+.panel-header {
+    min-height: 8rem;
+    max-height: 8rem;
+}
+
 .nav-link {
     position: relative;
     padding-top: .6rem;

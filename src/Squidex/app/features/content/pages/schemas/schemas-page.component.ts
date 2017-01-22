@@ -5,9 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import {
@@ -24,9 +23,13 @@ import {
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html'
 })
-export class SchemasPageComponent extends AppComponentBase implements OnInit {
+export class SchemasPageComponent extends AppComponentBase {
+    public schemasFilter = new FormControl();
     public schemasFiltered =
-        this.route.queryParams.map(q => q['schemaQuery'])
+        Observable.of(null)
+            .merge(this.schemasFilter.valueChanges)
+            .distinctUntilChanged()
+            .debounceTime(300)
             .combineLatest(this.loadSchemas(),
                 (query, schemas) => {
                     this.schemasFilter.setValue(query);
@@ -50,21 +53,10 @@ export class SchemasPageComponent extends AppComponentBase implements OnInit {
                 });
             });
 
-    public schemasFilter = new FormControl();
-
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
         super(apps, notifications, users);
-    }
-
-    public ngOnInit() {
-        this.schemasFilter.valueChanges.distinctUntilChanged().debounceTime(100)
-            .subscribe(f => {
-                this.router.navigate([], { queryParams: { schemaQuery: f }});
-            });
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {

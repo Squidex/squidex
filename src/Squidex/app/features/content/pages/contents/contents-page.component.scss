@@ -2,9 +2,36 @@
 @import '_mixins';
 
 .languages-buttons {
-    margin-right: 1rem;
+    margin-right: 2rem;
 }
 
 .content {
     cursor: pointer;
+}
+
+.btn-group {
+    margin-left: 1rem;
+}
+
+.form-inline {
+    display: inline-block;
+}
+
+.pagination {
+    & {
+        margin-top: 1rem;
+    }
+
+    &-button {
+        & {
+            color: $color-text;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        &:hover,
+        &.active {
+            color: darken($color-text, 20%);
+        }
+    }
 }

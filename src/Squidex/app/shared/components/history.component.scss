@@ -1,18 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
-.user-ref {
-    color: $color-theme-blue-dark;
-}
-
-.marker-ref {
-    color: $color-theme-blue-dark;
-}
-
 .event {
     & {
         @include flex-box;
-        margin-bottom: .8rem;
+        margin-bottom: 1rem;
     }
 
     &-message {

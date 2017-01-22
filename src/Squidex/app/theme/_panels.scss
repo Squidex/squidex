@@ -41,7 +41,7 @@
         & {
             background: $panel-light-background;
             min-height: $panel-header;
-            max-height: $panel-header * 3;
+            max-height: $panel-header;
             padding: $panel-padding;
             position: relative;
         }
@@ -120,8 +120,11 @@
     }
 
     &-title {
+        @include truncate;
+        line-height: 2rem;
         font-size: 1.5rem;
         font-weight: 400;
+        padding-right: 2rem;
     }
 
     &-row {
@@ -129,11 +132,11 @@
     }
 
     &-title-row {
-        padding-right: 2rem;
+        padding-right: $panel-sidebar - $panel-padding;
     }
 
     &-close {
-        @include absolute($panel-padding - .6rem, $panel-padding - .8rem, auto, auto);
+        @include absolute($panel-padding - .3rem, $panel-padding - .8rem, auto, auto);
         @include panel-icon;
     }
 }

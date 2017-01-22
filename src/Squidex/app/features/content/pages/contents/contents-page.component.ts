@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -49,8 +50,18 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public languages: AppLanguageDto[] = [];
     public languageSelected: AppLanguageDto;
 
-    public page = 0;
-    public query = '';
+    public contentsFilter = new FormControl();
+
+    public pageSize = 10;
+
+    public canGoNext = false;
+    public canGoPrev = false;
+
+    public itemFirst = 0;
+    public itemLast = 0;
+
+    public currentPage = 0;
+    public currentQuery = '';
 
     public get columnWidth() {
         return 100 / this.contentFields.length;
@@ -84,14 +95,20 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
         this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
             this.languages = languages;
-            this.languageSelected = languages.filter(t => t.isMasterLanguage)[0];
+        });
+
+        this.contentsFilter.valueChanges.debounceTime(300).subscribe(q => {
+            this.currentQuery = q;
+
+            if (this.schema) {
+                this.load();
+            }
         });
 
         this.route.data.map(p => p['schema']).subscribe(schema => {
             this.schema = schema;
 
             this.reset();
-            this.loadFields();
             this.load();
         });
     }
@@ -133,7 +150,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     private reset() {
-        this.page = 0;
+        this.loadFields();
+
+        this.currentPage = 0;
     }
 
     private loadFields() {
@@ -146,13 +165,43 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     private load() {
         this.appName()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, 20, this.page * 20, this.query))
+            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.pageSize, this.currentPage * this.pageSize, this.currentQuery))
                .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(dtos.items);
                     this.contentTotal = dtos.total;
+
+                    this.updatePaging();
                 }, error => {
                     this.notifyError(error);
                 });
+    }
+
+    public goNext() {
+        if (this.canGoNext) {
+            this.currentPage++;
+
+            this.updatePaging();
+            this.load();
+        }
+    }
+
+    public goPrev() {
+        if (this.canGoPrev) {
+            this.currentPage--;
+
+            this.updatePaging();
+            this.load();
+        }
+    }
+
+    private updatePaging() {
+        const totalPages = Math.ceil(this.contentTotal / this.pageSize);
+
+        this.itemFirst = this.currentPage * this.pageSize + 1;
+        this.itemLast = Math.min(this.contentTotal, (this.currentPage + 1) * this.pageSize);
+
+        this.canGoNext = this.currentPage < totalPages - 1;
+        this.canGoPrev = this.currentPage > 0;
     }
 
     private createContent(id: string, data: any): ContentDto {

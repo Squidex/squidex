@@ -1,4 +1,4 @@
-<div class="table-items-row">
+<div class="table-items-row" [class.invalid]="fieldForm.invalid">
     <label>
         {{field|displayName:'properties.label':'name'}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
@@ -7,13 +7,7 @@
 
     <div [formGroup]="fieldForm">
         <div *ngIf="field.properties.isLocalizable">
-            <div class="btn-group btn-group-sm languages-buttons" role="group">
-                <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName"
-                    [class.btn-danger]="fieldForm.controls[language.iso2Code].invalid && (fieldForm.controls[language.iso2Code].touched || contentFormSubmitted)"
-                    [class.active]="language.iso2Code == fieldLanguage" (click)="selectLanguage(language)">
-                    {{language.iso2Code}}
-                </button>
-            </div>
+            <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
         </div>
 
         <div *ngFor="let language of fieldLanguages">

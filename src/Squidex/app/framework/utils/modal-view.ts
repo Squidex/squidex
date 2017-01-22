@@ -9,6 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export class ModalView {
     private readonly isOpen$: BehaviorSubject<boolean>;
+    private static openView: ModalView;
 
     public get isOpen(): Observable<boolean> {
         return this.isOpen$.distinctUntilChanged();
@@ -21,20 +22,34 @@ export class ModalView {
     }
 
     public show() {
+        if (ModalView.openView !== this && ModalView.openView) {
+            ModalView.openView.hide();
+        }
+
+        ModalView.openView = this;
+
         this.isOpen$.next(true);
     }
 
     public hide() {
+        if (ModalView.openView === this) {
+            ModalView.openView = null;
+        }
+
         this.isOpen$.next(false);
     }
 
     public toggle() {
-        let value = false;
+        let isOpenSnapshot = false;
 
         this.isOpen.subscribe(v => {
-            value = v;
+            isOpenSnapshot = v;
         }).unsubscribe();
 
-        this.isOpen$.next(!value);
+        if (isOpenSnapshot) {
+            this.hide();
+        } else {
+            this.show();
+        }
     }
 }

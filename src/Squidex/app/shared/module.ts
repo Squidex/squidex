@@ -22,6 +22,7 @@ import {
     DashboardLinkDirective,
     HistoryComponent,
     HistoryService,
+    LanguageSelectorComponent,
     LanguageService,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
@@ -41,12 +42,14 @@ import {
     declarations: [
         AppFormComponent,
         DashboardLinkDirective,
-        HistoryComponent
+        HistoryComponent,
+        LanguageSelectorComponent
     ],
     exports: [
         AppFormComponent,
         DashboardLinkDirective,
-        HistoryComponent
+        HistoryComponent,
+        LanguageSelectorComponent
     ]
 })
 export class SqxSharedModule {

@@ -3,10 +3,16 @@
 
 .table-items-row {
     position: relative;
+    border-width: 1px;
+    border-left-width: 4px;
 }
 
 .languages-buttons {
     @include absolute(1rem, 1.25rem, auto, auto);
+}
+
+.invalid {
+    border-left-color: $color-theme-error;
 }
 
 .field {

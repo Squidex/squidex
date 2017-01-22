@@ -5,9 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+export * from './components/app-component-base';
 export * from './components/app-form.component';
 export * from './components/dashboard-link.directive';
 export * from './components/history.component';
+export * from './components/language-selector.component';
 
 export * from './guards/app-must-exist.guard';
 export * from './guards/must-be-authenticated.guard';
@@ -32,6 +34,5 @@ export * from './services/users.service';
 
 export * from './utils/messages';
 
-export * from './app-component-base';
 
 export * from 'framework';

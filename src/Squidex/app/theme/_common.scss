@@ -11,6 +11,14 @@ h1 {
     font-size: 2rem;
 }
 
+.user-ref {
+    color: $color-theme-blue-dark;
+}
+
+.marker-ref {
+    color: $color-theme-blue-dark;
+}
+
 .user-picture {
     & {
         @include circle(2.2rem);
@@ -35,16 +43,16 @@ h1 {
     }
 }
 
-.tooltip-dropdown {
+.dropdown-options {
     & {
         display: inline-block;
     }
 
-    &-menu {
+    .dropdown-menu {
         @include absolute(100%, 0, auto, auto);
     }
 
-    &-item {
+    .dropdown-item {
         cursor: pointer;
     }
 }

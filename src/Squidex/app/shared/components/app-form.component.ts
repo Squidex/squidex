@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 
 import { ValidatorsEx } from 'framework';
 
-import { AppsStoreService } from './../services/apps-store.service';
+import { AppsStoreService }     from './../services/apps-store.service';
 import { AppDto, CreateAppDto } from './../services/apps.service';
 
 const FALLBACK_NAME = 'my-app';
