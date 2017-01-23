@@ -1,6 +1,6 @@
-<td *ngFor="let field of fields">
+<td *ngFor="let value of values">
     <span class="field">
-        {{getValue(field)}}
+        {{value}}
     </span>
 </td>
 <td>
@@ -16,13 +16,13 @@
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [@fade]>
-            <a class="dropdown-item" (click)="published.emit(); $event.stopPropagation()" *ngIf="!content.isPublished">
+            <a class="dropdown-item" (click)="publishing.emit(); $event.stopPropagation()" *ngIf="!content.isPublished">
                 Publish
             </a>
-            <a class="dropdown-item" (click)="unpublished.emit(); $event.stopPropagation()" *ngIf="content.isPublished">
+            <a class="dropdown-item" (click)="unpublishing.emit(); $event.stopPropagation()" *ngIf="content.isPublished">
                 Unpublish
             </a>
-            <a class="dropdown-item" (click)="deleted.emit(); $event.stopPropagation()">
+            <a class="dropdown-item" (click)="deleting.emit(); $event.stopPropagation()">
                 Delete
             </a>
         </div>

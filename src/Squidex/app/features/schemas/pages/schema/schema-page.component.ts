@@ -217,13 +217,13 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.editSchemaDialog.hide();
     }
 
-    public updateProperties(properties: SchemaPropertiesDto) {
+    private updateProperties(properties: SchemaPropertiesDto) {
         this.schemaProperties = properties;
 
         this.notify();
     }
 
-    public updateField(field: FieldDto, newField: FieldDto) {
+    private updateField(field: FieldDto, newField: FieldDto) {
         this.schemaFields = this.schemaFields.replace(field, newField);
 
         this.notify();

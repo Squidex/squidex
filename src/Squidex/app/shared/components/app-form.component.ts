@@ -50,6 +50,11 @@ export class AppFormComponent {
     ) {
     }
 
+    public cancel() {
+        this.reset();
+        this.cancelled.emit();
+    }
+
     public createApp() {
         this.createFormSubmitted = true;
 
@@ -73,10 +78,5 @@ export class AppFormComponent {
         this.creationError = '';
         this.createForm.enable();
         this.createFormSubmitted = false;
-    }
-
-    public cancel() {
-        this.reset();
-        this.cancelled.emit();
     }
 }

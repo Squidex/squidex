@@ -62,6 +62,11 @@ export class SchemaFormComponent {
     ) {
     }
 
+    public cancel() {
+        this.reset();
+        this.cancelled.emit();
+    }
+
     public createSchema() {
         this.createFormSubmitted = true;
 
@@ -83,15 +88,10 @@ export class SchemaFormComponent {
         }
     }
 
-    public reset() {
+    private reset() {
         this.creationError = '';
         this.createForm.reset();
         this.createFormSubmitted = false;
-    }
-
-    public cancel() {
-        this.reset();
-        this.cancelled.emit();
     }
 
     private createSchemaDto(id: string, name: string) {

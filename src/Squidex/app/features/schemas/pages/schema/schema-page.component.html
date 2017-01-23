@@ -28,12 +28,12 @@
         <div class="panel-content">
             <div *ngFor="let field of schemaFields">
                 <sqx-field [field]="field"
-                    (disabled)="disableField(field)"
-                    (deleted)="deleteField(field)"
-                    (enabled)="enableField(field)"
-                    (hidden)="hideField(field)"
-                    (saved)="saveField(field, $event)"
-                    (shown)="showField(field)"></sqx-field>
+                    (disabling)="disableField(field)"
+                    (deleting)="deleteField(field)"
+                    (enabling)="enableField(field)"
+                    (showing)="showField(field)"
+                    (hiding)="hideField(field)"
+                    (saving)="saveField(field, $event)"></sqx-field>
             </div>
             
             <div class="table-items-footer">

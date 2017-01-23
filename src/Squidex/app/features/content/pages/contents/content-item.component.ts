@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -28,17 +28,17 @@ import {
         fadeAnimation
     ]
 })
-export class ContentItemComponent extends AppComponentBase {
+export class ContentItemComponent extends AppComponentBase implements OnInit {
     public dropdown = new ModalView(false, true);
 
     @Output()
-    public published = new EventEmitter<ContentDto>();
+    public publishing = new EventEmitter<ContentDto>();
 
     @Output()
-    public unpublished = new EventEmitter<ContentDto>();
+    public unpublishing = new EventEmitter<ContentDto>();
 
     @Output()
-    public deleted = new EventEmitter<ContentDto>();
+    public deleting = new EventEmitter<ContentDto>();
 
     @Input()
     public fields: FieldDto[];
@@ -52,8 +52,16 @@ export class ContentItemComponent extends AppComponentBase {
     @Input('sqxContent')
     public content: ContentDto;
 
+    public values: any[] = [];
+
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {
         super(apps, notifications, users);
+    }
+
+    public ngOnInit() {
+        for (let field of this.fields) {
+            this.values.push(this.getValue(field));
+        }
     }
 
     public getValue(field: FieldDto): any {

@@ -73,7 +73,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         this.load();
     }
 
-    public load() {
+    private load() {
         this.appName()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
             .subscribe(dtos => {

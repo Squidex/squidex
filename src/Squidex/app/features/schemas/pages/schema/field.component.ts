@@ -30,22 +30,22 @@ export class FieldComponent implements OnInit {
     public field: FieldDto;
 
     @Output()
-    public hidden = new EventEmitter<FieldDto>();
+    public hiding = new EventEmitter<FieldDto>();
 
     @Output()
-    public shown = new EventEmitter<FieldDto>();
+    public showing = new EventEmitter<FieldDto>();
 
     @Output()
-    public saved = new EventEmitter<FieldDto>();
+    public saving= new EventEmitter<FieldDto>();
 
     @Output()
-    public enabled = new EventEmitter<FieldDto>();
+    public enabling = new EventEmitter<FieldDto>();
 
     @Output()
-    public disabled = new EventEmitter<FieldDto>();
+    public disabling = new EventEmitter<FieldDto>();
 
     @Output()
-    public deleted = new EventEmitter<FieldDto>();
+    public deleting = new EventEmitter<FieldDto>();
 
     public isEditing: boolean = false;
     public selectedTab = 0;
@@ -93,7 +93,7 @@ export class FieldComponent implements OnInit {
                     this.field.isHidden,
                     properties);
 
-            this.saved.emit(field);
+            this.saving.emit(field);
         }
     }
 

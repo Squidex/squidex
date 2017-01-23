@@ -33,10 +33,10 @@ export class ClientComponent {
     public token: AccessTokenDto;
 
     @Output()
-    public renamed = new EventEmitter<string>();
+    public renaming = new EventEmitter<string>();
 
     @Output()
-    public revoked = new EventEmitter();
+    public revoking = new EventEmitter();
 
     @Input()
     public client: AppClientDto;
@@ -97,7 +97,7 @@ export class ClientComponent {
             const newName = this.renameForm.get('name').value;
 
             if (newName !== this.clientName) {
-                this.renamed.emit(newName);
+                this.renaming.emit(newName);
             }
         } finally {
             this.isRenaming = false;

@@ -82,15 +82,15 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public ngOnInit() {
-        this.messageUpdatedSubscription =
-            this.messageBus.of(ContentUpdated).subscribe(message => {
-                this.contentItems = this.contentItems.replaceAll(x => x.id === message.id, c => this.updateContent(c, true, message.data));
-            });
-
         this.messageCreatedSubscription =
             this.messageBus.of(ContentCreated).subscribe(message => {
                 this.contentTotal++;
                 this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data));
+            });
+
+        this.messageUpdatedSubscription =
+            this.messageBus.of(ContentUpdated).subscribe(message => {
+                this.updateContents(message.id, true, message.data);
             });
 
         this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
@@ -117,7 +117,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appName()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id))
             .subscribe(() => {
-                this.contentItems = this.contentItems.replaceAll(x => x.id === content.id, c => this.updateContent(c, true, content.data));
+                this.updateContents(content.id, true, content.data);
             }, error => {
                 this.notifyError(error);
             });
@@ -127,7 +127,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appName()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id))
             .subscribe(() => {
-                this.contentItems = this.contentItems.replaceAll(x => x.id === content.id, c => this.updateContent(c, false, content.data));
+                this.updateContents(content.id, false, content.data);
             }, error => {
                 this.notifyError(error);
             });
@@ -202,6 +202,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
         this.canGoNext = this.currentPage < totalPages - 1;
         this.canGoPrev = this.currentPage > 0;
+    }
+
+    private updateContents(id: string, isPublished: boolean, data: any) {
+        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, isPublished, data));
     }
 
     private createContent(id: string, data: any): ContentDto {

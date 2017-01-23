@@ -59,6 +59,11 @@ export class SchemaEditFormComponent implements OnInit {
         this.editForm.patchValue(this.schema);
     }
 
+    public cancel() {
+        this.reset();
+        this.cancelled.emit();
+    }
+
     public saveSchema() {
         this.editFormSubmitted = true;
 
@@ -78,13 +83,8 @@ export class SchemaEditFormComponent implements OnInit {
         }
     }
 
-    public reset() {
+    private reset() {
         this.editFormSubmitted = false;
         this.editForm.reset();
-    }
-
-    public cancel() {
-        this.reset();
-        this.cancelled.emit();
     }
 }

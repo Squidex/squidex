@@ -26,19 +26,19 @@
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [@fade]>
-                            <a class="dropdown-item" (click)="enabled.emit()" *ngIf="field.isDisabled">
+                            <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled">
                                 Enable
                             </a>
-                            <a class="dropdown-item" (click)="disabled.emit()" *ngIf="!field.isDisabled">
+                            <a class="dropdown-item" (click)="disabling.emit()" *ngIf="!field.isDisabled">
                                 Disable
                             </a>
-                            <a class="dropdown-item" (click)="hidden.emit()" *ngIf="!field.isHidden">
+                            <a class="dropdown-item" (click)="hiding.emit()" *ngIf="!field.isHidden">
                                 Hide
                             </a>
-                            <a class="dropdown-item" (click)="shown.emit()" *ngIf="field.isHidden">
+                            <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden">
                                 Show
                             </a>
-                            <a class="dropdown-item" (click)="deleted.emit()">
+                            <a class="dropdown-item" (click)="deleting.emit()">
                                 Delete
                             </a>
                         </div>
