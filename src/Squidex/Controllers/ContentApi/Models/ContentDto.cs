@@ -7,9 +7,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.ContentApi.Models
@@ -37,7 +36,7 @@ namespace Squidex.Controllers.ContentApi.Models
         /// The data of the content item.
         /// </summary>
         [Required]
-        public Dictionary<string, Dictionary<string, JToken>> Data { get; set; }
+        public ContentData Data { get; set; }
 
         /// <summary>
         /// The date and time when the content element has been created.

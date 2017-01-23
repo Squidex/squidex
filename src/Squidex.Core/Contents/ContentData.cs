@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
@@ -16,39 +15,67 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Contents
 {
-    public sealed class ContentData
+    public sealed class ContentData : Dictionary<string, ContentFieldData>
     {
-        private readonly ImmutableDictionary<string, ContentFieldData> fields;
-
-        public static readonly ContentData Empty = new ContentData(ImmutableDictionary<string, ContentFieldData>.Empty.WithComparers (StringComparer.OrdinalIgnoreCase));
-
-        public ImmutableDictionary<string, ContentFieldData> Fields
+        public ContentData()
+            : base(StringComparer.OrdinalIgnoreCase)
         {
-            get { return fields; }
-        }
-
-        public ContentData(ImmutableDictionary<string, ContentFieldData> fields)
-        {
-            Guard.NotNull(fields, nameof(fields));
-
-            this.fields = fields;
         }
 
         public ContentData AddField(string fieldName, ContentFieldData data)
         {
             Guard.ValidPropertyName(fieldName, nameof(fieldName));
 
-            return new ContentData(Fields.Add(fieldName, data));
+            this[fieldName] = data;
+
+            return this;
         }
 
-        public static ContentData FromApiRequest(Dictionary<string, Dictionary<string, JToken>> request)
+        public ContentData ToNameModel(Schema schema)
         {
-            Guard.NotNull(request, nameof(request));
+            Guard.NotNull(schema, nameof(schema));
 
-            return new ContentData(request.ToImmutableDictionary(x => x.Key, x => new ContentFieldData(x.Value.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)), StringComparer.OrdinalIgnoreCase));
+            var result = new ContentData();
+
+            foreach (var fieldValue in this)
+            {
+                var fieldId = 0L;
+
+                Field field;
+
+                if (!long.TryParse(fieldValue.Key, out fieldId) || !schema.Fields.TryGetValue(fieldId, out field))
+                {
+                    continue;
+                }
+
+                result[field.Name] = fieldValue.Value;
+            }
+
+            return result;
         }
 
-        public Dictionary<string, Dictionary<string, JToken>> ToApiResponse(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage, bool excludeHidden = true)
+        public ContentData ToIdModel(Schema schema)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new ContentData();
+
+            foreach (var fieldValue in this)
+            {
+                Field field;
+
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field))
+                {
+                    continue;
+                }
+
+                result[field.Id.ToString()] = fieldValue.Value;
+            }
+
+            return result;
+        }
+
+        public ContentData ToApiModel(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage, bool excludeHidden = true)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(languages, nameof(languages));
@@ -56,9 +83,9 @@ namespace Squidex.Core.Contents
 
             var invariantCode = Language.Invariant.Iso2Code;
 
-            var result = new Dictionary<string, Dictionary<string, JToken>>();
+            var result = new ContentData();
 
-            foreach (var fieldValue in fields)
+            foreach (var fieldValue in this)
             {
                 Field field;
                 
@@ -67,8 +94,8 @@ namespace Squidex.Core.Contents
                     continue;
                 }
 
-                var fieldResult = new Dictionary<string, JToken>();
-                var fieldValues = fieldValue.Value.ValueByLanguage;
+                var fieldResult = new ContentFieldData();
+                var fieldValues = fieldValue.Value;
 
                 if (field.RawProperties.IsLocalizable)
                 {

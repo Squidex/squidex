@@ -7,40 +7,33 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Contents
 {
-    public sealed class ContentFieldData
+    public sealed class ContentFieldData : Dictionary<string, JToken>
     {
-        private readonly ImmutableDictionary<string, JToken> valueByLanguage;
-
-        public static readonly ContentFieldData Empty = new ContentFieldData(ImmutableDictionary<string, JToken>.Empty.WithComparers(StringComparer.OrdinalIgnoreCase));
-
-        public ImmutableDictionary<string, JToken> ValueByLanguage
+        public ContentFieldData()
+            : base(StringComparer.OrdinalIgnoreCase)
         {
-            get { return valueByLanguage; }
         }
 
-        public ContentFieldData(ImmutableDictionary<string, JToken> valueByLanguage)
+        public ContentFieldData SetValue(JToken value)
         {
-            Guard.NotNull(valueByLanguage, nameof(valueByLanguage));
+            this["iv"] = value;
 
-            this.valueByLanguage = valueByLanguage;
-        }
-
-        public ContentFieldData AddValue(JToken value)
-        {
-            return new ContentFieldData(valueByLanguage.Add("iv", value));
+            return this;
         }
 
         public ContentFieldData AddValue(string language, JToken value)
         {
             Guard.NotNullOrEmpty(language, nameof(language));
 
-            return new ContentFieldData(valueByLanguage.Add(language, value));
+            this[language] = value;
+
+            return this;
         }
     }
 }

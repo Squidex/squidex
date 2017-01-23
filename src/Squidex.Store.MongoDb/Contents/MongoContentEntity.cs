@@ -14,16 +14,18 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Contents;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Contents;
+
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
 namespace Squidex.Store.MongoDb.Contents
 {
     public sealed class MongoContentEntity : MongoEntity, IContentEntity
     {
-        private BsonDocument data;
         private ContentData contentData;
 
         [BsonRequired]
@@ -52,40 +54,37 @@ namespace Squidex.Store.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement]
-        public BsonDocument Data
-        {
-            get { return data; }
-            set
-            {
-                data = value;
-
-                contentData = null;
-            }
-        }
+        public BsonDocument Data { get; set; }
 
         ContentData IContentEntity.Data
         {
             get
             {
-                if (contentData == null)
-                {
-                    if (data != null)
-                    {
-                        contentData = JsonConvert.DeserializeObject<ContentData>(data.ToJson());
-                    }
-                }
-
                 return contentData;
             }
         }
 
-        public void SetData(ContentData newContentData)
+        public void ParseData(Schema schema)
         {
-            data = null;
+            if (Data != null)
+            {
+                contentData = JsonConvert.DeserializeObject<ContentData>(Data.ToJson()).ToNameModel(schema);
+            }
+            else
+            {
+                contentData = null;
+            }
+        }
 
+        public void SetData(Schema schema, ContentData newContentData)
+        {
             if (newContentData != null)
             {
-                data = BsonDocument.Parse(JsonConvert.SerializeObject(newContentData));
+                Data = BsonDocument.Parse(JsonConvert.SerializeObject(newContentData.ToIdModel(schema)));
+            }
+            else
+            {
+                Data = null;
             }
 
             Text = ExtractText(newContentData);
@@ -99,7 +98,7 @@ namespace Squidex.Store.MongoDb.Contents
             }
             var stringBuilder = new StringBuilder();
 
-            foreach (var text in data.Fields.Values.SelectMany(x => x.ValueByLanguage.Values).Where(x => x != null).OfType<JValue>())
+            foreach (var text in data.Values.SelectMany(x => x.Values).Where(x => x != null).OfType<JValue>())
             {
                 if (text.Type == JTokenType.String)
                 {

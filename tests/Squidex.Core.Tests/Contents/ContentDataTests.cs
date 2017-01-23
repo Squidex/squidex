@@ -30,38 +30,59 @@ namespace Squidex.Core.Contents
         private readonly Language masterLanguage = Language.GetLanguage("en");
 
         [Fact]
-        public void Should_convert_from_dictionary()
+        public void Should_convert_to_id_model()
         {
             var input =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field1"] = new Dictionary<string, JToken>
-                    {
-                        ["en"] = "en_string",
-                        ["de"] = "de_string"
-                    },
-                    ["field2"] = new Dictionary<string, JToken>
-                    {
-                        ["iv"] = 3
-                    }
-                };
-
-            var actual = ContentData.FromApiRequest(input);
-
-            var expected =
-                ContentData.Empty
+               new ContentData()
                     .AddField("field1",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
                     .AddField("field2",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("iv", 3));
 
-            var output = actual.ToApiResponse(schema, languages, masterLanguage);
+            var actual = input.ToIdModel(schema);
+
+            var expected =
+                new ContentData()
+                    .AddField("1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"))
+                    .AddField("2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
+            
+            actual.ShouldBeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void Should_convert_to_from_id_model()
+        {
+            var input =
+               new ContentData()
+                    .AddField("1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"))
+                    .AddField("2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
+
+            var actual = input.ToNameModel(schema);
+
+            var expected =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
 
             actual.ShouldBeEquivalentTo(expected);
-            output.ShouldBeEquivalentTo(input);
         }
 
         [Fact]
@@ -78,16 +99,16 @@ namespace Squidex.Core.Contents
                 };
 
             var input =
-                ContentData.Empty
+                new ContentData()
                     .AddField("field0",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("en", "en_string"))
                     .AddField("field1",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
 
-            var output = input.ToApiResponse(schema, languages, masterLanguage);
+            var output = input.ToApiModel(schema, languages, masterLanguage);
 
             output.ShouldBeEquivalentTo(expected);
         }
@@ -106,14 +127,14 @@ namespace Squidex.Core.Contents
                 };
 
             var input =
-                ContentData.Empty
+                new ContentData()
                     .AddField("field1",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string")
                             .AddValue("it", "it_string"));
 
-            var output = input.ToApiResponse(schema, languages, masterLanguage);
+            var output = input.ToApiModel(schema, languages, masterLanguage);
 
             output.ShouldBeEquivalentTo(expected);
         }
@@ -131,13 +152,13 @@ namespace Squidex.Core.Contents
                 };
 
             var input =
-                ContentData.Empty
+                new ContentData()
                     .AddField("field2",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("en", 3));
 
-            var output = input.ToApiResponse(schema, languages, masterLanguage);
+            var output = input.ToApiModel(schema, languages, masterLanguage);
 
             output.ShouldBeEquivalentTo(expected);
         }
@@ -155,13 +176,13 @@ namespace Squidex.Core.Contents
                 };
 
             var input =
-                ContentData.Empty
+                new ContentData()
                     .AddField("field2",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("it", 3));
 
-            var output = input.ToApiResponse(schema, languages, masterLanguage);
+            var output = input.ToApiModel(schema, languages, masterLanguage);
 
             output.ShouldBeEquivalentTo(expected);
         }
@@ -179,15 +200,15 @@ namespace Squidex.Core.Contents
                 };
 
             var input =
-                ContentData.Empty
+                new ContentData()
                     .AddField("field2",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("iv", 2))
                     .AddField("field3",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var output = input.ToApiResponse(schema, languages, masterLanguage);
+            var output = input.ToApiModel(schema, languages, masterLanguage);
 
             output.ShouldBeEquivalentTo(expected);
         }

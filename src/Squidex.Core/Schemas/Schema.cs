@@ -15,8 +15,8 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
 namespace Squidex.Core.Schemas
@@ -194,7 +194,7 @@ namespace Squidex.Core.Schemas
             Guard.NotNull(errors, nameof(errors));
             Guard.NotEmpty(languages, nameof(languages));
 
-            foreach (var fieldValue in data.Fields)
+            foreach (var fieldValue in data)
             {
                 if (!fieldsByName.ContainsKey(fieldValue.Key))
                 {
@@ -206,11 +206,11 @@ namespace Squidex.Core.Schemas
             {
                 var fieldErrors = new List<string>();
 
-                var fieldData = data.Fields.GetOrDefault(field.Name) ?? ContentFieldData.Empty;
+                var fieldData = data.GetOrDefault(field.Name) ?? new ContentFieldData();
                 
                 if (field.RawProperties.IsLocalizable)
                 {
-                    foreach (var valueLanguage in fieldData.ValueByLanguage.Keys)
+                    foreach (var valueLanguage in fieldData.Keys)
                     {
                         Language language;
 
@@ -226,19 +226,19 @@ namespace Squidex.Core.Schemas
 
                     foreach (var language in languages)
                     {
-                        var value = fieldData.ValueByLanguage.GetValueOrDefault(language.Iso2Code, JValue.CreateNull());
+                        var value = fieldData.GetOrCreate(language.Iso2Code, k => JValue.CreateNull());
 
                         await field.ValidateAsync(value, fieldErrors, language);
                     }
                 }
                 else
                 {
-                    if (fieldData.ValueByLanguage.Keys.Any(x => x != "iv"))
+                    if (fieldData.Keys.Any(x => x != "iv"))
                     {
                         fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language (iv)");
                     }
 
-                    var value = fieldData.ValueByLanguage.GetValueOrDefault("iv", JValue.CreateNull());
+                    var value = fieldData.GetOrCreate("iv", k => JValue.CreateNull());
 
                     await field.ValidateAsync(value, fieldErrors);
                 }

@@ -26,7 +26,7 @@ namespace Squidex.Write.Contents
     {
         private readonly Guid appId = Guid.NewGuid();
         private readonly ContentDomainObject sut;
-        private readonly ContentData data = ContentData.Empty;
+        private readonly ContentData data = new ContentData();
 
         public ContentDomainObjectTests()
         {

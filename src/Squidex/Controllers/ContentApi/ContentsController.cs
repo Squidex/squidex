@@ -65,7 +65,7 @@ namespace Squidex.Controllers.ContentApi
 
                     if (x.Data != null)
                     {
-                        itemModel.Data = x.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage);
+                        itemModel.Data = x.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage);
                     }
 
                     return itemModel;
@@ -97,7 +97,7 @@ namespace Squidex.Controllers.ContentApi
 
             if (content.Data != null)
             {
-                model.Data = content.Data.ToApiResponse(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
+                model.Data = content.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
             }
 
             return Ok(model);
@@ -105,9 +105,9 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPost]
         [Route("content/{app}/{name}/")]
-        public async Task<IActionResult> PostContent([FromBody] Dictionary<string, Dictionary<string, JToken>> request)
+        public async Task<IActionResult> PostContent([FromBody] ContentData request)
         {
-            var command = new CreateContent { Data = ContentData.FromApiRequest(request), AggregateId = Guid.NewGuid() };
+            var command = new CreateContent { Data = request, AggregateId = Guid.NewGuid() };
 
             var context = await CommandBus.PublishAsync(command);
             var result = context.Result<Guid>();
@@ -117,9 +117,9 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
-        public async Task<IActionResult> PutContent(Guid id, [FromBody] Dictionary<string, Dictionary<string, JToken>> request)
+        public async Task<IActionResult> PutContent(Guid id, [FromBody] ContentData request)
         {
-            var command = new UpdateContent { AggregateId = id, Data = ContentData.FromApiRequest(request) };
+            var command = new UpdateContent { AggregateId = id, Data = request };
 
             await CommandBus.PublishAsync(command);
 

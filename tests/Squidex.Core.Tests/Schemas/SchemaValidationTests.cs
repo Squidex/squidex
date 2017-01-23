@@ -25,9 +25,9 @@ namespace Squidex.Core.Schemas
         public async Task Should_add_error_if_validating_data_with_unknown_field()
         {
             var data =
-                ContentData.Empty
+                new ContentData()
                     .AddField("unknown",
-                        ContentFieldData.Empty);
+                        new ContentFieldData());
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -44,10 +44,10 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
-                ContentData.Empty
+                new ContentData()
                     .AddField("my-field",
-                        ContentFieldData.Empty
-                            .AddValue(1000));
+                        new ContentFieldData()
+                            .SetValue(1000));
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -64,9 +64,9 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
 
             var data =
-                ContentData.Empty
+                new ContentData()
                     .AddField("my-field",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
@@ -85,7 +85,7 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
 
             var data =
-                ContentData.Empty;
+                new ContentData();
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -103,7 +103,7 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
 
             var data =
-                ContentData.Empty;
+                new ContentData();
 
             await sut.ValidateAsync(data, errors, languages);
 
@@ -120,9 +120,9 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
-                ContentData.Empty
+                new ContentData()
                     .AddField("my-field",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
@@ -141,9 +141,9 @@ namespace Squidex.Core.Schemas
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
-                ContentData.Empty
+                new ContentData()
                     .AddField("my-field",
-                        ContentFieldData.Empty
+                        new ContentFieldData()
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
