@@ -4,9 +4,7 @@
     "IdentityServer4": "1.0.0",
     "Microsoft.AspNetCore.Identity": "1.1.0",
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",
-    "Microsoft.NETCore.App": "1.1.0",
     "MongoDB.Driver": "2.4.1",
-    "NETStandard.Library": "1.6.1",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
@@ -14,9 +12,12 @@
     "Squidex.Read": "1.0.0-*"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "dependencies": {
-      }
+        "NETStandard.Library": "1.6.1",
+        "Microsoft.OData.Core": "6.15.0"
+      },
+      "imports": "dnxcore50"
     }
   },
   "version": "1.0.0-*"

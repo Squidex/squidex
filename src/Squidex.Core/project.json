@@ -3,14 +3,16 @@
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Infrastructure": "1.0.0-*",
     "protobuf-net": "2.1.0",
-    "NETStandard.Library": "1.6.1",
-    "Microsoft.NETCore.App": "1.1.0",
-    "NJsonSchema": "7.3.6214.20986"
+    "NJsonSchema": "7.3.6214.20986",
+    "System.Collections.Immutable": "1.3.1"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "dependencies": {
-      }
+        "NETStandard.Library": "1.6.1",
+        "Microsoft.OData.Core": "6.15.0"
+      },
+      "imports": "dnxcore50"
     }
   },
   "tooling": {

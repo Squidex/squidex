@@ -45,14 +45,15 @@
   "frameworks": {
     "netcoreapp1.1": {
       "dependencies": {
+        "Microsoft.OData.Core": "6.15.0",
         "Microsoft.NETCore.App": {
-          "type": "platform", "version": "1.1.0"
+          "type": "platform",
+          "version": "1.1.0"
         }
       },
       "imports": "dnxcore50"
     }
   },
-
   "nowarn": [ "1591" ],
 
   "buildOptions": {

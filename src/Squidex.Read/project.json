@@ -1,25 +1,22 @@
 {
-  "version": "1.0.0-*",
-
   "dependencies": {
     "Microsoft.Extensions.Caching.Memory": "1.1.0",
-    "Microsoft.NETCore.App": "1.1.0",
     "MongoDB.Driver": "2.4.1",
-    "NETStandard.Library": "1.6.1",
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*"
   },
-
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "dependencies": {
-      }
+        "NETStandard.Library": "1.6.1"
+      },
+      "imports": "dnxcore50"
     }
   },
-
   "tooling": {
     "defaultNamespace": "Squidex.Read"
-  }
+  },
+  "version": "1.0.0-*"
 }

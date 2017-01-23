@@ -1,10 +1,6 @@
 {
-  "version": "1.0.0-*",
-
   "dependencies": {
     "Microsoft.AspNetCore.Identity": "1.1.0",
-    "Microsoft.NETCore.App": "1.1.0",
-    "NETStandard.Library": "1.6.1",
     "NodaTime": "2.0.0-alpha20160729",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
@@ -12,15 +8,16 @@
     "Squidex.Read": "1.0.0-*",
     "System.Linq": "4.3.0"
   },
-
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "dependencies": {
-      }
+        "NETStandard.Library": "1.6.1"
+      },
+      "imports": "dnxcore50"
     }
   },
-
   "tooling": {
     "defaultNamespace": "Squidex.Write"
-  }
+  },
+  "version": "1.0.0-*"
 }
