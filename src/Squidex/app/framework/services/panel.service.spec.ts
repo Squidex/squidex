@@ -65,9 +65,16 @@ describe('PanelService', () => {
         panelService.pop(element3, <any>renderer);
 
         expect(styles).toEqual([
+            { element: element1, property: 'top', value: '0px' },
             { element: element1, property: 'left', value: '0px' },
+            { element: element1, property: 'bottom', value: '0px' },
+            { element: element1, property: 'position', value: 'absolute' },
             { element: element1, property: 'z-index', value: '20' },
+
+            { element: element2, property: 'top', value: '0px' },
             { element: element2, property: 'left', value: '100px' },
+            { element: element2, property: 'bottom', value: '0px' },
+            { element: element2, property: 'position', value: 'absolute' },
             { element: element2, property: 'z-index', value: '10' }
         ]);
 

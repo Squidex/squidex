@@ -50,11 +50,14 @@ export class ContentsService {
     public getContents(appName: string, schemaName: string, take: number, skip: number, query: string): Observable<ContentsDto> {
         let fullQuery = query ? query.trim() : '';
 
-        if (fullQuery.indexOf('$filter') < 0 &&
-            fullQuery.indexOf('$search') < 0 &&
-            fullQuery.indexOf('$orderby') < 0 &&
-            fullQuery.length > 0) {
-            fullQuery = `$search=${fullQuery}`;
+        if (fullQuery.length > 0) {
+            if (fullQuery.indexOf('$filter') < 0 &&
+                fullQuery.indexOf('$search') < 0 &&
+                fullQuery.indexOf('$orderby') < 0) {
+                fullQuery = `&$search=${fullQuery}`;
+            } else {
+                fullQuery = `&${fullQuery}`;
+            }
         }
 
         if (take > 0) {
@@ -65,7 +68,7 @@ export class ContentsService {
             fullQuery += `&$skip=${skip}`;
         }
 
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?nonPublished=true&hidden=true&${fullQuery}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?nonPublished=true&hidden=true${fullQuery}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())

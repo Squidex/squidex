@@ -7,7 +7,7 @@
 
 import { Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
@@ -29,7 +29,7 @@ describe('ContentsService', () => {
     });
 
     it('should make get request to get contents', () => {
-        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?take=17&skip=13&query=my-query&nonPublished=true&hidden=true'))
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$top=17&$skip=13'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -60,7 +60,7 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto | null = null;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13, null).subscribe(result => {
             contents = result;
         }).unsubscribe();
 
@@ -70,6 +70,50 @@ describe('ContentsService', () => {
                 new ContentDto('id2', true, 'Created2', 'LastModifiedBy2', DateTime.parseISO_UTC('2016-10-12T10:10'), DateTime.parseISO_UTC('2017-10-12T10:10'), {})
         ]));
 
+        authService.verifyAll();
+    });
+
+    it('should make append query to get request as search', () => {
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$search=my-query&$top=17&$skip=13'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            total: 10,
+                            items: []
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let contents: ContentsDto | null = null;
+
+        contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
+            contents = result;
+        }).unsubscribe();
+        authService.verifyAll();
+    });
+
+    it('should make append query to get request as plain', () => {
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$filter=my-filter&$top=17&$skip=13'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            total: 10,
+                            items: []
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let contents: ContentsDto | null = null;
+
+        contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe(result => {
+            contents = result;
+        }).unsubscribe();
         authService.verifyAll();
     });
 
@@ -148,9 +192,7 @@ describe('ContentsService', () => {
     });
 
     it('should make put request to publish content', () => {
-        const dto = {};
-
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/publish', dto))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/publish', It.isAny()))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -164,9 +206,7 @@ describe('ContentsService', () => {
     });
 
     it('should make put request to unpublish content', () => {
-        const dto = {};
-
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/unpublish', dto))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/unpublish', It.isAny()))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()

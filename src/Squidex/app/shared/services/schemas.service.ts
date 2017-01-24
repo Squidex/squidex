@@ -94,12 +94,12 @@ export class FieldDto {
 
 export abstract class FieldPropertiesDto {
     constructor(
-        public readonly label?: string,
-        public readonly hints?: string,
-        public readonly placeholder?: string,
-        public readonly isRequired: boolean = false,
-        public readonly isListField: boolean = false,
-        public readonly isLocalizable: boolean = false
+        public readonly label: string,
+        public readonly hints: string,
+        public readonly placeholder: string,
+        public readonly isRequired: boolean,
+        public readonly isListField: boolean,
+        public readonly isLocalizable: boolean
     ) {
     }
 }
