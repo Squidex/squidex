@@ -26,7 +26,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Write", "src\Squide
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Read", "src\Squidex.Read\Squidex.Read.xproj", "{A92B4734-2587-4F6F-97A3-741BE48709A5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Store.MongoDb", "src\Squidex.Store.MongoDb\Squidex.Store.MongoDb.xproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Read.MongoDb", "src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.xproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "squidex_store", "squidex_store", "{4082AA58-D410-4C52-8E88-3B0A4E860B28}"
 EndProject

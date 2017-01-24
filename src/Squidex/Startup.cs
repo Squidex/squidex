@@ -24,7 +24,7 @@ using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Pipeline;
-using Squidex.Store.MongoDb;
+using Squidex.Read.MongoDb;
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
 

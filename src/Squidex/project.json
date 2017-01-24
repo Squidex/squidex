@@ -33,7 +33,7 @@
     "Squidex.Infrastructure.MongoDb": "1.0.0-*",
     "Squidex.Infrastructure.RabbitMq": "1.0.0-*",
     "Squidex.Read": "1.0.0-*",
-    "Squidex.Store.MongoDb": "1.0.0-*",
+    "Squidex.Read.MongoDb": "1.0.0-*",
     "Squidex.Write": "1.0.0-*",
     "System.Linq": "4.3.0"
   },

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
-
 // ReSharper disable UnusedMethodReturnValue.Local
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedMember.Local

@@ -20,7 +20,6 @@ using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
 using Squidex.Write.Utils;
 using Xunit;
-
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Write.Contents

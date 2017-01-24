@@ -10,7 +10,6 @@ using System;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 using System.Linq;
-
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Infrastructure.CQRS

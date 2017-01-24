@@ -265,6 +265,27 @@ namespace Squidex.Core.Schemas
             Assert.NotNull(json);
         }
 
+        [Fact]
+        public void Should_build_edm_model()
+        {
+            var schema =
+                Schema.Create("user", new SchemaProperties { Hints = "The User" })
+                    .AddOrUpdateField(new StringField(1, "firstName",
+                        new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
+                    .AddOrUpdateField(new StringField(2, "lastName",
+                        new StringFieldProperties { Hints = "Last Name" }))
+                    .AddOrUpdateField(new BooleanField(3, "admin",
+                        new BooleanFieldProperties()))
+                    .AddOrUpdateField(new NumberField(4, "age",
+                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
+
+            var languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
+
+            var edmModel = schema.BuildEdmType(languages, x => x);
+
+            Assert.NotNull(edmModel);
+        }
+
         private NumberField AddField()
         {
             var field = new NumberField(1, "my-field", new NumberFieldProperties());
