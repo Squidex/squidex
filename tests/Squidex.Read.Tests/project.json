@@ -12,7 +12,8 @@
     "Moq": "4.6.38-alpha",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
-    "Squidex.Write": "1.0.0-*",
+    "Squidex.Read": "1.0.0-*",
+    "Squidex.Read.MongoDb": "1.0.0-*",
     "xunit": "2.2.0-beta4-build3444"
   },
   "frameworks": {

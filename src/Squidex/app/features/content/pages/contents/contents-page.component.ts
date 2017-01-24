@@ -84,25 +84,18 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public ngOnInit() {
         this.messageCreatedSubscription =
             this.messageBus.of(ContentCreated).subscribe(message => {
+                this.itemLast++;
                 this.contentTotal++;
                 this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data));
             });
 
         this.messageUpdatedSubscription =
             this.messageBus.of(ContentUpdated).subscribe(message => {
-                this.updateContents(message.id, true, message.data);
+                this.updateContents(message.id, undefined, message.data);
             });
 
         this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
             this.languages = languages;
-        });
-
-        this.contentsFilter.valueChanges.debounceTime(300).subscribe(q => {
-            this.currentQuery = q;
-
-            if (this.schema) {
-                this.load();
-            }
         });
 
         this.route.data.map(p => p['schema']).subscribe(schema => {
@@ -111,6 +104,12 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             this.reset();
             this.load();
         });
+    }
+
+    public search() {
+        this.currentQuery = this.contentsFilter.value;
+
+        this.load();
     }
 
     public publishContent(content: ContentDto) {
@@ -204,8 +203,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.canGoPrev = this.currentPage > 0;
     }
 
-    private updateContents(id: string, isPublished: boolean, data: any) {
-        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, isPublished, data));
+    private updateContents(id: string, p: boolean | undefined, data: any) {
+        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data));
     }
 
     private createContent(id: string, data: any): ContentDto {

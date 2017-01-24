@@ -19,7 +19,6 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
         public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity>  cursor, ODataUriParser query, Schema schema)
         {
-
             return cursor.Sort(SortBuilder.BuildSort(query, schema));
         }
 
@@ -49,6 +48,13 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
         public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Schema schema, bool nonPublished)
         {
+            var filter = BuildQuery(query, schema, nonPublished);
+
+            return cursor.Find(filter);
+        }
+
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Schema schema, bool nonPublished)
+        {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.IsDeleted, false)
@@ -66,7 +72,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
                 filters.Add(filter);
             }
 
-            return cursor.Find(Filter.And(filters));
+            return Filter.And(filters);
         }
     }
 }

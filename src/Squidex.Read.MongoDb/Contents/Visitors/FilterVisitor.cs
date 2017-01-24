@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using Microsoft.OData.Core.UriParser.Semantic;
 using Microsoft.OData.Core.UriParser.TreeNodeKinds;
 using Microsoft.OData.Core.UriParser.Visitors;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
 // ReSharper disable SwitchStatementMissingSomeCases
@@ -39,6 +41,24 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             if (nodeIn.OperatorKind == UnaryOperatorKind.Not)
             {
                 return Filter.Not(nodeIn.Operand.Accept(this));
+            }
+
+            throw new NotSupportedException();
+        }
+
+        public override FilterDefinition<MongoContentEntity> Visit(SingleValueFunctionCallNode nodeIn)
+        {
+            if (nodeIn.Name == "endswith")
+            {
+                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression(BuildValue(nodeIn.Parameters.ElementAt(1)) + "$", "i"));
+            }
+            if (nodeIn.Name == "startswith")
+            {
+                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression("^" + BuildValue(nodeIn.Parameters.ElementAt(1)), "i"));
+            }
+            if (nodeIn.Name == "contains")
+            {
+                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression(BuildValue(nodeIn.Parameters.ElementAt(1)).ToString(), "i"));
             }
 
             throw new NotSupportedException();

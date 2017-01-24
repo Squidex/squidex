@@ -42,6 +42,15 @@ exit /b %errorlevel%
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Write.xml" ^
 -oldStyle
+
+"%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
+-register:user ^
+-target:"C:\Program Files\dotnet\dotnet.exe" ^
+-targetargs:"test %~dp0\Squidex.Read.Tests" ^
+-filter:"+[Squidex*]*" ^
+-skipautoprops ^
+-output:"%~dp0\GeneratedReports\Read.xml" ^
+-oldStyle
 exit /b %errorlevel%
 
 :RunReportGeneratorOutput

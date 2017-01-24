@@ -12,7 +12,6 @@ using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read;
 
 namespace Squidex.Read.MongoDb.History
 {

@@ -18,14 +18,14 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.History.Repositories;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.Users.Repositories;
 using Squidex.Read.MongoDb.Apps;
 using Squidex.Read.MongoDb.Contents;
 using Squidex.Read.MongoDb.History;
 using Squidex.Read.MongoDb.Infrastructure;
 using Squidex.Read.MongoDb.Schemas;
 using Squidex.Read.MongoDb.Users;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Users.Repositories;
 
 namespace Squidex.Read.MongoDb
 {

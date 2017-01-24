@@ -23,7 +23,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             if (search != null)
             {
-                return Filter.Text(ConstantVisitor.Visit(search.Expression).ToString());
+                return Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString());
             }
 
             var filter = query.ParseFilter();

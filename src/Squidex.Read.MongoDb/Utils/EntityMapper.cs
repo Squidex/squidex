@@ -12,7 +12,6 @@ using MongoDB.Driver;
 using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read;
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable SuspiciousTypeConversion.Global
 

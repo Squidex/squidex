@@ -11,16 +11,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Events.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.MongoDb.Utils;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Replay;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Read.MongoDb.Apps
 {

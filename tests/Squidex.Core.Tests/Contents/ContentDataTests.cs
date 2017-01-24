@@ -40,6 +40,9 @@ namespace Squidex.Core.Contents
                             .AddValue("de", "de_string"))
                     .AddField("field2",
                         new ContentFieldData()
+                            .AddValue("iv", 3))
+                    .AddField("invalid",
+                        new ContentFieldData()
                             .AddValue("iv", 3));
 
             var actual = input.ToIdModel(schema);
@@ -67,6 +70,9 @@ namespace Squidex.Core.Contents
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
                     .AddField("2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3))
+                    .AddField("99",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 

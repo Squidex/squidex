@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OData.Core;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
@@ -24,9 +25,9 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Contents;
 using Squidex.Read.Contents.Repositories;
-using Squidex.Read.Schemas.Services;
 using Squidex.Read.MongoDb.Contents.Visitors;
 using Squidex.Read.MongoDb.Utils;
+using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Read.MongoDb.Contents
 {
@@ -87,8 +88,25 @@ namespace Squidex.Read.MongoDb.Contents
 
             await ForSchemaAsync(schemaId, async (collection, schema) =>
             {
-                var parser = schema.ParseQuery(languages, odataQuery);
-                var cursor = collection.Find(parser, schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schema);
+                IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
+                try
+                {
+                    var parser = schema.ParseQuery(languages, odataQuery);
+
+                    cursor = collection.Find(parser, schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schema);
+                }
+                catch (NotSupportedException)
+                {
+                    throw new ValidationException("This odata operation is not supported");
+                }
+                catch (NotImplementedException)
+                {
+                    throw new ValidationException("This odata operation is not supported");
+                }
+                catch (ODataException e)
+                {
+                    throw new ValidationException("Failed to parse query: " + e.Message, e);
+                }
 
                 var entities = await cursor.ToListAsync();
 
@@ -109,8 +127,25 @@ namespace Squidex.Read.MongoDb.Contents
 
             await ForSchemaAsync(schemaId, async (collection, schema) =>
             {
-                var parser = schema.ParseQuery(languages, odataQuery);
-                var cursor = collection.Find(parser, schema, nonPublished);
+                IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
+                try
+                {
+                    var parser = schema.ParseQuery(languages, odataQuery);
+
+                    cursor = collection.Find(parser, schema, nonPublished);
+                }
+                catch (NotSupportedException)
+                {
+                    throw new ValidationException("This odata operation is not supported");
+                }
+                catch (NotImplementedException)
+                {
+                    throw new ValidationException("This odata operation is not supported");
+                }
+                catch (ODataException e)
+                {
+                    throw new ValidationException("Failed to parse query: " + e.Message, e);
+                }
 
                 result = await cursor.CountAsync();
             });
@@ -196,11 +231,12 @@ namespace Squidex.Read.MongoDb.Contents
             return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
         }
 
-        protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
+        protected async Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
             var collection = GetCollection(headers.AggregateId());
 
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished).Text(x => x.Text));
+            await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
+            await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.Text));
         }
 
         public Task On(Envelope<IEvent> @event)

@@ -22,9 +22,9 @@ using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Read.MongoDb.Utils;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.MongoDb.Utils;
 
 namespace Squidex.Read.MongoDb.Schemas
 {

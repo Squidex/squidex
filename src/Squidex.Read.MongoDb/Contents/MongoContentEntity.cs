@@ -101,6 +101,7 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 if (text.Type == JTokenType.String)
                 {
+                    stringBuilder.Append(" ");
                     stringBuilder.Append(text);
                 }
             }

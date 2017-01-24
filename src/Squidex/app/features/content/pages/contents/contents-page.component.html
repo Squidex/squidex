@@ -4,7 +4,7 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-xs-right">
-                <form class="form-inline">
+                <form class="form-inline" (ngSubmit)="search()">
                     <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content..." />
                 </form>
                 

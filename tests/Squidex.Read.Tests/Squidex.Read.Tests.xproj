@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>9a3dea7e-1681-4d48-ac5c-1f0de421a203</ProjectGuid>
+    <ProjectGuid>8b074219-f69a-4e41-83c6-12ee1e647779</ProjectGuid>
     <RootNamespace>Squidex.Write</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>

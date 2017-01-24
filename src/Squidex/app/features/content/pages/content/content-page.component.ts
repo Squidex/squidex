@@ -46,7 +46,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     public contentData: any = null;
     public contentId: string;
 
-    public isNewMode = false;
+    public isNewMode = true;
 
     public languages: AppLanguageDto[] = [];
 
@@ -180,12 +180,12 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
         if (!content) {
             this.contentData = undefined;
             this.contentId = undefined;
-            this.isNewMode = false;
+            this.isNewMode = true;
             return;
         } else {
             this.contentData = content.data;
             this.contentId = content.id;
-            this.isNewMode = true;
+            this.isNewMode = false;
         }
 
         for (const field of this.schema.fields) {
