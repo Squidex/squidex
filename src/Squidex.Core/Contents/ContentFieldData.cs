@@ -22,7 +22,7 @@ namespace Squidex.Core.Contents
 
         public ContentFieldData SetValue(JToken value)
         {
-            this["iv"] = value;
+            this[Language.Invariant.Iso2Code] = value;
 
             return this;
         }

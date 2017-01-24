@@ -9,6 +9,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
@@ -45,11 +47,6 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(JToken value)
-        {
-            return value.ToString();
-        }
-
         protected override void PrepareJsonSchema(JsonProperty jsonProperty)
         {
             jsonProperty.Type = JsonObjectType.String;
@@ -61,6 +58,16 @@ namespace Squidex.Core.Schemas
             {
                 jsonProperty.EnumerationNames = new Collection<string>(Properties.AllowedValues);
             }
+        }
+
+        protected override IEdmTypeReference CreateEdmType()
+        {
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
+        }
+
+        protected override object ConvertValue(JToken value)
+        {
+            return value.ToString();
         }
     }
 }

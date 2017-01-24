@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+// ReSharper disable UnusedMember.Local
 
 namespace Squidex.Infrastructure.Dispatching
 {
@@ -27,7 +28,6 @@ namespace Squidex.Infrastructure.Dispatching
             return new Tuple<Type, Action<T, object>>(inputType, (Action<T, object>)handler);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private static Action<TTarget, object> Factory<TTarget, TIn>(MethodInfo methodInfo)
         {
             var type = typeof(Action<TTarget, TIn>);

@@ -7,6 +7,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
@@ -36,6 +38,11 @@ namespace Squidex.Core.Schemas
         protected override void PrepareJsonSchema(JsonProperty jsonProperty)
         {
             jsonProperty.Type = JsonObjectType.Boolean;
+        }
+
+        protected override IEdmTypeReference CreateEdmType()
+        {
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Boolean, !Properties.IsRequired);
         }
     }
 }

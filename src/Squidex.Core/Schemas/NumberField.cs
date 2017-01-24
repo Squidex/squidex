@@ -8,6 +8,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Schemas.Validators;
@@ -52,6 +54,11 @@ namespace Squidex.Core.Schemas
             {
                 jsonProperty.Maximum = (decimal)Properties.MaxValue.Value;
             }
+        }
+
+        protected override IEdmTypeReference CreateEdmType()
+        {
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Double, !Properties.IsRequired);
         }
 
         protected override object ConvertValue(JToken value)

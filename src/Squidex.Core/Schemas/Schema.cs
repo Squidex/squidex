@@ -11,11 +11,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
-
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
@@ -173,6 +173,21 @@ namespace Squidex.Core.Schemas
             return AddOrUpdateField(newField);
         }
 
+        public EdmComplexType BuildEdmType(HashSet<Language> languages, Func<EdmComplexType, EdmComplexType> typeResolver)
+        {
+            Guard.NotEmpty(languages, nameof(languages));
+            Guard.NotNull(typeResolver, nameof(typeResolver));
+
+            var edmType = new EdmComplexType("Squidex",  Name);
+
+            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
+            {
+                field.AddToEdmType(edmType, languages, Name, typeResolver);
+            }
+
+            return edmType;
+        }
+
         public JsonSchema4 BuildSchema(HashSet<Language> languages, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotEmpty(languages, nameof(languages));
@@ -233,12 +248,12 @@ namespace Squidex.Core.Schemas
                 }
                 else
                 {
-                    if (fieldData.Keys.Any(x => x != "iv"))
+                    if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
                     {
-                        fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language (iv)");
+                        fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
                     }
 
-                    var value = fieldData.GetOrCreate("iv", k => JValue.CreateNull());
+                    var value = fieldData.GetOrCreate(Language.Invariant.Iso2Code, k => JValue.CreateNull());
 
                     await field.ValidateAsync(value, fieldErrors);
                 }

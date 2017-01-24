@@ -25,7 +25,6 @@ using Squidex.Pipeline.Swagger;
 using Squidex.Read.Apps;
 using Squidex.Read.Schemas;
 // ReSharper disable InvertIf
-
 // ReSharper disable SuggestBaseTypeForParameter
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
@@ -203,10 +202,10 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Queries {schemaName} content elements.";
 
-                operation.Parameters.AddQueryParameter("take", JsonObjectType.Number, "The number of elements to take.");
-                operation.Parameters.AddQueryParameter("skip", JsonObjectType.Number, "The number of elements to skip.");
-
-                operation.Parameters.AddQueryParameter("query", JsonObjectType.String, "Optional full text query skip.");
+                operation.Parameters.AddQueryParameter("$top", JsonObjectType.Number, "The number of elements to take.");
+                operation.Parameters.AddQueryParameter("$skip", JsonObjectType.Number, "The number of elements to skip.");
+                operation.Parameters.AddQueryParameter("$filter", JsonObjectType.String, "Optional filter.");
+                operation.Parameters.AddQueryParameter("$search", JsonObjectType.String, "Optional full text query skip.");
 
                 var responseSchema = CreateContentsSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
 

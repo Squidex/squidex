@@ -9,6 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure;
@@ -129,6 +131,27 @@ namespace Squidex.Core.Schemas
             return Clone<Field>(clone => clone.name = newName);
         }
 
+        public void AddToEdmType(EdmStructuredType edmType, IEnumerable<Language> languages, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
+        {
+            Guard.NotNull(edmType, nameof(edmType));
+            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(typeResolver, nameof(typeResolver));
+
+            if (!RawProperties.IsLocalizable)
+            {
+                languages = new[] { Language.Invariant };
+            }
+
+            var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}_{Name}_Property"));
+
+            foreach (var language in languages)
+            {
+                languageType.AddStructuralProperty(language.Iso2Code, CreateEdmType());
+            }
+
+            edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(languageType, false));
+        }
+
         public void AddToSchema(JsonSchema4 schema, IEnumerable<Language> languages, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotNull(schema, nameof(schema));
@@ -152,7 +175,7 @@ namespace Squidex.Core.Schemas
                 languagesObject.Properties.Add(language.Iso2Code, languageProperty);
             }
 
-            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}{Name}Property", languagesObject));
+            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}_{Name}_Property", languagesObject));
 
             schema.Properties.Add(Name, languagesProperty);
         }
@@ -179,6 +202,8 @@ namespace Squidex.Core.Schemas
         }
 
         protected abstract IEnumerable<IValidator> CreateValidators();
+
+        protected abstract IEdmTypeReference CreateEdmType();
 
         protected abstract void PrepareJsonSchema(JsonProperty jsonProperty);
 

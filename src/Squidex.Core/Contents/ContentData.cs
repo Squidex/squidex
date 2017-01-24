@@ -39,7 +39,7 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                var fieldId = 0L;
+                long fieldId;
 
                 Field field;
 

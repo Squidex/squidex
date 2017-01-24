@@ -12,10 +12,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using Squidex.Controllers.Api;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -42,7 +42,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/{name}")]
-        public async Task<IActionResult> GetContents(string name, [FromQuery] string query = null, [FromQuery] int? take = null, [FromQuery] int? skip = null, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
+        public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
         {
             var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
 
@@ -51,8 +51,12 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, take, skip, query);
-            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query);
+            var languages = new HashSet<Language>(App.Languages);
+
+            var query = Request.QueryString.ToString();
+
+            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, languages);
+            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, languages);
 
             await Task.WhenAll(taskForContents, taskForCount);
 

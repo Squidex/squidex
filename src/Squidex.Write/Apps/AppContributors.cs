@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Core.Apps;
 using Squidex.Infrastructure;
-
 // ReSharper disable InvertIf
 
 namespace Squidex.Write.Apps

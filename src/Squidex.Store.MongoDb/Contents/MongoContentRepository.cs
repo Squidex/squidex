@@ -25,6 +25,7 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Contents;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.Schemas.Services;
+using Squidex.Store.MongoDb.Contents.Visitors;
 using Squidex.Store.MongoDb.Utils;
 
 namespace Squidex.Store.MongoDb.Contents
@@ -34,36 +35,12 @@ namespace Squidex.Store.MongoDb.Contents
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemaProvider;
-
-        protected ProjectionDefinitionBuilder<MongoContentEntity> Projection
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Projection;
-            }
-        }
-
-        protected SortDefinitionBuilder<MongoContentEntity> Sort
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Sort;
-            }
-        }
-
+        
         protected UpdateDefinitionBuilder<MongoContentEntity> Update
         {
             get
             {
                 return Builders<MongoContentEntity>.Update;
-            }
-        }
-
-        protected FilterDefinitionBuilder<MongoContentEntity> Filter
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Filter;
             }
         }
 
@@ -104,96 +81,60 @@ namespace Squidex.Store.MongoDb.Contents
             }
         }
 
-        public async Task<List<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, int? take, int? skip, string query)
+        public async Task<List<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
         {
-            var cursor = BuildQuery(schemaId, nonPublished, query);
+            List<IContentEntity> result = null;
 
-            if (take.HasValue)
+            await ForSchemaAsync(schemaId, async (collection, schema) =>
             {
-                cursor.Limit(take.Value);
-            }
+                var parser = schema.ParseQuery(languages, odataQuery);
+                var cursor = collection.Find(parser, schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schema);
 
-            if (skip.HasValue)
-            {
-                cursor.Skip(skip.Value);
-            }
+                var entities = await cursor.ToListAsync();
 
-            cursor.SortByDescending(x => x.LastModified);
+                foreach (var entity in entities)
+                {
+                    entity.ParseData(schema);
+                }
 
-            var schemaEntity = await schemaProvider.FindSchemaByIdAsync(schemaId);
+                result = entities.OfType<IContentEntity>().ToList();
+            });
 
-            if (schemaEntity == null)
-            {
-                return new List<IContentEntity>();
-            }
-
-            var entities = await cursor.ToListAsync();
-
-            foreach (var entity in entities)
-            {
-                entity.ParseData(schemaEntity.Schema);
-            }
-
-            return entities.OfType<IContentEntity>().ToList();
+            return result;
         }
 
-        public Task<long> CountAsync(Guid schemaId, bool nonPublished, string query)
+        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
         {
-            var cursor = BuildQuery(schemaId, nonPublished, query);
+            var result = 0L;
 
-            return cursor.CountAsync();
-        }
-
-        private IFindFluent<MongoContentEntity, MongoContentEntity> BuildQuery(Guid schemaId, bool nonPublished, string query)
-        {
-            var filters = new List<FilterDefinition<MongoContentEntity>>
+            await ForSchemaAsync(schemaId, async (collection, schema) =>
             {
-                Filter.Eq(x => x.IsDeleted, false)
-            };
+                var parser = schema.ParseQuery(languages, odataQuery);
+                var cursor = collection.Find(parser, schema, nonPublished);
 
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                filters.Add(Filter.Text(query, "en"));
-            }
+                result = await cursor.CountAsync();
+            });
 
-            if (!nonPublished)
-            {
-                filters.Add(Filter.Eq(x => x.IsPublished, false));
-            }
-
-            var collection = GetCollection(schemaId);
-
-            var cursor = collection.Find(Filter.And(filters));
-
-            return cursor;
+            return result;
         }
 
         public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
         {
-            var collection = GetCollection(schemaId);
+            MongoContentEntity result = null;
 
-            var entity = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
-
-            if (entity == null)
+            await ForSchemaAsync(schemaId, async (collection, schema) =>
             {
-                return null;
-            }
+                result = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-            var schemaEntity = await schemaProvider.FindSchemaByIdAsync(schemaId);
+                result?.ParseData(schema);
+            });
 
-            if (schemaEntity == null)
-            {
-                return null;
-            }
-
-            entity.ParseData(schemaEntity.Schema);
-
-            return entity;
+            return result;
         }
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers, (collection, schema) =>
+            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
             {
                 return collection.CreateAsync(headers, x =>
                 {
@@ -206,7 +147,7 @@ namespace Squidex.Store.MongoDb.Contents
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers, (collection, schema) =>
+            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
             {
                 return collection.UpdateAsync(headers, x =>
                 {
@@ -217,7 +158,7 @@ namespace Squidex.Store.MongoDb.Contents
 
         protected Task On(ContentPublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers, collection =>
+            return ForSchemaAsync(headers.SchemaId(), collection =>
             {
                 return collection.UpdateAsync(headers, x =>
                 {
@@ -228,7 +169,7 @@ namespace Squidex.Store.MongoDb.Contents
 
         protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers, collection =>
+            return ForSchemaAsync(headers.SchemaId(), collection =>
             {
                 return collection.UpdateAsync(headers, x =>
                 {
@@ -239,7 +180,7 @@ namespace Squidex.Store.MongoDb.Contents
 
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers, collection =>
+            return ForSchemaAsync(headers.SchemaId(), collection =>
             {
                 return collection.UpdateAsync(headers, x =>
                 {
@@ -267,11 +208,11 @@ namespace Squidex.Store.MongoDb.Contents
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
         }
 
-        private async Task ForSchemaAsync(EnvelopeHeaders headers, Func<IMongoCollection<MongoContentEntity>, Schema, Task> action)
+        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Schema, Task> action)
         {
-            var collection = GetCollection(headers.SchemaId());
+            var collection = GetCollection(schemaId);
 
-            var schemaEntity = await schemaProvider.FindSchemaByIdAsync(headers.SchemaId());
+            var schemaEntity = await schemaProvider.FindSchemaByIdAsync(schemaId);
 
             if (schemaEntity == null)
             {
@@ -281,9 +222,9 @@ namespace Squidex.Store.MongoDb.Contents
             await action(collection, schemaEntity.Schema);
         }
 
-        private async Task ForSchemaAsync(EnvelopeHeaders headers, Func<IMongoCollection<MongoContentEntity>, Task> action)
+        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
         {
-            var collection = GetCollection(headers.SchemaId());
+            var collection = GetCollection(schemaId);
 
             await action(collection);
         }

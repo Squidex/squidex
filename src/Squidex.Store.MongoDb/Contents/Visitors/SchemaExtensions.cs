@@ -1,0 +1,58 @@
+﻿// ==========================================================================
+//  SchemaExtensions.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
+using System.Collections.Generic;
+using Microsoft.OData.Core.UriParser;
+using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Library;
+using Squidex.Core.Schemas;
+using Squidex.Infrastructure;
+
+namespace Squidex.Store.MongoDb.Contents.Visitors
+{
+    public static class SchemaExtensions
+    {
+        public static EdmModel BuildEdmModel(this Schema schema, HashSet<Language> languages)
+        {
+            var model = new EdmModel();
+            var container = new EdmEntityContainer("Squidex", "Container");
+
+            var schemaType = schema.BuildEdmType(languages, x =>
+            {
+                model.AddElement(x);
+
+                return x;
+            });
+
+            var entityType = new EdmEntityType("Squidex", schema.Name);
+            entityType.AddStructuralProperty("Data", new EdmComplexTypeReference(schemaType, false));
+            entityType.AddStructuralProperty("Created", EdmPrimitiveTypeKind.Date);
+            entityType.AddStructuralProperty("CreatedBy", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("LastModified", EdmPrimitiveTypeKind.Date);
+            entityType.AddStructuralProperty("LastModifiedBy", EdmPrimitiveTypeKind.String);
+
+            model.AddElement(container);
+            model.AddElement(schemaType);
+            model.AddElement(entityType);
+
+            container.AddEntitySet($"{schema.Name}_Set", entityType);
+
+            return model;
+        }
+
+        public static ODataUriParser ParseQuery(this Schema schema, HashSet<Language> languages, string query)
+        {
+            var model = schema.BuildEdmModel(languages);
+
+            var parser = new ODataUriParser(model, new Uri($"{schema.Name}_Set?{query}", UriKind.Relative));
+
+            return parser;
+        }
+    }
+}
