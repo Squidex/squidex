@@ -10,6 +10,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
@@ -20,11 +22,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class MyLogger : ILogger<LogExceptionHandler>
         {
-            public int LogCount { get; private set; }
+            public HashSet<LogLevel> LogLevels { get; } = new HashSet<LogLevel>();
 
             public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
             {
-                LogCount++;
+                LogLevels.Add(logLevel);
             }
 
             public bool IsEnabled(LogLevel logLevel)
@@ -57,7 +59,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(0, logger.LogCount);
+            Assert.Equal(0, logger.LogLevels.Count);
         }
 
         [Fact]
@@ -70,20 +72,18 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(1, logger.LogCount);
+            Assert.Equal(new[] { LogLevel.Error }, logger.LogLevels.ToArray());
         }
 
         [Fact]
         public async Task Should_log_if_command_is_not_handled()
         {
             var context = new CommandContext(new MyCommand());
-
-            context.Fail(new InvalidOperationException());
-
+            
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(1, logger.LogCount);
+            Assert.Equal(new[] { LogLevel.Critical }, logger.LogLevels.ToArray());
         }
     }
 }

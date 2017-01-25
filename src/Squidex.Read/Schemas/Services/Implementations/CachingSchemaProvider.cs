@@ -55,7 +55,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
                 if (cacheItem.Entity != null)
                 {
-                    Cache.Set(BuildIdCacheKey(cacheItem.Entity.Id), cacheItem, CacheDuration);
+                    Cache.Set(BuildNameCacheKey(cacheItem.Entity.AppId, cacheItem.Entity.Name), cacheItem, CacheDuration);
                 }
             }
 

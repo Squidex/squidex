@@ -14,12 +14,12 @@ using MongoDB.Driver;
 using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Read.MongoDb.Contents;
 using Squidex.Read.MongoDb.Contents.Visitors;
 using Xunit;
+
 // ReSharper disable SpecifyACultureInStringConversionExplicitly
 
-namespace Squidex.Write.MongoDb.Contents
+namespace Squidex.Read.MongoDb.Contents
 {
     public class ODataQueryTests
     {

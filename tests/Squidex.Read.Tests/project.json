@@ -9,6 +9,7 @@
   "dependencies": {
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "FluentAssertions": "4.18.0",
+    "Microsoft.Extensions.Options": "1.1.0",
     "Moq": "4.6.38-alpha",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
@@ -29,7 +30,7 @@
   },
   "testRunner": "xunit",
   "tooling": {
-    "defaultNamespace": "Squidex.Write"
+    "defaultNamespace": "Squidex.Read"
   },
   "tools": {
     "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"
