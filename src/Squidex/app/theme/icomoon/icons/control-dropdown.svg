@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="40px"
+   height="40px"
+   viewBox="0 0 40 40"
+   enable-background="new 0 0 40 40"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="DropDown.svg"><metadata
+     id="metadata13"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+     id="defs11" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="742"
+     inkscape:window-height="480"
+     id="namedview9"
+     showgrid="false"
+     inkscape:zoom="5.9"
+     inkscape:cx="20"
+     inkscape:cy="20"
+     inkscape:window-x="2754"
+     inkscape:window-y="383"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" /><path
+     style="fill:#000000"
+     d="M 2 0 C 0.896 0 0 0.896 0 2 L 0 13 C 0 14.104 0.896 15 2 15 L 23 15 L 25 15 L 38 15 C 39.104 15 40 14.104 40 13 L 40 2 C 40 0.896 39.104 0 38 0 L 25 0 L 23 0 L 2 0 z M 3 2 L 23 2 L 23 13 L 3 13 C 2.447 13 2 12.553 2 12 L 2 3 C 2 2.447 2.447 2 3 2 z M 25 2 L 37 2 C 37.553 2 38 2.447 38 3 L 38 12 C 38 12.553 37.553 13 37 13 L 25 13 L 25 2 z M 28 6 C 27.984 6.014 31.482 10.021 31.5 10 C 31.52 10 35 6.275 35 6 C 35 6.015 28.275 6 28 6 z M 5 17 C 3.344 17 2 18.344 2 20 C 2 21.656 3.344 23 5 23 C 6.656 23 8 21.656 8 20 C 8 18.344 6.656 17 5 17 z M 5 19 C 5.553 19 6 19.447 6 20 C 6 20.553 5.553 21 5 21 C 4.447 21 4 20.553 4 20 C 4 19.447 4.447 19 5 19 z M 12 19 C 11.447 19 11 19.447 11 20 C 11 20.553 11.447 21 12 21 L 37 21 C 37.553 21 38 20.553 38 20 C 38 19.447 37.553 19 37 19 L 12 19 z M 5 25 C 3.344 25 2 26.343 2 28 C 2 29.657 3.344 31 5 31 C 6.656 31 8 29.657 8 28 C 8 26.343 6.656 25 5 25 z M 5 27 C 5.553 27 6 27.447 6 28 C 6 28.553 5.553 29 5 29 C 4.447 29 4 28.553 4 28 C 4 27.447 4.447 27 5 27 z M 12 27 C 11.447 27 11 27.447 11 28 C 11 28.553 11.447 29 12 29 L 37 29 C 37.553 29 38 28.553 38 28 C 38 27.447 37.553 27 37 27 L 12 27 z M 5 33 C 3.344 33 2 34.343 2 36 C 2 37.657 3.344 39 5 39 C 6.656 39 8 37.657 8 36 C 8 34.343 6.656 33 5 33 z M 5 35 C 5.553 35 6 35.447 6 36 C 6 36.553 5.553 37 5 37 C 4.447 37 4 36.553 4 36 C 4 35.447 4.447 35 5 35 z M 12 35 C 11.447 35 11 35.447 11 36 C 11 36.553 11.447 37 12 37 L 37 37 C 37.553 37 38 36.553 38 36 C 38 35.447 37.553 35 37 35 L 12 35 z "
+     id="path7" /></svg>

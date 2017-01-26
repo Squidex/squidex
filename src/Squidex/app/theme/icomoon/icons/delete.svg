@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="20px"
+   height="20px"
+   viewBox="0 0 20 20"
+   enable-background="new 0 0 20 20"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="delete.svg"><metadata
+     id="metadata15"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+     id="defs13" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview11"
+     showgrid="false"
+     inkscape:zoom="22.627417"
+     inkscape:cx="4.2778231"
+     inkscape:cy="3.2117488"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" /><path
+     sodipodi:type="inkscape:offset"
+     inkscape:radius="0.13095434"
+     inkscape:original="M 9.1679688 2 C 8.6159688 2 8.1679688 2.447 8.1679688 3 L 8.1679688 4 L 5.1679688 4 C 4.6159688 4 4.1679688 4.447 4.1679688 5 L 4.1679688 7 C 4.1679688 7.553 4.6159688 8 5.1679688 8 L 5.1679688 17 C 5.1679688 17.553 5.6159688 18 6.1679688 18 L 14.167969 18 C 14.720969 18 15.167969 17.553 15.167969 17 L 15.167969 8 C 15.720969 8 16.167969 7.553 16.167969 7 L 16.167969 5 C 16.167969 4.447 15.719969 4 15.167969 4 L 12.167969 4 L 12.167969 3 C 12.167969 2.447 11.720969 2 11.167969 2 L 9.1679688 2 z M 9.1679688 3 L 11.167969 3 L 11.167969 4 L 9.1679688 4 L 9.1679688 3 z M 5.1679688 5 L 15.167969 5 L 15.167969 7 L 5.1679688 7 L 5.1679688 5 z M 6.1679688 8 L 14.167969 8 L 14.167969 17 L 6.1679688 17 L 6.1679688 8 z M 8.6679688 9 C 8.3919688 9 8.1679688 9.225 8.1679688 9.5 L 8.1679688 15.5 C 8.1679688 15.776 8.3919688 16 8.6679688 16 C 8.9439687 16 9.1679688 15.776 9.1679688 15.5 L 9.1679688 9.5 C 9.1679688 9.225 8.9439687 9 8.6679688 9 z M 11.667969 9 C 11.391969 9 11.167969 9.225 11.167969 9.5 L 11.167969 15.5 C 11.167969 15.776 11.390969 16 11.667969 16 C 11.943969 16 12.167969 15.776 12.167969 15.5 L 12.167969 9.5 C 12.167969 9.225 11.943969 9 11.667969 9 z "
+     style="clip-rule:evenodd;fill:#000000;fill-rule:evenodd"
+     id="path4137"
+     d="M 9.1679688,1.8691406 C 8.5452724,1.8691406 8.0371094,2.3762736 8.0371094,3 l 0,0.8691406 -2.8691406,0 C 4.5452724,3.8691406 4.0371094,4.3762736 4.0371094,5 l 0,2 c 0,0.5772523 0.4415074,1.0355678 1,1.1035156 l 0,8.8964844 c 0,0.623726 0.508163,1.130859 1.1308594,1.130859 l 8.0000002,0 c 0.623568,0 1.130859,-0.50729 1.130859,-1.130859 l 0,-8.8964844 c 0.559073,-0.067967 1,-0.5264094 1,-1.1035156 l 0,-2 c 0,-0.6237264 -0.508163,-1.1308594 -1.130859,-1.1308594 l -2.869141,0 0,-0.8691406 c 0,-0.6235685 -0.507291,-1.1308594 -1.130859,-1.1308594 l -2.0000002,0 z m 0.1308593,1.2617188 1.7382809,0 0,0.7382812 -1.7382809,0 0,-0.7382812 z m -4,2 9.7382809,0 0,1.7382812 -9.7382809,0 0,-1.7382812 z m 1,3 7.7382809,0 0,8.7382816 -7.7382809,0 0,-8.7382816 z M 8.6679688,8.8691406 C 8.3207979,8.8691406 8.0371094,9.1538878 8.0371094,9.5 l 0,6 c 0,0.346855 0.2840048,0.630859 0.6308594,0.630859 0.3468544,0 0.6308593,-0.284004 0.6308593,-0.630859 l 0,-6 c 0,-0.3461122 -0.2836886,-0.6308594 -0.6308593,-0.6308594 z m 3.0000002,0 c -0.347171,0 -0.63086,0.2847472 -0.63086,0.6308594 l 0,6 c 0,0.346538 0.283261,0.630859 0.63086,0.630859 0.346854,0 0.630859,-0.284004 0.630859,-0.630859 l 0,-6 c 0,-0.3461122 -0.283688,-0.6308594 -0.630859,-0.6308594 z" /></svg>
