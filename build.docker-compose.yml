@@ -1,0 +1,8 @@
+version: '2'
+services:
+  tradapp-build:
+    image: microsoft/aspnetcore-build:1.1.0-projectjson
+    volumes:
+      - .:/sln
+    working_dir: /sln
+    entrypoint: ["sh", "./build.sh"]

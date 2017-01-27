@@ -78,6 +78,7 @@
     "include": [
       "appsettings.json",
       "appsettings.Production.json",
+	  "dockerfile",
       "Views",
       "web.config",
       "wwwroot"
@@ -87,6 +88,7 @@
   "scripts": {
     "prepublish": [
       "npm install",
+	  "npm rebuild node-sass",
       "npm run-script build:copy",
       "npm run-script build"
     ],
