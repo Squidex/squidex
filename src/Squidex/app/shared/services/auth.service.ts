@@ -191,7 +191,7 @@ export class AuthService {
 
     private checkResponse(response: Observable<Response>) {
         return response.catch((error: Response) => {
-            if (error.status === 401) {
+            if (error.status === 401 || error.status === 404) {
                 this.logoutRedirect();
 
                 return Observable.empty<Response>();
