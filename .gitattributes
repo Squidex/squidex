@@ -62,5 +62,5 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 
-.sh  text eol=lf
-.yml text eol=lf
+*.sh  text eol=lf
+*.yml text eol=lf
