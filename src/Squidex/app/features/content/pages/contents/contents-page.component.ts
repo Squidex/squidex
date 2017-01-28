@@ -1,6 +1,6 @@
 /*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
@@ -164,7 +164,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     private load() {
         this.appName()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.pageSize, this.currentPage * this.pageSize, this.currentQuery))
+            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.pageSize, this.currentPage *this.pageSize, this.currentQuery))
                .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(dtos.items);
                     this.contentTotal = dtos.total;
@@ -196,8 +196,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     private updatePaging() {
         const totalPages = Math.ceil(this.contentTotal / this.pageSize);
 
-        this.itemFirst = this.currentPage * this.pageSize + 1;
-        this.itemLast = Math.min(this.contentTotal, (this.currentPage + 1) * this.pageSize);
+        this.itemFirst = this.currentPage *this.pageSize + 1;
+        this.itemLast = Math.min(this.contentTotal, (this.currentPage + 1) *this.pageSize);
 
         this.canGoNext = this.currentPage < totalPages - 1;
         this.canGoPrev = this.currentPage > 0;

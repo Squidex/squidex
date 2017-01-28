@@ -57,11 +57,11 @@ module.exports = webpackMerge(runConfig, {
             {
                 test: /\.scss$/,
                 include: helpers.root('app', 'theme'),
-                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css!sass?sourceMap' })
+                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
                 exclude: helpers.root('app', 'theme'),
-                loaders: ['raw', helpers.root('app-config', 'clean-css-loader'), 'sass']
+                loaders: ['raw-loader', helpers.root('app-config', 'clean-css-loader'), 'sass-loader']
             }, { 
                 test: /\.ts/, 
                 loaders: ['@ngtools/webpack'] 
@@ -70,7 +70,7 @@ module.exports = webpackMerge(runConfig, {
     },
 
     plugins: [
-        new webpack.NoErrorsPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({ 'process.env': { 'ENV': JSON.stringify(ENV) } }),
 
         /*

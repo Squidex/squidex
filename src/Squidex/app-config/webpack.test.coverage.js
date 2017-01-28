@@ -12,12 +12,12 @@ module.exports = webpackMerge(testConfig, {
             {
                 test: /\.ts$/,
                 include: [/\.(e2e|spec)\.ts$/],
-                loaders: ['awesome-typescript']
+                loaders: ['awesome-typescript-loader']
             },
             {
                 test: /\.ts$/,
                 exclude: [/\.(e2e|spec)\.ts$/],
-                loaders: ['istanbul-instrumenter-loader', helpers.root('app-config', 'fix-coverage-loader'), 'awesome-typescript', 'angular2-router-loader', 'angular2-template-loader']
+                loaders: ['istanbul-instrumenter-loader', helpers.root('app-config', 'fix-coverage-loader'), 'awesome-typescript-loader', 'angular2-router-loader', 'angular2-template-loader']
             }
         ]
     }

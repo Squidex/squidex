@@ -1,6 +1,6 @@
 ﻿/*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
@@ -31,21 +31,21 @@ describe('MathHelper', () => {
 
     it('should convert to rad', () => {
         expect(MathHelper.toRad(0)).toBe(0);
-        expect(MathHelper.toRad(180)).toBe(Math.PI * 1);
-        expect(MathHelper.toRad(360)).toBe(Math.PI * 2);
+        expect(MathHelper.toRad(180)).toBe(Math.PI *1);
+        expect(MathHelper.toRad(360)).toBe(Math.PI *2);
     });
 
     it('should convert to degree', () => {
         expect(MathHelper.toDegree(0)).toBe(0);
-        expect(MathHelper.toDegree(Math.PI * 1)).toBe(180);
-        expect(MathHelper.toDegree(Math.PI * 2)).toBe(360);
+        expect(MathHelper.toDegree(Math.PI *1)).toBe(180);
+        expect(MathHelper.toDegree(Math.PI *2)).toBe(360);
     });
 
     it('should adjust invalid degrees', () => {
-        expect(MathHelper.toPositiveDegree(36.5 - (1 * 360))).toBe(36.5);
-        expect(MathHelper.toPositiveDegree(36.5 - (2 * 360))).toBe(36.5);
-        expect(MathHelper.toPositiveDegree(36.5 + (1 * 360))).toBe(36.5);
-        expect(MathHelper.toPositiveDegree(36.5 + (2 * 360))).toBe(36.5);
+        expect(MathHelper.toPositiveDegree(36.5 - (1 *360))).toBe(36.5);
+        expect(MathHelper.toPositiveDegree(36.5 - (2 *360))).toBe(36.5);
+        expect(MathHelper.toPositiveDegree(36.5 + (1 *360))).toBe(36.5);
+        expect(MathHelper.toPositiveDegree(36.5 + (2 *360))).toBe(36.5);
     });
 
     it('should calculate simple sin', () => {

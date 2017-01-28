@@ -1,11 +1,11 @@
 ﻿/*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as moment from 'moment';
+import *as moment from 'moment';
 
 export class DateTime {
     public get raw(): Date {
@@ -89,7 +89,7 @@ export class DateTime {
 
         const date = new Date(parseInt(value.substr(6), 10));
         const time = (date.getTime());
-        const offs = (date.getTimezoneOffset() + off * 60) * 60000;
+        const offs = (date.getTimezoneOffset() + off *60) *60000;
 
         date.setTime(time + offs);
 
@@ -154,7 +154,7 @@ export class DateTime {
     }
 
     public firstOfWeek(): DateTime {
-        const weekStart = new Date(this.value.valueOf() - (this.weekDay - 1) * 86400000);
+        const weekStart = new Date(this.value.valueOf() - (this.weekDay - 1) *86400000);
 
         return new DateTime(weekStart);
     }
@@ -192,7 +192,7 @@ export class DateTime {
     public addHours(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setTime(clone.getTime() + (value * 60 * 60 * 1000));
+        clone.setTime(clone.getTime() + (value *60 *60 *1000));
 
         return new DateTime(clone);
     }
@@ -200,7 +200,7 @@ export class DateTime {
     public addMinutes(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setTime(clone.getTime() + (value * 60 * 1000));
+        clone.setTime(clone.getTime() + (value *60 *1000));
 
         return new DateTime(clone);
     }
@@ -208,7 +208,7 @@ export class DateTime {
     public addSeconds(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setTime(clone.getTime() + (value * 1000));
+        clone.setTime(clone.getTime() + (value *1000));
 
         return new DateTime(clone);
     }

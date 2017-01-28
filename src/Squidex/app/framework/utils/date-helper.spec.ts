@@ -1,11 +1,11 @@
 ﻿/*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import * as moment from 'moment';
+import *as moment from 'moment';
 
 import { DateHelper } from './../';
 

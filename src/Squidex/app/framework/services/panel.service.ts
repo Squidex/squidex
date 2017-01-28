@@ -1,6 +1,6 @@
 /*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
@@ -33,7 +33,7 @@ export class PanelService {
 
     private update(renderer: Renderer) {
         let currentPosition = 0;
-        let currentLayer = this.elements.length * 10;
+        let currentLayer = this.elements.length *10;
 
         for (let element of this.elements) {
             const width = element.getBoundingClientRect().width;

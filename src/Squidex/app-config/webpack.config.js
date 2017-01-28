@@ -45,23 +45,23 @@ module.exports = {
         loaders: [
             {
                 test: /\.ts$/,
-                loaders: ['awesome-typescript', 'angular2-router-loader', 'angular2-template-loader', 'tslint']
+                loaders: ['awesome-typescript-loader', 'angular2-router-loader', 'angular2-template-loader', 'tslint-loader']
             }, {
                 test: /\.html$/,
-                loader: 'raw'
+                loader: 'raw-loader'
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
-                loader: 'file?name=assets/[name].[hash].[ext]'
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                loader: 'file?name=assets/[name].[hash].[ext]'
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
             }, {
                 test: /\.css$/,
-                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style', loader: 'css?sourceMap' })
+                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
                 exclude: helpers.root('app', 'theme'),
-                loaders: ['raw', 'sass']
+                loaders: ['raw-loader', 'sass-loader']
             }
         ]
     },

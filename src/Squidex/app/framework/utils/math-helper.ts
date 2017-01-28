@@ -1,6 +1,6 @@
 ﻿/*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
@@ -39,15 +39,15 @@ export module MathHelper {
     }
 
     export function s4(): string {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        return Math.floor((1 + Math.random()) *0x10000).toString(16).substring(1);
     }
 
     export function toRad(degree: number): number {
-        return degree * Math.PI / 180;
+        return degree *Math.PI / 180;
     }
 
     export function toDegree(rad: number): number {
-        return rad * 180 / Math.PI;
+        return rad *180 / Math.PI;
     }
 
     export function simpleCos(degree: number): number {
@@ -63,11 +63,11 @@ export module MathHelper {
     }
 
     export function roundToMultipleOf(value: number, factor: number): number {
-        return Math.round(value / factor) * factor;
+        return Math.round(value / factor) *factor;
     }
 
     export function roundToMultipleOfTwo(value: number): number {
-        return Math.round(value / 2) * 2;
+        return Math.round(value / 2) *2;
     }
 
     export function toPositiveDegree(degree: number): number {

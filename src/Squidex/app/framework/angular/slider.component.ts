@@ -1,6 +1,6 @@
 /*
  * Squidex Headless CMS
- * 
+ *
  * @license
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
@@ -79,7 +79,7 @@ export class SliderComponent implements ControlValueAccessor {
 
         const relativeValue = this.getRelativeX(event);
 
-        this.value = Math.round((relativeValue * (this.max - this.min) + this.min) / this.step) * this.step;
+        this.value = Math.round((relativeValue *(this.max - this.min) + this.min) / this.step) *this.step;
 
         this.updateThumbPosition();
         this.updateTouched();
@@ -89,7 +89,7 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     public onThumbMouseDown(event: MouseEvent): boolean {
-        this.centerStartOffset = event.offsetX - this.thumb.nativeElement.clientWidth * 0.5;
+        this.centerStartOffset = event.offsetX - this.thumb.nativeElement.clientWidth *0.5;
 
         this.startValue = this.value;
 
@@ -117,7 +117,7 @@ export class SliderComponent implements ControlValueAccessor {
 
         const relativeValue = this.getRelativeX(event);
 
-        this.value = Math.round((relativeValue * (this.max - this.min) + this.min) / this.step) * this.step;
+        this.value = Math.round((relativeValue *(this.max - this.min) + this.min) / this.step) *this.step;
 
         this.updateThumbPosition();
         this.updateTouched();
@@ -175,7 +175,7 @@ export class SliderComponent implements ControlValueAccessor {
     private updateThumbPosition() {
         const relativeValue = Math.min(1, Math.max(0, (this.value - this.min) / (this.max - this.min)));
 
-        this.renderer.setElementStyle(this.thumb.nativeElement, 'left', relativeValue * 100 + '%');
+        this.renderer.setElementStyle(this.thumb.nativeElement, 'left', relativeValue *100 + '%');
     }
 
     private releaseMouseHandlers() {
