@@ -7,7 +7,7 @@ npm rebuild phantomjs-prebuilt
 npm run test:coverage
 npm run build:copy
 npm run build
-cd ../..
+cd ./../..
 dotnet restore
 dotnet test tests/Squidex.Core.Tests/project.json
 dotnet test tests/Squidex.Infrastructure.Tests/project.json

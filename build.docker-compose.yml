@@ -1,8 +1,10 @@
 version: '2'
 services:
-  build:
+  squidex-build:
+# Use custom aspnet images where phantomjs is installed
     image: sebastianstehle/aspnetcore-build:1.1.0-projectjson-phantomjs
     volumes:
       - .:/sln
     working_dir: /sln
+# Run the build script on local folder
     entrypoint: ["sh", "./build.sh"]
