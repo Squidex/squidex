@@ -1,7 +1,7 @@
 version: '2'
 services:
-  tradapp-build:
-    image: microsoft/aspnetcore-build:1.1.0-projectjson
+  build:
+    image: sebastianstehle/aspnetcore-build:1.1.0-projectjson-phantomjs
     volumes:
       - .:/sln
     working_dir: /sln

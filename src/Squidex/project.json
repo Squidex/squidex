@@ -86,12 +86,6 @@
   },
 
   "scripts": {
-    "prepublish": [
-      "npm install",
-	  "npm rebuild node-sass",
-      "npm run-script build:copy",
-      "npm run-script build"
-    ],
     "postpublish": [
       "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
     ]
