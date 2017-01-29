@@ -104,11 +104,6 @@ namespace Squidex
             loggerFactory.AddConsole(LogLevel.Debug);
             loggerFactory.AddDebug();
 
-            if (!Environment.IsDevelopment())
-            {
-                app.UseMiddleware<SingleUrlsMiddleware>();
-            }
-
             MapAndUseIdentity(app);
             MapAndUseApi(app);
             MapAndUseFrontend(app);
