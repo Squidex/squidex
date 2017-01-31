@@ -80,6 +80,7 @@ namespace Squidex
                 Configuration.GetSection("identity"));
 
             var builder = new ContainerBuilder();
+            builder.Populate(services);
             builder.RegisterModule<InfrastructureModule>();
             builder.RegisterModule<MongoDbEventStoreModule>();
             builder.RegisterModule<MongoDbModule>();
@@ -87,7 +88,6 @@ namespace Squidex
             builder.RegisterModule<ReadModule>();
             builder.RegisterModule<WebModule>();
             builder.RegisterModule<WriteModule>();
-            builder.Populate(services);
 
             var container = builder.Build();
 
@@ -103,6 +103,8 @@ namespace Squidex
         {
             loggerFactory.AddConsole(LogLevel.Debug);
             loggerFactory.AddDebug();
+
+            app.UseMiddleware<SingleUrlsMiddleware>();
 
             MapAndUseIdentity(app);
             MapAndUseApi(app);

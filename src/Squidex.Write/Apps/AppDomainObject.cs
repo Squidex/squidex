@@ -23,7 +23,7 @@ namespace Squidex.Write.Apps
 {
     public class AppDomainObject : DomainObject
     {
-        private static readonly Language DefaultLanguage = Language.GetLanguage("en");
+        private static readonly Language DefaultLanguage = Language.EN;
         private readonly AppContributors contributors = new AppContributors();
         private readonly AppLanguages languages = new AppLanguages();
         private readonly AppClients clients = new AppClients();

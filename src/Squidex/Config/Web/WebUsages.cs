@@ -22,6 +22,7 @@ namespace Squidex.Config.Web
             {
                 OnPrepareResponse = context =>
                 {
+                    context.Context.Request.GetTypedHeaders();
                     var response = context.Context.Response;
 
                     var headers = response.GetTypedHeaders();

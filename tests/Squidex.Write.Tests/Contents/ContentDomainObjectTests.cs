@@ -25,7 +25,16 @@ namespace Squidex.Write.Contents
     {
         private readonly Guid appId = Guid.NewGuid();
         private readonly ContentDomainObject sut;
-        private readonly ContentData data = new ContentData();
+        private readonly ContentData data =
+            new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddValue("iv", 1));
+        private readonly ContentData otherData =
+            new ContentData()
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddValue("iv", 2));
 
         public ContentDomainObjectTests()
         {
@@ -86,15 +95,77 @@ namespace Squidex.Write.Contents
         public void Update_should_create_events()
         {
             CreateContent();
+            UpdateContent();
 
-            sut.Update(new UpdateContent { Data = data });
+            sut.Update(new UpdateContent { Data = otherData });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new ContentUpdated { Data = data }
+                        new ContentUpdated { Data = otherData }
                     });
+        }
+
+        [Fact]
+        public void Update_should_not_create_event_for_same_data()
+        {
+            CreateContent();
+            UpdateContent();
+
+            sut.Update(new UpdateContent { Data = data });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray().ShouldBeEquivalentTo(new IEvent[0]);
+        }
+
+        [Fact]
+        public void Patch_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.Patch(new PatchContent { Data = data }));
+        }
+
+        [Fact]
+        public void Patch_should_throw_if_schema_is_deleted()
+        {
+            CreateContent();
+            DeleteContent();
+
+            Assert.Throws<ValidationException>(() => sut.Patch(new PatchContent()));
+        }
+
+        [Fact]
+        public void Patch_should_throw_if_command_is_not_valid()
+        {
+            CreateContent();
+
+            Assert.Throws<ValidationException>(() => sut.Patch(new PatchContent()));
+        }
+
+        [Fact]
+        public void Patch_should_create_events()
+        {
+            CreateContent();
+            UpdateContent();
+
+            sut.Patch(new PatchContent { Data = otherData });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
+                .ShouldBeEquivalentTo(
+                    new IEvent[]
+                    {
+                        new ContentUpdated { Data = data.MergeInto(otherData) }
+                    });
+        }
+
+        [Fact]
+        public void Patch_should_not_create_event_for_same_data()
+        {
+            CreateContent();
+            UpdateContent();
+
+            sut.Patch(new PatchContent { Data = data });
+
+            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray().Should().BeEmpty();
         }
 
         [Fact]
@@ -197,6 +268,13 @@ namespace Squidex.Write.Contents
         private void CreateContent()
         {
             sut.Create(new CreateContent { Data = data, AppId = appId });
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void UpdateContent()
+        {
+            sut.Update(new UpdateContent { Data = data, AppId = appId });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

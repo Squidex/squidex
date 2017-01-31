@@ -223,5 +223,39 @@ namespace Squidex.Infrastructure
 
             Assert.False(lhs.EqualsDictionary(rhs));
         }
+
+        [Fact]
+        public void Dictionary_should_return_same_hashcode_for_equal_dictionaries()
+        {
+            var lhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+            var rhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+
+            Assert.Equal(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
+        }
+
+        [Fact]
+        public void Dictionary_should_return_different_hashcode_for_different_dictionaries()
+        {
+            var lhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            };
+            var rhs = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [3] = 3
+            };
+
+            Assert.NotEqual(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
+        }
     }
 }

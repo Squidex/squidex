@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_valid_language()
         {
-            var input = Tuple.Create(Language.GetLanguage("de"));
+            var input = Tuple.Create(Language.DE);
             var json = JsonConvert.SerializeObject(input, serializerSettings);
             var output = JsonConvert.DeserializeObject<Tuple<Language>>(json, serializerSettings);
 
@@ -81,6 +81,31 @@ namespace Squidex.Infrastructure
 
             Assert.Equal(key, language.Iso2Code);
             Assert.Equal(englishName, language.EnglishName);
+        }
+
+        [Theory]
+        [InlineData("iv", "iv")]
+        [InlineData("en", "en")]
+        [InlineData("EN", "en")]
+        [InlineData("en ", "en")]
+        public void Should_parse_valid_languages(string input, string languageCode)
+        {
+            var language = Language.TryParse(input);
+            
+            Assert.Equal(language, Language.GetLanguage(languageCode));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("xx")]
+        [InlineData("invalid")]
+        [InlineData(null)]
+        public void Should_parse_invalid_languages(string input)
+        {
+            var language = Language.TryParse(input);
+
+            Assert.Null(language);
         }
     }
 }

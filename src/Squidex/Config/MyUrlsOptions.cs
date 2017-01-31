@@ -12,6 +12,8 @@ namespace Squidex.Config
 {
     public sealed class MyUrlsOptions
     {
+        public bool EnforceSSL { get; set; }
+
         public string BaseUrl { get; set; }
 
         public string BuildUrl(string path, bool trailingSlash = true)

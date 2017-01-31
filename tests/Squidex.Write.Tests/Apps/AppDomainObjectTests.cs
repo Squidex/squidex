@@ -63,8 +63,8 @@ namespace Squidex.Write.Apps
                     {
                         new AppCreated { Name = TestName },
                         new AppContributorAssigned { ContributorId = user.Identifier, Permission = PermissionLevel.Owner },
-                        new AppLanguageAdded { Language = Language.GetLanguage("en") },
-                        new AppMasterLanguageSet { Language  = Language.GetLanguage("en") }
+                        new AppLanguageAdded { Language = Language.EN },
+                        new AppMasterLanguageSet { Language  = Language.EN }
                     });
         }
 
@@ -290,7 +290,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public void AddLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") }));
+            Assert.Throws<DomainException>(() => sut.AddLanguage(new AddLanguage { Language = Language.DE }));
         }
 
         [Fact]
@@ -306,7 +306,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("en") }));
+            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage { Language = Language.EN }));
         }
 
         [Fact]
@@ -314,20 +314,20 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
+            sut.AddLanguage(new AddLanguage { Language = Language.DE });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppLanguageAdded { Language = Language.GetLanguage("de") }
+                        new AppLanguageAdded { Language = Language.DE }
                     });
         }
 
         [Fact]
         public void RemoveLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("en") }));
+            Assert.Throws<DomainException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.EN }));
         }
 
         [Fact]
@@ -343,7 +343,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("de") }));
+            Assert.Throws<DomainObjectNotFoundException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.DE }));
         }
 
         [Fact]
@@ -351,7 +351,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("en") }));
+            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.EN }));
         }
 
         [Fact]
@@ -359,21 +359,21 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
-            sut.RemoveLanguage(new RemoveLanguage { Language = Language.GetLanguage("de") });
+            sut.AddLanguage(new AddLanguage { Language = Language.DE });
+            sut.RemoveLanguage(new RemoveLanguage { Language = Language.DE });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppLanguageRemoved { Language = Language.GetLanguage("de") }
+                        new AppLanguageRemoved { Language = Language.DE }
                     });
         }
 
         [Fact]
         public void SetMasterLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("en") }));
+            Assert.Throws<DomainException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.EN }));
         }
 
         [Fact]
@@ -389,7 +389,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("de") }));
+            Assert.Throws<DomainObjectNotFoundException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.DE }));
         }
 
         [Fact]
@@ -397,7 +397,7 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("en") }));
+            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.EN }));
         }
 
         [Fact]
@@ -405,14 +405,14 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AddLanguage(new AddLanguage { Language = Language.GetLanguage("de") });
-            sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.GetLanguage("de") });
+            sut.AddLanguage(new AddLanguage { Language = Language.DE });
+            sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.DE });
 
             sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
                 .ShouldBeEquivalentTo(
                     new IEvent[]
                     {
-                        new AppMasterLanguageSet { Language = Language.GetLanguage("de") }
+                        new AppMasterLanguageSet { Language = Language.DE }
                     });
         }
 

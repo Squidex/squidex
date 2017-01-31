@@ -33,7 +33,7 @@ namespace Squidex.Write.Apps
         private readonly AppDomainObject app;
         private readonly RefToken subjectId = new RefToken("subject", Guid.NewGuid().ToString());
         private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
-        private readonly Language language = Language.GetLanguage("de");
+        private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientName = "client";

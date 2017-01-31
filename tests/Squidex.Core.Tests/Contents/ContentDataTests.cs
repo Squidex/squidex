@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -26,8 +25,8 @@ namespace Squidex.Core.Contents
                 .AddOrUpdateField(
                     new NumberField(3, "field3", new NumberFieldProperties { IsLocalizable = false }))
                 .HideField(3);
-        private readonly Language[] languages = { Language.GetLanguage("de"), Language.GetLanguage("en") };
-        private readonly Language masterLanguage = Language.GetLanguage("en");
+        private readonly Language[] languages = { Language.DE, Language.EN };
+        private readonly Language masterLanguage = Language.EN;
 
         [Fact]
         public void Should_convert_to_id_model()
@@ -56,10 +55,10 @@ namespace Squidex.Core.Contents
                     .AddField("2",
                         new ContentFieldData()
                             .AddValue("iv", 3));
-            
-            actual.ShouldBeEquivalentTo(expected);
-        }
 
+            Assert.Equal(expected, actual);
+        }
+        
         [Fact]
         public void Should_convert_to_from_id_model()
         {
@@ -87,22 +86,18 @@ namespace Squidex.Core.Contents
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", 3));
-
-            actual.ShouldBeEquivalentTo(expected);
+            
+            Assert.Equal(expected, actual);
         }
-
         [Fact]
         public void Should_cleanup_old_fields()
         {
             var expected =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field1"] = new Dictionary<string, JToken>
-                    {
-                        ["en"] = "en_string",
-                        ["de"] = "de_string"
-                    }
-                };
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"));
 
             var input =
                 new ContentData()
@@ -114,23 +109,19 @@ namespace Squidex.Core.Contents
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
 
-            var output = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
 
-            output.ShouldBeEquivalentTo(expected);
+            Assert.Equal(expected, actual);
         }
-
         [Fact]
         public void Should_cleanup_old_languages()
         {
             var expected =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field1"] = new Dictionary<string, JToken>
-                    {
-                        ["en"] = "en_string",
-                        ["de"] = "de_string"
-                    }
-                };
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"));
 
             var input =
                 new ContentData()
@@ -140,22 +131,19 @@ namespace Squidex.Core.Contents
                             .AddValue("de", "de_string")
                             .AddValue("it", "it_string"));
 
-            var output = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
 
-            output.ShouldBeEquivalentTo(expected);
+            Assert.Equal(expected, actual);
         }
-
+        
         [Fact]
         public void Should_provide_invariant_from_master_language()
         {
             var expected =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field2"] = new Dictionary<string, JToken>
-                    {
-                        ["iv"] = 3
-                    }
-                };
+                new ContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
 
             var input =
                 new ContentData()
@@ -164,22 +152,19 @@ namespace Squidex.Core.Contents
                             .AddValue("de", 2)
                             .AddValue("en", 3));
 
-            var output = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
 
-            output.ShouldBeEquivalentTo(expected);
+            Assert.Equal(expected, actual);
         }
-
+        
         [Fact]
         public void Should_provide_invariant_from_first_language()
         {
             var expected =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field2"] = new Dictionary<string, JToken>
-                    {
-                        ["iv"] = 2
-                    }
-                };
+                new ContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
 
             var input =
                 new ContentData()
@@ -188,35 +173,167 @@ namespace Squidex.Core.Contents
                             .AddValue("de", 2)
                             .AddValue("it", 3));
 
-            var output = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
 
-            output.ShouldBeEquivalentTo(expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         public void Should_not_include_hidden_field()
         {
             var expected =
-                new Dictionary<string, Dictionary<string, JToken>>
-                {
-                    ["field2"] = new Dictionary<string, JToken>
-                    {
-                        ["iv"] = 2
-                    }
-                };
+                new ContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 5));
 
             var input =
                 new ContentData()
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddValue("iv", 5))
                     .AddField("field3",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var output = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
 
-            output.ShouldBeEquivalentTo(expected);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_return_original_when_no_language_preferences_defined()
+        {
+            var data =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 1));
+
+            Assert.Same(data, data.ToLanguageModel());
+        }
+
+        [Fact]
+        public void Should_return_flat_list_when_languages_specified()
+        {
+            var data =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("de", 1)
+                            .AddValue("en", 2))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("de", null)
+                            .AddValue("en", 4))
+                    .AddField("field3",
+                        new ContentFieldData()
+                            .AddValue("en", 6))
+                    .AddField("field4",
+                        new ContentFieldData()
+                            .AddValue("it", 7));
+
+            var output = (Dictionary<string, JToken>)data.ToLanguageModel(new List<Language> { Language.DE, Language.EN });
+
+            var expected = new Dictionary<string, JToken>
+            {
+                { "field1", 1 },
+                { "field2", 4 },
+                { "field3", 6 },
+            };
+
+            Assert.True(expected.EqualsDictionary(output));
+        }
+
+        [Fact]
+        public void Should_merge_two_data()
+        {
+            var lhs =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("de", 2));
+
+            var rhs =
+                new ContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("en", 3))
+                    .AddField("field3",
+                        new ContentFieldData()
+                            .AddValue("iv", 4));
+
+            var expected =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("de", 2)
+                            .AddValue("en", 3))
+                    .AddField("field3",
+                        new ContentFieldData()
+                            .AddValue("iv", 4));
+
+            var actual = lhs.MergeInto(rhs);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_be_equal_when_data_have_same_structure()
+        {
+            var lhs =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 2))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var rhs =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 2))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            Assert.True(lhs.Equals(rhs));
+            Assert.True(lhs.Equals((object)rhs));
+            Assert.Equal(lhs.GetHashCode(), rhs.GetHashCode());
+        }
+
+        [Fact]
+        public void Should_not_be_equal_when_data_have_not_same_structure()
+        {
+            var lhs =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 2))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var rhs =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", 2))
+                    .AddField("field3",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            Assert.False(lhs.Equals(rhs));
+            Assert.False(lhs.Equals((object)rhs));
+            Assert.NotEqual(lhs.GetHashCode(), rhs.GetHashCode());
         }
     }
 }

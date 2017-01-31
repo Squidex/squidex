@@ -17,7 +17,7 @@ namespace Squidex.Core.Schemas
 {
     public class SchemaValidationTests
     {
-        private readonly HashSet<Language> languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
+        private readonly HashSet<Language> languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
         private readonly List<ValidationError> errors = new List<ValidationError>();
         private Schema sut = Schema.Create("my-name", new SchemaProperties());
 
@@ -59,7 +59,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_non_localizable_field_contains_language()
+        public async Task Should_add_error_non_localizable_data_field_contains_language()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
 
@@ -98,7 +98,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_if_required_field_is_not_in_bag()
+        public async Task Should_add_error_if_required_data_field_is_not_in_bag()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
 
@@ -115,7 +115,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_if_value_contains_invalid_language()
+        public async Task Should_add_error_if_data_contains_invalid_language()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
@@ -136,7 +136,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_error_if_value_contains_unsupported_language()
+        public async Task Should_add_error_if_data_contains_unsupported_language()
         {
             sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
@@ -148,6 +148,133 @@ namespace Squidex.Core.Schemas
                             .AddValue("it", 1));
 
             await sut.ValidateAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field has an unsupported language 'es'", "my-field"),
+                    new ValidationError("my-field has an unsupported language 'it'", "my-field")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_validating_partial_data_with_unknown_field()
+        {
+            var data =
+                new ContentData()
+                    .AddField("unknown",
+                        new ContentFieldData());
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("unknown is not a known field", "unknown")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_validating_partial_data_with_invalid_field()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
+
+            var data =
+                new ContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .SetValue(1000));
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field must be less than '100'", "my-field")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_non_localizable_partial_data_field_contains_language()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
+
+            var data =
+                new ContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("es", 1)
+                            .AddValue("it", 1));
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field can only contain a single entry for invariant language (iv)", "my-field")
+                });
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_validating_partial_data_with_invalid_localizable_field()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
+
+            var data =
+                new ContentData();
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_required_partial_data_field_is_not_in_bag()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
+
+            var data =
+                new ContentData();
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_partial_data_contains_invalid_language()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+
+            var data =
+                new ContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("de", 1)
+                            .AddValue("xx", 1));
+
+            await sut.ValidatePartialAsync(data, errors, languages);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field has an invalid language 'xx'", "my-field")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_partial_data_contains_unsupported_language()
+        {
+            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+
+            var data =
+                new ContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("es", 1)
+                            .AddValue("it", 1));
+
+            await sut.ValidatePartialAsync(data, errors, languages);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

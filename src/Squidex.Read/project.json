@@ -2,7 +2,7 @@
   "dependencies": {
     "Microsoft.Extensions.Caching.Memory": "1.1.0",
     "MongoDB.Driver": "2.4.1",
-    "NodaTime": "2.0.0-alpha20160729",
+    "NodaTime": "2.0.0-beta20170123",
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*"

@@ -47,7 +47,7 @@ namespace Squidex.Write.Contents
 
             sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
 
-            appEntity.Setup(x => x.Languages).Returns(new[] { Language.GetLanguage("de") });
+            appEntity.Setup(x => x.Languages).Returns(new[] { Language.DE });
             appProvider.Setup(x => x.FindAppByIdAsync(appId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);
@@ -100,6 +100,34 @@ namespace Squidex.Write.Contents
             CreateContent();
 
             var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = data };
+            var context = new CommandContext(command);
+
+            await TestUpdate(content, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task Patch_should_throw_exception_if_data_is_not_valid()
+        {
+            CreateContent();
+
+            var command = new PatchContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new ContentData() };
+            var context = new CommandContext(command);
+
+            await TestUpdate(content, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task Patch_should_update_domain_object()
+        {
+            CreateContent();
+
+            var command = new PatchContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = data };
             var context = new CommandContext(command);
 
             await TestUpdate(content, async _ =>

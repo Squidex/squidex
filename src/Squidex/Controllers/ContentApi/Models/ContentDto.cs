@@ -36,7 +36,7 @@ namespace Squidex.Controllers.ContentApi.Models
         /// The data of the content item.
         /// </summary>
         [Required]
-        public ContentData Data { get; set; }
+        public object Data { get; set; }
 
         /// <summary>
         /// The date and time when the content element has been created.

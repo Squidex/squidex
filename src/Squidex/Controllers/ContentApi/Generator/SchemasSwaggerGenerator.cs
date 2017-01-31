@@ -185,6 +185,7 @@ When you change the field to be localizable the value will become the value for 
                 GenerateSchemaCreateOperation(schema, schemaName),
                 GenerateSchemaGetOperation(schema, schemaName),
                 GenerateSchemaUpdateOperation(schema, schemaName),
+                GenerateSchemaPatchOperation(schema, schemaName),
                 GenerateSchemaPublishOperation(schema, schemaName),
                 GenerateSchemaUnpublishOperation(schema, schemaName),
                 GenerateSchemaDeleteOperation(schema, schemaName)
@@ -247,6 +248,21 @@ When you change the field to be localizable the value will become the value for 
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
                 operation.Summary = $"Update a {schemaName} content element.";
+
+                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+
+                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
+
+                operation.Responses.Add("204",
+                    new SwaggerResponse { Description = $"{schemaName} element updated." });
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName)
+        {
+            return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
+            {
+                operation.Summary = $"Update a {schemaName} content element partially.";
 
                 var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
 

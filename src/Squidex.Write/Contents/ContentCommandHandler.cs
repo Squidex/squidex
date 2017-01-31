@@ -57,6 +57,13 @@ namespace Squidex.Write.Contents
             await handler.UpdateAsync<ContentDomainObject>(command, s => s.Update(command));
         }
 
+        protected async Task On(PatchContent command, CommandContext context)
+        {
+            await ValidateAsync(command, () => "Failed to patch content");
+
+            await handler.UpdateAsync<ContentDomainObject>(command, s => s.Patch(command));
+        }
+
         protected Task On(PublishContent command, CommandContext context)
         {
             return handler.UpdateAsync<ContentDomainObject>(command, s => s.Publish(command));

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Contents
 {
-    public sealed class ContentFieldData : Dictionary<string, JToken>
+    public sealed class ContentFieldData : Dictionary<string, JToken>, IEquatable<ContentFieldData>
     {
         public ContentFieldData()
             : base(StringComparer.OrdinalIgnoreCase)
@@ -34,6 +34,21 @@ namespace Squidex.Core.Contents
             this[language] = value;
 
             return this;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ContentFieldData);
+        }
+
+        public bool Equals(ContentFieldData other)
+        {
+            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return this.DictionaryHashCode();
         }
     }
 }

@@ -38,8 +38,8 @@ namespace Squidex.Read.MongoDb.Contents
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly HashSet<Language> languages = new HashSet<Language>
         {
-            Language.GetLanguage("en"),
-            Language.GetLanguage("de")
+            Language.EN,
+            Language.DE
         };
 
         [Fact]

@@ -127,12 +127,12 @@ namespace Squidex.Infrastructure
         
         public Instant ToInstant(CultureInfo culture)
         {
-            return ToOrParseValue(culture, x => InstantPattern.GeneralPattern.Parse(x).Value);
+            return ToOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
         }
         
         public Instant? ToNullableInstant(CultureInfo culture)
         {
-            return ToNullableOrParseValue(culture, x => InstantPattern.GeneralPattern.Parse(x).Value);
+            return ToNullableOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
         }
 
         public Guid ToGuid(CultureInfo culture)

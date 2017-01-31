@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Core.Contents;
 using Squidex.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -22,6 +23,7 @@ namespace Squidex.Write.Contents
         private bool isDeleted;
         private bool isCreated;
         private bool isPublished;
+        private ContentData data;
 
         public bool IsDeleted
         {
@@ -41,6 +43,13 @@ namespace Squidex.Write.Contents
         protected void On(ContentCreated @event)
         {
             isCreated = true;
+
+            data = @event.Data;
+        }
+
+        protected void On(ContentUpdated @event)
+        {
+            data = @event.Data;
         }
 
         protected void On(ContentPublished @event)
@@ -65,17 +74,6 @@ namespace Squidex.Write.Contents
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentCreated()));
-
-            return this;
-        }
-
-        public ContentDomainObject Update(UpdateContent command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot update content");
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
 
             return this;
         }
@@ -109,6 +107,36 @@ namespace Squidex.Write.Contents
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentUnpublished()));
+
+            return this;
+        }
+
+        public ContentDomainObject Update(UpdateContent command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot update content");
+
+            VerifyCreatedAndNotDeleted();
+
+            if (!command.Data.Equals(data))
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
+            }
+
+            return this;
+        }
+
+        public ContentDomainObject Patch(PatchContent command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot patch content");
+
+            VerifyCreatedAndNotDeleted();
+
+            var newData = data.MergeInto(command.Data);
+
+            if (!newData.Equals(data))
+            {
+                RaiseEvent(new ContentUpdated { Data = newData });
+            }
 
             return this;
         }

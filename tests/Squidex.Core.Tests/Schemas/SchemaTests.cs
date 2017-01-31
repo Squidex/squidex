@@ -258,7 +258,7 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new NumberField(4, "age",
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
 
-            var languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
+            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
 
             var json = schema.BuildSchema(languages, (n, s) => s).ToJson();
 
@@ -279,7 +279,7 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new NumberField(4, "age",
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
 
-            var languages = new HashSet<Language>(new[] { Language.GetLanguage("de"), Language.GetLanguage("en") });
+            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
 
             var edmModel = schema.BuildEdmType(languages, x => x);
 

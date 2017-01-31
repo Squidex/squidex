@@ -10,7 +10,7 @@
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "Moq": "4.6.38-alpha",
     "Squidex.Infrastructure": "1.0.0-*",
-    "xunit": "2.2.0-beta4-build3444"
+    "xunit": "2.2.0-beta5-build3474"
   },
   "frameworks": {
     "netcoreapp1.1": {
@@ -28,7 +28,7 @@
     "defaultNamespace": "Squidex.Core.Tests"
   },
   "tools": {
-    "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"
+    "Microsoft.DotNet.Watcher.Tools": "1.1.0-preview4-final"
   },
   "version": "1.0.0-*"
 }

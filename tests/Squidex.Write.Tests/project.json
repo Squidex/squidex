@@ -13,7 +13,7 @@
     "Squidex.Core": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
     "Squidex.Write": "1.0.0-*",
-    "xunit": "2.2.0-beta4-build3444"
+    "xunit": "2.2.0-beta5-build3474"
   },
   "frameworks": {
     "netcoreapp1.1": {
@@ -31,7 +31,7 @@
     "defaultNamespace": "Squidex.Write"
   },
   "tools": {
-    "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"
+    "Microsoft.DotNet.Watcher.Tools": "1.1.0-preview4-final"
   },
   "version": "1.0.0-*"
 }

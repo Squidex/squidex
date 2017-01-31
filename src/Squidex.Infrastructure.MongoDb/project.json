@@ -1,11 +1,11 @@
-﻿{
+{
   "version": "1.0.0-*",
   "dependencies": {
-    "Autofac": "4.2.1",
+    "Autofac": "4.3.0",
     "Microsoft.Extensions.Logging": "1.1.0",
     "MongoDB.Driver": "2.4.1",
-    "Newtonsoft.Json": "9.0.2-beta1",
-    "NodaTime": "2.0.0-alpha20160729",
+    "Newtonsoft.Json": "9.0.2-beta2",
+    "NodaTime": "2.0.0-beta20170123",
     "Squidex.Infrastructure": "1.0.0-*",
     "System.Linq": "4.3.0",
     "System.Reactive": "3.1.1",

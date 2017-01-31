@@ -130,6 +130,17 @@ namespace Squidex.Controllers.ContentApi
             return NoContent();
         }
 
+        [HttpPatch]
+        [Route("content/{app}/{name}/{id}")]
+        public async Task<IActionResult> PatchContent(Guid id, [FromBody] ContentData request)
+        {
+            var command = new PatchContent { AggregateId = id, Data = request };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish")]
         public async Task<IActionResult> PublishContent(Guid id)

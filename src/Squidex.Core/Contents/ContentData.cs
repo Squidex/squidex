@@ -12,13 +12,19 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+// ReSharper disable InvertIf
 
 namespace Squidex.Core.Contents
 {
-    public sealed class ContentData : Dictionary<string, ContentFieldData>
+    public sealed class ContentData : Dictionary<string, ContentFieldData>, IEquatable<ContentData>
     {
         public ContentData()
             : base(StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
+        public ContentData(IDictionary<string, ContentFieldData> copy)
+            : base(copy, StringComparer.OrdinalIgnoreCase)
         {
         }
 
@@ -31,24 +37,25 @@ namespace Squidex.Core.Contents
             return this;
         }
 
-        public ContentData ToNameModel(Schema schema)
+        public ContentData MergeInto(ContentData other)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(other, nameof(other));
 
-            var result = new ContentData();
+            var result = new ContentData(this);
 
-            foreach (var fieldValue in this)
+            if (ReferenceEquals(other, this))
             {
-                long fieldId;
+                return result;
+            }
 
-                Field field;
+            foreach (var otherValue in other)
+            {
+                var fieldValue = result.GetOrAdd(otherValue.Key, x => new ContentFieldData());
 
-                if (!long.TryParse(fieldValue.Key, out fieldId) || !schema.Fields.TryGetValue(fieldId, out field))
+                foreach (var value in otherValue.Value)
                 {
-                    continue;
+                    fieldValue[value.Key] = value.Value;
                 }
-
-                result[field.Name] = fieldValue.Value;
             }
 
             return result;
@@ -70,6 +77,29 @@ namespace Squidex.Core.Contents
                 }
 
                 result[field.Id.ToString()] = fieldValue.Value;
+            }
+
+            return result;
+        }
+
+        public ContentData ToNameModel(Schema schema)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new ContentData();
+
+            foreach (var fieldValue in this)
+            {
+                long fieldId;
+
+                Field field;
+
+                if (!long.TryParse(fieldValue.Key, out fieldId) || !schema.Fields.TryGetValue(fieldId, out field))
+                {
+                    continue;
+                }
+
+                result[field.Name] = fieldValue.Value;
             }
 
             return result;
@@ -133,6 +163,52 @@ namespace Squidex.Core.Contents
             }
 
             return result;
+        }
+
+        public object ToLanguageModel(IReadOnlyCollection<Language> languagePreferences = null)
+        {
+            if (languagePreferences == null)
+            {
+                return this;
+            }
+
+            var result = new Dictionary<string, JToken>();
+
+            foreach (var fieldValue in this)
+            {
+                var fieldValues = fieldValue.Value;
+
+                foreach (var language in languagePreferences)
+                {
+                    var languageCode = language.Iso2Code;
+
+                    JToken value;
+
+                    if (fieldValues.TryGetValue(languageCode, out value) && value != null)
+                    {
+                        result[fieldValue.Key] = value;
+
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ContentData);
+        }
+
+        public bool Equals(ContentData other)
+        {
+            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return this.DictionaryHashCode();
         }
     }
 }

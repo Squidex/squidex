@@ -203,17 +203,77 @@ namespace Squidex.Core.Schemas
             return schema;
         }
 
+        public async Task ValidatePartialAsync(ContentData data, IList<ValidationError> errors, HashSet<Language> languages)
+        {
+            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(errors, nameof(errors));
+
+            foreach (var fieldData in data)
+            {
+                Field field;
+
+                if (!fieldsByName.TryGetValue(fieldData.Key, out field))
+                {
+                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
+                }
+                else
+                {
+                    var fieldErrors = new List<string>();
+
+                    if (field.RawProperties.IsLocalizable)
+                    {
+                        foreach (var languageValue in fieldData.Value)
+                        {
+                            Language language;
+
+                            if (!Language.TryGetLanguage(languageValue.Key, out language))
+                            {
+                                fieldErrors.Add($"{field.Name} has an invalid language '{languageValue.Key}'");
+                            }
+                            else if (!languages.Contains(language))
+                            {
+                                fieldErrors.Add($"{field.Name} has an unsupported language '{languageValue.Key}'");
+                            }
+                            else
+                            {
+                                await field.ValidateAsync(languageValue.Value, fieldErrors, language);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (fieldData.Value.Keys.Any(x => x != Language.Invariant.Iso2Code))
+                        {
+                            fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
+                        }
+
+                        JToken value;
+
+                        if (fieldData.Value.TryGetValue(Language.Invariant.Iso2Code, out value))
+                        {
+                            await field.ValidateAsync(value, fieldErrors);
+                        }
+                    }
+
+                    foreach (var error in fieldErrors)
+                    {
+                        errors.Add(new ValidationError(error, field.Name));
+                    }
+                }
+            }
+        }
+
         public async Task ValidateAsync(ContentData data, IList<ValidationError> errors, HashSet<Language> languages)
         {
             Guard.NotNull(data, nameof(data));
             Guard.NotNull(errors, nameof(errors));
             Guard.NotEmpty(languages, nameof(languages));
 
-            foreach (var fieldValue in data)
+            foreach (var fieldData in data)
             {
-                if (!fieldsByName.ContainsKey(fieldValue.Key))
+                if (!fieldsByName.ContainsKey(fieldData.Key))
                 {
-                    errors.Add(new ValidationError($"{fieldValue.Key} is not a known field", fieldValue.Key));
+                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
                 }
             }
 

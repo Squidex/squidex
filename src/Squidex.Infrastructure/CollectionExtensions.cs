@@ -43,6 +43,8 @@ namespace Squidex.Infrastructure
 
         public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer)
         {
+            Guard.NotNull(comparer, nameof(comparer));
+
             var hashCodes = collection.Where(x => x != null).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
 
             var hashCode = 17;
@@ -55,9 +57,33 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
+        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
+        {
+            return DictionaryHashCode(dictionary, EqualityComparer<TValue>.Default);
+        }
+
+        public static int DictionaryHashCode<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEqualityComparer<TValue> comparer)
+        {
+            Guard.NotNull(comparer, nameof(comparer));
+
+            var hashCode = 17;
+
+            foreach (var kvp in dictionary.OrderBy(x => x.Key))
+            {
+                hashCode = hashCode * 23 + kvp.Key.GetHashCode();
+
+                if (kvp.Value != null)
+                {
+                    hashCode = hashCode * 23 + comparer.GetHashCode(kvp.Value);
+                }
+            }
+
+            return hashCode;
+        }
+
         public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IDictionary<TKey, TValue> other)
         {
-            return Equals(dictionary, other) || (other != null && dictionary.Count == other.Count && !dictionary.Except(other).Any());
+            return other != null && dictionary.Count == other.Count && !dictionary.Except(other).Any();
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
