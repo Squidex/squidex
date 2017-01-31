@@ -16,7 +16,8 @@ import {
     DecimalSeparatorConfig,
     SqxFrameworkModule,
     SqxSharedModule,
-    TitlesConfig
+    TitlesConfig,
+    UserReportConfig
 } from './shared';
 
 import { SqxShellModule } from './shell';
@@ -39,6 +40,10 @@ export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
+export function configUserReport() {
+    return new UserReportConfig('5e3e70c2-19b8-493a-9fa0-af240d50e0ba');
+}
+
 @NgModule({
     imports: [
         BrowserModule,
@@ -54,7 +59,8 @@ export function configCurrency() {
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
-        { provide: TitlesConfig, useFactory: configTitles }
+        { provide: TitlesConfig, useFactory: configTitles },
+        { provide: UserReportConfig, useFactory: configUserReport }
     ],
     bootstrap: [AppComponent]
 })

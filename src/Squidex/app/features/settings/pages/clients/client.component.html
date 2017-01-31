@@ -8,13 +8,13 @@
 
         <tr>
             <td colspan="2">
-                <div class="float-xs-right">
+                <div class="float-right">
                     <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
                 </div>
 
                 <div class="client-header">
                     <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
-                        <div class="form-group">
+                        <div class="form-group mr-2">
                             <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
                             
                             <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />

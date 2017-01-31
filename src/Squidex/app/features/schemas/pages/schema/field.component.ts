@@ -47,7 +47,7 @@ export class FieldComponent implements OnInit {
     @Output()
     public deleting = new EventEmitter<FieldDto>();
 
-    public isEditing: boolean = false;
+    public isEditing = false;
     public selectedTab = 0;
 
     public get displayName() {

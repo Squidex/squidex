@@ -14,6 +14,11 @@ body {
         line-height: 2.2rem;
     }
 
+    &-fixed-top {
+        @include fixed(0, 0, auto, 0);
+        z-index: 10000;
+    }
+
     .dropdown-menu {
         top: 2.6rem;
     }
@@ -107,6 +112,7 @@ body {
 @mixin link-button($color) {
     & {
         color: $color;
+        cursor: pointer;
     }
 
     &:focus {
@@ -115,6 +121,12 @@ body {
 
     &:disabled {
         @include opacity(.4);
+    }
+
+    &:disabled,
+    &.disabled {
+        cursor: not-allowed;
+        border: 0;
     }
 
     &:focus,

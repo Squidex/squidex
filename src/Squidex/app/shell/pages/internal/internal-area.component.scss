@@ -3,6 +3,7 @@
 
 .navbar {
     @include box-shadow(0, 4px, 4px, .2px);
+    display: block;
 }
 
 .navbar-brand {
@@ -14,6 +15,7 @@
     margin-right: 2rem;
     font-size: 1.8rem;
     text-align: center;
+    float: left;
 }
 
 .notification {

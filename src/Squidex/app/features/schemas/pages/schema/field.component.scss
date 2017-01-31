@@ -24,6 +24,9 @@ $field-header: #e7ebef;
     &-edit-button {
         & {
             color: $color-theme-blue;
+            line-height: 1rem;
+            font-size: 1rem;
+            font-weight: normal;
         }
 
         &:hover {

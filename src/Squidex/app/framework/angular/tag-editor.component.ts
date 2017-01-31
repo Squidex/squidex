@@ -71,10 +71,10 @@ export class TagEditorComponent implements ControlValueAccessor {
     public converter: Converter = new NoopConverter();
 
     @Input()
-    public useDefaultValue: boolean = true;
+    public useDefaultValue = true;
 
     @Input()
-    public inputName: string = 'tag-editor';
+    public inputName = 'tag-editor';
 
     public items: any[] = [];
 

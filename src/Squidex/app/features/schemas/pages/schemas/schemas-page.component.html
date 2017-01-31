@@ -25,19 +25,19 @@
 
     <div class="panel-main">
         <div class="panel-content">
-            <ul class="nav nav-pills nav-stacked nav-dark nav-dark-bordered">
+            <ul class="nav nav-pills flex-column nav-dark nav-dark-bordered">
                 <li class="nav-item" *ngFor="let schema of schemasFiltered">
                     <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
                         <div class="row">
-                            <div class="col-xs-4">
+                            <div class="col col-4">
                                 <span class="schema-name">{{schema|displayName}}</span> 
                             </div>
-                            <div class="col-xs-4">
+                            <div class="col col-4">
                                 <span class="schema-user">
                                     <i class="icon-person"></i> {{userName(schema.lastModifiedBy, true) | async}}
                                 </span>
                             </div>
-                            <div class="col-xs-4 schema-modified">
+                            <div class="col col-4 schema-modified">
                                 <span class="item-modified">{{schema.lastModified | fromNow}}</span>
                                 <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
                             </div>

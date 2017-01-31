@@ -25,10 +25,10 @@ import { PanelService } from './../services/panel.service';
 })
 export class PanelComponent implements OnDestroy, AfterViewInit {
     @Input()
-    public theme: string = 'light';
+    public theme = 'light';
 
     @Input()
-    public panelWidth: string = '10rem';
+    public panelWidth = '10rem';
 
     @ViewChild('panel')
     public panel: ElementRef;

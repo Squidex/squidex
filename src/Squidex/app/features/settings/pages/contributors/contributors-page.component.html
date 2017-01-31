@@ -12,7 +12,7 @@
     </div>
 
     <div class="panel-main">
-        <div class="panel-content">
+        <div class="panel-content panel-content-scroll">
             <table class="table table-items table-fixed">
                 <colgroup>
                     <col style="width: 70px" />
@@ -69,7 +69,7 @@
             
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
-                    <div class="form-group">
+                    <div class="form-group mr-2">
                         <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="contributor"></sqx-autocomplete>
                     </div>
 

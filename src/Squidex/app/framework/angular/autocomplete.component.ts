@@ -52,7 +52,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public source: AutocompleteSource;
 
     @Input()
-    public inputName: string = 'autocompletion';
+    public inputName = 'autocompletion';
 
     public items: AutocompleteItem[] = [];
     public itemSelection = -1;

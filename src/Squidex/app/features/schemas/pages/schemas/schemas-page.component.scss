@@ -13,9 +13,11 @@ $button-size: calc(2.5rem - 2px);
     margin-right: .4rem;
     min-width: $button-size;
     max-width: $button-size;
+    padding: 0;
     padding-left: 0;
     padding-right: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    line-height: 2.5rem;
 }
 
 .schema {
