@@ -36,6 +36,10 @@
     padding: 1rem 1.5rem;
 }
 
+.icon-plus {
+    font-size: .8rem;
+}
+
 .all-apps {
     & {
         position: relative;
@@ -47,8 +51,13 @@
 
     &-pill {
         @include absolute(.8rem, .625rem, auto, auto);
+        @include border-radius(8px);
+        padding: 0 .6rem;
         background: $color-theme-blue-lightest;
         border: 0;
+        line-height: 1.5rem;
+        font-size: .9rem;
+        font-weight: normal;
         color: $color-theme-blue;
     }
 }
