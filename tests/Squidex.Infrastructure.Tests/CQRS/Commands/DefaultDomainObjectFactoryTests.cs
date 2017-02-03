@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AutofacDomainObjectFactoryTests.cs
+//  DefaultDomainObjectFactoryTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,14 @@
 // ==========================================================================
 
 using System;
-using Autofac;
+using Moq;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
+// ReSharper disable ConvertToLambdaExpression
 
-namespace Squidex.Infrastructure.CQRS.Autofac
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public class AutofacDomainObjectFactoryTests
+    public class DefaultDomainObjectFactoryTests
     {
         private sealed class DO : DomainObject
         {
@@ -29,16 +30,20 @@ namespace Squidex.Infrastructure.CQRS.Autofac
         [Fact]
         public void Should_create_domain_object_with_autofac()
         {
-            var containerBuilder = new ContainerBuilder();
+            var serviceProvider = new Mock<IServiceProvider>();
 
-            containerBuilder.RegisterType<DO>()
-                .AsSelf();
+            var factoryFunction = new DomainObjectFactoryFunction<DO>(passedId =>
+            {
+                return new DO(passedId, 0);
+            });
 
-            var factory = new AutofacDomainObjectFactory(containerBuilder.Build());
+            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>))).Returns(factoryFunction);
+
+            var sut = new DefaultDomainObjectFactory(serviceProvider.Object);
 
             var id = Guid.NewGuid();
 
-            var domainObject = factory.CreateNew(typeof(DO), id);
+            var domainObject = sut.CreateNew(typeof(DO), id);
 
             Assert.Equal(id, domainObject.Id);
             Assert.Equal(0, domainObject.Version);

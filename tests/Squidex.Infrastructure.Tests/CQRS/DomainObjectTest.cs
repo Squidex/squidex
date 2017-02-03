@@ -20,9 +20,9 @@ namespace Squidex.Infrastructure.CQRS
         {
         }
 
-        private sealed class UserDomainObject : DomainObject
+        private sealed class DO : DomainObject
         {
-            public UserDomainObject(Guid id, int version) 
+            public DO(Guid id, int version) 
                 : base(id, version)
             {
             }
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.CQRS
         {
             var id = Guid.NewGuid();
             var ver = 123;
-            var sut = new UserDomainObject(id, ver);
+            var sut = new DO(id, ver);
 
             Assert.Equal(id, sut.Id);
             Assert.Equal(ver, sut.Version);
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.CQRS
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new UserDomainObject(Guid.NewGuid(), 10);
+            var sut = new DO(Guid.NewGuid(), 10);
 
             IAggregate aggregate = sut;
 
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.CQRS
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new UserDomainObject(Guid.NewGuid(), 10);
+            var sut = new DO(Guid.NewGuid(), 10);
 
             IAggregate aggregate = sut;
 
@@ -93,9 +93,9 @@ namespace Squidex.Infrastructure.CQRS
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var user1a = new UserDomainObject(id1, 1);
-            var user1b = new UserDomainObject(id1, 2);
-            var user2 = new UserDomainObject(id2, 2);
+            var user1a = new DO(id1, 1);
+            var user1b = new DO(id1, 2);
+            var user2 = new DO(id2, 2);
 
             Assert.True(user1a.Equals(user1b));
 
@@ -108,10 +108,10 @@ namespace Squidex.Infrastructure.CQRS
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var user1a = new UserDomainObject(id1, 1);
+            var user1a = new DO(id1, 1);
 
-            object user1b = new UserDomainObject(id1, 2);
-            object user2  = new UserDomainObject(id2, 2);
+            object user1b = new DO(id1, 2);
+            object user2  = new DO(id2, 2);
 
             Assert.True(user1a.Equals(user1b));
 
@@ -124,9 +124,9 @@ namespace Squidex.Infrastructure.CQRS
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var user1a = new UserDomainObject(id1, 1);
-            var user1b = new UserDomainObject(id1, 2);
-            var user2 =  new UserDomainObject(id2, 2);
+            var user1a = new DO(id1, 1);
+            var user1b = new DO(id1, 2);
+            var user2 =  new DO(id2, 2);
 
             Assert.Equal(user1a.GetHashCode(), user1b.GetHashCode());
 
