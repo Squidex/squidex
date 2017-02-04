@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
-    public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
+    public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore, IExternalSystem
     {
         private sealed class EventCountEntity
         {
@@ -49,6 +49,18 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.EventStream).Ascending(x => x.EventsVersion), new CreateIndexOptions { Unique = true });
+        }
+
+        public void CheckConnection()
+        {
+            try
+            {
+                Database.ListCollections();
+            }
+            catch (Exception e)
+            {
+                throw new ConfigurationException($"MongoDb Event Store failed to connect to database {Database.DatabaseNamespace.DatabaseName}", e);
+            }
         }
 
         public IObservable<EventData> GetEventsAsync(string streamName)

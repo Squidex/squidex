@@ -20,6 +20,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     public sealed class EventReceiver
     {
         private readonly EventDataFormatter formatter;
+        private readonly bool canCatch;
         private readonly IEnumerable<ILiveEventConsumer> liveConsumers;
         private readonly IEnumerable<ICatchEventConsumer> catchConsumers;
         private readonly IEventStream eventStream;
@@ -31,7 +32,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             IEventStream eventStream,
             IEnumerable<ILiveEventConsumer> liveConsumers,
             IEnumerable<ICatchEventConsumer> catchConsumers,
-            EventDataFormatter formatter)
+            EventDataFormatter formatter,
+            bool canCatch = true)
         {
             Guard.NotNull(logger, nameof(logger));
             Guard.NotNull(formatter, nameof(formatter));
@@ -41,6 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             this.logger = logger;
             this.formatter = formatter;
+            this.canCatch = canCatch;
             this.eventStream = eventStream;
             this.liveConsumers = liveConsumers;
             this.catchConsumers = catchConsumers;
@@ -70,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     DispatchConsumers(catchConsumers.OfType<IEventConsumer>().Union(liveConsumers), @event);
                 }
-                else
+                else if (canCatch)
                 {
                     DispatchConsumers(catchConsumers, @event);
                 }

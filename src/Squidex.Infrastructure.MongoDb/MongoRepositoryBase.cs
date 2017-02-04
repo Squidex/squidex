@@ -84,6 +84,11 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
+        static MongoRepositoryBase()
+        {
+            RefTokenSerializer.Register();
+        }
+
         protected MongoRepositoryBase(IMongoDatabase database)
         {
             Guard.NotNull(database, nameof(database));

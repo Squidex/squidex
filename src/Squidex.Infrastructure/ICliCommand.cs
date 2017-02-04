@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  MyMongoDbOptions.cs
+//  ICommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.MongoDb
+namespace Squidex.Infrastructure
 {
-    public class MyMongoDbOptions
+    public interface ICliCommand
     {
-        public string ConnectionString { get; set; }
+        string Name { get; }
 
-        public string DatabaseName { get; set; }
+        void Execute(string[] args);
     }
 }

@@ -15,12 +15,14 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.CQRS.Replay
 {
-    public sealed class ReplayGenerator
+    public sealed class ReplayGenerator : ICliCommand
     {
         private readonly ILogger<ReplayGenerator> logger;
         private readonly IEventStore eventStore;
         private readonly IEventPublisher eventPublisher;
         private readonly IEnumerable<IReplayableStore> stores;
+
+        public string Name { get; } = "replay";
 
         public ReplayGenerator(
             ILogger<ReplayGenerator> logger,
@@ -37,6 +39,11 @@ namespace Squidex.Infrastructure.CQRS.Replay
             this.logger = logger;
             this.eventStore = eventStore;
             this.eventPublisher = eventPublisher;
+        }
+
+        public void Execute(string[] args)
+        {
+            ReplayAllAsync().Wait();
         }
 
         public async Task ReplayAllAsync()

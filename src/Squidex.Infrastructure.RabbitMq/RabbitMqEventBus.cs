@@ -16,32 +16,58 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.RabbitMq
 {
-    public sealed class RabbitMqEventChannel : DisposableObject, IEventPublisher, IEventStream
+    public sealed class RabbitMqEventBus : DisposableObject, IEventPublisher, IEventStream, IExternalSystem
     {
+        private readonly bool isPersistent;
         private const string Exchange = "Squidex";
-        private readonly IConnection connection;
-        private readonly IModel channel;
+        private readonly IConnectionFactory connectionFactory;
+        private readonly Lazy<IConnection> connection;
+        private readonly Lazy<IModel> channel;
         private EventingBasicConsumer consumer;
 
-        public RabbitMqEventChannel(IConnectionFactory connectionFactory)
+        public RabbitMqEventBus(IConnectionFactory connectionFactory, bool isPersistent)
         {
             Guard.NotNull(connectionFactory, nameof(connectionFactory));
 
-            connection = connectionFactory.CreateConnection();
-            channel = CreateChannel(connection);
+            this.connectionFactory = connectionFactory;
+
+            connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
+            channel = new Lazy<IModel>(() => CreateChannel(connection.Value));
+
+            this.isPersistent = isPersistent;
         }
 
         protected override void DisposeObject(bool disposing)
         {
-            connection.Close();
-            connection.Dispose();
+            if (connection.IsValueCreated)
+            {
+                connection.Value.Close();
+                connection.Value.Dispose();
+            }
         }
 
         public void Publish(EventData eventData)
         {
             ThrowIfDisposed();
             
-            channel.BasicPublish(Exchange, string.Empty, null, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(eventData)));
+            channel.Value.BasicPublish(Exchange, string.Empty, null, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(eventData)));
+        }
+
+        public void CheckConnection()
+        {
+            try
+            {
+                var currentConnection = connection.Value;
+
+                if (!currentConnection.IsOpen)
+                {
+                    throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.VirtualHost}");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.VirtualHost}", e);
+            }
         }
 
         public void Connect(string queueName, Action<EventData> received)
@@ -51,14 +77,16 @@ namespace Squidex.Infrastructure.RabbitMq
 
             lock (connection)
             {
+                var currentChannel = channel.Value;
+
                 ThrowIfConnected();
                 
                 queueName = $"{queueName}_{Environment.MachineName}";
 
-                channel.QueueDeclare(queueName, true, false, false);
-                channel.QueueBind(queueName, Exchange, string.Empty);
+                currentChannel.QueueDeclare(queueName, isPersistent, false, !isPersistent);
+                currentChannel.QueueBind(queueName, Exchange, string.Empty);
 
-                consumer = new EventingBasicConsumer(channel);
+                consumer = new EventingBasicConsumer(currentChannel);
 
                 consumer.Received += (model, e) =>
                 {
@@ -67,7 +95,7 @@ namespace Squidex.Infrastructure.RabbitMq
                     received(eventData);
                 };
 
-                channel.BasicConsume(queueName, true, consumer);
+                currentChannel.BasicConsume(queueName, true, consumer);
             }
         }
 

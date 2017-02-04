@@ -239,7 +239,7 @@ namespace Squidex.Core.Contents
             {
                 { "field1", 1 },
                 { "field2", 4 },
-                { "field3", 6 },
+                { "field3", 6 }
             };
 
             Assert.True(expected.EqualsDictionary(output));

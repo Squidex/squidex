@@ -51,9 +51,14 @@ namespace Squidex.Core.Schemas
 
         public FieldRegistry()
         {
-            Add<BooleanFieldProperties>((id, name, properties) => new BooleanField(id, name, (BooleanFieldProperties)properties));
-            Add<NumberFieldProperties>((id, name, properties) => new NumberField(id, name, (NumberFieldProperties)properties));
-            Add<StringFieldProperties>((id, name, properties) => new StringField(id, name, (StringFieldProperties)properties));
+            Add<BooleanFieldProperties>(
+                (id, name, p) => new BooleanField(id, name, (BooleanFieldProperties)p));
+
+            Add<NumberFieldProperties>(
+                (id, name, p) => new NumberField(id, name, (NumberFieldProperties)p));
+
+            Add<StringFieldProperties>(
+                (id, name, p) => new StringField(id, name, (StringFieldProperties)p));
         }
 
         public void Add<TFieldProperties>(FactoryFunction fieldFactory)

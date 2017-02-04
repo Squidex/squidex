@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "Autofac": "4.3.0",
     "IdentityServer4": "1.0.2",
     "Microsoft.AspNetCore.Identity": "1.1.0",
     "Microsoft.AspNetCore.Identity.MongoDB": "1.0.2",

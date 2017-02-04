@@ -18,8 +18,6 @@ namespace Squidex.Config.Identity
 
         public string GoogleSecret { get; set; }
 
-        public string KeysFolder { get; set; }
-
         public bool RequiresHttps { get; set; }
     }
 }
