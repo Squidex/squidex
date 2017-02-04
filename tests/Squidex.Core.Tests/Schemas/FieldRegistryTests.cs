@@ -24,7 +24,6 @@ namespace Squidex.Core.Schemas
                 yield break;
             }
         }
-        
 
         [Fact]
         public void Should_throw_if_creating_field_and_field_is_not_registered()

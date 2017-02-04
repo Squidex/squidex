@@ -25,12 +25,13 @@ namespace Squidex.Write.Schemas
         private readonly Guid appId = Guid.NewGuid();
         private readonly string fieldName = "age";
         private readonly string appName = "schema";
-        private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly SchemaDomainObject sut;
         
         public SchemaDomainObjectTests()
         {
-            sut = new SchemaDomainObject(Guid.NewGuid(), 0, registry);
+            var fieldRegistry = new FieldRegistry(new TypeNameRegistry());
+
+            sut = new SchemaDomainObject(Guid.NewGuid(), 0, fieldRegistry);
         }
 
         [Fact]

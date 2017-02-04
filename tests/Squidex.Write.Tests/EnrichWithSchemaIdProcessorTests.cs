@@ -33,6 +33,7 @@ namespace Squidex.Write
         {
         }
 
+        private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly EnrichWithSchemaIdProcessor sut = new EnrichWithSchemaIdProcessor();
 
         [Fact]
@@ -52,7 +53,7 @@ namespace Squidex.Write
 
             var envelope = new Envelope<IEvent>(new MyEvent());
 
-            await sut.ProcessEventAsync(envelope, new SchemaDomainObject(appId, 1, new FieldRegistry(new TypeNameRegistry())), new MyNormalCommand());
+            await sut.ProcessEventAsync(envelope, new SchemaDomainObject(appId, 1, registry), new MyNormalCommand());
 
             Assert.Equal(appId, envelope.Headers.SchemaId());
         }
