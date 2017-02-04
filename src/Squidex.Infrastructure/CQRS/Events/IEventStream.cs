@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventStream : IDisposable
     {
-        void Connect(string queueName, Action<EventData> received);
+        void Connect(string queuePrefix, Action<EventData> received);
     }
 }

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             subject.OnNext(eventData);
         }
 
-        public void Connect(string queueName, Action<EventData> received)
+        public void Connect(string queuePrefix, Action<EventData> received)
         {
             subject.Subscribe(received);
         }

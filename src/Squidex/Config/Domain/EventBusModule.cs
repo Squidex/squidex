@@ -57,13 +57,15 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("You must specify the RabbitMq connection string in the 'squidex:eventBus:rabbitMq:connectionString' configuration section.");
                 }
 
+                var queueName = Configuration.GetValue<string>("squidex:eventBus:rabbitMq:queueName");
+
                 builder.Register(c =>
                     {
                         var connectionFactory = new ConnectionFactory();
 
                         connectionFactory.SetUri(new Uri(connectionString));
 
-                        return new RabbitMqEventBus(connectionFactory, canCatch);
+                        return new RabbitMqEventBus(connectionFactory, canCatch, queueName);
                     })
                     .As<IEventStream>()
                     .As<IEventPublisher>()

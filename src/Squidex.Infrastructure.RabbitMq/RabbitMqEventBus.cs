@@ -19,15 +19,18 @@ namespace Squidex.Infrastructure.RabbitMq
     public sealed class RabbitMqEventBus : DisposableObject, IEventPublisher, IEventStream, IExternalSystem
     {
         private readonly bool isPersistent;
+        private readonly string queueName;
         private const string Exchange = "Squidex";
         private readonly ConnectionFactory connectionFactory;
         private readonly Lazy<IConnection> connection;
         private readonly Lazy<IModel> channel;
         private EventingBasicConsumer consumer;
 
-        public RabbitMqEventBus(ConnectionFactory connectionFactory, bool isPersistent)
+        public RabbitMqEventBus(ConnectionFactory connectionFactory, bool isPersistent, string queueName)
         {
             Guard.NotNull(connectionFactory, nameof(connectionFactory));
+
+            this.queueName = queueName;
 
             this.connectionFactory = connectionFactory;
 
@@ -70,7 +73,7 @@ namespace Squidex.Infrastructure.RabbitMq
             }
         }
 
-        public void Connect(string queueName, Action<EventData> received)
+        public void Connect(string queuePrefix, Action<EventData> received)
         {
             ThrowIfDisposed();
             ThrowIfConnected();
@@ -81,10 +84,19 @@ namespace Squidex.Infrastructure.RabbitMq
 
                 ThrowIfConnected();
                 
-                queueName = $"{queueName}_{Environment.MachineName}";
+                var fullQueueName = $"{queuePrefix}_";
 
-                currentChannel.QueueDeclare(queueName, isPersistent, false, !isPersistent);
-                currentChannel.QueueBind(queueName, Exchange, string.Empty);
+                if (!string.IsNullOrWhiteSpace(queueName))
+                {
+                    fullQueueName += queueName;
+                }
+                else
+                {
+                    fullQueueName += Environment.MachineName;
+                }
+
+                currentChannel.QueueDeclare(fullQueueName, isPersistent, false, !isPersistent);
+                currentChannel.QueueBind(fullQueueName, Exchange, string.Empty);
 
                 consumer = new EventingBasicConsumer(currentChannel);
 
@@ -95,7 +107,7 @@ namespace Squidex.Infrastructure.RabbitMq
                     received(eventData);
                 };
 
-                currentChannel.BasicConsume(queueName, true, consumer);
+                currentChannel.BasicConsume(fullQueueName, true, consumer);
             }
         }
 
