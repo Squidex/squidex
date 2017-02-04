@@ -20,12 +20,12 @@ namespace Squidex.Infrastructure.RabbitMq
     {
         private readonly bool isPersistent;
         private const string Exchange = "Squidex";
-        private readonly IConnectionFactory connectionFactory;
+        private readonly ConnectionFactory connectionFactory;
         private readonly Lazy<IConnection> connection;
         private readonly Lazy<IModel> channel;
         private EventingBasicConsumer consumer;
 
-        public RabbitMqEventBus(IConnectionFactory connectionFactory, bool isPersistent)
+        public RabbitMqEventBus(ConnectionFactory connectionFactory, bool isPersistent)
         {
             Guard.NotNull(connectionFactory, nameof(connectionFactory));
 
@@ -61,12 +61,12 @@ namespace Squidex.Infrastructure.RabbitMq
 
                 if (!currentConnection.IsOpen)
                 {
-                    throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.VirtualHost}");
+                    throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}");
                 }
             }
             catch (Exception e)
             {
-                throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.VirtualHost}", e);
+                throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}", e);
             }
         }
 

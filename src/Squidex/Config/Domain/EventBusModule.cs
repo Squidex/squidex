@@ -67,6 +67,7 @@ namespace Squidex.Config.Domain
                     })
                     .As<IEventStream>()
                     .As<IEventPublisher>()
+                    .As<IExternalSystem>()
                     .SingleInstance();
             }
             else
