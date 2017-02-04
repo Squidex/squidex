@@ -16,6 +16,7 @@ namespace Squidex.Core.Schemas
 
     public sealed class FieldRegistry
     {
+        private readonly TypeNameRegistry typeNameRegistry;
         private readonly Dictionary<string, IRegisteredField> fieldsByTypeName = new Dictionary<string, IRegisteredField>();
         private readonly Dictionary<Type, IRegisteredField> fieldsByPropertyType = new Dictionary<Type, IRegisteredField>();
 
@@ -35,9 +36,9 @@ namespace Squidex.Core.Schemas
                 get { return typeName; }
             }
 
-            public Registered(FactoryFunction fieldFactory, Type propertiesType)
+            public Registered(FactoryFunction fieldFactory, Type propertiesType, TypeNameRegistry typeNameRegistry)
             {
-                typeName = TypeNameRegistry.GetName(propertiesType);
+                typeName = typeNameRegistry.GetName(propertiesType);
 
                 this.fieldFactory = fieldFactory;
                 this.propertiesType = propertiesType;
@@ -49,8 +50,12 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public FieldRegistry()
+        public FieldRegistry(TypeNameRegistry typeNameRegistry)
         {
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+
+            this.typeNameRegistry = typeNameRegistry;
+
             Add<BooleanFieldProperties>(
                 (id, name, p) => new BooleanField(id, name, (BooleanFieldProperties)p));
 
@@ -64,8 +69,10 @@ namespace Squidex.Core.Schemas
         public void Add<TFieldProperties>(FactoryFunction fieldFactory)
         {
             Guard.NotNull(fieldFactory, nameof(fieldFactory));
+
+            typeNameRegistry.Map(typeof(TFieldProperties));
            
-            var registered = new Registered(fieldFactory, typeof(TFieldProperties));
+            var registered = new Registered(fieldFactory, typeof(TFieldProperties), typeNameRegistry);
 
             fieldsByTypeName[registered.TypeName] = registered;
             fieldsByPropertyType[registered.PropertiesType] = registered;

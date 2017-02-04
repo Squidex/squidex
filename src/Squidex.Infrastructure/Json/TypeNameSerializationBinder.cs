@@ -13,9 +13,18 @@ namespace Squidex.Infrastructure.Json
 {
     public class TypeNameSerializationBinder : DefaultSerializationBinder
     {
+        private readonly TypeNameRegistry typeNameRegistry;
+
+        public TypeNameSerializationBinder(TypeNameRegistry typeNameRegistry)
+        {
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+
+            this.typeNameRegistry = typeNameRegistry;
+        }
+
         public override Type BindToType(string assemblyName, string typeName)
         {
-            var type = TypeNameRegistry.GetType(typeName);
+            var type = typeNameRegistry.GetType(typeName);
 
             return type ?? base.BindToType(assemblyName, typeName);
         }
@@ -24,7 +33,7 @@ namespace Squidex.Infrastructure.Json
         {
             assemblyName = null;
 
-            var name = TypeNameRegistry.GetName(serializedType);
+            var name = typeNameRegistry.GetName(serializedType);
 
             if (name != null)
             {

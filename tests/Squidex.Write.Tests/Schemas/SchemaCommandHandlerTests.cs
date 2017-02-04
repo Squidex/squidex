@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Core.Schemas;
@@ -27,15 +26,10 @@ namespace Squidex.Write.Schemas
         private readonly Mock<ISchemaProvider> schemaProvider = new Mock<ISchemaProvider>();
         private readonly SchemaCommandHandler sut;
         private readonly SchemaDomainObject schema;
-        private readonly FieldRegistry registry = new FieldRegistry();
+        private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly Guid appId = Guid.NewGuid();
         private readonly string fieldName = "age";
         private readonly string schemaName = "users";
-
-        static SchemaCommandHandlerTests()
-        {
-            TypeNameRegistry.Map(typeof(Schema).GetTypeInfo().Assembly);
-        }
 
         public SchemaCommandHandlerTests()
         {

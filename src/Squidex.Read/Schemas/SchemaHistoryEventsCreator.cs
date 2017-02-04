@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
@@ -18,39 +17,28 @@ using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Read.Schemas
 {
-    public class SchemaHistoryEventsCreator : IHistoryEventsCreator
+    public class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
     {
         private readonly ISchemaProvider schemaProvider;
 
-        private static readonly IReadOnlyDictionary<string, string> TextsEN =
-            new Dictionary<string, string>
-            {
-                {
-                    TypeNameRegistry.GetName<SchemaCreated>(),
-                    "created schema {[Name]}"
-                },
-                {
-                    TypeNameRegistry.GetName<SchemaUpdated>(),
-                    "updated schema {[Name]}"
-                },
-                {
-                    TypeNameRegistry.GetName<SchemaPublished>(),
-                    "published schema {[Name]}"
-                },
-                {
-                    TypeNameRegistry.GetName<SchemaUnpublished>(),
-                    "unpublished schema {[Name]}"
-                }
-            };
-
-        public SchemaHistoryEventsCreator(ISchemaProvider schemaProvider)
+        public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry, ISchemaProvider schemaProvider)
+            : base(typeNameRegistry)
         {
+            Guard.NotNull(schemaProvider, nameof(schemaProvider));
+
             this.schemaProvider = schemaProvider;
-        }
 
-        public IReadOnlyDictionary<string, string> Texts
-        {
-            get { return TextsEN; }
+            AddEventMessage<SchemaCreated>(
+                "created schema {[Name]}");
+
+            AddEventMessage<SchemaUpdated>(
+                "updated schema {[Name]}");
+
+            AddEventMessage<SchemaPublished>(
+                "published schema {[Name]}");
+
+            AddEventMessage<SchemaUnpublished>(
+                "unpublished schema {[Name]}");
         }
 
         protected Task<HistoryEventToStore> On(SchemaCreated @event, EnvelopeHeaders headers)
@@ -60,7 +48,7 @@ namespace Squidex.Read.Schemas
             string channel = $"schemas.{name}";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Name", name));
         }
 
@@ -71,7 +59,7 @@ namespace Squidex.Read.Schemas
             string channel = $"schemas.{name}";
             
             return
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Name", name);
         }
 
@@ -82,7 +70,7 @@ namespace Squidex.Read.Schemas
             string channel = $"schemas.{name}";
 
             return
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Name", name);
         }
 
@@ -93,11 +81,11 @@ namespace Squidex.Read.Schemas
             string channel = $"schemas.{name}";
 
             return
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Name", name);
         }
 
-        public Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
+        public override Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
         {
             return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
         }

@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Read.MongoDb.History
@@ -56,15 +55,6 @@ namespace Squidex.Read.MongoDb.History
         public MongoHistoryEventEntity()
         {
             Parameters = new Dictionary<string, string>();
-        }
-
-        public MongoHistoryEventEntity Setup<T>(EnvelopeHeaders headers, string channel)
-        {
-            Channel = channel;
-
-            Message = TypeNameRegistry.GetName<T>();
-
-            return this;
         }
 
         public MongoHistoryEventEntity AddParameter(string key, string value)

@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
         private readonly Mock<IEventPublisher> eventPublisher = new Mock<IEventPublisher>();
         private readonly Mock<IStreamNameResolver> streamNameResolver = new Mock<IStreamNameResolver>();
-        private readonly Mock<EventDataFormatter> eventDataFormatter = new Mock<EventDataFormatter>(null);
+        private readonly Mock<EventDataFormatter> eventDataFormatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly string streamName = Guid.NewGuid().ToString();
         private readonly Guid aggregateId = Guid.NewGuid();
         private readonly MyDomainObject domainObject;

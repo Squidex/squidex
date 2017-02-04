@@ -10,7 +10,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Squidex.Core.Schemas;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -19,9 +18,10 @@ namespace Squidex.Config.Domain
 {
     public static class Serializers
     {
+        private static readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings)
         {
-            settings.SerializationBinder = new TypeNameSerializationBinder();
+            settings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new PropertiesBagConverter());
@@ -32,6 +32,11 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = TypeNameHandling.Auto;
 
             return settings;
+        }
+
+        static Serializers()
+        {
+            typeNameRegistry.Map(typeof(EventExtensions).GetTypeInfo().Assembly);
         }
 
         private static JsonSerializerSettings CreateSettings()
@@ -46,9 +51,7 @@ namespace Squidex.Config.Domain
 
         public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)
         {
-            TypeNameRegistry.Map(typeof(Schema).GetTypeInfo().Assembly);
-            TypeNameRegistry.Map(typeof(EventExtensions).GetTypeInfo().Assembly);
-
+            services.AddSingleton(t => typeNameRegistry);
             services.AddSingleton(t => CreateSettings());
             services.AddSingleton(t => CreateSerializer(t.GetRequiredService<JsonSerializerSettings>()));
 

@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
@@ -17,48 +16,34 @@ using Squidex.Read.History;
 
 namespace Squidex.Read.Apps
 {
-    public class AppHistoryEventsCreator : IHistoryEventsCreator
+    public class AppHistoryEventsCreator : HistoryEventsCreatorBase
     {
-        private static readonly IReadOnlyDictionary<string, string> TextsEN =
-            new Dictionary<string, string>
-            {
-                {
-                    TypeNameRegistry.GetName<AppContributorAssigned>(),
-                    "assigned {user:[Contributor]} as [Permission]"
-                },
-                {
-                    TypeNameRegistry.GetName<AppContributorRemoved>(),
-                    "removed {user:[Contributor]} from app"
-                },
-                {
-                    TypeNameRegistry.GetName<AppClientAttached>(),
-                    "added client {[Id]} to app"
-                },
-                {
-                    TypeNameRegistry.GetName<AppClientRevoked>(),
-                    "revoked client {[Id]}"
-                },
-                {
-                    TypeNameRegistry.GetName<AppClientRenamed>(),
-                    "named client {[Id]} as {[Name]}"
-                },
-                {
-                    TypeNameRegistry.GetName<AppLanguageAdded>(),
-                    "added language {[Language]}"
-                },
-                {
-                    TypeNameRegistry.GetName<AppLanguageRemoved>(),
-                    "removed language {[Language]}"
-                },
-                {
-                    TypeNameRegistry.GetName<AppMasterLanguageSet>(),
-                    "changed master language to {[Language]}"
-                }
-            };
-
-        public IReadOnlyDictionary<string, string> Texts
+        public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
+            : base(typeNameRegistry)
         {
-            get { return TextsEN; }
+            AddEventMessage<AppContributorAssigned>(
+                "assigned {user:[Contributor]} as [Permission]");
+
+            AddEventMessage<AppContributorRemoved>(
+                "removed {user:[Contributor]} from app");
+
+            AddEventMessage<AppClientAttached>(
+                "added client {[Id]} to app");
+
+            AddEventMessage<AppClientRevoked>(
+                "revoked client {[Id]}");
+
+            AddEventMessage<AppClientRenamed>(
+                "named client {[Id]} as {[Name]}");
+
+            AddEventMessage<AppLanguageAdded>(
+                "added language {[Language]}");
+
+            AddEventMessage<AppLanguageRemoved>(
+                "removed language {[Language]}");
+
+            AddEventMessage<AppMasterLanguageSet>(
+                "changed master language to {[Language]}");
         }
 
         protected Task<HistoryEventToStore> On(AppContributorAssigned @event, EnvelopeHeaders headers)
@@ -66,7 +51,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.contributors";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Contributor", @event.ContributorId)
                     .AddParameter("Permission", @event.Permission.ToString()));
         }
@@ -76,7 +61,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.contributors";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Contributor", @event.ContributorId));
         }
 
@@ -85,7 +70,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.clients";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Id", @event.Id)
                     .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id));
         }
@@ -95,7 +80,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.clients";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Id", @event.Id));
         }
 
@@ -104,7 +89,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.clients";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Id", @event.Id));
         }
 
@@ -113,7 +98,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.languages";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Language", @event.Language.EnglishName));
         }
 
@@ -122,7 +107,7 @@ namespace Squidex.Read.Apps
             const string channel = "settings.languages";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Language", @event.Language.EnglishName));
         }
 
@@ -131,11 +116,11 @@ namespace Squidex.Read.Apps
             const string channel = "settings.languages";
 
             return Task.FromResult(
-                HistoryEventToStore.Create(@event, channel)
+                ForEvent(@event, channel)
                     .AddParameter("Language", @event.Language.EnglishName));
         }
 
-        public Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
+        public override Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
         {
             return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
         }

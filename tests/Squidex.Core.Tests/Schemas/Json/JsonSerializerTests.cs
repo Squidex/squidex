@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Reflection;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
@@ -17,20 +16,16 @@ namespace Squidex.Core.Schemas.Json
 {
     public class JsonSerializerTests
     {
-        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
+        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly SchemaJsonSerializer sut;
-
-        static JsonSerializerTests()
-        {
-            TypeNameRegistry.Map(typeof(FieldRegistry).GetTypeInfo().Assembly);
-
-            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-            serializerSettings.SerializationBinder = new TypeNameSerializationBinder();
-        }
 
         public JsonSerializerTests()
         {
-            sut = new SchemaJsonSerializer(new FieldRegistry(), serializerSettings);
+            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+            serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
+            
+            sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry), serializerSettings);
         }
 
         [Fact]

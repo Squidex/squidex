@@ -22,16 +22,14 @@ namespace Squidex.Infrastructure.CQRS.Events
             public string MyProperty { get; set; }
         }
 
-        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-
-        static EventStoreFormatterTests()
-        {
-            serializerSettings.Converters.Add(new PropertiesBagConverter());
-        }
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
+        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
 
         public EventStoreFormatterTests()
         {
-            TypeNameRegistry.Map(typeof(MyEvent), "Event");
+            serializerSettings.Converters.Add(new PropertiesBagConverter());
+
+            typeNameRegistry.Map(typeof(MyEvent), "Event");
         }
 
         [Fact]
@@ -46,7 +44,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             inputEvent.SetEventNumber(1);
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
-            var sut = new EventDataFormatter(serializerSettings);
+            var sut = new EventDataFormatter(typeNameRegistry, serializerSettings);
 
             var eventData = sut.ToEventData(inputEvent.To<IEvent>(), commitId);
 

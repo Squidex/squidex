@@ -126,7 +126,7 @@ body {
     &:disabled,
     &.disabled {
         cursor: not-allowed;
-        border: 0;
+        border-color: transparent;
     }
 
     &:focus,

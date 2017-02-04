@@ -8,11 +8,10 @@
 
 using System.Collections.Generic;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Read.History
 {
-    public class HistoryEventToStore
+    public sealed class HistoryEventToStore
     {
         private readonly Dictionary<string, string> parameters = new Dictionary<string, string>();
 
@@ -25,19 +24,13 @@ namespace Squidex.Read.History
             get { return parameters; }
         }
 
-        public static HistoryEventToStore Create(IEvent @event, string channel)
-        {
-            Guard.NotNull(@event, nameof(@event));
-
-            return new HistoryEventToStore(channel, TypeNameRegistry.GetName(@event.GetType()));
-        }
-
         public HistoryEventToStore(string channel, string message)
         {
             Guard.NotNullOrEmpty(channel, nameof(channel));
             Guard.NotNullOrEmpty(message, nameof(message));
 
             Channel = channel;
+
             Message = message;
         }
 

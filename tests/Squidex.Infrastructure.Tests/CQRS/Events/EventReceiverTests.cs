@@ -9,7 +9,6 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using NodaTime;
 using Xunit;
 
@@ -46,7 +45,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly Mock<ICatchEventConsumer> catchConsumer1 = new Mock<ICatchEventConsumer>();
         private readonly Mock<ICatchEventConsumer> catchConsumer2 = new Mock<ICatchEventConsumer>();
         private readonly Mock<IEventStream> eventStream = new Mock<IEventStream>();
-        private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new JsonSerializerSettings());
+        private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly EventData eventDataPast = new EventData();
         private readonly EventData eventDataFuture = new EventData();
         private readonly Envelope<IEvent> eventPast = new Envelope<IEvent>(new MyEvent());

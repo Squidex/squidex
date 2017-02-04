@@ -15,7 +15,7 @@ namespace Squidex.Core.Schemas
 {
     public class FieldRegistryTests
     {
-        private readonly FieldRegistry sut = new FieldRegistry();
+        private readonly FieldRegistry sut = new FieldRegistry(new TypeNameRegistry());
 
         private sealed class InvalidProperties : FieldProperties
         {
@@ -24,14 +24,7 @@ namespace Squidex.Core.Schemas
                 yield break;
             }
         }
-
-        static FieldRegistryTests()
-        {
-            TypeNameRegistry.Map(typeof(BooleanFieldProperties), "BooleanField");
-            TypeNameRegistry.Map(typeof(NumberFieldProperties), "NumberField");
-            TypeNameRegistry.Map(typeof(StringFieldProperties), "StringField");
-            TypeNameRegistry.Map(typeof(InvalidProperties), "invalid");
-        }
+        
 
         [Fact]
         public void Should_throw_if_creating_field_and_field_is_not_registered()

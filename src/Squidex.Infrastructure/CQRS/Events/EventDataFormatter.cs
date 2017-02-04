@@ -15,9 +15,14 @@ namespace Squidex.Infrastructure.CQRS.Events
     public class EventDataFormatter
     {
         private readonly JsonSerializerSettings serializerSettings;
+        private readonly TypeNameRegistry typeNameRegistry;
 
-        public EventDataFormatter(JsonSerializerSettings serializerSettings = null)
+        public EventDataFormatter(TypeNameRegistry typeNameRegistry, JsonSerializerSettings serializerSettings = null)
         {
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+
+            this.typeNameRegistry = typeNameRegistry;
+
             this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
         }
 
@@ -25,7 +30,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var headers = ReadJson<PropertiesBag>(eventData.Metadata);
 
-            var eventType = TypeNameRegistry.GetType(eventData.Type);
+            var eventType = typeNameRegistry.GetType(eventData.Type);
             var eventContent = ReadJson<IEvent>(eventData.Payload, eventType);
 
             var envelope = new Envelope<IEvent>(eventContent, headers);
@@ -35,7 +40,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public virtual EventData ToEventData(Envelope<IEvent> envelope, Guid commitId)
         {
-            var eventType = TypeNameRegistry.GetName(envelope.Payload.GetType());
+            var eventType = typeNameRegistry.GetName(envelope.Payload.GetType());
 
             envelope.SetCommitId(commitId);
 

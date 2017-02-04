@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Core.Schemas;
 using Squidex.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
@@ -51,7 +52,7 @@ namespace Squidex.Write
 
             var envelope = new Envelope<IEvent>(new MyEvent());
 
-            await sut.ProcessEventAsync(envelope, new SchemaDomainObject(appId, 1, new FieldRegistry()), new MyNormalCommand());
+            await sut.ProcessEventAsync(envelope, new SchemaDomainObject(appId, 1, new FieldRegistry(new TypeNameRegistry())), new MyNormalCommand());
 
             Assert.Equal(appId, envelope.Headers.SchemaId());
         }
