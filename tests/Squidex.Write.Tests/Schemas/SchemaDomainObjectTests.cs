@@ -20,7 +20,6 @@ using Xunit;
 
 namespace Squidex.Write.Schemas
 {
-    [Collection("Schema")]
     public class SchemaDomainObjectTests
     {
         private readonly Guid appId = Guid.NewGuid();

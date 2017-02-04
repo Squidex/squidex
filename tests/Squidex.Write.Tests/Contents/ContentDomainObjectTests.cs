@@ -20,7 +20,6 @@ using Xunit;
 
 namespace Squidex.Write.Contents
 {
-    [Collection("Content")]
     public class ContentDomainObjectTests
     {
         private readonly Guid appId = Guid.NewGuid();
