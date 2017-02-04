@@ -58,7 +58,7 @@ namespace Squidex.Config.Domain
                 throw new ConfigurationException("You must specify the MongoDB connection string in the 'squidex:stores:mongoDb:connectionString' configuration section.");
             }
 
-            builder.Register(context =>
+            builder.Register(c =>
             {
                 var mongoDbClient = new MongoClient(connectionString);
                 var mongoDatabase = mongoDbClient.GetDatabase(databaseName);
@@ -66,9 +66,9 @@ namespace Squidex.Config.Domain
                 return mongoDatabase;
             }).Named<IMongoDatabase>(MongoDatabaseName).SingleInstance();
 
-            builder.Register<IUserStore<IdentityUser>>(context =>
+            builder.Register<IUserStore<IdentityUser>>(c =>
             {
-                var usersCollection = context.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityUser>("Identity_Users");
+                var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityUser>("Identity_Users");
 
                 IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
                 IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
@@ -76,9 +76,9 @@ namespace Squidex.Config.Domain
                 return new UserStore<IdentityUser>(usersCollection);
             }).SingleInstance();
 
-            builder.Register<IRoleStore<IdentityRole>>(context =>
+            builder.Register<IRoleStore<IdentityRole>>(c =>
             {
-                var rolesCollection = context.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityRole>("Identity_Roles");
+                var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityRole>("Identity_Roles");
 
                 IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
 

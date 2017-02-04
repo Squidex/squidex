@@ -50,7 +50,7 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("You must specify the MongoDB connection string in the 'squidex:eventStore:mongoDb:connectionString' configuration section.");
                 }
 
-                builder.Register(context =>
+                builder.Register(c =>
                     {
                         var mongoDbClient = new MongoClient(connectionString);
                         var mongoDatabase = mongoDbClient.GetDatabase(databaseName);

@@ -87,15 +87,20 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
 
-            builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(s => (id => new AppDomainObject(id, 0)))
+            builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, 0)))
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(s => (id => new ContentDomainObject(id, 0)))
+            builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, 0)))
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.Register<DomainObjectFactoryFunction<SchemaDomainObject>>(s => (id => new SchemaDomainObject(id, 0, s.Resolve<FieldRegistry>())))
+            builder.Register<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
+                {
+                    var fieldRegistry = c.Resolve<FieldRegistry>();
+
+                    return (id => new SchemaDomainObject(id, 0, fieldRegistry));
+                })
                 .AsSelf()
                 .InstancePerDependency();
         }
