@@ -8,7 +8,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.ContentApi.Models

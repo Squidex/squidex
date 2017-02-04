@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Autofac;
+using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
@@ -20,6 +21,13 @@ namespace Squidex.Config.Domain
 {
     public sealed class ReadModule : Module
     {
+        public IConfiguration Configuration { get; }
+
+        public ReadModule(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<CachingAppProvider>()

@@ -11,9 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Squidex.Core.Schemas;
-using Squidex.Events.Schemas;
+using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Config.Domain
@@ -48,11 +47,10 @@ namespace Squidex.Config.Domain
         public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)
         {
             TypeNameRegistry.Map(typeof(Schema).GetTypeInfo().Assembly);
-            TypeNameRegistry.Map(typeof(SchemaCreated).GetTypeInfo().Assembly);
+            TypeNameRegistry.Map(typeof(EventExtensions).GetTypeInfo().Assembly);
 
             services.AddSingleton(t => CreateSettings());
             services.AddSingleton(t => CreateSerializer(t.GetRequiredService<JsonSerializerSettings>()));
-            services.AddSingleton<EventDataFormatter>();
 
             return services;
         }

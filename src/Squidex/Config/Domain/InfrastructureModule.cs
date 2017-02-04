@@ -9,9 +9,10 @@
 using Autofac;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
-using Squidex.Infrastructure.CQRS.Autofac;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.CQRS.Replay;
@@ -20,6 +21,13 @@ namespace Squidex.Config.Domain
 {
     public class InfrastructureModule : Module
     {
+        public IConfiguration Configuration { get; }
+
+        public InfrastructureModule(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<HttpContextAccessor>()
@@ -28,10 +36,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<ActionContextAccessor>()
                 .As<IActionContextAccessor>()
-                .SingleInstance();
-
-            builder.RegisterType<AutofacDomainObjectFactory>()
-                .As<IDomainObjectFactory>()
                 .SingleInstance();
 
             builder.RegisterType<DefaultDomainObjectRepository>()
@@ -46,7 +50,15 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
+            builder.RegisterType<DefaultNameResolver>()
+                .As<IStreamNameResolver>()
+                .SingleInstance();
+
             builder.RegisterType<ReplayGenerator>()
+                .As<ICliCommand>()
+                .SingleInstance();
+
+            builder.RegisterType<EventDataFormatter>()
                 .AsSelf()
                 .SingleInstance();
 

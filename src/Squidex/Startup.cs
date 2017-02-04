@@ -19,12 +19,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Config;
 using Squidex.Config.Domain;
-using Squidex.Config.EventStore;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Pipeline;
-using Squidex.Read.MongoDb;
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
 
@@ -60,6 +58,7 @@ namespace Squidex
         {
             services.AddMySwaggerSettings();
             services.AddMyEventFormatter();
+            services.AddMyDataProtectection(Configuration);
             services.AddMyIdentity();
             services.AddMyIdentityServer(Environment);
             services.AddMyMvc();
@@ -70,24 +69,19 @@ namespace Squidex
             services.AddRouting();
             services.AddWebpackBuilder();
 
-            services.Configure<MyMongoDbOptions>(
-                Configuration.GetSection("stores:mongoDb"));
-            services.Configure<MyRabbitMqOptions>(
-                Configuration.GetSection("stores:rabbitMq"));
             services.Configure<MyUrlsOptions>(
-                Configuration.GetSection("urls"));
+                Configuration.GetSection("squidex:urls"));
             services.Configure<MyIdentityOptions>(
-                Configuration.GetSection("identity"));
+                Configuration.GetSection("squidex:identity"));
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterModule<InfrastructureModule>();
-            builder.RegisterModule<MongoDbEventStoreModule>();
-            builder.RegisterModule<MongoDbModule>();
-            builder.RegisterModule<RabbitMqEventChannelModule>();
-            builder.RegisterModule<ReadModule>();
-            builder.RegisterModule<WebModule>();
-            builder.RegisterModule<WriteModule>();
+            builder.RegisterModule(new EventBusModule(Configuration));
+            builder.RegisterModule(new EventStoreModule(Configuration));
+            builder.RegisterModule(new InfrastructureModule(Configuration));
+            builder.RegisterModule(new ReadModule(Configuration));
+            builder.RegisterModule(new StoreModule(Configuration));
+            builder.RegisterModule(new WriteModule(Configuration));
 
             var container = builder.Build();
 
@@ -103,6 +97,8 @@ namespace Squidex
         {
             loggerFactory.AddConsole(LogLevel.Debug);
             loggerFactory.AddDebug();
+
+            app.TestExternalSystems();
 
             app.UseMiddleware<SingleUrlsMiddleware>();
 

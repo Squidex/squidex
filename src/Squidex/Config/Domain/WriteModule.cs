@@ -5,7 +5,10 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 using Autofac;
+using Microsoft.Extensions.Configuration;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline.CommandHandlers;
@@ -18,6 +21,13 @@ namespace Squidex.Config.Domain
 {
     public class WriteModule : Module
     {
+        public IConfiguration Configuration { get; }
+
+        public WriteModule(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<EnrichWithTimestampHandler>()
@@ -36,6 +46,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
+
             builder.RegisterType<EnrichWithAppIdProcessor>()
                 .As<IEventProcessor>()
                 .SingleInstance();
@@ -52,35 +63,39 @@ namespace Squidex.Config.Domain
                 .As<IEventProcessor>()
                 .SingleInstance();
 
-            builder.RegisterType<AppCommandHandler>()
-                .As<ICommandHandler>()
-                .SingleInstance();
 
             builder.RegisterType<ClientKeyGenerator>()
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.RegisterType<ContentCommandHandler>()
-                .As<ICommandHandler>()
-                .SingleInstance();
 
-            builder.RegisterType<ContentDomainObject>()
+            builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .InstancePerDependency();
+
 
             builder.RegisterType<AppCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<AppDomainObject>()
-                .AsSelf()
-                .InstancePerDependency();
+            builder.RegisterType<ContentCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
 
             builder.RegisterType<SchemaCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<SchemaDomainObject>()
+
+            builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(s => (id => new AppDomainObject(id, 0)))
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(s => (id => new ContentDomainObject(id, 0)))
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.Register<DomainObjectFactoryFunction<SchemaDomainObject>>(s => (id => new SchemaDomainObject(id, 0, s.Resolve<FieldRegistry>())))
                 .AsSelf()
                 .InstancePerDependency();
         }

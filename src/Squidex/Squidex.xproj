@@ -27,4 +27,9 @@
     <DnxInvisibleFolder Include="_test-output\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet.Web\Microsoft.DotNet.Web.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JSONSchema="http://json.schemastore.org/babelrc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

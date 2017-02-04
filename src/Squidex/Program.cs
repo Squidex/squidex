@@ -6,10 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.CQRS.Replay;
+using Squidex.Infrastructure;
+// ReSharper disable InvertIf
 
 namespace Squidex
 {
@@ -24,9 +28,20 @@ namespace Squidex
                 .UseStartup<Startup>()
                 .Build();
 
-            if (args.Length == 1 && args[0] == "--replay")
+            if (args.Length > 0)
             {
-                host.Services.GetService<ReplayGenerator>().ReplayAllAsync().Wait();
+                var commands = host.Services.GetService<IEnumerable<ICliCommand>>();
+
+                foreach (var command in commands)
+                {
+                    if (string.Equals(args[0], command.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        command.Execute(args.Skip(1).ToArray());
+                        return;
+                    }
+                }
+
+                Console.WriteLine("Unknown command: {0}", args[0]);
             }
             else
             {

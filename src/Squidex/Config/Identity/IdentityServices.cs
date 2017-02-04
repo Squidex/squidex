@@ -7,12 +7,15 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Security;
 
@@ -20,6 +23,20 @@ namespace Squidex.Config.Identity
 {
     public static class IdentityServices
     {
+        public static IServiceCollection AddMyDataProtectection(this IServiceCollection services, IConfiguration configuration)
+        {
+            var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
+
+            var keysFolder = configuration.GetValue<string>("squidex:identity:keysFolder");
+
+            if (!string.IsNullOrWhiteSpace(keysFolder))
+            {
+                dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysFolder));
+            }
+
+            return services;
+        }
+
         public static IServiceCollection AddMyIdentityServer(this IServiceCollection services, IHostingEnvironment env)
         {
             X509Certificate2 certificate;
