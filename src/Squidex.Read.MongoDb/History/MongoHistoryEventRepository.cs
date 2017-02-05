@@ -67,7 +67,7 @@ namespace Squidex.Read.MongoDb.History
         public async Task<List<IHistoryEventEntity>> QueryEventsByChannel(Guid appId, string channelPrefix, int count)
         {
             var entities =
-                await Collection.Find(x => x.AppId == appId && x.Channel.StartsWith(channelPrefix))
+                await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
                     .SortByDescending(x => x.Created).ThenByDescending(x => x.SessionEventIndex).Limit(count).ToListAsync();
 
             return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();

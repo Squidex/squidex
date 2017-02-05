@@ -11,13 +11,13 @@ using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Read.History;
 using Squidex.Read.Schemas.Services;
+// ReSharper disable InvertIf
 
 namespace Squidex.Read.Schemas
 {
-    public class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
+    public sealed class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
     {
         private readonly ISchemaProvider schemaProvider;
 
@@ -34,67 +34,70 @@ namespace Squidex.Read.Schemas
             AddEventMessage<SchemaUpdated>(
                 "updated schema {[Name]}");
 
+            AddEventMessage<SchemaDeleted>(
+                "deleted schema {[Name]}");
+
             AddEventMessage<SchemaPublished>(
                 "published schema {[Name]}");
 
             AddEventMessage<SchemaUnpublished>(
                 "unpublished schema {[Name]}");
+
+            AddEventMessage<FieldAdded>(
+                "added field {[Field]} to schema {[Name]}");
+
+            AddEventMessage<FieldDeleted>(
+                "deleted field {[Field]} from schema {[Name]}");
+
+            AddEventMessage<FieldDisabled>(
+                "disabled field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldEnabled>(
+                "disabled field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldHidden>(
+                "has hidden field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldShown>(
+                "has shown field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldUpdated>(
+                "has updated field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldDeleted>(
+                "deleted field {[Field]} of schema {[Name]}");
         }
 
-        protected Task<HistoryEventToStore> On(SchemaCreated @event, EnvelopeHeaders headers)
+        protected override async Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            var name = @event.Name;
+            var schemaCreated = @event.Payload as SchemaCreated;
 
-            string channel = $"schemas.{name}";
+            if (schemaCreated != null)
+            {
+                string channel = $"schemas.{schemaCreated.Name}";
 
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", name));
-        }
+                return ForEvent(@event.Payload, channel).AddParameter("Name", schemaCreated.Name);
+            }
+            else
+            {
+                var schemaEntity = await schemaProvider.FindSchemaByIdAsync(@event.Headers.AggregateId());
+                var schemaName = schemaEntity.Label ?? schemaEntity.Name;
 
-        protected async Task<HistoryEventToStore> On(SchemaUpdated @event, EnvelopeHeaders headers)
-        {
-            var name = await FindSchemaNameAsync(headers);
+                string channel = $"schemas.{schemaName}";
 
-            string channel = $"schemas.{name}";
-            
-            return
-                ForEvent(@event, channel)
-                    .AddParameter("Name", name);
-        }
+                var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaName);
 
-        protected async Task<HistoryEventToStore> On(SchemaPublished @event, EnvelopeHeaders headers)
-        {
-            var name = await FindSchemaNameAsync(headers);
+                var fieldEvent = @event.Payload as FieldEvent;
 
-            string channel = $"schemas.{name}";
+                if (fieldEvent != null)
+                {
+                    var fieldName = schemaEntity.Schema.Fields.GetOrDefault(fieldEvent.FieldId)?.Name;
 
-            return
-                ForEvent(@event, channel)
-                    .AddParameter("Name", name);
-        }
+                    result.AddParameter("Field", fieldName);
+                }
 
-        protected async Task<HistoryEventToStore> On(SchemaUnpublished @event, EnvelopeHeaders headers)
-        {
-            var name = await FindSchemaNameAsync(headers);
-
-            string channel = $"schemas.{name}";
-
-            return
-                ForEvent(@event, channel)
-                    .AddParameter("Name", name);
-        }
-
-        public override Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
-        {
-            return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
-        }
-
-        private async Task<string> FindSchemaNameAsync(EnvelopeHeaders headers)
-        {
-            var schema = await schemaProvider.FindSchemaByIdAsync(headers.AggregateId());
-
-            return schema.Label ?? schema.Name;
+                return result;
+            }
         }
     }
 }

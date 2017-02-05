@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
+// ReSharper disable ConvertIfStatementToReturnStatement
 
 namespace Squidex.Read.History
 {
@@ -38,6 +39,13 @@ namespace Squidex.Read.History
             texts[typeNameRegistry.GetName<TEvent>()] = message;
         }
 
+        protected bool HasEventText(IEvent @event)
+        {
+            var message = typeNameRegistry.GetName(@event.GetType());
+
+            return texts.ContainsKey(message);
+        }
+
         protected HistoryEventToStore ForEvent(IEvent @event, string channel)
         {
             var message = typeNameRegistry.GetName(@event.GetType());
@@ -45,6 +53,16 @@ namespace Squidex.Read.History
             return new HistoryEventToStore(channel, message);
         }
 
-        public abstract Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event);
+        public Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
+        {
+            if (HasEventText(@event.Payload))
+            {
+                return CreateEventCoreAsync(@event);
+            }
+
+            return Task.FromResult<HistoryEventToStore>(null);
+        }
+
+        protected abstract Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event);
     }
 }

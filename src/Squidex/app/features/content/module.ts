@@ -44,12 +44,6 @@ const routes: Routes = [
                         path: 'new',
                         component: ContentPageComponent
                     }, {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'contents.{schemaName}'
-                        }
-                    }, {
                         path: ':contentId',
                         component: ContentPageComponent,
                         resolve: {
@@ -60,7 +54,7 @@ const routes: Routes = [
                                 path: 'history',
                                 component: HistoryComponent,
                                 data: {
-                                    channel: 'contents.{schemaName}.{contentId}'
+                                    channel: 'contents.{contentId}'
                                 }
                             }
                         ]

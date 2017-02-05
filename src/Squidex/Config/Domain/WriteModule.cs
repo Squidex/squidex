@@ -66,12 +66,12 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<ClientKeyGenerator>()
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
 
 
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
 
 
             builder.RegisterType<AppCommandHandler>()
@@ -89,11 +89,11 @@ namespace Squidex.Config.Domain
 
             builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, 0)))
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
 
             builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, 0)))
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
 
             builder.Register<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
                 {
@@ -102,7 +102,7 @@ namespace Squidex.Config.Domain
                     return (id => new SchemaDomainObject(id, 0, fieldRegistry));
                 })
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
         }
     }
 }

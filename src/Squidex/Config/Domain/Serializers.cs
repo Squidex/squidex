@@ -19,7 +19,8 @@ namespace Squidex.Config.Domain
     public static class Serializers
     {
         private static readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings)
+
+        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -29,7 +30,7 @@ namespace Squidex.Config.Domain
             settings.NullValueHandling = NullValueHandling.Ignore;
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             settings.DateParseHandling = DateParseHandling.DateTime;
-            settings.TypeNameHandling = TypeNameHandling.Auto;
+            settings.TypeNameHandling = typeNameHandling;
 
             return settings;
         }
@@ -41,7 +42,7 @@ namespace Squidex.Config.Domain
 
         private static JsonSerializerSettings CreateSettings()
         {
-            return ConfigureJson(new JsonSerializerSettings());
+            return ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
         }
 
         private static JsonSerializer CreateSerializer(JsonSerializerSettings settings)
@@ -62,7 +63,7 @@ namespace Squidex.Config.Domain
         {
             mvc.AddJsonOptions(options =>
             {
-                ConfigureJson(options.SerializerSettings);
+                ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
             });
 
             return mvc;

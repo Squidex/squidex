@@ -59,6 +59,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit {
     }
 
     public ngOnInit() {
+        this.values = [];
+
         for (let field of this.fields) {
             this.values.push(this.getValue(field));
         }

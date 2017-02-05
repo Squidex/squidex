@@ -12,6 +12,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Read.Contents;
 using Squidex.Read.History;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
@@ -41,6 +42,10 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<AppHistoryEventsCreator>()
+                .As<IHistoryEventsCreator>()
+                .SingleInstance();
+
+            builder.RegisterType<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
                 .SingleInstance();
 

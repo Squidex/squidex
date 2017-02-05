@@ -46,16 +46,6 @@ namespace Squidex.Read.Apps
                 "changed master language to {[Language]}");
         }
 
-        protected Task<HistoryEventToStore> On(AppContributorAssigned @event, EnvelopeHeaders headers)
-        {
-            const string channel = "settings.contributors";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId)
-                    .AddParameter("Permission", @event.Permission.ToString()));
-        }
-
         protected Task<HistoryEventToStore> On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
             const string channel = "settings.contributors";
@@ -65,14 +55,14 @@ namespace Squidex.Read.Apps
                     .AddParameter("Contributor", @event.ContributorId));
         }
 
-        protected Task<HistoryEventToStore> On(AppClientRenamed @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
-            const string channel = "settings.clients";
+            const string channel = "settings.contributors";
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Id", @event.Id)
-                    .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id));
+                    .AddParameter("Contributor", @event.ContributorId)
+                    .AddParameter("Permission", @event.Permission.ToString()));
         }
 
         protected Task<HistoryEventToStore> On(AppClientAttached @event, EnvelopeHeaders headers)
@@ -91,6 +81,16 @@ namespace Squidex.Read.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("Id", @event.Id));
+        }
+
+        protected Task<HistoryEventToStore> On(AppClientRenamed @event, EnvelopeHeaders headers)
+        {
+            const string channel = "settings.clients";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Id", @event.Id)
+                    .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id));
         }
 
         protected Task<HistoryEventToStore> On(AppLanguageAdded @event, EnvelopeHeaders headers)
@@ -120,7 +120,7 @@ namespace Squidex.Read.Apps
                     .AddParameter("Language", @event.Language.EnglishName));
         }
 
-        public override Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
         }
