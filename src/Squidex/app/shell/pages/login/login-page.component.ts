@@ -11,10 +11,10 @@ import { Router } from '@angular/router';
 import { AuthService } from 'shared';
 
 @Component({
-    selector: 'sqx-logout',
+    selector: 'sqx-login',
     template: ''
 })
-export class LogoutPageComponent implements OnInit {
+export class LoginPageComponent implements OnInit {
     constructor(
         private readonly auth: AuthService,
         private readonly router: Router
@@ -22,9 +22,9 @@ export class LogoutPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.auth.logoutRedirectComplete().subscribe(
+        this.auth.loginRedirectComplete().subscribe(
             () => {
-                this.router.navigate(['/'], { replaceUrl: true });
+                this.router.navigate(['/app'], { replaceUrl: true });
             },
             () => {
                 this.router.navigate(['/'], { replaceUrl: true });

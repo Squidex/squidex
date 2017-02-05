@@ -55,9 +55,9 @@ namespace Squidex.Controllers.Api.Apps
         {
             var subject = HttpContext.User.OpenIdSubject();
 
-            var schemas = await appRepository.QueryAllAsync(subject);
+            var apps = await appRepository.QueryAllAsync(subject);
 
-            var response = schemas.Select(s =>
+            var response = apps.Select(s =>
             {
                 var dto = SimpleMapper.Map(s, new AppDto());
 

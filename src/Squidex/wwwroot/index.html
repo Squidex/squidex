@@ -7,7 +7,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    
     <style>
         body {
             background: #F4F8F9;
@@ -21,7 +21,7 @@
         }
         
         .loading {
-            text-align: center; margin-top: 200px;
+            text-align: center;
         }
 
         .loading img {
@@ -33,9 +33,34 @@
             font-size: 30px;
             font-weight: lighter;
         }
+
+        .loading, noscript {
+            margin-top: 200px;
+        }
+
+        noscript {
+            display: block;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 30px;
+            font-weight: lighter;
+            color: red;
+        }
     </style>
+
+    <noscript>
+        <style>
+            .loading {
+                display: none;
+            }
+        </style>
+    </noscript>
 </head>
 <body>
+    <noscript>
+        You must enable Javascript to use the Squidex Portal
+    </noscript>
+
     <sqx-app>
         <div class="loading">
             <img src="/images/loader.gif" />

@@ -3,7 +3,7 @@
 
     <button class="btn btn-primary btn-lg login-button" (click)="login()">Login to Squidex</button>
 
-    <p class="login-hint">
+    <p class="login-hint" *ngIf="!isIE()">
         The login button will open a new popup. Once you are logged in successfull we will redirect you to the squidex management portal.
     </p>
 

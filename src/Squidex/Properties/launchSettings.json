@@ -16,10 +16,8 @@
     },
     "Squidex": {
       "commandName": "Project",
-      "commandLineArgs": "replay",
       "launchUrl": "http://localhost:5000",
       "environmentVariables": {
-        "SQUIDEX__EVENTBUS__TYPE": "Memory",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }

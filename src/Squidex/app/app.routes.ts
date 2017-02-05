@@ -12,6 +12,7 @@ import {
     AppAreaComponent,
     HomePageComponent,
     InternalAreaComponent,
+    LoginPageComponent,
     LogoutPageComponent,
     NotFoundPageComponent
 } from './shell';
@@ -60,6 +61,10 @@ export const routes: Routes = [
     {
         path: 'logout',
         component: LogoutPageComponent
+    },
+    {
+        path: 'login',
+        component: LoginPageComponent
     },
     {
         path: '**',

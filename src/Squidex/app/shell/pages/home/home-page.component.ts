@@ -25,11 +25,21 @@ export class HomePageComponent {
     }
 
     public login() {
-        this.auth.loginPopup()
-            .subscribe(() => {
-                this.router.navigate(['/app']);
-            }, ex => {
-                this.showLoginError = true;
-            });
+        if (this.isIE()) {
+            this.auth.loginRedirect();
+        } else {
+            this.auth.loginPopup()
+                .subscribe(() => {
+                    this.router.navigate(['/app']);
+                }, ex => {
+                    this.showLoginError = true;
+                });
+        }
+    }
+
+    public isIE() {
+        const isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+
+        return isIE;
     }
 }
