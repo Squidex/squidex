@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -46,8 +47,9 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly schemasService: SchemasService,
+        private readonly authService: AuthService,
         private readonly messageBus: MessageBus,
-        private readonly authService: AuthService
+        private readonly route: ActivatedRoute
     ) {
         super(apps, notifications, users);
     }
@@ -63,6 +65,12 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             .subscribe(q => {
                 this.updateSchemas(this.schemas, this.schemaQuery = q);
             });
+
+        this.route.params.map(q => q['showDialog']).subscribe(showDialog => {
+            if (showDialog) {
+                this.addSchemaDialog.show();
+            }
+        });
 
         this.messageSubscription =
             this.messageBus.of(SchemaUpdated)

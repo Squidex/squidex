@@ -83,6 +83,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             this.schemaName = schema.name;
             this.schemaFields = ImmutableArray.of(schema.fields);
             this.schemaProperties = new SchemaPropertiesDto(schema.name, schema.label, schema.hints);
+
             this.isPublished = schema.isPublished;
         });
     }

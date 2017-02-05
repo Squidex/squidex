@@ -1,12 +1,54 @@
 <sqx-title message="{app} | Dashboard" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<div class="panel panel-light">
-    <div class="panel-header">
-        <h3 class="panel-title">Dashboard</h3>
-    </div>
+<div class="dashboard">
+    <div>
+        <h1>Hi {{profileDisplayName}}</h1>
 
-    <div class="panel-main">
-        <div class="panel-content">
+        <div class="subtext">
+            Welcome to <span class="app-name">{{appName() | async}}</span> dashboard.
         </div>
     </div>
-</div>
+
+    <div>
+        <a class="card" [routerLink]="['schemas', { showDialog: true }]">
+            <div class="card-block">
+                <div class="card-image">
+                    <img src="/images/dashboard-schema.png" />
+                </div>
+
+                <h4 class="card-title">New Schema</h4>
+                <p class="card-text">A schema defines the structure of your content element.</p>
+            </div>
+        </a>
+        <a class="card" href="/api/content/{{appName() | async}}/docs" target="_blank">
+            <div class="card-block">
+                <div class="card-image">
+                    <img src="/images/dashboard-api.png" />
+                </div>
+
+                <h4 class="card-title">API Documentation</h4>
+                <p class="card-text">Swagger compatible documentation for your schemas.</p>
+            </div>
+        </a>
+        <a class="card" (click)="showForum()">
+            <div class="card-block">
+                <div class="card-image">
+                    <img src="/images/dashboard-feedback.png" />
+                </div>
+
+                <h4 class="card-title">Feedback</h4>
+                <p class="card-text">Provide feedback and request features to help us to improve Squidex.</p>
+            </div>
+        </a>
+        <a class="card" href="https://github.com/squidex/squidex" target="_blank">
+            <div class="card-block">
+                <div class="card-image">
+                    <img src="/images/dashboard-github.png" />
+                </div>
+
+                <h4 class="card-title">Github</h4>
+                <p class="card-text">Get the source code from Github and report bugs or ask for support.</p>
+            </div>
+        </a>
+    </div>
+</div> 

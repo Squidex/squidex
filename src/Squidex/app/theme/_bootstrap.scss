@@ -37,7 +37,7 @@ body {
 }
 
 .dropdown-menu {
-    @include box-shadow(0, .3px, 16px, .2px);
+    @include box-shadow(0, 3px, 16px, .2px);
     border: 0;
     background: $panel-light-background;
 }

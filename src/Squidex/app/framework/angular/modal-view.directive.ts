@@ -17,7 +17,7 @@ export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
     private subscription: Subscription;
     private isEnabled = true;
     private clickHandler: Function | null;
-    private renderedView: EmbeddedViewRef<any> | null;
+    private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
     public modalView: ModalView;

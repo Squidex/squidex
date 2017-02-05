@@ -1,0 +1,65 @@
+@import '_vars';
+@import '_mixins';
+
+.dashboard {
+    padding: 2rem;
+    padding-right: 1rem;
+}
+
+h1 {
+    font-weight: light;
+    font-size: 1.4rem;
+}
+
+.subtext {
+    margin-top: .5rem;
+    margin-bottom: .8rem;
+    color: $color-subtext;
+}
+
+.app-name {
+    color: $color-title;
+}
+
+.card {
+    & {
+        cursor: pointer;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+        width: 16rem;
+        float: left;
+    }
+
+    &:hover {
+        @include box-shadow(0, 3px, 16px, .2px);
+    }
+
+    &:hover,
+    &:active {
+        text-decoration: none;
+    }
+
+    h4 {
+        color: $color-title;
+    }
+
+    &-block {
+        min-height: 14.5rem;
+    }
+
+    &-image {
+        text-align: center;
+    }
+
+    &-text {
+        font-weight: normal;
+        font-size: .9rem;
+        color: $color-empty;
+    }
+
+    &-title {
+        font-weight: light;
+        font-size: 1.2rem;
+        margin-top: .4rem;
+    }
+}

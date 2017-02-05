@@ -6,13 +6,17 @@
  */
 
 import { Component } from '@angular/core';
+import { Subscription} from 'rxjs';
 
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     NotificationService,
     UsersProviderService
  } from 'shared';
+
+declare var _urq: any;
 
 @Component({
     selector: 'sqx-dashboard-page',
@@ -20,8 +24,33 @@ import {
     templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent extends AppComponentBase {
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {
+    private authenticationSubscription: Subscription;
+
+    public profileDisplayName = '';
+
+    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+        private readonly auth: AuthService
+    ) {
         super(apps, notifications, users);
+    }
+
+    public ngOnDestroy() {
+        this.authenticationSubscription.unsubscribe();
+    }
+
+    public ngOnInit() {
+        this.authenticationSubscription =
+            this.auth.isAuthenticated.subscribe(() => {
+                const user = this.auth.user;
+
+                if (user) {
+                    this.profileDisplayName = user.displayName;
+                }
+            });
+    }
+
+    public showForum() {
+        _urq.push(['Feedback_Open']);
     }
 }
 

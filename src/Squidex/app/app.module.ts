@@ -41,7 +41,7 @@ export function configCurrency() {
 }
 
 export function configUserReport() {
-    return new UserReportConfig('5e3e70c2-19b8-493a-9fa0-af240d50e0ba');
+    return new UserReportConfig('221afe63-0ca2-42aa-8efe-188d77964a7f');
 }
 
 @NgModule({
