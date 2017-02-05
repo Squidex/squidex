@@ -110,10 +110,8 @@ body {
 }
 
 @mixin link-button($color) {
-    & {
-        color: $color;
-        cursor: pointer;
-    }
+    color: $color;
+    cursor: pointer;
 
     &:focus {
         outline-color: transparent;

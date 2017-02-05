@@ -77,6 +77,8 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     DispatchConsumers(catchConsumers, @event);
                 }
+
+                logger.LogDebug("Event {0} handled", @event.Payload.GetType().Name);
             });
 
             isSubscribed = true;

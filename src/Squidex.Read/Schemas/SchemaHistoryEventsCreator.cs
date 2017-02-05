@@ -87,13 +87,22 @@ namespace Squidex.Read.Schemas
 
                 var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaName);
 
-                var fieldEvent = @event.Payload as FieldEvent;
+                var fieldAdded = @event.Payload as FieldAdded;
 
-                if (fieldEvent != null)
+                if (fieldAdded != null)
                 {
-                    var fieldName = schemaEntity.Schema.Fields.GetOrDefault(fieldEvent.FieldId)?.Name;
+                    result.AddParameter("Field", fieldAdded.Name);
+                }
+                else
+                {
+                    var fieldEvent = @event.Payload as FieldEvent;
 
-                    result.AddParameter("Field", fieldName);
+                    if (fieldEvent != null)
+                    {
+                        var fieldName = schemaEntity.Schema.Fields.GetOrDefault(fieldEvent.FieldId)?.Name;
+
+                        result.AddParameter("Field", fieldName);
+                    }
                 }
 
                 return result;

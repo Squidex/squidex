@@ -65,7 +65,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name must be a valid javascript name in camel case.')
                 ]]
         });
 

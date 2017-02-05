@@ -27,9 +27,9 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            var storeType = Configuration.GetValue<string>("squidex:eventBus:type");
+            var eventBusType = Configuration.GetValue<string>("squidex:eventBus:type");
 
-            if (string.IsNullOrWhiteSpace(storeType))
+            if (string.IsNullOrWhiteSpace(eventBusType))
             {
                 throw new ConfigurationException("You must specify the event bus type in the 'squidex:eventBus:type' configuration section.");
             }
@@ -41,14 +41,14 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            if (string.Equals(storeType, "Memory", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(eventBusType, "Memory", StringComparison.OrdinalIgnoreCase))
             {
                 builder.RegisterType<InMemoryEventBus>()
                     .As<IEventStream>()
                     .As<IEventPublisher>()
                     .SingleInstance();
             }
-            if (string.Equals(storeType, "RabbitMq", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(eventBusType, "RabbitMq", StringComparison.OrdinalIgnoreCase))
             {
                 var connectionString = Configuration.GetValue<string>("squidex:eventBus:rabbitMq:connectionString");
 
@@ -74,7 +74,7 @@ namespace Squidex.Config.Domain
             }
             else
             {
-                throw new ConfigurationException($"Unsupported store type '{storeType}' for key 'squidex:eventStore:type', supported: Memory, RabbmitMq.");
+                throw new ConfigurationException($"Unsupported store type '{eventBusType}' for key 'squidex:eventStore:type', supported: Memory, RabbmitMq.");
             }
         }
     }

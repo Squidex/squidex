@@ -7,15 +7,13 @@
 }
 
 @mixin panel-icon {
-    & {
-        color: $color-panel-icon;
-        font-size: 1.2rem;
-        font-weight: 400;
-        text-decoration: none;
-        text-align: center;
-        padding: .6rem;
-        cursor: pointer;
-    }
+    color: $color-panel-icon;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-decoration: none;
+    text-align: center;
+    padding: .6rem;
+    cursor: pointer;
 
     &:hover,
     &:focus {
@@ -138,6 +136,8 @@
     &-close {
         @include absolute($panel-padding - .3rem, $panel-padding - .8rem, auto, auto);
         @include panel-icon;
+        font-size: 1rem;
+        font-weight: 300;
     }
 }
 
