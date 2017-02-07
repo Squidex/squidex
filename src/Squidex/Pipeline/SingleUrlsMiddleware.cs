@@ -31,7 +31,7 @@ namespace Squidex.Pipeline
 
         public async Task Invoke(HttpContext context)
         {
-            if (!urls.Value.EnforceSSL)
+            if (!urls.Value.EnforceHTTPS)
             {
                 await next(context);
             }

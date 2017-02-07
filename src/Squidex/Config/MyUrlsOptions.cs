@@ -12,7 +12,7 @@ namespace Squidex.Config
 {
     public sealed class MyUrlsOptions
     {
-        public bool EnforceSSL { get; set; }
+        public bool EnforceHTTPS { get; set; }
 
         public string BaseUrl { get; set; }
 
