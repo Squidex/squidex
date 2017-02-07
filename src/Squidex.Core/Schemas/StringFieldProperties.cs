@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 using System.Collections.Immutable;
+
 // ReSharper disable ObjectCreationAsStatement
 
 namespace Squidex.Core.Schemas

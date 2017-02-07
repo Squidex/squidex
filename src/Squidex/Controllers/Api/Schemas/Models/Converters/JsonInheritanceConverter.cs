@@ -13,6 +13,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
+
 // ReSharper disable ConvertIfStatementToReturnStatement
 
 namespace Squidex.Controllers.Api.Schemas.Models.Converters

@@ -9,6 +9,7 @@
 using Microsoft.OData.Core.UriParser;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
+
 // ReSharper disable ConvertIfStatementToReturnStatement
 
 namespace Squidex.Read.MongoDb.Contents.Visitors

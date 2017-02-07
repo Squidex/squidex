@@ -13,6 +13,7 @@ using Microsoft.OData.Core.UriParser.Semantic;
 using Microsoft.OData.Core.UriParser.Visitors;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
+
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
 

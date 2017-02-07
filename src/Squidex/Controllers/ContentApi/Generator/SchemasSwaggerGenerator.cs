@@ -24,6 +24,7 @@ using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Read.Apps;
 using Squidex.Read.Schemas;
+
 // ReSharper disable InvertIf
 // ReSharper disable SuggestBaseTypeForParameter
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable

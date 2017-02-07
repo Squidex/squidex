@@ -16,6 +16,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Utils;
 using Squidex.Events;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Read.Schemas.Services.Implementations

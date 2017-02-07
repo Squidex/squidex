@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure.Json;
 using Xunit;
+
 // ReSharper disable PossibleInvalidOperationException
 // ReSharper disable UnusedParameter.Local
 

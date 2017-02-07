@@ -12,6 +12,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
+
 // ReSharper disable UseObjectOrCollectionInitializer
 
 namespace Squidex.Core.Schemas.Json

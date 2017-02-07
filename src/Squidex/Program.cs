@@ -13,6 +13,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+
 // ReSharper disable InvertIf
 
 namespace Squidex

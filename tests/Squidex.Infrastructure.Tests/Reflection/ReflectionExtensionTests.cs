@@ -8,6 +8,7 @@
 
 using System.Linq;
 using Xunit;
+
 // ReSharper disable UnusedMember.Local
 
 namespace Squidex.Infrastructure.Reflection

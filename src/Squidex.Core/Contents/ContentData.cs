@@ -12,6 +12,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Core.Contents

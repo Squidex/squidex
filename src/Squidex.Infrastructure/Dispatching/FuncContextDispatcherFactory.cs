@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+
 // ReSharper disable UnusedMember.Local
 
 namespace Squidex.Infrastructure.Dispatching

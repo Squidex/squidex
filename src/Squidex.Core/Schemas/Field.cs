@@ -14,6 +14,7 @@ using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure;
+
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression

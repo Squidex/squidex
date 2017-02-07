@@ -16,6 +16,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
+
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InvertIf

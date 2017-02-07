@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Write.Apps

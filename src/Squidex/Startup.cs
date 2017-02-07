@@ -14,7 +14,6 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,7 @@ using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
-using Squidex.Pipeline;
+
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
 
@@ -102,8 +101,7 @@ namespace Squidex
 
             app.TestExternalSystems();
 
-            app.UseForwardedHeaders();
-            app.UseMiddleware<SingleUrlsMiddleware>();
+            app.UseMyForwardingRules();
 
             MapAndUseIdentity(app);
             MapAndUseApi(app);

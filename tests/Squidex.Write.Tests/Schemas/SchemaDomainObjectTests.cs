@@ -16,6 +16,7 @@ using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Write.Schemas.Commands;
 using Xunit;
+
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Write.Schemas

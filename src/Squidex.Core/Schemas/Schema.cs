@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
+
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 

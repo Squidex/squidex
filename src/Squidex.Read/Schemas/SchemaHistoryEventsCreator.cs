@@ -13,6 +13,7 @@ using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.History;
 using Squidex.Read.Schemas.Services;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Read.Schemas

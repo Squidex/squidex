@@ -20,6 +20,7 @@ using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Schemas.Services.Implementations;
 using Squidex.Read.MongoDb.Schemas;
 using Xunit;
+
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable UnusedParameter.Local
 

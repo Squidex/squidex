@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.CQRS.Commands

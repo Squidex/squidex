@@ -8,6 +8,7 @@
 
 using System;
 using Xunit;
+
 // ReSharper disable UnusedParameter.Local
 
 namespace Squidex.Infrastructure.Reflection

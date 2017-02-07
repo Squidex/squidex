@@ -8,6 +8,7 @@
 
 using System;
 using System.Text.RegularExpressions;
+
 // ReSharper disable ObjectCreationAsStatement
 
 namespace Squidex.Infrastructure

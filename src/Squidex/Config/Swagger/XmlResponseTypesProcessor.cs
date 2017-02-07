@@ -16,6 +16,7 @@ using NSwag;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Contexts;
 using Squidex.Controllers.Api;
+
 // ReSharper disable UseObjectOrCollectionInitializer
 
 namespace Squidex.Config.Swagger

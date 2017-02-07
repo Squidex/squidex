@@ -19,6 +19,7 @@ using Squidex.Read.Users.Repositories;
 using Squidex.Write.Apps.Commands;
 using Squidex.Write.Utils;
 using Xunit;
+
 // ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable ConvertToConstant.Local
 

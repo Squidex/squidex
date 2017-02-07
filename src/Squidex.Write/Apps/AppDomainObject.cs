@@ -17,6 +17,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Write.Apps.Commands;
+
 // ReSharper disable InvertIf
 
 namespace Squidex.Write.Apps

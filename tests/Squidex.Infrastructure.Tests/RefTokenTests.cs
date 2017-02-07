@@ -10,6 +10,7 @@ using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 using Xunit;
+
 // ReSharper disable RedundantCast
 
 namespace Squidex.Infrastructure
