@@ -102,7 +102,7 @@ namespace Squidex
 
             app.TestExternalSystems();
 
-            app.UseHttpMethodOverride();
+            app.UseForwardedHeaders();
             app.UseMiddleware<SingleUrlsMiddleware>();
 
             MapAndUseIdentity(app);
