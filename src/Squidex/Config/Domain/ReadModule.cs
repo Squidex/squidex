@@ -33,11 +33,13 @@ namespace Squidex.Config.Domain
         {
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
+                .As<ILiveEventConsumer>()
                 .As<ICatchEventConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
+                .As<ILiveEventConsumer>()
                 .As<ICatchEventConsumer>()
                 .SingleInstance();
 

@@ -13,14 +13,14 @@ exports.root = function () {
 };
 
 exports.removeLoaders = function (config, extensions) {
-    var loaders = config.module.loaders;
+    var rules = config.module.rules;
 
-    for (var i = 0; i < loaders.length; i += 1) {
-        var loader = loaders[i];
+    for (var i = 0; i < rules.length; i += 1) {
+        var rule = rules[i];
 
         for (var j = 0; j < extensions.length; j += 1) {
-            if (loader.test.source.indexOf(extensions[j]) >= 0) {
-                loaders.splice(i, 1);
+            if (rule.test.source.indexOf(extensions[j]) >= 0) {
+                rules.splice(i, 1);
                 i--;
                 break;
             }

@@ -92,7 +92,7 @@ describe('ImmutableArray', () => {
 
     it('should replace all by predicate', () => {
         const array_1 = ImmutableArray.of([1, 2, 3, 4]);
-        const array_2 = array_1.replaceAll((i: number) => i % 2 === 0, i => i *2);
+        const array_2 = array_1.replaceAll((i: number) => i % 2 === 0, i => i * 2);
 
         expect(array_2.values).toEqual([1, 4, 3, 8]);
     });
@@ -113,7 +113,7 @@ describe('ImmutableArray', () => {
 
     it('should map items', () => {
         const array_1 = ImmutableArray.of([1, 2, 3, 4]);
-        const array_2 = array_1.map((i: number) => i *2);
+        const array_2 = array_1.map((i: number) => i * 2);
 
         expect(array_2.values).toEqual([2, 4, 6, 8]);
     });

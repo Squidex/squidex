@@ -37,11 +37,17 @@ module.exports = webpackMerge(runConfig, {
          *
          * See: http://webpack.github.io/docs/configuration.html#module-loaders
          */
-        loaders: [
+        rules: [
             {
                 test: /\.scss$/,
-                include: helpers.root('app', 'theme'),
-                loaders: ['style-loader', 'css-loader', 'sass-loader?sourceMap']
+                use: [{
+                    loader: 'style-loader'
+                }, {
+                    loader: 'css-loader'
+                }, {
+                    loader: 'sass-loader?sourceMap',
+                }],
+                include: helpers.root('app', 'theme')
             }
         ]
     },

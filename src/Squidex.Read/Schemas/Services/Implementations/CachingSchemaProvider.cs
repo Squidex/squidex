@@ -20,7 +20,7 @@ using Squidex.Events;
 
 namespace Squidex.Read.Schemas.Services.Implementations
 {
-    public class CachingSchemaProvider : CachingProvider, ISchemaProvider, ICatchEventConsumer
+    public class CachingSchemaProvider : CachingProvider, ISchemaProvider, ICatchEventConsumer, ILiveEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly ISchemaRepository repository;

@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
@@ -22,11 +22,13 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private sealed class MyLogger : ILogger<EventReceiver>
         {
-            public int LogCount { get; private set; }
+            public Dictionary<LogLevel, int> LogCount { get; } = new Dictionary<LogLevel, int>();
 
             public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
             {
-                LogCount++;
+                var count = LogCount.GetOrDefault(logLevel);
+
+                LogCount[logLevel] = count + 1;
             }
 
             public bool IsEnabled(LogLevel logLevel)
@@ -46,47 +48,26 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly Mock<ICatchEventConsumer> catchConsumer2 = new Mock<ICatchEventConsumer>();
         private readonly Mock<IEventStream> eventStream = new Mock<IEventStream>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
-        private readonly EventData eventDataPast = new EventData();
-        private readonly EventData eventDataFuture = new EventData();
-        private readonly Envelope<IEvent> eventPast = new Envelope<IEvent>(new MyEvent());
-        private readonly Envelope<IEvent> eventFuture = new Envelope<IEvent>(new MyEvent());
+        private readonly EventData eventData = new EventData();
+        private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
         private readonly MyLogger logger = new MyLogger();
-        private readonly EventReceiver sut;
 
         public EventReceiverTests()
         {
-            eventFuture.SetTimestamp(Instant.FromDateTimeUtc(DateTime.UtcNow.AddYears(1)));
-
-            formatter.Setup(x => x.Parse(eventDataPast)).Returns(eventPast);
-            formatter.Setup(x => x.Parse(eventDataFuture)).Returns(eventFuture);
+            formatter.Setup(x => x.Parse(eventData)).Returns(envelope);
 
             eventStream.Setup(x => x.Connect("squidex", It.IsAny<Action<EventData>>())).Callback(
                 new Action<string, Action<EventData>>((queue, callback) =>
                 {
-                    callback(eventDataPast);
-                    callback(eventDataFuture);
+                    callback(eventData);
                 }));
-
-            sut =
-                new EventReceiver(
-                    logger, 
-                    eventStream.Object,
-                    new[]
-                    {
-                        liveConsumer1.Object,
-                        liveConsumer2.Object
-                    },
-                    new[]
-                    {
-                        catchConsumer1.Object,
-                        catchConsumer2.Object
-                    },
-                    formatter.Object);
         }
 
         [Fact]
         public void Should_only_connect_once()
         {
+            var sut = CreateSut(true);
+
             sut.Subscribe();
             sut.Subscribe();
 
@@ -94,69 +75,94 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public void Should_invoke_consumers()
+        public void Should_invoke_live_consumers()
         {
+            var sut = CreateSut(false);
+
             sut.Subscribe();
 
-            catchConsumer1.Verify(x => x.On(eventPast), Times.Once());
-            catchConsumer2.Verify(x => x.On(eventPast), Times.Once());
+            catchConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            catchConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
 
-            catchConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            catchConsumer2.Verify(x => x.On(eventFuture), Times.Once());
+            liveConsumer1.Verify(x => x.On(envelope), Times.Once());
+            liveConsumer2.Verify(x => x.On(envelope), Times.Once());
 
-            liveConsumer1.Verify(x => x.On(eventPast), Times.Never());
-            liveConsumer2.Verify(x => x.On(eventPast), Times.Never());
-
-            liveConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            liveConsumer2.Verify(x => x.On(eventFuture), Times.Once());
-
-            Assert.Equal(0, logger.LogCount);
+            Assert.Equal(1, logger.LogCount.Count);
+            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
         }
-        
+
+        [Fact]
+        public void Should_invoke_catch_consumers()
+        {
+            var sut = CreateSut(true);
+
+            sut.Subscribe();
+
+            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+
+            catchConsumer1.Verify(x => x.On(envelope), Times.Once());
+            catchConsumer2.Verify(x => x.On(envelope), Times.Once());
+
+            Assert.Equal(1, logger.LogCount.Count);
+            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
+        }
+
         [Fact]
         public void Should_log_if_parsing_event_failed()
         {
-            formatter.Setup(x => x.Parse(eventDataPast)).Throws(new InvalidOperationException());
+            formatter.Setup(x => x.Parse(eventData)).Throws(new InvalidOperationException());
+
+            var sut = CreateSut(true);
 
             sut.Subscribe();
 
-            catchConsumer1.Verify(x => x.On(eventPast), Times.Never());
-            catchConsumer2.Verify(x => x.On(eventPast), Times.Never());
+            catchConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            catchConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
 
-            catchConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            catchConsumer2.Verify(x => x.On(eventFuture), Times.Once());
+            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
 
-            liveConsumer1.Verify(x => x.On(eventPast), Times.Never());
-            liveConsumer2.Verify(x => x.On(eventPast), Times.Never());
-
-            liveConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            liveConsumer2.Verify(x => x.On(eventFuture), Times.Once());
-
-            Assert.Equal(1, logger.LogCount);
+            Assert.Equal(1, logger.LogCount.Count);
+            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
         }
 
         [Fact]
         public void Should_log_if_handling_failed()
         {
-            catchConsumer1.Setup(x => x.On(eventPast)).Throws(new InvalidOperationException());
+            catchConsumer1.Setup(x => x.On(envelope)).Throws(new InvalidOperationException());
 
-            liveConsumer1.Setup(x => x.On(eventFuture)).Throws(new InvalidOperationException());
+            var sut = CreateSut(true);
 
             sut.Subscribe();
 
-            catchConsumer1.Verify(x => x.On(eventPast), Times.Once());
-            catchConsumer2.Verify(x => x.On(eventPast), Times.Once());
+            catchConsumer1.Verify(x => x.On(envelope), Times.Once());
+            catchConsumer2.Verify(x => x.On(envelope), Times.Once());
 
-            catchConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            catchConsumer2.Verify(x => x.On(eventFuture), Times.Once());
+            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
 
-            liveConsumer1.Verify(x => x.On(eventPast), Times.Never());
-            liveConsumer2.Verify(x => x.On(eventPast), Times.Never());
+            Assert.Equal(2, logger.LogCount.Count);
+            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
+        }
 
-            liveConsumer1.Verify(x => x.On(eventFuture), Times.Once());
-            liveConsumer2.Verify(x => x.On(eventFuture), Times.Once());
-
-            Assert.Equal(2, logger.LogCount);
+        private EventReceiver CreateSut(bool canCatch)
+        {
+            return new EventReceiver(
+                logger,
+                eventStream.Object,
+                new[]
+                {
+                        liveConsumer1.Object,
+                        liveConsumer2.Object
+                },
+                new[]
+                {
+                        catchConsumer1.Object,
+                        catchConsumer2.Object
+                },
+                formatter.Object, canCatch);
         }
     }
 }

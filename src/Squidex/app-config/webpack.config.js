@@ -42,26 +42,44 @@ module.exports = {
          *
          * See: http://webpack.github.io/docs/configuration.html#module-loaders
          */
-        loaders: [
+        rules: [
             {
                 test: /\.ts$/,
-                loaders: ['awesome-typescript-loader', 'angular2-router-loader', 'angular2-template-loader', 'tslint-loader']
+                use: [{
+                    loader: 'awesome-typescript-loader' 
+                }, {
+                    loader: 'angular2-router-loader'
+                }, {
+                    loader: 'angular2-template-loader'
+                },{
+                    loader: 'tslint-loader' 
+                }]
             }, {
                 test: /\.html$/,
-                loader: 'raw-loader'
+                use: [{
+                    loader: 'raw-loader'
+                }]
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
-                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                use: [{
+                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                }]
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                use: [{
+                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                }]
             }, {
                 test: /\.css$/,
-                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
+                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
-                exclude: helpers.root('app', 'theme'),
-                loaders: ['raw-loader', 'sass-loader']
+                use: [{
+                    loader: 'raw-loader'
+                }, {
+                    loader: 'sass-loader'
+                }],
+                exclude: helpers.root('app', 'theme')
             }
         ]
     },

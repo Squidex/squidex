@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
@@ -56,8 +55,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return;
             }
 
-            var startTime = SystemClock.Instance.GetCurrentInstant();
-
             eventStream.Connect("squidex", eventData =>
             {
                 var @event = ParseEvent(eventData);
@@ -67,15 +64,13 @@ namespace Squidex.Infrastructure.CQRS.Events
                     return;
                 }
 
-                var isLive = @event.Headers.Timestamp() >= startTime;
-
-                if (isLive)
-                {
-                    DispatchConsumers(catchConsumers.OfType<IEventConsumer>().Union(liveConsumers), @event);
-                }
-                else if (canCatch)
+                if (canCatch)
                 {
                     DispatchConsumers(catchConsumers, @event);
+                }
+                else
+                {
+                    DispatchConsumers(liveConsumers, @event);
                 }
 
                 logger.LogDebug("Event {0} handled", @event.Payload.GetType().Name);
