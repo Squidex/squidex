@@ -12,6 +12,7 @@ import {
     AppComponentBase,
     AppsStoreService,
     AuthService,
+    fadeAnimation,
     NotificationService,
     UsersProviderService
  } from 'shared';
@@ -21,7 +22,10 @@ declare var _urq: any;
 @Component({
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
-    templateUrl: './dashboard-page.component.html'
+    templateUrl: './dashboard-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class DashboardPageComponent extends AppComponentBase {
     private authenticationSubscription: Subscription;

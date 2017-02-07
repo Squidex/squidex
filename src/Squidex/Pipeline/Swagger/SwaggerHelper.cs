@@ -46,9 +46,9 @@ namespace Squidex.Pipeline.Swagger
                 };
         }
 
-        public static void AddQueryParameter(this ICollection<SwaggerParameter> parameters, string name, JsonObjectType type, string description)
+        public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description)
         {
-            parameters.Add(
+            operation.Parameters.Add(
                 new SwaggerParameter
                 {
                     Type = type,
@@ -58,9 +58,9 @@ namespace Squidex.Pipeline.Swagger
                 });
         }
 
-        public static void AddPathParameter(this ICollection<SwaggerParameter> parameters, string name, JsonObjectType type, string description)
+        public static void AddPathParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description)
         {
-            parameters.Add(
+            operation.Parameters.Add(
                 new SwaggerParameter
                 {
                     Type = type,
@@ -72,9 +72,9 @@ namespace Squidex.Pipeline.Swagger
                 });
         }
 
-        public static void AddBodyParameter(this ICollection<SwaggerParameter> parameters, JsonSchema4 schema, string name, string description)
+        public static void AddBodyParameter(this SwaggerOperation operation, JsonSchema4 schema, string name, string description)
         {
-            parameters.Add(
+            operation.Parameters.Add(
                 new SwaggerParameter
                 {
                     Name = name,
@@ -84,6 +84,11 @@ namespace Squidex.Pipeline.Swagger
                     IsNullableRaw = false,
                     Description = description
                 });
+        }
+
+        public static void AddResponse(this SwaggerOperation operation, string statusCode, string description, JsonSchema4 schema = null)
+        {
+            operation.Responses.Add(statusCode, new SwaggerResponse { Description = description, Schema = schema });
         }
     }
 }

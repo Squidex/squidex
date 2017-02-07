@@ -35,7 +35,7 @@ namespace Squidex.Controllers.ContentApi.Generator
         private const string BodyDescription =
             @"The data of the {0} to be created or updated.
             
-Please not that each field is an object with one entry per language. 
+Please note that each field is an object with one entry per language. 
 If the field is not localizable you must use iv (Invariant Language) as a key.
 When you change the field to be localizable the value will become the value for the master language, depending what the master language is at this point of time.";
 
@@ -73,7 +73,7 @@ When you change the field to be localizable the value will become the value for 
             appBasePath = $"/content/{appEntity.Name}";
 
             await GenerateBasicSchemas();
-
+            
             GenerateTitle();
             GenerateRequestInfo();
             GenerateContentTypes();
@@ -179,13 +179,15 @@ When you change the field to be localizable the value will become the value for 
                     Name = schemaName, Description = $"API to managed {schemaName} content elements."
                 });
 
+            var dataSchem = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+
             var schemaOperations = new List<SwaggerOperations>
             {
-                GenerateSchemaQueryOperation(schema, schemaName),
-                GenerateSchemaCreateOperation(schema, schemaName),
-                GenerateSchemaGetOperation(schema, schemaName),
-                GenerateSchemaUpdateOperation(schema, schemaName),
-                GenerateSchemaPatchOperation(schema, schemaName),
+                GenerateSchemaQueryOperation(schema, schemaName, dataSchem),
+                GenerateSchemaCreateOperation(schema, schemaName, dataSchem),
+                GenerateSchemaGetOperation(schema, schemaName, dataSchem),
+                GenerateSchemaUpdateOperation(schema, schemaName, dataSchem),
+                GenerateSchemaPatchOperation(schema, schemaName, dataSchem),
                 GenerateSchemaPublishOperation(schema, schemaName),
                 GenerateSchemaUnpublishOperation(schema, schemaName),
                 GenerateSchemaDeleteOperation(schema, schemaName)
@@ -197,79 +199,68 @@ When you change the field to be localizable the value will become the value for 
             }
         }
 
-        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, JsonSchema4 dataSchem)
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
             {
-                operation.Summary = $"Queries {schemaName} content elements.";
+                operation.Summary = $"Queries {schemaName} content elements."; 
 
-                operation.Parameters.AddQueryParameter("$top", JsonObjectType.Number, "The number of elements to take.");
-                operation.Parameters.AddQueryParameter("$skip", JsonObjectType.Number, "The number of elements to skip.");
-                operation.Parameters.AddQueryParameter("$filter", JsonObjectType.String, "Optional filter.");
-                operation.Parameters.AddQueryParameter("$search", JsonObjectType.String, "Optional full text query skip.");
+                operation.AddQueryParameter("$top", JsonObjectType.Number, "The number of elements to take.");
+                operation.AddQueryParameter("$skip", JsonObjectType.Number, "The number of elements to skip.");
+                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional filter.");
+                operation.AddQueryParameter("$search", JsonObjectType.String, "Optional full text query string.");
 
-                var responseSchema = CreateContentsSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
+                var responseSchema = CreateContentsSchema(schemaName, schema.Name, dataSchem);
 
-                operation.Responses.Add("200",
-                    new SwaggerResponse { Description = $"{schemaName} content elements retrieved.", Schema = responseSchema });
+                operation.AddResponse("200", $"{schemaName} content elements retrieved.", responseSchema);
             });
         }
 
-        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
                 operation.Summary = $"Get a {schemaName} content element.";
 
-                var responseSchema = CreateContentSchema(schema.BuildSchema(languages, AppendSchema), schemaName, schema.Name);
+                var responseSchema = CreateContentSchema(schemaName, schema.Name, dataSchema);
 
-                operation.Responses.Add("200",
-                    new SwaggerResponse { Description = $"{schemaName} element found.", Schema = responseSchema });
+                operation.AddResponse("200", $"{schemaName} element found.", responseSchema);
             });
         }
 
-        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appBasePath}/{schema.Name}", operation =>
             {
                 operation.Summary = $"Create a {schemaName} content element.";
 
-                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
-                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
-
-                operation.Responses.Add("201",
-                    new SwaggerResponse { Description = $"{schemaName} created.", Schema = entityCreatedDtoSchema });
+                operation.AddResponse("201", $"{schemaName} created.",  entityCreatedDtoSchema);
             });
         }
 
-        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
                 operation.Summary = $"Update a {schemaName} content element.";
 
-                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
-                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
-
-                operation.Responses.Add("204",
-                    new SwaggerResponse { Description = $"{schemaName} element updated." });
+                operation.AddResponse("204", $"{schemaName} element updated.");
             });
         }
 
-        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
-                operation.Summary = $"Update a {schemaName} content element partially.";
+                operation.Summary = $"Patchs a {schemaName} content element.";
 
-                var bodySchema = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
-                operation.Parameters.AddBodyParameter(bodySchema, "data", string.Format(BodyDescription, schemaName));
-
-                operation.Responses.Add("204",
-                    new SwaggerResponse { Description = $"{schemaName} element updated." });
+                operation.AddResponse("204", $"{schemaName} element updated.");
             });
         }
 
@@ -278,9 +269,8 @@ When you change the field to be localizable the value will become the value for 
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/publish", operation =>
             {
                 operation.Summary = $"Publish a {schemaName} content element.";
-
-                operation.Responses.Add("204",
-                    new SwaggerResponse { Description = $"{schemaName} element published." });
+                
+                operation.AddResponse("204", $"{schemaName} element published.");
             });
         }
 
@@ -290,8 +280,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Unpublish a {schemaName} content element.";
 
-                operation.Responses.Add("204",
-                    new SwaggerResponse { Description = $"{schemaName} element unpublished." });
+                operation.AddResponse("204", $"{schemaName} element unpublished.");
             });
         }
 
@@ -301,8 +290,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Delete a {schemaName} content element.";
 
-                operation.Responses.Add("204",
-                    new SwaggerResponse { Description = $"{schemaName} element deleted." });
+                operation.AddResponse("204", $"{schemaName} element deleted.");
             });
         }
 
@@ -317,18 +305,17 @@ When you change the field to be localizable the value will become the value for 
 
             if (entityName != null)
             {
-                operation.Parameters.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
+                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
 
-                operation.Responses.Add("404",
-                    new SwaggerResponse { Description = $"App, schema or {entityName} not found." });
+                operation.AddResponse("404", $"App, schema or {entityName} not found.");
             }
 
             return operations;
         }
 
-        private JsonSchema4 CreateContentsSchema(JsonSchema4 dataSchema, string schemaName, string id)
+        private JsonSchema4 CreateContentsSchema(string schemaName, string id, JsonSchema4 dataSchema)
         {
-            var contentSchema = CreateContentSchema(dataSchema, schemaName, id);
+            var contentSchema = CreateContentSchema(schemaName, id, dataSchema);
 
             var schema = new JsonSchema4
             {
@@ -340,10 +327,7 @@ When you change the field to be localizable the value will become the value for 
                     },
                     ["items"] = new JsonProperty
                     {
-                        IsRequired = true,
-                        Item = contentSchema,
-                        Type = JsonObjectType.Array,
-                        Description = $"The item of {schemaName} content elements."
+                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The item of {schemaName} content elements."
                     }
                 },
                 Type = JsonObjectType.Object
@@ -352,15 +336,14 @@ When you change the field to be localizable the value will become the value for 
             return schema;
         }
 
-        private JsonSchema4 CreateContentSchema(JsonSchema4 dataSchema, string schemaName, string id)
+        private JsonSchema4 CreateContentSchema(string schemaName, string id, JsonSchema4 dataSchema)
         {
             var CreateProperty = 
                 new Func<string, string, JsonProperty>((d, f) => 
                     new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
 
-            var dataProperty = new JsonProperty { Type = JsonObjectType.Object, IsRequired = true, Description = "The data of the content element" };
-
-            dataProperty.AllOf.Add(dataSchema);
+            var dataDescription = $"The data of the {schemaName} content element";
+            var dataProperty = new JsonProperty { Description = dataDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
             {
@@ -371,11 +354,7 @@ When you change the field to be localizable the value will become the value for 
                     ["created"] = CreateProperty($"The date and time when the {schemaName} content element has been created.", "date-time"),
                     ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content element.", null),
                     ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content element has been modified last.", "date-time"),
-                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content element.", null),
-                    ["nonPublished"] = new JsonProperty
-                    {
-                        Description = $"Indicates if the {schemaName} content element is publihed.", IsRequired = true, Type = JsonObjectType.Boolean
-                    }   
+                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content element.", null)
                 },
                 Type = JsonObjectType.Object
             };

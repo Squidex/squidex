@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_throw_if_getting_readonly()
+        public void Should_throw_if_getting_readonly_property()
         {
             Assert.Throws<NotSupportedException>(() => accessor.GetValue(target, "Write"));
         }
