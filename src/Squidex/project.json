@@ -9,6 +9,7 @@
     "Microsoft.AspNetCore.Authentication.Google": "1.1.0",
     "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
+    "Microsoft.AspNetCore.HttpOverrides": "1.1.0",
     "Microsoft.AspNetCore.Identity": "1.1.0",
     "Microsoft.AspNetCore.Mvc": "1.1.1",
     "Microsoft.AspNetCore.Razor.Tools": "1.1.0-preview4-final",
