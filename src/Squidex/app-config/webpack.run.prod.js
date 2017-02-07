@@ -53,18 +53,26 @@ module.exports = webpackMerge(runConfig, {
          *
          * See: http://webpack.github.io/docs/configuration.html#module-loaders
          */
-        loaders: [
+        rules: [
             {
                 test: /\.scss$/,
+                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' }),
                 include: helpers.root('app', 'theme'),
-                loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
+                use: [{
+                    loader: 'raw-loader'
+                }, {
+                    loader: helpers.root('app-config', 'clean-css-loader')
+                }, {
+                    loader: 'sass-loader'
+                }],
                 exclude: helpers.root('app', 'theme'),
-                loaders: ['raw-loader', helpers.root('app-config', 'clean-css-loader'), 'sass-loader']
             }, { 
                 test: /\.ts/, 
-                loaders: ['@ngtools/webpack'] 
+                use: [{
+                    loader: '@ngtools/webpack'
+                }]
             }
         ]
     },
