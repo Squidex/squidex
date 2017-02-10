@@ -14,12 +14,12 @@ namespace Squidex.Infrastructure.CQRS
 {
     public static class EnvelopeExtensions
     {
-        public static int EventNumber(this EnvelopeHeaders headers)
+        public static long EventNumber(this EnvelopeHeaders headers)
         {
             return headers[CommonHeaders.EventNumber].ToInt32(CultureInfo.InvariantCulture);
         }
 
-        public static Envelope<T> SetEventNumber<T>(this Envelope<T> envelope, int value) where T : class
+        public static Envelope<T> SetEventNumber<T>(this Envelope<T> envelope, long value) where T : class
         {
             envelope.Headers.Set(CommonHeaders.EventNumber, value);
 

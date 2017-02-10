@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IEventStream.cs
+//  IEventsPushedNotifier.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,8 +10,10 @@ using System;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface IEventStream : IDisposable
+    public interface IEventNotifier
     {
-        void Connect(string queuePrefix, Action<EventData> received);
+        void NotifyEventsStored();
+
+        void Subscribe(Action handler);
     }
 }

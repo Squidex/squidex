@@ -30,14 +30,18 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
         [BsonElement]
         [BsonRequired]
+        public long EventsOffset { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public long EventStreamOffset { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
         public string EventStream { get; set; }
 
         [BsonElement]
         [BsonRequired]
-        public int EventsVersion { get; set; }
-
-        [BsonElement]
-        [BsonRequired]
-        public int EventCount { get; set; }
+        public long EventsCount { get; set; }
     }
 }

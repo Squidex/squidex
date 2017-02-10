@@ -20,26 +20,22 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly IStreamNameResolver nameResolver;
         private readonly IDomainObjectFactory factory;
         private readonly IEventStore eventStore;
-        private readonly IEventPublisher eventPublisher;
         private readonly EventDataFormatter formatter;
 
         public DefaultDomainObjectRepository(
             IDomainObjectFactory factory, 
             IEventStore eventStore,
-            IEventPublisher eventPublisher,
             IStreamNameResolver nameResolver,
             EventDataFormatter formatter)
         {
             Guard.NotNull(factory, nameof(factory));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventPublisher, nameof(eventPublisher));
             Guard.NotNull(nameResolver, nameof(nameResolver));
 
             this.factory = factory;
-            this.eventStore = eventStore;
             this.formatter = formatter;
-            this.eventPublisher = eventPublisher;
+            this.eventStore = eventStore;
             this.nameResolver = nameResolver;
         }
 
@@ -58,9 +54,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var domainObject = (TDomainObject)factory.CreateNew(typeof(TDomainObject), id);
 
-            foreach (var eventData in events)
+            foreach (var storedEvent in events)
             {
-                var envelope = formatter.Parse(eventData);
+                var envelope = formatter.Parse(storedEvent.Data);
 
                 domainObject.ApplyEvent(envelope);
             }
@@ -92,11 +88,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
             catch (WrongEventVersionException)
             {
                 throw new DomainObjectVersionException(domainObject.Id.ToString(), domainObject.GetType(), versionCurrent, versionExpected);
-            }
-
-            foreach (var eventData in eventsToSave)
-            {
-                eventPublisher.Publish(eventData);
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ICatchEventConsumer.cs
+//  StoredEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,7 +7,19 @@
 // ==========================================================================
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface ICatchEventConsumer : IEventConsumer
+    public sealed class StoredEvent
     {
+        public long EventNumber { get; }
+
+        public EventData Data { get; }
+
+        public StoredEvent(long eventNumber, EventData data)
+        {
+            Guard.NotNull(data, nameof(data));
+
+            EventNumber = eventNumber;
+
+            Data = data;
+        }
     }
 }

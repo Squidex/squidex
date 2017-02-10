@@ -12,20 +12,20 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public class WrongEventVersionException : Exception
     {
-        private readonly int currentVersion;
-        private readonly int expectedVersion;
+        private readonly long currentVersion;
+        private readonly long expectedVersion;
 
-        public int CurrentVersion
+        public long CurrentVersion
         {
             get { return currentVersion; }
         }
 
-        public int ExpectedVersion
+        public long ExpectedVersion
         {
             get { return expectedVersion; }
         }
 
-        public WrongEventVersionException(int currentVersion, int expectedVersion)
+        public WrongEventVersionException(long currentVersion, long expectedVersion)
             : base(FormatMessage(currentVersion, expectedVersion))
         {
             this.currentVersion = currentVersion;
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.expectedVersion = expectedVersion;
         }
 
-        private static string FormatMessage(int currentVersion, int expectedVersion)
+        private static string FormatMessage(long currentVersion, long expectedVersion)
         {
             return $"Requested version {expectedVersion}, but found {currentVersion}.";
         }

@@ -14,9 +14,9 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventStore
     {
-        IObservable<EventData> GetEventsAsync();
+        IObservable<StoredEvent> GetEventsAsync(long lastReceivedPosition = -1);
 
-        IObservable<EventData> GetEventsAsync(string streamName);
+        IObservable<StoredEvent> GetEventsAsync(string streamName);
 
         Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events);
     }

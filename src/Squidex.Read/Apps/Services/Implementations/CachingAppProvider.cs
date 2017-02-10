@@ -9,10 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Utils;
 
@@ -20,7 +17,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Apps.Services.Implementations
 {
-    public class CachingAppProvider : CachingProvider, IAppProvider, ICatchEventConsumer, ILiveEventConsumer
+    public class CachingAppProvider : CachingProvider, IAppProvider
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
         private readonly IAppRepository repository;
@@ -49,7 +46,7 @@ namespace Squidex.Read.Apps.Services.Implementations
             {
                 var entity = await repository.FindAppAsync(appId);
 
-                cacheItem = new CacheItem { Entity = entity, Name = entity?.Name };
+                cacheItem = new CacheItem { Entity = entity, Name = entity.Name };
 
                 Cache.Set(cacheKey, cacheItem, CacheDuration);
 
@@ -86,40 +83,18 @@ namespace Squidex.Read.Apps.Services.Implementations
             return cacheItem.Entity;
         }
 
-        public Task On(Envelope<IEvent> @event)
+        public void Remove(Guid id)
         {
-            if (@event.Payload is AppContributorAssigned ||
-                @event.Payload is AppContributorRemoved ||
-                @event.Payload is AppClientAttached ||
-                @event.Payload is AppClientRevoked ||
-                @event.Payload is AppClientRenamed ||
-                @event.Payload is AppLanguageAdded ||
-                @event.Payload is AppLanguageRemoved ||
-                @event.Payload is AppMasterLanguageSet)
+            var cacheKey = BuildIdCacheKey(id);
+
+            var cacheItem = Cache.Get<CacheItem>(cacheKey);
+
+            if (cacheItem?.Name != null)
             {
-                var cacheKey = BuildIdCacheKey(@event.Headers.AggregateId());
-
-                var cacheItem = Cache.Get<CacheItem>(cacheKey);
-
-                if (cacheItem?.Name != null)
-                {
-                    Cache.Remove(BuildNameCacheKey(cacheItem.Name));
-                }
-
-                Cache.Remove(cacheKey);
-            }
-            else
-            {
-                var appCreated = @event.Payload as AppCreated;
-
-                if (appCreated != null)
-                {
-                    Cache.Remove(BuildIdCacheKey(@event.Headers.AggregateId()));
-                    Cache.Remove(BuildNameCacheKey(appCreated.Name));
-                }
+                Cache.Remove(BuildNameCacheKey(cacheItem.Name));
             }
 
-            return Task.FromResult(true);
+            Cache.Remove(cacheKey);
         }
 
         private static string BuildNameCacheKey(string name)

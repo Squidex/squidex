@@ -15,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.History.Repositories;
@@ -102,29 +101,25 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoContentRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<IContentRepository>()
-                .As<ICatchEventConsumer>()
-                .As<IReplayableStore>()
+                .As<IEventCatchConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<MongoHistoryEventRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<IHistoryEventRepository>()
-                .As<ICatchEventConsumer>()
-                .As<IReplayableStore>()
+                .As<IEventCatchConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<MongoSchemaRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<ISchemaRepository>()
-                .As<ICatchEventConsumer>()
-                .As<IReplayableStore>()
+                .As<IEventCatchConsumer>()
                 .SingleInstance();
 
             builder.RegisterType<MongoAppRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<IAppRepository>()
-                .As<ICatchEventConsumer>()
-                .As<IReplayableStore>()
+                .As<IEventCatchConsumer>()
                 .SingleInstance();
         }
     }

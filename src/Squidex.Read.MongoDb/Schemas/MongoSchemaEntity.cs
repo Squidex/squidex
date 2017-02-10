@@ -58,11 +58,26 @@ namespace Squidex.Read.MongoDb.Schemas
             get { return schema.Value; }
         }
 
+        public void SerializeSchema(Schema newSchema, SchemaJsonSerializer serializer)
+        {
+            Label = newSchema.Properties.Label ?? newSchema.Name;
+
+            Schema = serializer.Serialize(newSchema).ToString();
+            schema = new Lazy<Schema>(() => newSchema);
+
+            IsPublished = newSchema.IsPublished;
+        }
+
+        public void UpdateSchema(SchemaJsonSerializer serializer, Func<Schema, Schema> updater)
+        {
+            DeserializeSchema(serializer);
+
+            SerializeSchema(updater(schema.Value), serializer);
+        }
+
         public Lazy<Schema> DeserializeSchema(SchemaJsonSerializer serializer)
         {
-            schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(JObject.Parse(Schema)) : null);
-
-            return schema;
+            return schema ?? (schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(JObject.Parse(Schema)) : null));
         }
     }
 }

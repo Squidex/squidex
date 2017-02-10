@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Replay;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.History;
 using Squidex.Read.History.Repositories;
@@ -22,7 +21,7 @@ using Squidex.Read.MongoDb.Utils;
 
 namespace Squidex.Read.MongoDb.History
 {
-    public class MongoHistoryEventRepository : MongoRepositoryBase<MongoHistoryEventEntity>, IHistoryEventRepository, ICatchEventConsumer, IReplayableStore
+    public class MongoHistoryEventRepository : MongoRepositoryBase<MongoHistoryEventEntity>, IHistoryEventRepository, IEventConsumer
     {
         private readonly List<IHistoryEventsCreator> creators;
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();

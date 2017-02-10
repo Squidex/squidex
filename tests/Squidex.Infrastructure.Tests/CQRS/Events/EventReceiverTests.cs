@@ -44,8 +44,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private readonly Mock<ILiveEventConsumer> liveConsumer1 = new Mock<ILiveEventConsumer>();
         private readonly Mock<ILiveEventConsumer> liveConsumer2 = new Mock<ILiveEventConsumer>();
-        private readonly Mock<ICatchEventConsumer> catchConsumer1 = new Mock<ICatchEventConsumer>();
-        private readonly Mock<ICatchEventConsumer> catchConsumer2 = new Mock<ICatchEventConsumer>();
+        private readonly Mock<IEventCatchConsumer> catchConsumer1 = new Mock<IEventCatchConsumer>();
+        private readonly Mock<IEventCatchConsumer> catchConsumer2 = new Mock<IEventCatchConsumer>();
         private readonly Mock<IEventStream> eventStream = new Mock<IEventStream>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly EventData eventData = new EventData();

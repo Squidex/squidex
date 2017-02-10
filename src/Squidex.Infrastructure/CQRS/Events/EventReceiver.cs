@@ -7,93 +7,93 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Timers;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class EventReceiver
+    public sealed class EventReceiver : DisposableObject
     {
         private readonly EventDataFormatter formatter;
-        private readonly bool canCatch;
-        private readonly IEnumerable<ILiveEventConsumer> liveConsumers;
-        private readonly IEnumerable<ICatchEventConsumer> catchConsumers;
-        private readonly IEventStream eventStream;
+        private readonly IEventStore eventStore;
+        private readonly IEventNotifier eventNotifier;
+        private readonly IEventCatchConsumer eventConsumer;
         private readonly ILogger<EventReceiver> logger;
-        private bool isSubscribed;
+        private CompletionTimer timer;
 
         public EventReceiver(
-            ILogger<EventReceiver> logger,
-            IEventStream eventStream,
-            IEnumerable<ILiveEventConsumer> liveConsumers,
-            IEnumerable<ICatchEventConsumer> catchConsumers,
             EventDataFormatter formatter,
-            bool canCatch = true)
+            IEventStore eventStore, 
+            IEventNotifier eventNotifier,
+            IEventCatchConsumer eventConsumer, 
+            ILogger<EventReceiver> logger)
         {
             Guard.NotNull(logger, nameof(logger));
             Guard.NotNull(formatter, nameof(formatter));
-            Guard.NotNull(eventStream, nameof(eventStream));
-            Guard.NotNull(liveConsumers, nameof(liveConsumers));
-            Guard.NotNull(catchConsumers, nameof(catchConsumers));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventNotifier, nameof(eventNotifier));
+            Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
             this.logger = logger;
             this.formatter = formatter;
-            this.canCatch = canCatch;
-            this.eventStream = eventStream;
-            this.liveConsumers = liveConsumers;
-            this.catchConsumers = catchConsumers;
+            this.eventStore = eventStore;
+            this.eventNotifier = eventNotifier;
+            this.eventConsumer = eventConsumer;
         }
 
-        public void Subscribe()
+        protected override void DisposeObject(bool disposing)
         {
-            if (isSubscribed)
+            if (disposing)
+            {
+                timer?.Dispose();
+            }
+        }
+
+        public void Subscribe(int delay = 5000)
+        {
+            if (timer != null)
             {
                 return;
             }
 
-            eventStream.Connect("squidex", eventData =>
+            var lastReceivedPosition = long.MinValue;
+            
+            timer = new CompletionTimer(delay, async ct =>
             {
-                var @event = ParseEvent(eventData);
-
-                if (@event == null)
+                if (lastReceivedPosition == long.MinValue)
                 {
-                    return;
+                    lastReceivedPosition = await eventConsumer.GetLastHandledEventNumber();
                 }
 
-                if (canCatch)
+                await eventStore.GetEventsAsync(lastReceivedPosition).ForEachAsync(async storedEvent =>
                 {
-                    DispatchConsumers(catchConsumers, @event);
-                }
-                else
-                {
-                    DispatchConsumers(liveConsumers, @event);
-                }
+                    var @event = ParseEvent(storedEvent.Data);
 
-                logger.LogDebug("Event {0} handled", @event.Payload.GetType().Name);
+                    @event.SetEventNumber(storedEvent.EventNumber);
+
+                    await DispatchConsumer(@event, eventConsumer, storedEvent.EventNumber);
+                }, ct);
             });
 
-            isSubscribed = true;
+            eventNotifier.Subscribe(timer.Trigger);
         }
 
-        private void DispatchConsumers(IEnumerable<IEventConsumer> consumers, Envelope<IEvent> @event)
-        {
-            Task.WaitAll(consumers.Select(c => DispatchConsumer(@event, c)).ToArray());
-        }
-
-        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer consumer)
+        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventCatchConsumer consumer, long eventNumber)
         {
             try
             {
-                await consumer.On(@event);
+                await consumer.On(@event, eventNumber);
             }
             catch (Exception ex)
             {
                 logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "[{0}]: Failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
+
+                throw;
             }
         }
 
@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             {
                 logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex, "Failed to parse event {0}", eventData.EventId);
 
-                return null;
+                throw;
             }
         }
     }

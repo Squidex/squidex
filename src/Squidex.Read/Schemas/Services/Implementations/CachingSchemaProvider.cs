@@ -9,19 +9,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Utils;
-using Squidex.Events;
 
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
 namespace Squidex.Read.Schemas.Services.Implementations
 {
-    public class CachingSchemaProvider : CachingProvider, ISchemaProvider, ICatchEventConsumer, ILiveEventConsumer
+    public class CachingSchemaProvider : CachingProvider, ISchemaProvider
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly ISchemaRepository repository;
@@ -29,6 +26,8 @@ namespace Squidex.Read.Schemas.Services.Implementations
         private sealed class CacheItem
         {
             public ISchemaEntityWithSchema Entity;
+
+            public Guid AppId;
 
             public string Name;
         }
@@ -41,16 +40,23 @@ namespace Squidex.Read.Schemas.Services.Implementations
             this.repository = repository;
         }
 
-        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid schemaId)
+        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id)
         {
-            var cacheKey = BuildIdCacheKey(schemaId);
+            var cacheKey = BuildIdCacheKey(id);
             var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
             if (cacheItem == null)
             {
-                var entity = await repository.FindSchemaAsync(schemaId);
+                var entity = await repository.FindSchemaAsync(id);
 
-                cacheItem = new CacheItem { Entity = entity, Name = entity?.Name };
+                if (entity == null)
+                {
+                    cacheItem = new CacheItem();
+                }
+                else
+                {
+                    cacheItem = new CacheItem { Entity = entity, Name = entity.Name, AppId = entity.AppId };
+                }
 
                 Cache.Set(cacheKey, cacheItem, CacheDuration);
 
@@ -74,7 +80,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             {
                 var entity = await repository.FindSchemaAsync(appId, name);
 
-                cacheItem = new CacheItem { Entity = entity, Name = name };
+                cacheItem = new CacheItem { Entity = entity, Name = name, AppId = appId };
 
                 Cache.Set(cacheKey, cacheItem, CacheDuration);
 
@@ -87,37 +93,18 @@ namespace Squidex.Read.Schemas.Services.Implementations
             return cacheItem.Entity;
         }
 
-        public Task On(Envelope<IEvent> @event)
+        public void Remove(Guid id)
         {
-            if (@event.Payload is SchemaDeleted || 
-                @event.Payload is SchemaPublished ||
-                @event.Payload is SchemaUnpublished ||
-                @event.Payload is SchemaUpdated ||
-                @event.Payload is FieldEvent)
+            var cacheKey = BuildIdCacheKey(id);
+
+            var cacheItem = Cache.Get<CacheItem>(cacheKey);
+
+            if (cacheItem?.Name != null)
             {
-                var cacheKey = BuildIdCacheKey(@event.Headers.AggregateId());
-
-                var cacheItem = Cache.Get<CacheItem>(cacheKey);
-
-                if (cacheItem?.Name != null)
-                {
-                    Cache.Remove(BuildNameCacheKey(@event.Headers.AppId(), cacheItem.Name));
-                }
-
-                Cache.Remove(cacheKey);
-            }
-            else
-            {
-                var schemaCreated = @event.Payload as SchemaCreated;
-
-                if (schemaCreated != null)
-                {
-                    Cache.Remove(BuildIdCacheKey(@event.Headers.AggregateId()));
-                    Cache.Remove(BuildNameCacheKey(@event.Headers.AppId(), schemaCreated.Name));
-                }
+                Cache.Remove(BuildNameCacheKey(cacheItem.AppId, cacheItem.Name));
             }
 
-            return Task.FromResult(true);
+            Cache.Remove(cacheKey);
         }
 
         private static string BuildNameCacheKey(Guid appId, string name)

@@ -11,39 +11,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Core;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
-using Squidex.Events;
-using Squidex.Events.Contents;
-using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Replay;
-using Squidex.Infrastructure.Dispatching;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Contents;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.MongoDb.Contents.Visitors;
-using Squidex.Read.MongoDb.Utils;
 using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Read.MongoDb.Contents
 {
-    public class MongoContentRepository : IContentRepository, ICatchEventConsumer, IReplayableStore
+    public partial class MongoContentRepository : IContentRepository, IEventConsumer
     {
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemaProvider;
-        
-        protected UpdateDefinitionBuilder<MongoContentEntity> Update
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Update;
-            }
-        }
 
         protected IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
         {
@@ -61,25 +44,6 @@ namespace Squidex.Read.MongoDb.Contents
             this.database = database;
 
             this.schemaProvider = schemaProvider;
-        }
-
-        public async Task ClearAsync()
-        {
-            using (var collections = await database.ListCollectionsAsync())
-            {
-                while (await collections.MoveNextAsync())
-                {
-                    foreach (var collection in collections.Current)
-                    {
-                        var name = collection["name"].ToString();
-
-                        if (name.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
-                        {
-                            await database.DropCollectionAsync(name);
-                        }
-                    }
-                }
-            }
         }
 
         public async Task<List<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
@@ -167,83 +131,6 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        protected Task On(ContentCreated @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
-            {
-                return collection.CreateAsync(headers, x =>
-                {
-                    SimpleMapper.Map(@event, x);
-
-                    x.SetData(schema, @event.Data);
-                });
-            });
-        }
-
-        protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
-            {
-                return collection.UpdateAsync(headers, x =>
-                {
-                    x.SetData(schema, @event.Data);
-                });
-            });
-        }
-
-        protected Task On(ContentPublished @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaAsync(headers.SchemaId(), collection =>
-            {
-                return collection.UpdateAsync(headers, x =>
-                {
-                    x.IsPublished = true;
-                });
-            });
-        }
-
-        protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaAsync(headers.SchemaId(), collection =>
-            {
-                return collection.UpdateAsync(headers, x =>
-                {
-                    x.IsPublished = false;
-                });
-            });
-        }
-
-        protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaAsync(headers.SchemaId(), collection =>
-            {
-                return collection.UpdateAsync(headers, x =>
-                {
-                    x.IsDeleted = true;
-                });
-            });
-        }
-
-        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
-        {
-            var collection = GetCollection(headers.SchemaId());
-
-            return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
-        }
-
-        protected async Task On(SchemaCreated @event, EnvelopeHeaders headers)
-        {
-            var collection = GetCollection(headers.AggregateId());
-
-            await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
-            await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.Text));
-        }
-
-        public Task On(Envelope<IEvent> @event)
-        {
-            return this.DispatchActionAsync(@event.Payload, @event.Headers);
-        }
-
         private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Schema, Task> action)
         {
             var collection = GetCollection(schemaId);
@@ -256,20 +143,6 @@ namespace Squidex.Read.MongoDb.Contents
             }
 
             await action(collection, schemaEntity.Schema);
-        }
-
-        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
-        {
-            var collection = GetCollection(schemaId);
-
-            await action(collection);
-        }
-
-        private IMongoCollection<MongoContentEntity> GetCollection(Guid schemaId)
-        {
-            var name = $"{Prefix}{schemaId}";
-
-            return database.GetCollection<MongoContentEntity>(name);
         }
     }
 }
