@@ -10,25 +10,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
-using Squidex.Read.Apps.Services;
 
 namespace Squidex.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
     {
-        private readonly IAppProvider appProvider;
-
-        public MongoAppRepository(IMongoDatabase database, IAppProvider appProvider) 
+        public MongoAppRepository(IMongoDatabase database) 
             : base(database)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
-            this.appProvider = appProvider;
         }
 
         protected override string CollectionName()
@@ -39,6 +32,11 @@ namespace Squidex.Read.MongoDb.Apps
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+        }
+
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId)

@@ -22,7 +22,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
-    public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore, IExternalSystem
+    public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
         private const int Retries = 500;
         private readonly IEventNotifier notifier;
@@ -54,18 +54,6 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }));
 
             eventsOffsetIndex = indexNames[0];
-        }
-
-        public void CheckConnection()
-        {
-            try
-            {
-                Database.ListCollections();
-            }
-            catch (Exception e)
-            {
-                throw new ConfigurationException($"MongoDb Event Store failed to connect to database {Database.DatabaseNamespace.DatabaseName}", e);
-            }
         }
 
         public IObservable<StoredEvent> GetEventsAsync(string streamName)
@@ -100,14 +88,14 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 {
                     foreach (var @event in commit.Events)
                     {
-                        if (position >= lastReceivedPosition)
+                        position++;
+
+                        if (position > lastReceivedPosition)
                         {
                             var eventData = SimpleMapper.Map(@event, new EventData());
 
                             observer.OnNext(new StoredEvent(position, eventData));
                         }
-
-                        position++;
                     }
                 }, ct);
             });
@@ -187,7 +175,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
             if (document != null)
             {
-                return document["EventsOffset"].ToInt64();
+                return document["EventStreamOffset"].ToInt64();
             }
 
             return -1;

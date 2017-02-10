@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Apps.Services;
+using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Config.Domain
 {
@@ -18,7 +22,28 @@ namespace Squidex.Config.Domain
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<EventReceiver>().Subscribe();
+            var catchConsumers = app.ApplicationServices.GetServices<IEventCatchConsumer>();
+
+            foreach (var catchConsumer in catchConsumers)
+            {
+                var receiver = app.ApplicationServices.GetService<EventReceiver>();
+
+                receiver?.Subscribe(catchConsumer);
+            }
+
+            var appProvider = app.ApplicationServices.GetRequiredService<IAppProvider>();
+
+            app.ApplicationServices.GetRequiredService<IAppRepository>().AppSaved += id =>
+            {
+                appProvider.Remove(id);
+            };
+            
+            var schemaProvider = app.ApplicationServices.GetRequiredService<ISchemaProvider>();
+
+            app.ApplicationServices.GetRequiredService<ISchemaRepository>().SchemaSaved += id =>
+            {
+                schemaProvider.Remove(id);
+            };
 
             return app;
         }

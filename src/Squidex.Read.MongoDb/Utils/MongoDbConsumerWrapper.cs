@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -18,8 +19,12 @@ namespace Squidex.Read.MongoDb.Utils
 {
     public sealed class EventPosition
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
         public string Name { get; set; }
 
+        [BsonElement]
+        [BsonRequired]
         public long EventNumber { get; set; }
     }
 
@@ -36,17 +41,12 @@ namespace Squidex.Read.MongoDb.Utils
 
             this.eventConsumer = eventConsumer;
 
-            eventStoreName = GetType().Name;
+            eventStoreName = eventConsumer.GetType().Name;
         }
 
         protected override string CollectionName()
         {
             return "EventPositions";
-        }
-
-        protected override Task SetupCollectionAsync(IMongoCollection<EventPosition> collection)
-        {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name), new CreateIndexOptions { Unique = true });
         }
 
         public async Task On(Envelope<IEvent> @event, long eventNumber)
@@ -65,7 +65,7 @@ namespace Squidex.Read.MongoDb.Utils
         {
             var collectionPosition =
                 await Collection
-                    .Find(new BsonDocument()).SortByDescending(x => x.EventNumber).Limit(1)
+                    .Find(x => x.Name == eventStoreName).SortByDescending(x => x.EventNumber).Limit(1)
                     .FirstOrDefaultAsync();
                     
             return collectionPosition?.EventNumber ?? -1;

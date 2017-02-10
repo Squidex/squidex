@@ -12,10 +12,8 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Replay;
 
 namespace Squidex.Config.Domain
 {
@@ -54,12 +52,12 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultNameResolver>()
-                .As<IStreamNameResolver>()
+            builder.RegisterType<InMemoryEventNotifier>()
+                .As<IEventNotifier>()
                 .SingleInstance();
 
-            builder.RegisterType<ReplayGenerator>()
-                .As<ICliCommand>()
+            builder.RegisterType<DefaultNameResolver>()
+                .As<IStreamNameResolver>()
                 .SingleInstance();
 
             builder.RegisterType<EventDataFormatter>()

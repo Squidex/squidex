@@ -8,7 +8,6 @@
 
 using Autofac;
 using Microsoft.Extensions.Configuration;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Apps.Services.Implementations;

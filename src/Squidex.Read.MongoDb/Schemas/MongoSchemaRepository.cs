@@ -18,7 +18,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Read.MongoDb.Schemas
 {
@@ -26,18 +25,16 @@ namespace Squidex.Read.MongoDb.Schemas
     {
         private readonly SchemaJsonSerializer serializer;
         private readonly FieldRegistry registry;
-        private readonly ISchemaProvider schemaProvider;
 
-        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry registry, ISchemaProvider schemaProvider)
+        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry registry)
             : base(database)
         {
             Guard.NotNull(registry, nameof(registry));
             Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(schemaProvider, nameof(schemaProvider));
 
             this.registry = registry;
+
             this.serializer = serializer;
-            this.schemaProvider = schemaProvider;
         }
 
         protected override string CollectionName()

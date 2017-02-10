@@ -7,11 +7,11 @@
 // ==========================================================================
 
 using System;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
 
+// ReSharper disable MethodSupportsCancellation
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
@@ -22,7 +22,6 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
         private readonly IEventNotifier eventNotifier;
-        private readonly IEventCatchConsumer eventConsumer;
         private readonly ILogger<EventReceiver> logger;
         private CompletionTimer timer;
 
@@ -30,20 +29,17 @@ namespace Squidex.Infrastructure.CQRS.Events
             EventDataFormatter formatter,
             IEventStore eventStore, 
             IEventNotifier eventNotifier,
-            IEventCatchConsumer eventConsumer, 
             ILogger<EventReceiver> logger)
         {
             Guard.NotNull(logger, nameof(logger));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventNotifier, nameof(eventNotifier));
-            Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
             this.logger = logger;
             this.formatter = formatter;
             this.eventStore = eventStore;
             this.eventNotifier = eventNotifier;
-            this.eventConsumer = eventConsumer;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -54,8 +50,10 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Subscribe(int delay = 5000)
+        public void Subscribe(IEventCatchConsumer eventConsumer, int delay = 5000)
         {
+            Guard.NotNull(eventConsumer, nameof(eventConsumer));
+
             if (timer != null)
             {
                 return;
@@ -70,14 +68,26 @@ namespace Squidex.Infrastructure.CQRS.Events
                     lastReceivedPosition = await eventConsumer.GetLastHandledEventNumber();
                 }
 
-                await eventStore.GetEventsAsync(lastReceivedPosition).ForEachAsync(async storedEvent =>
+                var tcs = new TaskCompletionSource<bool>();
+
+                eventStore.GetEventsAsync(lastReceivedPosition).Subscribe(storedEvent =>
                 {
                     var @event = ParseEvent(storedEvent.Data);
 
                     @event.SetEventNumber(storedEvent.EventNumber);
 
-                    await DispatchConsumer(@event, eventConsumer, storedEvent.EventNumber);
+                    DispatchConsumer(@event, eventConsumer, storedEvent.EventNumber).Wait();
+
+                    lastReceivedPosition++;
+                }, ex =>
+                {
+                    tcs.SetException(ex);
+                }, () =>
+                {
+                    tcs.SetResult(true);
                 }, ct);
+
+                await tcs.Task;
             });
 
             eventNotifier.Subscribe(timer.Trigger);

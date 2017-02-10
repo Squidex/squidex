@@ -27,15 +27,15 @@ namespace Squidex.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public HashSet<string> Languages { get; } = new HashSet<string>(); 
+        public HashSet<string> Languages { get; set; } = new HashSet<string>(); 
 
         [BsonRequired]
         [BsonElement]
-        public Dictionary<string, MongoAppClientEntity> Clients { get; } = new Dictionary<string, MongoAppClientEntity>();
+        public Dictionary<string, MongoAppClientEntity> Clients { get; set; } = new Dictionary<string, MongoAppClientEntity>();
 
         [BsonRequired]
         [BsonElement]
-        public Dictionary<string, MongoAppContributorEntity> Contributors { get; } = new Dictionary<string, MongoAppContributorEntity>();
+        public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; } = new Dictionary<string, MongoAppContributorEntity>();
 
         IReadOnlyCollection<IAppClientEntity> IAppEntity.Clients
         {

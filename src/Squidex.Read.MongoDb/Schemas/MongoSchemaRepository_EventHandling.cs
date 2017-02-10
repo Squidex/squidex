@@ -21,6 +21,8 @@ namespace Squidex.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
     {
+        public event Action<Guid> SchemaSaved;
+
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
@@ -32,7 +34,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
             await Collection.CreateAsync(headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
 
-            schemaProvider.Remove(headers.AggregateId());
+            SchemaSaved?.Invoke(headers.AggregateId());
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
@@ -89,14 +91,14 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             await Collection.UpdateAsync(headers, s => s.IsDeleted = true);
 
-            schemaProvider.Remove(headers.AggregateId());
+            SchemaSaved?.Invoke(headers.AggregateId());
         }
 
         private async Task UpdateSchema(EnvelopeHeaders headers, Func<Schema, Schema> updater)
         {
             await Collection.UpdateAsync(headers, e => UpdateSchema(e, updater));
 
-            schemaProvider.Remove(headers.AggregateId());
+            SchemaSaved?.Invoke(headers.AggregateId());
         }
 
         private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)

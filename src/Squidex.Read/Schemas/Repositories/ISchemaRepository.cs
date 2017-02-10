@@ -14,6 +14,8 @@ namespace Squidex.Read.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
+        event Action<Guid> SchemaSaved;
+
         Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId);
 
         Task<IReadOnlyList<ISchemaEntityWithSchema>> QueryAllWithSchemaAsync(Guid appId);

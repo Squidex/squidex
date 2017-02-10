@@ -35,15 +35,15 @@ namespace Squidex.Infrastructure.Timers
                 try
                 {
                     await callback(disposeCancellationTokenSource.Token).ConfigureAwait(false);
+
+                    delayCancellationSource = new CancellationTokenSource();
+
+                    await Task.Delay(delay, delayCancellationSource.Token).ConfigureAwait(false);
                 }
                 catch (TaskCanceledException)
                 {
                     Console.WriteLine("Task in TriggerTimer has been cancelled.");
                 }
-
-                delayCancellationSource = new CancellationTokenSource();
-
-                await Task.Delay(delay, delayCancellationSource.Token).ConfigureAwait(false);
             }
         }
         

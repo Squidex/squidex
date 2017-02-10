@@ -17,7 +17,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.RabbitMq
 {
-    public sealed class RabbitMqEventBus : DisposableObject, IEventPublisher, IEventStream, IExternalSystem
+    public sealed class RabbitMqEventBus : DisposableObject, IExternalSystem
     {
         private readonly bool isPersistent;
         private readonly string queueName;

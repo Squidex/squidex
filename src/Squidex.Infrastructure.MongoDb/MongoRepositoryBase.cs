@@ -13,7 +13,7 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity>
+    public abstract class MongoRepositoryBase<TEntity> : IExternalSystem
     {
         private const string CollectionFormat = "{0}Set";
         private Lazy<IMongoCollection<TEntity>> mongoCollection;
@@ -141,6 +141,18 @@ namespace Squidex.Infrastructure.MongoDb
             catch
             {
                 return false;
+            }
+        }
+
+        public void CheckConnection()
+        {
+            try
+            {
+                Database.ListCollections();
+            }
+            catch (Exception e)
+            {
+                throw new ConfigurationException($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}", e);
             }
         }
     }

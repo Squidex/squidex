@@ -55,7 +55,7 @@ namespace Squidex.Config.Domain
                         var mongoDbClient = new MongoClient(connectionString);
                         var mongoDatabase = mongoDbClient.GetDatabase(databaseName);
 
-                        var eventStore = new MongoEventStore(mongoDatabase);
+                        var eventStore = new MongoEventStore(mongoDatabase, c.Resolve<IEventNotifier>());
 
                         return eventStore;
                     })

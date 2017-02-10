@@ -14,6 +14,8 @@ namespace Squidex.Read.Apps.Repositories
 {
     public interface IAppRepository
     {
+        event Action<Guid> AppSaved;
+
         Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId);
 
         Task<IAppEntity> FindAppAsync(Guid appId);
