@@ -30,9 +30,9 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            var canCatch = Configuration.GetValue<bool>("squidex:catch");
+            var handleEvents = Configuration.GetValue<bool>("squidex:handleEvents");
 
-            if (canCatch)
+            if (handleEvents)
             {
                 builder.RegisterType<EventReceiver>()
                     .AsSelf()
