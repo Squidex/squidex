@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Read.Schemas.Services
 {
@@ -16,7 +17,7 @@ namespace Squidex.Read.Schemas.Services
         Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id);
 
         Task<ISchemaEntityWithSchema> FindSchemaByNameAsync(Guid appId, string name);
-
-        void Remove(Guid id);
+        
+        void Remove(NamedId<Guid> appId, NamedId<Guid> schemaId);
     }
 }

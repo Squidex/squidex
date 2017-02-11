@@ -8,6 +8,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -41,128 +43,118 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return null;
             }
         }
-
-        private readonly Mock<ILiveEventConsumer> liveConsumer1 = new Mock<ILiveEventConsumer>();
-        private readonly Mock<ILiveEventConsumer> liveConsumer2 = new Mock<ILiveEventConsumer>();
-        private readonly Mock<IEventCatchConsumer> catchConsumer1 = new Mock<IEventCatchConsumer>();
-        private readonly Mock<IEventCatchConsumer> catchConsumer2 = new Mock<IEventCatchConsumer>();
-        private readonly Mock<IEventStream> eventStream = new Mock<IEventStream>();
+        
+        private readonly Mock<IEventCatchConsumer> eventConsumer = new Mock<IEventCatchConsumer>();
+        private readonly Mock<IEventNotifier> eventNotifier = new Mock<IEventNotifier>();
+        private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
-        private readonly EventData eventData = new EventData();
-        private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
+        private readonly EventData eventData1 = new EventData();
+        private readonly EventData eventData2 = new EventData();
+        private readonly EventData eventData3 = new EventData();
+        private readonly EventData eventData4 = new EventData();
+        private readonly Envelope<IEvent> envelope1 = new Envelope<IEvent>(new MyEvent());
+        private readonly Envelope<IEvent> envelope2 = new Envelope<IEvent>(new MyEvent());
+        private readonly Envelope<IEvent> envelope3 = new Envelope<IEvent>(new MyEvent());
+        private readonly Envelope<IEvent> envelope4 = new Envelope<IEvent>(new MyEvent());
+        private readonly EventReceiver sut;
         private readonly MyLogger logger = new MyLogger();
+        private readonly StoredEvent[][] events;
 
         public EventReceiverTests()
         {
-            formatter.Setup(x => x.Parse(eventData)).Returns(envelope);
-
-            eventStream.Setup(x => x.Connect("squidex", It.IsAny<Action<EventData>>())).Callback(
-                new Action<string, Action<EventData>>((queue, callback) =>
+            events = new []
+            {
+                new []
                 {
-                    callback(eventData);
-                }));
+                    new StoredEvent(3, eventData1),
+                    new StoredEvent(4, eventData1)
+                },
+                new[]
+                {
+                    new StoredEvent(5, eventData1),
+                    new StoredEvent(6, eventData1)
+                }
+            };
+
+
+            formatter.Setup(x => x.Parse(eventData1)).Returns(envelope1);
+            formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
+            formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
+            formatter.Setup(x => x.Parse(eventData4)).Returns(envelope4);
+
+            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, logger);
         }
 
         [Fact]
         public void Should_only_connect_once()
         {
-            var sut = CreateSut(true);
+            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer.Object);
 
-            sut.Subscribe();
-            sut.Subscribe();
-
-            eventStream.Verify(x => x.Connect("squidex", It.IsAny<Action<EventData>>()), Times.Once());
+            eventConsumer.Verify(x => x.GetLastHandledEventNumber(), Times.Once());
         }
 
         [Fact]
-        public void Should_invoke_live_consumers()
+        public void Should_subscribe_to_consumers_and_handle_events()
         {
-            var sut = CreateSut(false);
+            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
+            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Returns(Task.FromResult(true));
 
-            sut.Subscribe();
+            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(4)).Returns(events[1].ToObservable());
 
-            catchConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-            catchConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
 
-            liveConsumer1.Verify(x => x.On(envelope), Times.Once());
-            liveConsumer2.Verify(x => x.On(envelope), Times.Once());
+            sut.Subscribe(eventConsumer.Object, 20);
+
+            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
 
             Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(4, logger.LogCount[LogLevel.Debug]);
+
+            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(4));
         }
 
         [Fact]
-        public void Should_invoke_catch_consumers()
+        public void Should_abort_if_handling_failed()
         {
-            var sut = CreateSut(true);
+            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
+            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Throws<InvalidOperationException>();
 
-            sut.Subscribe();
+            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
 
-            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            sut.Subscribe(eventConsumer.Object, 20);
 
-            catchConsumer1.Verify(x => x.On(envelope), Times.Once());
-            catchConsumer2.Verify(x => x.On(envelope), Times.Once());
-
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
-        }
-
-        [Fact]
-        public void Should_log_if_parsing_event_failed()
-        {
-            formatter.Setup(x => x.Parse(eventData)).Throws(new InvalidOperationException());
-
-            var sut = CreateSut(true);
-
-            sut.Subscribe();
-
-            catchConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-            catchConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-
-            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
-        }
-
-        [Fact]
-        public void Should_log_if_handling_failed()
-        {
-            catchConsumer1.Setup(x => x.On(envelope)).Throws(new InvalidOperationException());
-
-            var sut = CreateSut(true);
-
-            sut.Subscribe();
-
-            catchConsumer1.Verify(x => x.On(envelope), Times.Once());
-            catchConsumer2.Verify(x => x.On(envelope), Times.Once());
-
-            liveConsumer1.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
-            liveConsumer2.Verify(x => x.On(It.IsAny<Envelope<IEvent>>()), Times.Never());
+            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
 
             Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
             Assert.Equal(1, logger.LogCount[LogLevel.Error]);
+            Assert.Equal(1, logger.LogCount[LogLevel.Critical]);
+
+            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(1));
+            eventStore.Verify(x => x.GetEventsAsync(It.IsAny<long>()), Times.Exactly(1));
         }
 
-        private EventReceiver CreateSut(bool canCatch)
+        [Fact]
+        public void Should_abort_if_serialization_failed()
         {
-            return new EventReceiver(
-                logger,
-                eventStream.Object,
-                new[]
-                {
-                        liveConsumer1.Object,
-                        liveConsumer2.Object
-                },
-                new[]
-                {
-                        catchConsumer1.Object,
-                        catchConsumer2.Object
-                },
-                formatter.Object, canCatch);
+            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
+            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Throws<InvalidOperationException>();
+
+            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
+
+            sut.Subscribe(eventConsumer.Object, 20);
+
+            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
+
+            Assert.Equal(2, logger.LogCount.Count);
+            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
+            Assert.Equal(1, logger.LogCount[LogLevel.Critical]);
+
+            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(1));
+            eventStore.Verify(x => x.GetEventsAsync(It.IsAny<long>()), Times.Exactly(1));
         }
     }
 }

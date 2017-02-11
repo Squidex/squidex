@@ -12,6 +12,7 @@ using Squidex.Core.Schemas;
 using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Events.Schemas.Utils;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
@@ -22,7 +23,7 @@ namespace Squidex.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
     {
-        public event Action<Guid> SchemaSaved;
+        public event Action<NamedId<Guid>, NamedId<Guid>> SchemaSaved;
 
         public Task On(Envelope<IEvent> @event)
         {
@@ -35,7 +36,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
             await Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
 
-            SchemaSaved?.Invoke(headers.AggregateId());
+            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
@@ -92,14 +93,14 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             await Collection.UpdateAsync(@event, headers, s => s.IsDeleted = true);
 
-            SchemaSaved?.Invoke(headers.AggregateId());
+            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }
 
-        private async Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        private async Task UpdateSchema(SchemaEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
         {
             await Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
 
-            SchemaSaved?.Invoke(headers.AggregateId());
+            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }
 
         private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)

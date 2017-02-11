@@ -21,7 +21,7 @@ namespace Squidex.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository
     {
-        public event Action<Guid> AppSaved;
+        public event Action<NamedId<Guid>> AppSaved;
 
         public Task On(Envelope<IEvent> @event)
         {
@@ -35,7 +35,7 @@ namespace Squidex.Read.MongoDb.Apps
                 SimpleMapper.Map(@event, a);
             });
 
-            AppSaved?.Invoke(headers.AggregateId());
+            AppSaved?.Invoke(@event.AppId);
         }
 
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
@@ -104,11 +104,11 @@ namespace Squidex.Read.MongoDb.Apps
             });
         }
 
-        public async Task UpdateAsync(SquidexEvent @event, EnvelopeHeaders headers, Action<MongoAppEntity> updater)
+        public async Task UpdateAsync(AppEvent @event, EnvelopeHeaders headers, Action<MongoAppEntity> updater)
         {
             await Collection.UpdateAsync(@event, headers, updater);
 
-            AppSaved?.Invoke(headers.AggregateId());
+            AppSaved?.Invoke(@event.AppId);
         }
     }
 }

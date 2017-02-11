@@ -23,15 +23,6 @@ namespace Squidex.Read.Schemas.Services.Implementations
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly ISchemaRepository repository;
 
-        private sealed class CacheItem
-        {
-            public ISchemaEntityWithSchema Entity;
-
-            public Guid AppId;
-
-            public string Name;
-        }
-
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
             : base(cache)
         {
@@ -43,30 +34,22 @@ namespace Squidex.Read.Schemas.Services.Implementations
         public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id)
         {
             var cacheKey = BuildIdCacheKey(id);
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
-            if (cacheItem == null)
+            ISchemaEntityWithSchema result;
+
+            if (!Cache.TryGetValue(cacheKey, out result))
             {
-                var entity = await repository.FindSchemaAsync(id);
+                result = await repository.FindSchemaAsync(id);
 
-                if (entity == null)
-                {
-                    cacheItem = new CacheItem();
-                }
-                else
-                {
-                    cacheItem = new CacheItem { Entity = entity, Name = entity.Name, AppId = entity.AppId };
-                }
+                Cache.Set(cacheKey, result, CacheDuration);
 
-                Cache.Set(cacheKey, cacheItem, CacheDuration);
-
-                if (cacheItem.Entity != null)
+                if (result != null)
                 {
-                    Cache.Set(BuildNameCacheKey(cacheItem.Entity.AppId, cacheItem.Entity.Name), cacheItem, CacheDuration);
+                    Cache.Set(BuildNameCacheKey(result.AppId, result.Name), result, CacheDuration);
                 }
             }
 
-            return cacheItem.Entity;
+            return result;
         }
 
         public async Task<ISchemaEntityWithSchema> FindSchemaByNameAsync(Guid appId, string name)
@@ -74,37 +57,28 @@ namespace Squidex.Read.Schemas.Services.Implementations
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var cacheKey = BuildNameCacheKey(appId, name);
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
-            if (cacheItem == null)
+            ISchemaEntityWithSchema result;
+
+            if (!Cache.TryGetValue(cacheKey, out result))
             {
-                var entity = await repository.FindSchemaAsync(appId, name);
+                result = await repository.FindSchemaAsync(appId, name);
 
-                cacheItem = new CacheItem { Entity = entity, Name = name, AppId = appId };
+                Cache.Set(cacheKey, result, CacheDuration);
 
-                Cache.Set(cacheKey, cacheItem, CacheDuration);
-
-                if (cacheItem.Entity != null)
+                if (result != null)
                 {
-                    Cache.Set(BuildIdCacheKey(cacheItem.Entity.Id), cacheItem, CacheDuration);
+                    Cache.Set(BuildIdCacheKey(result.Id), result, CacheDuration);
                 }
             }
 
-            return cacheItem.Entity;
+            return result;
         }
 
-        public void Remove(Guid id)
+        public void Remove(NamedId<Guid> appId, NamedId<Guid> schemaId)
         {
-            var cacheKey = BuildIdCacheKey(id);
-
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
-
-            if (cacheItem?.Name != null)
-            {
-                Cache.Remove(BuildNameCacheKey(cacheItem.AppId, cacheItem.Name));
-            }
-
-            Cache.Remove(cacheKey);
+            Cache.Remove(BuildIdCacheKey(schemaId.Id));
+            Cache.Remove(BuildNameCacheKey(appId.Id, schemaId.Name));
         }
 
         private static string BuildNameCacheKey(Guid appId, string name)

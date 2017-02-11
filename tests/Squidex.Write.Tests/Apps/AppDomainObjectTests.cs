@@ -8,24 +8,21 @@
 
 using System;
 using System.Linq;
-using FluentAssertions;
 using Squidex.Core.Apps;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Write.Apps.Commands;
+using Squidex.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Write.Apps
 {
-    public class AppDomainObjectTests
+    public class AppDomainObjectTests : HandlerTestBase<AppDomainObject>
     {
-        private const string TestName = "app";
         private readonly AppDomainObject sut;
-        private readonly RefToken user = new RefToken("subject", Guid.NewGuid().ToString());
         private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
@@ -34,7 +31,7 @@ namespace Squidex.Write.Apps
 
         public AppDomainObjectTests()
         {
-            sut = new AppDomainObject(Guid.NewGuid(), 0);
+            sut = new AppDomainObject(AppId, 0);
         }
 
         [Fact]
@@ -42,43 +39,53 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainException>(() => sut.Create(new CreateApp { Name = TestName }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Create(CreateCommand(new CreateApp { Name = AppName }));
+            });
         }
 
         [Fact]
         public void Create_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<ValidationException>(() => sut.Create(new CreateApp()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Create(CreateCommand(new CreateApp()));
+            });
         }
 
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(new CreateApp { Name = TestName, Actor = user });
+            sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AggregateId = AppId }));
 
-            Assert.Equal(TestName, sut.Name);
+            Assert.Equal(AppName, sut.Name);
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppCreated { Name = TestName },
-                        new AppContributorAssigned { ContributorId = user.Identifier, Permission = PermissionLevel.Owner },
-                        new AppLanguageAdded { Language = Language.EN },
-                        new AppMasterLanguageSet { Language  = Language.EN }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppCreated { Name = AppName }),
+                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = PermissionLevel.Owner }),
+                    CreateEvent(new AppLanguageAdded { Language = Language.EN }),
+                    CreateEvent(new AppMasterLanguageSet { Language  = Language.EN })
+                );
         }
 
         [Fact]
         public void AssignContributor_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.AssignContributor(new AssignContributor { ContributorId = contributorId }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId }));
+            });
         }
 
         [Fact]
         public void AssignContributor_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AssignContributor(CreateCommand(new AssignContributor()));
+            });
         }
 
         [Fact]
@@ -86,16 +93,22 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor { ContributorId = user.Identifier, Permission = PermissionLevel.Editor }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = User.Identifier, Permission = PermissionLevel.Editor }));
+            });
         }
 
         [Fact]
         public void AssignContributor_should_throw_if_user_already_contributor()
         {
             CreateApp();
-            sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor });
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
 
-            Assert.Throws<ValidationException>(() => sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            });
         }
 
         [Fact]
@@ -103,26 +116,30 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor });
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppContributorAssigned { ContributorId = contributorId, Permission = PermissionLevel.Editor }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Permission = PermissionLevel.Editor })
+                );
         }
 
         [Fact]
         public void RemoveContributor_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = contributorId }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = contributorId }));
+            });
         }
 
         [Fact]
         public void RemoveContributor_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<ValidationException>(() => sut.RemoveContributor(new RemoveContributor()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RemoveContributor(CreateCommand(new RemoveContributor()));
+            });
         }
 
         [Fact]
@@ -130,7 +147,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = user.Identifier }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = User.Identifier }));
+            });
         }
 
         [Fact]
@@ -138,7 +158,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RemoveContributor(new RemoveContributor { ContributorId = "not-found" }));
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = "not-found" }));
+            });
         }
 
         [Fact]
@@ -146,21 +169,22 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AssignContributor(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor });
-            sut.RemoveContributor(new RemoveContributor { ContributorId = contributorId });
-            
-            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppContributorRemoved { ContributorId = contributorId }
-                    });
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = contributorId }));
+
+            sut.GetUncomittedEvents().Skip(1)
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppContributorRemoved { ContributorId = contributorId })
+                );
         }
 
         [Fact]
         public void AttachClient_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+            });
         }
 
         [Fact]
@@ -168,8 +192,15 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient(), clientSecret, expiresUtc));
-            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { Id = string.Empty }, clientSecret, expiresUtc));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AttachClient(CreateCommand(new AttachClient()), clientSecret, expiresUtc);
+            });
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AttachClient(CreateCommand(new AttachClient { Id = string.Empty }), clientSecret, expiresUtc);
+            });
         }
 
         [Fact]
@@ -177,9 +208,12 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
 
-            Assert.Throws<ValidationException>(() => sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+            });
         }
 
         [Fact]
@@ -189,20 +223,21 @@ namespace Squidex.Write.Apps
 
             CreateApp();
 
-            sut.AttachClient(new AttachClient { Id = clientId, Timestamp = now }, clientSecret, expiresUtc);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId, Timestamp = now }), clientSecret, expiresUtc);
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppClientAttached { Id = clientId, Secret = clientSecret, ExpiresUtc = expiresUtc }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppClientAttached { Id = clientId, Secret = clientSecret, ExpiresUtc = expiresUtc })
+                );
         }
 
         [Fact]
         public void RevokeClient_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RevokeClient(new RevokeClient { Id = "not-found" }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.RevokeClient(CreateCommand(new RevokeClient { Id = "not-found" }));
+            });
         }
 
         [Fact]
@@ -210,8 +245,15 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient()));
-            Assert.Throws<ValidationException>(() => sut.RevokeClient(new RevokeClient { Id = string.Empty }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RevokeClient(CreateCommand(new RevokeClient()));
+            });
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RevokeClient(CreateCommand(new RevokeClient { Id = string.Empty }));
+            });
         }
 
         [Fact]
@@ -219,29 +261,33 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RevokeClient(new RevokeClient { Id = "not-found" }));
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.RevokeClient(CreateCommand(new RevokeClient { Id = "not-found" }));
+            });
         }
 
         [Fact]
         public void RevokeClient_should_create_events()
         {
             CreateApp();
+            CreateClient();
 
-            sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc);
-            sut.RevokeClient(new RevokeClient { Id = clientId });
+            sut.RevokeClient(CreateCommand(new RevokeClient { Id = clientId }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppClientRevoked { Id = clientSecret }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppClientRevoked { Id = clientId })
+                );
         }
 
         [Fact]
         public void RenameClient_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RenameClient(new RenameClient { Id = "not-found", Name = clientNewName }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.RenameClient(CreateCommand(new RenameClient { Id = "not-found", Name = clientNewName }));
+            });
         }
 
         [Fact]
@@ -249,8 +295,15 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient()));
-            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient { Id = string.Empty }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RenameClient(CreateCommand(new RenameClient()));
+            });
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RenameClient(CreateCommand(new RenameClient { Id = string.Empty }));
+            });
         }
 
         [Fact]
@@ -258,40 +311,47 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RenameClient(new RenameClient { Id = "not-found", Name = clientNewName }));
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.RenameClient(CreateCommand(new RenameClient { Id = "not-found", Name = clientNewName }));
+            });
         }
 
         [Fact]
         public void RenameClient_should_throw_if_same_client_name()
         {
             CreateApp();
+            CreateClient();
 
-            sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc);
-            sut.RenameClient(new RenameClient { Id = clientId, Name = clientNewName });
+            sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
 
-            Assert.Throws<ValidationException>(() => sut.RenameClient(new RenameClient { Id = clientId, Name = clientNewName }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
+            });
         }
 
         [Fact]
         public void RenameClient_should_create_events()
         {
             CreateApp();
+            CreateClient();
 
-            sut.AttachClient(new AttachClient { Id = clientId }, clientSecret, expiresUtc);
-            sut.RenameClient(new RenameClient { Id = clientId, Name = clientNewName });
+            sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppClientRenamed { Id = clientId, Name = clientNewName }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName })
+                );
         }
 
         [Fact]
         public void AddLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.AddLanguage(new AddLanguage { Language = Language.DE }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.DE }));
+            });
         }
 
         [Fact]
@@ -299,7 +359,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AddLanguage(CreateCommand(new AddLanguage()));
+            });
         }
 
         [Fact]
@@ -307,7 +370,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.AddLanguage(new AddLanguage { Language = Language.EN }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.EN }));
+            });
         }
 
         [Fact]
@@ -315,20 +381,21 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AddLanguage(new AddLanguage { Language = Language.DE });
+            sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.DE }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppLanguageAdded { Language = Language.DE }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppLanguageAdded { Language = Language.DE })
+                );
         }
 
         [Fact]
         public void RemoveLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.EN }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.EN }));
+            });
         }
 
         [Fact]
@@ -336,7 +403,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RemoveLanguage(CreateCommand(new RemoveLanguage()));
+            });
         }
 
         [Fact]
@@ -344,7 +414,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.DE }));
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
+            });
         }
 
         [Fact]
@@ -352,29 +425,33 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.RemoveLanguage(new RemoveLanguage { Language = Language.EN }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.EN }));
+            });
         }
 
         [Fact]
         public void RemoveLanguage_should_create_events()
         {
             CreateApp();
+            CreateLanguage();
+            
+            sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
 
-            sut.AddLanguage(new AddLanguage { Language = Language.DE });
-            sut.RemoveLanguage(new RemoveLanguage { Language = Language.DE });
-
-            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppLanguageRemoved { Language = Language.DE }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppLanguageRemoved { Language = Language.DE })
+                );
         }
 
         [Fact]
         public void SetMasterLanguage_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.EN }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.EN }));
+            });
         }
 
         [Fact]
@@ -382,7 +459,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage()));
+            });
         }
 
         [Fact]
@@ -390,7 +470,10 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.DE }));
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.DE }));
+            });
         }
 
         [Fact]
@@ -398,28 +481,43 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            Assert.Throws<ValidationException>(() => sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.EN }));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.EN }));
+            });
         }
 
         [Fact]
         public void SetMasterLanguage_should_create_events()
         {
             CreateApp();
+            CreateLanguage();
 
-            sut.AddLanguage(new AddLanguage { Language = Language.DE });
-            sut.SetMasterLanguage(new SetMasterLanguage { Language = Language.DE });
+            sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.DE }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).Skip(1).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new AppMasterLanguageSet { Language = Language.DE }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppMasterLanguageSet { Language = Language.DE })
+                );
         }
 
         private void CreateApp()
         {
-            sut.Create(new CreateApp { Name = TestName, Actor = user });
+            sut.Create(CreateCommand(new CreateApp { Name = AppName }));
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void CreateClient()
+        {
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void CreateLanguage()
+        {
+            sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.DE }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 // ReSharper disable RedundantCast
@@ -17,14 +17,6 @@ namespace Squidex.Infrastructure
 {
     public class RefTokenTests
     {
-        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-
-        static RefTokenTests()
-        {
-            serializerSettings.Converters.Add(new RefTokenConverter());
-            serializerSettings.NullValueHandling = NullValueHandling.Include;
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
@@ -84,24 +76,23 @@ namespace Squidex.Infrastructure
         {
             var token1a = RefToken.Parse("client:client1");
             var token1b = RefToken.Parse("client:client1");
-            var token2  = RefToken.Parse("client:client2");
+            var token2a  = RefToken.Parse("client:client2");
 
             Assert.True(token1a.Equals(token1b));
 
-            Assert.False(token1a.Equals(token2));
+            Assert.False(token1a.Equals(token2a));
         }
 
         [Fact]
         public void Should_make_correct_object_equal_comparisons()
         {
-            var token1a = RefToken.Parse("client:client1");
-
+            object token1a = RefToken.Parse("client:client1");
             object token1b = RefToken.Parse("client:client1");
-            object token2  = RefToken.Parse("client:client2");
+            object token2a  = RefToken.Parse("client:client2");
 
             Assert.True(token1a.Equals(token1b));
 
-            Assert.False(token1a.Equals(token2));
+            Assert.False(token1a.Equals(token2a));
         }
 
         [Fact]
@@ -109,31 +100,23 @@ namespace Squidex.Infrastructure
         {
             var token1a = RefToken.Parse("client:client1");
             var token1b = RefToken.Parse("client:client1");
-            var token2  = RefToken.Parse("client:client2");
+            var token2a = RefToken.Parse("client:client2");
 
             Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
 
-            Assert.NotEqual(token1a.GetHashCode(), token2.GetHashCode());
+            Assert.NotEqual(token1a.GetHashCode(), token2a.GetHashCode());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_null_token()
         {
-            var input = Tuple.Create<RefToken>(null);
-            var json = JsonConvert.SerializeObject(input, serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<RefToken>>(json, serializerSettings);
-
-            Assert.Equal(output.Item1, input.Item1);
+            JsonHelper.SerializeAndDeserialize<RefToken>(null, new RefTokenConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_valid_token()
         {
-            var input = Tuple.Create(RefToken.Parse("client:client1"));
-            var json = JsonConvert.SerializeObject(input, serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<RefToken>>(json, serializerSettings);
-
-            Assert.Equal(output.Item1, input.Item1);
+            RefToken.Parse("client:client1").SerializeAndDeserialize(new RefTokenConverter());
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Squidex.Write
     {
         Guid IAggregateCommand.AggregateId
         {
-            get { return AppId.Id; }
+            get { return SchemaId.Id; }
         }
     }
 }

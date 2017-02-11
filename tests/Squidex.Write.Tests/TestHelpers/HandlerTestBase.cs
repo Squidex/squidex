@@ -8,10 +8,12 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Write.Utils
+namespace Squidex.Write.TestHelpers
 {
     public abstract class HandlerTestBase<T> where T : DomainObject
     {
@@ -46,16 +48,35 @@ namespace Squidex.Write.Utils
         }
 
         private readonly MockupHandler handler = new MockupHandler();
-        private readonly Guid id = Guid.NewGuid();
 
-        protected Guid Id
+        protected RefToken User { get; } = new RefToken("subject", Guid.NewGuid().ToString());
+
+        protected Guid AppId { get; } = Guid.NewGuid();
+
+        protected Guid SchemaId { get; } = Guid.NewGuid();
+
+        protected string AppName { get; } = "my-app";
+
+        protected string SchemaName { get; } = "my-schema";
+
+        protected NamedId<Guid> AppNamedId
         {
-            get { return id; }
+            get { return new NamedId<Guid>(AppId, AppName); }
+        }
+
+        protected NamedId<Guid> SchemaNamedId
+        {
+            get { return new NamedId<Guid>(SchemaId, SchemaName); }
         }
 
         protected IAggregateHandler Handler
         {
             get { return handler; }
+        }
+
+        protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+        {
+            return new CommandContext(CreateCommand(command));
         }
 
         public async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
@@ -80,6 +101,48 @@ namespace Squidex.Write.Utils
             {
                 throw new InvalidOperationException("Create not called");
             }
+        }
+
+        protected virtual TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+        {
+            command.Actor = User;
+
+            var appCommand = command as AppCommand;
+
+            if (appCommand != null)
+            {
+                appCommand.AppId = AppNamedId;
+            }
+
+            var schemaCommand = command as SchemaCommand;
+
+            if (schemaCommand != null)
+            {
+                schemaCommand.SchemaId = SchemaNamedId;
+            }
+
+            return command;
+        }
+
+        protected virtual TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
+        {
+            @event.Actor = User;
+
+            var appEvent = @event as AppEvent;
+
+            if (appEvent != null)
+            {
+                appEvent.AppId = AppNamedId;
+            }
+
+            var schemaEvent = @event as SchemaEvent;
+
+            if (schemaEvent != null)
+            {
+                schemaEvent.SchemaId = SchemaNamedId;
+            }
+
+            return @event;
         }
     }
 }

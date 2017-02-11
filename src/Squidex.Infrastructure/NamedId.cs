@@ -38,12 +38,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(NamedId<T> other)
         {
-            return other != null && (ReferenceEquals(this, other) || Id.Equals(other.Id));
+            return other != null && (ReferenceEquals(this, other) || (Id.Equals(other.Id) && Name.Equals(other.Name)));
         }
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return (Id.GetHashCode() * 397) ^ Name.GetHashCode();
         }
     }
 }

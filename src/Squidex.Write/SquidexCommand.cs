@@ -7,10 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write
 {
-    public abstract class SquidexCommand
+    public abstract class SquidexCommand : ICommand
     {
         public RefToken Actor { get; set; }
     }

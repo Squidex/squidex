@@ -34,9 +34,9 @@ namespace Squidex.Read.History
             Message = message;
         }
 
-        public HistoryEventToStore AddParameter(string key, string value)
+        public HistoryEventToStore AddParameter(string key, object value)
         {
-            parameters[key] = value;
+            parameters[key] = value.ToString();
 
             return this;
         }

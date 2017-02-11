@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Read.Apps.Services
 {
@@ -17,6 +18,6 @@ namespace Squidex.Read.Apps.Services
 
         Task<IAppEntity> FindAppByNameAsync(string name);
 
-        void Remove(Guid id);
+        void Remove(NamedId<Guid> id);
     }
 }

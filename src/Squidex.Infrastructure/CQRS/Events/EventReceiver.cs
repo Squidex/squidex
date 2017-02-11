@@ -46,7 +46,14 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             if (disposing)
             {
-                timer?.Dispose();
+                try
+                {
+                    timer?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogCritical(InfrastructureErrors.EventHandlingFailed, ex, "Event stream {0} has been aborted");
+                }
             }
         }
 
@@ -98,6 +105,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             try
             {
                 await consumer.On(@event, eventNumber);
+
+                logger.LogDebug("[{0}]: Handled event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
             }
             catch (Exception ex)
             {

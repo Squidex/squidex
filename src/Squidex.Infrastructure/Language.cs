@@ -112,5 +112,10 @@ namespace Squidex.Infrastructure
 
             return null;
         }
+
+        public override string ToString()
+        {
+            return EnglishName;
+        }
     }
 }

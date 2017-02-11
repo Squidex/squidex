@@ -126,7 +126,7 @@ namespace Squidex.Config.Domain
                     c.Resolve<MongoAppRepository>()))
                 .As<IEventCatchConsumer>()
                 .SingleInstance();
-            /*
+            
             builder.Register(c =>
                 new MongoDbConsumerWrapper(
                     c.ResolveNamed<IMongoDatabase>(MongoDatabaseName),
@@ -146,7 +146,7 @@ namespace Squidex.Config.Domain
                     c.ResolveNamed<IMongoDatabase>(MongoDatabaseName),
                     c.Resolve<MongoHistoryEventRepository>()))
                 .As<IEventCatchConsumer>()
-                .SingleInstance();*/
+                .SingleInstance();
         }
     }
 }

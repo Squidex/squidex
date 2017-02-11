@@ -22,13 +22,6 @@ namespace Squidex.Read.Apps.Services.Implementations
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
         private readonly IAppRepository repository;
 
-        private sealed class CacheItem
-        {
-            public IAppEntity Entity;
-
-            public string Name;
-        }
-
         public CachingAppProvider(IMemoryCache cache, IAppRepository repository)
             : base(cache)
         {
@@ -40,23 +33,22 @@ namespace Squidex.Read.Apps.Services.Implementations
         public async Task<IAppEntity> FindAppByIdAsync(Guid appId)
         {
             var cacheKey = BuildIdCacheKey(appId);
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
-            if (cacheItem == null)
+            IAppEntity result;
+            
+            if (!Cache.TryGetValue(cacheKey, out result))
             {
-                var entity = await repository.FindAppAsync(appId);
+                result = await repository.FindAppAsync(appId);
 
-                cacheItem = new CacheItem { Entity = entity, Name = entity.Name };
+                Cache.Set(cacheKey, result, CacheDuration);
 
-                Cache.Set(cacheKey, cacheItem, CacheDuration);
-
-                if (cacheItem.Entity != null)
+                if (result != null)
                 {
-                    Cache.Set(BuildNameCacheKey(cacheItem.Name), cacheItem, CacheDuration);
+                    Cache.Set(BuildNameCacheKey(result.Name), result, CacheDuration);
                 }
             }
 
-            return cacheItem.Entity;
+            return result;
         }
 
         public async Task<IAppEntity> FindAppByNameAsync(string name)
@@ -64,37 +56,28 @@ namespace Squidex.Read.Apps.Services.Implementations
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var cacheKey = BuildNameCacheKey(name);
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
 
-            if (cacheItem == null)
+            IAppEntity result;
+
+            if (!Cache.TryGetValue(cacheKey, out result))
             {
-                var entity = await repository.FindAppAsync(name);
+                result = await repository.FindAppAsync(name);
 
-                cacheItem = new CacheItem { Entity = entity, Name = name };
+                Cache.Set(cacheKey, result, CacheDuration);
 
-                Cache.Set(cacheKey, cacheItem, CacheDuration);
-
-                if (cacheItem.Entity != null)
+                if (result != null)
                 {
-                    Cache.Set(BuildIdCacheKey(cacheItem.Entity.Id), cacheItem, CacheDuration);
+                    Cache.Set(BuildIdCacheKey(result.Id), result, CacheDuration);
                 }
             }
 
-            return cacheItem.Entity;
+            return result;
         }
 
-        public void Remove(Guid id)
+        public void Remove(NamedId<Guid> id)
         {
-            var cacheKey = BuildIdCacheKey(id);
-
-            var cacheItem = Cache.Get<CacheItem>(cacheKey);
-
-            if (cacheItem?.Name != null)
-            {
-                Cache.Remove(BuildNameCacheKey(cacheItem.Name));
-            }
-
-            Cache.Remove(cacheKey);
+            Cache.Remove(BuildIdCacheKey(id.Id));
+            Cache.Remove(BuildNameCacheKey(id.Name));
         }
 
         private static string BuildNameCacheKey(string name)

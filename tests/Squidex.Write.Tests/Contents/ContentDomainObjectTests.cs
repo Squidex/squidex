@@ -7,23 +7,21 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Core.Contents;
 using Squidex.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Write.Contents.Commands;
+using Squidex.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Write.Contents
 {
-    public class ContentDomainObjectTests
+    public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>
     {
-        private readonly Guid appId = Guid.NewGuid();
         private readonly ContentDomainObject sut;
         private readonly ContentData data =
             new ContentData()
@@ -36,9 +34,11 @@ namespace Squidex.Write.Contents
                     new ContentFieldData()
                         .AddValue("iv", 2));
 
+        public Guid ContentId { get; } = Guid.NewGuid();
+
         public ContentDomainObjectTests()
         {
-            sut = new ContentDomainObject(Guid.NewGuid(), 0);
+            sut = new ContentDomainObject(ContentId, 0);
         }
 
         [Fact]
@@ -46,32 +46,39 @@ namespace Squidex.Write.Contents
         {
             sut.Create(new CreateContent { Data = data });
 
-            Assert.Throws<DomainException>(() => sut.Create(new CreateContent { Data = data }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Create(CreateContentCommand(new CreateContent { Data = data }));
+            });
         }
 
         [Fact]
         public void Create_should_throw_if_command_is_not_valid()
         {
-            Assert.Throws<ValidationException>(() => sut.Create(new CreateContent()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Create(CreateContentCommand(new CreateContent()));
+            });
         }
 
         [Fact]
         public void Create_should_create_events()
         {
-            sut.Create(new CreateContent { Data = data, AppId = appId });
+            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentCreated { Data = data }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data })
+                );
         }
 
         [Fact]
         public void Update_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Update(new UpdateContent { Data = data }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
+            });
         }
 
         [Fact]
@@ -80,7 +87,10 @@ namespace Squidex.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<ValidationException>(() => sut.Update(new UpdateContent()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Update(CreateContentCommand(new UpdateContent()));
+            });
         }
 
         [Fact]
@@ -88,7 +98,10 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            Assert.Throws<ValidationException>(() => sut.Update(new UpdateContent()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Update(CreateContentCommand(new UpdateContent()));
+            });
         }
 
         [Fact]
@@ -97,14 +110,12 @@ namespace Squidex.Write.Contents
             CreateContent();
             UpdateContent();
 
-            sut.Update(new UpdateContent { Data = otherData });
+            sut.Update(CreateContentCommand(new UpdateContent { Data = otherData }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentUpdated { Data = otherData }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                );
         }
 
         [Fact]
@@ -113,15 +124,18 @@ namespace Squidex.Write.Contents
             CreateContent();
             UpdateContent();
 
-            sut.Update(new UpdateContent { Data = data });
+            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray().ShouldBeEquivalentTo(new IEvent[0]);
+            sut.GetUncomittedEvents().Should().BeEmpty();
         }
 
         [Fact]
         public void Patch_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Patch(new PatchContent { Data = data }));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
+            });
         }
 
         [Fact]
@@ -130,7 +144,10 @@ namespace Squidex.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<ValidationException>(() => sut.Patch(new PatchContent()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Patch(CreateContentCommand(new PatchContent()));
+            });
         }
 
         [Fact]
@@ -138,7 +155,10 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            Assert.Throws<ValidationException>(() => sut.Patch(new PatchContent()));
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Patch(CreateContentCommand(new PatchContent()));
+            });
         }
 
         [Fact]
@@ -147,31 +167,32 @@ namespace Squidex.Write.Contents
             CreateContent();
             UpdateContent();
 
-            sut.Patch(new PatchContent { Data = otherData });
+            sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentUpdated { Data = data.MergeInto(otherData) }
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                );
         }
-
+    
         [Fact]
         public void Patch_should_not_create_event_for_same_data()
         {
             CreateContent();
             UpdateContent();
 
-            sut.Patch(new PatchContent { Data = data });
+            sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray().Should().BeEmpty();
+            sut.GetUncomittedEvents().Should().BeEmpty();
         }
 
         [Fact]
         public void Publish_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Publish(new PublishContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Publish(CreateContentCommand(new PublishContent()));
+            });
         }
 
         [Fact]
@@ -180,7 +201,10 @@ namespace Squidex.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<DomainException>(() => sut.Publish(new PublishContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Publish(CreateContentCommand(new PublishContent()));
+            });
         }
 
         [Fact]
@@ -188,22 +212,23 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            sut.Publish(new PublishContent());
+            sut.Publish(CreateContentCommand(new PublishContent()));
 
             Assert.True(sut.IsPublished);
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentPublished()
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentPublished())
+                );
         }
 
         [Fact]
         public void Unpublish_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Unpublish(CreateContentCommand(new UnpublishContent()));
+            });
         }
 
         [Fact]
@@ -212,7 +237,10 @@ namespace Squidex.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<DomainException>(() => sut.Unpublish(new UnpublishContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Unpublish(CreateContentCommand(new UnpublishContent()));
+            });
         }
 
         [Fact]
@@ -221,22 +249,23 @@ namespace Squidex.Write.Contents
             CreateContent();
             PublishContent();
 
-            sut.Unpublish(new UnpublishContent());
+            sut.Unpublish(CreateContentCommand(new UnpublishContent()));
 
             Assert.False(sut.IsPublished);
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentUnpublished()
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUnpublished())
+                );
         }
 
         [Fact]
         public void Delete_should_throw_if_not_created()
         {
-            Assert.Throws<DomainException>(() => sut.Delete(new DeleteContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Delete(CreateContentCommand(new DeleteContent()));
+            });
         }
 
         [Fact]
@@ -245,7 +274,10 @@ namespace Squidex.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<DomainException>(() => sut.Delete(new DeleteContent()));
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Delete(CreateContentCommand(new DeleteContent()));
+            });
         }
 
         [Fact]
@@ -253,44 +285,56 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            sut.Delete(new DeleteContent());
+            sut.Delete(CreateContentCommand(new DeleteContent()));
 
             Assert.True(sut.IsDeleted);
 
-            sut.GetUncomittedEvents().Select(x => x.Payload).ToArray()
-                .ShouldBeEquivalentTo(
-                    new IEvent[]
-                    {
-                        new ContentDeleted()
-                    });
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentDeleted())
+                );
         }
 
         private void CreateContent()
         {
-            sut.Create(new CreateContent { Data = data, AppId = appId });
+            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }
 
         private void UpdateContent()
         {
-            sut.Update(new UpdateContent { Data = data, AppId = appId });
+            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }
 
         private void PublishContent()
         {
-            sut.Publish(new PublishContent());
+            sut.Publish(CreateContentCommand(new PublishContent()));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }
 
         private void DeleteContent()
         {
-            sut.Delete(new DeleteContent());
+            sut.Delete(CreateContentCommand(new DeleteContent()));
 
             ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        protected T CreateContentEvent<T>(T @event) where T : ContentEvent
+        {
+            @event.ContentId = ContentId;
+
+            return CreateEvent(@event);
+        }
+
+        protected T CreateContentCommand<T>(T command) where T : ContentCommand
+        {
+            command.ContentId = ContentId;
+
+            return CreateCommand(command);
         }
     }
 }

@@ -9,10 +9,10 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Core.Apps;
+using Squidex.Events;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -198,6 +198,16 @@ namespace Squidex.Write.Apps
             RaiseEvent(SimpleMapper.Map(command, new AppMasterLanguageSet()));
 
             return this;
+        }
+
+        protected void RaiseEvent(AppEvent @event)
+        {
+            if (@event.AppId == null)
+            {
+                @event.AppId = new NamedId<Guid>(Id, name);
+            }
+
+            base.RaiseEvent(Envelope<IEvent>.Create(@event));
         }
 
         private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)

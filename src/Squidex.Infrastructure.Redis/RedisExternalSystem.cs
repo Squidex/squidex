@@ -11,7 +11,7 @@ using StackExchange.Redis;
 
 namespace Squidex.Infrastructure.Redis
 {
-    public class RedisExternalSystem
+    public sealed class RedisExternalSystem : IExternalSystem
     {
         private readonly IConnectionMultiplexer redis;
 

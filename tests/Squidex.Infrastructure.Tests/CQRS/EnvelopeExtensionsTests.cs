@@ -63,17 +63,6 @@ namespace Squidex.Infrastructure.CQRS
         }
 
         [Fact]
-        public void Should_set_and_get_actor()
-        {
-            var actor = new RefToken("subject", "123");
-
-            sut.SetActor(actor);
-
-            Assert.Equal(actor, sut.Headers.Actor());
-            Assert.Equal(actor, RefToken.Parse(sut.Headers["Actor"].ToString()));
-        }
-
-        [Fact]
         public void Should_set_and_get_event_number()
         {
             const int eventNumber = 123;

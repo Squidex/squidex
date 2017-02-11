@@ -39,9 +39,9 @@ namespace Squidex.Infrastructure
             serializerSettings.Converters.Add(new PropertiesBagConverter());
 
             var content = JsonConvert.SerializeObject(bag, serializerSettings);
-            var response = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
+            var output  = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
             
-            Assert.Equal(bag.Count, response.Count);
+            Assert.Equal(bag.Count, output.Count);
         }
 
         [Fact]

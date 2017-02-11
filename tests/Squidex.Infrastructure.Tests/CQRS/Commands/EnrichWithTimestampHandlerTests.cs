@@ -14,11 +14,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class EnrichWithTimestampHandlerTests
     {
-        private sealed class MyNormalCommand : AggregateCommand
+        private sealed class MyNormalCommand : ICommand
         {
         }
 
-        private sealed class MyTimestampCommand : AggregateCommand, ITimestampCommand
+        private sealed class MyTimestampCommand : ITimestampCommand
         {
             public DateTime Timestamp { get; set; }
         }

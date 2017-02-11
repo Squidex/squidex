@@ -134,7 +134,7 @@ namespace Squidex.Write.Schemas
 
             VerifyNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new SchemaCreated()));
+            RaiseEvent(SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(Id, command.Name) }));
 
             return this;
         }
@@ -211,7 +211,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new SchemaPublished());
+            RaiseEvent(SimpleMapper.Map(command, new SchemaPublished()));
 
             return this;
         }
@@ -222,7 +222,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new SchemaUnpublished());
+            RaiseEvent(SimpleMapper.Map(command, new SchemaUnpublished()));
 
             return this;
         }
@@ -230,14 +230,16 @@ namespace Squidex.Write.Schemas
         public SchemaDomainObject Delete(DeleteSchema command)
         {
             VerifyCreatedAndNotDeleted();
-            
-            RaiseEvent(new SchemaDeleted());
+
+            RaiseEvent(SimpleMapper.Map(command, new SchemaDeleted()));
 
             return this;
         }
 
         protected void RaiseEvent(FieldCommand fieldCommand, FieldEvent @event)
         {
+            SimpleMapper.Map(fieldCommand, @event);
+
             Field field;
 
             if (schema.Fields.TryGetValue(fieldCommand.FieldId, out field))

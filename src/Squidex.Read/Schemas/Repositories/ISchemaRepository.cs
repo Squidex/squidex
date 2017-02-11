@@ -9,12 +9,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Read.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
-        event Action<Guid> SchemaSaved;
+        event Action<NamedId<Guid>, NamedId<Guid>> SchemaSaved;
 
         Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId);
 

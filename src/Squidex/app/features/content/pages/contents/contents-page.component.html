@@ -5,7 +5,7 @@
         <div class="panel-title-row">
             <div class="float-right">
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content..." />
+                    <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content" />
                 </form>
                 
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>

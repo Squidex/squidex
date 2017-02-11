@@ -24,7 +24,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         private readonly Mock<IDomainObjectFactory> factory = new Mock<IDomainObjectFactory>();
         private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
-        private readonly Mock<IEventPublisher> eventPublisher = new Mock<IEventPublisher>();
         private readonly Mock<IStreamNameResolver> streamNameResolver = new Mock<IStreamNameResolver>();
         private readonly Mock<EventDataFormatter> eventDataFormatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly string streamName = Guid.NewGuid().ToString();
@@ -40,7 +39,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             factory.Setup(x => x.CreateNew(typeof(MyDomainObject), aggregateId)).Returns(domainObject);
 
-            sut = new DefaultDomainObjectRepository(factory.Object, eventStore.Object, eventPublisher.Object, streamNameResolver.Object, eventDataFormatter.Object);
+            sut = new DefaultDomainObjectRepository(factory.Object, eventStore.Object, streamNameResolver.Object, eventDataFormatter.Object);
         }
 
         public sealed class MyEvent : IEvent
@@ -74,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Observable.Empty<EventData>());
+            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Observable.Empty<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
         }
@@ -88,7 +87,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(new[] { eventData1, eventData2 }.ToObservable());
+            var events = new[]
+            {
+                new StoredEvent(0, eventData1),
+                new StoredEvent(1, eventData2)
+            };
+
+            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -107,7 +112,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(new[] { eventData1, eventData2 }.ToObservable());
+            var events = new[]
+            {
+                new StoredEvent(0, eventData1),
+                new StoredEvent(1, eventData2)
+            };
+
+            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -136,9 +147,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
             domainObject.AddEvent(event2);
 
             await sut.SaveAsync(domainObject, domainObject.GetUncomittedEvents(), commitId);
-
-            eventPublisher.Verify(x => x.Publish(eventData1));
-            eventPublisher.Verify(x => x.Publish(eventData2));
 
             eventStore.VerifyAll();
         }

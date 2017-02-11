@@ -33,16 +33,16 @@ namespace Squidex.Config.Domain
 
             var appProvider = app.ApplicationServices.GetRequiredService<IAppProvider>();
 
-            app.ApplicationServices.GetRequiredService<IAppRepository>().AppSaved += id =>
+            app.ApplicationServices.GetRequiredService<IAppRepository>().AppSaved += appId =>
             {
-                appProvider.Remove(id);
+                appProvider.Remove(appId);
             };
             
             var schemaProvider = app.ApplicationServices.GetRequiredService<ISchemaProvider>();
 
-            app.ApplicationServices.GetRequiredService<ISchemaRepository>().SchemaSaved += id =>
+            app.ApplicationServices.GetRequiredService<ISchemaRepository>().SchemaSaved += (appId, schemaId) =>
             {
-                schemaProvider.Remove(id);
+                schemaProvider.Remove(appId, schemaId);
             };
 
             return app;

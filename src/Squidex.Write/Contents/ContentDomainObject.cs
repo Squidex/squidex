@@ -135,7 +135,7 @@ namespace Squidex.Write.Contents
 
             if (!newData.Equals(data))
             {
-                RaiseEvent(new ContentUpdated { Data = newData });
+                RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = newData }));
             }
 
             return this;

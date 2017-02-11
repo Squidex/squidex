@@ -61,8 +61,7 @@ namespace Squidex.Read.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId)
-                    .AddParameter("Permission", @event.Permission.ToString()));
+                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Permission", @event.Permission));
         }
 
         protected Task<HistoryEventToStore> On(AppClientAttached @event, EnvelopeHeaders headers)
@@ -89,8 +88,7 @@ namespace Squidex.Read.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Id", @event.Id)
-                    .AddParameter("Name", !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id));
+                    .AddParameter("Id", @event.Id).AddParameter("Name", ClientName(@event)));
         }
 
         protected Task<HistoryEventToStore> On(AppLanguageAdded @event, EnvelopeHeaders headers)
@@ -99,7 +97,7 @@ namespace Squidex.Read.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language.EnglishName));
+                    .AddParameter("Language", @event.Language));
         }
 
         protected Task<HistoryEventToStore> On(AppLanguageRemoved @event, EnvelopeHeaders headers)
@@ -108,7 +106,7 @@ namespace Squidex.Read.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language.EnglishName));
+                    .AddParameter("Language", @event.Language));
         }
 
         protected Task<HistoryEventToStore> On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
@@ -117,12 +115,17 @@ namespace Squidex.Read.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language.EnglishName));
+                    .AddParameter("Language", @event.Language));
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
+        }
+
+        private static string ClientName(AppClientRenamed @event)
+        {
+            return !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id;
         }
     }
 }

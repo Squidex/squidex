@@ -8,22 +8,14 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure
 {
     public class LanguageTests
     {
-        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-
-        static LanguageTests()
-        {
-            serializerSettings.Converters.Add(new LanguageConverter());
-            serializerSettings.NullValueHandling = NullValueHandling.Include;
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
@@ -53,21 +45,13 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_language()
         {
-            var input = Tuple.Create<Language>(null);
-            var json = JsonConvert.SerializeObject(input, serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<Language>>(json, serializerSettings);
-
-            Assert.Equal(output.Item1, input.Item1);
+            JsonHelper.SerializeAndDeserialize<Language>(null, new LanguageConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_valid_language()
         {
-            var input = Tuple.Create(Language.DE);
-            var json = JsonConvert.SerializeObject(input, serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<Language>>(json, serializerSettings);
-
-            Assert.Equal(output.Item1, input.Item1);
+            Language.DE.SerializeAndDeserialize(new LanguageConverter());
         }
 
         [Theory]

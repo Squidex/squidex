@@ -12,13 +12,12 @@ using Moq;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
-using Squidex.Write.Utils;
+using Squidex.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
@@ -33,33 +32,31 @@ namespace Squidex.Write.Contents
         private readonly Mock<IAppProvider> appProvider = new Mock<IAppProvider>();
         private readonly Mock<ISchemaEntityWithSchema> schemaEntity = new Mock<ISchemaEntityWithSchema>();
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
-        private readonly Guid schemaId = Guid.NewGuid();
-        private readonly Guid appId = Guid.NewGuid();
         private readonly ContentData data = new ContentData().AddField("my-field", new ContentFieldData().SetValue(1));
+        private readonly Guid contentId = Guid.NewGuid();
 
         public ContentCommandHandlerTests()
         {
-            var schema = 
+            var schema =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new NumberField(1, "my-field", 
+                    .AddOrUpdateField(new NumberField(1, "my-field",
                         new NumberFieldProperties { IsRequired = true }));
 
-            content = new ContentDomainObject(Id, 0);
+            content = new ContentDomainObject(contentId, 0);
 
             sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
 
             appEntity.Setup(x => x.Languages).Returns(new[] { Language.DE });
-            appProvider.Setup(x => x.FindAppByIdAsync(appId)).Returns(Task.FromResult(appEntity.Object));
+            appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);
-            schemaProvider.Setup(x => x.FindSchemaByIdAsync(schemaId)).Returns(Task.FromResult(schemaEntity.Object));
+            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId)).Returns(Task.FromResult(schemaEntity.Object));
         }
 
         [Fact]
         public async Task Create_should_throw_exception_if_data_is_not_valid()
         {
-            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new ContentData() };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = new ContentData() });
 
             await TestCreate(content, async _ =>
             {
@@ -70,15 +67,14 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Create_should_create_content()
         {
-            var command = new CreateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = data };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data });
 
             await TestCreate(content, async _ =>
             {
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(Id, context.Result<Guid>());
+            Assert.Equal(contentId, context.Result<Guid>());
         }
 
         [Fact]
@@ -86,8 +82,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new ContentData() };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = new ContentData() });
 
             await TestUpdate(content, async _ =>
             {
@@ -100,8 +95,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new UpdateContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = data };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = data });
 
             await TestUpdate(content, async _ =>
             {
@@ -114,8 +108,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new PatchContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = new ContentData() };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = new ContentData() });
 
             await TestUpdate(content, async _ =>
             {
@@ -126,10 +119,11 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Patch_should_update_domain_object()
         {
+            var otherContent = new ContentData().AddField("my-field", new ContentFieldData().SetValue(3));
+
             CreateContent();
 
-            var command = new PatchContent { AggregateId = Id, AppId = appId, SchemaId = schemaId, Data = data };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = otherContent });
 
             await TestUpdate(content, async _ =>
             {
@@ -142,8 +136,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new PublishContent { AggregateId = Id, AppId = appId, SchemaId = schemaId };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new PublishContent { ContentId = contentId });
 
             await TestUpdate(content, async _ =>
             {
@@ -156,8 +149,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new UnpublishContent { AggregateId = Id, AppId = appId, SchemaId = schemaId };
-            var context = new CommandContext(command);
+            var context = CreateContextForCommand(new UnpublishContent { ContentId = contentId });
 
             await TestUpdate(content, async _ =>
             {
@@ -170,12 +162,11 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var command = new DeleteContent { AggregateId = Id };
-            var context = new CommandContext(command);
+            var command = CreateContextForCommand(new DeleteContent { ContentId = contentId });
 
             await TestUpdate(content, async _ =>
             {
-                await sut.HandleAsync(context);
+                await sut.HandleAsync(command);
             });
         }
 
