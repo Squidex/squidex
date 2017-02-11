@@ -12,10 +12,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class UpdateField : SchemaAggregateCommand, IValidatable
+    public class UpdateField : FieldCommand, IValidatable
     {
-        public long FieldId { get; set; }
-
         public FieldProperties Properties { get; set; }
 
         public void Validate(IList<ValidationError> errors)

@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Write;
 
@@ -27,7 +28,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var appCommand = context.Command as IAppCommand;
+            var appCommand = context.Command as AppCommand;
 
             if (appCommand != null)
             {
@@ -38,7 +39,7 @@ namespace Squidex.Pipeline.CommandHandlers
                     throw new InvalidOperationException("Cannot resolve app");
                 }
 
-                appCommand.AppId = appFeature.App.Id;
+                appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
             }
 
             return Task.FromResult(false);

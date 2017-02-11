@@ -8,8 +8,7 @@
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class ShowField : SchemaAggregateCommand
+    public class ShowField : FieldCommand
     {
-        public long FieldId { get; set; }
     }
 }

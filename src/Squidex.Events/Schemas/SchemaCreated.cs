@@ -8,12 +8,11 @@
 
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
     [TypeName("SchemaCreatedEvent")]
-    public class SchemaCreated : IEvent
+    public class SchemaCreated : SchemaEvent
     {
         public string Name { get; set; }
 

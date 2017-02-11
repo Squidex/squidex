@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Squidex.Infrastructure;
@@ -32,7 +33,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public async Task<bool> HandleAsync(CommandContext context)
         {
-            var schemaCommand = context.Command as ISchemaCommand;
+            var schemaCommand = context.Command as SchemaCommand;
 
             if (schemaCommand != null)
             {
@@ -42,14 +43,14 @@ namespace Squidex.Pipeline.CommandHandlers
                 {
                     var schemaName = routeValues["name"].ToString();
 
-                    var schema = await schemaProvider.FindSchemaByNameAsync(schemaCommand.AppId, schemaName);
+                    var schema = await schemaProvider.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
 
                     if (schema == null)
                     {
                         throw new DomainObjectNotFoundException(schemaName, typeof(SchemaDomainObject));
                     }
 
-                    schemaCommand.SchemaId = schema.Id;
+                    schemaCommand.SchemaId = new NamedId<Guid>(schema.Id, schema.Name);
                 }
             }
 

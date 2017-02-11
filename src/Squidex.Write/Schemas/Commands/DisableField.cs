@@ -8,8 +8,7 @@
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class DisableField : SchemaAggregateCommand
+    public class DisableField : FieldCommand
     {
-        public long FieldId { get; set; }
     }
 }

@@ -8,7 +8,7 @@
 
 namespace Squidex.Write.Contents.Commands
 {
-    public class UnpublishContent : SchemaCommand
+    public class UnpublishContent : ContentCommand
     {
     }
 }

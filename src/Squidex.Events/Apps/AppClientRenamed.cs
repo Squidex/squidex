@@ -7,12 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
     [TypeName("AppClientRenamedEvent")]
-    public sealed class AppClientRenamed : IEvent
+    public sealed class AppClientRenamed : AppEvent
     {
         public string Id { get; set; }
 

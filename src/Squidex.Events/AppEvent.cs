@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SchemaAggregateCommand.cs
+//  AppEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,15 +7,12 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure;
 
-namespace Squidex.Write
+namespace Squidex.Events
 {
-    public abstract class SchemaAggregateCommand : SchemaCommand, IAggregateCommand
+    public abstract class AppEvent : SquidexEvent
     {
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AppId.Id; }
-        }
+        public NamedId<Guid> AppId { get; set; }
     }
 }

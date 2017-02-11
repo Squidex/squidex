@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Contents
+namespace Squidex.Write.Contents.Commands
 {
-    public class ContentDataCommand : SchemaCommand, IValidatable
+    public abstract class ContentDataCommand : ContentCommand, IValidatable
     {
         public ContentData Data { get; set; }
 

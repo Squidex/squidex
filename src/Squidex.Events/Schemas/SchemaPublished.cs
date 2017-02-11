@@ -7,12 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Schemas
 {
     [TypeName("SchemaPublished")]
-    public class SchemaPublished : IEvent
+    public class SchemaPublished : SchemaEvent
     {
     }
 }

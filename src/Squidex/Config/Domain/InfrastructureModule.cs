@@ -64,10 +64,6 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<EventReceiver>()
-                .AsSelf()
-                .SingleInstance();
-
             builder.RegisterType<SchemaJsonSerializer>()
                 .AsSelf()
                 .SingleInstance();

@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure;
 
 namespace Squidex.Events.Schemas
 {
-    public abstract class FieldEvent : IEvent
+    public abstract class FieldEvent : SchemaEvent
     {
-        public long FieldId { get; set; }
+        public NamedId<long> FieldId { get; set; }
     }
 }

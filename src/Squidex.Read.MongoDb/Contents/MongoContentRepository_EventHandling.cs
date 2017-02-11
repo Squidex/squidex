@@ -10,7 +10,6 @@ using System;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Events;
 using Squidex.Events.Contents;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure.CQRS;
@@ -59,7 +58,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(headers.AggregateId(), async collection =>
+            return ForSchemaIdAsync(@event.SchemaId.Id, async collection =>
             {
                 await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
                 await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.Text));
@@ -68,9 +67,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
             {
-                return collection.CreateAsync(headers, x =>
+                return collection.CreateAsync(@event, headers, x =>
                 {
                     SimpleMapper.Map(@event, x);
 
@@ -81,9 +80,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(headers.SchemaId(), (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
             {
-                return collection.UpdateAsync(headers, x =>
+                return collection.UpdateAsync(@event, headers, x =>
                 {
                     x.SetData(schema, @event.Data);
                 });
@@ -92,9 +91,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentPublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(headers.SchemaId(), collection =>
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
-                return collection.UpdateAsync(headers, x =>
+                return collection.UpdateAsync(@event, headers, x =>
                 {
                     x.IsPublished = true;
                 });
@@ -103,9 +102,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(headers.SchemaId(), collection =>
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
-                return collection.UpdateAsync(headers, x =>
+                return collection.UpdateAsync(@event, headers, x =>
                 {
                     x.IsPublished = false;
                 });
@@ -114,9 +113,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(headers.SchemaId(), collection =>
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
-                return collection.UpdateAsync(headers, x =>
+                return collection.UpdateAsync(@event, headers, x =>
                 {
                     x.IsDeleted = true;
                 });
@@ -125,7 +124,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(headers.SchemaId(), collection =>
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
                 return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
             });

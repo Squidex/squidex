@@ -8,7 +8,7 @@
 
 namespace Squidex.Write.Contents.Commands
 {
-    public class DeleteContent : SchemaCommand
+    public class DeleteContent : ContentCommand
     {
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  NamedGuidIdConverted.cs
+//  NamedLongIdConverter.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,11 +12,11 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class NamedGuidIdConverted : JsonConverter
+    public sealed class NamedLongIdConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var namedId = (NamedId<Guid>)value;
+            var namedId = (NamedId<long>)value;
 
             writer.WriteValue($"{namedId.Id},{namedId.Name}");
         }
@@ -35,19 +35,19 @@ namespace Squidex.Infrastructure.Json
                 throw new JsonException("Named id must have more than 2 parts divided by commata");
             }
 
-            Guid id;
+            long id;
 
-            if (!Guid.TryParse(parts[0], out id))
+            if (!long.TryParse(parts[0], out id))
             {
-                throw new JsonException("Named id must be a valid guid");
+                throw new JsonException("Named id must be a valid long");
             }
 
-            return new NamedId<Guid>(id, string.Join(",", parts.Skip(1)));
+            return new NamedId<long>(id, string.Join(",", parts.Skip(1)));
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(NamedId<Guid>);
+            return objectType == typeof(NamedId<long>);
         }
     }
 }

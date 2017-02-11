@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class AddField : SchemaAggregateCommand, IValidatable
+    public class AddField : FieldCommand, IValidatable
     {
         public string Name { get; set; }
 

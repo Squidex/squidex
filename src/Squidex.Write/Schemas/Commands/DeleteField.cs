@@ -8,8 +8,7 @@
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class DeleteField : SchemaAggregateCommand
+    public class DeleteField : FieldCommand
     {
-        public long FieldId { get; set; }
     }
 }

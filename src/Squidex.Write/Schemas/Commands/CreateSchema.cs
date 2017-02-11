@@ -10,10 +10,11 @@ using System;
 using System.Collections.Generic;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class CreateSchema : AppCommand, IValidatable
+    public class CreateSchema : AppCommand, IValidatable, IAggregateCommand
     {
         private SchemaProperties properties;
 
@@ -31,9 +32,16 @@ namespace Squidex.Write.Schemas.Commands
 
         public string Name { get; set; }
 
+        public Guid SchemaId { get; set; }
+
+        Guid IAggregateCommand.AggregateId
+        {
+            get { return SchemaId; }
+        }
+
         public CreateSchema()
         {
-            AggregateId = Guid.NewGuid();
+            SchemaId = Guid.NewGuid();
         }
 
         public void Validate(IList<ValidationError> errors)

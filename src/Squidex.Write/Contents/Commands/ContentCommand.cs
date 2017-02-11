@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ISchemaCommand.cs
+//  ContentCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,11 +7,17 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Write
+namespace Squidex.Write.Contents.Commands
 {
-    public interface ISchemaCommand : IAppCommand
+    public abstract class ContentCommand : SchemaCommand, IAggregateCommand
     {
-        Guid SchemaId { get; set; }
+        public Guid ContentId { get; set; }
+
+        Guid IAggregateCommand.AggregateId
+        {
+            get { return ContentId; }
+        }
     }
 }

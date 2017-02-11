@@ -23,13 +23,21 @@ namespace Squidex.Config.Domain
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
+
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            settings.Converters.Add(new NamedGuidIdConverter());
+            settings.Converters.Add(new NamedLongIdConverter());
+            settings.Converters.Add(new NamedStringIdConverter());
             settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new PropertiesBagConverter());
             settings.Converters.Add(new RefTokenConverter());
+
             settings.NullValueHandling = NullValueHandling.Ignore;
+
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
             settings.DateParseHandling = DateParseHandling.DateTime;
+
             settings.TypeNameHandling = typeNameHandling;
 
             return settings;
@@ -37,7 +45,7 @@ namespace Squidex.Config.Domain
 
         static Serializers()
         {
-            typeNameRegistry.Map(typeof(EventExtensions).GetTypeInfo().Assembly);
+            typeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
         }
 
         private static JsonSerializerSettings CreateSettings()

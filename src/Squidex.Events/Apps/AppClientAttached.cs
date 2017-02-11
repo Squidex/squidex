@@ -8,12 +8,11 @@
 
 using System;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
     [TypeName("AppClientAttachedEvent")]
-    public sealed class AppClientAttached : IEvent
+    public sealed class AppClientAttached : AppEvent
     {
         public string Id { get; set; }
 

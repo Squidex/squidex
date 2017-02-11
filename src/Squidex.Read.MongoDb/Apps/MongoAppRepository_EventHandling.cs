@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Events;
 using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -29,7 +30,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected async Task On(AppCreated @event, EnvelopeHeaders headers)
         {
-            await Collection.CreateAsync(headers, a =>
+            await Collection.CreateAsync(@event, headers, a =>
             {
                 SimpleMapper.Map(@event, a);
             });
@@ -39,7 +40,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
 
@@ -49,7 +50,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Contributors.Remove(@event.ContributorId);
             });
@@ -57,7 +58,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Clients[@event.Id] = SimpleMapper.Map(@event, new MongoAppClientEntity());
             });
@@ -65,7 +66,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppClientRevoked @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Clients.Remove(@event.Id);
             });
@@ -73,7 +74,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppClientRenamed @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Clients[@event.Id].Name = @event.Name;
             });
@@ -81,7 +82,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppLanguageAdded @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Languages.Add(@event.Language.Iso2Code);
             });
@@ -89,7 +90,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppLanguageRemoved @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.Languages.Remove(@event.Language.Iso2Code);
             });
@@ -97,15 +98,15 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected Task On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
         {
-            return UpdateAsync(headers, a =>
+            return UpdateAsync(@event, headers, a =>
             {
                 a.MasterLanguage = @event.Language.Iso2Code;
             });
         }
 
-        public async Task UpdateAsync(EnvelopeHeaders headers, Action<MongoAppEntity> updater)
+        public async Task UpdateAsync(SquidexEvent @event, EnvelopeHeaders headers, Action<MongoAppEntity> updater)
         {
-            await Collection.UpdateAsync(headers, updater);
+            await Collection.UpdateAsync(@event, headers, updater);
 
             AppSaved?.Invoke(headers.AggregateId());
         }

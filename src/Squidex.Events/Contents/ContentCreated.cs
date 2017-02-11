@@ -6,18 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Contents
 {
     [TypeName("ContentCreatedEvent")]
-    public class ContentCreated : IEvent
+    public class ContentCreated : ContentEvent
     {
-        public Guid SchemaId { get; set; }
-
         public ContentData Data { get; set; }
     }
 }

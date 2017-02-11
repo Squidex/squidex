@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Events;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
@@ -80,15 +81,17 @@ namespace Squidex.Read.MongoDb.History
 
                 if (message != null)
                 {
-                    await Collection.CreateAsync(@event.Headers, x =>
+                    await Collection.CreateAsync((SquidexEvent)@event.Payload, @event.Headers, entity =>
                     {
-                        x.SessionEventIndex = Interlocked.Increment(ref sessionEventCount);
+                        entity.Id = Guid.NewGuid();
 
-                        x.Channel = message.Channel;
-                        x.Message = message.Message;
+                        entity.SessionEventIndex = Interlocked.Increment(ref sessionEventCount);
 
-                        x.Parameters = message.Parameters.ToDictionary(p => p.Key, p => p.Value);
-                    }, false);
+                        entity.Channel = message.Channel;
+                        entity.Message = message.Message;
+
+                        entity.Parameters = message.Parameters.ToDictionary(p => p.Key, p => p.Value);
+                    });
                 }
             }
         }

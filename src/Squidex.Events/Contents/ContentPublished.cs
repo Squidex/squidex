@@ -7,12 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Contents
 {
     [TypeName("ContentPublishedEvent")]
-    public class ContentPublished : IEvent
+    public class ContentPublished : ContentEvent
     {
     }
 }

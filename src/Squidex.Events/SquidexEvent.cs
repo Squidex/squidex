@@ -1,21 +1,18 @@
 ﻿// ==========================================================================
-//  SchemaAggregateCommand.cs
+//  SquidexEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Write
+namespace Squidex.Events
 {
-    public abstract class SchemaAggregateCommand : SchemaCommand, IAggregateCommand
+    public abstract class SquidexEvent : IEvent
     {
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AppId.Id; }
-        }
+        public RefToken Actor { get; set; }
     }
 }

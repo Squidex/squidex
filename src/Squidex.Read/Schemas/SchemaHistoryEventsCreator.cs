@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.History;
-using Squidex.Read.Schemas.Services;
 
 // ReSharper disable InvertIf
 
@@ -20,15 +20,9 @@ namespace Squidex.Read.Schemas
 {
     public sealed class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
     {
-        private readonly ISchemaProvider schemaProvider;
-
-        public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry, ISchemaProvider schemaProvider)
+        public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
-            Guard.NotNull(schemaProvider, nameof(schemaProvider));
-
-            this.schemaProvider = schemaProvider;
-
             AddEventMessage<SchemaCreated>(
                 "created schema {[Name]}");
 
@@ -69,45 +63,27 @@ namespace Squidex.Read.Schemas
                 "deleted field {[Field]} of schema {[Name]}");
         }
 
-        protected override async Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            var schemaCreated = @event.Payload as SchemaCreated;
+            var schemaEvent = @event.Payload as SchemaEvent;
 
-            if (schemaCreated != null)
+            if (schemaEvent == null)
             {
-                string channel = $"schemas.{schemaCreated.Name}";
-
-                return ForEvent(@event.Payload, channel).AddParameter("Name", schemaCreated.Name);
+                return Task.FromResult<HistoryEventToStore>(null);
             }
-            else
+
+            string channel = $"schemas.{schemaEvent.SchemaId.Name}";
+
+            var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaEvent.SchemaId.Name);
+
+            var fieldEvent = schemaEvent as FieldEvent;
+
+            if (fieldEvent != null)
             {
-                var schemaEntity = await schemaProvider.FindSchemaByIdAsync(@event.Headers.AggregateId());
-                var schemaName = schemaEntity.Label ?? schemaEntity.Name;
-
-                string channel = $"schemas.{schemaName}";
-
-                var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaName);
-
-                var fieldAdded = @event.Payload as FieldAdded;
-
-                if (fieldAdded != null)
-                {
-                    result.AddParameter("Field", fieldAdded.Name);
-                }
-                else
-                {
-                    var fieldEvent = @event.Payload as FieldEvent;
-
-                    if (fieldEvent != null)
-                    {
-                        var fieldName = schemaEntity.Schema.Fields.GetOrDefault(fieldEvent.FieldId)?.Name;
-
-                        result.AddParameter("Field", fieldName);
-                    }
-                }
-
-                return result;
+                result.AddParameter("Field", fieldEvent.FieldId.Name);
             }
+
+            return Task.FromResult(result);
         }
     }
 }

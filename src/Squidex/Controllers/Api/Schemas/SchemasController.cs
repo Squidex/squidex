@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -100,7 +99,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(ErrorDto), 409)]
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
-            var command = SimpleMapper.Map(request, new CreateSchema { AggregateId = Guid.NewGuid() });
+            var command = SimpleMapper.Map(request, new CreateSchema());
 
             await CommandBus.PublishAsync(command);
 

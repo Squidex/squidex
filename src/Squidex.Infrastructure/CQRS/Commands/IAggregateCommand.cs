@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface IAggregateCommand : ICommand
     {
-        Guid AggregateId { get; set; }
+        Guid AggregateId { get; }
     }
 }

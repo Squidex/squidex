@@ -7,12 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
     [TypeName("AppContributorRemovedEvent")]
-    public class AppContributorRemoved : IEvent
+    public class AppContributorRemoved : AppEvent
     {
         public string ContributorId { get; set; }
     }

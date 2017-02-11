@@ -8,12 +8,11 @@
 
 using Squidex.Core.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Apps
 {
     [TypeName("AppContributorAssignedEvent")]
-    public class AppContributorAssigned : IEvent
+    public class AppContributorAssigned : AppEvent
     {
         public string ContributorId { get; set; }
 

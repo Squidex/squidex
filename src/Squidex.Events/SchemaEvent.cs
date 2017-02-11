@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppCommand.cs
+//  SchemaEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure;
 
-namespace Squidex.Write
+namespace Squidex.Events
 {
-    public interface IAppCommand : ICommand
+    public abstract class SchemaEvent : AppEvent
     {
-        Guid AppId { get; set; }
+        public NamedId<Guid> SchemaId { get; set; }
     }
 }

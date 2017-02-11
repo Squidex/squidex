@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  IActorCommand.cs
+//  ContentEvent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Commands
+using System;
+
+namespace Squidex.Events.Contents
 {
-    public interface IActorCommand : ICommand
+    public abstract class ContentEvent : SchemaEvent
     {
-        RefToken Actor { get; set; }
+        public Guid ContentId { get; set; }
     }
 }

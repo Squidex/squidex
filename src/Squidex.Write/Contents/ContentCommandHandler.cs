@@ -46,7 +46,7 @@ namespace Squidex.Write.Contents
             {
                 s.Create(command);
 
-                context.Succeed(command.AggregateId);
+                context.Succeed(command.ContentId);
             });
         }
 
@@ -88,8 +88,11 @@ namespace Squidex.Write.Contents
         {
             Guard.Valid(command, nameof(command), message);
 
-            var taskForApp = appProvider.FindAppByIdAsync(command.AppId);
-            var taskForSchema = schemaProvider.FindSchemaByIdAsync(command.SchemaId);
+            var taskForApp = 
+                appProvider.FindAppByIdAsync(command.AppId.Id);
+
+            var taskForSchema = 
+                schemaProvider.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);
 

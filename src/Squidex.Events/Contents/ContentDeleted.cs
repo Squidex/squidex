@@ -7,12 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Events.Contents
 {
     [TypeName("ContentDeletedEvent")]
-    public class ContentDeleted : IEvent
+    public class ContentDeleted : ContentEvent
     {
     }
 }

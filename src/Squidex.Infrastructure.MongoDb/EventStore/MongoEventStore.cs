@@ -82,19 +82,21 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             return Observable.Create<StoredEvent>(async (observer, ct) =>
             {
-                var position = await GetPreviousOffset(lastReceivedPosition);
+                var commitOffset = await GetPreviousOffset(lastReceivedPosition);
 
-                await Collection.Find(new BsonDocument()).ForEachAsync(commit =>
+                await Collection.Find(x => x.EventsOffset >= commitOffset).SortBy(x => x.EventsOffset).ForEachAsync(commit =>
                 {
+                    var eventNumber = commit.EventsOffset;
+
                     foreach (var @event in commit.Events)
                     {
-                        position++;
+                        eventNumber++;
 
-                        if (position > lastReceivedPosition)
+                        if (eventNumber > lastReceivedPosition)
                         {
                             var eventData = SimpleMapper.Map(@event, new EventData());
 
-                            observer.OnNext(new StoredEvent(position, eventData));
+                            observer.OnNext(new StoredEvent(eventNumber, eventData));
                         }
                     }
                 }, ct);

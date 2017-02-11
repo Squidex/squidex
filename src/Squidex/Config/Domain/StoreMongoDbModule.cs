@@ -96,7 +96,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoContentRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<IContentRepository>()
-                .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
 
@@ -120,7 +119,14 @@ namespace Squidex.Config.Domain
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
-            
+
+            builder.Register(c =>
+                new MongoDbConsumerWrapper(
+                    c.ResolveNamed<IMongoDatabase>(MongoDatabaseName),
+                    c.Resolve<MongoAppRepository>()))
+                .As<IEventCatchConsumer>()
+                .SingleInstance();
+            /*
             builder.Register(c =>
                 new MongoDbConsumerWrapper(
                     c.ResolveNamed<IMongoDatabase>(MongoDatabaseName),
@@ -138,9 +144,9 @@ namespace Squidex.Config.Domain
             builder.Register(c =>
                 new MongoDbConsumerWrapper(
                     c.ResolveNamed<IMongoDatabase>(MongoDatabaseName),
-                    c.Resolve<MongoAppRepository>()))
+                    c.Resolve<MongoHistoryEventRepository>()))
                 .As<IEventCatchConsumer>()
-                .SingleInstance();
+                .SingleInstance();*/
         }
     }
 }

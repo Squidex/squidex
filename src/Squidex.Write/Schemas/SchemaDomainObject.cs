@@ -112,7 +112,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = ++totalFields }));
+            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(++totalFields, command.Name) }));
 
             return this;
         }
@@ -123,7 +123,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new FieldUpdated()));
+            RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
 
             return this;
         }
@@ -156,7 +156,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldHidden { FieldId = command.FieldId });
+            RaiseEvent(command, new FieldHidden());
 
             return this;
         }
@@ -167,7 +167,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldShown { FieldId = command.FieldId });
+            RaiseEvent(command, new FieldShown());
 
             return this;
         }
@@ -178,7 +178,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(new FieldDisabled { FieldId = command.FieldId });
+            RaiseEvent(command, new FieldDisabled());
 
             return this;
         }
@@ -189,7 +189,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldEnabled { FieldId = command.FieldId });
+            RaiseEvent(command, new FieldEnabled());
 
             return this;
         }
@@ -200,7 +200,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
             
-            RaiseEvent(new FieldDeleted { FieldId = command.FieldId });
+            RaiseEvent(command, new FieldDeleted());
 
             return this;
         }
@@ -234,6 +234,22 @@ namespace Squidex.Write.Schemas
             RaiseEvent(new SchemaDeleted());
 
             return this;
+        }
+
+        protected void RaiseEvent(FieldCommand fieldCommand, FieldEvent @event)
+        {
+            Field field;
+
+            if (schema.Fields.TryGetValue(fieldCommand.FieldId, out field))
+            {
+                @event.FieldId = new NamedId<long>(field.Id, field.Name);
+            }
+            else
+            {
+                throw new DomainObjectNotFoundException(fieldCommand.FieldId.ToString(), "Fields", typeof(Field));
+            }
+
+            RaiseEvent(@event);
         }
 
         private void VerifyNotCreated()

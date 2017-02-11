@@ -46,7 +46,7 @@ namespace Squidex.Config.Domain
                 throw new ConfigurationException("You must specify the clusterer type in the 'squidex:clusterer:type' configuration section.");
             }
 
-            if (string.Equals(clustererType, "Slack", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(clustererType, "Redis", StringComparison.OrdinalIgnoreCase))
             {
                 var connectionString = Configuration.GetValue<string>("squidex:clusterer:redis:connectionString");
 
@@ -78,9 +78,9 @@ namespace Squidex.Config.Domain
                     .As<IMemoryCache>()
                     .SingleInstance();
             }
-            else
+            else if (!string.Equals(clustererType, "None", StringComparison.OrdinalIgnoreCase))
             {
-                throw new ConfigurationException($"Unsupported clusterer type '{clustererType}' for key 'squidex:clusterer:type', supported: Redis.");
+                throw new ConfigurationException($"Unsupported clusterer type '{clustererType}' for key 'squidex:clusterer:type', supported: Redis, None.");
             }
         }
     }

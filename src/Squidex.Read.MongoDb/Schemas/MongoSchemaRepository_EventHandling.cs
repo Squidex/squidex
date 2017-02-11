@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Core.Schemas;
+using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Events.Schemas.Utils;
 using Squidex.Infrastructure.CQRS;
@@ -32,71 +33,71 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             var schema = SchemaEventDispatcher.Dispatch(@event);
 
-            await Collection.CreateAsync(headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
+            await Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
 
             SchemaSaved?.Invoke(headers.AggregateId());
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldHidden @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldShown @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaPublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(SchemaUnpublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
         protected Task On(FieldAdded @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
         protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            await Collection.UpdateAsync(headers, s => s.IsDeleted = true);
+            await Collection.UpdateAsync(@event, headers, s => s.IsDeleted = true);
 
             SchemaSaved?.Invoke(headers.AggregateId());
         }
 
-        private async Task UpdateSchema(EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        private async Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
         {
-            await Collection.UpdateAsync(headers, e => UpdateSchema(e, updater));
+            await Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
 
             SchemaSaved?.Invoke(headers.AggregateId());
         }

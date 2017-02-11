@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Write
 {
-    public abstract class AppCommand : SquidexCommand, IAppCommand
+    public abstract class AppCommand : SquidexCommand
     {
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
     }
 }

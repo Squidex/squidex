@@ -101,11 +101,13 @@ namespace Squidex.Write.Apps
 
             ThrowIfCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AppCreated()));
+            var appId = new NamedId<Guid>(command.AggregateId, command.Name);
 
-            RaiseEvent(CreateInitialOwner(command));
-            RaiseEvent(CreateInitialLanguage());
-            RaiseEvent(CreateInitialMasterLanguage());
+            RaiseEvent(SimpleMapper.Map(command, new AppCreated { AppId = appId }));
+
+            RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
+            RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
+            RaiseEvent(SimpleMapper.Map(command, CreateInitialMasterLanguage(appId)));
 
             return this;
         }
@@ -198,19 +200,19 @@ namespace Squidex.Write.Apps
             return this;
         }
 
-        private static AppLanguageAdded CreateInitialLanguage()
+        private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)
         {
-            return new AppLanguageAdded { Language = DefaultLanguage };
+            return new AppLanguageAdded { AppId = id, Language = DefaultLanguage };
         }
 
-        private static AppMasterLanguageSet CreateInitialMasterLanguage()
+        private static AppMasterLanguageSet CreateInitialMasterLanguage(NamedId<Guid> id)
         {
-            return new AppMasterLanguageSet { Language = DefaultLanguage };
+            return new AppMasterLanguageSet { AppId = id, Language = DefaultLanguage };
         }
 
-        private static AppContributorAssigned CreateInitialOwner(IActorCommand command)
+        private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
-            return new AppContributorAssigned { ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
         }
 
         private void ThrowIfNotCreated()

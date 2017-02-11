@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  AggregateCommand.cs
+//  FieldCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Write.Schemas.Commands
 {
-    public class AggregateCommand : IAggregateCommand
+    public class FieldCommand : SchemaAggregateCommand
     {
-        public Guid AggregateId { get; set; }
+        public long FieldId { get; set; }
     }
 }

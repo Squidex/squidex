@@ -62,18 +62,6 @@ namespace Squidex.Infrastructure.CQRS
             return envelope;
         }
 
-        public static RefToken Actor(this EnvelopeHeaders headers)
-        {
-            return RefToken.Parse(headers[CommonHeaders.Actor].ToString());
-        }
-
-        public static Envelope<T> SetActor<T>(this Envelope<T> envelope, RefToken value) where T : class
-        {
-            envelope.Headers.Set(CommonHeaders.Actor, value.ToString());
-
-            return envelope;
-        }
-
         public static Instant Timestamp(this EnvelopeHeaders headers)
         {
             return headers[CommonHeaders.Timestamp].ToInstant(CultureInfo.InvariantCulture);
