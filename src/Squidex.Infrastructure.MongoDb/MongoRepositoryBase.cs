@@ -150,9 +150,9 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 Database.ListCollections();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new ConfigurationException($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}", e);
+                throw new ConfigurationException($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}", ex);
             }
         }
     }

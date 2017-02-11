@@ -40,9 +40,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
                         context.Succeed();
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    context.Fail(e);
+                    context.Fail(ex);
                 }
             }
 

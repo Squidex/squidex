@@ -54,10 +54,19 @@ namespace Squidex.Config.Domain
                 {
                     throw new ConfigurationException("You must specify the Redis connection string in the 'squidex:clusterer:redis:connectionString' configuration section.");
                 }
-                
-                builder.Register(c => ConnectionMultiplexer.Connect(connectionString))
-                    .As<IConnectionMultiplexer>()
-                    .SingleInstance();
+
+                try
+                {
+                    var connectionMultiplexer = ConnectionMultiplexer.Connect(connectionString);
+
+                    builder.RegisterInstance(connectionMultiplexer)
+                        .As<IConnectionMultiplexer>()
+                        .SingleInstance();
+                }
+                catch (Exception ex)
+                {
+                    throw new ConfigurationException($"Redis connection failed to connect to database {connectionString}", ex);
+                }
 
                 builder.RegisterType<RedisEventNotifier>()
                     .As<IEventNotifier>()

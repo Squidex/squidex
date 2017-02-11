@@ -67,9 +67,9 @@ namespace Squidex.Read.MongoDb.Contents
                 {
                     throw new ValidationException("This odata operation is not supported");
                 }
-                catch (ODataException e)
+                catch (ODataException ex)
                 {
-                    throw new ValidationException("Failed to parse query: " + e.Message, e);
+                    throw new ValidationException("Failed to parse query: " + ex.Message, ex);
                 }
 
                 var entities = await cursor.ToListAsync();
@@ -106,9 +106,9 @@ namespace Squidex.Read.MongoDb.Contents
                 {
                     throw new ValidationException("This odata operation is not supported");
                 }
-                catch (ODataException e)
+                catch (ODataException ex)
                 {
-                    throw new ValidationException("Failed to parse query: " + e.Message, e);
+                    throw new ValidationException("Failed to parse query: " + ex.Message, ex);
                 }
 
                 result = await cursor.CountAsync();

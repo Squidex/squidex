@@ -37,9 +37,9 @@ namespace Squidex.Infrastructure.Redis
             {
                 inMemoryNotifier.NotifyEventsStored();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, e, "Failed to receive invalidation message.");
+                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to receive invalidation message.");
             }
         }
 
@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.Redis
             {
                 subscriber.Publish(Channel, RedisValue.Null);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, e, "Failed to send invalidation message");
+                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to send invalidation message");
             }
         }
 

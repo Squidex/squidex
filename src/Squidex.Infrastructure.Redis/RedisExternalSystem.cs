@@ -28,9 +28,9 @@ namespace Squidex.Infrastructure.Redis
             {
                 redis.GetStatus();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new ConfigurationException($"Redis connection failed to connect to database {redis.Configuration}", e);
+                throw new ConfigurationException($"Redis connection failed to connect to database {redis.Configuration}", ex);
             }
         }
     }

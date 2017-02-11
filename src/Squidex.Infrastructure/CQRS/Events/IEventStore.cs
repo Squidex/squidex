@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventStore
     {
-        IObservable<StoredEvent> GetEventsAsync(long lastReceivedPosition = -1);
+        IObservable<StoredEvent> GetEventsAsync(long lastReceivedEventNumber = -1);
 
         IObservable<StoredEvent> GetEventsAsync(string streamName);
 

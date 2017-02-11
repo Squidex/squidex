@@ -168,9 +168,9 @@ namespace Squidex.Core.Schemas
                     {
                         property.SetValue(sut, value);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        throw e.InnerException;
+                        throw ex.InnerException;
                     }
                 });
             }

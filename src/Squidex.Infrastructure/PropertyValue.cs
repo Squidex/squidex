@@ -218,11 +218,11 @@ namespace Squidex.Infrastructure
             {
                 return parser(value.ToString());
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 string message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
 
-                throw new InvalidCastException(message, e);
+                throw new InvalidCastException(message, ex);
             }
         }
 

@@ -73,9 +73,9 @@ namespace Squidex.Infrastructure.Redis
                     cache.Remove(parts[1]);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, e, "Failed to receive invalidation message.");
+                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to receive invalidation message.");
             }
         }
 
@@ -87,9 +87,9 @@ namespace Squidex.Infrastructure.Redis
 
                 subscriber.Publish(Channel, message);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, e, "Failed to send invalidation message {0}", key);
+                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to send invalidation message {0}", key);
             }
         }
     }
