@@ -10,7 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public class InvalidatingMemoryCache : IMemoryCache
+    public class InvalidatingMemoryCache : IMemoryCache, IInvalidatingCache
     {
         private const string ChannelName = "CacheInvalidations";
         private readonly IMemoryCache inner;
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Caching
 
         public ICacheEntry CreateEntry(object key)
         {
-            return new WrapperCacheEntry(inner.CreateEntry(key), Invalidate);
+            return inner.CreateEntry(key);
         }
 
         public bool TryGetValue(object key, out object value)
@@ -45,11 +45,9 @@ namespace Squidex.Infrastructure.Caching
         public void Remove(object key)
         {
             inner.Remove(key);
-
-            Invalidate(key);
         }
 
-        private void Invalidate(object key)
+        public void Invalidate(object key)
         {
             if (key is string)
             {

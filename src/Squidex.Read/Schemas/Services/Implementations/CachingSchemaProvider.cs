@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Utils;
 
@@ -77,8 +78,14 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
         public void Remove(NamedId<Guid> appId, NamedId<Guid> schemaId)
         {
-            Cache.Remove(BuildIdCacheKey(schemaId.Id));
-            Cache.Remove(BuildNameCacheKey(appId.Id, schemaId.Name));
+            var cacheKeyById = BuildIdCacheKey(schemaId.Id);
+            var cacheKeyByName = BuildNameCacheKey(appId.Id, schemaId.Name);
+
+            Cache.Remove(cacheKeyById);
+            Cache.Remove(cacheKeyByName);
+
+            Cache.Invalidate(cacheKeyById);
+            Cache.Invalidate(cacheKeyByName);
         }
 
         private static string BuildNameCacheKey(Guid appId, string name)

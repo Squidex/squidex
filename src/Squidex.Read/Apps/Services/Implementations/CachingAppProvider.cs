@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Utils;
 
@@ -76,8 +77,14 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public void Remove(NamedId<Guid> id)
         {
-            Cache.Remove(BuildIdCacheKey(id.Id));
-            Cache.Remove(BuildNameCacheKey(id.Name));
+            var cacheKeyById = BuildIdCacheKey(id.Id);
+            var cacheKeyByName = BuildNameCacheKey(id.Name);
+
+            Cache.Remove(cacheKeyById);
+            Cache.Remove(cacheKeyByName);
+
+            Cache.Invalidate(cacheKeyById);
+            Cache.Invalidate(cacheKeyByName);
         }
 
         private static string BuildNameCacheKey(string name)

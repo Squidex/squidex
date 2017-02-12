@@ -38,8 +38,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Read.Tests", "tests
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Infrastructure.Redis", "src\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.xproj", "{D7166C56-178A-4457-B56A-C615C7450DEE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Squidex.Infrastructure.GoogleCloud", "src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.xproj", "{4A80390E-507A-4477-8A10-BE89A7427232}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,10 +96,6 @@ Global
 		{D7166C56-178A-4457-B56A-C615C7450DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7166C56-178A-4457-B56A-C615C7450DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7166C56-178A-4457-B56A-C615C7450DEE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A80390E-507A-4477-8A10-BE89A7427232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A80390E-507A-4477-8A10-BE89A7427232}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A80390E-507A-4477-8A10-BE89A7427232}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A80390E-507A-4477-8A10-BE89A7427232}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +113,5 @@ Global
 		{6A811927-3C37-430A-90F4-503E37123956} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{8B074219-F69A-4E41-83C6-12EE1E647779} = {4C6B06C2-6D77-4E0E-AE32-D7050236433A}
 		{D7166C56-178A-4457-B56A-C615C7450DEE} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
-		{4A80390E-507A-4477-8A10-BE89A7427232} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 	EndGlobalSection
 EndGlobal
