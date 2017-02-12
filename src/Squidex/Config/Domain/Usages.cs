@@ -54,7 +54,7 @@ namespace Squidex.Config.Domain
 
             foreach (var system in systems)
             {
-                system.CheckConnection();
+                system.Connect();
             }
 
             return app;

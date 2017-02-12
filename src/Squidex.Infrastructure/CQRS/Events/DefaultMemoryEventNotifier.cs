@@ -7,22 +7,30 @@
 // ==========================================================================
 
 using System;
-using System.Reactive.Subjects;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class InMemoryEventNotifier : IEventNotifier
+    public sealed class DefaultMemoryEventNotifier : IEventNotifier
     {
-        private readonly Subject<object> subject = new Subject<object>();
+        private readonly string ChannelName = typeof(DefaultMemoryEventNotifier).Name;
+
+        private readonly IPubSub invalidator;
+
+        public DefaultMemoryEventNotifier(IPubSub invalidator)
+        {
+            Guard.NotNull(invalidator, nameof(invalidator));
+
+            this.invalidator = invalidator;
+        }
 
         public void NotifyEventsStored()
         {
-            subject.OnNext(null);
+            invalidator.Publish(ChannelName, string.Empty, true);
         }
 
         public void Subscribe(Action handler)
         {
-            subject.Subscribe(_ => handler());
+            invalidator.Subscribe(ChannelName, x => handler());
         }
     }
 }

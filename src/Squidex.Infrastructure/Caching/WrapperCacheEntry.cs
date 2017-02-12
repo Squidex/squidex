@@ -11,12 +11,12 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 
-namespace Squidex.Infrastructure.Redis
+namespace Squidex.Infrastructure.Caching
 {
     internal sealed class WrapperCacheEntry : ICacheEntry
     {
         private readonly ICacheEntry inner;
-        private readonly RedisInvalidator invalidator;
+        private readonly Action<object> invalidator;
 
         public object Key
         {
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.Redis
             set { inner.Value = value; }
         }
 
-        public WrapperCacheEntry(ICacheEntry inner, RedisInvalidator invalidator)
+        public WrapperCacheEntry(ICacheEntry inner, Action<object> invalidator)
         {
             this.inner = inner;
 
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Redis
         {
             if (Key is string)
             {
-                invalidator.Invalidate(Key?.ToString());
+                invalidator(Key);
             }
 
             inner.Dispose();

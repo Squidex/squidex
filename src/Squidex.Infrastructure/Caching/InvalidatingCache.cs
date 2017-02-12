@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RedisInvalidatingCache.cs
+//  InvalidatingCache.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,30 +7,34 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
-namespace Squidex.Infrastructure.Redis
+namespace Squidex.Infrastructure.Caching
 {
-    public class RedisInvalidatingCache : IMemoryCache
+    public class InvalidatingCache : IMemoryCache
     {
+        private const string ChannelName = "CacheInvalidations";
         private readonly IMemoryCache inner;
-        private readonly RedisInvalidator invalidator;
+        private readonly IPubSub invalidator;
 
-        public RedisInvalidatingCache(IMemoryCache inner, IConnectionMultiplexer redis, ILogger<RedisInvalidatingCache> logger)
+        public InvalidatingCache(IMemoryCache inner, IPubSub invalidator)
         {
-            Guard.NotNull(redis, nameof(redis));
             Guard.NotNull(inner, nameof(inner));
-            Guard.NotNull(logger, nameof(logger));
+            Guard.NotNull(invalidator, nameof(invalidator));
 
             this.inner = inner;
+            this.invalidator = invalidator;
 
-            invalidator = new RedisInvalidator(redis, inner, logger);
+            invalidator.Subscribe(ChannelName, Remove);
         }
 
         public void Dispose()
         {
             inner.Dispose();
+        }
+
+        public ICacheEntry CreateEntry(object key)
+        {
+            return new WrapperCacheEntry(inner.CreateEntry(key), Invalidate);
         }
 
         public bool TryGetValue(object key, out object value)
@@ -42,15 +46,15 @@ namespace Squidex.Infrastructure.Redis
         {
             inner.Remove(key);
 
-            if (key is string)
-            {
-                invalidator.Invalidate(key.ToString());
-            }
+            Invalidate(key);
         }
 
-        public ICacheEntry CreateEntry(object key)
+        private void Invalidate(object key)
         {
-            return new WrapperCacheEntry(inner.CreateEntry(key), invalidator);
+            if (key is string)
+            {
+                invalidator.Publish(ChannelName, key.ToString(), false);
+            }
         }
     }
 }

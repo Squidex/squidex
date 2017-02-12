@@ -9,9 +9,13 @@
 using Autofac;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 
@@ -52,7 +56,11 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<InMemoryEventNotifier>()
+            builder.RegisterType<InMemoryPubSub>()
+                .As<IPubSub>()
+                .SingleInstance();
+
+            builder.RegisterType<DefaultMemoryEventNotifier>()
                 .As<IEventNotifier>()
                 .SingleInstance();
 
@@ -70,6 +78,10 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c => new InvalidatingCache(new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>()), c.Resolve<IPubSub>()))
+                .As<IMemoryCache>()
                 .SingleInstance();
         }
     }

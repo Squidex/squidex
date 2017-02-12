@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public void CheckConnection()
+        public void Connect()
         {
             try
             {

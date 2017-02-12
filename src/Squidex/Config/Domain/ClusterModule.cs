@@ -8,10 +8,7 @@
 
 using System;
 using Autofac;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Redis;
@@ -68,23 +65,9 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException($"Redis connection failed to connect to database {connectionString}", ex);
                 }
 
-                builder.RegisterType<RedisEventNotifier>()
+                builder.RegisterType<RedisPubSub>()
+                    .As<IPubSub>()
                     .As<IEventNotifier>()
-                    .SingleInstance();
-
-                builder.RegisterType<RedisExternalSystem>()
-                    .As<IExternalSystem>()
-                    .SingleInstance();
-
-                builder.Register(c =>
-                    {
-                        var inner = new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>());
-
-                        return new RedisInvalidatingCache(inner,
-                            c.Resolve<IConnectionMultiplexer>(),
-                            c.Resolve<ILogger<RedisInvalidatingCache>>());
-                    })
-                    .As<IMemoryCache>()
                     .SingleInstance();
             }
             else if (!string.Equals(clustererType, "None", StringComparison.OrdinalIgnoreCase))
