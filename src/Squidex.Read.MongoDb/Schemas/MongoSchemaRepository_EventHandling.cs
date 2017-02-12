@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 using Squidex.Core.Schemas;
 using Squidex.Events;
 using Squidex.Events.Schemas;
@@ -91,7 +92,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            await Collection.UpdateAsync(@event, headers, s => s.IsDeleted = true);
+            await Collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
 
             SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }

@@ -3,7 +3,7 @@
         {{field|displayName:'properties.label':'name'}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
     
-    <span class="field-disabled" *ngIf="fieldForm.disabled">Disabled</span>
+    <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
 
     <div [formGroup]="fieldForm">
         <div *ngIf="field.properties.isLocalizable">

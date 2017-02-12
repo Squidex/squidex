@@ -55,10 +55,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
         public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Schema schema, bool nonPublished)
         {
-            var filters = new List<FilterDefinition<MongoContentEntity>>
-            {
-                Filter.Eq(x => x.IsDeleted, false)
-            };
+            var filters = new List<FilterDefinition<MongoContentEntity>>();
 
             if (!nonPublished)
             {

@@ -31,7 +31,6 @@
     "Squidex.Core": "1.0.0-*",
     "Squidex.Events": "1.0.0-*",
     "Squidex.Infrastructure": "1.0.0-*",
-    "Squidex.Infrastructure.GoogleCloud": "1.0.0-*",
     "Squidex.Infrastructure.MongoDb": "1.0.0-*",
     "Squidex.Infrastructure.Redis": "1.0.0-*",
     "Squidex.Read": "1.0.0-*",

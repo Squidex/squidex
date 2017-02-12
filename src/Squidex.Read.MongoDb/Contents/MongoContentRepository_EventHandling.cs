@@ -111,22 +111,19 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
-            {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.IsDeleted = true;
-                });
-            });
-        }
-
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
             return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
                 return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
+            });
+        }
+
+        protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
+        {
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            {
+                return collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
             });
         }
 

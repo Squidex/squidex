@@ -30,10 +30,6 @@ namespace Squidex.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement]
-        public bool IsDeleted { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
         public bool IsPublished { get; set; }
 
         [BsonRequired]

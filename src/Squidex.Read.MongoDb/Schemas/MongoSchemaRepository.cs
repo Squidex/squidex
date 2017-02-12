@@ -54,14 +54,14 @@ namespace Squidex.Read.MongoDb.Schemas
 
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
+            var entities = await Collection.Find(s => s.AppId == appId).ToListAsync();
 
             return entities.OfType<ISchemaEntity>().ToList();
         }
 
         public async Task<IReadOnlyList<ISchemaEntityWithSchema>> QueryAllWithSchemaAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
+            var entities = await Collection.Find(s => s.AppId == appId).ToListAsync();
 
             entities.ForEach(x => x.DeserializeSchema(serializer));
 
@@ -71,7 +71,7 @@ namespace Squidex.Read.MongoDb.Schemas
         public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name)
         {
             var entity = 
-                await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
+                await Collection.Find(s => s.Name == name && s.AppId == appId)
                     .FirstOrDefaultAsync();
 
             entity?.DeserializeSchema(serializer);
@@ -82,7 +82,7 @@ namespace Squidex.Read.MongoDb.Schemas
         public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid schemaId)
         {
             var entity = 
-                await Collection.Find(s => s.Id == schemaId && !s.IsDeleted)
+                await Collection.Find(s => s.Id == schemaId)
                     .FirstOrDefaultAsync();
 
             entity?.DeserializeSchema(serializer);
@@ -93,7 +93,7 @@ namespace Squidex.Read.MongoDb.Schemas
         public async Task<Guid?> FindSchemaIdAsync(Guid appId, string name)
         {
             var entity = 
-                await Collection.Find(s => s.Name == name & s.AppId == appId && !s.IsDeleted)
+                await Collection.Find(s => s.Name == name & s.AppId == appId)
                     .Project<MongoSchemaEntity>(Projection.Include(x => x.Id)).FirstOrDefaultAsync();
 
             return entity?.Id;

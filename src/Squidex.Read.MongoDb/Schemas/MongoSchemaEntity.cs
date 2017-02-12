@@ -35,10 +35,6 @@ namespace Squidex.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public bool IsDeleted { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
         public Guid AppId { get; set; }
 
         [BsonRequired]
