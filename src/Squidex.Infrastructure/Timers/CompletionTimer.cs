@@ -16,9 +16,9 @@ namespace Squidex.Infrastructure.Timers
 {
     public sealed class CompletionTimer : DisposableObject
     {
-        private readonly CancellationTokenSource disposeCancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Task runTask;
-        private CancellationTokenSource delayCancellationSource;
+        private CancellationTokenSource delayToken;
         
         public CompletionTimer(int delay, Func<CancellationToken, Task> callback)
         {
@@ -30,15 +30,18 @@ namespace Squidex.Infrastructure.Timers
 
         private async Task RunInternal(int delay, Func<CancellationToken, Task> callback)
         {
-            while (!disposeCancellationTokenSource.IsCancellationRequested)
+            while (!disposeToken.IsCancellationRequested)
             {
                 try
                 {
-                    await callback(disposeCancellationTokenSource.Token).ConfigureAwait(false);
+                    await callback(disposeToken.Token).ConfigureAwait(false);
 
-                    delayCancellationSource = new CancellationTokenSource();
+                    delayToken = new CancellationTokenSource();
 
-                    await Task.Delay(delay, delayCancellationSource.Token).ConfigureAwait(false);
+                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(disposeToken.Token, delayToken.Token))
+                    {
+                        await Task.Delay(delay, cts.Token).ConfigureAwait(false);
+                    }
                 }
                 catch (TaskCanceledException)
                 {
@@ -51,8 +54,7 @@ namespace Squidex.Infrastructure.Timers
         {
             if (disposing)
             {
-                delayCancellationSource?.Cancel();
-                disposeCancellationTokenSource.Cancel();
+                disposeToken.Cancel();
 
                 runTask.Wait();
             }
@@ -62,7 +64,7 @@ namespace Squidex.Infrastructure.Timers
         {
             ThrowIfDisposed();
 
-            delayCancellationSource?.Cancel();
+            delayToken?.Cancel();
         }
     }
 }

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -17,7 +18,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
+using StackExchange.Redis;
 
 namespace Squidex.Config.Identity
 {
@@ -27,11 +30,29 @@ namespace Squidex.Config.Identity
         {
             var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
 
-            var keysFolder = configuration.GetValue<string>("squidex:identity:keysFolder");
+            var clustererType = configuration.GetValue<string>("squidex:clusterer:type");
 
-            if (!string.IsNullOrWhiteSpace(keysFolder))
+            if (clustererType.Equals("redis", StringComparison.OrdinalIgnoreCase))
             {
-                dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysFolder));
+                var connectionString = configuration.GetValue<string>("squidex:clusterer:redis:connectionString");
+
+                if (string.IsNullOrWhiteSpace(connectionString) || !Uri.IsWellFormedUriString(connectionString, UriKind.Absolute))
+                {
+                    throw new ConfigurationException("You must specify the Redis connection string in the 'squidex:clusterer:redis:connectionString' configuration section.");
+                }
+                
+                var connectionMultiplexer = ConnectionMultiplexer.Connect(connectionString);
+
+                dataProtection.PersistKeysToRedis(connectionMultiplexer);
+            }
+            else
+            {
+                var keysFolder = configuration.GetValue<string>("squidex:identity:keysFolder");
+
+                if (!string.IsNullOrWhiteSpace(keysFolder))
+                {
+                    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysFolder));
+                }
             }
 
             return services;
