@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Redis
             this.channelName = channelName;
         }
 
-        public void Invalidate(string token, bool notifySelf)
+        public void Publish(string token, bool notifySelf)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Redis
 
                 var parts = value.Split('#');
 
-                if (parts.Length < 2)
+                if (parts.Length < 1)
                 {
                     return;
                 }

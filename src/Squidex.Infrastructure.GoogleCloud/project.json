@@ -1,0 +1,24 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Google.Cloud.PubSub.V1": "1.0.0-beta06",
+    "Microsoft.Extensions.Caching.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.0",
+    "Squidex.Infrastructure": "1.0.0-*",
+    "System.Linq": "4.3.0",
+    "System.Reactive": "3.1.1",
+    "System.Reflection.TypeExtensions": "4.3.0",
+    "System.Security.Claims": "4.3.0"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1"
+      },
+      "imports": "dnxcore50"
+    }
+  },
+  "tooling": {
+    "defaultNamespace": "Squidex.Infrastructure.Redis"
+  }
+}

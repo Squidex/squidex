@@ -8,9 +8,11 @@
 
 using System;
 using Autofac;
+using Google.Cloud.PubSub.V1;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Redis;
 using StackExchange.Redis;
 
@@ -67,10 +69,35 @@ namespace Squidex.Config.Domain
 
                 builder.RegisterType<RedisPubSub>()
                     .As<IPubSub>()
-                    .As<IEventNotifier>()
+                    .As<IExternalSystem>()
                     .SingleInstance();
             }
-            else if (!string.Equals(clustererType, "None", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(clustererType, "GCE", StringComparison.OrdinalIgnoreCase))
+            {
+                var projectId = Configuration.GetValue<string>("squidex:clusterer:gce:projectId");
+
+                if (string.IsNullOrWhiteSpace(projectId))
+                {
+                    throw new ConfigurationException("You must specify the Google cloud engine project id in the 'squidex:clusterer:gce:projectId' configuration section.");
+                }
+
+                builder.RegisterInstance(new ProjectName(projectId))
+                    .AsSelf()
+                    .SingleInstance();
+
+                builder.RegisterType<GoogleCloudPubSub>()
+                    .As<IPubSub>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+
+            }
+            else if (string.Equals(clustererType, "None", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.RegisterType<InMemoryPubSub>()
+                    .As<IPubSub>()
+                    .SingleInstance();
+            }
+            else
             {
                 throw new ConfigurationException($"Unsupported clusterer type '{clustererType}' for key 'squidex:clusterer:type', supported: Redis, None.");
             }

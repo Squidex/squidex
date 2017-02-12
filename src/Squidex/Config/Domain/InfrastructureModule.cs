@@ -56,10 +56,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<InMemoryPubSub>()
-                .As<IPubSub>()
-                .SingleInstance();
-
             builder.RegisterType<DefaultMemoryEventNotifier>()
                 .As<IEventNotifier>()
                 .SingleInstance();
@@ -80,7 +76,7 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.Register(c => new InvalidatingCache(new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>()), c.Resolve<IPubSub>()))
+            builder.Register(c => new InvalidatingMemoryCache(new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>()), c.Resolve<IPubSub>()))
                 .As<IMemoryCache>()
                 .SingleInstance();
         }

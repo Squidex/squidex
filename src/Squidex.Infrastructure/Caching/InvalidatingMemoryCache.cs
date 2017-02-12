@@ -10,13 +10,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public class InvalidatingCache : IMemoryCache
+    public class InvalidatingMemoryCache : IMemoryCache
     {
         private const string ChannelName = "CacheInvalidations";
         private readonly IMemoryCache inner;
         private readonly IPubSub invalidator;
 
-        public InvalidatingCache(IMemoryCache inner, IPubSub invalidator)
+        public InvalidatingMemoryCache(IMemoryCache inner, IPubSub invalidator)
         {
             Guard.NotNull(inner, nameof(inner));
             Guard.NotNull(invalidator, nameof(invalidator));
@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Caching
             this.inner = inner;
             this.invalidator = invalidator;
 
-            invalidator.Subscribe(ChannelName, Remove);
+            invalidator.Subscribe(ChannelName, inner.Remove);
         }
 
         public void Dispose()

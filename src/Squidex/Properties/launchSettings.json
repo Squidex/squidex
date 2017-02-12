@@ -18,7 +18,9 @@
       "commandName": "Project",
       "launchUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "SQUIDEX__CLUSTERER__GCE__PROJECTID": "squidex-157415",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SQUIDEX__CLUSTERER__TYPE": "gce"
       }
     }
   }

@@ -15,12 +15,12 @@ namespace Squidex.Infrastructure.Redis
 {
     public class RedisPubSub : IPubSub, IExternalSystem
     {
-        private readonly ConnectionMultiplexer redis;
-        private readonly ConcurrentDictionary<string, RedisSubscription> subjects = new ConcurrentDictionary<string, RedisSubscription>();
+        private readonly ConcurrentDictionary<string, RedisSubscription> subscriptions = new ConcurrentDictionary<string, RedisSubscription>();
+        private readonly IConnectionMultiplexer redis;
         private readonly ILogger<RedisPubSub> logger;
         private readonly ISubscriber subscriber;
 
-        public RedisPubSub(ConnectionMultiplexer redis, ILogger<RedisPubSub> logger)
+        public RedisPubSub(IConnectionMultiplexer redis, ILogger<RedisPubSub> logger)
         {
             Guard.NotNull(redis, nameof(redis));
             Guard.NotNull(logger, nameof(logger));
@@ -48,14 +48,14 @@ namespace Squidex.Infrastructure.Redis
         {
             Guard.NotNullOrEmpty(channelName, nameof(channelName));
 
-            subjects.GetOrAdd(channelName, c => new RedisSubscription(subscriber, c, logger)).Invalidate(token, notifySelf);
+            subscriptions.GetOrAdd(channelName, c => new RedisSubscription(subscriber, c, logger)).Publish(token, notifySelf);
         }
 
         public IDisposable Subscribe(string channelName, Action<string> handler)
         {
             Guard.NotNullOrEmpty(channelName, nameof(channelName));
 
-            return subjects.GetOrAdd(channelName, c => new RedisSubscription(subscriber, c, logger)).Subscribe(handler);
+            return subscriptions.GetOrAdd(channelName, c => new RedisSubscription(subscriber, c, logger)).Subscribe(handler);
         }
     }
 }
