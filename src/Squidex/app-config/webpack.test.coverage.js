@@ -4,12 +4,15 @@ var webpackMerge = require('webpack-merge'),
          helpers = require('./helpers'),
       testConfig = require('./webpack.test.js');
 
-     // console.log(JSON.stringify(testConfig, null, '\t'));
-
 helpers.removeLoaders(testConfig, ['ts']);
 
 module.exports = webpackMerge(testConfig, {
-    module: {
+    module: {        
+        /**
+         * An array of Rules which are matched to requests when modules are created.
+         *
+         * See: https://webpack.js.org/configuration/module/#module-rules
+         */
         rules: [
             {
                 test: /\.ts$/,

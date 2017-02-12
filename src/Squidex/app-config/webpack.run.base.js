@@ -12,7 +12,7 @@ module.exports = webpackMerge(commonConfig, {
      * The entry point for the bundle
      * Our Angular.js app
      *
-     * See: http://webpack.github.io/docs/configuration.html#entry
+     * See: https://webpack.js.org/configuration/entry-context/
      */
     entry: {
         'polyfills': './app/polyfills.ts',
@@ -23,9 +23,8 @@ module.exports = webpackMerge(commonConfig, {
     plugins: [
         /**
          * Shares common code between the pages.
-         * It identifies common modules and put them into a commons chunk.
          *
-         * See: https://webpack.github.io/docs/list-of-plugins.html#commonschunkplugin
+         * See: https://webpack.js.org/plugins/commons-chunk-plugin/
          */
         new webpack.optimize.CommonsChunkPlugin({
             name: ['app', 'vendor', 'polyfills']

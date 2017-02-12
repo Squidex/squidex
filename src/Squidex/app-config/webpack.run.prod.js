@@ -16,7 +16,7 @@ module.exports = webpackMerge(runConfig, {
         /**
          * The output directory as absolute path (required).
          *
-         * See: http://webpack.github.io/docs/configuration.html#output-path
+         * See: https://webpack.js.org/configuration/output/#output-path
          */
         path: helpers.root('wwwroot/build/'),
 
@@ -26,7 +26,7 @@ module.exports = webpackMerge(runConfig, {
          * Specifies the name of each output file on disk.
          * IMPORTANT: You must not specify an absolute path here!
          *
-         * See: http://webpack.github.io/docs/configuration.html#output-filename
+         * See: https://webpack.js.org/configuration/output/#output-filename
          */
         filename: '[name].[hash].js',
 
@@ -34,7 +34,7 @@ module.exports = webpackMerge(runConfig, {
          * The filename of non-entry chunks as relative path
          * inside the output.path directory.
          *
-         * See: http://webpack.github.io/docs/configuration.html#output-chunkfilename
+         * See: https://webpack.js.org/configuration/output/#output-chunkfilename
          */
         chunkFilename: '[id].[hash].chunk.js'
     },
@@ -42,23 +42,26 @@ module.exports = webpackMerge(runConfig, {
     /*
      * Options affecting the normal modules.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module
+     * See: https://webpack.js.org/configuration/module/
      */
     module: {
         /**
-         * An array of automatically applied loaders.
+         * An array of Rules which are matched to requests when modules are created.
          *
-         * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-         * This means they are not resolved relative to the configuration file.
-         *
-         * See: http://webpack.github.io/docs/configuration.html#module-loaders
+         * See: https://webpack.js.org/configuration/module/#module-rules
          */
         rules: [
             {
                 test: /\.scss$/,
-                use: ExtractTextPlugin.extract({ 
-                    fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' 
-                }),
+                /*
+                 * Extract the content from a bundle to a file
+                 * 
+                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
+                 */
+                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' }),
+                /*
+                 * Do not include component styles
+                 */
                 include: helpers.root('app', 'theme'),
             }, {
                 test: /\.scss$/,

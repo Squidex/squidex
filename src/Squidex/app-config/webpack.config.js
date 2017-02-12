@@ -11,13 +11,13 @@ module.exports = {
     /**
      * Options affecting the resolving of modules.
      *
-     * See: http://webpack.github.io/docs/configuration.html#resolve
+     * See: https://webpack.js.org/configuration/resolve/
      */
     resolve: {
         /**
          * An array of extensions that should be used to resolve modules.
          *
-         * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
+         * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
          */
         extensions: ['.js', '.ts', '.css', '.scss'],
         modules: [
@@ -31,16 +31,13 @@ module.exports = {
     /*
      * Options affecting the normal modules.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module
+     * See: https://webpack.js.org/configuration/module/
      */
     module: {
         /**
-         * An array of automatically applied loaders.
+         * An array of Rules which are matched to requests when modules are created.
          *
-         * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-         * This means they are not resolved relative to the configuration file.
-         *
-         * See: http://webpack.github.io/docs/configuration.html#module-loaders
+         * See: https://webpack.js.org/configuration/module/#module-rules
          */
         rules: [
             {
@@ -71,9 +68,12 @@ module.exports = {
                 }]
             }, {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({ 
-                    fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap'
-                })
+                /*
+                 * Extract the content from a bundle to a file
+                 * 
+                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
+                 */
+                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
                 use: [{
@@ -121,7 +121,7 @@ module.exports = {
         /**
          * Shim additional libraries
          * 
-         * See: https://webpack.github.io/docs/shimming-modules.html
+         * See: https://webpack.js.org/plugins/provide-plugin/
          */
         new webpack.ProvidePlugin({
             // Mouse trap handles shortcut management

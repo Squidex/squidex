@@ -10,8 +10,8 @@ module.exports = webpackMerge(runConfig, {
     /**
      * Developer tool to enhance debugging
      *
-     * See: http://webpack.github.io/docs/configuration.html#devtool
-     * See: https://github.com/webpack/docs/wiki/build-performance#sourcemaps
+     * See: https://webpack.js.org/configuration/devtool/#devtool
+     * See: https://webpack.js.org/guides/build-performance/
      */
     devtool: 'cheap-module-source-map',
 
@@ -26,16 +26,13 @@ module.exports = webpackMerge(runConfig, {
     /*
      * Options affecting the normal modules.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module
+     * See: https://webpack.js.org/configuration/module/
      */
     module: {
         /**
-         * An array of automatically applied loaders.
+         * An array of Rules which are matched to requests when modules are created.
          *
-         * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-         * This means they are not resolved relative to the configuration file.
-         *
-         * See: http://webpack.github.io/docs/configuration.html#module-loaders
+         * See: https://webpack.js.org/configuration/module/#module-rules
          */
         rules: [
             {
