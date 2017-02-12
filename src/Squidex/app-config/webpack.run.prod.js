@@ -56,7 +56,9 @@ module.exports = webpackMerge(runConfig, {
         rules: [
             {
                 test: /\.scss$/,
-                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' }),
+                use: ExtractTextPlugin.extract({ 
+                    fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' 
+                }),
                 include: helpers.root('app', 'theme'),
             }, {
                 test: /\.scss$/,

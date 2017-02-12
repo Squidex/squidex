@@ -71,7 +71,9 @@ module.exports = {
                 }]
             }, {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
+                use: ExtractTextPlugin.extract({ 
+                    fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap'
+                })
             }, {
                 test: /\.scss$/,
                 use: [{
