@@ -34,14 +34,24 @@ namespace Squidex.Pipeline
 
         static ApiExceptionFilterAttribute()
         {
-            AddHandler<DomainObjectNotFoundException>(ex =>
-                new NotFoundResult());
+            AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
+            AddHandler<DomainException>(OnDomainException);
+            AddHandler<ValidationException>(OnValidationException);
+        }
 
-            AddHandler<DomainException>(ex =>
-                new BadRequestObjectResult(new ErrorDto { Message = ex.Message }));
+        private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
+        {
+            return new NotFoundResult();
+        }
 
-            AddHandler<ValidationException>(ex =>
-                new BadRequestObjectResult(new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() }));
+        private static IActionResult OnDomainException(DomainException ex)
+        {
+            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message });
+        }
+
+        private static IActionResult OnValidationException(ValidationException ex)
+        {
+            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)

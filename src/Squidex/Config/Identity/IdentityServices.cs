@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
@@ -107,13 +108,25 @@ namespace Squidex.Config.Identity
 
         private static IEnumerable<ApiResource> GetApiResources()
         {
-            yield return new ApiResource(Constants.ApiScope);
+            yield return new ApiResource(Constants.ApiScope)
+            {
+                UserClaims = new List<string>
+                {
+                    JwtClaimTypes.Role
+                }
+            };
         }
 
         private static IEnumerable<IdentityResource> GetIdentityResources()
         {
             yield return new IdentityResources.OpenId();
             yield return new IdentityResources.Profile();
+            yield return new IdentityResources.Profile();
+            yield return new IdentityResource(Constants.RoleScope,
+                new[]
+                {
+                    JwtClaimTypes.Role
+                });
             yield return new IdentityResource(Constants.ProfileScope,
                 new[]
                 {

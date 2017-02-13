@@ -5,21 +5,31 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class StoredEvent
     {
-        public long EventNumber { get; }
+        private readonly long eventNumber;
+        private readonly EventData data;
 
-        public EventData Data { get; }
+        public long EventNumber
+        {
+            get { return eventNumber; }
+        }
+
+        public EventData Data
+        {
+            get { return data; }
+        }
 
         public StoredEvent(long eventNumber, EventData data)
         {
             Guard.NotNull(data, nameof(data));
 
-            EventNumber = eventNumber;
+            this.data = data;
 
-            Data = data;
+            this.eventNumber = eventNumber;
         }
     }
 }

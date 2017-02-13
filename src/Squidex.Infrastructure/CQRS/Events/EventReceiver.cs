@@ -22,6 +22,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
         private readonly IEventNotifier eventNotifier;
+        private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
         private readonly ILogger<EventReceiver> logger;
         private CompletionTimer timer;
 
@@ -29,17 +30,20 @@ namespace Squidex.Infrastructure.CQRS.Events
             EventDataFormatter formatter,
             IEventStore eventStore, 
             IEventNotifier eventNotifier,
+            IEventConsumerInfoRepository eventConsumerInfoRepository,
             ILogger<EventReceiver> logger)
         {
             Guard.NotNull(logger, nameof(logger));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventNotifier, nameof(eventNotifier));
+            Guard.NotNull(eventConsumerInfoRepository, nameof(eventConsumerInfoRepository));
 
             this.logger = logger;
             this.formatter = formatter;
             this.eventStore = eventStore;
             this.eventNotifier = eventNotifier;
+            this.eventConsumerInfoRepository = eventConsumerInfoRepository;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -57,7 +61,12 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Subscribe(IEventCatchConsumer eventConsumer, int delay = 5000)
+        public void Trigger()
+        {
+            timer?.Trigger();
+        }
+
+        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
@@ -66,67 +75,121 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return;
             }
 
-            var lastReceivedPosition = long.MinValue;
+            var consumerName = eventConsumer.GetType().Name;
+            var consumerStarted = false;
             
             timer = new CompletionTimer(delay, async ct =>
             {
-                if (lastReceivedPosition == long.MinValue)
+                if (!consumerStarted)
                 {
-                    lastReceivedPosition = await eventConsumer.GetLastHandledEventNumber();
+                    await eventConsumerInfoRepository.CreateAsync(consumerName);
+
+                    consumerStarted = true;
                 }
 
-                var tcs = new TaskCompletionSource<bool>();
-
-                eventStore.GetEventsAsync(lastReceivedPosition).Subscribe(storedEvent =>
+                try
                 {
-                    var @event = ParseEvent(storedEvent.Data);
+                    var status = await eventConsumerInfoRepository.FindAsync(consumerName);
 
-                    @event.SetEventNumber(storedEvent.EventNumber);
+                    var lastHandledEventNumber = status.LastHandledEventNumber;
 
-                    DispatchConsumer(@event, eventConsumer, storedEvent.EventNumber).Wait();
+                    if (status.IsResetting)
+                    {
+                        await ResetAsync(eventConsumer, consumerName);
 
-                    lastReceivedPosition++;
-                }, ex =>
+                        lastHandledEventNumber = -1;
+                    }
+                    else if (status.IsStopped)
+                    {
+                        return;
+                    }
+
+                    var tcs = new TaskCompletionSource<bool>();
+                    
+                    eventStore.GetEventsAsync(lastHandledEventNumber).Subscribe(storedEvent =>
+                    {
+                        HandleEventAsync(eventConsumer, storedEvent, consumerName).Wait();
+                    }, ex =>
+                    {
+                        tcs.SetException(ex);
+                    }, () =>
+                    {
+                        tcs.SetResult(true);
+                    }, ct);
+
+                    await tcs.Task;
+                }
+                catch (Exception ex)
                 {
-                    tcs.SetException(ex);
-                }, () =>
-                {
-                    tcs.SetResult(true);
-                }, ct);
+                    logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "Failed to handle events");
 
-                await tcs.Task;
+                    await eventConsumerInfoRepository.StopAsync(consumerName);
+
+                    throw;
+                }
             });
 
             eventNotifier.Subscribe(timer.Trigger);
         }
 
-        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventCatchConsumer consumer, long eventNumber)
+        private async Task HandleEventAsync(IEventConsumer eventConsumer, StoredEvent storedEvent, string consumerName)
+        {
+            var @event = ParseEvent(storedEvent);
+
+            await DispatchConsumer(@event, eventConsumer);
+
+            await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventNumber);
+        }
+
+        private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName)
         {
             try
             {
-                await consumer.On(@event, eventNumber);
 
-                logger.LogDebug("[{0}]: Handled event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
+                logger.LogDebug("[{0}]: Reset started", eventConsumer);
+
+                await eventConsumer.ClearAsync();
+                await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, -1);
+
+                logger.LogDebug("[{0}]: Reset completed", eventConsumer);
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "[{0}]: Failed to handle event {1} ({2})", consumer, @event.Payload, @event.Headers.EventId());
+                logger.LogError(InfrastructureErrors.EventResetFailed, ex, "[{0}]: Reset failed", eventConsumer);
 
                 throw;
             }
         }
 
-        private Envelope<IEvent> ParseEvent(EventData eventData)
+        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer)
         {
             try
             {
-                var @event = formatter.Parse(eventData);
+                await eventConsumer.On(@event);
+
+                logger.LogDebug("[{0}]: Handled event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "[{0}]: Failed to handle event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+
+                throw;
+            }
+        }
+
+        private Envelope<IEvent> ParseEvent(StoredEvent storedEvent)
+        {
+            try
+            {
+                var @event = formatter.Parse(storedEvent.Data);
+
+                @event.SetEventNumber(storedEvent.EventNumber);
 
                 return @event;
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex, "Failed to parse event {0}", eventData.EventId);
+                logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex, "Failed to parse event {0}", storedEvent.Data.EventId);
 
                 throw;
             }

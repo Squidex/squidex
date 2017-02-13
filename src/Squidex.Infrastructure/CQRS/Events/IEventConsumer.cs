@@ -12,6 +12,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventConsumer
     {
+        Task ClearAsync();
+
         Task On(Envelope<IEvent> @event);
     }
 }

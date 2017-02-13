@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure
 
         public static readonly EventId CommandFailed = new EventId(20001, "CommandFailed");
 
+        public static readonly EventId EventResetFailed = new EventId(10000, "EventResetFailed");
+
         public static readonly EventId EventHandlingFailed = new EventId(10001, "EventHandlingFailed");
 
         public static readonly EventId EventDeserializationFailed = new EventId(10002, "EventDeserializationFailed");

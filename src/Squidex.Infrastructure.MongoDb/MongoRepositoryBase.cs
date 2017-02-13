@@ -9,6 +9,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb
@@ -126,6 +127,11 @@ namespace Squidex.Infrastructure.MongoDb
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection)
         {
             return Task.FromResult(true);
+        }
+
+        public virtual Task ClearAsync()
+        {
+            return Collection.DeleteManyAsync(new BsonDocument());
         }
 
         public async Task<bool> TryDropCollectionAsync()

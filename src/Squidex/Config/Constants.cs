@@ -14,6 +14,8 @@ namespace Squidex.Config
 
         public const string ApiScope = "squidex-api";
 
+        public const string RoleScope = "role";
+
         public const string ProfileScope = "squidex-profile";
 
         public const string FrontendClient = "squidex-frontend";

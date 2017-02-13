@@ -7,7 +7,13 @@
         </span>
 
         <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
-            <a class="dropdown-item" (click)="logout()">Logout</a>
+            <a class="dropdown-item"  [routerLink]="['/app/administration']" *ngIf="isAdmin">
+                Administration
+            </a>
+
+            <a class="dropdown-item" (click)="logout()">
+                Logout
+            </a>
         </div>
     </li>
 </ul>

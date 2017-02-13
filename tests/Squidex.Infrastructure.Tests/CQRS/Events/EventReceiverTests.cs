@@ -14,12 +14,25 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class EventReceiverTests
+    public class EventReceiverTests : IDisposable
     {
         public sealed class MyEvent : IEvent
         {
+        }
+
+        private sealed class MyEventConsumerInfo : IEventConsumerInfo
+        {
+            public long LastHandledEventNumber { get; set; }
+
+            public bool IsStopped { get; set; }
+
+            public bool IsResetting { get; set; }
+
+            public string Name { get; set; }
         }
 
         private sealed class MyLogger : ILogger<EventReceiver>
@@ -43,46 +56,49 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return null;
             }
         }
-        
-        private readonly Mock<IEventCatchConsumer> eventConsumer = new Mock<IEventCatchConsumer>();
+
+        private readonly Mock<IEventConsumerInfoRepository> eventConsumerInfoRepository = new Mock<IEventConsumerInfoRepository>();
+        private readonly Mock<IEventConsumer> eventConsumer = new Mock<IEventConsumer>();
         private readonly Mock<IEventNotifier> eventNotifier = new Mock<IEventNotifier>();
         private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly EventData eventData1 = new EventData();
         private readonly EventData eventData2 = new EventData();
         private readonly EventData eventData3 = new EventData();
-        private readonly EventData eventData4 = new EventData();
         private readonly Envelope<IEvent> envelope1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> envelope2 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> envelope3 = new Envelope<IEvent>(new MyEvent());
-        private readonly Envelope<IEvent> envelope4 = new Envelope<IEvent>(new MyEvent());
         private readonly EventReceiver sut;
         private readonly MyLogger logger = new MyLogger();
-        private readonly StoredEvent[][] events;
+        private readonly StoredEvent[] events;
+        private readonly MyEventConsumerInfo consumerInfo = new MyEventConsumerInfo();
+        private readonly string consumerName;
 
         public EventReceiverTests()
         {
-            events = new []
+            events = new[]
             {
-                new []
-                {
-                    new StoredEvent(3, eventData1),
-                    new StoredEvent(4, eventData1)
-                },
-                new[]
-                {
-                    new StoredEvent(5, eventData1),
-                    new StoredEvent(6, eventData1)
-                }
+                new StoredEvent(3, eventData1),
+                new StoredEvent(4, eventData2),
+                new StoredEvent(4, eventData3)
             };
 
+            consumerName = eventConsumer.Object.GetType().Name;
+
+            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events.ToObservable());
+
+            eventConsumerInfoRepository.Setup(x => x.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
 
             formatter.Setup(x => x.Parse(eventData1)).Returns(envelope1);
             formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
             formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
-            formatter.Setup(x => x.Parse(eventData4)).Returns(envelope4);
 
-            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, logger);
+            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, eventConsumerInfoRepository.Object, logger);
+        }
+
+        public void Dispose()
+        {
+            sut.Dispose();
         }
 
         [Fact]
@@ -91,70 +107,91 @@ namespace Squidex.Infrastructure.CQRS.Events
             sut.Subscribe(eventConsumer.Object);
             sut.Subscribe(eventConsumer.Object);
 
-            eventConsumer.Verify(x => x.GetLastHandledEventNumber(), Times.Once());
+            eventConsumerInfoRepository.Verify(x => x.CreateAsync(consumerName), Times.Once());
         }
 
         [Fact]
-        public void Should_subscribe_to_consumers_and_handle_events()
+        public async Task Should_subscribe_to_consumers_and_handle_events()
         {
-            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
-            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Returns(Task.FromResult(true));
+            consumerInfo.LastHandledEventNumber = 2L;
+            
+            sut.Subscribe(eventConsumer.Object);
 
-            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
-            eventStore.Setup(x => x.GetEventsAsync(4)).Returns(events[1].ToObservable());
-
-            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
-
-            sut.Subscribe(eventConsumer.Object, 20);
-
-            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
+            await Task.Delay(20);
 
             Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(4, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(3, logger.LogCount[LogLevel.Debug]);
 
-            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(4));
+            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope3), Times.Once());
         }
 
         [Fact]
-        public void Should_abort_if_handling_failed()
+        public async Task Should_abort_if_handling_failed()
         {
-            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
-            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Throws<InvalidOperationException>();
+            consumerInfo.LastHandledEventNumber = 2L;
 
-            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
-            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
+            eventConsumer.Setup(x => x.On(envelope1)).Returns(Task.FromResult(true));
+            eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
 
-            sut.Subscribe(eventConsumer.Object, 20);
+            sut.Subscribe(eventConsumer.Object);
 
-            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
+            await Task.Delay(20);
 
             Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(1, logger.LogCount[LogLevel.Critical]);
+            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
+            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
 
-            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(1));
-            eventStore.Verify(x => x.GetEventsAsync(It.IsAny<long>()), Times.Exactly(1));
+            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope3), Times.Never());
+
+            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName), Times.Once());
         }
 
         [Fact]
-        public void Should_abort_if_serialization_failed()
+        public async Task Should_abort_if_serialization_failed()
         {
-            eventConsumer.Setup(x => x.GetLastHandledEventNumber()).Returns(Task.FromResult(2L));
-            eventConsumer.Setup(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>())).Throws<InvalidOperationException>();
+            consumerInfo.LastHandledEventNumber = 2L;
 
-            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events[0].ToObservable());
-            eventStore.Setup(x => x.GetEventsAsync(It.Is<long>(l => l != 2 && l != 4))).Returns(Observable.Empty<StoredEvent>());
+            formatter.Setup(x => x.Parse(eventData2)).Throws(new InvalidOperationException());
 
-            sut.Subscribe(eventConsumer.Object, 20);
+            sut.Subscribe(eventConsumer.Object);
 
-            Task.Delay(400).ContinueWith(x => sut.Dispose()).Wait();
+            await Task.Delay(20);
 
             Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(1, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(1, logger.LogCount[LogLevel.Critical]);
+            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
+            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
 
-            eventConsumer.Verify(x => x.On(It.IsAny<Envelope<IEvent>>(), It.IsAny<long>()), Times.Exactly(1));
-            eventStore.Verify(x => x.GetEventsAsync(It.IsAny<long>()), Times.Exactly(1));
+            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope2), Times.Never());
+            eventConsumer.Verify(x => x.On(envelope3), Times.Never());
+
+            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName), Times.Once());
+        }
+
+        [Fact]
+        public async Task Should_reset_if_requested()
+        {
+            consumerInfo.IsResetting = true;
+            consumerInfo.LastHandledEventNumber = 2L;
+            
+            eventStore.Setup(x => x.GetEventsAsync(-1)).Returns(events.ToObservable());
+
+            sut.Subscribe(eventConsumer.Object);
+
+            await Task.Delay(20);
+
+            Assert.Equal(1, logger.LogCount.Count);
+            Assert.Equal(5, logger.LogCount[LogLevel.Debug]);
+
+            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
+            eventConsumer.Verify(x => x.On(envelope3), Times.Once());
+
+            eventConsumer.Verify(x => x.ClearAsync(), Times.Once());
         }
     }
 }

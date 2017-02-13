@@ -31,6 +31,10 @@ export class Profile {
         return this.user.profile['urn:squidex:picture'];
     }
 
+    public get isAdmin(): boolean {
+        return this.user.profile['role'] === 'administrator';
+    }
+
     public get token(): string {
         return `subject:${this.id}`;
     }
@@ -74,7 +78,7 @@ export class AuthService {
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
-                           scope: 'squidex-api openid profile squidex-profile',
+                           scope: 'squidex-api openid profile squidex-profile role',
                    response_type: 'id_token token',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),

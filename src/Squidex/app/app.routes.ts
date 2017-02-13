@@ -37,6 +37,9 @@ export const routes: Routes = [
                 path: '',
                 loadChildren: './features/apps/module#SqxFeatureAppsModule'
             }, {
+                path: 'administration',
+                loadChildren: './features/administration/module#SqxFeatureAdministrationModule'
+            }, {
                 path: ':appName',
                 component: AppAreaComponent,
                 canActivate: [AppMustExistGuard],

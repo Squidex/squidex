@@ -1,0 +1,64 @@
+<sqx-title message="Event Consumers"></sqx-title>
+
+<sqx-panel theme="light" panelWidth="50rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <h3 class="panel-title">EventConsumers</h3>
+        </div>
+
+        <a class="panel-close" routerLink="['..']">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-scroll">
+            <table class="table table-items table-fixed">
+                <colgroup>
+                    <col style="width: 100%" />
+                    <col style="width: 160px" />
+                    <col style="width: 160px" />
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th class="col-right">
+                            Event Number
+                        </th>
+                        <th class="col-right">
+                            Options
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template ngFor let-eventConsumer [ngForOf]="eventConsumers">
+                        <tr>
+                            <td>
+                                <span class="truncate">{{eventConsumer.name}}</span>
+                            </td>
+                            <td class="col-right">
+                                <span>{{eventConsumer.lastHandledEventNumber}}</span>
+                            </td>
+                            <td class="col-right">
+                                <button class="btn btn-simple" (click)="reset(eventConsumer.name)" *ngIf="!eventConsumer.isResetting">
+                                    <i class="icon icon-reset"></i>
+                                </button>
+                                <button class="btn btn-simple" (click)="start(eventConsumer.name)" *ngIf="eventConsumer.isStopped">
+                                    <i class="icon icon-play"></i>
+                                </button>
+                                <button class="btn btn-simple" (click)="stop(eventConsumer.name)" *ngIf="!eventConsumer.isStopped">
+                                    <i class="icon icon-pause"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</sqx-panel>

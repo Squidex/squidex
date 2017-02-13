@@ -30,6 +30,8 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
     public profileDisplayName = '';
     public profilePictureUrl = '';
 
+    public isAdmin = false;
+
     constructor(
         private readonly auth: AuthService
     ) {
@@ -41,12 +43,14 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.authenticationSubscription =
-            this.auth.isAuthenticated.subscribe(() => {
+            this.auth.isAuthenticated.take(1).subscribe(() => {
                 const user = this.auth.user;
 
                 if (user) {
                     this.profilePictureUrl = user.pictureUrl;
                     this.profileDisplayName = user.displayName;
+
+                    this.isAdmin = user.isAdmin;
                 }
             });
     }

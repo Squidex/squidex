@@ -140,8 +140,7 @@ namespace Squidex.Config.Identity
                 {
                     var apiRequestUri = new Uri($"https://www.googleapis.com/oauth2/v2/userinfo?access_token={context.AccessToken}");
 
-                    var jsonReponseString =
-                        await HttpClient.GetStringAsync(apiRequestUri);
+                    var jsonReponseString = await HttpClient.GetStringAsync(apiRequestUri);
                     var jsonResponse = JToken.Parse(jsonReponseString);
 
                     var pictureUrl = jsonResponse["picture"]?.Value<string>();

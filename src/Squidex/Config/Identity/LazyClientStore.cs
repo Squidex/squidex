@@ -77,7 +77,8 @@ namespace Squidex.Config.Identity
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = new List<string>
                 {
-                    Constants.ApiScope
+                    Constants.ApiScope,
+                    Constants.RoleScope
                 }
             };
         }
@@ -115,7 +116,8 @@ namespace Squidex.Config.Identity
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     Constants.ApiScope,
-                    Constants.ProfileScope
+                    Constants.ProfileScope,
+                    Constants.RoleScope
                 },
                 RequireConsent = false
             };

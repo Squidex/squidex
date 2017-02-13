@@ -1,19 +1,21 @@
 // ==========================================================================
-//  IEventCatchConsumer.cs
+//  IEventCatchConsumerInfo.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface IEventCatchConsumer
+    public interface IEventConsumerInfo
     {
-        Task<long> GetLastHandledEventNumber();
+        long LastHandledEventNumber { get; }
 
-        Task On(Envelope<IEvent> @event, long eventNumber);
+        bool IsStopped { get; }
+
+        bool IsResetting { get; }
+
+        string Name { get; }
     }
 }

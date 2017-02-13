@@ -22,7 +22,7 @@ namespace Squidex.Config.Domain
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            var catchConsumers = app.ApplicationServices.GetServices<IEventCatchConsumer>();
+            var catchConsumers = app.ApplicationServices.GetServices<IEventConsumer>();
 
             foreach (var catchConsumer in catchConsumers)
             {

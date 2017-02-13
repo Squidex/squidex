@@ -47,11 +47,6 @@ namespace Squidex.Read.MongoDb.Schemas
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
         }
 
-        public Task ClearAsync()
-        {
-            return TryDropCollectionAsync();
-        }
-
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
             var entities = await Collection.Find(s => s.AppId == appId).ToListAsync();
