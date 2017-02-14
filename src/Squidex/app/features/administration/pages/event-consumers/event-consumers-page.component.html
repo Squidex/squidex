@@ -29,28 +29,32 @@
                             Event Number
                         </th>
                         <th class="col-right">
-                            Options
+                            Actions
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <template ngFor let-eventConsumer [ngForOf]="eventConsumers">
-                        <tr>
+                        <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
                             <td>
-                                <span class="truncate">{{eventConsumer.name}}</span>
+                                <span class="truncate">
+                                    <i class="faulted-icon icon icon-warning" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
+
+                                    {{eventConsumer.name}}
+                                </span>
                             </td>
                             <td class="col-right">
                                 <span>{{eventConsumer.lastHandledEventNumber}}</span>
                             </td>
                             <td class="col-right">
-                                <button class="btn btn-simple" (click)="reset(eventConsumer.name)" *ngIf="!eventConsumer.isResetting">
+                                <button class="btn btn-simple" (click)="reset(eventConsumer.name)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
                                     <i class="icon icon-reset"></i>
                                 </button>
-                                <button class="btn btn-simple" (click)="start(eventConsumer.name)" *ngIf="eventConsumer.isStopped">
+                                <button class="btn btn-simple" (click)="start(eventConsumer.name)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
                                     <i class="icon icon-play"></i>
                                 </button>
-                                <button class="btn btn-simple" (click)="stop(eventConsumer.name)" *ngIf="!eventConsumer.isStopped">
+                                <button class="btn btn-simple" (click)="stop(eventConsumer.name)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
                                     <i class="icon icon-pause"></i>
                                 </button>
                             </td>
@@ -62,3 +66,22 @@
         </div>
     </div>
 </sqx-panel>
+
+<div class="modal" *sqxModalView="eventConsumerErrorDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Error</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="eventConsumerErrorDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
+            </div>
+        </div>
+    </div>
+</div>

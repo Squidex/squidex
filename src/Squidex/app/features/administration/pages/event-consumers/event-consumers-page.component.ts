@@ -11,17 +11,24 @@ import { Observable, Subscription } from 'rxjs';
 import {
     EventConsumerDto,
     EventConsumersService,
-    ImmutableArray
+    fadeAnimation,
+    ImmutableArray,
+    ModalView
 } from 'shared';
 
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
-    templateUrl: './event-consumers-page.component.html'
+    templateUrl: './event-consumers-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class EventConsumersPage implements OnInit, OnDestroy {
     private subscription: Subscription;
 
+    public eventConsumerErrorDialog = new ModalView();
+    public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
     constructor(
@@ -47,7 +54,7 @@ export class EventConsumersPage implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.map(e => {
                     if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, false, e.isResetting);
+                        return new EventConsumerDto(name, e.lastHandledEventNumber, false, e.isResetting, e.error);
                     } else {
                         return e;
                     }
@@ -60,7 +67,7 @@ export class EventConsumersPage implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.map(e => {
                     if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, true, e.isResetting);
+                        return new EventConsumerDto(name, e.lastHandledEventNumber, true, e.isResetting, e.error);
                     } else {
                         return e;
                     }
@@ -73,12 +80,17 @@ export class EventConsumersPage implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.map(e => {
                     if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, e.isStopped, true);
+                        return new EventConsumerDto(name, e.lastHandledEventNumber, e.isStopped, true, e.error);
                     } else {
                         return e;
                     }
                 });
             });
+    }
+
+    public showError(eventConsumer: EventConsumerDto) {
+        this.eventConsumerError = eventConsumer.error;
+        this.eventConsumerErrorDialog.show();
     }
 }
 

@@ -19,6 +19,10 @@ namespace Squidex.Infrastructure.MongoDb
         public string Name { get; set; }
 
         [BsonElement]
+        [BsonIgnoreIfNull]
+        public string Error { get; set; }
+
+        [BsonElement]
         [BsonIgnoreIfDefault]
         public bool IsStopped { get; set; }
 

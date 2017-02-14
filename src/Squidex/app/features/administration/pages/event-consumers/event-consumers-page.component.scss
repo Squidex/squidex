@@ -8,3 +8,25 @@ button {
 .col-right {
     text-align: right;
 }
+
+.faulted-icon {
+    & {
+        @include transition(color .3s ease);
+        cursor: pointer;
+        color: $color-theme-error;
+    }
+
+    &:hover {
+        color: darken($color-theme-error, 10%);
+    }
+}
+
+.faulted {
+    color: $color-theme-error;
+}
+
+.error-message {
+    height: 18rem;
+    font-size: .8rem;
+    font-weight: normal;
+}

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
@@ -103,29 +104,20 @@ namespace Squidex.Infrastructure.CQRS.Events
                     {
                         return;
                     }
-
-                    var tcs = new TaskCompletionSource<bool>();
                     
-                    eventStore.GetEventsAsync(lastHandledEventNumber).Subscribe(storedEvent =>
-                    {
-                        HandleEventAsync(eventConsumer, storedEvent, consumerName).Wait();
-                    }, ex =>
-                    {
-                        tcs.SetException(ex);
-                    }, () =>
-                    {
-                        tcs.SetResult(true);
-                    }, ct);
+                    await eventStore.GetEventsAsync(lastHandledEventNumber)
+                        .SelectMany(async storedEvent =>
+                            {
+                                await HandleEventAsync(eventConsumer, storedEvent, consumerName);
 
-                    await tcs.Task;
+                                return storedEvent;
+                            }).DefaultIfEmpty();
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "Failed to handle events");
 
-                    await eventConsumerInfoRepository.StopAsync(consumerName);
-
-                    throw;
+                    await eventConsumerInfoRepository.StopAsync(consumerName, ex.ToString());
                 }
             });
 
@@ -137,7 +129,6 @@ namespace Squidex.Infrastructure.CQRS.Events
             var @event = ParseEvent(storedEvent);
 
             await DispatchConsumer(@event, eventConsumer);
-
             await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventNumber);
         }
 

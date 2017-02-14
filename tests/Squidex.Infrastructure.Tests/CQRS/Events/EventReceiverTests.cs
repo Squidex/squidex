@@ -33,6 +33,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             public bool IsResetting { get; set; }
 
             public string Name { get; set; }
+
+            public string Error { get; set; }
         }
 
         private sealed class MyLogger : ILogger<EventReceiver>
@@ -147,7 +149,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
             eventConsumer.Verify(x => x.On(envelope3), Times.Never());
 
-            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName), Times.Once());
+            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName, It.IsAny<string>()), Times.Once());
         }
 
         [Fact]
@@ -169,7 +171,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             eventConsumer.Verify(x => x.On(envelope2), Times.Never());
             eventConsumer.Verify(x => x.On(envelope3), Times.Never());
 
-            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName), Times.Once());
+            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName, It.IsAny<string>()), Times.Once());
         }
 
         [Fact]

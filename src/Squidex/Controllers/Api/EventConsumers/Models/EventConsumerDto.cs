@@ -17,5 +17,7 @@ namespace Squidex.Controllers.Api.EventConsumers.Models
         public bool IsResetting { get; set; }
 
         public string Name { get; set; }
+
+        public string Error { get; set; }
     }
 }

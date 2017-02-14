@@ -18,7 +18,8 @@ export class EventConsumerDto {
         public readonly name: string,
         public readonly lastHandledEventNumber: number,
         public readonly isStopped: boolean,
-        public readonly isResetting: boolean
+        public readonly isResetting: boolean,
+        public readonly error: string
     ) {
     }
 }
@@ -44,7 +45,8 @@ export class EventConsumersService {
                             item.name,
                             item.lastHandledEventNumber,
                             item.isStopped,
-                            item.isResetting);
+                            item.isResetting,
+                            item.error);
                     });
                 })
                 .catchError('Failed to load event consumers. Please reload.');

@@ -74,15 +74,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <h4 class="modal-title">Access Token</h4>
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="tokenDialog.hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
-
-                <h4 class="modal-title">Access Token</h4>
             </div>
 
             <div class="modal-body">
-                <textarea class="form-control access-token">{{token.tokenType}} {{token.accessToken}}</textarea>
+                <textarea readonly class="form-control access-token">{{token.tokenType}} {{token.accessToken}}</textarea>
             </div>
         </div>
     </div>

@@ -17,5 +17,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         bool IsResetting { get; }
 
         string Name { get; }
+
+        string Error { get; }
     }
 }
