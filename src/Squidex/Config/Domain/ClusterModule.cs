@@ -47,7 +47,7 @@ namespace Squidex.Config.Domain
             {
                 var connectionString = Configuration.GetValue<string>("squidex:clusterer:redis:connectionString");
 
-                if (string.IsNullOrWhiteSpace(connectionString) || !Uri.IsWellFormedUriString(connectionString, UriKind.Absolute))
+                if (string.IsNullOrWhiteSpace(connectionString))
                 {
                     throw new ConfigurationException("You must specify the Redis connection string in the 'squidex:clusterer:redis:connectionString' configuration section.");
                 }
