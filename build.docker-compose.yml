@@ -2,7 +2,7 @@ version: '2'
 services:
   squidex-build:
 # Use custom aspnet images where phantomjs is installed
-    image: sebastianstehle/aspnetcore-build:1.1.0-projectjson-phantomjs
+    build: tools/aspnetcore-build-phantomjs
     volumes:
       - .:/sln
     working_dir: /sln
