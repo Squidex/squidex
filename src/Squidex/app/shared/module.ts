@@ -21,6 +21,8 @@ import {
     ContentsService,
     DashboardLinkDirective,
     EventConsumersService,
+    HelpComponent,
+    HelpService,
     HistoryComponent,
     HistoryService,
     LanguageSelectorComponent,
@@ -43,12 +45,14 @@ import {
     declarations: [
         AppFormComponent,
         DashboardLinkDirective,
+        HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent
     ],
     exports: [
         AppFormComponent,
         DashboardLinkDirective,
+        HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent
     ]
@@ -67,6 +71,7 @@ export class SqxSharedModule {
                 AuthService,
                 ContentsService,
                 EventConsumersService,
+                HelpService,
                 HistoryService,
                 LanguageService,
                 MustBeAuthenticatedGuard,

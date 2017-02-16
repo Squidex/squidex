@@ -106,9 +106,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                     }
                     
                     await eventStore.GetEventsAsync(lastHandledEventNumber)
-                        .SelectMany(async storedEvent =>
+                        .Select(storedEvent =>
                             {
-                                await HandleEventAsync(eventConsumer, storedEvent, consumerName);
+                                HandleEventAsync(eventConsumer, storedEvent, consumerName).Wait();
 
                                 return storedEvent;
                             }).DefaultIfEmpty();
@@ -156,6 +156,8 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             try
             {
+                logger.LogDebug("[{0}]: Handling event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+
                 await eventConsumer.On(@event);
 
                 logger.LogDebug("[{0}]: Handled event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());

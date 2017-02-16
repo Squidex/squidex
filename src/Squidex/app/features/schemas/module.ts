@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    HelpComponent,
     HistoryComponent,
     ResolveSchemaGuard,
     SqxFrameworkModule,
@@ -49,6 +50,13 @@ const routes: Routes = [
                         component: HistoryComponent,
                         data: {
                             channel: 'schemas.{schemaName}'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '04-guides/schemas'
                         }
                     }
                 ]

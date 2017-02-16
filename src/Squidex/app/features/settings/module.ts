@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    HelpComponent,
     HistoryComponent,
     SqxFrameworkModule,
     SqxSharedModule
@@ -40,6 +41,13 @@ const routes: Routes = [
                         data: {
                             channel: 'settings.clients'
                         }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '04-guides/clients'
+                        }
                     }
                 ]
             }, {
@@ -52,6 +60,13 @@ const routes: Routes = [
                         data: {
                             channel: 'settings.contributors'
                         }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '04-guides/contributors'
+                        }
                     }
                 ]
             }, {
@@ -63,6 +78,13 @@ const routes: Routes = [
                         component: HistoryComponent,
                         data: {
                             channel: 'settings.languages'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '04-guides/languages'
                         }
                     }
                 ]

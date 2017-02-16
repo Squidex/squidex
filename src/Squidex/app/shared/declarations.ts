@@ -8,6 +8,7 @@
 export * from './components/app-component-base';
 export * from './components/app-form.component';
 export * from './components/dashboard-link.directive';
+export * from './components/help.component';
 export * from './components/history.component';
 export * from './components/language-selector.component';
 
@@ -27,6 +28,7 @@ export * from './services/apps.service';
 export * from './services/auth.service';
 export * from './services/contents.service';
 export * from './services/event-consumers.service';
+export * from './services/help.service';
 export * from './services/history.service';
 export * from './services/languages.service';
 export * from './services/schemas.service';

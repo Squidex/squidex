@@ -219,6 +219,7 @@ export class AuthService {
         }
 
         options.headers.append('Accept-Language', '*');
+        options.headers.append('Pragma', 'no-cache');
 
         if (this.currentUser && this.currentUser.user) {
             options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);

@@ -56,7 +56,6 @@
         @include flex-box;
         @include flex-flow(row);
         @include flex-grow(1);
-        overflow: hidden;
     }
 
     &-content {
