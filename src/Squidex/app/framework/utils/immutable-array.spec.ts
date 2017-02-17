@@ -47,6 +47,21 @@ describe('ImmutableArray', () => {
         expect(array_2).toBe(array_1);
     });
 
+    it('should push front items', () => {
+        const array_1 = ImmutableArray.of([1, 2, 3]);
+        const array_2 = array_1.pushFront(4, 5);
+
+        expect(array_2.length).toBe(5);
+        expect(array_2.values).toEqual([4, 5, 1, 2, 3]);
+    });
+
+    it('should return same array if pushing zero items to the front', () => {
+        const array_1 = ImmutableArray.of([1, 2, 3]);
+        const array_2 = array_1.pushFront();
+
+        expect(array_2).toBe(array_1);
+    });
+
     it('should remove item', () => {
         const array_1 = ImmutableArray.of([1, 2, 3]);
         const array_2 = array_1.remove(2);

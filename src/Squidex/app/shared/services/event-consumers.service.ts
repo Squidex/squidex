@@ -56,7 +56,6 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/start`);
 
         return this.authService.authPut(url, {})
-                .map(response => response.json())
                 .catchError('Failed to start event consumer. Please reload.');
     }
 
@@ -64,7 +63,6 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/stop`);
 
         return this.authService.authPut(url, {})
-                .map(response => response.json())
                 .catchError('Failed to stop event consumer. Please reload.');
     }
 
@@ -72,7 +70,6 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/reset`);
 
         return this.authService.authPut(url, {})
-                .map(response => response.json())
                 .catchError('Failed to reset event consumer. Please reload.');
     }
 }

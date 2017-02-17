@@ -73,7 +73,7 @@ describe('ContentsService', () => {
         authService.verifyAll();
     });
 
-    it('should make append query to get request as search', () => {
+    it('should append query to get request as search', () => {
         authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$search=my-query&$top=17&$skip=13'))
             .returns(() => Observable.of(
                 new Response(
@@ -95,7 +95,7 @@ describe('ContentsService', () => {
         authService.verifyAll();
     });
 
-    it('should make append query to get request as plain', () => {
+    it('should append query to get request as plain query string', () => {
         authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$filter=my-filter&$top=17&$skip=13'))
             .returns(() => Observable.of(
                 new Response(
