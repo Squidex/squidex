@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public async Task Should_subscribe_to_consumers_and_handle_events()
+        public async Task Should_subscribe_to_consumer_and_handle_events()
         {
             consumerInfo.LastHandledEventNumber = 2L;
             
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await Task.Delay(20);
 
             Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(3, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(6, logger.LogCount[LogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -143,7 +143,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             Assert.Equal(2, logger.LogCount.Count);
             Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(3, logger.LogCount[LogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             Assert.Equal(2, logger.LogCount.Count);
             Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(1, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(2, logger.LogCount[LogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Never());
@@ -187,7 +187,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await Task.Delay(20);
 
             Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(5, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(8, logger.LogCount[LogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
