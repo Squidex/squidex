@@ -25,19 +25,15 @@ namespace Squidex.Write.Apps
 
         public void Add(string id, string secret, DateTime expires)
         {
-            Func<string> message = () => "Cannot add client";
-
-            ThrowIfFound(id, message);
+            ThrowIfFound(id, () => "Cannot rename client");
 
             clients[id] = new AppClient(id, secret, expires);
         }
 
         public void Rename(string clientId, string name)
         {
-            Func<string> message = () => "Cannot rename client";
-
             ThrowIfNotFound(clientId);
-            ThrowIfSameName(clientId, name, message);
+            ThrowIfSameName(clientId, name, () => "Cannot rename client");
 
             clients[clientId] = clients[clientId].Rename(name);
         }

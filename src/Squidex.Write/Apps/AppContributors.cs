@@ -22,20 +22,20 @@ namespace Squidex.Write.Apps
 
         public void Assign(string contributorId, PermissionLevel permission)
         {
-            Func<string> message = () => "Cannot assign contributor";
+            string Message() => "Cannot assign contributor";
 
-            ThrowIfFound(contributorId, permission, message);
-            ThrowIfNoOwner(c => c[contributorId] = permission, message);
+            ThrowIfFound(contributorId, permission, Message);
+            ThrowIfNoOwner(c => c[contributorId] = permission, Message);
 
             contributors[contributorId] = permission;
         }
 
         public void Remove(string contributorId)
         {
-            Func<string> message = () => "Cannot remove contributor";
+            string Message() => "Cannot remove contributor";
 
             ThrowIfNotFound(contributorId);
-            ThrowIfNoOwner(c => c.Remove(contributorId), message);
+            ThrowIfNoOwner(c => c.Remove(contributorId), Message);
 
             contributors.Remove(contributorId);
         }

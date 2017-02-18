@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:1.1.0-projectjson
+FROM microsoft/dotnet:1.1.0-sdk-msbuild-rc4
 	
 # Install runtime dependencies
 RUN apt-get update \

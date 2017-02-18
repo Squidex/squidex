@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
 using NSwag.AspNetCore;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Security;
+using NSwag.SwaggerGeneration.WebApi.Processors.Security;
 using Squidex.Controllers.ContentApi.Generator;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;

@@ -13,8 +13,8 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NSwag;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Contexts;
+using NSwag.SwaggerGeneration.Processors;
+using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Controllers.Api;
 
 // ReSharper disable UseObjectOrCollectionInitializer

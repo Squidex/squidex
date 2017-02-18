@@ -63,6 +63,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 204 => Schema field created.

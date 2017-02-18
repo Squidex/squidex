@@ -10,8 +10,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
 using NSwag.Annotations;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Contexts;
+using NSwag.SwaggerGeneration.Processors;
+using NSwag.SwaggerGeneration.Processors.Contexts;
 
 // ReSharper disable InvertIf
 

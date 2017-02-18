@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ConsoleApplication
+namespace GenerateLanguages
 {
     public class Program
     {

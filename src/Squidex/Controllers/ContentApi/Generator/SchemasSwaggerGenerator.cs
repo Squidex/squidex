@@ -16,7 +16,7 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
 using NSwag.AspNetCore;
-using NSwag.CodeGeneration.SwaggerGenerators;
+using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Controllers.Api;
 using Squidex.Core.Schemas;

@@ -21,29 +21,23 @@ namespace Squidex.Write.Apps
 
         public void Add(Language language)
         {
-            Func<string> message = () => "Cannot add language";
-
-            ThrowIfFound(language, message);
+            ThrowIfFound(language, () => "Cannot add language");
 
             languages.Add(language);
         }
 
         public void Remove(Language language)
         {
-            Func<string> message = () => "Cannot remove language";
-
             ThrowIfNotFound(language);
-            ThrowIfMasterLanguage(language, message);
+            ThrowIfMasterLanguage(language, () => "Cannot remove language");
 
             languages.Remove(language);
         }
 
         public void SetMasterLanguage(Language language)
         {
-            Func<string> message = () => "Cannot set master language";
-
             ThrowIfNotFound(language);
-            ThrowIfMasterLanguage(language, message);
+            ThrowIfMasterLanguage(language, () => "Cannot set master language");
 
             masterLanguage = language;
         }
