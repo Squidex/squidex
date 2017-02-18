@@ -1,0 +1,45 @@
+﻿body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #F4F8F9;
+    margin: 0;
+    padding-top: 3.25rem;
+    padding-left: 7rem;
+    padding-right: 7rem;
+    line-height: 1.5;
+}
+
+h1, p {
+    text-align: center;
+}
+
+img {
+    vertical-align: middle;
+}
+
+.redirect-button {
+    display: none;
+}
+        
+.loading {
+    text-align: center;
+}
+
+.loading img {
+    height: 60px;
+}
+
+.loading, noscript {
+    margin-top: 200px;
+}
+
+.loading div {
+    font-size: 30px;
+    font-weight: lighter;
+}
+
+noscript {
+    display: block;
+    font-size: 30px;
+    font-weight: lighter;
+    color: red;
+}

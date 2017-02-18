@@ -7,12 +7,8 @@
 <html>
     <head>
         <title>Squidex - Login</title>
-
-        <style>
-            button {
-                display: none;
-            }
-        </style>
+        
+        <link href="styles/static.css" rel="stylesheet" />
     </head>
     <body>
         <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
@@ -20,7 +16,7 @@
                 <p>
                     @foreach (var provider in Model.ExternalProviders)
                     {
-                        <button type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+                        <button class="redirect-button" type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
                     }
                 </p>
             </div>

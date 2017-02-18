@@ -59,13 +59,19 @@ namespace Squidex.Controllers.UI.Account
             this.identityOptions = identityOptions;
             this.signInManager = signInManager;
         }
-
-        [Authorize]
+        
         [HttpGet]
         [Route("account/forbidden")]
         public IActionResult Forbidden()
         {
             return View("Error");
+        }
+        
+        [HttpGet]
+        [Route("account/accessdenied")]
+        public IActionResult AccessDenied()
+        {
+            return View("LockedOut");
         }
 
         [HttpGet]
@@ -223,16 +229,9 @@ namespace Squidex.Controllers.UI.Account
 
             var user = new IdentityUser { Email = mail, UserName = mail };
 
-            var pictureUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl);
-            if (pictureUrl != null)
+            foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix)))
             {
-                user.AddClaim(pictureUrl);
-            }
-
-            var displayName = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexDisplayName);
-            if (displayName != null)
-            {
-                user.AddClaim(displayName);
+                user.AddClaim(squidexClaim);
             }
 
             return user;

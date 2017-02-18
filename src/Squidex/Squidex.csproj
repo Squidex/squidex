@@ -10,10 +10,12 @@
     <PackageId>Squidex</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.1.0</RuntimeFrameworkVersion>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Config\Identity\Cert\*.*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <Content Include="wwwroot\styles\static.css" />
     <Content Update="appsettings.json;appsettings.Production.json;dockerfile;Views\**\*;web.config;wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -66,5 +68,5 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="Microsoft.OData.Core" Version="6.15.0" />
   </ItemGroup>
-
+  
 </Project>
