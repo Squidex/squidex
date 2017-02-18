@@ -6,9 +6,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <base href="/">
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <title>Squidex - Login</title>
         
-        <link href="styles/static.css" rel="stylesheet" />
+        <link href="/styles/static.css" rel="stylesheet" />
     </head>
     <body>
         <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
