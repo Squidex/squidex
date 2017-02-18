@@ -1,22 +1,17 @@
 ﻿// ==========================================================================
-//  IUserRepository.cs
+//  SquidexClaimTypes.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Squidex.Read.Users.Repositories
+namespace Squidex.Core.Identity
 {
-    public interface IUserRepository
+    public class SquidexClaimTypes
     {
-        Task<List<IUserEntity>> QueryUsersByQuery(string query);
+        public const string SquidexDisplayName = "urn:squidex:name";
 
-        Task<IUserEntity> FindUserByIdAsync(string id);
-
-        Task<long> CountAsync();
+        public const string SquidexPictureUrl = "urn:squidex:picture";
     }
 }

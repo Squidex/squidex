@@ -1,17 +1,21 @@
 ﻿// ==========================================================================
-//  ExtendedClaimTypes.cs
+//  SquidexRoles.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Security
+namespace Squidex.Core.Identity
 {
-    public class ExtendedClaimTypes
+    public static class SquidexRoles
     {
-        public const string SquidexDisplayName = "urn:squidex:name";
+        public const string Administrator = "administrator";
 
-        public const string SquidexPictureUrl = "urn:squidex:picture";
+        public const string AppOwner = "app-owner";
+
+        public const string AppEditor = "app-editor";
+
+        public const string AppDeveloper = "app-developer";
     }
 }

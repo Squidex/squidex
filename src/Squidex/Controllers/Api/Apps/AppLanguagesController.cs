@@ -14,6 +14,7 @@ using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Services;
@@ -24,7 +25,7 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [Authorize(Roles = "app-owner")]
+    [Authorize(Roles = SquidexRoles.AppOwner)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Apps")]

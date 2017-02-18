@@ -19,6 +19,7 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Controllers.Api;
+using Squidex.Core.Identity;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
@@ -144,7 +145,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 new SwaggerSecurityRequirement
                 {
-                    { "roles", new List<string> { "app-owner", "app-developer", "app-editor" } }
+                    { "roles", new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
                 }
             };
 

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Controllers.Api.Schemas.Models;
+using Squidex.Core.Identity;
 using Squidex.Pipeline;
 using Squidex.Write.Schemas.Commands;
 
@@ -20,7 +21,7 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [Authorize(Roles = "app-owner,app-developer")]
+    [Authorize(Roles = SquidexRoles.AppDeveloper)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Schemas")]

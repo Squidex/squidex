@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Identity.MongoDB;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure.Security;
 using Squidex.Read.Users;
 
@@ -28,12 +29,12 @@ namespace Squidex.Read.MongoDb.Users
 
         public string DisplayName
         {
-            get { return inner.Claims.Find(x => x.Type == ExtendedClaimTypes.SquidexDisplayName)?.Value; }
+            get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexDisplayName)?.Value; }
         }
 
         public string PictureUrl
         {
-            get { return inner.Claims.Find(x => x.Type == ExtendedClaimTypes.SquidexPictureUrl)?.Value; }
+            get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value; }
         }
 
         public MongoUserEntity(IdentityUser inner)

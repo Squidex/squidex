@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using StackExchange.Redis;
@@ -130,8 +131,8 @@ namespace Squidex.Config.Identity
             yield return new IdentityResource(Constants.ProfileScope,
                 new[]
                 {
-                    ExtendedClaimTypes.SquidexDisplayName,
-                    ExtendedClaimTypes.SquidexPictureUrl
+                    SquidexClaimTypes.SquidexDisplayName,
+                    SquidexClaimTypes.SquidexPictureUrl
                 });
         }
     }

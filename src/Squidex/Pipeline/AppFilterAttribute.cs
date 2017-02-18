@@ -13,9 +13,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Core.Apps;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure.Security;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
+
+// ReSharper disable SwitchStatementMissingSomeCases
 
 namespace Squidex.Pipeline
 {
@@ -53,14 +56,24 @@ namespace Squidex.Pipeline
                     context.Result = new NotFoundResult();
                     return;
                 }
-
-                var roleName = $"app-{permission.ToString().ToLowerInvariant()}";
-
+                
                 var defaultIdentity = context.HttpContext.User.Identities.First();
 
-                defaultIdentity
-                    .AddClaim(
-                        new Claim(defaultIdentity.RoleClaimType, roleName));
+                switch (permission.Value)
+                {
+                    case PermissionLevel.Owner:
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppOwner));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        break;
+                    case PermissionLevel.Editor:
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        break;
+                    case PermissionLevel.Developer:
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        break;
+                }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
             }

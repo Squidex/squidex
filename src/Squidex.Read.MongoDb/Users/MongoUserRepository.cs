@@ -41,5 +41,12 @@ namespace Squidex.Read.MongoDb.Users
 
             return user != null ? new MongoUserEntity(user) : null;
         }
+
+        public Task<long> CountAsync()
+        {
+            var count = userManager.Users.LongCount();
+
+            return Task.FromResult(count);
+        }
     }
 }

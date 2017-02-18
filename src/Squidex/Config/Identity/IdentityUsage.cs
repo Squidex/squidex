@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure.Security;
 
 // ReSharper disable InvertIf
@@ -116,7 +117,7 @@ namespace Squidex.Config.Identity
                 var displayNameClaim = context.Identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name);
                 if (displayNameClaim != null)
                 {
-                    context.Identity.AddClaim(new Claim(ExtendedClaimTypes.SquidexDisplayName, displayNameClaim.Value));
+                    context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, displayNameClaim.Value));
                 }
 
                 return base.CreatingTicket(context);
@@ -147,7 +148,7 @@ namespace Squidex.Config.Identity
 
                     if (!string.IsNullOrWhiteSpace(pictureUrl))
                     {
-                        context.Identity.AddClaim(new Claim(ExtendedClaimTypes.SquidexPictureUrl, pictureUrl));
+                        context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl));
                     }
                 }
 

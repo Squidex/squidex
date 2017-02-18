@@ -19,5 +19,7 @@ namespace Squidex.Config.Identity
         public string GoogleSecret { get; set; }
 
         public bool RequiresHttps { get; set; }
+
+        public bool LockAutomatically { get; set; }
     }
 }

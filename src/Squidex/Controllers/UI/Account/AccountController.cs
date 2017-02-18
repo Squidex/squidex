@@ -6,19 +6,25 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
-using Squidex.Infrastructure.Security;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
+using Squidex.Config.Identity;
+using Squidex.Core.Identity;
+using Squidex.Read.Users.Repositories;
 
+// ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertIfStatementToReturnStatement
 
@@ -27,21 +33,31 @@ namespace Squidex.Controllers.UI.Account
     [SwaggerIgnore]
     public sealed class AccountController : Controller
     {
+        private static readonly EventId IdentityEventId = new EventId(8000, "IdentityEventId");
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
+        private readonly IUserRepository userRepository;
+        private readonly ILogger<AccountController> logger;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
             SignInManager<IdentityUser> signInManager, 
             UserManager<IdentityUser> userManager,
+            IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
+            IUserRepository userRepository,
+            ILogger<AccountController> logger,
             IIdentityServerInteractionService interactions)
         {
-            this.signInManager = signInManager;
+            this.logger = logger;
             this.urlOptions = urlOptions;
             this.userManager = userManager;
+            this.userRepository = userRepository;
             this.interactions = interactions;
+            this.identityOptions = identityOptions;
+            this.signInManager = signInManager;
         }
 
         [Authorize]
@@ -125,15 +141,26 @@ namespace Squidex.Controllers.UI.Account
                 return RedirectToAction(nameof(Login));
             }
 
-            var isLoggedIn = await LoginAsync(externalLogin);
+            var result = await signInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
+
+            if (!result.Succeeded && result.IsLockedOut)
+            {
+                return View("LockedOut");
+            }
+
+            var isLoggedIn = result.Succeeded;
 
             if (!isLoggedIn)
             {
                 var user = CreateUser(externalLogin);
 
+                var isFirst = await userRepository.CountAsync() == 0;
+
                 isLoggedIn =
                     await AddUserAsync(user) &&
                     await AddLoginAsync(user, externalLogin) &&
+                    await MakeAdminAsync(user, isFirst) &&
+                    await LockAsync(user, isFirst) &&
                     await LoginAsync(externalLogin);
             }
 
@@ -158,11 +185,9 @@ namespace Squidex.Controllers.UI.Account
             return result.Succeeded;
         }
 
-        private async Task<bool> AddUserAsync(IdentityUser user)
+        private Task<bool> AddUserAsync(IdentityUser user)
         {
-            var result = await userManager.CreateAsync(user);
-
-            return result.Succeeded;
+            return MakeIdentityOperation("LoginAsync", () => userManager.CreateAsync(user));
         }
 
         private async Task<bool> LoginAsync(UserLoginInfo externalLogin)
@@ -172,25 +197,75 @@ namespace Squidex.Controllers.UI.Account
             return result.Succeeded;
         }
 
+        private Task<bool> LockAsync(IdentityUser user, bool isFirst)
+        {
+            if (isFirst || !identityOptions.Value.LockAutomatically)
+            {
+                return Task.FromResult(false);
+            }
+
+            return MakeIdentityOperation("LockAsync", () => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
+        }
+
+        private Task<bool> MakeAdminAsync(IdentityUser user, bool isFirst)
+        {
+            if (isFirst)
+            {
+                return Task.FromResult(false);
+            }
+
+            return MakeIdentityOperation("LockAsync", () => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
+        }
+
         private static IdentityUser CreateUser(ExternalLoginInfo externalLogin)
         {
             var mail = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
             var user = new IdentityUser { Email = mail, UserName = mail };
 
-            var pictureUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexPictureUrl);
+            var pictureUrl = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl);
             if (pictureUrl != null)
             {
                 user.AddClaim(pictureUrl);
             }
 
-            var displayName = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == ExtendedClaimTypes.SquidexDisplayName);
+            var displayName = externalLogin.Principal.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexDisplayName);
             if (displayName != null)
             {
                 user.AddClaim(displayName);
             }
 
             return user;
+        }
+
+        private async Task<bool> MakeIdentityOperation(string operationName, Func<Task<IdentityResult>> action)
+        {
+            try
+            {
+                var result = await action();
+
+                if (!result.Succeeded)
+                {
+                    var errorMessageBuilder = new StringBuilder();
+
+                    foreach (var error in result.Errors)
+                    {
+                        errorMessageBuilder.Append(error.Code);
+                        errorMessageBuilder.Append(": ");
+                        errorMessageBuilder.AppendLine(error.Description);
+                    }
+
+                    logger.LogError(IdentityEventId, "Operation '{0}' failed with errors: {1}", operationName, errorMessageBuilder.ToString());
+                }
+
+                return result.Succeeded;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(IdentityEventId, e, "Operation '{0}' failed with exception", operationName);
+
+                return false;
+            }
         }
     }
 }

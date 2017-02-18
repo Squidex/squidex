@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Controllers.Api;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -25,7 +26,7 @@ using Squidex.Write.Contents.Commands;
 
 namespace Squidex.Controllers.ContentApi
 {
-    [Authorize(Roles = "app-editor,app-owner,app-developer")]
+    [Authorize(Roles = SquidexRoles.AppEditor)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     public class ContentsController : ControllerBase
