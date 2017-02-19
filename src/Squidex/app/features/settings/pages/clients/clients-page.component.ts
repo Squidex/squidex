@@ -46,7 +46,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnInit() {

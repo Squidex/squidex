@@ -1,0 +1,89 @@
+<sqx-title message="User Management"></sqx-title>
+
+<sqx-panel panelWidth="50rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <div class="float-right">
+                <form class="form-inline" (ngSubmit)="search()">
+                    <input class="form-control" [formControl]="usersFilter" placeholder="Search for user" />
+                </form>
+            </div>
+            
+            <h3 class="panel-title">Users</h3>
+        </div>
+
+        <a class="panel-close" routerLink="../">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-scroll">
+            <table class="table table-items table-fixed">
+                <colgroup>
+                    <col style="width: 70px" />
+                    <col style="width: 50%" />
+                    <col style="width: 50%" />
+                    <col style="width: 120px" />
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>
+                            &nbsp;
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template ngFor let-user [ngForOf]="usersItems">
+                        <tr>
+                            <td>
+                                <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
+                            </td>
+                            <td>
+                                <span class="user-name">{{user.displayName}}</span>
+                            </td>
+                            <td>
+                                <span class="user-email">{{user.email}}</span>
+                            </td>
+                            <td class="col-right">
+                                <span *ngIf="user.id !== currentUserId">
+                                    <button class="btn btn-simple" (click)="lock(user.id)" *ngIf="!user.isLocked" title="Lock User">
+                                        <i class="icon icon-unlocked"></i>
+                                    </button>
+                                    <button class="btn btn-simple" (click)="unlock(user.id)" *ngIf="user.isLocked" title="Unlock User">
+                                        <i class="icon icon-lock"></i>
+                                    </button>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </template>
+                </tbody>
+            </table>
+
+            <div class="clearfix" *ngIf="usersTotal > 0">
+                <div class="float-right pagination">
+                    <span class="pagination-text">{{itemFirst}}-{{itemLast}} of {{usersTotal}}</span>
+
+                    <button class="btn btn-simple pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
+                        <i class="icon-angle-left"></i>
+                    </button>
+                    <button class="btn btn-simple pagination-button" [disabled]="!canGoNext" (click)="goNext()">
+                        <i class="icon-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</sqx-panel>

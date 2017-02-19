@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import { ApiUrlConfig } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class LanguageDto {
@@ -44,6 +43,6 @@ export class LanguageService {
                             item.englishName);
                     });
                 })
-                .catchError('Failed to load languages. Please reload');
+                .catchError('Failed to load languages. Please reload.');
     }
 }

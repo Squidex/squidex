@@ -28,7 +28,7 @@ describe('UsersProviderService', () => {
     });
 
     it('Should return users service when user not cached', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
@@ -45,7 +45,7 @@ describe('UsersProviderService', () => {
     });
 
     it('Should return provide user from cache', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
@@ -63,8 +63,8 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('Should return Me when user is current user', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image');
+    it('Should return me when user is current user', () => {
+        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
@@ -78,7 +78,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image'));
+        expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image', true));
 
         usersService.verifyAll();
     });
@@ -96,7 +96,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', ''));
+        expect(resultingUser).toEqual(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', null, false));
 
         usersService.verifyAll();
     });

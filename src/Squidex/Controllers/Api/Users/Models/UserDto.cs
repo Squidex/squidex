@@ -35,5 +35,11 @@ namespace Squidex.Controllers.Api.Users.Models
         /// </summary>
         [Required]
         public string DisplayName { get; set; }
+
+        /// <summary>
+        /// Determines if the user is locked.
+        /// </summary>
+        [Required]
+        public bool IsLocked { get; set; }
     }
 }

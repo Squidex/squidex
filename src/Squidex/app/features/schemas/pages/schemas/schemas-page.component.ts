@@ -51,7 +51,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnDestroy() {

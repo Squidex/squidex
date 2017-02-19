@@ -15,7 +15,8 @@ import {
 
 import {
     AdministrationAreaComponent,
-    EventConsumersPage
+    EventConsumersPageComponent,
+    UsersPageComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -27,7 +28,10 @@ const routes: Routes = [
                 path: '',
                 children: [{
                     path: 'event-consumers',
-                    component: EventConsumersPage
+                    component: EventConsumersPageComponent
+                }, {
+                    path: 'users',
+                    component: UsersPageComponent
                 }]
             }
         ]
@@ -42,7 +46,8 @@ const routes: Routes = [
     ],
     declarations: [
         AdministrationAreaComponent,
-        EventConsumersPage
+        EventConsumersPageComponent,
+        UsersPageComponent
     ]
 })
 export class SqxFeatureAdministrationModule { }

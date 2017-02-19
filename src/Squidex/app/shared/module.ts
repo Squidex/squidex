@@ -34,6 +34,7 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
+    UserManagementService,
     UsersProviderService,
     UsersService
 } from './declarations';
@@ -81,6 +82,7 @@ export class SqxSharedModule {
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
                 SchemasService,
+                UserManagementService,
                 UsersProviderService,
                 UsersService
             ]

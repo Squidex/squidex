@@ -55,7 +55,7 @@ export class ContentItemComponent extends AppComponentBase implements OnInit {
     public values: any[] = [];
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnInit() {

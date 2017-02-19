@@ -82,3 +82,27 @@
         height: .3rem;
     }
 }
+
+.pagination {
+    & {
+        margin-top: 1rem;
+    }
+
+    &-text {
+        line-height: 2.2rem;
+    }
+
+    &-button {
+        & {
+            color: $color-text;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-left: .4rem;
+        }
+
+        &:hover,
+        &.active {
+            color: darken($color-text, 20%);
+        }
+    }
+}

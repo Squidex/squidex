@@ -61,7 +61,7 @@ namespace Squidex.Controllers.Api.History
                 return NotFound();
             }
 
-            var schemas = await historyEventRepository.QueryEventsByChannel(entity.Id, channel, 100);
+            var schemas = await historyEventRepository.QueryByChannelAsync(entity.Id, channel, 100);
 
             var response = schemas.Select(x => SimpleMapper.Map(x, new HistoryEventDto())).ToList();
 

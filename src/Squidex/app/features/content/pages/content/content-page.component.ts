@@ -56,7 +56,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnDestroy() {

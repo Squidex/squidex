@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.EventConsumers.Models;
+using Squidex.Core.Identity;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -19,7 +20,7 @@ using Squidex.Pipeline;
 namespace Squidex.Controllers.Api.EventConsumers
 {
     [ApiExceptionFilter]
-    [Authorize(Roles = "administrator")]
+    [Authorize(Roles = SquidexRoles.Administrator)]
     [SwaggerIgnore]
     public sealed class EventConsumersController : Controller
     {

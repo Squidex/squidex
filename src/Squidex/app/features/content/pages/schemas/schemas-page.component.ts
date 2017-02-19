@@ -56,7 +56,7 @@ export class SchemasPageComponent extends AppComponentBase {
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly schemasService: SchemasService
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {

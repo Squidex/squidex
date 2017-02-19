@@ -46,12 +46,12 @@ export class HistoryComponent extends AppComponentBase {
             .switchMap(() => this.appName())
             .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
-    constructor(appsStore: AppsStoreService, notifications: NotificationService, usersProvider: UsersProviderService,
+    constructor(appsStore: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(appsStore, notifications, usersProvider);
+        super(notifications, users, appsStore);
     }
 
     public actorName(actor: string): Observable<string> {

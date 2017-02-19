@@ -7,6 +7,7 @@
 
 export * from './components/app-component-base';
 export * from './components/app-form.component';
+export * from './components/component-base';
 export * from './components/dashboard-link.directive';
 export * from './components/help.component';
 export * from './components/history.component';

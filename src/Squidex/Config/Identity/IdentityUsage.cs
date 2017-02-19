@@ -19,7 +19,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Identity;
-using Squidex.Infrastructure.Security;
 
 // ReSharper disable InvertIf
 

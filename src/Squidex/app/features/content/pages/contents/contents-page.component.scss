@@ -20,22 +20,3 @@
 .form-inline {
     display: inline-block;
 }
-
-.pagination {
-    & {
-        margin-top: 1rem;
-    }
-
-    &-button {
-        & {
-            color: $color-text;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        &:hover,
-        &.active {
-            color: darken($color-text, 20%);
-        }
-    }
-}

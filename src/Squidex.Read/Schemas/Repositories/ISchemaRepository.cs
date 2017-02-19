@@ -21,10 +21,10 @@ namespace Squidex.Read.Schemas.Repositories
 
         Task<IReadOnlyList<ISchemaEntityWithSchema>> QueryAllWithSchemaAsync(Guid appId);
 
-        Task<Guid?> FindSchemaIdAsync(Guid appId, string name);
-
         Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name);
 
         Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid schemaId);
+
+        Task<Guid?> FindSchemaIdAsync(Guid appId, string name);
     }
 }

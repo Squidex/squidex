@@ -1,19 +1,23 @@
 ﻿// ==========================================================================
-//  IHistoryEventRepository.cs
+//  UsersDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Squidex.Read.History.Repositories
+namespace Squidex.Controllers.Api.Users.Models
 {
-    public interface IHistoryEventRepository
+    public class UsersDto
     {
-        Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count);
+        /// <summary>
+        /// The total number of users.
+        /// </summary>
+        public long Total { get; set; }
+
+        /// <summary>
+        /// The users.
+        /// </summary>
+        public UserDto[] Items { get; set; }
     }
 }

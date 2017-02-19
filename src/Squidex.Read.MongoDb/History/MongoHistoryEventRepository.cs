@@ -59,7 +59,7 @@ namespace Squidex.Read.MongoDb.History
                 collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
         }
 
-        public async Task<List<IHistoryEventEntity>> QueryEventsByChannel(Guid appId, string channelPrefix, int count)
+        public async Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
         {
             var entities =
                 await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)

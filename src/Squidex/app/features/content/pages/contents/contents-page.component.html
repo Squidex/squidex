@@ -10,9 +10,9 @@
                 
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
 
-                <a class="btn btn-success" [routerLink]="['new']">
+                <button class="btn btn-success" [routerLink]="['new']">
                     <i class="icon-plus"></i> New
-                </a>
+                </button>
             </div>
 
             <h3 class="panel-title">{{schema|displayName}} Contents</h3>
@@ -67,7 +67,7 @@
 
             <div class="clearfix" *ngIf="contentTotal > 0">
                 <div class="float-right pagination">
-                    {{itemFirst}}-{{itemLast}} of {{contentTotal}}
+                    <span class="pagination-text">{{itemFirst}}-{{itemLast}} of {{contentTotal}}</span>
 
                     <button class="btn btn-simple pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
                         <i class="icon-angle-left"></i>

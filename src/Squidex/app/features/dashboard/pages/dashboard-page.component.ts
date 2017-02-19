@@ -35,7 +35,7 @@ export class DashboardPageComponent extends AppComponentBase {
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly auth: AuthService
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnDestroy() {

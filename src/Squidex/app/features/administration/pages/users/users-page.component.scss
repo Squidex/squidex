@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+.col-right {
+    text-align: right;
+}
+
 .user {
     &-name,
     &-email {

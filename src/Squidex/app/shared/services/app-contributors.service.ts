@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import { ApiUrlConfig } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class AppContributorDto {

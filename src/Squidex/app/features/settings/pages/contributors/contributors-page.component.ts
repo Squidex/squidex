@@ -83,7 +83,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
 
         this.usersDataSource = new UsersDataSource(usersService, this);
     }

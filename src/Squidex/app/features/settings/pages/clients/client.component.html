@@ -22,9 +22,9 @@
 
                         <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid">Save</button>
 
-                        <a class="btn btn-default btn-cancel" (click)="cancelRename()">
+                        <button class="btn btn-default btn-cancel" (click)="cancelRename()">
                             <i class="icon-close"></i>
-                        </a>
+                        </button>
                     </form>
 
                     <span *ngIf="!isRenaming">

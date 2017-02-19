@@ -8,11 +8,11 @@
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,6 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Core.Identity;
-using Squidex.Read.Users.Repositories;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
@@ -38,7 +37,6 @@ namespace Squidex.Controllers.UI.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
-        private readonly IUserRepository userRepository;
         private readonly ILogger<AccountController> logger;
         private readonly IIdentityServerInteractionService interactions;
 
@@ -47,14 +45,12 @@ namespace Squidex.Controllers.UI.Account
             UserManager<IdentityUser> userManager,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
-            IUserRepository userRepository,
             ILogger<AccountController> logger,
             IIdentityServerInteractionService interactions)
         {
             this.logger = logger;
             this.urlOptions = urlOptions;
             this.userManager = userManager;
-            this.userRepository = userRepository;
             this.interactions = interactions;
             this.identityOptions = identityOptions;
             this.signInManager = signInManager;
@@ -119,8 +115,7 @@ namespace Squidex.Controllers.UI.Account
         {
             var providers = 
                 signInManager.GetExternalAuthenticationSchemes()
-                    .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName))
-                    .ToList();
+                    .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName)).ToList();
 
             return View(new LoginVM { ExternalProviders = providers, ReturnUrl = returnUrl });
         }
@@ -160,7 +155,7 @@ namespace Squidex.Controllers.UI.Account
             {
                 var user = CreateUser(externalLogin);
 
-                var isFirst = await userRepository.CountAsync() == 0;
+                var isFirst = userManager.Users.LongCount() == 0;
 
                 isLoggedIn =
                     await AddUserAsync(user) &&
@@ -184,16 +179,14 @@ namespace Squidex.Controllers.UI.Account
             }
         }
 
-        private async Task<bool> AddLoginAsync(IdentityUser user, UserLoginInfo externalLogin)
+        private Task<bool> AddLoginAsync(IdentityUser user, UserLoginInfo externalLogin)
         {
-            var result = await userManager.AddLoginAsync(user, externalLogin);
-
-            return result.Succeeded;
+            return MakeIdentityOperation(() => userManager.AddLoginAsync(user, externalLogin));
         }
 
         private Task<bool> AddUserAsync(IdentityUser user)
         {
-            return MakeIdentityOperation("LoginAsync", () => userManager.CreateAsync(user));
+            return MakeIdentityOperation(() => userManager.CreateAsync(user));
         }
 
         private async Task<bool> LoginAsync(UserLoginInfo externalLogin)
@@ -210,7 +203,7 @@ namespace Squidex.Controllers.UI.Account
                 return Task.FromResult(false);
             }
 
-            return MakeIdentityOperation("LockAsync", () => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
+            return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
         }
 
         private Task<bool> MakeAdminAsync(IdentityUser user, bool isFirst)
@@ -220,7 +213,7 @@ namespace Squidex.Controllers.UI.Account
                 return Task.FromResult(false);
             }
 
-            return MakeIdentityOperation("LockAsync", () => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
+            return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
         }
 
         private static IdentityUser CreateUser(ExternalLoginInfo externalLogin)
@@ -237,7 +230,7 @@ namespace Squidex.Controllers.UI.Account
             return user;
         }
 
-        private async Task<bool> MakeIdentityOperation(string operationName, Func<Task<IdentityResult>> action)
+        private async Task<bool> MakeIdentityOperation(Func<Task<IdentityResult>> action, [CallerMemberName] string operationName = null)
         {
             try
             {

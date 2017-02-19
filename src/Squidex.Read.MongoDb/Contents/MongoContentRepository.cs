@@ -46,7 +46,7 @@ namespace Squidex.Read.MongoDb.Contents
             this.schemaProvider = schemaProvider;
         }
 
-        public async Task<List<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
         {
             List<IContentEntity> result = null;
 

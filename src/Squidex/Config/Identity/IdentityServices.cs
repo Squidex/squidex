@@ -21,7 +21,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using StackExchange.Redis;
 
 namespace Squidex.Config.Identity

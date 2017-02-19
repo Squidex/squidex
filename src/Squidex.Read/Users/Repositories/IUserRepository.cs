@@ -13,10 +13,14 @@ namespace Squidex.Read.Users.Repositories
 {
     public interface IUserRepository
     {
-        Task<List<IUserEntity>> QueryUsersByQuery(string query);
+        Task<IReadOnlyList<IUserEntity>> QueryByEmailAsync(string email = null, int take = 10, int skip = 0);
 
         Task<IUserEntity> FindUserByIdAsync(string id);
 
-        Task<long> CountAsync();
+        Task LockAsync(string id);
+
+        Task UnlockAsync(string id);
+
+        Task<long> CountAsync(string email = null);
     }
 }

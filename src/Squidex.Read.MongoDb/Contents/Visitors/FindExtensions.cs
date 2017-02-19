@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using Microsoft.OData.Core.UriParser;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
 
@@ -69,7 +70,18 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
                 filters.Add(filter);
             }
 
-            return Filter.And(filters);
+            if (filters.Count > 1)
+            {
+                return Filter.And(filters);
+            }
+            else if (filters.Count == 1)
+            {
+                return filters[0];
+            }
+            else
+            {
+                return new BsonDocument();
+            }
         }
     }
 }

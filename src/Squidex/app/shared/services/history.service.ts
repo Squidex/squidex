@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import { ApiUrlConfig, DateTime } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class HistoryEventDto {
@@ -48,6 +47,6 @@ export class HistoryService {
                             DateTime.parseISO_UTC(item.created));
                     });
                 })
-                .catchError('Failed to load history. Please reload');
+                .catchError('Failed to load history. Please reload.');
     }
 }

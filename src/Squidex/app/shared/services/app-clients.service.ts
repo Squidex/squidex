@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import { ApiUrlConfig, DateTime } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class AppClientDto {

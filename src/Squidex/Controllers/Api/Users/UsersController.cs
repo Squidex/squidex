@@ -48,7 +48,7 @@ namespace Squidex.Controllers.Api.Users
         [ProducesResponseType(typeof(UserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
-            var entities = await userRepository.QueryUsersByQuery(query ?? string.Empty);
+            var entities = await userRepository.QueryByEmailAsync(query ?? string.Empty);
 
             var response = entities.Select(x => SimpleMapper.Map(x, new UserDto())).ToList();
 

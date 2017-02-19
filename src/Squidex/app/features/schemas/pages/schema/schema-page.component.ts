@@ -75,7 +75,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnInit() {

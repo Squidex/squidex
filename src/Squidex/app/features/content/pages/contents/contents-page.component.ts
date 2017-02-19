@@ -73,7 +73,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus
     ) {
-        super(apps, notifications, users);
+        super(notifications, users, apps);
     }
 
     public ngOnDestroy() {
@@ -107,6 +107,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public search() {
+        this.currentPage = 0;
         this.currentQuery = this.contentsFilter.value;
 
         this.load();

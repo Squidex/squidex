@@ -9,11 +9,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
+    ComponentBase,
     EventConsumerDto,
     EventConsumersService,
     fadeAnimation,
     ImmutableArray,
-    ModalView
+    ModalView,
+    NotificationService,
+    UsersProviderService
 } from 'shared';
 
 @Component({
@@ -24,16 +27,17 @@ import {
         fadeAnimation
     ]
 })
-export class EventConsumersPage implements OnInit, OnDestroy {
+export class EventConsumersPageComponent extends ComponentBase implements OnInit, OnDestroy {
     private subscription: Subscription;
 
     public eventConsumerErrorDialog = new ModalView();
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(
+    constructor(notifications: NotificationService, users: UsersProviderService,
         private readonly eventConsumersService: EventConsumersService
     ) {
+        super(notifications, users);
     }
 
     public ngOnInit() {
@@ -59,6 +63,8 @@ export class EventConsumersPage implements OnInit, OnDestroy {
                         return e;
                     }
                 });
+            }, error => {
+                this.notifyError(error);
             });
     }
 
@@ -72,6 +78,8 @@ export class EventConsumersPage implements OnInit, OnDestroy {
                         return e;
                     }
                 });
+            }, error => {
+                this.notifyError(error);
             });
     }
 
@@ -85,6 +93,8 @@ export class EventConsumersPage implements OnInit, OnDestroy {
                         return e;
                     }
                 });
+            }, error => {
+                this.notifyError(error);
             });
     }
 

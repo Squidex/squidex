@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import { ApiUrlConfig } from 'framework';
-
 import { AuthService } from './auth.service';
 
 export class AppLanguageDto {
@@ -60,7 +59,7 @@ export class AppLanguagesService {
                             item.isMasterLanguage === true);
                     });
                 })
-                .catchError('Failed to load languages. Please reload');
+                .catchError('Failed to load languages. Please reload.');
     }
 
     public postLanguages(appName: string, dto: AddAppLanguageDto): Observable<AppLanguageDto> {
