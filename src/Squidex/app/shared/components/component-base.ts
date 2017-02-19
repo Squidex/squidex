@@ -56,7 +56,11 @@ export abstract class ComponentBase {
             if (parts[0] === 'subject') {
                 return this.users.getUser(parts[1], placeholder).map(u => u.displayName);
             } else {
-                return Observable.of(`Client '${parts[1]}'`);
+                if (parts[1].endsWith('client')) {
+                    return Observable.of(parts[1]);
+                } else {
+                    return Observable.of(`${parts[1]}-client`);
+                }
             }
         } else {
             return this.users.getUser(userId, placeholder).map(u => u.displayName);
