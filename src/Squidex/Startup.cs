@@ -121,6 +121,7 @@ namespace Squidex
 
                 identityApp.UseMyIdentity();
                 identityApp.UseMyIdentityServer();
+                identityApp.UseAdminRole();
                 identityApp.UseMyApiProtection();
                 identityApp.UseMyGoogleAuthentication();
                 identityApp.UseStaticFiles();

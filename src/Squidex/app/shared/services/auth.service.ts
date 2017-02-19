@@ -32,7 +32,7 @@ export class Profile {
     }
 
     public get isAdmin(): boolean {
-        return this.user.profile['role'] === 'administrator';
+        return this.user.profile['role'].toLowerCase() === 'administrator';
     }
 
     public get token(): string {

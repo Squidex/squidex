@@ -208,7 +208,7 @@ namespace Squidex.Controllers.UI.Account
 
         private Task<bool> MakeAdminAsync(IdentityUser user, bool isFirst)
         {
-            if (isFirst)
+            if (!isFirst)
             {
                 return Task.FromResult(true);
             }

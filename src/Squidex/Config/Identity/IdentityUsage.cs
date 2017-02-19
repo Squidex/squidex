@@ -85,6 +85,15 @@ namespace Squidex.Config.Identity
             return app;
         }
 
+        public static IApplicationBuilder UseAdminRole(this IApplicationBuilder app)
+        {
+            var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IdentityRole>>();
+
+            roleManager.CreateAsync(new IdentityRole { Name = SquidexRoles.Administrator, NormalizedName = SquidexRoles.Administrator }).Wait();
+
+            return app;
+        }
+
         public static IApplicationBuilder UseMyApiProtection(this IApplicationBuilder app)
         {
             const string apiScope = Constants.ApiScope;
