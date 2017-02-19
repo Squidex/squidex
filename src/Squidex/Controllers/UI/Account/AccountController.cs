@@ -200,7 +200,7 @@ namespace Squidex.Controllers.UI.Account
         {
             if (isFirst || !identityOptions.Value.LockAutomatically)
             {
-                return Task.FromResult(false);
+                return Task.FromResult(true);
             }
 
             return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
@@ -210,7 +210,7 @@ namespace Squidex.Controllers.UI.Account
         {
             if (isFirst)
             {
-                return Task.FromResult(false);
+                return Task.FromResult(true);
             }
 
             return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
