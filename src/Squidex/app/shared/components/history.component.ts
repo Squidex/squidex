@@ -55,23 +55,11 @@ export class HistoryComponent extends AppComponentBase {
     }
 
     public actorName(actor: string): Observable<string> {
-        const parts = actor.split(':');
-
-        if (parts[0] === 'subject') {
-            return this.userName(parts[1], false, 'I');
-        }
-
-        return Observable.of(parts[1]);
+        return this.userName(actor, true, 'I');
     }
 
-    public actorProfile(actor: string): Observable<string> {
-        const parts = actor.split(':');
-
-        if (parts[0] === 'subject') {
-            return this.userPicture(parts[1]);
-        }
-
-        return Observable.of('');
+    public actorPicture(actor: string): Observable<string> {
+        return this.userPicture(actor, true);
     }
 
     public format(message: string): Observable<string> {

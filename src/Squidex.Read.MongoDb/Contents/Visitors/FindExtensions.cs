@@ -12,6 +12,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
 
+// ReSharper disable RedundantIfElseBlock
+
 namespace Squidex.Read.MongoDb.Contents.Visitors
 {
     public static class FindExtensions
@@ -60,7 +62,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             if (!nonPublished)
             {
-                filters.Add(Filter.Eq(x => x.IsPublished, false));
+                filters.Add(Filter.Eq(x => x.IsPublished, true));
             }
 
             var filter = FilterBuilder.Build(query, schema);

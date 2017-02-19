@@ -42,7 +42,7 @@ export abstract class ComponentBase {
             if (parts[0] === 'subject') {
                 return this.users.getUser(parts[1]).map(u => u.pictureUrl);
             } else {
-                return null;
+                return Observable.of('/images/client.png');
             }
         } else {
             return this.users.getUser(userId).map(u => u.pictureUrl);
@@ -56,7 +56,7 @@ export abstract class ComponentBase {
             if (parts[0] === 'subject') {
                 return this.users.getUser(parts[1], placeholder).map(u => u.displayName);
             } else {
-                return Observable.of(parts[1]);
+                return Observable.of(`Client '${parts[1]}'`);
             }
         } else {
             return this.users.getUser(userId, placeholder).map(u => u.displayName);

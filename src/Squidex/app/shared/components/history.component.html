@@ -13,7 +13,7 @@
         <div class="panel-content panel-content-blank">
             <div *ngFor="let event of events | async" class="event">
                 <div class="event-left">
-                    <img class="user-picture"[attr.title]="actorName(event.actor) | async" [attr.src]="actorProfile(event.actor) | async" />
+                    <img class="user-picture" [attr.title]="actorName(event.actor) | async" [attr.src]="actorPicture(event.actor) | async" />
                 </div>
                 <div class="event-main">
                     <div class="event-message">

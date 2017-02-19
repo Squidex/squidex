@@ -10,7 +10,7 @@
         
         <sqx-control-errors for="name" [submitted]="createFormSubmitted"></sqx-control-errors>
 
-		<input type="text" class="form-control" id="schema-name" formControlName="name" />
+		<input type="text" class="form-control" id="schema-name" formControlName="name" sqxFocusOnInit />
         
         <span class="form-hint">
             The schema name becomes part of the api url,<br /> e.g https://{{appName}}.squidex.io/<b>{{schemaName | async}}</b>/.

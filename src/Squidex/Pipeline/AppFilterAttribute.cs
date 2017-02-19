@@ -88,7 +88,7 @@ namespace Squidex.Pipeline
                 return null;
             }
 
-            clientId = clientId.Split(':')[0];
+            clientId = clientId.Split(':')[1];
 
             var contributor = app.Clients.FirstOrDefault(x => string.Equals(x.Id, clientId, StringComparison.OrdinalIgnoreCase));
 
