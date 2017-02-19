@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Squidex.Core.Identity;
-using Squidex.Infrastructure.Security;
 using Squidex.Read.Users;
 
 namespace Squidex.Read.MongoDb.Users
@@ -31,10 +31,14 @@ namespace Squidex.Read.MongoDb.Users
         {
             get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexDisplayName)?.Value; }
         }
-
         public string PictureUrl
         {
             get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value; }
+        }
+
+        public bool IsLocked
+        {
+            get { return inner.LockoutEndDateUtc != null && inner.LockoutEndDateUtc.Value > DateTime.UtcNow; }
         }
 
         public MongoUserEntity(IdentityUser inner)

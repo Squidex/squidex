@@ -17,5 +17,7 @@ namespace Squidex.Read.Users
         string PictureUrl { get; }
 
         string DisplayName { get; }
+
+        bool IsLocked { get; }
     }
 }
