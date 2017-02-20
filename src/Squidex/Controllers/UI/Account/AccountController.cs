@@ -85,6 +85,13 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
+        [Route("account/logout-completed/")]
+        public IActionResult LogoutCompleted()
+        {
+            return View();
+        }
+
+        [HttpGet]
         [Route("account/error/")]
         public IActionResult Error()
         {
@@ -107,6 +114,15 @@ namespace Squidex.Controllers.UI.Account
             }
 
             return Redirect(logoutUrl);
+        }
+
+        [HttpGet]
+        [Route("account/logout-redirect/")]
+        public async Task<IActionResult> LogoutRedirect()
+        {
+            await signInManager.SignOutAsync();
+
+            return RedirectToAction(nameof(LogoutCompleted));
         }
 
         [HttpGet]

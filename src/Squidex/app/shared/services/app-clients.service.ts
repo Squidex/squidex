@@ -11,15 +11,14 @@ import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, DateTime } from 'framework';
+import { ApiUrlConfig } from 'framework';
 import { AuthService } from './auth.service';
 
 export class AppClientDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly secret: string,
-        public readonly expiresUtc: DateTime
+        public readonly secret: string
     ) {
     }
 }
@@ -67,8 +66,7 @@ export class AppClientsService {
                         return new AppClientDto(
                             item.id,
                             item.name,
-                            item.secret,
-                            DateTime.parseISO_UTC(item.expiresUtc));
+                            item.secret);
                     });
                 })
                 .catchError('Failed to load clients. Please reload.');
@@ -83,8 +81,7 @@ export class AppClientsService {
                     return new AppClientDto(
                         response.id,
                         response.name,
-                        response.secret,
-                        DateTime.parseISO_UTC(response.expiresUtc));
+                        response.secret);
                 })
                 .catchError('Failed to add client. Please reload.');
     }

@@ -5,6 +5,10 @@
     padding: 0;
 }
 
+.nav-item {
+    line-height: 2rem;
+}
+
 .dropdown {
     &-menu {
         @include absolute(2.6rem, 0, auto, auto);

@@ -31,7 +31,6 @@ namespace Squidex.Write.Apps
         private readonly Mock<IUserRepository> userRepository = new Mock<IUserRepository>();
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
-        private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
@@ -151,15 +150,14 @@ namespace Squidex.Write.Apps
 
             keyGenerator.VerifyAll();
 
-            context.Result<AppClient>().ShouldBeEquivalentTo(
-                new AppClient(clientName, clientSecret, timestamp.AddYears(1)));
+            context.Result<AppClient>().ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
         }
 
         [Fact]
         public async Task RenameClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret, expiresUtc);
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
 
             var context = CreateContextForCommand(new RenameClient { Id = clientName, Name = "New Name" });
 
@@ -173,7 +171,7 @@ namespace Squidex.Write.Apps
         public async Task RevokeClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret, expiresUtc);
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
 
             var context = CreateContextForCommand(new RevokeClient { Id = clientName });
 

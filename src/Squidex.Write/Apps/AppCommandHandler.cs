@@ -80,7 +80,7 @@ namespace Squidex.Write.Apps
         {
             return handler.UpdateAsync<AppDomainObject>(command, x =>
             {
-                x.AttachClient(command, keyGenerator.GenerateKey(), command.Timestamp.AddYears(1));
+                x.AttachClient(command, keyGenerator.GenerateKey());
 
                 context.Succeed(x.Clients[command.Id]);
             });

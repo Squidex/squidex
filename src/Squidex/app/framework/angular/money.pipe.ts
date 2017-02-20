@@ -33,5 +33,3 @@ export class MoneyPipe {
         return result;
     }
 }
-
-

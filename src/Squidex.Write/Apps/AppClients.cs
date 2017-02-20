@@ -23,11 +23,11 @@ namespace Squidex.Write.Apps
             get { return clients; }
         }
 
-        public void Add(string id, string secret, DateTime expires)
+        public void Add(string id, string secret)
         {
             ThrowIfFound(id, () => "Cannot rename client");
 
-            clients[id] = new AppClient(id, secret, expires);
+            clients[id] = new AppClient(id, secret);
         }
 
         public void Rename(string clientId, string name)

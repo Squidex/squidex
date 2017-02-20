@@ -62,7 +62,7 @@ namespace Squidex.Write.Apps
 
         protected void On(AppClientAttached @event)
         {
-            clients.Add(@event.Id, @event.Secret, @event.ExpiresUtc);
+            clients.Add(@event.Id, @event.Secret);
         }
 
         protected void On(AppClientRenamed @event)
@@ -134,13 +134,13 @@ namespace Squidex.Write.Apps
             return this;
         }
 
-        public AppDomainObject AttachClient(AttachClient command, string secret, DateTime expiresUtc)
+        public AppDomainObject AttachClient(AttachClient command, string secret)
         {
             Guard.Valid(command, nameof(command), () => "Cannot attach client");
 
             ThrowIfNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { Secret = secret, ExpiresUtc = expiresUtc }));
+            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { Secret = secret }));
 
             return this;
         }

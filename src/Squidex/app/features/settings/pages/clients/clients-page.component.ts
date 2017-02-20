@@ -122,5 +122,5 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 }
 
 function rename(client: AppClientDto, name: string): AppClientDto {
-    return new AppClientDto(client.id, name, client.secret, client.expiresUtc);
+    return new AppClientDto(client.id, name, client.secret);
 };

@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Events.Apps
@@ -17,7 +16,5 @@ namespace Squidex.Events.Apps
         public string Id { get; set; }
 
         public string Secret { get; set; }
-
-        public DateTime ExpiresUtc { get; set; }
     }
 }

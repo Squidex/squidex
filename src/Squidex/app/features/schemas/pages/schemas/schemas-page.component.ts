@@ -133,4 +133,3 @@ function updateSchema(schema: SchemaDto, authService: AuthService, message: Sche
         schema.created, DateTime.now());
 }
 
-

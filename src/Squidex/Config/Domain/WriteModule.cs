@@ -45,21 +45,17 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-
             builder.RegisterType<EnrichWithAggregateIdProcessor>()
                 .As<IEventProcessor>()
                 .SingleInstance();
-
 
             builder.RegisterType<ClientKeyGenerator>()
                 .AsSelf()
                 .SingleInstance();
 
-
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();
-
 
             builder.RegisterType<AppCommandHandler>()
                 .As<ICommandHandler>()
@@ -72,7 +68,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<SchemaCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
-
 
             builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, 0)))
                 .AsSelf()

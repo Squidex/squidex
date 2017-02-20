@@ -147,7 +147,6 @@ describe('SchemasService', () => {
         authService.verifyAll();
     });
 
-
     it('should make post request to create schema', () => {
         const dto = new CreateSchemaDto('name');
 

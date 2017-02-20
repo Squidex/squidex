@@ -25,5 +25,3 @@ namespace Squidex.Infrastructure.CQRS
         ICollection<Envelope<IEvent>> GetUncomittedEvents();
     }
 }
-
-

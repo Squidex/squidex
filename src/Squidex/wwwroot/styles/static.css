@@ -8,12 +8,18 @@
     line-height: 1.5;
 }
 
-.splash-h1, .splash-text {
+img {
+    vertical-align: middle;
+}
+
+.splash-h1,
+.splash-text {
     text-align: center;
 }
 
-img {
-    vertical-align: middle;
+.splash-text a, 
+.splash-text a:visited {
+    color: #146feb;
 }
 
 .redirect-button {

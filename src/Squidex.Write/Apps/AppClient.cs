@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Write.Apps
@@ -16,7 +15,6 @@ namespace Squidex.Write.Apps
         private readonly string name;
         private readonly string id;
         private readonly string secret;
-        private readonly DateTime expiresUtc;
 
         public string Id
         {
@@ -33,12 +31,7 @@ namespace Squidex.Write.Apps
             get { return secret; }
         }
 
-        public DateTime ExpiresUtc
-        {
-            get { return expiresUtc; }
-        }
-
-        public AppClient(string id, string secret, DateTime expiresUtc, string name = null)
+        public AppClient(string id, string secret, string name = null)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(secret, nameof(secret));
@@ -46,12 +39,11 @@ namespace Squidex.Write.Apps
             this.id = id;
             this.name = name;
             this.secret = secret;
-            this.expiresUtc = expiresUtc;
         }
 
         public AppClient Rename(string newName)
         {
-            return new AppClient(Id, Secret, ExpiresUtc, newName);
+            return new AppClient(Id, Secret, newName);
         }
     }
 }

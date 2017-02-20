@@ -16,7 +16,6 @@ import {
     AppClientsService,
     AuthService,
     CreateAppClientDto,
-    DateTime,
     UpdateAppClientDto
 } from './../';
 
@@ -40,13 +39,11 @@ describe('AppClientsService', () => {
                         body: [{
                             id: 'client1',
                             name: 'Client 1',
-                            secret: 'secret1',
-                            expiresUtc: '2016-12-12T10:10'
+                            secret: 'secret1'
                         }, {
                             id: 'client2',
                             name: 'Client 2',
-                            secret: 'secret2',
-                            expiresUtc: '2016-11-11T10:10'
+                            secret: 'secret2'
                         }]
                     })
                 )
@@ -61,8 +58,8 @@ describe('AppClientsService', () => {
 
         expect(clients).toEqual(
             [
-                new AppClientDto('client1', 'Client 1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')),
-                new AppClientDto('client2', 'Client 2', 'secret2', DateTime.parseISO_UTC('2016-11-11T10:10'))
+                new AppClientDto('client1', 'Client 1', 'secret1'),
+                new AppClientDto('client2', 'Client 2', 'secret2')
             ]);
 
         authService.verifyAll();
@@ -78,8 +75,7 @@ describe('AppClientsService', () => {
                         body: {
                             id: 'client1',
                             name: 'Client 1',
-                            secret: 'secret1',
-                            expiresUtc: '2016-12-12T10:10'
+                            secret: 'secret1'
                         }
                     })
                 )
@@ -93,7 +89,7 @@ describe('AppClientsService', () => {
         });
 
         expect(client).toEqual(
-            new AppClientDto('client1', 'Client 1', 'secret1', DateTime.parseISO_UTC('2016-12-12T10:10')));
+            new AppClientDto('client1', 'Client 1', 'secret1'));
 
         authService.verifyAll();
     });
@@ -145,7 +141,7 @@ describe('AppClientsService', () => {
 
         let accessTokenDto: AccessTokenDto | null = null;
 
-        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', DateTime.now())).subscribe(result => {
+        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret')).subscribe(result => {
             accessTokenDto = result;
         });
 

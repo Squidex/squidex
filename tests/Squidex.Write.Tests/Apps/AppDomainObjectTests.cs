@@ -23,7 +23,6 @@ namespace Squidex.Write.Apps
     public class AppDomainObjectTests : HandlerTestBase<AppDomainObject>
     {
         private readonly AppDomainObject sut;
-        private readonly DateTime expiresUtc = DateTime.UtcNow.AddYears(1);
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
@@ -183,7 +182,7 @@ namespace Squidex.Write.Apps
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret);
             });
         }
 
@@ -194,12 +193,12 @@ namespace Squidex.Write.Apps
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AttachClient(CreateCommand(new AttachClient()), clientSecret, expiresUtc);
+                sut.AttachClient(CreateCommand(new AttachClient()), clientSecret);
             });
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AttachClient(CreateCommand(new AttachClient { Id = string.Empty }), clientSecret, expiresUtc);
+                sut.AttachClient(CreateCommand(new AttachClient { Id = string.Empty }), clientSecret);
             });
         }
 
@@ -208,11 +207,11 @@ namespace Squidex.Write.Apps
         {
             CreateApp();
 
-            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret);
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret);
             });
         }
 
@@ -223,11 +222,11 @@ namespace Squidex.Write.Apps
 
             CreateApp();
 
-            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId, Timestamp = now }), clientSecret, expiresUtc);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId, Timestamp = now }), clientSecret);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppClientAttached { Id = clientId, Secret = clientSecret, ExpiresUtc = expiresUtc })
+                    CreateEvent(new AppClientAttached { Id = clientId, Secret = clientSecret })
                 );
         }
 
@@ -510,7 +509,7 @@ namespace Squidex.Write.Apps
 
         private void CreateClient()
         {
-            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret, expiresUtc);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret);
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }
