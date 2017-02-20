@@ -50,9 +50,7 @@ namespace Squidex.Write.Apps
 
         private void ThrowIfFound(string contributorId, PermissionLevel permission, Func<string> message)
         {
-            PermissionLevel currentPermission;
-
-            if (contributors.TryGetValue(contributorId, out currentPermission) && currentPermission == permission)
+            if (contributors.TryGetValue(contributorId, out PermissionLevel currentPermission) && currentPermission == permission)
             {
                 var error = new ValidationError("Contributor is already part of the app with same permissions", "ContributorId");
 

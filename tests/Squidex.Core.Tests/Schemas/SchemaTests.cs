@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -20,6 +21,11 @@ namespace Squidex.Core.Schemas
 
         private sealed class InvalidProperties : FieldProperties
         {
+            public override JToken GetDefaultValue()
+            {
+                return null;
+            }
+
             protected override IEnumerable<ValidationError> ValidateCore()
             {
                 yield break;
@@ -247,26 +253,24 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_build_schema()
         {
-            var schema = 
-                Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new StringField(1, "firstName", 
-                        new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new [] { "1", "2" }.ToImmutableList() }))
-                    .AddOrUpdateField(new StringField(2, "lastName",  
-                        new StringFieldProperties { Hints = "Last Name" }))
-                    .AddOrUpdateField(new BooleanField(3, "admin", 
-                        new BooleanFieldProperties()))
-                    .AddOrUpdateField(new NumberField(4, "age",
-                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
-
             var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
 
-            var json = schema.BuildSchema(languages, (n, s) => s).ToJson();
+            var json = BuildMixedSchema().BuildSchema(languages, (n, s) => s).ToJson();
 
             Assert.NotNull(json);
         }
 
         [Fact]
         public void Should_build_edm_model()
+        {
+            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
+
+            var edmModel = BuildMixedSchema().BuildEdmType(languages, x => x);
+
+            Assert.NotNull(edmModel);
+        }
+
+        private Schema BuildMixedSchema()
         {
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
@@ -276,14 +280,12 @@ namespace Squidex.Core.Schemas
                         new StringFieldProperties { Hints = "Last Name" }))
                     .AddOrUpdateField(new BooleanField(3, "admin",
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new NumberField(4, "age",
+                    .AddOrUpdateField(new DateTimeField(4, "birtday",
+                        new DateTimeFieldProperties()))
+                    .AddOrUpdateField(new NumberField(5, "age",
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
 
-            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
-
-            var edmModel = schema.BuildEdmType(languages, x => x);
-
-            Assert.NotNull(edmModel);
+            return schema;
         }
 
         private NumberField AddField()

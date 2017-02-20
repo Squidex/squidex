@@ -162,9 +162,7 @@ namespace Squidex.Core.Schemas
         {
             Guard.NotNull(updater, nameof(updater));
 
-            Field field;
-
-            if (!fieldsById.TryGetValue(fieldId, out field))
+            if (!fieldsById.TryGetValue(fieldId, out Field field))
             {
                 throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
             }
@@ -211,9 +209,7 @@ namespace Squidex.Core.Schemas
 
             foreach (var fieldData in data)
             {
-                Field field;
-
-                if (!fieldsByName.TryGetValue(fieldData.Key, out field))
+                if (!fieldsByName.TryGetValue(fieldData.Key, out Field field))
                 {
                     errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
                 }
@@ -225,9 +221,7 @@ namespace Squidex.Core.Schemas
                     {
                         foreach (var languageValue in fieldData.Value)
                         {
-                            Language language;
-
-                            if (!Language.TryGetLanguage(languageValue.Key, out language))
+                            if (!Language.TryGetLanguage(languageValue.Key, out Language language))
                             {
                                 fieldErrors.Add($"{field.Name} has an invalid language '{languageValue.Key}'");
                             }
@@ -248,9 +242,7 @@ namespace Squidex.Core.Schemas
                             fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
                         }
 
-                        JToken value;
-
-                        if (fieldData.Value.TryGetValue(Language.Invariant.Iso2Code, out value))
+                        if (fieldData.Value.TryGetValue(Language.Invariant.Iso2Code, out JToken value))
                         {
                             await field.ValidateAsync(value, fieldErrors);
                         }
@@ -281,16 +273,13 @@ namespace Squidex.Core.Schemas
             foreach (var field in fieldsByName.Values)
             {
                 var fieldErrors = new List<string>();
+                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
 
-                var fieldData = data.GetOrDefault(field.Name) ?? new ContentFieldData();
-                
                 if (field.RawProperties.IsLocalizable)
                 {
                     foreach (var valueLanguage in fieldData.Keys)
                     {
-                        Language language;
-
-                        if (!Language.TryGetLanguage(valueLanguage, out language))
+                        if (!Language.TryGetLanguage(valueLanguage, out Language language))
                         {
                             fieldErrors.Add($"{field.Name} has an invalid language '{valueLanguage}'");
                         }
@@ -322,6 +311,34 @@ namespace Squidex.Core.Schemas
                 foreach (var error in fieldErrors)
                 {
                     errors.Add(new ValidationError(error, field.Name));
+                }
+            }
+        }
+
+        public void Enrich(ContentData data, HashSet<Language> languages)
+        {
+            Guard.NotNull(data, nameof(data));
+            Guard.NotEmpty(languages, nameof(languages));
+
+            foreach (var field in fieldsByName.Values)
+            {
+                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
+
+                if (field.RawProperties.IsLocalizable)
+                {
+                    foreach (var language in languages)
+                    {
+                        field.Enrich(fieldData, language);
+                    }
+                }
+                else
+                {
+                    field.Enrich(fieldData, Language.Invariant);
+                }
+
+                if (fieldData.Count > 0)
+                {
+                    data.AddField(field.Name, fieldData);
                 }
             }
         }

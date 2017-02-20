@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
@@ -61,6 +62,8 @@ namespace Squidex.Core.Schemas
                 placeholder = value;
             }
         }
+
+        public abstract JToken GetDefaultValue();
 
         public void Validate(IList<ValidationError> errors)
         {

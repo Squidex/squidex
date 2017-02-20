@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 using System.Collections.Immutable;
+using Newtonsoft.Json.Linq;
 
 // ReSharper disable ObjectCreationAsStatement
 
@@ -21,6 +22,7 @@ namespace Squidex.Core.Schemas
         private int? maxLength;
         private string pattern;
         private string patternMessage;
+        private string defaultValue;
         private ImmutableList<string> allowedValues;
         private StringFieldEditor editor;
 
@@ -43,6 +45,17 @@ namespace Squidex.Core.Schemas
                 ThrowIfFrozen();
 
                 maxLength = value;
+            }
+        }
+
+        public string DefaultValue
+        {
+            get { return defaultValue; }
+            set
+            {
+                ThrowIfFrozen();
+
+                defaultValue = value;
             }
         }
 
@@ -88,6 +101,11 @@ namespace Squidex.Core.Schemas
 
                 editor = value;
             }
+        }
+
+        public override JToken GetDefaultValue()
+        {
+            return DefaultValue;
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

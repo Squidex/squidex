@@ -103,9 +103,7 @@ namespace Squidex.Infrastructure
                 input = match.Groups[0].Value;
             }
 
-            Language result;
-
-            if (TryGetLanguage(input.ToLowerInvariant(), out result))
+            if (TryGetLanguage(input.ToLowerInvariant(), out Language result))
             {
                 return result;
             }

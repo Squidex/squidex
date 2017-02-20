@@ -240,9 +240,7 @@ namespace Squidex.Write.Schemas
         {
             SimpleMapper.Map(fieldCommand, @event);
 
-            Field field;
-
-            if (schema.Fields.TryGetValue(fieldCommand.FieldId, out field))
+            if (schema.Fields.TryGetValue(fieldCommand.FieldId, out Field field))
             {
                 @event.FieldId = new NamedId<long>(field.Id, field.Name);
             }

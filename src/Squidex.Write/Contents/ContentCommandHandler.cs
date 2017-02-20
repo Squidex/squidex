@@ -96,13 +96,18 @@ namespace Squidex.Write.Contents
 
             await Task.WhenAll(taskForApp, taskForSchema);
 
-            var errors = new List<ValidationError>();
+            var languages = new HashSet<Language>(taskForApp.Result.Languages);
 
-            await taskForSchema.Result.Schema.ValidateAsync(command.Data, errors, new HashSet<Language>(taskForApp.Result.Languages));
+            var schemaObject = taskForSchema.Result.Schema;
+            var schemaErrors = new List<ValidationError>();
 
-            if (errors.Count > 0)
+            await schemaObject.ValidateAsync(command.Data, schemaErrors, languages);
+
+            schemaObject.Enrich(command.Data, languages);
+
+            if (schemaErrors.Count > 0)
             {
-                throw new ValidationException(message(), errors);
+                throw new ValidationException(message(), schemaErrors);
             }
         }
     }

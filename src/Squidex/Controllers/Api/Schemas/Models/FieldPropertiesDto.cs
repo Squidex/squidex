@@ -16,6 +16,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
     [KnownType(typeof(BooleanFieldPropertiesDto))]
+    [KnownType(typeof(DateTimeFieldPropertiesDto))]
     [KnownType(typeof(NumberFieldPropertiesDto))]
     [KnownType(typeof(StringFieldPropertiesDto))]
     public abstract class FieldPropertiesDto

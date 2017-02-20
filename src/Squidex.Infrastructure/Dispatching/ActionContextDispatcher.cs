@@ -30,9 +30,7 @@ namespace Squidex.Infrastructure.Dispatching
 
         public static bool Dispatch(TTarget target, TIn input, TContext context)
         {
-            Action<TTarget, object, TContext> handler;
-
-            if (!Handlers.TryGetValue(input.GetType(), out handler))
+            if (!Handlers.TryGetValue(input.GetType(), out Action<TTarget, object, TContext> handler))
             {
                 return false;
             }

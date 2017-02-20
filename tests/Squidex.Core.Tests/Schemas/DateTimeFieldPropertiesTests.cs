@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  NumberFieldPropertiesTests.cs
+//  DateTimeFieldPropertiesTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
@@ -17,18 +16,18 @@ using Xunit;
 
 namespace Squidex.Core.Schemas
 {
-    public class NumberFieldPropertiesTests
+    public class DateTimeFieldPropertiesTests
     {
         private readonly List<ValidationError> errors = new List<ValidationError>();
 
         [Fact]
         public void Should_not_add_error_if_sut_is_valid()
         {
-            var sut = new NumberFieldProperties
+            var sut = new DateTimeFieldProperties
             {
-                MinValue = 0,
-                MaxValue = 100,
-                DefaultValue = 5
+                MinValue = FutureDays(10),
+                MaxValue = FutureDays(20),
+                DefaultValue = FutureDays(15)
             };
 
             sut.Validate(errors);
@@ -39,7 +38,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_add_error_if_default_value_is_less_than_min()
         {
-            var sut = new NumberFieldProperties { MinValue = 10, DefaultValue = 5 };
+            var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), DefaultValue = FutureDays(5) };
 
             sut.Validate(errors);
 
@@ -53,7 +52,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_add_error_if_default_value_is_greater_than_min()
         {
-            var sut = new NumberFieldProperties { MaxValue = 0, DefaultValue = 5 };
+            var sut = new DateTimeFieldProperties { MaxValue = FutureDays(10), DefaultValue = FutureDays(15) };
 
             sut.Validate(errors);
 
@@ -67,7 +66,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_add_error_if_min_greater_than_max()
         {
-            var sut = new NumberFieldProperties { MinValue = 10, MaxValue = 5 };
+            var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), MaxValue = FutureDays(5) };
 
             sut.Validate(errors);
 
@@ -79,51 +78,9 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_add_error_if_allowed_values_and_max_value_is_specified()
-        {
-            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
-
-            sut.Validate(errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_allowed_values_and_min_value_is_specified()
-        {
-            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
-
-            sut.Validate(errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_radio_button_has_no_allowed_values()
-        {
-            var sut = new NumberFieldProperties { Editor = NumberFieldEditor.Radio };
-
-            sut.Validate(errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Radio buttons or dropdown list need allowed values", "AllowedValues")
-                });
-        }
-
-        [Fact]
         public void Should_add_error_if_editor_is_not_valid()
         {
-            var sut = new NumberFieldProperties { Editor = (NumberFieldEditor)123 };
+            var sut = new DateTimeFieldProperties { Editor = (DateTimeFieldEditor)123 };
 
             sut.Validate(errors);
 
@@ -137,7 +94,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_set_or_freeze_sut()
         {
-            var sut = new NumberFieldProperties();
+            var sut = new DateTimeFieldProperties();
 
             foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
@@ -174,6 +131,11 @@ namespace Squidex.Core.Schemas
                     }
                 });
             }
+        }
+
+        private static DateTimeOffset FutureDays(int days)
+        {
+            return DateTimeOffset.UtcNow.AddDays(days);
         }
     }
 }

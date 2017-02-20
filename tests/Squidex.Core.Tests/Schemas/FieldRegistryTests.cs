@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -19,6 +20,11 @@ namespace Squidex.Core.Schemas
 
         private sealed class InvalidProperties : FieldProperties
         {
+            public override JToken GetDefaultValue()
+            {
+                return null;
+            }
+
             protected override IEnumerable<ValidationError> ValidateCore()
             {
                 yield break;

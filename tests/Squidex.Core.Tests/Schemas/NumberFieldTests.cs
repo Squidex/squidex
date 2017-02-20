@@ -22,15 +22,15 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
 
-            Assert.Equal("name", sut.Name);
+            Assert.Equal("my-number", sut.Name);
         }
 
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -38,7 +38,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_valid()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name" });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number" });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -48,56 +48,56 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_required()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name", IsRequired = true });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number", IsRequired = true });
             
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new [] { "Name is required" });
+                new [] { "My-Number is required" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_number_is_less_than_min()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name", MinValue = 10 });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number", MinValue = 10 });
 
             await sut.ValidateAsync(CreateValue(5), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name must be greater than '10'" });
+                new[] { "My-Number must be greater than '10'" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_number_is_greater_than_max()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name", MaxValue = 10 });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number", MaxValue = 10 });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name must be less than '10'" });
+                new[] { "My-Number must be less than '10'" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_number_is_not_allowed()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name", AllowedValues = ImmutableList.Create(10d) });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number", AllowedValues = ImmutableList.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name is not an allowed value" });
+                new[] { "My-Number is not an allowed value" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new NumberField(1, "name", new NumberFieldProperties { Label = "Name" });
+            var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number" });
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name is not a valid value" });
+                new[] { "My-Number is not a valid value" });
         }
 
         private static JValue CreateValue(object v)

@@ -64,7 +64,7 @@ namespace Squidex.Read.Schemas
             repository.Verify(x => x.FindSchemaAsync(schemaId.Id), Times.Never());
         }
 
-        [Theory]
+        [Fact]
         public async Task Should_clear_cache_for_id_after_update_event()
         {
             var schemas = ProviderResults(schemaV1, schemaV2);
@@ -80,7 +80,7 @@ namespace Squidex.Read.Schemas
             repository.Verify(x => x.FindSchemaAsync(schemaId.Id), Times.Exactly(2));
         }
 
-        [Theory]
+        [Fact]
         public async Task Should_clear_cache_for_name_after_update_event()
         {
             var schemas = ProviderResults(schemaV1, schemaV2);

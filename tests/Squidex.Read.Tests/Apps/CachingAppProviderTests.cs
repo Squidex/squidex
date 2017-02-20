@@ -63,7 +63,7 @@ namespace Squidex.Read.Apps
             repository.Verify(x => x.FindAppAsync(appId.Id), Times.Never());
         }
 
-        [Theory]
+        [Fact]
         public async Task Should_clear_cache_for_id_after_update_event()
         {
             var apps = ProviderResults(appV1, appV2);
@@ -79,7 +79,7 @@ namespace Squidex.Read.Apps
             repository.Verify(x => x.FindAppAsync(appId.Id), Times.Exactly(2));
         }
         
-        [Theory]
+        [Fact]
         public async Task Should_clear_cache_for_name_after_update_event()
         {
             var apps = ProviderResults(appV1, appV2);

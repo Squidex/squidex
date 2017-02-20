@@ -136,7 +136,6 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             try
             {
-
                 logger.LogDebug("[{0}]: Reset started", eventConsumer);
 
                 await eventConsumer.ClearAsync();

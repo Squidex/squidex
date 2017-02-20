@@ -19,7 +19,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\Squidex.Infrastructure.Tests" ^
+-targetargs:"test %~dp0\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" ^
 -filter:"+[Squidex*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Infrastructure.xml" ^
@@ -28,7 +28,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\Squidex.Core.Tests" ^
+-targetargs:"test %~dp0\Squidex.Core.Tests\Squidex.Core.Tests.csproj" ^
 -filter:"+[Squidex*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Core.xml" ^
@@ -37,7 +37,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\Squidex.Write.Tests" ^
+-targetargs:"test %~dp0\Squidex.Write.Tests\Squidex.Write.Tests.csproj" ^
 -filter:"+[Squidex*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Write.xml" ^
@@ -46,7 +46,7 @@ exit /b %errorlevel%
 "%UserProfile%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" ^
 -register:user ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test %~dp0\Squidex.Read.Tests" ^
+-targetargs:"test %~dp0\Squidex.Read.Tests\Squidex.Read.Tests.csproj" ^
 -filter:"+[Squidex*]*" ^
 -skipautoprops ^
 -output:"%~dp0\GeneratedReports\Read.xml" ^

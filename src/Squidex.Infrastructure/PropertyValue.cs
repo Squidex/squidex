@@ -58,9 +58,7 @@ namespace Squidex.Infrastructure
         {
             result = null;
 
-            Func<PropertyValue, CultureInfo, object> parser;
-
-            if (!Parsers.TryGetValue(binder.Type, out parser))
+            if (!Parsers.TryGetValue(binder.Type, out Func<PropertyValue, CultureInfo, object> parser))
             {
                 return false;
             }
@@ -147,16 +145,12 @@ namespace Squidex.Infrastructure
 
         private T? ToNullableOrParseValue<T>(IFormatProvider culture, Func<string, T> parser) where T : struct
         {
-            T result;
-
-            return TryParse(culture, parser, out result) ? result : (T?)null;
+            return TryParse(culture, parser, out T result) ? result : (T?)null;
         }
 
         private T ToOrParseValue<T>(IFormatProvider culture, Func<string, T> parser)
         {
-            T result;
-
-            return TryParse(culture, parser, out result) ? result : default(T);
+            return TryParse(culture, parser, out T result) ? result : default(T);
         }
 
         private bool TryParse<T>(IFormatProvider culture, Func<string, T> parser, out T result)

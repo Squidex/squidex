@@ -1,5 +1,5 @@
-// ==========================================================================
-//  SchemaProperties.cs
+﻿// ==========================================================================
+//  DateTimeFieldEditor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,7 +8,11 @@
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class SchemaProperties : NamedElementProperties
+    public enum DateTimeFieldEditor
     {
+        Date,
+        DateWithTimezone,
+        DateTime,
+        DateTimeWithTimezone
     }
 }

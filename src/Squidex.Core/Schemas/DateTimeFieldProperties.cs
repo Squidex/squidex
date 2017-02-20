@@ -1,28 +1,27 @@
 ﻿// ==========================================================================
-//  NumberFieldProperties.cs
+//  DateTimeFieldProperties.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    [TypeName("NumberField")]
-    public sealed class NumberFieldProperties : FieldProperties
+    [TypeName("DateTime")]
+    public sealed class DateTimeFieldProperties : FieldProperties
     {
-        private double? maxValue;
-        private double? minValue;
-        private double? defaultValue;
-        private ImmutableList<double> allowedValues;
-        private NumberFieldEditor editor;
+        private DateTimeFieldEditor editor;
+        private DateTimeOffset? maxValue;
+        private DateTimeOffset? minValue;
+        private DateTimeOffset? defaultValue;
 
-        public double? MaxValue
+        public DateTimeOffset? MaxValue
         {
             get { return maxValue; }
             set
@@ -33,7 +32,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public double? MinValue
+        public DateTimeOffset? MinValue
         {
             get { return minValue; }
             set
@@ -44,7 +43,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public double? DefaultValue
+        public DateTimeOffset? DefaultValue
         {
             get { return defaultValue; }
             set
@@ -55,18 +54,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public ImmutableList<double> AllowedValues
-        {
-            get { return allowedValues; }
-            set
-            {
-                ThrowIfFrozen();
-
-                allowedValues = value;
-            }
-        }
-
-        public NumberFieldEditor Editor
+        public DateTimeFieldEditor Editor
         {
             get { return editor; }
             set
@@ -89,11 +77,6 @@ namespace Squidex.Core.Schemas
                 yield return new ValidationError("Editor ist not a valid value", nameof(Editor));
             }
 
-            if ((Editor == NumberFieldEditor.Radio || Editor == NumberFieldEditor.Dropdown) && (AllowedValues == null || AllowedValues.Count == 0))
-            {
-                yield return new ValidationError("Radio buttons or dropdown list need allowed values", nameof(AllowedValues));
-            }
-
             if (MaxValue.HasValue && MinValue.HasValue && MinValue.Value >= MaxValue.Value)
             {
                 yield return new ValidationError("Max value must be greater than min value", nameof(MinValue), nameof(MaxValue));
@@ -107,14 +90,6 @@ namespace Squidex.Core.Schemas
             if (DefaultValue.HasValue && MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
             {
                 yield return new ValidationError("Default value must be less than max value", nameof(DefaultValue));
-            }
-
-            if (AllowedValues != null && AllowedValues.Count > 0 && (MinValue.HasValue || MaxValue.HasValue))
-            {
-                yield return new ValidationError("Either allowed values or min and max value can be defined",
-                    nameof(AllowedValues),
-                    nameof(MinValue),
-                    nameof(MaxValue));
             }
         }
     }

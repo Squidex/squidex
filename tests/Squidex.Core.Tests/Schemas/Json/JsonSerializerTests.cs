@@ -33,12 +33,14 @@ namespace Squidex.Core.Schemas.Json
         {
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new StringField(1, "field1", 
-                        new StringFieldProperties { Label = "Field1", Pattern = "[0-9]{3}" })).DisableField(1)
-                    .AddOrUpdateField(new NumberField(2, "field2", 
-                        new NumberFieldProperties { Hints = "Hints" }))
-                    .AddOrUpdateField(new BooleanField(3, "field3", 
+                    .AddOrUpdateField(new StringField(1, "my-string", 
+                        new StringFieldProperties { Label = "My-String", Pattern = "[0-9]{3}" })).DisableField(1)
+                    .AddOrUpdateField(new NumberField(2, "my-number", 
+                        new NumberFieldProperties { Hints = "My-Number" }))
+                    .AddOrUpdateField(new BooleanField(3, "my-boolean", 
                         new BooleanFieldProperties())).HideField(2)
+                    .AddOrUpdateField(new DateTimeField(4, "my-datetime",
+                        new DateTimeFieldProperties())).HideField(2)
                     .Publish();
 
             var deserialized = sut.Deserialize(sut.Serialize(schema));

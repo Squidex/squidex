@@ -64,6 +64,9 @@ namespace Squidex.Core.Schemas
 
             Add<StringFieldProperties>(
                 (id, name, p) => new StringField(id, name, (StringFieldProperties)p));
+
+            Add<DateTimeFieldProperties>(
+                (id, name, p) => new DateTimeField(id, name, (DateTimeFieldProperties)p));
         }
 
         public void Add<TFieldProperties>(FactoryFunction fieldFactory)

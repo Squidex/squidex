@@ -21,9 +21,9 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
-            Assert.Equal("name", sut.Name);
+            Assert.Equal("my-bolean", sut.Name);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_valid_null()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_valid()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
 
             await sut.ValidateAsync(CreateValue(true), errors);
 
@@ -57,23 +57,23 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_boolean_is_required()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name", IsRequired = true });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean", IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name is required" });
+                new[] { "My-Boolean is required" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties { Label = "Name" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Name is not a valid value" });
+                new[] { "My-Boolean is not a valid value" });
         }
 
         private static JValue CreateValue(object v)

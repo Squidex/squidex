@@ -64,9 +64,7 @@ namespace Squidex.Infrastructure.Redis
                     return;
                 }
 
-                Guid sender;
-
-                if (!Guid.TryParse(parts[0], out sender))
+                if (!Guid.TryParse(parts[0], out Guid sender))
                 {
                     return;
                 }

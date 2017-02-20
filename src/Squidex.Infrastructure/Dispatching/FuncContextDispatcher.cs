@@ -31,9 +31,7 @@ namespace Squidex.Infrastructure.Dispatching
 
         public static TOut Dispatch(TTarget target, TIn item, TContext context)
         {
-            Func<TTarget, object, TContext, TOut > handler;
-
-            return Handlers.TryGetValue(item.GetType(), out handler) ? handler(target, item, context) : default(TOut);
+            return Handlers.TryGetValue(item.GetType(), out Func<TTarget, object, TContext, TOut> handler) ? handler(target, item, context) : default(TOut);
         }
     }
 }

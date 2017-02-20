@@ -3,6 +3,10 @@
     <TargetFramework>netstandard1.6</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Core\Squidex.Core.csproj" />
     <ProjectReference Include="..\Squidex.Events\Squidex.Events.csproj" />

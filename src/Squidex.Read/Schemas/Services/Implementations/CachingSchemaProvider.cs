@@ -36,9 +36,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
         {
             var cacheKey = BuildIdCacheKey(id);
 
-            ISchemaEntityWithSchema result;
-
-            if (!Cache.TryGetValue(cacheKey, out result))
+            if (!Cache.TryGetValue(cacheKey, out ISchemaEntityWithSchema result))
             {
                 result = await repository.FindSchemaAsync(id);
 
@@ -59,9 +57,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
             var cacheKey = BuildNameCacheKey(appId, name);
 
-            ISchemaEntityWithSchema result;
-
-            if (!Cache.TryGetValue(cacheKey, out result))
+            if (!Cache.TryGetValue(cacheKey, out ISchemaEntityWithSchema result))
             {
                 result = await repository.FindSchemaAsync(appId, name);
 

@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models

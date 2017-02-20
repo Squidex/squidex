@@ -13,6 +13,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
@@ -64,6 +65,19 @@ namespace Squidex.Core.Schemas
         }
 
         public abstract Field Update(FieldProperties newProperties);
+
+        public void Enrich(ContentFieldData fieldData, Language language)
+        {
+            Guard.NotNull(fieldData, nameof(fieldData));
+            Guard.NotNull(language, nameof(language));
+
+            var defaultValue = RawProperties.GetDefaultValue();
+
+            if (!RawProperties.IsRequired && defaultValue != null && fieldData.GetOrDefault(language.Iso2Code) == null)
+            {
+                fieldData.AddValue(language.Iso2Code, defaultValue);
+            }
+        }
 
         public async Task ValidateAsync(JToken value, ICollection<string> errors, Language language = null)
         {

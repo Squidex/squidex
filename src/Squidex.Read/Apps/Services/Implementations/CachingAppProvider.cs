@@ -35,9 +35,7 @@ namespace Squidex.Read.Apps.Services.Implementations
         {
             var cacheKey = BuildIdCacheKey(appId);
 
-            IAppEntity result;
-            
-            if (!Cache.TryGetValue(cacheKey, out result))
+            if (!Cache.TryGetValue(cacheKey, out IAppEntity result))
             {
                 result = await repository.FindAppAsync(appId);
 
@@ -58,9 +56,7 @@ namespace Squidex.Read.Apps.Services.Implementations
 
             var cacheKey = BuildNameCacheKey(name);
 
-            IAppEntity result;
-
-            if (!Cache.TryGetValue(cacheKey, out result))
+            if (!Cache.TryGetValue(cacheKey, out IAppEntity result))
             {
                 result = await repository.FindAppAsync(name);
 

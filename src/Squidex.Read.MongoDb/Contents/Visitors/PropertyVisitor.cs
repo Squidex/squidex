@@ -29,9 +29,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             if (propertyNames.Length == 3)
             {
-                Field field;
-
-                if (!schema.FieldsByName.TryGetValue(propertyNames[1], out field))
+                if (!schema.FieldsByName.TryGetValue(propertyNames[1], out Field field))
                 {
                     throw new NotSupportedException();
                 }

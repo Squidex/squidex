@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -282,6 +283,41 @@ namespace Squidex.Core.Schemas
                     new ValidationError("my-field has an unsupported language 'es'", "my-field"),
                     new ValidationError("my-field has an unsupported language 'it'", "my-field")
                 });
+        }
+
+        [Fact]
+        private void Should_enrich_with_default_values()
+        {
+            var schema =
+                Schema.Create("my-schema", new SchemaProperties())
+                    .AddOrUpdateField(
+                        new StringField(1, "my-string", new StringFieldProperties { DefaultValue = "EN-String", IsLocalizable = true }))
+                    .AddOrUpdateField(
+                        new BooleanField(2, "my-boolean", new BooleanFieldProperties { DefaultValue = true }))
+                    .AddOrUpdateField(
+                        new NumberField(3, "my-number", new NumberFieldProperties { DefaultValue = 123 }))
+                    .AddOrUpdateField(
+                        new DateTimeField(4, "my-datetime", new DateTimeFieldProperties { DefaultValue = DateTime.Today }));
+            
+            var data =
+                new ContentData()
+                    .AddField("my-string",
+                        new ContentFieldData()
+                            .AddValue("de", "DE-String"))
+                    .AddField("my-number",
+                        new ContentFieldData()
+                            .AddValue("iv", 456));
+            
+            schema.Enrich(data, languages);
+
+            Assert.Equal(456, (int)data["my-number"]["iv"]);
+
+            Assert.Equal("DE-String", (string)data["my-string"]["de"]);
+            Assert.Equal("EN-String", (string)data["my-string"]["en"]);
+
+            Assert.Equal(DateTime.Today, (DateTime)data["my-datetime"]["iv"]);
+
+            Assert.Equal(true, (bool)data["my-boolean"]["iv"]);
         }
     }
 }

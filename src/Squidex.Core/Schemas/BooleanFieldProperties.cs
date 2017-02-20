@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
@@ -37,6 +38,11 @@ namespace Squidex.Core.Schemas
 
                 editor = value;
             }
+        }
+
+        public override JToken GetDefaultValue()
+        {
+            return DefaultValue;
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

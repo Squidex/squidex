@@ -70,9 +70,7 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                Field field;
-
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field))
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out Field field))
                 {
                     continue;
                 }
@@ -91,11 +89,7 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                long fieldId;
-
-                Field field;
-
-                if (!long.TryParse(fieldValue.Key, out fieldId) || !schema.Fields.TryGetValue(fieldId, out field))
+                if (!long.TryParse(fieldValue.Key, out long fieldId) || !schema.Fields.TryGetValue(fieldId, out Field field))
                 {
                     continue;
                 }
@@ -118,9 +112,7 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                Field field;
-                
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out field) || (excludeHidden && field.IsHidden))
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out Field field) || (excludeHidden && field.IsHidden))
                 {
                     continue;
                 }
@@ -134,9 +126,7 @@ namespace Squidex.Core.Contents
                     {
                         var languageCode = language.Iso2Code;
 
-                        JToken value;
-
-                        if (fieldValues.TryGetValue(languageCode, out value))
+                        if (fieldValues.TryGetValue(languageCode, out JToken value))
                         {
                             fieldResult.Add(languageCode, value);
                         }
@@ -144,9 +134,7 @@ namespace Squidex.Core.Contents
                 }
                 else
                 {
-                    JToken value;
-
-                    if (fieldValues.TryGetValue(invariantCode, out value))
+                    if (fieldValues.TryGetValue(invariantCode, out JToken value))
                     {
                         fieldResult.Add(invariantCode, value);
                     }
@@ -183,9 +171,7 @@ namespace Squidex.Core.Contents
                 {
                     var languageCode = language.Iso2Code;
 
-                    JToken value;
-
-                    if (fieldValues.TryGetValue(languageCode, out value) && value != null)
+                    if (fieldValues.TryGetValue(languageCode, out JToken value) && value != null)
                     {
                         result[fieldValue.Key] = value;
 
