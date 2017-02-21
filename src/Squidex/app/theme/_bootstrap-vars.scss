@@ -5,11 +5,11 @@ $brand-primary: $color-theme-blue;
 $brand-success: $color-theme-green;
 $brand-danger: $color-theme-error;
 
-$btn-secondary-bg: #dce5e8;
-$btn-secondary-border: #dce5e8;
+$btn-secondary-bg: $color-theme-secondary;
+$btn-secondary-border: $color-theme-secondary;
 
-$input-bg-disabled: #eef1f4;
-$input-border-color: #dbe4eb;
+$input-bg-disabled: $color-disabled;
+$input-border-color: $color-input;
 
 $dropdown-border-color: $color-border;
 

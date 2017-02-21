@@ -1,5 +1,5 @@
 <div class="btn-group btn-group-{{size}}" *ngIf="isSmallMode">
-    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == languageSelected" (click)="selectLanguage(language)">
+    <button type="button" class="btn btn-secondary" *ngFor="let language of languages" [attr.title]="language.englishName" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
         <span class="iso-code">{{language.iso2Code}}</span>
     </button>
 </div>
