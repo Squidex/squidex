@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Core.Schemas
@@ -64,7 +65,7 @@ namespace Squidex.Core.Schemas
             await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"My-DateTime must be greater than '{DateTimeOffset.UtcNow.AddDays(10)}'" });
+                new[] { $"My-DateTime must be greater than '{FutureDays(10)}'" });
         }
 
         [Fact]
@@ -89,14 +90,14 @@ namespace Squidex.Core.Schemas
                 new[] { "My-DateTime is not a valid value" });
         }
 
-        private static DateTimeOffset FutureDays(int days)
+        private static Instant FutureDays(int days)
         {
-            return DateTimeOffset.UtcNow.AddDays(days);
+            return SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(days));
         }
 
         private static JValue CreateValue(object v)
         {
-            return new JValue(v);
+            return v is Instant ? new JValue(v.ToString()) : new JValue(v);
         }
     }
 }

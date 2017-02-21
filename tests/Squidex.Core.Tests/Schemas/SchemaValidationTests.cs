@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NodaTime;
+using NodaTime.Text;
 using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 using Xunit;
@@ -288,6 +290,8 @@ namespace Squidex.Core.Schemas
         [Fact]
         private void Should_enrich_with_default_values()
         {
+            var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
+
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
                     .AddOrUpdateField(
@@ -297,7 +301,7 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(
                         new NumberField(3, "my-number", new NumberFieldProperties { DefaultValue = 123 }))
                     .AddOrUpdateField(
-                        new DateTimeField(4, "my-datetime", new DateTimeFieldProperties { DefaultValue = DateTime.Today }));
+                        new DateTimeField(4, "my-datetime", new DateTimeFieldProperties { DefaultValue = now }));
             
             var data =
                 new ContentData()
@@ -315,7 +319,7 @@ namespace Squidex.Core.Schemas
             Assert.Equal("DE-String", (string)data["my-string"]["de"]);
             Assert.Equal("EN-String", (string)data["my-string"]["en"]);
 
-            Assert.Equal(DateTime.Today, (DateTime)data["my-datetime"]["iv"]);
+            Assert.Equal(now, InstantPattern.General.Parse((string)data["my-datetime"]["iv"]).Value);
 
             Assert.Equal(true, (bool)data["my-boolean"]["iv"]);
         }

@@ -11,8 +11,6 @@ namespace Squidex.Core.Schemas
     public enum DateTimeFieldEditor
     {
         Date,
-        DateWithTimezone,
-        DateTime,
-        DateTimeWithTimezone
+        DateTime
     }
 }

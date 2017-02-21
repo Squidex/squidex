@@ -12,8 +12,12 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using NodaTime;
+using NodaTime.Text;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
+
+// ReSharper disable ConvertIfStatementToSwitchStatement
 
 namespace Squidex.Core.Schemas
 {
@@ -34,13 +38,30 @@ namespace Squidex.Core.Schemas
 
             if (Properties.MinValue.HasValue || Properties.MaxValue.HasValue)
             {
-                yield return new RangeValidator<DateTimeOffset>(Properties.MinValue, Properties.MaxValue);
+                yield return new RangeValidator<Instant>(Properties.MinValue, Properties.MaxValue);
             }
         }
 
         protected override object ConvertValue(JToken value)
         {
-            return (DateTimeOffset?)value;
+            if (value.Type == JTokenType.String)
+            {
+                var parseResult = InstantPattern.General.Parse(value.ToString());
+
+                if (!parseResult.Success)
+                {
+                    throw parseResult.Exception;
+                }
+
+                return parseResult.Value;
+            }
+
+            if (value.Type == JTokenType.Null)
+            {
+                return null;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected string.");
         }
 
         protected override void PrepareJsonSchema(JsonProperty jsonProperty)
@@ -51,7 +72,7 @@ namespace Squidex.Core.Schemas
 
         protected override IEdmTypeReference CreateEdmType()
         {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.DateTimeOffset, !Properties.IsRequired);
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Date, !Properties.IsRequired);
         }
     }
 }

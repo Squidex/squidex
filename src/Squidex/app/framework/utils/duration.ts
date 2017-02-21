@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import *as moment from 'moment';
+import * as moment from 'moment';
 
 import { DateTime } from './date-time';
 

@@ -1,0 +1,15 @@
+<div>
+    <div class="form-inline">
+        <div class="form-group date-group">
+            <input type="text" class="form-control" #dateInput [disabled]="isDisabled" readonly />
+        </div>
+        <div class="form-group time-group" *ngIf="showTime">
+            <input type="text" class="form-control" [formControl]="timeControl" (blur)="touched()" />
+        </div>
+        <div class="form-group timezone-group" *ngIf="showTimezone">
+            <select class="form-control" [formControl]="timeZoneControl">
+                <option *ngFor="let timezone of timezones" [ngValue]="timezone.value">{{timezone.label}}</option>
+            </select>
+        </div>
+    </div>
+</div>

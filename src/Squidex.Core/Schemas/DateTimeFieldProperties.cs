@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using NodaTime;
 using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
@@ -17,11 +17,11 @@ namespace Squidex.Core.Schemas
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         private DateTimeFieldEditor editor;
-        private DateTimeOffset? maxValue;
-        private DateTimeOffset? minValue;
-        private DateTimeOffset? defaultValue;
+        private Instant? maxValue;
+        private Instant? minValue;
+        private Instant? defaultValue;
 
-        public DateTimeOffset? MaxValue
+        public Instant? MaxValue
         {
             get { return maxValue; }
             set
@@ -32,7 +32,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public DateTimeOffset? MinValue
+        public Instant? MinValue
         {
             get { return minValue; }
             set
@@ -43,7 +43,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public DateTimeOffset? DefaultValue
+        public Instant? DefaultValue
         {
             get { return defaultValue; }
             set
@@ -67,7 +67,7 @@ namespace Squidex.Core.Schemas
 
         public override JToken GetDefaultValue()
         {
-            return DefaultValue;
+            return DefaultValue != null ? DefaultValue.ToString() : null;
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

@@ -1,0 +1,36 @@
+@import '_mixins';
+@import '_vars';
+
+$form-color: #fff;
+
+.form-control {
+    &[readonly] {
+        background: $form-color;
+    }
+}
+
+.date-group {
+    & {
+        padding-right: .5rem;
+    }
+
+    .form-control {
+        width: 8rem;
+    }
+}
+
+.time-group {
+    & {
+        padding-right: .5rem;
+    }
+
+    .form-control {
+        width: 5rem;
+    }
+}
+
+.timezone-group {
+    .form-control {
+        width: 8.5rem;
+    }
+}

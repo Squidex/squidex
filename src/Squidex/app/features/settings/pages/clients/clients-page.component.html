@@ -13,6 +13,11 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
+            <div><sqx-date-time-editor mode="Date" ngModel="2013-01-01T00:00:00-13:00"></sqx-date-time-editor></div>
+            <div><sqx-date-time-editor mode="DateWithTimezone" ngModel="2013-01-01T00:00:00-13:00"></sqx-date-time-editor></div>
+            <div><sqx-date-time-editor mode="DateTime" ngModel="2013-01-01T00:00:00-13:00"></sqx-date-time-editor></div>
+            <div><sqx-date-time-editor mode="DateTimeWithTimezone" ngModel="2013-01-01T00:00:00-13:00"></sqx-date-time-editor></div>
+
             <div class="table-items-row" *ngIf="appClients && appClients.length === 0">
                 No client created yet.
             </div>

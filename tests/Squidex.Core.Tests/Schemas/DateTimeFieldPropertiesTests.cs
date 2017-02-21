@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
+using NodaTime;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -133,9 +134,9 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private static DateTimeOffset FutureDays(int days)
+        private static Instant FutureDays(int days)
         {
-            return DateTimeOffset.UtcNow.AddDays(days);
+            return SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(days));
         }
     }
 }
