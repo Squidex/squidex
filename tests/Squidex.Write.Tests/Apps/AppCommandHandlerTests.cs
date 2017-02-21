@@ -139,9 +139,7 @@ namespace Squidex.Write.Apps
 
             CreateApp();
 
-            var timestamp = DateTime.Today;
-
-            var context = CreateContextForCommand(new AttachClient { Id = clientName, Timestamp = timestamp });
+            var context = CreateContextForCommand(new AttachClient { Id = clientName });
 
             await TestUpdate(app, async _ =>
             {

@@ -8,23 +8,19 @@
 
 using System;
 using System.Threading.Tasks;
+using NodaTime;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class EnrichWithTimestampHandler : ICommandHandler
     {
-        private readonly Func<DateTime> timestamp;
+        private readonly IClock clock;
 
-        public EnrichWithTimestampHandler()
-            : this(() => DateTime.UtcNow)
+        public EnrichWithTimestampHandler(IClock clock)
         {
-        }
+            Guard.NotNull(clock, nameof(clock));
 
-        public EnrichWithTimestampHandler(Func<DateTime> timestamp)
-        {
-            Guard.NotNull(timestamp, nameof(timestamp));
-
-            this.timestamp = timestamp;
+            this.clock = clock;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
@@ -33,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             if (timestampCommand != null)
             {
-                timestampCommand.Timestamp = timestamp();
+                timestampCommand.Timestamp = clock.GetCurrentInstant();
             }
 
             return Task.FromResult(false);

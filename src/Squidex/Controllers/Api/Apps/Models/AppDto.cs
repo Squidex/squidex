@@ -10,6 +10,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
 using Squidex.Core.Apps;
 
 namespace Squidex.Controllers.Api.Apps.Models
@@ -31,12 +32,12 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// <summary>
         /// The date and time when the app has been created.
         /// </summary>
-        public DateTime Created { get; set; }
+        public Instant Created { get; set; }
         
         /// <summary>
         /// The date and time when the app has been modified last.
         /// </summary>
-        public DateTime LastModified { get; set; }
+        public Instant LastModified { get; set; }
 
         /// <summary>
         /// The permission level of the user.

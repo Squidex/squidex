@@ -46,12 +46,12 @@ namespace Squidex.Read.MongoDb.Utils
 
         private static void SetCreated(EnvelopeHeaders headers, MongoEntity entity)
         {
-            entity.Created = headers.Timestamp().ToDateTimeUtc();
+            entity.Created = headers.Timestamp();
         }
 
         private static void SetLastModified(EnvelopeHeaders headers, MongoEntity entity)
         {
-            entity.LastModified = headers.Timestamp().ToDateTimeUtc();
+            entity.LastModified = headers.Timestamp();
         }
 
         private static void SetCreatedBy(SquidexEvent @event, MongoEntity entity)

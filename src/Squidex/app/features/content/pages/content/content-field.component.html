@@ -55,6 +55,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div><div *ngSwitchCase="'dateTime'">
+                        <sqx-date-time-editor [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
                     </div>
                     <div *ngSwitchCase="'boolean'">
                         <div [ngSwitch]="field.properties.editor">
@@ -64,8 +66,6 @@
                                         <input class="form-check-input" type="checkbox" [formControlName]="language">
                                     </label>
                                 </div>
-                            </div>
-                            <div *ngSwitchCase="'Toggle'">
                             </div>
                         </div>
                     </div>

@@ -10,6 +10,7 @@ using System;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
+using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb.EventStore;
@@ -55,7 +56,7 @@ namespace Squidex.Config.Domain
                         var mongoDbClient = new MongoClient(connectionString);
                         var mongoDatabase = mongoDbClient.GetDatabase(databaseName);
 
-                        var eventStore = new MongoEventStore(mongoDatabase, c.Resolve<IEventNotifier>());
+                        var eventStore = new MongoEventStore(mongoDatabase, c.Resolve<IEventNotifier>(), c.Resolve<IClock>());
 
                         return eventStore;
                     })

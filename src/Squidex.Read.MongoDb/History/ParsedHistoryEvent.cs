@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Read.History;
 
@@ -35,12 +36,12 @@ namespace Squidex.Read.MongoDb.History
             get { return inner.Actor; }
         }
 
-        public DateTime Created
+        public Instant Created
         {
             get { return inner.Created; }
         }
 
-        public DateTime LastModified
+        public Instant LastModified
         {
             get { return inner.LastModified; }
         }

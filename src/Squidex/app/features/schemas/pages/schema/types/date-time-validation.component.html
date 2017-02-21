@@ -1,0 +1,33 @@
+<div [formGroup]="editForm">
+    <div class="form-group row">
+        <label class="col col-3 col-form-checkbox-label" for="field-required">Required</label>
+
+        <div class="col col-6">
+            <input type="checkbox" class="form-check-input" id="field-required" formControlName="isRequired" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label">Min Value</label>
+
+        <div class="col col-9">
+            <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="minValue"></sqx-date-time-editor>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label">Max Value</label>
+
+        <div class="col col-9">
+            <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="maxValue"></sqx-date-time-editor>
+        </div>
+    </div>
+
+    <div class="form-group row" [class.hidden]="(hideDefaultValue | async)">
+        <label class="col col-3 col-form-label" for="field-default-value">Default Value</label>
+
+        <div class="col col-9">
+            <sqx-date-time-editor enforceTime="true" formControlName="defaultValue"></sqx-date-time-editor>
+        </div>
+    </div>
+</div>

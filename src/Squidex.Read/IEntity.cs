@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using NodaTime;
 
 namespace Squidex.Read
 {
@@ -14,8 +15,8 @@ namespace Squidex.Read
     {
         Guid Id { get; }
 
-        DateTime Created { get; }
+        Instant Created { get; }
 
-        DateTime LastModified { get; }
+        Instant LastModified { get; }
     }
 }

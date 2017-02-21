@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NodaTime;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 
@@ -26,12 +27,16 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
     {
         private const int Retries = 500;
         private readonly IEventNotifier notifier;
+        private readonly IClock clock;
         private string eventsOffsetIndex;
 
-        public MongoEventStore(IMongoDatabase database, IEventNotifier notifier) 
+        public MongoEventStore(IMongoDatabase database, IEventNotifier notifier, IClock clock) 
             : base(database)
         {
+            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(notifier, nameof(notifier));
+
+            this.clock = clock;
 
             this.notifier = notifier;
         }
@@ -115,7 +120,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 throw new WrongEventVersionException(currentVersion, expectedVersion);
             }
 
-            var now = DateTime.UtcNow;
+            var now = clock.GetCurrentInstant();
 
             var commitEvents = events.Select(x => SimpleMapper.Map(x, new MongoEvent())).ToList();
 

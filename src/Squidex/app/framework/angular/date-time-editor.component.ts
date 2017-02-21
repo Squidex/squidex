@@ -11,7 +11,6 @@ import * as moment from 'moment';
 
 let Pikaday = require('pikaday/pikaday');
 
-
 /* tslint:disable:no-empty */
 
 const NOOP = () => { };
@@ -22,50 +21,6 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     multi: true
 };
 
-const TIMEZONES: any[] = [
-    { label: 'UTC-13:00', value: -780 },
-    { label: 'UTC-12:00', value: -720 },
-    { label: 'UTC-11:00', value: -660 },
-    { label: 'UTC-10:00', value: -600 },
-    { label: 'UTC-09:30', value: -570 },
-    { label: 'UTC-09:00', value: -540 },
-    { label: 'UTC-08:00', value: -480 },
-    { label: 'UTC-07:00', value: -420 },
-    { label: 'UTC-06:00', value: -360 },
-    { label: 'UTC-05:00', value: -300 },
-    { label: 'UTC-04:30', value: -270 },
-    { label: 'UTC-04:00', value: -240 },
-    { label: 'UTC-03:30', value: -210 },
-    { label: 'UTC-03:00', value: -180 },
-    { label: 'UTC-02:00', value: -120 },
-    { label: 'UTC-01:00', value: -60 },
-    { label: 'UTC+00:00', value: 0 },
-    { label: 'UTC+01:00', value: 60 },
-    { label: 'UTC+02:00', value: 120 },
-    { label: 'UTC+03:00', value: 180 },
-    { label: 'UTC+03:30', value: 210 },
-    { label: 'UTC+04:00', value: 240 },
-    { label: 'UTC+04:30', value: 270 },
-    { label: 'UTC+05:00', value: 300 },
-    { label: 'UTC+05:30', value: 330 },
-    { label: 'UTC+05:45', value: 345 },
-    { label: 'UTC+06:00', value: 360 },
-    { label: 'UTC+06:30', value: 390 },
-    { label: 'UTC+07:00', value: 420 },
-    { label: 'UTC+08:00', value: 480 },
-    { label: 'UTC+08:45', value: 425 },
-    { label: 'UTC+09:00', value: 540 },
-    { label: 'UTC+09:30', value: 570 },
-    { label: 'UTC+10:00', value: 600 },
-    { label: 'UTC+10:30', value: 630 },
-    { label: 'UTC+11:00', value: 660 },
-    { label: 'UTC+11:30', value: 690 },
-    { label: 'UTC+12:00', value: 720 },
-    { label: 'UTC+12:45', value: 765 },
-    { label: 'UTC+13:00', value: 780 },
-    { label: 'UTC+14:00', value: 840 }
-];
-
 @Component({
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
@@ -74,75 +29,75 @@ const TIMEZONES: any[] = [
 })
 export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, AfterViewInit {
     private picker: any;
-    private time: any;
-    private date: any;
-    private offset: number;
+    private timeValue: any | null = null;
+    private dateValue: any | null = null;
     private suppressEvents = false;
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
     public get showTime() {
-        return this.mode === 'DateTime' || this.mode === 'DateTimeWithTimezone';
+        return this.mode === 'DateTime';
     }
 
-    public get showTimezone() {
-        return this.mode === 'DateWithTimezone' || this.mode === 'DateTimeWithTimezone';
-    }
+    public timeControl = new FormControl();
 
-    public timezones = TIMEZONES;
-
-    public timeControl =
-        new FormControl();
-
-    public timeZoneControl =
-        new FormControl();
-
-    public isDisabled = false;
+    public dateControl = new FormControl();
 
     @Input()
     public mode: string;
+
+    @Input()
+    public enforceTime: boolean;
 
     @ViewChild('dateInput')
     public dateInput: ElementRef;
 
     public ngOnInit() {
         this.timeControl.valueChanges.subscribe(value => {
-            const time = moment(value, 'HH:mm:ss');
-
-            this.time = moment();
-            this.time.hours(time.hours()).minutes(time.minutes()).seconds(time.seconds());
+            if (!value || value.length === 0) {
+                this.timeValue = null;
+            } else {
+                this.timeValue = moment(value, 'HH:mm:ss');
+            }
 
             this.updateValue();
         });
 
-        this.timeZoneControl.valueChanges.subscribe(value => {
-            this.offset = value;
+        this.dateControl.valueChanges.subscribe(value => {
+            if (!value || value.length === 0) {
+                this.dateValue = null;
+            } else {
+                this.dateValue = moment(value, 'YYYY-MM-DD');
+            }
 
             this.updateValue();
-            this.touched();
         });
     }
 
     public writeValue(value: any) {
-        const parsed = (moment.parseZone(value) || moment());
+        if (!value || value.length === 0) {
+            this.timeValue = null;
+            this.dateValue = null;
+        } else {
+            const parsed = moment.parseZone(value);
 
-        this.time = moment(parsed);
-        this.date = moment(parsed);
+            this.dateValue = moment(parsed);
 
-        this.offset = parsed.utcOffset();
+            if (this.showTime) {
+                this.timeValue = moment(parsed);
+            }
+        }
 
         this.updateControls();
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
         if (isDisabled) {
+            this.dateControl.disable();
             this.timeControl.disable();
-            this.timeZoneControl.disable();
         } else {
+            this.dateControl.enable();
             this.timeControl.enable();
-            this.timeZoneControl.enable();
         }
     }
 
@@ -155,17 +110,9 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     }
 
     public ngAfterViewInit() {
-        this.picker = new Pikaday({
-            field: this.dateInput.nativeElement,
-            format: 'YYYY-MM-DD',
+        this.picker = new Pikaday({ field: this.dateInput.nativeElement, format: 'YYYY-MM-DD',
             onSelect: () => {
-                if (this.suppressEvents) {
-                    return;
-                }
-
-                const date = this.picker.getMoment();
-
-                this.date.years(date.years()).months(date.months()).dates(date.dates());
+                this.dateValue = this.picker.getMoment();
 
                 this.updateValue();
                 this.touched();
@@ -180,34 +127,43 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     }
 
     private updateValue() {
-        let result = this.date.format('YYYY-MM-DD');
+        let result: string = null;
 
-        if (this.showTime) {
-            result += 'T';
-            result += this.time.format('HH:mm:ss');
+        if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
+            result = 'Invalid DateTime';
+        } else if (!this.dateValue && !this.timeValue) {
+            result = null;
+        } else {
+            result = this.dateValue.format('YYYY-MM-DD');
+
+            if (this.showTime && this.timeValue) {
+                result += 'T';
+                result += this.timeValue.format('HH:mm:ss');
+                result += 'Z';
+            } else if (this.enforceTime) {
+                result += 'T00:00:00Z';
+            }
         }
 
-        if (this.showTimezone) {
-            result += moment().utcOffset(this.offset).format('Z');
-        } else if (this.showTime) {
-            result += 'Z';
-        }
+        console.error(result);
 
         this.changeCallback(result);
     }
 
     private updateControls() {
-        if (!this.date) {
+        if (!this.dateValue) {
             return;
         }
 
         this.suppressEvents = true;
 
-        this.timeControl.setValue(this.time.format('HH:mm'), { emitEvent: false });
-        this.timeZoneControl.setValue(this.offset, { emitEvent: false });
+        if (this.timeValue && this.timeValue.isValid()) {
+            this.timeControl.setValue(this.timeValue.format('HH:mm:ss'), { emitEvent: false });
+        }
+        if (this.dateValue && this.dateValue.isValid()) {
+            this.dateControl.setValue(this.dateValue.format('YYYY-MM-DD'), { emitEvent: false });
 
-        if (this.picker) {
-            this.picker.setMoment(this.date);
+            this.picker.setMoment(this.dateValue);
         }
 
         this.suppressEvents = false;

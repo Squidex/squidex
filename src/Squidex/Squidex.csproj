@@ -58,6 +58,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.2" />
     <PackageReference Include="NJsonSchema" Version="8.5.6255.20253" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0-beta20170123" />
     <PackageReference Include="NSwag.AspNetCore" Version="9.5.0" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="ReportGenerator" Version="2.5.3-beta2" />

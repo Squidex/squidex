@@ -31,6 +31,7 @@ namespace Squidex.Read.MongoDb.Users
         {
             get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexDisplayName)?.Value; }
         }
+
         public string PictureUrl
         {
             get { return inner.Claims.Find(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value; }

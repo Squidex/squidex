@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using NodaTime;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface ITimestampCommand : ICommand
     {
-        DateTime Timestamp { get; set; }
+        Instant Timestamp { get; set; }
     }
 }

@@ -9,6 +9,7 @@
 using Squidex.Infrastructure;
 using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
@@ -52,11 +53,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// <summary>
         /// The date and time when the schema has been created.
         /// </summary>
-        public DateTime Created { get; set; }
+        public Instant Created { get; set; }
 
         /// <summary>
         /// The date and time when the schema has been modified last.
         /// </summary>
-        public DateTime LastModified { get; set; }
+        public Instant LastModified { get; set; }
     }
 }

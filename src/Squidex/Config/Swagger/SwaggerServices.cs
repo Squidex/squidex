@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
+using NodaTime;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.WebApi.Processors.Security;
 using Squidex.Controllers.ContentApi.Generator;
@@ -70,6 +71,11 @@ namespace Squidex.Config.Swagger
 
             settings.TypeMappers = new List<ITypeMapper>
             {
+                new PrimitiveTypeMapper(typeof(Instant), schema =>
+                {
+                    schema.Type = JsonObjectType.String;
+                    schema.Format = JsonFormatStrings.DateTime;
+                }),
                 new PrimitiveTypeMapper(typeof(Language), s => s.Type = JsonObjectType.String),
                 new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
             };

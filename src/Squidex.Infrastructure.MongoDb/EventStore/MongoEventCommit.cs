@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using NodaTime;
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
@@ -22,7 +23,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
         [BsonRequired]
         [BsonElement]
-        public DateTime Timestamp { get; set; }
+        public Instant Timestamp { get; set; }
 
         [BsonElement]
         [BsonRequired]

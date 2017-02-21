@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Read.Apps
 {
     public interface IAppClientEntity
@@ -17,7 +15,5 @@ namespace Squidex.Read.Apps
         string Name { get; }
 
         string Secret { get; }
-
-        DateTime ExpiresUtc { get; }
     }
 }

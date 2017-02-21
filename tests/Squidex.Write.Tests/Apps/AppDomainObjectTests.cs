@@ -218,11 +218,9 @@ namespace Squidex.Write.Apps
         [Fact]
         public void AttachClient_should_create_events()
         {
-            var now = DateTime.Today;
-
             CreateApp();
 
-            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId, Timestamp = now }), clientSecret);
+            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }), clientSecret);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

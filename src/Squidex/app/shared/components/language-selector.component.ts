@@ -35,7 +35,7 @@ export class LanguageSelectorComponent implements OnInit {
     public selectedLanguageChanged = new EventEmitter<Language>();
 
     public get isSmallMode(): boolean {
-        return this.languages && this.languages.length > 0 && this.languages.length <= 0;
+        return this.languages && this.languages.length > 0 && this.languages.length <= 3;
     }
 
     public get isLargeMode(): boolean {

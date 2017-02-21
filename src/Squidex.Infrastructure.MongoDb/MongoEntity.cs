@@ -9,6 +9,7 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using NodaTime;
 
 namespace Squidex.Infrastructure.MongoDb
 {
@@ -21,10 +22,10 @@ namespace Squidex.Infrastructure.MongoDb
 
         [BsonRequired]
         [BsonElement]
-        public DateTime Created { get; set; }
+        public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public DateTime LastModified { get; set; }
+        public Instant LastModified { get; set; }
     }
 }

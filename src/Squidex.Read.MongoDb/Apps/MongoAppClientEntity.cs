@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Read.Apps;
 
@@ -21,10 +20,6 @@ namespace Squidex.Read.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public string Secret { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public DateTime ExpiresUtc { get; set; }
 
         [BsonRequired]
         [BsonElement]

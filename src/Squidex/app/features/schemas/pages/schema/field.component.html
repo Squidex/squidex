@@ -138,6 +138,9 @@
                     <div *ngSwitchCase="'boolean'">
                         <sqx-boolean-validation [editForm]="editForm" [properties]="field.properties"></sqx-boolean-validation>
                     </div>
+                    <div *ngSwitchCase="'dateTime'">
+                        <sqx-date-time-validation [editForm]="editForm" [properties]="field.properties"></sqx-date-time-validation>
+                    </div>
                 </div>
             </div>
 
@@ -151,6 +154,9 @@
                     </div>
                     <div *ngSwitchCase="'boolean'">
                         <sqx-boolean-ui [editForm]="editForm" [properties]="field.properties"></sqx-boolean-ui>
+                    </div>
+                    <div *ngSwitchCase="'dateTime'">
+                        <sqx-date-time-ui [editForm]="editForm" [properties]="field.properties"></sqx-date-time-ui>
                     </div>
                 </div>
             </div>

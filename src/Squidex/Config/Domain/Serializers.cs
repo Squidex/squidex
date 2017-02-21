@@ -10,6 +10,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -26,19 +28,22 @@ namespace Squidex.Config.Domain
 
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
+            settings.Converters.Add(new InstantConverter());
+            settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new NamedGuidIdConverter());
             settings.Converters.Add(new NamedLongIdConverter());
             settings.Converters.Add(new NamedStringIdConverter());
-            settings.Converters.Add(new LanguageConverter());
             settings.Converters.Add(new PropertiesBagConverter());
             settings.Converters.Add(new RefTokenConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 
             settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            settings.DateParseHandling = DateParseHandling.DateTime;
+            settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
+
+            settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
             return settings;
         }

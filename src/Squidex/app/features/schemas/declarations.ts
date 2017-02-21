@@ -7,6 +7,8 @@
 
 export * from './pages/schema/types/boolean-ui.component';
 export * from './pages/schema/types/boolean-validation.component';
+export * from './pages/schema/types/date-time-ui.component';
+export * from './pages/schema/types/date-time-validation.component';
 export * from './pages/schema/types/number-ui.component';
 export * from './pages/schema/types/number-validation.component';
 export * from './pages/schema/types/string-ui.component';

@@ -6,8 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
+using Moq;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
@@ -20,14 +21,18 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class MyTimestampCommand : ITimestampCommand
         {
-            public DateTime Timestamp { get; set; }
+            public Instant Timestamp { get; set; }
         }
+
+        private readonly Mock<IClock> clock = new Mock<IClock>();
 
         [Fact]
         public async Task Should_set_timestamp_for_timestamp_command()
         {
-            var utc = DateTime.Today;
-            var sut = new EnrichWithTimestampHandler(() => utc);
+            var utc = Instant.FromUnixTimeSeconds(1000);
+            var sut = new EnrichWithTimestampHandler(clock.Object);
+
+            clock.Setup(x => x.GetCurrentInstant()).Returns(utc);
 
             var command = new MyTimestampCommand();
 
@@ -38,28 +43,15 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public async Task Should_set_with_now_datetime_for_timestamp_command()
-        {
-            var now = DateTime.UtcNow;
-            var sut = new EnrichWithTimestampHandler();
-
-            var command = new MyTimestampCommand();
-
-            var result = await sut.HandleAsync(new CommandContext(command));
-
-            Assert.False(result);
-            Assert.True(command.Timestamp >= now && command.Timestamp <= DateTime.UtcNow);
-        }
-
-        [Fact]
         public async Task Should_do_nothing_for_normal_command()
         {
-            var utc = DateTime.Today;
-            var sut = new EnrichWithTimestampHandler(() => utc);
+            var sut = new EnrichWithTimestampHandler(clock.Object);
 
             var result = await sut.HandleAsync(new CommandContext(new MyNormalCommand()));
 
             Assert.False(result);
+
+            clock.Verify(x => x.GetCurrentInstant(), Times.Never());
         }
     }
 }

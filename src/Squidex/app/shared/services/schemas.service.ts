@@ -40,6 +40,12 @@ export function createProperties(fieldType: string, values: Object | null = null
                     undefined, undefined, undefined, false, false, false, 'Checkbox',
                     undefined);
             break;
+        case 'dateTime':
+            properties =
+                new DateTimeFieldPropertiesDto(
+                    undefined, undefined, undefined, false, false, false, 'DateTime',
+                    undefined, undefined, undefined);
+            break;
         default:
             throw 'Invalid properties type';
     }
@@ -137,6 +143,22 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
         this['fieldType'] = 'string';
+    }
+}
+
+export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
+        public readonly editor: string,
+        public readonly defaultValue?: string,
+        public readonly maxValue?: string,
+        public readonly minValue?: string
+    ) {
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
+
+        this['fieldType'] = 'dateTime';
     }
 }
 

@@ -101,8 +101,7 @@ namespace Squidex.Infrastructure.Reflection
                 typeof(short),
                 typeof(int),
                 typeof(long),
-                typeof(string),
-                typeof(DateTime)
+                typeof(string)
             };
 
             static ClassMapper()

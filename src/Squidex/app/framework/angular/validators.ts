@@ -11,6 +11,8 @@ import {
     Validators
 } from '@angular/forms';
 
+import { DateTime } from './../utils/date-time';
+
 export module ValidatorsEx {
     export function pattern(pattern: string | RegExp, message?: string): ValidatorFn {
         if (!pattern) {
@@ -40,6 +42,22 @@ export module ValidatorsEx {
                     return { patternmessage: { requiredPattern: regexStr, actualValue: n, message } };
                 } else {
                     return { pattern: { requiredPattern: regexStr, actualValue: n } };
+                }
+            }
+
+            return {};
+        };
+    }
+
+    export function validDateTime() {
+        return (control: AbstractControl): { [key: string]: any } => {
+            const v: string = control.value;
+
+            if (v) {
+                try {
+                    DateTime.parseISO_UTC(v);
+                } catch (e) {
+                    return { validdateTime: false };
                 }
             }
 

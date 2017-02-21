@@ -8,6 +8,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
 using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.ContentApi.Models
@@ -40,12 +41,12 @@ namespace Squidex.Controllers.ContentApi.Models
         /// <summary>
         /// The date and time when the content element has been created.
         /// </summary>
-        public DateTime Created { get; set; }
+        public Instant Created { get; set; }
 
         /// <summary>
         /// The date and time when the content element has been modified last.
         /// </summary>
-        public DateTime LastModified { get; set; }
+        public Instant LastModified { get; set; }
 
         /// <summary>
         /// Indicates if the content element is publihed.

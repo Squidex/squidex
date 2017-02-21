@@ -270,20 +270,24 @@ namespace Squidex.Core.Schemas
             Assert.NotNull(edmModel);
         }
 
-        private Schema BuildMixedSchema()
+        private static Schema BuildMixedSchema()
         {
+            var allowedValues = new[] { "1", "2" }.ToImmutableList();
+
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new StringField(1, "firstName",
-                        new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
-                    .AddOrUpdateField(new StringField(2, "lastName",
-                        new StringFieldProperties { Hints = "Last Name" }))
-                    .AddOrUpdateField(new BooleanField(3, "admin",
+                    .AddOrUpdateField(new StringField(1, "my-string1",
+                        new StringFieldProperties { Label = "My String1", IsLocalizable = true, IsRequired = true, AllowedValues = allowedValues }))
+                    .AddOrUpdateField(new StringField(2, "my-string2",
+                        new StringFieldProperties { Hints = "My String1" }))
+                    .AddOrUpdateField(new NumberField(3, "my-number",
+                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
+                    .AddOrUpdateField(new BooleanField(4, "my-boolean",
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new DateTimeField(4, "birtday",
-                        new DateTimeFieldProperties()))
-                    .AddOrUpdateField(new NumberField(5, "age",
-                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
+                    .AddOrUpdateField(new DateTimeField(5, "my-datetime",
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
+                    .AddOrUpdateField(new DateTimeField(6, "my-date",
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }));
 
             return schema;
         }

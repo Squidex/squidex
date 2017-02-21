@@ -43,7 +43,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public fieldTypes: string[] = [
         'string',
         'number',
-        'boolean'
+        'boolean',
+        'dateTime'
     ];
 
     public schemaName: string;
@@ -65,7 +66,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name must be a valid javascript name in camel case.')
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
                 ]]
         });
 

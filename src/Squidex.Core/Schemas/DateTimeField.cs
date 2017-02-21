@@ -17,6 +17,7 @@ using NodaTime.Text;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable ConvertIfStatementToSwitchStatement
 
 namespace Squidex.Core.Schemas
@@ -67,7 +68,15 @@ namespace Squidex.Core.Schemas
         protected override void PrepareJsonSchema(JsonProperty jsonProperty)
         {
             jsonProperty.Type = JsonObjectType.String;
-            jsonProperty.Format = "date-time";
+
+            if (Properties.Editor == DateTimeFieldEditor.Date)
+            {
+                jsonProperty.Format = JsonFormatStrings.Date;
+            }
+            else
+            {
+                jsonProperty.Format = JsonFormatStrings.DateTime;
+            }
         }
 
         protected override IEdmTypeReference CreateEdmType()

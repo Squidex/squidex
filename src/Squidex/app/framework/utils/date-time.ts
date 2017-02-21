@@ -111,7 +111,6 @@ export class DateTime {
             return new DateTime(parsedMoment.toDate());
         } else {
             throw `${value} is not a valid date time string`;
-
         }
     }
 

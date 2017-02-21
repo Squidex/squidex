@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -297,9 +296,9 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(
                         new StringField(1, "my-string", new StringFieldProperties { DefaultValue = "EN-String", IsLocalizable = true }))
                     .AddOrUpdateField(
-                        new BooleanField(2, "my-boolean", new BooleanFieldProperties { DefaultValue = true }))
+                        new NumberField(2, "my-number", new NumberFieldProperties { DefaultValue = 123 }))
                     .AddOrUpdateField(
-                        new NumberField(3, "my-number", new NumberFieldProperties { DefaultValue = 123 }))
+                        new BooleanField(3, "my-boolean", new BooleanFieldProperties { DefaultValue = true }))
                     .AddOrUpdateField(
                         new DateTimeField(4, "my-datetime", new DateTimeFieldProperties { DefaultValue = now }));
             

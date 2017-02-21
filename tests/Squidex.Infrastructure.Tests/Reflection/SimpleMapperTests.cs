@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using NodaTime;
 using Xunit;
 
 // ReSharper disable UnusedParameter.Local
@@ -17,13 +18,13 @@ namespace Squidex.Infrastructure.Reflection
     {
         public class MyClass1Base
         {
+            public Guid MappedGuid { get; set; }
+
             public string MappedString { get; set; }
 
             public string MappedNull { get; set; }
 
             public long MappedNumber { get; set; }
-
-            public Guid MappedGuid { get; set; }
 
             public long WrongType1 { get; set; }
 
@@ -53,9 +54,9 @@ namespace Squidex.Infrastructure.Reflection
                 get { return "Value"; }
             }
 
-            public DateTime WrongType1 { get; set; }
+            public Instant WrongType1 { get; set; }
 
-            public TimeSpan WrongType2 { get; set; }
+            public Duration WrongType2 { get; set; }
         }
 
         [Fact]

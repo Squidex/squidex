@@ -3,6 +3,21 @@
 
 $form-color: #fff;
 
+:host(.ng-invalid) {
+    &.ng-dirty {
+        .form-control {
+            & {
+                border-color: $color-theme-error;
+            }
+
+            &:hover,
+            &:focus {
+                border-color: $color-theme-error-dark;
+            }
+        }
+    }
+}
+
 .form-control {
     &[readonly] {
         background: $form-color;
@@ -11,26 +26,16 @@ $form-color: #fff;
 
 .date-group {
     & {
-        padding-right: .5rem;
+        padding-right: .25rem;
     }
 
     .form-control {
-        width: 8rem;
+        width: 7.5rem;
     }
 }
 
 .time-group {
-    & {
-        padding-right: .5rem;
-    }
-
     .form-control {
-        width: 5rem;
-    }
-}
-
-.timezone-group {
-    .form-control {
-        width: 8.5rem;
+        width: 7.5rem;
     }
 }

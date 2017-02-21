@@ -24,7 +24,7 @@ namespace GenerateLanguages
 
             var writer = new StringWriter();
             writer.WriteLine("// ==========================================================================");
-            writer.WriteLine("//  Langauges.cs");
+            writer.WriteLine("//  Languages.cs");
             writer.WriteLine("//  Squidex Headless CMS");
             writer.WriteLine("// ==========================================================================");
             writer.WriteLine("//  Copyright (c) Squidex Group");

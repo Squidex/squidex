@@ -8,6 +8,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
 
 namespace Squidex.Controllers.Api.History.Models
 {
@@ -33,6 +34,6 @@ namespace Squidex.Controllers.Api.History.Models
         /// <summary>
         /// The time when the event happened.
         /// </summary>
-        public DateTime Created { get; set; }
+        public Instant Created { get; set; }
     }
 }
