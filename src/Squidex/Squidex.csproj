@@ -14,10 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Config\Identity\Cert\*.*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
-    <Content Update="appsettings.json;appsettings.Production.json;dockerfile;Views\**\*;web.config;wwwroot\**\*">
+    <EmbeddedResource Include="Config\Identity\Cert\*.*" />
+	<None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
