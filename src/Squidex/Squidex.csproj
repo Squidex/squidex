@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Config\Identity\Cert\*.*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
-    <Content Include="wwwroot\styles\static.css" />
     <Content Update="appsettings.json;appsettings.Production.json;dockerfile;Views\**\*;web.config;wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
