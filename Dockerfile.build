@@ -34,8 +34,19 @@ COPY . .
 
 WORKDIR /
 
+# Build Frontend
+RUN cp -a /tmp/node_modules /src/Squidex/ \
+ && cd /src/Squidex \
+ && npm run build:copy \
+ && npm run build \
+ && npm run test:coverage
 
-RUN dotnet restore 
-
+# Test Backend
+RUN dotnet restore \
+ && dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
+ && dotnet test tests/Squidex.Core.Tests/Squidex.Core.Tests.csproj \ 
+ && dotnet test tests/Squidex.Read.Tests/Squidex.Read.Tests.csproj \
+ && dotnet test tests/Squidex.Write.Tests/Squidex.Write.Tests.csproj
+ 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Release
