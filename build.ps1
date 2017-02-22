@@ -1,11 +1,11 @@
 # Build the image
-docker build . -t build-image -f Dockerfile.build
+docker build . -t squidex-build-image -f Dockerfile.build
 
 # Open the image
-docker create --name build-cont build-image
+docker create --name squidex-build-container squidex-build-image
 
 # Copy the output to the host file system
-docker cp build-cont:/out ./publish
+docker cp squidex-build-container:/out ./publish
 
 # Cleanup
-docker rm build-cont
+docker rm squidex-build-container

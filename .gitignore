@@ -5,16 +5,16 @@
 *.log
 
 # Build results
-build
-bin
-obj
-publish
+build/
+bin/
+obj/
+publish/
 
 # Test Output
-_test-output
+_test-output/
 
 # NodeJS 
-node_modules
+node_modules/
 
 # Scripts (should be copied from node_modules on build)
 **/wwwroot/scripts/**/*.*
