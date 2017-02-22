@@ -93,11 +93,11 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     public setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
-            this.dateControl.disable();
-            this.timeControl.disable();
+            this.dateControl.disable({ emitEvent: false });
+            this.timeControl.disable({ emitEvent: false });
         } else {
-            this.dateControl.enable();
-            this.timeControl.enable();
+            this.dateControl.enable({ emitEvent: false });
+            this.timeControl.enable({ emitEvent: false });
         }
     }
 
@@ -112,6 +112,9 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     public ngAfterViewInit() {
         this.picker = new Pikaday({ field: this.dateInput.nativeElement, format: 'YYYY-MM-DD',
             onSelect: () => {
+                if (this.suppressEvents) {
+                    return;
+                }
                 this.dateValue = this.picker.getMoment();
 
                 this.updateValue();
@@ -145,8 +148,6 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
             }
         }
 
-        console.error(result);
-
         this.changeCallback(result);
     }
 
@@ -160,7 +161,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
         if (this.timeValue && this.timeValue.isValid()) {
             this.timeControl.setValue(this.timeValue.format('HH:mm:ss'), { emitEvent: false });
         }
-        if (this.dateValue && this.dateValue.isValid()) {
+        if (this.dateValue && this.dateValue.isValid() && this.picker) {
             this.dateControl.setValue(this.dateValue.format('YYYY-MM-DD'), { emitEvent: false });
 
             this.picker.setMoment(this.dateValue);

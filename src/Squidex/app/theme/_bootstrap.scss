@@ -182,7 +182,7 @@ body {
             & {
                 @include box-shadow(0, 0, 10px, .5);
                 background: $color-theme-blue;
-                border: 0;
+                border-color: $color-theme-blue;
                 color: $color-accent-dark;
             }
 

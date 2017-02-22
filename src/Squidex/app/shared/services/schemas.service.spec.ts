@@ -99,7 +99,7 @@ describe('SchemasService', () => {
                             lastModified: '2017-12-12T10:10',
                             lastModifiedBy: 'LastModifiedBy1',
                             fields: [{
-                                fieldId: 123,
+                                fieldId: 1,
                                 name: 'field1',
                                 isHidden: true,
                                 isDisabled: true,
@@ -107,7 +107,7 @@ describe('SchemasService', () => {
                                     fieldType: 'number'
                                 }
                             }, {
-                                fieldId: 234,
+                                fieldId: 2,
                                 name: 'field2',
                                 isHidden: true,
                                 isDisabled: true,
@@ -115,12 +115,20 @@ describe('SchemasService', () => {
                                     fieldType: 'string'
                                 }
                             }, {
-                                fieldId: 345,
+                                fieldId: 3,
                                 name: 'field3',
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
                                     fieldType: 'boolean'
+                                }
+                            }, {
+                                fieldId: 4,
+                                name: 'field4',
+                                isHidden: true,
+                                isDisabled: true,
+                                properties: {
+                                    fieldType: 'dateTime'
                                 }
                             }]
                         }
@@ -139,9 +147,10 @@ describe('SchemasService', () => {
             new SchemaDetailsDto('id1', 'name1', 'label1', 'hints1', true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'), [
-                    new FieldDto(123, 'field1', true, true, createProperties('number')),
-                    new FieldDto(234, 'field2', true, true, createProperties('string')),
-                    new FieldDto(345, 'field3', true, true, createProperties('boolean'))
+                    new FieldDto(1, 'field1', true, true, createProperties('number')),
+                    new FieldDto(2, 'field2', true, true, createProperties('string')),
+                    new FieldDto(3, 'field3', true, true, createProperties('boolean')),
+                    new FieldDto(4, 'field4', true, true, createProperties('dateTime'))
                 ]));
 
         authService.verifyAll();

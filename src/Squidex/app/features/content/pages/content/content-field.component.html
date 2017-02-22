@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div><div *ngSwitchCase="'dateTime'">
-                        <sqx-date-time-editor [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
+                        <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
                     </div>
                     <div *ngSwitchCase="'boolean'">
                         <div [ngSwitch]="field.properties.editor">
