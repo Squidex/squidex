@@ -2,6 +2,7 @@
 *.suo
 *.user
 *.vs
+*.log
 
 # Build results
 build
