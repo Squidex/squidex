@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$reportsFolder = ".\GeneratedReports"
+$reportsFolder = ".\_test-output"
 $userProfile = $env:USERPROFILE
 $workingFolder = Get-Location
 
