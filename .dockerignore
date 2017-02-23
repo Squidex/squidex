@@ -8,7 +8,6 @@
 .git
 
 # Build results
-**/build/
 **/bin/
 **/obj/
 **/publish/
