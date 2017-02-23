@@ -22,29 +22,32 @@ export function createProperties(fieldType: string, values: Object | null = null
     let properties: FieldPropertiesDto;
 
     switch (fieldType) {
-        case 'number':
+        case 'Number':
             properties =
                 new NumberFieldPropertiesDto(
                     undefined, undefined, undefined, false, false, false, 'Input',
                     undefined, undefined, undefined, undefined);
             break;
-        case 'string':
+        case 'String':
             properties =
                 new StringFieldPropertiesDto(
                     undefined, undefined, undefined, false, false, false, 'Input',
                     undefined, undefined, undefined, undefined, undefined, undefined);
             break;
-        case 'boolean':
+        case 'Boolean':
             properties =
                 new BooleanFieldPropertiesDto(
                     undefined, undefined, undefined, false, false, false, 'Checkbox',
                     undefined);
             break;
-        case 'dateTime':
+        case 'DateTime':
             properties =
                 new DateTimeFieldPropertiesDto(
                     undefined, undefined, undefined, false, false, false, 'DateTime',
                     undefined, undefined, undefined);
+            break;
+        case 'Json':
+            properties = new JsonFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -110,23 +113,6 @@ export abstract class FieldPropertiesDto {
     }
 }
 
-export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
-        isRequired: boolean,
-        isListField: boolean,
-        isLocalizable: boolean,
-        public readonly editor: string,
-        public readonly defaultValue?: number,
-        public readonly maxValue?: number,
-        public readonly minValue?: number,
-        public readonly allowedValues?: number[]
-    ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'number';
-    }
-}
-
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
         isRequired: boolean,
@@ -142,7 +128,24 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
-        this['fieldType'] = 'string';
+        this['fieldType'] = 'String';
+    }
+}
+
+export class NumberFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
+        public readonly editor: string,
+        public readonly defaultValue?: number,
+        public readonly maxValue?: number,
+        public readonly minValue?: number,
+        public readonly allowedValues?: number[]
+    ) {
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
+
+        this['fieldType'] = 'Number';
     }
 }
 
@@ -158,7 +161,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
-        this['fieldType'] = 'dateTime';
+        this['fieldType'] = 'DateTime';
     }
 }
 
@@ -172,7 +175,19 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
-        this['fieldType'] = 'boolean';
+        this['fieldType'] = 'Boolean';
+    }
+}
+
+export class JsonFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean
+    ) {
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
+
+        this['fieldType'] = 'Json';
     }
 }
 

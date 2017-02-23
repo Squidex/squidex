@@ -157,11 +157,18 @@ namespace Squidex.Core.Schemas
                 languages = new[] { Language.Invariant };
             }
 
+            var edmValueType = CreateEdmType();
+
+            if (edmValueType == null)
+            {
+                return;
+            }
+
             var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}_{Name}_Property"));
 
             foreach (var language in languages)
             {
-                languageType.AddStructuralProperty(language.Iso2Code, CreateEdmType());
+                languageType.AddStructuralProperty(language.Iso2Code, edmValueType);
             }
 
             edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(languageType, false));

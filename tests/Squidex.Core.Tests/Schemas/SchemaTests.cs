@@ -276,6 +276,8 @@ namespace Squidex.Core.Schemas
 
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
+                    .AddOrUpdateField(new JsonField(0, "my-json", 
+                        new JsonFieldProperties()))
                     .AddOrUpdateField(new StringField(1, "my-string1",
                         new StringFieldProperties { Label = "My String1", IsLocalizable = true, IsRequired = true, AllowedValues = allowedValues }))
                     .AddOrUpdateField(new StringField(2, "my-string2",

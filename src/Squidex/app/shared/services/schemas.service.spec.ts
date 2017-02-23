@@ -130,6 +130,14 @@ describe('SchemasService', () => {
                                 properties: {
                                     fieldType: 'dateTime'
                                 }
+                            }, {
+                                fieldId: 5,
+                                name: 'field5',
+                                isHidden: true,
+                                isDisabled: true,
+                                properties: {
+                                    fieldType: 'json'
+                                }
                             }]
                         }
                     })
@@ -150,7 +158,8 @@ describe('SchemasService', () => {
                     new FieldDto(1, 'field1', true, true, createProperties('number')),
                     new FieldDto(2, 'field2', true, true, createProperties('string')),
                     new FieldDto(3, 'field3', true, true, createProperties('boolean')),
-                    new FieldDto(4, 'field4', true, true, createProperties('dateTime'))
+                    new FieldDto(4, 'field4', true, true, createProperties('dateTime')),
+                    new FieldDto(5, 'field5', true, true, createProperties('json'))
                 ]));
 
         authService.verifyAll();

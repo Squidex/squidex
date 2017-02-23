@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?9dpklz');
-  src:  url('fonts/icomoon.eot?9dpklz#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?9dpklz') format('truetype'),
-    url('fonts/icomoon.woff?9dpklz') format('woff'),
-    url('fonts/icomoon.svg?9dpklz#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?8vtvuo');
+  src:  url('fonts/icomoon.eot?8vtvuo#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?8vtvuo') format('truetype'),
+    url('fonts/icomoon.woff?8vtvuo') format('woff'),
+    url('fonts/icomoon.svg?8vtvuo#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -48,10 +48,10 @@
 .icon-bin2:before {
   content: "\e902";
 }
-.icon-control-date:before {
+.icon-control-Date:before {
   content: "\e936";
 }
-.icon-control-date-time:before {
+.icon-control-DateTime:before {
   content: "\e937";
 }
 .icon-angle-right:before {
@@ -108,22 +108,22 @@
 .icon-content:before {
   content: "\e909";
 }
-.icon-control-checkbox:before {
+.icon-control-Checkbox:before {
   content: "\e90a";
 }
-.icon-control-dropdown:before {
+.icon-control-Dropdown:before {
   content: "\e90b";
 }
-.icon-control-input:before {
+.icon-control-Input:before {
   content: "\e90c";
 }
-.icon-control-radio:before {
+.icon-control-Radio:before {
   content: "\e90d";
 }
-.icon-control-textarea:before {
+.icon-control-Textarea:before {
   content: "\e90e";
 }
-.icon-control-toggle:before {
+.icon-control-Toggle:before {
   content: "\e90f";
 }
 .icon-copy:before {
@@ -159,6 +159,9 @@
 .icon-help:before {
   content: "\e919";
 }
+.icon-type-Json:before {
+  content: "\e91a";
+}
 .icon-json:before {
   content: "\e91a";
 }
@@ -192,22 +195,16 @@
 .icon-settings:before {
   content: "\e923";
 }
-.icon-type-boolean:before {
+.icon-type-Boolean:before {
   content: "\e924";
 }
-.icon-type-datetime:before {
+.icon-type-DateTime:before {
   content: "\e925";
 }
-.icon-type-date-time:before {
-  content: "\e925";
-}
-.icon-type-dateTime:before {
-  content: "\e925";
-}
-.icon-type-number:before {
+.icon-type-Number:before {
   content: "\e926";
 }
-.icon-type-string:before {
+.icon-type-String:before {
   content: "\e927";
 }
 .icon-user:before {

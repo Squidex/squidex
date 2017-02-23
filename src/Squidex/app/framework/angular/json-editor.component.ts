@@ -94,13 +94,15 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     private setValue(value: any) {
-        if (!value) {
-            value = {};
+        if (value) {
+            const jsonString = JSON.stringify(value, undefined, 4);
+
+            this.aceEditor.setValue(jsonString);
+        } else {
+            this.aceEditor.setValue('');
         }
 
-        const jsonString = JSON.stringify(value, undefined, 4);
-
-        this.aceEditor.setValue(jsonString);
+        this.aceEditor.clearSelection();
     }
 
     private static loadScript(callback: () => void) {

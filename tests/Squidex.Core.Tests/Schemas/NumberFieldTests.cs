@@ -36,7 +36,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid()
+        public async Task Should_not_add_error_if_number_is_valid()
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties { Label = "My-Number" });
 

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonSchema("dateTime")]
+    [JsonSchema("DateTime")]
     public sealed class DateTimeFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>

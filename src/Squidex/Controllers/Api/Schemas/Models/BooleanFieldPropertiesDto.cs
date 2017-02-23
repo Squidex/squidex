@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonSchema("boolean")]
+    [JsonSchema("Boolean")]
     public sealed class BooleanFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>

@@ -288,7 +288,7 @@
       "properties": {
         "order": 71,
         "id": 42,
-        "name": "control-date",
+        "name": "control-Date",
         "prevSize": 28,
         "code": 59702
       },
@@ -317,7 +317,7 @@
       "properties": {
         "order": 70,
         "id": 41,
-        "name": "control-date-time",
+        "name": "control-DateTime",
         "prevSize": 28,
         "code": 59703
       },
@@ -789,7 +789,7 @@
       "properties": {
         "order": 38,
         "id": 30,
-        "name": "control-checkbox",
+        "name": "control-Checkbox",
         "prevSize": 32,
         "code": 59658
       },
@@ -818,7 +818,7 @@
       "properties": {
         "order": 39,
         "id": 29,
-        "name": "control-dropdown",
+        "name": "control-Dropdown",
         "prevSize": 32,
         "code": 59659
       },
@@ -847,7 +847,7 @@
       "properties": {
         "order": 41,
         "id": 28,
-        "name": "control-input",
+        "name": "control-Input",
         "prevSize": 32,
         "code": 59660
       },
@@ -876,7 +876,7 @@
       "properties": {
         "order": 42,
         "id": 27,
-        "name": "control-radio",
+        "name": "control-Radio",
         "prevSize": 32,
         "code": 59661
       },
@@ -905,7 +905,7 @@
       "properties": {
         "order": 17,
         "id": 26,
-        "name": "control-textarea",
+        "name": "control-Textarea",
         "prevSize": 32,
         "code": 59662
       },
@@ -934,7 +934,7 @@
       "properties": {
         "order": 16,
         "id": 25,
-        "name": "control-toggle",
+        "name": "control-Toggle",
         "prevSize": 32,
         "code": 59663
       },
@@ -1253,7 +1253,7 @@
       "properties": {
         "order": 20,
         "id": 14,
-        "name": "json",
+        "name": "type-Json, json",
         "prevSize": 32,
         "code": 59674
       },
@@ -1543,7 +1543,7 @@
       "properties": {
         "order": 21,
         "id": 4,
-        "name": "type-boolean",
+        "name": "type-Boolean",
         "prevSize": 32,
         "code": 59684
       },
@@ -1572,7 +1572,7 @@
       "properties": {
         "order": 24,
         "id": 3,
-        "name": "type-datetime, type-date-time, type-dateTime",
+        "name": "type-DateTime",
         "prevSize": 32,
         "code": 59685
       },
@@ -1601,7 +1601,7 @@
       "properties": {
         "order": 32,
         "id": 2,
-        "name": "type-number",
+        "name": "type-Number",
         "prevSize": 32,
         "code": 59686
       },
@@ -1630,7 +1630,7 @@
       "properties": {
         "order": 48,
         "id": 1,
-        "name": "type-string",
+        "name": "type-String",
         "prevSize": 32,
         "code": 59687
       },

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    [JsonSchema("string")]
+    [JsonSchema("String")]
     public sealed class StringFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>

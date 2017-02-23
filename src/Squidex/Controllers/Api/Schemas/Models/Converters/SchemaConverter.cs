@@ -28,6 +28,10 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
                 p => Convert((DateTimeFieldProperties)p)
             },
             {
+                typeof(JsonFieldProperties),
+                p => Convert((JsonFieldProperties)p)
+            },
+            {
                 typeof(StringFieldProperties),
                 p => Convert((StringFieldProperties)p)
             },
@@ -70,6 +74,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         private static FieldPropertiesDto Convert(DateTimeFieldProperties source)
         {
             var result = SimpleMapper.Map(source, new DateTimeFieldPropertiesDto());
+
+            return result;
+        }
+
+        private static FieldPropertiesDto Convert(JsonFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new JsonFieldPropertiesDto());
 
             return result;
         }

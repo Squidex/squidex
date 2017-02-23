@@ -15,7 +15,7 @@ namespace GenerateLanguages
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             var languageCodesFile = new FileInfo("../../src/Squidex.Infrastructure/language-codes.csv");
             var languageFile = Path.Combine(languageCodesFile.DirectoryName, "Languages.cs");

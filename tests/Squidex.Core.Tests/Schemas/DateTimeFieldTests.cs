@@ -36,7 +36,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid()
+        public async Task Should_not_add_error_if_datetime_is_valid()
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime" });
 

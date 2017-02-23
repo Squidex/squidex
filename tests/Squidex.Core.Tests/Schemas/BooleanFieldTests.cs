@@ -35,7 +35,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid_null()
+        public async Task Should_not_add_error_if_null_boolean_is_valid()
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
 
@@ -45,7 +45,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid()
+        public async Task Should_not_add_error_if_boolean_is_valid()
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
 

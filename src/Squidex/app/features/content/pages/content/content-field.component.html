@@ -15,7 +15,7 @@
                 <sqx-control-errors [for]="language" fieldName="{{field|displayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
 
                 <div [ngSwitch]="field.properties.fieldType">
-                    <div *ngSwitchCase="'number'">
+                    <div *ngSwitchCase="'Number'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
                                 <input class="form-control" type="number" [formControlName]="language">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngSwitchCase="'string'">
+                    <div *ngSwitchCase="'String'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
                                 <input class="form-control" type="text" [formControlName]="language">
@@ -44,7 +44,7 @@
                                     <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
                                 </select>
                             </div>
-                            <div *ngSwitchCase="'TextArea'">
+                            <div *ngSwitchCase="'Textarea'">
                                 <textarea class="form-control" [formControlName]="language"></textarea>
                             </div>
                             <div *ngSwitchCase="'Radio'">
@@ -55,10 +55,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div><div *ngSwitchCase="'dateTime'">
-                        <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
                     </div>
-                    <div *ngSwitchCase="'boolean'">
+                    <div *ngSwitchCase="'Boolean'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Checkbox'">
                                 <div class="form-check form-check-inline">
@@ -68,6 +66,12 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div *ngSwitchCase="'DateTime'">
+                        <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
+                    </div>
+                    <div *ngSwitchCase="'Json'">
+                        <sqx-json-editor [formControlName]="language"></sqx-json-editor>
                     </div>
                 </div>
             </div>

@@ -36,7 +36,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_valid()
+        public async Task Should_not_add_error_if_string_is_valid()
         {
             var sut = new StringField(1, "my-string", new StringFieldProperties { Label = "My-String" });
 

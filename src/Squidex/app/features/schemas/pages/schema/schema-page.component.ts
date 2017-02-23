@@ -41,10 +41,11 @@ import { SchemaUpdated } from './../messages';
 })
 export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public fieldTypes: string[] = [
-        'string',
-        'number',
-        'boolean',
-        'dateTime'
+        'Boolean',
+        'DateTime',
+        'Json',
+        'Number',
+        'String'
     ];
 
     public schemaName: string;

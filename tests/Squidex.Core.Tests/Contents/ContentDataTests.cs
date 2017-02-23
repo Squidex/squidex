@@ -18,12 +18,12 @@ namespace Squidex.Core.Contents
     {
         private readonly Schema schema =
             Schema.Create("schema", new SchemaProperties())
-                .AddOrUpdateField(
-                    new NumberField(1, "field1", new NumberFieldProperties { IsLocalizable = true }))
-                .AddOrUpdateField(
-                    new NumberField(2, "field2", new NumberFieldProperties { IsLocalizable = false }))
-                .AddOrUpdateField(
-                    new NumberField(3, "field3", new NumberFieldProperties { IsLocalizable = false }))
+                .AddOrUpdateField(new NumberField(1, "field1", 
+                    new NumberFieldProperties { IsLocalizable = true }))
+                .AddOrUpdateField(new NumberField(2, "field2", 
+                    new NumberFieldProperties { IsLocalizable = false }))
+                .AddOrUpdateField(new NumberField(3, "field3", 
+                    new NumberFieldProperties { IsLocalizable = false }))
                 .HideField(3);
         private readonly Language[] languages = { Language.DE, Language.EN };
         private readonly Language masterLanguage = Language.EN;

@@ -129,34 +129,40 @@
 
             <div class="field-details-tab" [class.hidden]="selectedTab !== 1">
                 <div [ngSwitch]="field.properties.fieldType">
-                    <div *ngSwitchCase="'number'">
+                    <div *ngSwitchCase="'Number'">
                         <sqx-number-validation [editForm]="editForm" [properties]="field.properties"></sqx-number-validation>
                     </div>
-                    <div *ngSwitchCase="'string'">
+                    <div *ngSwitchCase="'String'">
                         <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
                     </div>
-                    <div *ngSwitchCase="'boolean'">
+                    <div *ngSwitchCase="'Boolean'">
                         <sqx-boolean-validation [editForm]="editForm" [properties]="field.properties"></sqx-boolean-validation>
                     </div>
-                    <div *ngSwitchCase="'dateTime'">
+                    <div *ngSwitchCase="'DateTime'">
                         <sqx-date-time-validation [editForm]="editForm" [properties]="field.properties"></sqx-date-time-validation>
+                    </div>
+                    <div *ngSwitchCase="'Json'">
+                        <sqx-json-validation [editForm]="editForm" [properties]="field.properties"></sqx-json-validation>
                     </div>
                 </div>
             </div>
 
             <div class="field-details-tab" [class.hidden]="selectedTab !== 2">
                 <div [ngSwitch]="field.properties.fieldType">
-                    <div *ngSwitchCase="'number'">
+                    <div *ngSwitchCase="'Number'">
                         <sqx-number-ui [editForm]="editForm" [properties]="field.properties"></sqx-number-ui>
                     </div>
-                    <div *ngSwitchCase="'string'">
+                    <div *ngSwitchCase="'String'">
                         <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
                     </div>
-                    <div *ngSwitchCase="'boolean'">
+                    <div *ngSwitchCase="'Boolean'">
                         <sqx-boolean-ui [editForm]="editForm" [properties]="field.properties"></sqx-boolean-ui>
                     </div>
-                    <div *ngSwitchCase="'dateTime'">
+                    <div *ngSwitchCase="'DateTime'">
                         <sqx-date-time-ui [editForm]="editForm" [properties]="field.properties"></sqx-date-time-ui>
+                    </div>
+                    <div *ngSwitchCase="'Json'">
+                        <sqx-json-ui [editForm]="editForm" [properties]="field.properties"></sqx-json-ui>
                     </div>
                 </div>
             </div>
