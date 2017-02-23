@@ -1,0 +1,8 @@
+@import '_mixins';
+@import '_vars';
+
+.editor {
+    background: $color-accent-dark;
+    border: 1px solid $color-input;
+    height: 20rem;
+}

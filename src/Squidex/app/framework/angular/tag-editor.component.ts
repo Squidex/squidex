@@ -8,9 +8,8 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-/* tslint:disable:no-empty */
-
 const KEY_ENTER = 13;
+/* tslint:disable:no-empty */
 const NOOP = () => { };
 
 export interface Converter {

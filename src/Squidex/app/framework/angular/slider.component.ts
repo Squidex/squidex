@@ -9,7 +9,6 @@ import { Component, ElementRef, forwardRef, Input, Renderer, ViewChild } from '@
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 /* tslint:disable:no-empty */
-
 const NOOP = () => { };
 
 export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
