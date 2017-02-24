@@ -10,8 +10,12 @@
                     </button>
                 </div>
                 
-                <h3 class="panel-title" *ngIf="isNewMode">New {{schema|displayName}}</h3>
-                <h3 class="panel-title" *ngIf="!isNewMode">Edit {{schema|displayName}}</h3>
+                <h3 class="panel-title" *ngIf="isNewMode">
+                    New Content
+                </h3>
+                <h3 class="panel-title" *ngIf="!isNewMode">
+                    Edit Content
+                </h3>
             </div>
 
             <a class="panel-close" routerLink="../">
