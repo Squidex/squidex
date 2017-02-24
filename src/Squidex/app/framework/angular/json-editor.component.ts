@@ -7,6 +7,7 @@
 
 import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subject } from 'rxjs';
 
 import { ResourceLoaderService } from './../services/resource-loader.service';
 
@@ -28,6 +29,7 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit {
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
+    private valueChanged = new Subject();
     private aceEditor: any;
     private value: any;
     private isDisabled = false;
@@ -65,6 +67,22 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public ngAfterViewInit() {
+        this.valueChanged.debounceTime(1000).subscribe(() => {
+            const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+
+            if (!isValid) {
+                this.changeCallback(null);
+            } else {
+                try {
+                    const value = JSON.parse(this.aceEditor.getValue());
+
+                    this.changeCallback(value);
+                } catch (e) {
+                    this.changeCallback(null);
+                }
+            }
+        });
+
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
@@ -75,21 +93,11 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
             this.setValue(this.value);
 
             this.aceEditor.on('blur', () => {
-                const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
-
-                if (!isValid) {
-                    this.changeCallback(null);
-                } else {
-                    try {
-                        const value = JSON.parse(this.aceEditor.getValue());
-
-                        this.changeCallback(value);
-                    } catch (e) {
-                        this.changeCallback(null);
-                    }
-                }
-
                 this.touchedCallback();
+            });
+
+            this.aceEditor.on('change', () => {
+                this.valueChanged.next();
             });
         });
     }
