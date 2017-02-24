@@ -35,6 +35,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     @ViewChild('editor')
     public editor: ElementRef;
 
+    @ViewChild('container')
+    public container: ElementRef;
+
+    @ViewChild('inner')
+    public inner: ElementRef;
+
+    public isFullscreen = false;
+
     constructor(
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -74,6 +82,16 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                 const value = this.simplemde.value();
 
                 this.changeCallback(value);
+            });
+
+            this.simplemde.codemirror.on('refresh', () => {
+                this.isFullscreen = this.simplemde.isFullscreenActive();
+
+                if (this.isFullscreen) {
+                    document.body.appendChild(this.inner.nativeElement);
+                } else {
+                    this.container.nativeElement.appendChild(this.inner.nativeElement);
+                }
             });
         });
     }
