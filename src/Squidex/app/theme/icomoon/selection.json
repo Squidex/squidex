@@ -905,7 +905,7 @@
       "properties": {
         "order": 17,
         "id": 26,
-        "name": "control-Textarea",
+        "name": "control-TextArea",
         "prevSize": 32,
         "code": 59662
       },

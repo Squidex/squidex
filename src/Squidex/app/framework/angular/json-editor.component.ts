@@ -7,7 +7,8 @@
 
 import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ReplaySubject } from 'rxjs';
+
+import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var ace: any;
 
@@ -15,9 +16,7 @@ declare var ace: any;
 const NOOP = () => { };
 
 export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => JsonEditorComponent),
-    multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JsonEditorComponent), multi: true
 };
 
 @Component({
@@ -27,9 +26,6 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private static loaderCallback: ReplaySubject<any>;
-    private static isLoaded: boolean;
-
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
     private aceEditor: any;
@@ -38,6 +34,11 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
 
     @ViewChild('editor')
     public editor: ElementRef;
+
+    constructor(
+        private readonly resourceLoader: ResourceLoaderService
+    ) {
+    }
 
     public writeValue(value: any) {
         this.value = value;
@@ -64,7 +65,7 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public ngAfterViewInit() {
-        JsonEditorComponent.loadScript(() => {
+        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
             this.aceEditor.getSession().setMode('ace/mode/javascript');
@@ -103,37 +104,5 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
         }
 
         this.aceEditor.clearSelection();
-    }
-
-    private static loadScript(callback: () => void) {
-        if (JsonEditorComponent.isLoaded) {
-            callback();
-
-            return;
-        }
-
-        if (JsonEditorComponent.loaderCallback) {
-            JsonEditorComponent.loaderCallback.subscribe(callback);
-
-            return;
-        }
-
-        JsonEditorComponent.loaderCallback = new ReplaySubject(1);
-        JsonEditorComponent.loaderCallback.subscribe(callback);
-
-        const url = 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js';
-
-        const script = document.createElement('script');
-        script.src = url;
-        script.async = true;
-        script.onload = () => {
-            JsonEditorComponent.loaderCallback.next(null);
-            JsonEditorComponent.loaderCallback = null;
-            JsonEditorComponent.isLoaded = true;
-        };
-
-        const node = document.getElementsByTagName('script')[0];
-
-        node.parentNode.insertBefore(script, node);
     }
 }

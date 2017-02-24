@@ -39,13 +39,13 @@
                             <div *ngSwitchCase="'Input'">
                                 <input class="form-control" type="text" [formControlName]="language">
                             </div>
+                            <div *ngSwitchCase="'Textarea'">
+                                <textarea class="form-control" [formControlName]="language"></textarea>
+                            </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
                                     <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
                                 </select>
-                            </div>
-                            <div *ngSwitchCase="'Textarea'">
-                                <textarea class="form-control" [formControlName]="language"></textarea>
                             </div>
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
@@ -53,6 +53,12 @@
                                         <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="language"> {{value}}
                                     </label>
                                 </div>
+                            </div>
+                            <div *ngSwitchCase="'RichText'">
+                                <sqx-rich-editor [formControlName]="language"></sqx-rich-editor>
+                            </div>
+                            <div *ngSwitchCase="'Markdown'">
+                                <sqx-markdown-editor [formControlName]="language"></sqx-markdown-editor>
                             </div>
                         </div>
                     </div>

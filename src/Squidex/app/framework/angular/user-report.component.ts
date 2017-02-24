@@ -7,6 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 
+import { ResourceLoaderService } from './../services/resource-loader.service';
 import { UserReportConfig } from './../configurations';
 
 @Component({
@@ -14,22 +15,16 @@ import { UserReportConfig } from './../configurations';
     template: ''
 })
 export class UserReportComponent implements OnInit {
-    constructor(config: UserReportConfig) {
+    constructor(config: UserReportConfig,
+        private readonly resourceLoader: ResourceLoaderService
+    ) {
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', config.siteId]);
     }
 
     public ngOnInit() {
         setTimeout(() => {
-            const url = 'https://cdn.userreport.com/userreport.js';
-
-            const script = document.createElement('script');
-            script.src = url;
-            script.async = true;
-
-            const node = document.getElementsByTagName('script')[0];
-
-            node.parentNode.insertBefore(script, node);
+            this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
         }, 4000);
     }
 }

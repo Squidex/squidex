@@ -15,9 +15,7 @@ let Pikaday = require('pikaday/pikaday');
 const NOOP = () => { };
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => DateTimeEditorComponent),
-    multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true
 };
 
 @Component({

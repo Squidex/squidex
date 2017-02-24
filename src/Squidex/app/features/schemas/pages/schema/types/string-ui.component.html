@@ -21,12 +21,26 @@
 
                 <span class="radio-label">Input</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Textarea'">
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'TextArea'">
                 <input type="radio" class="radio-input" formControlName="editor" value="TextArea" />
 
-                <i class="icon-control-Textarea"></i>
+                <i class="icon-control-TextArea"></i>
 
                 <span class="radio-label">TextArea</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'RichText'">
+                <input type="radio" class="radio-input" formControlName="editor" value="RichText" />
+
+                <i class="icon-control-RichText"></i>
+
+                <span class="radio-label">RichText</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Markdown'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Markdown" />
+
+                <i class="icon-control-Markdown"></i>
+
+                <span class="radio-label">Markdown</span>
             </label>
             <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Dropdown'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />

@@ -10,9 +10,11 @@ namespace Squidex.Core.Schemas
 {
     public enum StringFieldEditor
     {
+        Dropdown,
         Input,
-        Textarea,
+        Markdown,
         Radio,
-        Dropdown
+        RichText,
+        TextArea
     }
 }

@@ -49,9 +49,7 @@ export class NoopConverter implements Converter {
 }
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => TagEditorComponent),
-    multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
 
 @Component({

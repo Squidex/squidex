@@ -12,9 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 const NOOP = () => { };
 
 export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => SliderComponent),
-    multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SliderComponent), multi: true
 };
 
 @Component({

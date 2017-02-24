@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?8vtvuo');
-  src:  url('fonts/icomoon.eot?8vtvuo#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?8vtvuo') format('truetype'),
-    url('fonts/icomoon.woff?8vtvuo') format('woff'),
-    url('fonts/icomoon.svg?8vtvuo#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?y0t7c1');
+  src:  url('fonts/icomoon.eot?y0t7c1#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?y0t7c1') format('truetype'),
+    url('fonts/icomoon.woff?y0t7c1') format('woff'),
+    url('fonts/icomoon.svg?y0t7c1#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -120,7 +120,7 @@
 .icon-control-Radio:before {
   content: "\e90d";
 }
-.icon-control-Textarea:before {
+.icon-control-TextArea:before {
   content: "\e90e";
 }
 .icon-control-Toggle:before {

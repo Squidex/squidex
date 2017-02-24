@@ -30,9 +30,7 @@ const KEY_DOWN = 40;
 const NOOP = () => { };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => AutocompleteComponent),
-    multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
 };
 
 @Component({

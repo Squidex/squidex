@@ -9,6 +9,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
@@ -35,6 +36,7 @@ namespace Squidex.Config.Domain
             settings.Converters.Add(new NamedStringIdConverter());
             settings.Converters.Add(new PropertiesBagConverter());
             settings.Converters.Add(new RefTokenConverter());
+            settings.Converters.Add(new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 
