@@ -61,7 +61,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         this.isDisabled = isDisabled;
 
         if (this.simplemde) {
-            this.simplemde.setOption('readOnly', isDisabled);
+            this.simplemde.codemirror.setOption('readOnly', isDisabled);
         }
     }
 
@@ -78,10 +78,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             this.simplemde = new SimpleMDE({ element: this.editor.nativeElement });
             this.simplemde.value(this.value || '');
 
-            this.simplemde.codemirror.on('blur', () => {
+            this.simplemde.codemirror.on('change', () => {
                 const value = this.simplemde.value();
 
                 this.changeCallback(value);
+            });
+
+            this.simplemde.codemirror.on('blur', () => {
+                this.touchedCallback();
             });
 
             this.simplemde.codemirror.on('refresh', () => {

@@ -8,7 +8,9 @@
                     <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content" />
                 </form>
                 
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                <span *ngIf="languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                </span>
 
                 <button class="btn btn-success" [routerLink]="['new']">
                     <i class="icon-plus"></i> New
