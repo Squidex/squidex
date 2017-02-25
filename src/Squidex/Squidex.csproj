@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Config\Identity\Cert\*.*" />
+    <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
 	<None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

@@ -34,19 +34,14 @@ namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
-        private const string BodyDescription =
-            @"The data of the {0} to be created or updated.
-            
-Please note that each field is an object with one entry per language. 
-If the field is not localizable you must use iv (Invariant Language) as a key.
-When you change the field to be localizable the value will become the value for the master language, depending what the master language is at this point of time.";
-
         private readonly SwaggerJsonSchemaGenerator schemaGenerator;
         private readonly SwaggerDocument document = new SwaggerDocument { Tags = new List<SwaggerTag>() };
         private readonly HttpContext context;
         private readonly JsonSchemaResolver schemaResolver;
         private readonly SwaggerGenerator swaggerGenerator;
         private readonly MyUrlsOptions urlOptions;
+        private readonly string schemaQueryDescription;
+        private readonly string schemaBodyDescription;
         private HashSet<Language> languages;
         private JsonSchema4 errorDtoSchema;
         private JsonSchema4 entityCreatedDtoSchema;
@@ -64,6 +59,8 @@ When you change the field to be localizable the value will become the value for 
 
             swaggerGenerator = new SwaggerGenerator(schemaGenerator, swaggerSettings, schemaResolver);
 
+            schemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
+            schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity appEntity, IEnumerable<ISchemaEntityWithSchema> schemas)
@@ -72,10 +69,9 @@ When you change the field to be localizable the value will become the value for 
 
             languages = new HashSet<Language>(appEntity.Languages);
 
-            appBasePath = $"/content/{appEntity.Name}";
-
             await GenerateBasicSchemas();
-            
+
+            GenerateBasePath(appEntity);
             GenerateTitle();
             GenerateRequestInfo();
             GenerateContentTypes();
@@ -88,6 +84,11 @@ When you change the field to be localizable the value will become the value for 
             return document;
         }
 
+        private void GenerateBasePath(IAppEntity appEntity)
+        {
+            appBasePath = $"/content/{appEntity.Name}";
+        }
+
         private void GenerateSchemes()
         {
             document.Schemes.Add(context.Request.Scheme == "http" ? SwaggerSchema.Http : SwaggerSchema.Https);
@@ -96,7 +97,6 @@ When you change the field to be localizable the value will become the value for 
         private void GenerateTitle()
         {
             document.Host = context.Request.Host.Value ?? string.Empty;
-
             document.BasePath = "/api";
         }
 
@@ -201,11 +201,13 @@ When you change the field to be localizable the value will become the value for 
             }
         }
 
-        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, JsonSchema4 dataSchem)
+        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
             {
-                operation.Summary = $"Queries {schemaName} content."; 
+                operation.Summary = $"Queries {schemaName} content.";
+
+                operation.Description = schemaQueryDescription;
 
                 operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take.");
                 operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
@@ -213,7 +215,7 @@ When you change the field to be localizable the value will become the value for 
                 operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
                 operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
 
-                var responseSchema = CreateContentsSchema(schemaName, schema.Name, dataSchem);
+                var responseSchema = CreateContentsSchema(schemaName, schema.Name, dataSchema);
 
                 operation.AddResponse("200", $"{schemaName} content retrieved.", responseSchema);
             });
@@ -237,7 +239,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Create a {schemaName} content.";
 
-                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
+                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
 
                 operation.AddResponse("201", $"{schemaName} created.",  entityCreatedDtoSchema);
             });
@@ -249,7 +251,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Update a {schemaName} content.";
 
-                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
+                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
 
                 operation.AddResponse("204", $"{schemaName} element updated.");
             });
@@ -261,7 +263,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.Summary = $"Patchs a {schemaName} content.";
 
-                operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
+                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
 
                 operation.AddResponse("204", $"{schemaName} element updated.");
             });
@@ -344,9 +346,8 @@ When you change the field to be localizable the value will become the value for 
             var CreateProperty = 
                 new Func<string, string, JsonProperty>((d, f) => 
                     new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
-
-            var dataDescription = $"The data of the {schemaName} content.";
-            var dataProperty = new JsonProperty { Description = dataDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
+            
+            var dataProperty = new JsonProperty { Description = schemaBodyDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
             {

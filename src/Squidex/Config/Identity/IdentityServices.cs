@@ -63,10 +63,9 @@ namespace Squidex.Config.Identity
         {
             X509Certificate2 certificate;
 
-            var assemblyName = new AssemblyName("Squidex");
-            var assemblyRef = Assembly.Load(assemblyName);
+            var assembly = typeof(IdentityServices).GetTypeInfo().Assembly;
 
-            using (var certStream = assemblyRef.GetManifestResourceStream("Squidex.Config.Identity.Cert.IdentityCert.pfx"))
+            using (var certStream = assembly.GetManifestResourceStream("Squidex.Config.Identity.Cert.IdentityCert.pfx"))
             {
                 var certData = new byte[certStream.Length];
 

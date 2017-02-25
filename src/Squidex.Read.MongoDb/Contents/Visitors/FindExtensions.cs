@@ -6,12 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData.Core.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
 
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable RedundantIfElseBlock
 
 namespace Squidex.Read.MongoDb.Contents.Visitors
@@ -31,7 +33,11 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             if (top.HasValue)
             {
-                cursor = cursor.Limit((int)top.Value);
+                cursor = cursor.Limit(Math.Min((int)top.Value, 200));
+            }
+            else
+            {
+                cursor = cursor.Limit(20);
             }
 
             return cursor;

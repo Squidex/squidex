@@ -23,8 +23,7 @@ namespace Squidex.Config.Swagger
         {
             foreach (var controllerType in context.ControllerTypes)
             {
-                var tagAttribute =
-                    controllerType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
+                var tagAttribute = controllerType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
 
                 if (tagAttribute != null)
                 {
@@ -50,8 +49,7 @@ namespace Squidex.Config.Swagger
 
         public Task<bool> ProcessAsync(OperationProcessorContext context)
         {
-            var tagAttribute = 
-                context.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
+            var tagAttribute = context.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
 
             if (tagAttribute != null)
             {

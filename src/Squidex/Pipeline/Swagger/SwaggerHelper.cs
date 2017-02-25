@@ -6,33 +6,43 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
+using System.IO;
 using NJsonSchema;
 using NSwag;
 using Squidex.Config;
+using System.Reflection;
 
 namespace Squidex.Pipeline.Swagger
 {
     public static class SwaggerHelper
     {
-        private const string SecurityDescription =
-@"To retrieve an access token, the client id must make a request to the token url. For example:
+        private static ConcurrentDictionary<string, string> docs = new ConcurrentDictionary<string, string>();
 
-    $ curl
-        -X POST '{0}' 
-        -H 'Content-Type: application/x-www-form-urlencoded' 
-        -d 'grant_type=client_credentials&
-              client_id=[APP_NAME]:[CLIENT_NAME]&
-              client_secret=[CLIENT_SECRET]'";
+        public static string LoadDocs(string name)
+        {
+            return docs.GetOrAdd(name, x =>
+            {
+                var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
+
+                using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
+                {
+                    var streamReader = new StreamReader(resourceStream);
+
+                    return streamReader.ReadToEnd();
+                }
+            });
+        }
 
         public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
         {
             var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityPrefix}/connect/token");
 
-            var description = string.Format(CultureInfo.InvariantCulture, SecurityDescription, tokenUrl);
+            var securityDocs = LoadDocs("security");
+            var securityDescription = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
-            return 
+            var result = 
                 new SwaggerSecurityScheme
                 {
                     TokenUrl = tokenUrl,
@@ -42,53 +52,61 @@ namespace Squidex.Pipeline.Swagger
                     {
                         { Constants.ApiScope, "Read and write access to the API" }
                     },
-                    Description = description
+                    Description = securityDescription
                 };
+
+            return result;
         }
 
-        public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description)
+        public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)
         {
-            operation.Parameters.Add(
-                new SwaggerParameter
-                {
-                    Type = type,
-                    Name = name,
-                    Kind = SwaggerParameterKind.Query,
-                    Description = description
-                });
+            var parameter = new SwaggerParameter { Type = type, Name = name, Kind = SwaggerParameterKind.Query };
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                parameter.Description = description;
+            }
+
+            operation.Parameters.Add(parameter);
         }
 
-        public static void AddPathParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description)
+        public static void AddPathParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)
         {
-            operation.Parameters.Add(
-                new SwaggerParameter
-                {
-                    Type = type,
-                    Name = name,
-                    Kind = SwaggerParameterKind.Path,
-                    IsRequired = true,
-                    IsNullableRaw = false,
-                    Description = description
-                });
+            var parameter = new SwaggerParameter { Type = type, Name = name, Kind = SwaggerParameterKind.Path };
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                parameter.Description = description;
+            }
+
+            parameter.IsRequired = true;
+            parameter.IsNullableRaw = false;
+
+            operation.Parameters.Add(parameter);
+
+            operation.Parameters.Add(parameter);
         }
 
         public static void AddBodyParameter(this SwaggerOperation operation, JsonSchema4 schema, string name, string description)
         {
-            operation.Parameters.Add(
-                new SwaggerParameter
-                {
-                    Name = name,
-                    Kind = SwaggerParameterKind.Body,
-                    Schema = schema,
-                    IsRequired = true,
-                    IsNullableRaw = false,
-                    Description = description
-                });
+            var parameter = new SwaggerParameter { Schema = schema, Name = name, Kind = SwaggerParameterKind.Body };
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                parameter.Description = description;
+            }
+
+            parameter.IsRequired = true;
+            parameter.IsNullableRaw = false;
+
+            operation.Parameters.Add(parameter);
         }
 
         public static void AddResponse(this SwaggerOperation operation, string statusCode, string description, JsonSchema4 schema = null)
         {
-            operation.Responses.Add(statusCode, new SwaggerResponse { Description = description, Schema = schema });
+            var response = new SwaggerResponse { Description = description, Schema = schema };
+
+            operation.Responses.Add(statusCode, response);
         }
     }
 }

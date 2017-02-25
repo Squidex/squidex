@@ -64,7 +64,7 @@ namespace Squidex.Controllers.ContentApi
             var model = new ContentsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForContents.Result.Select(x =>
+                Items = taskForContents.Result.Take(200).Select(x =>
                 {
                     var itemModel = SimpleMapper.Map(x, new ContentDto());
 
