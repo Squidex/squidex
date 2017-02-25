@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  Extensions.cs
+//  StringExtensionsTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure
 {
-    public static class Extensions
+    public static class StringExtensions
     {
         private static readonly Regex SlugRegex = new Regex("^[a-z0-9]+(\\-[a-z0-9]+)*$", RegexOptions.Compiled);
         private static readonly Regex PropertyNameRegex = new Regex("^[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*$", RegexOptions.Compiled);
@@ -27,9 +27,9 @@ namespace Squidex.Infrastructure
             return value != null && PropertyNameRegex.IsMatch(value);
         }
 
-        public static bool IsBetween<TValue>(this TValue value, TValue low, TValue high) where TValue : IComparable
+        public static string ToPascalCase(this string value)
         {
-            return Comparer<TValue>.Default.Compare(low, value) <= 0 && Comparer<TValue>.Default.Compare(high, value) >= 0;
+            return string.Concat(value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(c => char.ToUpper(c[0]) + c.Substring(1)));
         }
     }
 }

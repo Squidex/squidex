@@ -6,7 +6,7 @@
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
 
     <div [formGroup]="fieldForm">
-        <div *ngIf="field.properties.isLocalizable">
+        <div *ngIf="field.properties.isLocalizable && languages.length > 1">
             <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
         </div>
 

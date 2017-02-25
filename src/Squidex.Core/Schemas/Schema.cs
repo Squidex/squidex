@@ -177,11 +177,13 @@ namespace Squidex.Core.Schemas
             Guard.NotEmpty(languages, nameof(languages));
             Guard.NotNull(typeResolver, nameof(typeResolver));
 
-            var edmType = new EdmComplexType("Squidex",  Name);
+            var schemaName = Name.ToPascalCase();
+
+            var edmType = new EdmComplexType("Squidex", schemaName);
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
-                field.AddToEdmType(edmType, languages, Name, typeResolver);
+                field.AddToEdmType(edmType, languages, schemaName, typeResolver);
             }
 
             return edmType;
@@ -192,11 +194,13 @@ namespace Squidex.Core.Schemas
             Guard.NotEmpty(languages, nameof(languages));
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
-            var schema = new JsonSchema4 { Id = Name, Type = JsonObjectType.Object };
+            var schemaName = Name.ToPascalCase();
+
+            var schema = new JsonSchema4 { Id = schemaName, Type = JsonObjectType.Object };
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
-                field.AddToSchema(schema, languages, Name, schemaResolver);
+                field.AddToSchema(schema, languages, schemaName, schemaResolver);
             }
 
             return schema;

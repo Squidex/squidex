@@ -164,7 +164,7 @@ namespace Squidex.Core.Schemas
                 return;
             }
 
-            var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}_{Name}_Property"));
+            var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}{Name.ToPascalCase()}Property"));
 
             foreach (var language in languages)
             {
@@ -197,7 +197,7 @@ namespace Squidex.Core.Schemas
                 languagesObject.Properties.Add(language.Iso2Code, languageProperty);
             }
 
-            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}_{Name}_Property", languagesObject));
+            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", languagesObject));
 
             schema.Properties.Add(Name, languagesProperty);
         }

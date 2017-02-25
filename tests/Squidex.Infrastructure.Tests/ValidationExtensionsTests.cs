@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnumExtensionsTests.cs
+//  ValidationExtensionsTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,8 +11,36 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class EnumExtensionsTests
+    public sealed class ValidationExtensionsTests
     {
+        [Fact]
+        public void Should_return_true_if_is_between()
+        {
+            Assert.True(1.IsBetween(0, 2));
+        }
+
+        [Fact]
+        public void Should_return_false_if_is_not_between()
+        {
+            Assert.False(1.IsBetween(2, 3));
+        }
+
+        [Fact]
+        public void Should_return_true_if_is_valid_regex()
+        {
+            var regex = "[a-z]*";
+
+            Assert.True(regex.IsValidRegex());
+        }
+
+        [Fact]
+        public void Should_return_true_if_is_not_a_valid_regex()
+        {
+            var regex = "([a-z]*";
+
+            Assert.False(regex.IsValidRegex());
+        }
+
         [Fact]
         public void Should_return_true_if_enum_is_valid()
         {

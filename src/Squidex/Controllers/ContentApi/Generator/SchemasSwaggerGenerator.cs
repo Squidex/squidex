@@ -159,7 +159,7 @@ When you change the field to be localizable the value will become the value for 
         {
             foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
             {
-                operation.Responses.Add("500", new SwaggerResponse { Description = "Operations failed with internal server error.", Schema = errorDtoSchema });
+                operation.Responses.Add("500", new SwaggerResponse { Description = "Operation failed with internal server error.", Schema = errorDtoSchema });
             }
         }
 
@@ -178,7 +178,7 @@ When you change the field to be localizable the value will become the value for 
             document.Tags.Add(
                 new SwaggerTag
                 {
-                    Name = schemaName, Description = $"API to managed {schemaName} content elements."
+                    Name = schemaName, Description = $"API to managed {schemaName} content."
                 });
 
             var dataSchem = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
@@ -205,16 +205,17 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
             {
-                operation.Summary = $"Queries {schemaName} content elements."; 
+                operation.Summary = $"Queries {schemaName} content."; 
 
-                operation.AddQueryParameter("$top", JsonObjectType.Number, "The number of elements to take.");
-                operation.AddQueryParameter("$skip", JsonObjectType.Number, "The number of elements to skip.");
-                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional filter.");
-                operation.AddQueryParameter("$search", JsonObjectType.String, "Optional full text query string.");
+                operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take.");
+                operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
+                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
+                operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
+                operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
 
                 var responseSchema = CreateContentsSchema(schemaName, schema.Name, dataSchem);
 
-                operation.AddResponse("200", $"{schemaName} content elements retrieved.", responseSchema);
+                operation.AddResponse("200", $"{schemaName} content retrieved.", responseSchema);
             });
         }
 
@@ -222,11 +223,11 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
-                operation.Summary = $"Get a {schemaName} content element.";
+                operation.Summary = $"Get a {schemaName} content.";
 
                 var responseSchema = CreateContentSchema(schemaName, schema.Name, dataSchema);
 
-                operation.AddResponse("200", $"{schemaName} element found.", responseSchema);
+                operation.AddResponse("200", $"{schemaName} content found.", responseSchema);
             });
         }
 
@@ -234,7 +235,7 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appBasePath}/{schema.Name}", operation =>
             {
-                operation.Summary = $"Create a {schemaName} content element.";
+                operation.Summary = $"Create a {schemaName} content.";
 
                 operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
@@ -246,7 +247,7 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
-                operation.Summary = $"Update a {schemaName} content element.";
+                operation.Summary = $"Update a {schemaName} content.";
 
                 operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
@@ -258,7 +259,7 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
-                operation.Summary = $"Patchs a {schemaName} content element.";
+                operation.Summary = $"Patchs a {schemaName} content.";
 
                 operation.AddBodyParameter(dataSchema, "data", string.Format(BodyDescription, schemaName));
 
@@ -270,7 +271,7 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/publish", operation =>
             {
-                operation.Summary = $"Publish a {schemaName} content element.";
+                operation.Summary = $"Publish a {schemaName} content.";
                 
                 operation.AddResponse("204", $"{schemaName} element published.");
             });
@@ -280,7 +281,7 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/unpublish", operation =>
             {
-                operation.Summary = $"Unpublish a {schemaName} content element.";
+                operation.Summary = $"Unpublish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} element unpublished.");
             });
@@ -290,9 +291,9 @@ When you change the field to be localizable the value will become the value for 
         {
             return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/", operation =>
             {
-                operation.Summary = $"Delete a {schemaName} content element.";
+                operation.Summary = $"Delete a {schemaName} content.";
 
-                operation.AddResponse("204", $"{schemaName} element deleted.");
+                operation.AddResponse("204", $"{schemaName} content deleted.");
             });
         }
 
@@ -309,7 +310,7 @@ When you change the field to be localizable the value will become the value for 
             {
                 operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
 
-                operation.AddResponse("404", $"App, schema or {entityName} not found.");
+                operation.AddResponse("404", $"App, schema or {entityName} content not found.");
             }
 
             return operations;
@@ -325,11 +326,11 @@ When you change the field to be localizable the value will become the value for 
                 {
                     ["total"] = new JsonProperty
                     {
-                        Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} content elements."
+                        Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} contents."
                     },
                     ["items"] = new JsonProperty
                     {
-                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The item of {schemaName} content elements."
+                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The {schemaName} contents."
                     }
                 },
                 Type = JsonObjectType.Object
@@ -344,19 +345,19 @@ When you change the field to be localizable the value will become the value for 
                 new Func<string, string, JsonProperty>((d, f) => 
                     new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
 
-            var dataDescription = $"The data of the {schemaName} content element";
+            var dataDescription = $"The data of the {schemaName} content";
             var dataProperty = new JsonProperty { Description = dataDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
             {
                 Properties =
                 {
-                    ["id"] = CreateProperty($"The id of the {schemaName}", null),
+                    ["id"] = CreateProperty($"The id of the {schemaName} content.", null),
                     ["data"] = dataProperty,
-                    ["created"] = CreateProperty($"The date and time when the {schemaName} content element has been created.", "date-time"),
-                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content element.", null),
-                    ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content element has been modified last.", "date-time"),
-                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content element.", null)
+                    ["created"] = CreateProperty($"The date and time when the {schemaName} content has been created.", "date-time"),
+                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content.", null),
+                    ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content has been modified last.", "date-time"),
+                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.", null)
                 },
                 Type = JsonObjectType.Object
             };
