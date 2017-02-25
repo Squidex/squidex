@@ -200,7 +200,7 @@ namespace Squidex.Write.Apps
             return this;
         }
 
-        protected void RaiseEvent(AppEvent @event)
+        private void RaiseEvent(AppEvent @event)
         {
             if (@event.AppId == null)
             {

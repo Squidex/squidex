@@ -33,7 +33,7 @@ namespace Squidex.Read.History
             this.typeNameRegistry = typeNameRegistry;
         }
 
-        public void AddEventMessage<TEvent>(string message) where TEvent : IEvent
+        protected void AddEventMessage<TEvent>(string message) where TEvent : IEvent
         {
             Guard.NotNullOrEmpty(message, nameof(message));
 

@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+// ReSharper disable ObjectCreationAsStatement
+
 namespace Squidex.Infrastructure
 {
     public static class ValidationExtensions

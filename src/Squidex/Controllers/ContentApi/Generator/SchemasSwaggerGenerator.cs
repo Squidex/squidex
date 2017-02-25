@@ -66,7 +66,7 @@ When you change the field to be localizable the value will become the value for 
 
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity appEntity, IReadOnlyCollection<ISchemaEntityWithSchema> schemas)
+        public async Task<SwaggerDocument> Generate(IAppEntity appEntity, IEnumerable<ISchemaEntityWithSchema> schemas)
         {
             app = appEntity;
 

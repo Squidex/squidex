@@ -9,7 +9,6 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
-using NodaTime.Text;
 
 // ReSharper disable InvertIf
 

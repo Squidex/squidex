@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_return_true_if_is_valid_regex()
         {
-            var regex = "[a-z]*";
+            const string regex = "[a-z]*";
 
             Assert.True(regex.IsValidRegex());
         }
@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_return_true_if_is_not_a_valid_regex()
         {
-            var regex = "([a-z]*";
+            const string regex = "([a-z]*";
 
             Assert.False(regex.IsValidRegex());
         }

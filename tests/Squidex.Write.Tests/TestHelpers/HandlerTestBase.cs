@@ -79,7 +79,7 @@ namespace Squidex.Write.TestHelpers
             return new CommandContext(CreateCommand(command));
         }
 
-        public async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
+        protected async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
         {
             handler.Init(domainObject);
 
@@ -91,7 +91,7 @@ namespace Squidex.Write.TestHelpers
             }
         }
 
-        public async Task TestUpdate(T domainObject, Func<T, Task> action, bool shouldUpdate = true)
+        protected async Task TestUpdate(T domainObject, Func<T, Task> action, bool shouldUpdate = true)
         {
             handler.Init(domainObject);
 
@@ -103,7 +103,7 @@ namespace Squidex.Write.TestHelpers
             }
         }
 
-        protected virtual TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+        protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             command.Actor = User;
 
@@ -124,7 +124,7 @@ namespace Squidex.Write.TestHelpers
             return command;
         }
 
-        protected virtual TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
+        protected TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
         {
             @event.Actor = User;
 

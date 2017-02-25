@@ -10,6 +10,7 @@ using System;
 using NodaTime;
 using Xunit;
 
+// ReSharper disable MemberCanBeMadeStatic.Global
 // ReSharper disable UnusedParameter.Local
 
 namespace Squidex.Infrastructure.Reflection

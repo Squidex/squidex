@@ -8,6 +8,8 @@
 
 using Squidex.Core.Schemas;
 
+// ReSharper disable UnusedParameter.Global
+
 namespace Squidex.Events.Schemas.Utils
 {
     public class SchemaEventDispatcher

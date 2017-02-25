@@ -10,6 +10,8 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
+
 namespace Squidex.Write.Apps
 {
     public class ClientKeyGenerator

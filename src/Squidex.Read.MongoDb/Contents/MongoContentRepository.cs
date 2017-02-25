@@ -28,7 +28,7 @@ namespace Squidex.Read.MongoDb.Contents
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemaProvider;
 
-        protected IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
+        protected static IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
         {
             get
             {

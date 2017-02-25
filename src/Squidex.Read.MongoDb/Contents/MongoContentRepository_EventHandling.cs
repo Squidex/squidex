@@ -18,13 +18,14 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.MongoDb.Utils;
 
+// ReSharper disable UnusedParameterGlobal
 // ReSharper disable ConvertToLambdaExpression
 
 namespace Squidex.Read.MongoDb.Contents
 {
     public partial class MongoContentRepository
     {
-        protected UpdateDefinitionBuilder<MongoContentEntity> Update
+        private static UpdateDefinitionBuilder<MongoContentEntity> Update
         {
             get
             {

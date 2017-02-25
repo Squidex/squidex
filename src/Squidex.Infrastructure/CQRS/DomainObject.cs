@@ -45,12 +45,12 @@ namespace Squidex.Infrastructure.CQRS
             DispatchEvent(@event); version++;
         }
 
-        protected virtual void RaiseEvent(IEvent @event)
+        protected void RaiseEvent(IEvent @event)
         {
             RaiseEvent(Envelope<IEvent>.Create(@event));
         }
 
-        protected virtual void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
+        protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
         {
             Guard.NotNull(@event, nameof(@event));
 

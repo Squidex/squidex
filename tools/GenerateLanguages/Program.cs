@@ -53,7 +53,7 @@ namespace GenerateLanguages
                         Console.WriteLine("Languages contains duplicate {0}", languageIso2Code);
                     } 
 
-                    writer.WriteLine("        public static Language {0} = AddLanguage(\"{1}\", \"{2}\");", languageIso2Code.ToUpperInvariant(), languageIso2Code, languageEnglishName);
+                    writer.WriteLine("        public static readonly Language {0} = AddLanguage(\"{1}\", \"{2}\");", languageIso2Code.ToUpperInvariant(), languageIso2Code, languageEnglishName);
                 }
             }
 

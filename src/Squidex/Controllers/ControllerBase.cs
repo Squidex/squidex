@@ -16,7 +16,7 @@ namespace Squidex.Controllers
 {
     public abstract class ControllerBase : Controller
     {
-        public ICommandBus CommandBus { get; }
+        protected ICommandBus CommandBus { get; }
 
         protected ControllerBase(ICommandBus commandBus)
         {
@@ -28,7 +28,7 @@ namespace Squidex.Controllers
             throw new NotImplementedException();
         }
 
-        public IAppEntity App
+        protected IAppEntity App
         {
             get
             {
@@ -43,7 +43,7 @@ namespace Squidex.Controllers
             }
         }
 
-        public Guid AppId
+        protected Guid AppId
         {
             get
             {

@@ -25,12 +25,7 @@ namespace Squidex.Infrastructure
             get { return id; }
         }
 
-        protected DomainObjectException(string message, string id, Type type)
-            : this(message, id, type, null)
-        {
-        }
-
-        protected DomainObjectException(string message, string id, Type type, Exception inner)
+        protected DomainObjectException(string message, string id, Type type, Exception inner = null)
             : base(message, inner)
         {
             this.id = id;
