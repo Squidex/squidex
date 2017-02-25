@@ -345,7 +345,7 @@ When you change the field to be localizable the value will become the value for 
                 new Func<string, string, JsonProperty>((d, f) => 
                     new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
 
-            var dataDescription = $"The data of the {schemaName} content";
+            var dataDescription = $"The data of the {schemaName} content.";
             var dataProperty = new JsonProperty { Description = dataDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
