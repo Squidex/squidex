@@ -14,7 +14,7 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class InstantSerializer : SerializerBase<Instant>
+    public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer
     {
         private static bool isRegistered;
         private static readonly object LockObject = new object();
@@ -36,6 +36,11 @@ namespace Squidex.Infrastructure.MongoDb
             }
 
             return false;
+        }
+
+        public bool IsDiscriminatorCompatibleWithObjectSerializer
+        {
+            get { return true; }
         }
 
         public override Instant Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

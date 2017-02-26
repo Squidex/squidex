@@ -32,9 +32,9 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             var entityType = new EdmEntityType("Squidex", schema.Name);
             entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
-            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.Date);
+            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.Date);
+            entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
 
             model.AddElement(container);

@@ -69,19 +69,12 @@ namespace Squidex.Core.Schemas
         {
             jsonProperty.Type = JsonObjectType.String;
 
-            if (Properties.Editor == DateTimeFieldEditor.Date)
-            {
-                jsonProperty.Format = JsonFormatStrings.Date;
-            }
-            else
-            {
-                jsonProperty.Format = JsonFormatStrings.DateTime;
-            }
+            jsonProperty.Format = JsonFormatStrings.DateTime;
         }
 
         protected override IEdmTypeReference CreateEdmType()
         {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Date, !Properties.IsRequired);
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.DateTimeOffset, !Properties.IsRequired);
         }
     }
 }

@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.MongoDb.Contents.Visitors;
 using Xunit;
 
@@ -28,11 +29,13 @@ namespace Squidex.Read.MongoDb.Contents
                 .AddOrUpdateField(new StringField(1, "firstName",
                     new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
                 .AddOrUpdateField(new StringField(2, "lastName",
-                    new StringFieldProperties { Hints = "Last Name" }))
-                .AddOrUpdateField(new BooleanField(3, "admin",
+                    new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }))
+                .AddOrUpdateField(new BooleanField(3, "isAdmin",
                     new BooleanFieldProperties()))
                 .AddOrUpdateField(new NumberField(4, "age",
-                    new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
+                    new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
+                .AddOrUpdateField(new DateTimeField(5, "birthday",
+                    new DateTimeFieldProperties()));
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
@@ -42,10 +45,15 @@ namespace Squidex.Read.MongoDb.Contents
             Language.DE
         };
 
+        static ODataQueryTests()
+        {
+            InstantSerializer.Register();
+        }
+
         [Fact]
         public void Should_parse_query()
         {
-            var parser = schema.ParseQuery(languages, "$filter=data/FirstName/de eq 'Sebastian'");
+            var parser = schema.ParseQuery(languages, "$filter=data/firstName/de eq 'Sebastian'");
 
             Assert.NotNull(parser);
         }
@@ -91,6 +99,24 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var i = F("$filter=data/firstName/de eq 'Sebastian'");
             var o = C("{ 'Data.1.de' : 'Sebastian' }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_datetime_equals_query()
+        {
+            var i = F("$filter=data/birthday/iv eq 1988-01-19T12:00:00Z");
+            var o = C("{ 'Data.5.iv' : ISODate(\"1988-01-19T12:00:00Z\") }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_boolean_equals_query()
+        {
+            var i = F("$filter=data/isAdmin/iv eq true");
+            var o = C("{ 'Data.3.iv' : true }");
 
             Assert.Equal(o, i);
         }
@@ -206,14 +232,25 @@ namespace Squidex.Read.MongoDb.Contents
         }
 
         [Fact]
-        public void Should_not_set_top()
+        public void Should_set_max_top_if_larger()
+        {
+            var parser = schema.ParseQuery(languages, "$top=300");
+            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+
+            cursor.Object.Take(parser);
+
+            cursor.Verify(x => x.Limit(200));
+        }
+
+        [Fact]
+        public void Should_set_default_top()
         {
             var parser = schema.ParseQuery(languages, "");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Take(parser);
 
-            cursor.Verify(x => x.Limit(It.IsAny<int>()), Times.Never);
+            cursor.Verify(x => x.Limit(20));
         }
 
         [Fact]

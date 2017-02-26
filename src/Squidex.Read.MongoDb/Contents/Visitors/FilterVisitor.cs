@@ -15,6 +15,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
 
+// ReSharper disable InvertIf
 // ReSharper disable SwitchStatementMissingSomeCases
 // ReSharper disable ConvertIfStatementToSwitchStatement
 
@@ -49,17 +50,26 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
         public override FilterDefinition<MongoContentEntity> Visit(SingleValueFunctionCallNode nodeIn)
         {
+            var fieldNode = nodeIn.Parameters.ElementAt(0);
+            var valueNode = nodeIn.Parameters.ElementAt(1);
+
             if (nodeIn.Name == "endswith")
             {
-                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression(BuildValue(nodeIn.Parameters.ElementAt(1)) + "$", "i"));
+                var value = BuildRegex(valueNode, v => v + "$");
+
+                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
             if (nodeIn.Name == "startswith")
             {
-                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression("^" + BuildValue(nodeIn.Parameters.ElementAt(1)), "i"));
+                var value = BuildRegex(valueNode, v => "^" + v);
+
+                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
             if (nodeIn.Name == "contains")
             {
-                return Filter.Regex(BuildFieldDefinition(nodeIn.Parameters.ElementAt(0)), new BsonRegularExpression(BuildValue(nodeIn.Parameters.ElementAt(1)).ToString(), "i"));
+                var value = BuildRegex(valueNode, v => v);
+
+                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
 
             throw new NotSupportedException();
@@ -101,6 +111,11 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             }
 
             throw new NotSupportedException();
+        }
+
+        private static BsonRegularExpression BuildRegex(QueryNode node, Func<string, string> formatter)
+        {
+            return new BsonRegularExpression(formatter(BuildValue(node).ToString()), "i");
         }
 
         private FieldDefinition<MongoContentEntity, object> BuildFieldDefinition(QueryNode nodeIn)
