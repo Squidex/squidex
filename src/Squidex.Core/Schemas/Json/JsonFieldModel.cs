@@ -10,12 +10,12 @@ namespace Squidex.Core.Schemas.Json
 {
     public sealed class JsonFieldModel
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public bool IsHidden;
+        public bool IsHidden { get; set; }
 
-        public bool IsDisabled;
+        public bool IsDisabled { get; set; }
 
-        public FieldProperties Properties;
+        public FieldProperties Properties { get; set; }
     }
 }

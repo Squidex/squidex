@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to send invalidation message {0}", token);
+                logger.LogError(RedisInfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to send invalidation message {0}", token);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to receive invalidation message.");
+                logger.LogError(RedisInfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to receive invalidation message.");
             }
         }
 

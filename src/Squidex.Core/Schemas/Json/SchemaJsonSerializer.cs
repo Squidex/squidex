@@ -74,7 +74,7 @@ namespace Squidex.Core.Schemas.Json
                     }
 
                     return field;
-                }).ToDictionary(x => x.Id, x => x).ToImmutableDictionary();
+                }).ToImmutableDictionary(x => x.Id, x => x);
 
             var schema =
                 new Schema(

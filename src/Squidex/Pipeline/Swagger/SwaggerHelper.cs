@@ -18,7 +18,7 @@ namespace Squidex.Pipeline.Swagger
 {
     public static class SwaggerHelper
     {
-        private static ConcurrentDictionary<string, string> docs = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> docs = new ConcurrentDictionary<string, string>();
 
         public static string LoadDocs(string name)
         {

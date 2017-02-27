@@ -16,7 +16,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Read.MongoDb.Utils
 {
-    public static class CollectionExtensions
+    public static class MongoCollectionExtensions
     {
         public static Task CreateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : MongoEntity, new()
         {

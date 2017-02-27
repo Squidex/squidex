@@ -10,16 +10,16 @@ namespace Squidex.Infrastructure.CQRS
 {
     public sealed class CommonHeaders
     {
-        public const string AggregateId = "AggregateId";
+        public static readonly string AggregateId = "AggregateId";
 
-        public const string CommitId = "CommitId";
+        public static readonly string CommitId = "CommitId";
 
-        public const string EventId = "EventId";
+        public static readonly string EventId = "EventId";
 
-        public const string EventNumber = "EventNumber";
+        public static readonly string EventNumber = "EventNumber";
 
-        public const string Timestamp = "Timestamp";
+        public static readonly string Timestamp = "Timestamp";
 
-        public const string Actor = "Actor";
+        public static readonly string Actor = "Actor";
     }
 }

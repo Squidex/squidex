@@ -266,13 +266,7 @@ namespace Squidex.Core.Schemas
             Guard.NotNull(errors, nameof(errors));
             Guard.NotEmpty(languages, nameof(languages));
 
-            foreach (var fieldData in data)
-            {
-                if (!fieldsByName.ContainsKey(fieldData.Key))
-                {
-                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
-                }
-            }
+            ValidateUnknownFields(data, errors);
 
             foreach (var field in fieldsByName.Values)
             {
@@ -281,35 +275,11 @@ namespace Squidex.Core.Schemas
 
                 if (field.RawProperties.IsLocalizable)
                 {
-                    foreach (var valueLanguage in fieldData.Keys)
-                    {
-                        if (!Language.TryGetLanguage(valueLanguage, out Language language))
-                        {
-                            fieldErrors.Add($"{field.Name} has an invalid language '{valueLanguage}'");
-                        }
-                        else if (!languages.Contains(language))
-                        {
-                            fieldErrors.Add($"{field.Name} has an unsupported language '{valueLanguage}'");
-                        }
-                    }
-
-                    foreach (var language in languages)
-                    {
-                        var value = fieldData.GetOrCreate(language.Iso2Code, k => JValue.CreateNull());
-
-                        await field.ValidateAsync(value, fieldErrors, language);
-                    }
+                    await ValidateLocalizableFieldAsync(languages, fieldData, fieldErrors, field);
                 }
                 else
                 {
-                    if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
-                    {
-                        fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
-                    }
-
-                    var value = fieldData.GetOrCreate(Language.Invariant.Iso2Code, k => JValue.CreateNull());
-
-                    await field.ValidateAsync(value, fieldErrors);
+                    await ValidateNonLocalizableField(fieldData, fieldErrors, field);
                 }
 
                 foreach (var error in fieldErrors)
@@ -317,6 +287,51 @@ namespace Squidex.Core.Schemas
                     errors.Add(new ValidationError(error, field.Name));
                 }
             }
+        }
+
+        private void ValidateUnknownFields(ContentData data, IList<ValidationError> errors)
+        {
+            foreach (var fieldData in data)
+            {
+                if (!fieldsByName.ContainsKey(fieldData.Key))
+                {
+                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
+                }
+            }
+        }
+
+        private static async Task ValidateLocalizableFieldAsync(HashSet<Language> languages, ContentFieldData fieldData, List<string> fieldErrors, Field field)
+        {
+            foreach (var valueLanguage in fieldData.Keys)
+            {
+                if (!Language.TryGetLanguage(valueLanguage, out Language language))
+                {
+                    fieldErrors.Add($"{field.Name} has an invalid language '{valueLanguage}'");
+                }
+                else if (!languages.Contains(language))
+                {
+                    fieldErrors.Add($"{field.Name} has an unsupported language '{valueLanguage}'");
+                }
+            }
+
+            foreach (var language in languages)
+            {
+                var value = fieldData.GetOrCreate(language.Iso2Code, k => JValue.CreateNull());
+
+                await field.ValidateAsync(value, fieldErrors, language);
+            }
+        }
+
+        private static async Task ValidateNonLocalizableField(ContentFieldData fieldData, List<string> fieldErrors, Field field)
+        {
+            if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
+            {
+                fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
+            }
+
+            var value = fieldData.GetOrCreate(Language.Invariant.Iso2Code, k => JValue.CreateNull());
+
+            await field.ValidateAsync(value, fieldErrors);
         }
 
         public void Enrich(ContentData data, HashSet<Language> languages)

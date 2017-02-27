@@ -12,12 +12,12 @@ namespace Squidex.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public bool IsPublished;
+        public bool IsPublished { get; set; }
 
-        public SchemaProperties Properties;
+        public SchemaProperties Properties { get; set; }
 
-        public Dictionary<long, JsonFieldModel> Fields;
+        public Dictionary<long, JsonFieldModel> Fields { get; set; }
     }
 }

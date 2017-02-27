@@ -10,16 +10,16 @@ namespace Squidex.Config
 {
     public class Constants
     {
-        public const string ApiPrefix = "/api";
+        public static readonly string ApiPrefix = "/api";
 
-        public const string ApiScope = "squidex-api";
+        public static readonly string ApiScope = "squidex-api";
 
-        public const string RoleScope = "role";
+        public static readonly string RoleScope = "role";
 
-        public const string ProfileScope = "squidex-profile";
+        public static readonly string ProfileScope = "squidex-profile";
 
-        public const string FrontendClient = "squidex-frontend";
+        public static readonly string FrontendClient = "squidex-frontend";
 
-        public const string IdentityPrefix = "/identity-server";
+        public static readonly string IdentityPrefix = "/identity-server";
     }
 }

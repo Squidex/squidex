@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  InfrastructureErrors.cs
+//  RedisInfrastructureErrors.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Redis
 {
-    public class InfrastructureErrors
+    public class RedisInfrastructureErrors
     {
         public static readonly EventId InvalidatingReceivedFailed = new EventId(50001, "InvalidingReceivedFailed");
 
