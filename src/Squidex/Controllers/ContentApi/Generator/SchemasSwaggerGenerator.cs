@@ -165,7 +165,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntityWithSchema> schemas)
         {
-            foreach (var schema in schemas.Select(x => x.Schema))
+            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
             {
                 GenerateSchemaOperations(schema);
             }
@@ -310,7 +310,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             if (entityName != null)
             {
-                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
+                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} content (GUID).");
 
                 operation.AddResponse("404", $"App, schema or {entityName} content not found.");
             }

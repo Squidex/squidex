@@ -10,6 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
+    ApiUrlConfig,
     AuthService,
     CreateSchemaDto,
     DateTime,
@@ -56,6 +57,7 @@ export class SchemaFormComponent {
             .merge(this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME));
 
     constructor(
+        public readonly apiUrl: ApiUrlConfig,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder,
         private readonly authService: AuthService
