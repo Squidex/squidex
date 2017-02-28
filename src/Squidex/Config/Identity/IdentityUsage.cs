@@ -96,7 +96,7 @@ namespace Squidex.Config.Identity
 
         public static IApplicationBuilder UseMyApiProtection(this IApplicationBuilder app)
         {
-            const string apiScope = Constants.ApiScope;
+            var apiScope = Constants.ApiScope;
 
             var urlsOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
 

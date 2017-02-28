@@ -35,7 +35,7 @@ namespace Squidex.Write.Schemas
             if (await schemas.FindSchemaByNameAsync(command.AppId.Id, command.Name) != null)
             {
                 var error = 
-                    new ValidationError($"A schema with name '{command.Name}' already exists", "DisplayName", 
+                    new ValidationError($"A schema with name '{command.Name}' already exists", "Name", 
                         nameof(CreateSchema.Name));
 
                 throw new ValidationException("Cannot create a new schema", error);

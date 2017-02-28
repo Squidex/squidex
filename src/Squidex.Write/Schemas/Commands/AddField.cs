@@ -22,7 +22,7 @@ namespace Squidex.Write.Schemas.Commands
         {
             if (!Name.IsPropertyName())
             {
-                errors.Add(new ValidationError("DisplayName must be a valid property name", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid property name", nameof(Name)));
             }
 
             if (Properties == null)
