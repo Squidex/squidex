@@ -59,7 +59,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public addFieldFormSubmitted = false;
     public addFieldForm: FormGroup =
         this.formBuilder.group({
-            type: [this.fieldTypes[0]',
+            type: [this.fieldTypes[0],
                 [
                     Validators.required
                 ]],
