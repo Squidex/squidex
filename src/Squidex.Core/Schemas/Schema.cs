@@ -196,7 +196,7 @@ namespace Squidex.Core.Schemas
 
             var schemaName = Name.ToPascalCase();
 
-            var schema = new JsonSchema4 { Id = schemaName, Type = JsonObjectType.Object };
+            var schema = new JsonSchema4 { Type = JsonObjectType.Object };
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
@@ -300,7 +300,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private static async Task ValidateLocalizableFieldAsync(HashSet<Language> languages, ContentFieldData fieldData, List<string> fieldErrors, Field field)
+        private static async Task ValidateLocalizableFieldAsync(ICollection<Language> languages, ContentFieldData fieldData, List<string> fieldErrors, Field field)
         {
             foreach (var valueLanguage in fieldData.Keys)
             {

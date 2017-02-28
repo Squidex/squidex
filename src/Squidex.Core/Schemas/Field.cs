@@ -197,7 +197,7 @@ namespace Squidex.Core.Schemas
                 languagesObject.Properties.Add(language.Iso2Code, languageProperty);
             }
 
-            languagesProperty.AllOf.Add(schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", languagesObject));
+            languagesProperty.SchemaReference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", languagesObject);
 
             schema.Properties.Add(Name, languagesProperty);
         }
