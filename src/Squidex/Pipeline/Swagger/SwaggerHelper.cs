@@ -83,8 +83,6 @@ namespace Squidex.Pipeline.Swagger
             parameter.IsNullableRaw = false;
 
             operation.Parameters.Add(parameter);
-
-            operation.Parameters.Add(parameter);
         }
 
         public static void AddBodyParameter(this SwaggerOperation operation, JsonSchema4 schema, string name, string description)
