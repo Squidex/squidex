@@ -93,7 +93,7 @@ namespace Squidex.Config.Identity
 
         private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions)
         {
-            const string id = Constants.FrontendClient;
+            var id = Constants.FrontendClient;
 
             yield return new Client
             {
