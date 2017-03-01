@@ -206,9 +206,9 @@ namespace Squidex.Core.Schemas
         {
             var jsonProperty = new JsonProperty { IsRequired = RawProperties.IsRequired, Type = JsonObjectType.Object };
 
-            if (!string.IsNullOrWhiteSpace(RawProperties.Label))
+            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
             {
-                jsonProperty.Description = RawProperties.Label;
+                jsonProperty.Description = RawProperties.Hints;
             }
             else
             {
