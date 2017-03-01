@@ -104,7 +104,11 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             document.Info = new SwaggerInfo
             {
-                Title = $"Suidex API for {app.Name} App"
+                ExtensionData = new Dictionary<string, object>
+                {
+                    ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
+                },
+                Title = $"Suidex API for {app.Name} App",
             };
         }
 
