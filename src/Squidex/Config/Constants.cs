@@ -10,6 +10,8 @@ namespace Squidex.Config
 {
     public class Constants
     {
+        public static readonly string SecurityDefinition = "oauth-client-auth";
+
         public static readonly string ApiPrefix = "/api";
 
         public static readonly string ApiScope = "squidex-api";

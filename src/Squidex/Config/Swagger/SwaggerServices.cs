@@ -43,9 +43,9 @@ namespace Squidex.Config.Swagger
         private static SwaggerOwinSettings ConfigureIdentity(this SwaggerOwinSettings settings, MyUrlsOptions urlOptions)
         {
             settings.DocumentProcessors.Add(
-                new SecurityDefinitionAppender("OAuth2", SwaggerHelper.CreateOAuthSchema(urlOptions)));
+                new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
-            settings.OperationProcessors.Add(new OperationSecurityScopeProcessor("roles"));
+            settings.OperationProcessors.Add(new OperationSecurityScopeProcessor(Constants.SecurityDefinition));
 
             return settings;
         }

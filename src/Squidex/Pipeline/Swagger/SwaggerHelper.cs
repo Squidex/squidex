@@ -13,6 +13,7 @@ using NJsonSchema;
 using NSwag;
 using Squidex.Config;
 using System.Reflection;
+using Squidex.Core.Identity;
 
 namespace Squidex.Pipeline.Swagger
 {
@@ -46,11 +47,15 @@ namespace Squidex.Pipeline.Swagger
                 new SwaggerSecurityScheme
                 {
                     TokenUrl = tokenUrl,
+                    Name = Constants.SecurityDefinition,
                     Type = SwaggerSecuritySchemeType.OAuth2,
                     Flow = SwaggerOAuth2Flow.Application,
                     Scopes = new Dictionary<string, string>
                     {
-                        { Constants.ApiScope, "Read and write access to the API" }
+                        { Constants.ApiScope, "Read and write access to the API" },
+                        { SquidexRoles.AppOwner, "You get this scope / role when you are owner of the app you are accessing." },
+                        { SquidexRoles.AppEditor, "You get this scope / role when you are owner of the app you are accessing or when the subject is a client." },
+                        { SquidexRoles.AppDeveloper, "You get this scope / role when you are owner of the app you are accessing." }
                     },
                     Description = securityDescription
                 };

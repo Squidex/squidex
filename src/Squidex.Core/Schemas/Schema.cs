@@ -289,7 +289,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private void ValidateUnknownFields(ContentData data, IList<ValidationError> errors)
+        private void ValidateUnknownFields(ContentData data, ICollection<ValidationError> errors)
         {
             foreach (var fieldData in data)
             {
@@ -300,7 +300,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private static async Task ValidateLocalizableFieldAsync(ICollection<Language> languages, ContentFieldData fieldData, List<string> fieldErrors, Field field)
+        private static async Task ValidateLocalizableFieldAsync(ICollection<Language> languages, ContentFieldData fieldData, ICollection<string> fieldErrors, Field field)
         {
             foreach (var valueLanguage in fieldData.Keys)
             {
@@ -322,7 +322,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        private static async Task ValidateNonLocalizableField(ContentFieldData fieldData, List<string> fieldErrors, Field field)
+        private static async Task ValidateNonLocalizableField(ContentFieldData fieldData, ICollection<string> fieldErrors, Field field)
         {
             if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
             {

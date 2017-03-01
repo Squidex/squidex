@@ -145,7 +145,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             {
                 new SwaggerSecurityRequirement
                 {
-                    { "roles", new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
+                    { Constants.SecurityDefinition, new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
                 }
             };
 
