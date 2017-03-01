@@ -47,7 +47,6 @@ namespace Squidex.Pipeline.Swagger
                 new SwaggerSecurityScheme
                 {
                     TokenUrl = tokenUrl,
-                    Name = Constants.SecurityDefinition,
                     Type = SwaggerSecuritySchemeType.OAuth2,
                     Flow = SwaggerOAuth2Flow.Application,
                     Scopes = new Dictionary<string, string>
