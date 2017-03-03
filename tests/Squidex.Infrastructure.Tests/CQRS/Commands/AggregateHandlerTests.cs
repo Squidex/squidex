@@ -83,6 +83,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
+        public Task Create_async_should_throw_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
+        }
+
+        [Fact]
         public async Task Create_async_should_create_domain_object_and_save()
         {
             factory.Setup(x => x.CreateNew(typeof(MyDomainObject), domainObject.Id))
@@ -130,6 +136,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
             repository.VerifyAll();
+        }
+
+        [Fact]
+        public Task Update_async_should_throw_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
         }
 
         [Fact]

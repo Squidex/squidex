@@ -35,6 +35,7 @@ namespace Squidex.Pipeline
         static ApiExceptionFilterAttribute()
         {
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
+            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
         }
@@ -42,6 +43,11 @@ namespace Squidex.Pipeline
         private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
         {
             return new NotFoundResult();
+        }
+
+        private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
+        {
+            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 409 };
         }
 
         private static IActionResult OnDomainException(DomainException ex)

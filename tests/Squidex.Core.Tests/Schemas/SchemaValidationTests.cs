@@ -293,15 +293,15 @@ namespace Squidex.Core.Schemas
 
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new JsonField(0, "my-json", 
+                    .AddOrUpdateField(new JsonField(1, "my-json", 
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new StringField(1, "my-string", 
+                    .AddOrUpdateField(new StringField(2, "my-string", 
                         new StringFieldProperties { DefaultValue = "EN-String", IsLocalizable = true }))
-                    .AddOrUpdateField(new NumberField(2, "my-number", 
+                    .AddOrUpdateField(new NumberField(3, "my-number", 
                         new NumberFieldProperties { DefaultValue = 123 }))
-                    .AddOrUpdateField(new BooleanField(3, "my-boolean", 
+                    .AddOrUpdateField(new BooleanField(4, "my-boolean", 
                         new BooleanFieldProperties { DefaultValue = true }))
-                    .AddOrUpdateField(new DateTimeField(4, "my-datetime", 
+                    .AddOrUpdateField(new DateTimeField(5, "my-datetime", 
                         new DateTimeFieldProperties { DefaultValue = now }));
             
             var data =

@@ -9,13 +9,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Read.Contents.Builders;
 using Squidex.Read.MongoDb.Contents.Visitors;
+using Squidex.Read.Schemas;
 using Xunit;
 
 // ReSharper disable SpecifyACultureInStringConversionExplicitly
@@ -39,6 +44,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
+        private readonly IEdmModel edmModel;
         private readonly HashSet<Language> languages = new HashSet<Language>
         {
             Language.EN,
@@ -50,10 +56,22 @@ namespace Squidex.Read.MongoDb.Contents
             InstantSerializer.Register();
         }
 
+        public ODataQueryTests()
+        {
+            var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
+
+            var schemaEntity = new Mock<ISchemaEntityWithSchema>();
+            schemaEntity.Setup(x => x.Id).Returns(Guid.NewGuid());
+            schemaEntity.Setup(x => x.Version).Returns(3);
+            schemaEntity.Setup(x => x.Schema).Returns(schema);
+
+            edmModel = builder.BuildEdmModel(schemaEntity.Object, languages);
+        }
+
         [Fact]
         public void Should_parse_query()
         {
-            var parser = schema.ParseQuery(languages, "$filter=data/firstName/de eq 'Sebastian'");
+            var parser = edmModel.ParseQuery("$filter=data/firstName/de eq 'Sebastian'");
 
             Assert.NotNull(parser);
         }
@@ -223,7 +241,7 @@ namespace Squidex.Read.MongoDb.Contents
         [Fact]
         public void Should_set_top()
         {
-            var parser = schema.ParseQuery(languages, "$top=3");
+            var parser = edmModel.ParseQuery("$top=3");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Take(parser);
@@ -234,7 +252,7 @@ namespace Squidex.Read.MongoDb.Contents
         [Fact]
         public void Should_set_max_top_if_larger()
         {
-            var parser = schema.ParseQuery(languages, "$top=300");
+            var parser = edmModel.ParseQuery("$top=300");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Take(parser);
@@ -245,7 +263,7 @@ namespace Squidex.Read.MongoDb.Contents
         [Fact]
         public void Should_set_default_top()
         {
-            var parser = schema.ParseQuery(languages, "");
+            var parser = edmModel.ParseQuery("");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Take(parser);
@@ -256,7 +274,7 @@ namespace Squidex.Read.MongoDb.Contents
         [Fact]
         public void Should_set_skip()
         {
-            var parser = schema.ParseQuery(languages, "$skip=3");
+            var parser = edmModel.ParseQuery("$skip=3");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Skip(parser);
@@ -267,7 +285,7 @@ namespace Squidex.Read.MongoDb.Contents
         [Fact]
         public void Should_not_set_skip()
         {
-            var parser = schema.ParseQuery(languages, "");
+            var parser = edmModel.ParseQuery("");
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.Object.Take(parser);
@@ -282,7 +300,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         private string S(string value)
         {
-            var parser = schema.ParseQuery(languages, value);
+            var parser = edmModel.ParseQuery(value);
             var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             var i = string.Empty;
@@ -299,7 +317,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         private string F(string value)
         {
-            var parser = schema.ParseQuery(languages, value);
+            var parser = edmModel.ParseQuery(value);
 
             var query = FilterBuilder.Build(parser, schema).Render(serializer, registry).ToString();
 

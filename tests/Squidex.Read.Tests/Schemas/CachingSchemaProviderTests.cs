@@ -14,7 +14,6 @@ using Moq;
 using Squidex.Infrastructure;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Schemas.Services.Implementations;
-using Squidex.Read.MongoDb.Schemas;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
@@ -27,15 +26,26 @@ namespace Squidex.Read.Schemas
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly Mock<ISchemaRepository> repository = new Mock<ISchemaRepository>();
         private readonly CachingSchemaProvider sut;
-        private readonly MongoSchemaEntity schemaV1;
-        private readonly MongoSchemaEntity schemaV2;
+        private readonly ISchemaEntityWithSchema schemaV1;
+        private readonly ISchemaEntityWithSchema schemaV2;
         private readonly NamedId<Guid> schemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema");
         private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
         public CachingSchemaProviderTests()
         {
-            schemaV1 = new MongoSchemaEntity { Name = schemaId.Name, Id = schemaId.Id, AppId = appId.Id };
-            schemaV2 = new MongoSchemaEntity { Name = schemaId.Name, Id = schemaId.Id, AppId = appId.Id };
+            var schemaV1Mock = new Mock<ISchemaEntityWithSchema>();
+            var schemaV2Mock = new Mock<ISchemaEntityWithSchema>();
+
+            schemaV1Mock.Setup(x => x.Id).Returns(schemaId.Id);
+            schemaV1Mock.Setup(x => x.Name).Returns(schemaId.Name);
+            schemaV1Mock.Setup(x => x.AppId).Returns(appId.Id);
+
+            schemaV2Mock.Setup(x => x.Id).Returns(schemaId.Id);
+            schemaV2Mock.Setup(x => x.Name).Returns(schemaId.Name);
+            schemaV2Mock.Setup(x => x.AppId).Returns(appId.Id);
+
+            schemaV1 = schemaV1Mock.Object;
+            schemaV2 = schemaV2Mock.Object;
 
             sut = new CachingSchemaProvider(cache, repository.Object);
         }
@@ -43,7 +53,7 @@ namespace Squidex.Read.Schemas
         [Fact]
         public async Task Should_also_retrieve_schema_by_name_if_retrieved_by_id_before()
         {
-            repository.Setup(x => x.FindSchemaAsync(schemaId.Id)).Returns(Task.FromResult<ISchemaEntityWithSchema>(schemaV1));
+            repository.Setup(x => x.FindSchemaAsync(schemaId.Id)).Returns(Task.FromResult(schemaV1));
 
             await ProvideSchemaById(schemaV1);
             await ProvideSchemaByName(schemaV1);
@@ -55,7 +65,7 @@ namespace Squidex.Read.Schemas
         [Fact]
         public async Task Should_also_retrieve_schema_by_id_if_retrieved_by_name_before()
         {
-            repository.Setup(x => x.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(Task.FromResult<ISchemaEntityWithSchema>(schemaV1));
+            repository.Setup(x => x.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(Task.FromResult(schemaV1));
 
             await ProvideSchemaByName(schemaV1);
             await ProvideSchemaById(schemaV1);
@@ -69,7 +79,7 @@ namespace Squidex.Read.Schemas
         {
             var schemas = ProviderResults(schemaV1, schemaV2);
 
-            repository.Setup(x => x.FindSchemaAsync(schemaId.Id)).Returns(() => Task.FromResult<ISchemaEntityWithSchema>(schemas()));
+            repository.Setup(x => x.FindSchemaAsync(schemaId.Id)).Returns(() => Task.FromResult(schemas()));
 
             await ProvideSchemaById(schemaV1);
 
@@ -85,7 +95,7 @@ namespace Squidex.Read.Schemas
         {
             var schemas = ProviderResults(schemaV1, schemaV2);
 
-            repository.Setup(x => x.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(() => Task.FromResult<ISchemaEntityWithSchema>(schemas()));
+            repository.Setup(x => x.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(() => Task.FromResult(schemas()));
 
             await ProvideSchemaByName(schemaV1);
 

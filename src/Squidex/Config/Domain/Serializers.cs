@@ -10,7 +10,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Squidex.Events;
@@ -27,16 +26,15 @@ namespace Squidex.Config.Domain
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
 
-            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-            settings.Converters.Add(new InstantConverter());
-            settings.Converters.Add(new LanguageConverter());
-            settings.Converters.Add(new NamedGuidIdConverter());
-            settings.Converters.Add(new NamedLongIdConverter());
-            settings.Converters.Add(new NamedStringIdConverter());
-            settings.Converters.Add(new PropertiesBagConverter());
-            settings.Converters.Add(new RefTokenConverter());
-            settings.Converters.Add(new StringEnumConverter());
+            settings.ContractResolver = new ConverterContractResolver(
+                new InstantConverter(),
+                new LanguageConverter(),
+                new NamedGuidIdConverter(),
+                new NamedLongIdConverter(),
+                new NamedStringIdConverter(),
+                new PropertiesBagConverter(),
+                new RefTokenConverter(),
+                new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 

@@ -12,6 +12,7 @@ using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Apps.Services.Implementations;
 using Squidex.Read.Contents;
+using Squidex.Read.Contents.Builders;
 using Squidex.Read.History;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
@@ -48,6 +49,10 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .SingleInstance();
+
+            builder.RegisterType<EdmModelBuilder>()
+                .AsSelf()
                 .SingleInstance();
         }
     }

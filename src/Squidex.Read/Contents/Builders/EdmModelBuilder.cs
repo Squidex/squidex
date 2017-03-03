@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SchemaExtensions.cs
+//  EdmModelBuilder.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,19 +8,45 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.OData.Core.UriParser;
+using System.Linq;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Read.Schemas;
+using Squidex.Read.Utils;
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Read.Contents.Builders
 {
-    public static class SchemaExtensions
+    public sealed class EdmModelBuilder : CachingProvider
     {
-        public static EdmModel BuildEdmModel(this Schema schema, HashSet<Language> languages)
+        public EdmModelBuilder(IMemoryCache cache) 
+            : base(cache)
+        {
+        }
+
+        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, HashSet<Language> languages)
+        {
+            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(schemaEntity, nameof(schemaEntity));
+
+            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{string.Join(",", languages.Select(x => x.Iso2Code).OrderBy(x => x))}";
+
+            var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
+            {
+                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
+
+                return BuildEdmModel(schemaEntity.Schema, languages);
+            });
+
+            return result;
+        }
+
+        private static EdmModel BuildEdmModel(Schema schema, HashSet<Language> languages)
         {
             var model = new EdmModel();
+
             var container = new EdmEntityContainer("Squidex", "Container");
 
             var schemaType = schema.BuildEdmType(languages, x =>
@@ -41,18 +67,9 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             model.AddElement(schemaType);
             model.AddElement(entityType);
 
-            container.AddEntitySet($"{schema.Name}_Set", entityType);
+            container.AddEntitySet("ContentSet", entityType);
 
             return model;
-        }
-
-        public static ODataUriParser ParseQuery(this Schema schema, HashSet<Language> languages, string query)
-        {
-            var model = schema.BuildEdmModel(languages);
-
-            var parser = new ODataUriParser(model, new Uri($"{schema.Name}_Set?{query}", UriKind.Relative));
-
-            return parser;
         }
     }
 }

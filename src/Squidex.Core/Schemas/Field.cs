@@ -86,7 +86,7 @@ namespace Squidex.Core.Schemas
             var rawErrors = new List<string>();
             try
             {
-                var typedValue = value.Type == JTokenType.Null ? null :  ConvertValue(value);
+                var typedValue = value.Type == JTokenType.Null ? null : ConvertValue(value);
 
                 foreach (var validator in validators.Value)
                 {

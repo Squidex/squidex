@@ -12,12 +12,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Core;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Contents;
+using Squidex.Read.Contents.Builders;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.MongoDb.Contents.Visitors;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Read.MongoDb.Contents
@@ -27,6 +28,7 @@ namespace Squidex.Read.MongoDb.Contents
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemaProvider;
+        private readonly EdmModelBuilder modelBuilder;
 
         protected static IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
         {
@@ -36,13 +38,14 @@ namespace Squidex.Read.MongoDb.Contents
             }
         }
 
-        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemaProvider)
+        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemaProvider, EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(database, nameof(database));
+            Guard.NotNull(modelBuilder, nameof(modelBuilder));
             Guard.NotNull(schemaProvider, nameof(schemaProvider));
 
             this.database = database;
-
+            this.modelBuilder = modelBuilder;
             this.schemaProvider = schemaProvider;
         }
 
@@ -50,14 +53,16 @@ namespace Squidex.Read.MongoDb.Contents
         {
             List<IContentEntity> result = null;
 
-            await ForSchemaAsync(schemaId, async (collection, schema) =>
+            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var parser = schema.ParseQuery(languages, odataQuery);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, languages);
 
-                    cursor = collection.Find(parser, schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schema);
+                    var parser = model.ParseQuery(odataQuery);
+
+                    cursor = collection.Find(parser, schemaEntity.Schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schemaEntity.Schema);
                 }
                 catch (NotSupportedException)
                 {
@@ -76,7 +81,7 @@ namespace Squidex.Read.MongoDb.Contents
 
                 foreach (var entity in entities)
                 {
-                    entity.ParseData(schema);
+                    entity.ParseData(schemaEntity.Schema);
                 }
 
                 result = entities.OfType<IContentEntity>().ToList();
@@ -89,14 +94,16 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var result = 0L;
 
-            await ForSchemaAsync(schemaId, async (collection, schema) =>
+            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var parser = schema.ParseQuery(languages, odataQuery);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, languages);
 
-                    cursor = collection.Find(parser, schema, nonPublished);
+                    var parser = model.ParseQuery(odataQuery);
+
+                    cursor = collection.Find(parser, schemaEntity.Schema, nonPublished);
                 }
                 catch (NotSupportedException)
                 {
@@ -121,17 +128,17 @@ namespace Squidex.Read.MongoDb.Contents
         {
             MongoContentEntity result = null;
 
-            await ForSchemaAsync(schemaId, async (collection, schema) =>
+            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
             {
                 result = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-                result?.ParseData(schema);
+                result?.ParseData(schemaEntity.Schema);
             });
 
             return result;
         }
 
-        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Schema, Task> action)
+        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntityWithSchema, Task> action)
         {
             var collection = GetCollection(schemaId);
 
@@ -142,7 +149,7 @@ namespace Squidex.Read.MongoDb.Contents
                 return;
             }
 
-            await action(collection, schemaEntity.Schema);
+            await action(collection, schemaEntity);
         }
     }
 }

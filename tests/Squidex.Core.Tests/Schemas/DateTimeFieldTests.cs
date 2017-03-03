@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -89,9 +90,20 @@ namespace Squidex.Core.Schemas
                 new[] { "My-DateTime is not a valid value" });
         }
 
+        [Fact]
+        public async Task Should_add_errors_if_value_is_another_type()
+        {
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime" });
+
+            await sut.ValidateAsync(CreateValue(123), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "My-DateTime is not a valid value" });
+        }
+
         private static Instant FutureDays(int days)
         {
-            return SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(days));
+            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
         }
 
         private static JValue CreateValue(object v)

@@ -68,24 +68,24 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.CreateAsync(@event, headers, x =>
                 {
                     SimpleMapper.Map(@event, x);
 
-                    x.SetData(schema, @event.Data);
+                    x.SetData(schemaEntity.Schema, @event.Data);
                 });
             });
         }
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.SetData(schema, @event.Data);
+                    x.SetData(schemaEntity.Schema, @event.Data);
                 });
             });
         }

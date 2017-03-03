@@ -136,7 +136,7 @@ namespace Squidex.Core.Schemas
 
         private static Instant FutureDays(int days)
         {
-            return SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(days));
+            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
         }
     }
 }

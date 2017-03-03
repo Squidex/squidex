@@ -14,7 +14,6 @@ using Moq;
 using Squidex.Infrastructure;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Apps.Services.Implementations;
-using Squidex.Read.MongoDb.Apps;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
@@ -27,14 +26,23 @@ namespace Squidex.Read.Apps
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly Mock<IAppRepository> repository = new Mock<IAppRepository>();
         private readonly CachingAppProvider sut;
-        private readonly MongoAppEntity appV1;
-        private readonly MongoAppEntity appV2;
+        private readonly IAppEntity appV1;
+        private readonly IAppEntity appV2;
         private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
         public CachingAppProviderTests()
         {
-            appV1 = new MongoAppEntity { Name = appId.Name, Id = appId.Id };
-            appV2 = new MongoAppEntity { Name = appId.Name, Id = appId.Id };
+            var appV1Mock = new Mock<IAppEntity>();
+            var appV2Mock = new Mock<IAppEntity>();
+
+            appV1Mock.Setup(x => x.Id).Returns(appId.Id);
+            appV1Mock.Setup(x => x.Name).Returns(appId.Name);
+
+            appV2Mock.Setup(x => x.Id).Returns(appId.Id);
+            appV2Mock.Setup(x => x.Name).Returns(appId.Name);
+
+            appV1 = appV1Mock.Object;
+            appV2 = appV2Mock.Object;
 
             sut = new CachingAppProvider(cache, repository.Object);
         }
@@ -42,7 +50,7 @@ namespace Squidex.Read.Apps
         [Fact]
         public async Task Should_also_retrieve_app_by_name_if_retrieved_by_id_before()
         {
-            repository.Setup(x => x.FindAppAsync(appId.Id)).Returns(Task.FromResult<IAppEntity>(appV1));
+            repository.Setup(x => x.FindAppAsync(appId.Id)).Returns(Task.FromResult(appV1));
 
             await ProvideAppById(appV1);
             await ProvideAppByName(appV1);
@@ -54,7 +62,7 @@ namespace Squidex.Read.Apps
         [Fact]
         public async Task Should_also_retrieve_app_by_id_if_retrieved_by_name_before()
         {
-            repository.Setup(x => x.FindAppAsync(appId.Name)).Returns(Task.FromResult<IAppEntity>(appV1));
+            repository.Setup(x => x.FindAppAsync(appId.Name)).Returns(Task.FromResult(appV1));
 
             await ProvideAppByName(appV1);
             await ProvideAppById(appV1);
@@ -68,7 +76,7 @@ namespace Squidex.Read.Apps
         {
             var apps = ProviderResults(appV1, appV2);
 
-            repository.Setup(x => x.FindAppAsync(appId.Id)).Returns(() => Task.FromResult<IAppEntity>(apps()));
+            repository.Setup(x => x.FindAppAsync(appId.Id)).Returns(() => Task.FromResult(apps()));
 
             await ProvideAppById(appV1);
 
@@ -84,7 +92,7 @@ namespace Squidex.Read.Apps
         {
             var apps = ProviderResults(appV1, appV2);
 
-            repository.Setup(x => x.FindAppAsync(appId.Name)).Returns(() => Task.FromResult<IAppEntity>(apps()));
+            repository.Setup(x => x.FindAppAsync(appId.Name)).Returns(() => Task.FromResult(apps()));
 
             await ProvideAppByName(appV1);
 

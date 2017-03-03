@@ -73,8 +73,6 @@ namespace Squidex.Write.Contents
             {
                 await sut.HandleAsync(context);
             });
-
-            Assert.Equal(contentId, context.Result<Guid>());
         }
 
         [Fact]

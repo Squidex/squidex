@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Schemas.Commands;
@@ -65,8 +66,6 @@ namespace Squidex.Write.Schemas
             {
                 await sut.HandleAsync(context);
             });
-
-            Assert.Equal(SchemaName, context.Result<string>());
         }
 
         [Fact]
@@ -134,7 +133,7 @@ namespace Squidex.Write.Schemas
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(1, context.Result<long>());
+            Assert.Equal(1, context.Result<EntityCreatedResult<long>>().IdOrValue);
         }
 
         [Fact]
