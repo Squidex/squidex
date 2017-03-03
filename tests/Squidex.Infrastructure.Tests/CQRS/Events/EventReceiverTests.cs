@@ -12,6 +12,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -134,7 +135,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.LastHandledEventNumber = 2L;
 
-            eventConsumer.Setup(x => x.On(envelope1)).Returns(Task.FromResult(true));
+            eventConsumer.Setup(x => x.On(envelope1)).Returns(TaskHelper.True);
             eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer.Object);

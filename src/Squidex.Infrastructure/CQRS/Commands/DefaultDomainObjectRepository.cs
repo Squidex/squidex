@@ -39,10 +39,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.nameResolver = nameResolver;
         }
 
-        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, int version = int.MaxValue) where TDomainObject : class, IAggregate
+        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, long? expectedVersion = null) where TDomainObject : class, IAggregate
         {
-            Guard.GreaterThan(version, 0, nameof(version));
-
             var streamName = nameResolver.GetStreamName(typeof(TDomainObject), id);
 
             var events = await eventStore.GetEventsAsync(streamName).ToList();
@@ -61,9 +59,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 domainObject.ApplyEvent(envelope);
             }
 
-            if (domainObject.Version != version && version < int.MaxValue)
+            if (expectedVersion != null && domainObject.Version != expectedVersion.Value)
             {
-                throw new DomainObjectVersionException(id.ToString(), typeof(TDomainObject), domainObject.Version, version);
+                throw new DomainObjectVersionException(id.ToString(), typeof(TDomainObject), domainObject.Version, expectedVersion.Value);
             }
 
             return domainObject;

@@ -10,7 +10,6 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline.CommandHandlers;
 using Squidex.Write.Apps;
 using Squidex.Write.Contents;
@@ -29,6 +28,10 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<EnrichWithExpectedVersionHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
             builder.RegisterType<EnrichWithTimestampHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
@@ -43,10 +46,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<EnrichWithSchemaIdHandler>()
                 .As<ICommandHandler>()
-                .SingleInstance();
-
-            builder.RegisterType<EnrichWithAggregateIdProcessor>()
-                .As<IEventProcessor>()
                 .SingleInstance();
 
             builder.RegisterType<ClientKeyGenerator>()
@@ -66,6 +65,10 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<SchemaCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<SetVersionAsETagHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 

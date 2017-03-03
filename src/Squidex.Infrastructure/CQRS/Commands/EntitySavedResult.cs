@@ -1,19 +1,20 @@
 ﻿// ==========================================================================
-//  ISchemaEntity.cs
+//  EntitySavedResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public interface ISchemaEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public class EntitySavedResult
     {
-        string Name { get; }
+        public long Version { get; }
 
-        string Label { get; }
-
-        bool IsPublished { get; }
+        public EntitySavedResult(long version)
+        {
+            Version = version;
+        }
     }
 }

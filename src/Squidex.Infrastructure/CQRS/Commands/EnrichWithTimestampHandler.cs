@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
@@ -31,7 +32,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 timestampCommand.Timestamp = clock.GetCurrentInstant();
             }
 
-            return Task.FromResult(false);
+            return TaskHelper.False;
         }
     }
 }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Schemas.Commands;
 
@@ -41,77 +42,72 @@ namespace Squidex.Write.Schemas
                 throw new ValidationException("Cannot create a new schema", error);
             }
 
-            await handler.CreateAsync<SchemaDomainObject>(command, s =>
-            {
-                s.Create(command);
-
-                context.Succeed(command.Name);
-            });
+            await handler.CreateAsync<SchemaDomainObject>(context, s => s.Create(command));
         }
 
         protected Task On(AddField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s =>
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
             {
                 s.AddField(command);
 
-                context.Succeed(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id);
+                context.Succeed(new EntityCreatedResult<long>(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 
         protected Task On(DeleteSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.Delete(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Delete(command));
         }
 
         protected Task On(DeleteField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.DeleteField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DeleteField(command));
         }
 
         protected Task On(DisableField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.DisableField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DisableField(command));
         }
 
         protected Task On(EnableField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.EnableField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.EnableField(command));
         }
 
         protected Task On(HideField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.HideField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.HideField(command));
         }
 
         protected Task On(ShowField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.ShowField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ShowField(command));
         }
 
         protected Task On(UpdateSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => s.Update(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Update(command));
         }
 
         protected Task On(UpdateField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.UpdateField(command); });
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.UpdateField(command));
         }
 
         protected Task On(PublishSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.Publish(command); });
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Publish(command));
         }
 
         protected Task On(UnpublishSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(command, s => { s.Unpublish(command); });
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Unpublish(command));
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
+            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
         }
     }
 }

@@ -32,14 +32,14 @@ namespace Squidex.Write.TestHelpers
                 IsUpdated = false;
             }
 
-            public Task CreateAsync<V>(IAggregateCommand command, Func<V, Task> creator) where V : class, IAggregate
+            public Task CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IAggregate
             {
                 IsCreated = true;
 
                 return creator(domainObject as V);
             }
 
-            public Task UpdateAsync<V>(IAggregateCommand command, Func<V, Task> updater) where V : class, IAggregate
+            public Task UpdateAsync<V>(CommandContext context, Func<V, Task> updater) where V : class, IAggregate
             {
                 IsUpdated = true;
 

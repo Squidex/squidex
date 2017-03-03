@@ -15,13 +15,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class EnrichWithTimestampHandlerTests
     {
-        private sealed class MyNormalCommand : ICommand
-        {
-        }
-
         private sealed class MyTimestampCommand : ITimestampCommand
         {
             public Instant Timestamp { get; set; }
+
+            public long? ExpectedVersion { get; set; }
         }
 
         private readonly Mock<IClock> clock = new Mock<IClock>();
@@ -47,7 +45,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             var sut = new EnrichWithTimestampHandler(clock.Object);
 
-            var result = await sut.HandleAsync(new CommandContext(new MyNormalCommand()));
+            var result = await sut.HandleAsync(new CommandContext(new Mock<ICommand>().Object));
 
             Assert.False(result);
 

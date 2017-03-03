@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -79,6 +80,8 @@ namespace Squidex.Controllers.Api.Schemas
             }
 
             var model = entity.ToModel();
+
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
             return Ok(model);
         }

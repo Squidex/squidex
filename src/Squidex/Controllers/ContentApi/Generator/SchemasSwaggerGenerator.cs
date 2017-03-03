@@ -80,6 +80,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             GenerateSecurityDefinitions();
             GenerateSecurityRequirements();
             GenerateDefaultErrors();
+            GeneratePing();
 
             return document;
         }
@@ -108,7 +109,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 {
                     ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
                 },
-                Title = $"Suidex API for {app.Name} App",
+                Title = $"Suidex API for {app.Name} App"
             };
         }
 
@@ -203,6 +204,24 @@ namespace Squidex.Controllers.ContentApi.Generator
             foreach (var operation in schemaOperations.SelectMany(x => x.Values).Distinct())
             {
                 operation.Tags = new List<string> { schemaName };
+            }
+        }
+
+        private void GeneratePing()
+        {
+            var swaggerOperation = AddOperation(SwaggerOperationMethod.Get, null, $"ping/{app.Name}", operation =>
+            {
+                operation.OperationId = "MakePingTest";
+
+                operation.Description = "Make a simple request, e.g. to test credentials.";
+
+                operation.Summary = "Make Test";
+
+            });
+
+            foreach (var operation in swaggerOperation.Values)
+            {
+                operation.Tags = new List<string> { "PingTest" };
             }
         }
 

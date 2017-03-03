@@ -23,6 +23,7 @@ namespace Squidex.Read.MongoDb.Utils
 
             SetId(headers, entity);
 
+            SetVersion(headers, entity);
             SetCreated(headers, entity);
             SetCreatedBy(@event, entity);
 
@@ -33,6 +34,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         public static T Update<T>(SquidexEvent @event, EnvelopeHeaders headers, T entity) where T : MongoEntity, new()
         {
+            SetVersion(headers, entity);
             SetLastModified(headers, entity);
             SetLastModifiedBy(@event, entity);
 
@@ -54,23 +56,33 @@ namespace Squidex.Read.MongoDb.Utils
             entity.LastModified = headers.Timestamp();
         }
 
+        private static void SetVersion(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            var withVersion = entity as IEntityWithVersion;
+
+            if (withVersion != null)
+            {
+                withVersion.Version = headers.EventNumber();
+            }
+        }
+
         private static void SetCreatedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var createdBy = entity as ITrackCreatedByEntity;
+            var withCreatedBy = entity as IEntityWithCreatedBy;
 
-            if (createdBy != null)
+            if (withCreatedBy != null)
             {
-                createdBy.CreatedBy = @event.Actor;
+                withCreatedBy.CreatedBy = @event.Actor;
             }
         }
 
         private static void SetLastModifiedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var modifiedBy = entity as ITrackLastModifiedByEntity;
+            var withModifiedBy = entity as IEntityWithLastModifiedBy;
 
-            if (modifiedBy != null)
+            if (withModifiedBy != null)
             {
-                modifiedBy.LastModifiedBy = @event.Actor;
+                withModifiedBy.LastModifiedBy = @event.Actor;
             }
         }
 

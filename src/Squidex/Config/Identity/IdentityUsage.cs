@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Identity;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
@@ -140,7 +141,7 @@ namespace Squidex.Config.Identity
             {
                 context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
 
-                return Task.FromResult(true);
+                return TaskHelper.Done;
             }
 
             public override async Task CreatingTicket(OAuthCreatingTicketContext context)

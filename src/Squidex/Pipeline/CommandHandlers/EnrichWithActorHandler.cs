@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Write;
 
 // ReSharper disable InvertIf
@@ -37,15 +38,10 @@ namespace Squidex.Pipeline.CommandHandlers
                     FindActorFromSubject() ?? 
                     FindActorFromClient();
 
-                if (actorToken == null)
-                {
-                    throw new SecurityException("No actor with subject or client id available");
-                }
-
-                squidexCommand.Actor = actorToken;
+                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available");
             }
 
-            return Task.FromResult(false);
+            return TaskHelper.False;
         }
 
         private RefToken FindActorFromSubject()

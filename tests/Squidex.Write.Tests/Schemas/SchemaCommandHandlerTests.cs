@@ -40,7 +40,9 @@ namespace Squidex.Write.Schemas
         {
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
-            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName)).Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
+                .Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object))
+                .Verifiable();
 
             await TestCreate(schema, async _ =>
             {
@@ -55,7 +57,9 @@ namespace Squidex.Write.Schemas
         {
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
-            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName)).Returns(Task.FromResult<ISchemaEntityWithSchema>(null)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
+                .Returns(Task.FromResult<ISchemaEntityWithSchema>(null))
+                .Verifiable();
 
             await TestCreate(schema, async _ =>
             {

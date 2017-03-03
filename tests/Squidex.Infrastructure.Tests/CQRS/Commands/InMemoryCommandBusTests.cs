@@ -8,18 +8,16 @@
 
 using System;
 using System.Threading.Tasks;
+using Moq;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class InMemoryCommandBusTests
     {
-        private readonly MyCommand command = new MyCommand();
-
-        private sealed class MyCommand : ICommand
-        {    
-        }
-
+        private readonly ICommand command = new Mock<ICommand>().Object;
+        
         private sealed class HandledHandler : ICommandHandler
         {
             public ICommand LastCommand;
@@ -28,7 +26,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 LastCommand = context.Command;
 
-                return Task.FromResult(true);
+                return TaskHelper.True;
             }
         }
 
@@ -40,7 +38,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 LastCommand = context.Command;
 
-                return Task.FromResult(false);
+                return TaskHelper.False;
             }
         }
 
@@ -64,7 +62,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 LastException = context.Exception;
 
-                return Task.FromResult(false);
+                return TaskHelper.False;
             }
         }
 

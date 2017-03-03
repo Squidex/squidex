@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
@@ -42,46 +43,41 @@ namespace Squidex.Write.Contents
         {
             await ValidateAsync(command, () => "Failed to create content");
 
-            await handler.CreateAsync<ContentDomainObject>(command, s =>
-            {
-                s.Create(command);
-
-                context.Succeed(command.ContentId);
-            });
+            await handler.CreateAsync<ContentDomainObject>(context, c => c.Create(command));
         }
 
         protected async Task On(UpdateContent command, CommandContext context)
         {
             await ValidateAsync(command, () => "Failed to update content");
 
-            await handler.UpdateAsync<ContentDomainObject>(command, s => s.Update(command));
+            await handler.UpdateAsync<ContentDomainObject>(context, c => c.Update(command));
         }
 
         protected async Task On(PatchContent command, CommandContext context)
         {
             await ValidateAsync(command, () => "Failed to patch content");
 
-            await handler.UpdateAsync<ContentDomainObject>(command, s => s.Patch(command));
+            await handler.UpdateAsync<ContentDomainObject>(context, c => c.Patch(command));
         }
 
         protected Task On(PublishContent command, CommandContext context)
         {
-            return handler.UpdateAsync<ContentDomainObject>(command, s => s.Publish(command));
+            return handler.UpdateAsync<ContentDomainObject>(context, c => c.Publish(command));
         }
 
         protected Task On(UnpublishContent command, CommandContext context)
         {
-            return handler.UpdateAsync<ContentDomainObject>(command, s => s.Unpublish(command));
+            return handler.UpdateAsync<ContentDomainObject>(context, c => c.Unpublish(command));
         }
 
         protected Task On(DeleteContent command, CommandContext context)
         {
-            return handler.UpdateAsync<ContentDomainObject>(command, s => s.Delete(command));
+            return handler.UpdateAsync<ContentDomainObject>(context, c => c.Delete(command));
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
+            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
         }
 
         private async Task ValidateAsync(ContentDataCommand command, Func<string> message)

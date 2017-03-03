@@ -12,20 +12,20 @@ namespace Squidex.Infrastructure
 {
     public class DomainObjectVersionException : DomainObjectException
     {
-        private readonly int currentVersion;
-        private readonly int expectedVersion;
+        private readonly long currentVersion;
+        private readonly long expectedVersion;
 
-        public int CurrentVersion
+        public long CurrentVersion
         {
             get { return currentVersion; }
         }
 
-        public int ExpectedVersion
+        public long ExpectedVersion
         {
             get { return expectedVersion; }
         }
 
-        public DomainObjectVersionException(string id, Type type, int currentVersion, int expectedVersion)
+        public DomainObjectVersionException(string id, Type type, long currentVersion, long expectedVersion)
             : base(FormatMessage(id, type, currentVersion, expectedVersion), id, type)
         {
             this.currentVersion = currentVersion;
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure
             this.expectedVersion = expectedVersion;
         }
 
-        private static string FormatMessage(string id, Type type, int currentVersion, int expectedVersion)
+        private static string FormatMessage(string id, Type type, long currentVersion, long expectedVersion)
         {
             return $"Requested version {expectedVersion} for object '{id}' (type {type}), but found {currentVersion}.";
         }

@@ -1,18 +1,15 @@
 ﻿// ==========================================================================
-//  IEventProcessor.cs
+//  IEntityWithVersion.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Commands;
-
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Read
 {
-    public interface IEventProcessor
+    public interface IEntityWithVersion
     {
-        Task ProcessEventAsync(Envelope<IEvent> @event, IAggregate aggregate, ICommand command);
+        long Version { get; set; }
     }
 }

@@ -54,9 +54,11 @@ namespace Squidex.Controllers.Api.Schemas
             var command = new AddField { Name = request.Name, Properties = request.Properties.ToProperties() };
 
             var context = await CommandBus.PublishAsync(command);
-            var result = context.Result<long>();
 
-            return StatusCode(201, new EntityCreatedDto { Id = result.ToString() });
+            var result = context.Result<EntityCreatedResult<long>>().IdOrValue;
+            var response = new EntityCreatedDto { Id = result.ToString() };
+
+            return StatusCode(201, response);
         }
 
         /// <summary>

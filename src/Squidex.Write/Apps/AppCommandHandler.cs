@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Users.Repositories;
 using Squidex.Write.Apps.Commands;
@@ -51,10 +52,8 @@ namespace Squidex.Write.Apps
                 throw new ValidationException("Cannot create a new app", error);
             }
 
-            await handler.CreateAsync<AppDomainObject>(command, x =>
+            await handler.CreateAsync<AppDomainObject>(context, x =>
             {
-                x.Create(command);
-
                 context.Succeed(command.AggregateId);
             });
         }
@@ -70,15 +69,15 @@ namespace Squidex.Write.Apps
                 throw new ValidationException("Cannot assign contributor to app", error);
             }
 
-            await handler.UpdateAsync<AppDomainObject>(command, x =>
+            await handler.UpdateAsync<AppDomainObject>(context, x =>
             {
-                x.AssignContributor(command);
+                context.Succeed(new EntitySavedResult(x.Version));
             });
         }
 
         protected Task On(AttachClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x =>
+            return handler.UpdateAsync<AppDomainObject>(context, x =>
             {
                 x.AttachClient(command, keyGenerator.GenerateKey());
 
@@ -88,37 +87,37 @@ namespace Squidex.Write.Apps
 
         protected Task On(RemoveContributor command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.RemoveContributor(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.RemoveContributor(command));
         }
 
         protected Task On(RenameClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.RenameClient(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.RenameClient(command));
         }
 
         protected Task On(RevokeClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.RevokeClient(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.RevokeClient(command));
         }
 
         protected Task On(AddLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.AddLanguage(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.AddLanguage(command));
         }
 
         protected Task On(RemoveLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.RemoveLanguage(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.RemoveLanguage(command));
         }
 
         protected Task On(SetMasterLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(command, x => x.SetMasterLanguage(command));
+            return handler.UpdateAsync<AppDomainObject>(context, x => x.SetMasterLanguage(command));
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            return context.IsHandled ? Task.FromResult(false) : this.DispatchActionAsync(context.Command, context);
+            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
         }
     }
 }

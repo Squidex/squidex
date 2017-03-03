@@ -27,6 +27,10 @@ namespace Squidex.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
+        public long Version { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public HashSet<string> Languages { get; set; } = new HashSet<string>(); 
 
         [BsonRequired]

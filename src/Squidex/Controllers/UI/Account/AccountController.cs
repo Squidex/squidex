@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Core.Identity;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
@@ -216,7 +217,7 @@ namespace Squidex.Controllers.UI.Account
         {
             if (isFirst || !identityOptions.Value.LockAutomatically)
             {
-                return Task.FromResult(true);
+                return TaskHelper.True;
             }
 
             return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
@@ -226,7 +227,7 @@ namespace Squidex.Controllers.UI.Account
         {
             if (!isFirst)
             {
-                return Task.FromResult(true);
+                return TaskHelper.True;
             }
 
             return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));

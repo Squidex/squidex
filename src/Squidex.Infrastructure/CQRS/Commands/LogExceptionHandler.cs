@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
@@ -36,7 +37,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 logger.LogCritical(InfrastructureErrors.CommandUnknown, exception, "Unknown command {0}", context.Command);
             }
 
-            return Task.FromResult(false);
+            return TaskHelper.False;
         }
     }
 }

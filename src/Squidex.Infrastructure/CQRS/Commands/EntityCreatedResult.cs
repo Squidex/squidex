@@ -1,17 +1,21 @@
 ﻿// ==========================================================================
-//  ITrackLastModifiedByEntity.cs
+//  EntityCreatedResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-namespace Squidex.Read
+namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public interface ITrackLastModifiedByEntity
+    public sealed class EntityCreatedResult<T> : EntitySavedResult
     {
-        RefToken LastModifiedBy { get; set; }
+        public T IdOrValue { get; }
+
+        public EntityCreatedResult(T idOrValue, long version)
+            : base(version)
+        {
+            IdOrValue = idOrValue;
+        }
     }
 }

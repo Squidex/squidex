@@ -1,46 +1,35 @@
 ﻿// ==========================================================================
-//  EnrichWithAppIdHandler.cs
+//  SetVersionAsETagHandler.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Infrastructure;
+using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Write;
-
-// ReSharper disable InvertIf
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithAppIdHandler : ICommandHandler
+    public class SetVersionAsETagHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithAppIdHandler(IHttpContextAccessor httpContextAccessor)
+        public SetVersionAsETagHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var appCommand = context.Command as AppCommand;
+            var result = context.Result<object>() as EntitySavedResult;
 
-            if (appCommand != null)
+            if (result != null)
             {
-                var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
-
-                if (appFeature == null)
-                {
-                    throw new InvalidOperationException("Cannot resolve app");
-                }
-
-                appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
+                httpContextAccessor.HttpContext.Response.Headers["ETag"] = new StringValues(result.Version.ToString());
             }
 
             return TaskHelper.False;

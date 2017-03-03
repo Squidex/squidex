@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ITrackCreatedByEntity.cs
+//  ITrackLastModifiedByEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,8 +10,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Read
 {
-    public interface ITrackCreatedByEntity
+    public interface IEntityWithLastModifiedBy
     {
-        RefToken CreatedBy { get; set; }
+        RefToken LastModifiedBy { get; set; }
     }
 }

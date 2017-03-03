@@ -25,6 +25,11 @@ namespace Squidex.Controllers.Api.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The version of the app.
+        /// </summary>
+        public long Version { get; set; }
+
+        /// <summary>
         /// The name of the app.
         /// </summary>
         public Guid Id { get; set; }

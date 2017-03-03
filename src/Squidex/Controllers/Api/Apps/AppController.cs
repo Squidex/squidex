@@ -92,9 +92,11 @@ namespace Squidex.Controllers.Api.Apps
             var command = SimpleMapper.Map(request, new CreateApp());
 
             var context = await CommandBus.PublishAsync(command);
-            var result = context.Result<Guid>();
 
-            return CreatedAtAction(nameof(GetApps), new EntityCreatedDto { Id = result.ToString() });
+            var result = context.Result<EntityCreatedResult<Guid>>();
+            var response = new EntityCreatedDto { Id = result.ToString(), Version = result.Version };
+
+            return CreatedAtAction(nameof(GetApps), response);
         }
     }
 }

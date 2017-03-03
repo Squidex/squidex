@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Squidex.Controllers.Api;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
@@ -91,19 +92,21 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var content = await contentRepository.FindContentAsync(schemaEntity.Id, id);
+            var entity = await contentRepository.FindContentAsync(schemaEntity.Id, id);
 
-            if (content == null)
+            if (entity == null)
             {
                 return NotFound();
             }
 
-            var model = SimpleMapper.Map(content, new ContentDto());
+            var model = SimpleMapper.Map(entity, new ContentDto());
 
-            if (content.Data != null)
+            if (entity.Data != null)
             {
-                model.Data = content.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
+                model.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
             }
+
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
             return Ok(model);
         }
@@ -115,9 +118,11 @@ namespace Squidex.Controllers.ContentApi
             var command = new CreateContent { Data = request, ContentId = Guid.NewGuid() };
 
             var context = await CommandBus.PublishAsync(command);
-            var result = context.Result<Guid>();
 
-            return CreatedAtAction(nameof(GetContent), new { id = result }, new EntityCreatedDto { Id = result.ToString() });
+            var result = context.Result<EntityCreatedResult<Guid>>().IdOrValue;
+            var response = new EntityCreatedDto { Id = result.ToString() };
+
+            return CreatedAtAction(nameof(GetContent), new { id = result }, response);
         }
 
         [HttpPut]

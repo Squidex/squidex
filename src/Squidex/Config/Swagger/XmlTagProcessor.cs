@@ -12,6 +12,7 @@ using NJsonSchema.Infrastructure;
 using NSwag.Annotations;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
@@ -57,7 +58,7 @@ namespace Squidex.Config.Swagger
                 context.OperationDescription.Operation.Tags.Add(tagAttribute.Name);
             }
 
-            return Task.FromResult(true);
+            return TaskHelper.True;
         }
     }
 }

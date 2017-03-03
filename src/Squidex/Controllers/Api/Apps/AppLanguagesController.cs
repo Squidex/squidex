@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -66,6 +67,8 @@ namespace Squidex.Controllers.Api.Apps
                 return SimpleMapper.Map(x, new AppLanguageDto { IsMasterLanguage = isMasterLanguage });
             }).ToList();
 
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+
             return Ok(model);
         }
 
@@ -89,7 +92,7 @@ namespace Squidex.Controllers.Api.Apps
 
             var response = SimpleMapper.Map(request.Language, new AppLanguageDto());
 
-            return StatusCode(201, response);
+            return CreatedAtAction(nameof(GetLanguages), new { app }, response);
         }
         
         /// <summary>

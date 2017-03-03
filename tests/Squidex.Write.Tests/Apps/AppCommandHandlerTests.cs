@@ -48,7 +48,9 @@ namespace Squidex.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(AppName))
+                .Returns(Task.FromResult(new Mock<IAppEntity>().Object))
+                .Verifiable();
 
             await TestCreate(app, async _ =>
             {
@@ -63,7 +65,9 @@ namespace Squidex.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(AppName))
+                .Returns(Task.FromResult<IAppEntity>(null))
+                .Verifiable();
 
             await TestCreate(app, async _ =>
             {
@@ -135,7 +139,9 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AttachClient_should_update_domain_object()
         {
-            keyGenerator.Setup(x => x.GenerateKey()).Returns(clientSecret).Verifiable();
+            keyGenerator.Setup(x => x.GenerateKey())
+                .Returns(clientSecret)
+                .Verifiable();
 
             CreateApp();
 
