@@ -39,7 +39,7 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private messageSubscription: Subscription;
-    private version: Version;
+    private version: Version = new Version('');
 
     public schema: SchemaDetailsDto;
 

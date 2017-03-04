@@ -26,6 +26,18 @@ namespace Squidex.Infrastructure.CQRS
             return envelope;
         }
 
+        public static long EventStreamNumber(this EnvelopeHeaders headers)
+        {
+            return headers[CommonHeaders.EventStreamNumber].ToInt32(CultureInfo.InvariantCulture);
+        }
+
+        public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class
+        {
+            envelope.Headers.Set(CommonHeaders.EventStreamNumber, value);
+
+            return envelope;
+        }
+
         public static Guid CommitId(this EnvelopeHeaders headers)
         {
             return headers[CommonHeaders.CommitId].ToGuid(CultureInfo.InvariantCulture);

@@ -62,7 +62,7 @@ namespace Squidex.Read.MongoDb.Utils
 
             if (withVersion != null)
             {
-                withVersion.Version = headers.EventNumber();
+                withVersion.Version = headers.EventStreamNumber();
             }
         }
 

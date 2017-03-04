@@ -72,5 +72,16 @@ namespace Squidex.Infrastructure.CQRS
             Assert.Equal(eventNumber, sut.Headers.EventNumber());
             Assert.Equal(eventNumber, sut.Headers["EventNumber"].ToInt32(culture));
         }
+
+        [Fact]
+        public void Should_set_and_get_event_stream_number()
+        {
+            const int eventStreamNumber = 123;
+
+            sut.SetEventStreamNumber(eventStreamNumber);
+
+            Assert.Equal(eventStreamNumber, sut.Headers.EventStreamNumber());
+            Assert.Equal(eventStreamNumber, sut.Headers["EventStreamNumber"].ToInt32(culture));
+        }
     }
 }

@@ -81,9 +81,9 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             events = new[]
             {
-                new StoredEvent(3, eventData1),
-                new StoredEvent(4, eventData2),
-                new StoredEvent(4, eventData3)
+                new StoredEvent(3, 3, eventData1),
+                new StoredEvent(4, 4, eventData2),
+                new StoredEvent(4, 4, eventData3)
             };
 
             consumerName = eventConsumer.Object.GetType().Name;

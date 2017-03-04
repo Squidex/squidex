@@ -90,8 +90,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, eventData1),
-                new StoredEvent(1, eventData2)
+                new StoredEvent(0, 0, eventData1),
+                new StoredEvent(1, 1, eventData2)
             };
 
             eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
@@ -115,8 +115,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, eventData1),
-                new StoredEvent(1, eventData2)
+                new StoredEvent(0, 0, eventData1),
+                new StoredEvent(1, 1, eventData2)
             };
 
             eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());

@@ -176,6 +176,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 var @event = formatter.Parse(storedEvent.Data);
 
                 @event.SetEventNumber(storedEvent.EventNumber);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
             }
