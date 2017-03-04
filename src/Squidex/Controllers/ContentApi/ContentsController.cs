@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using NSwag.Annotations;
 using Squidex.Controllers.Api;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
@@ -30,6 +31,7 @@ namespace Squidex.Controllers.ContentApi
     [Authorize(Roles = SquidexRoles.AppEditor)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerIgnore]
     public class ContentsController : ControllerBase
     {
         private readonly ISchemaProvider schemas;

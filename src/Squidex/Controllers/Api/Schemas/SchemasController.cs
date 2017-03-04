@@ -42,7 +42,7 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
-        /// Get app schemas.
+        /// Get schemas.
         /// </summary>
         /// <returns>
         /// 200 => Schemas returned.
