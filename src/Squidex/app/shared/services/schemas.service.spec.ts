@@ -22,12 +22,14 @@ import {
     SchemaDto,
     SchemasService,
     UpdateFieldDto,
-    UpdateSchemaDto
+    UpdateSchemaDto,
+    Version
 } from './../';
 
 describe('SchemasService', () => {
     let authService: IMock<AuthService>;
     let schemasService: SchemasService;
+    let version = new Version('1');
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);
@@ -52,6 +54,7 @@ describe('SchemasService', () => {
                             createdBy: 'Created1',
                             lastModified: '2017-12-12T10:10',
                             lastModifiedBy: 'LastModifiedBy1',
+                            version: 11,
                             data: {}
                         }, {
                             id: 'id2',
@@ -62,6 +65,7 @@ describe('SchemasService', () => {
                             createdBy: 'Created2',
                             lastModified: '2017-10-12T10:10',
                             lastModifiedBy: 'LastModifiedBy2',
+                            version: 22,
                             data: {}
                         }]
                     })
@@ -76,8 +80,14 @@ describe('SchemasService', () => {
         }).unsubscribe();
 
         expect(schemas).toEqual([
-            new SchemaDto('id1', 'name1', 'label1', true, 'Created1', 'LastModifiedBy1', DateTime.parseISO_UTC('2016-12-12T10:10'), DateTime.parseISO_UTC('2017-12-12T10:10')),
-            new SchemaDto('id2', 'name2', 'label2',  true, 'Created2', 'LastModifiedBy2', DateTime.parseISO_UTC('2016-10-12T10:10'), DateTime.parseISO_UTC('2017-10-12T10:10'))
+            new SchemaDto('id1', 'name1', 'label1', true, 'Created1', 'LastModifiedBy1',
+                DateTime.parseISO_UTC('2016-12-12T10:10'),
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                new Version('11')),
+            new SchemaDto('id2', 'name2', 'label2', true, 'Created2', 'LastModifiedBy2',
+                DateTime.parseISO_UTC('2016-10-12T10:10'),
+                DateTime.parseISO_UTC('2017-10-12T10:10'),
+                new Version('22'))
         ]);
 
         authService.verifyAll();
@@ -98,13 +108,14 @@ describe('SchemasService', () => {
                             createdBy: 'Created1',
                             lastModified: '2017-12-12T10:10',
                             lastModifiedBy: 'LastModifiedBy1',
+                            version: 11,
                             fields: [{
                                 fieldId: 1,
                                 name: 'field1',
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
-                                    fieldType: 'number'
+                                    fieldType: 'Number'
                                 }
                             }, {
                                 fieldId: 2,
@@ -112,7 +123,7 @@ describe('SchemasService', () => {
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
-                                    fieldType: 'string'
+                                    fieldType: 'String'
                                 }
                             }, {
                                 fieldId: 3,
@@ -120,7 +131,7 @@ describe('SchemasService', () => {
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
-                                    fieldType: 'boolean'
+                                    fieldType: 'Boolean'
                                 }
                             }, {
                                 fieldId: 4,
@@ -128,7 +139,7 @@ describe('SchemasService', () => {
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
-                                    fieldType: 'dateTime'
+                                    fieldType: 'DateTime'
                                 }
                             }, {
                                 fieldId: 5,
@@ -136,7 +147,7 @@ describe('SchemasService', () => {
                                 isHidden: true,
                                 isDisabled: true,
                                 properties: {
-                                    fieldType: 'json'
+                                    fieldType: 'Json'
                                 }
                             }]
                         }
@@ -147,19 +158,21 @@ describe('SchemasService', () => {
 
         let schema: SchemaDetailsDto | null = null;
 
-        schemasService.getSchema('my-app', 'my-schema').subscribe(result => {
+        schemasService.getSchema('my-app', 'my-schema', version).subscribe(result => {
             schema = result;
         }).unsubscribe();
 
         expect(schema).toEqual(
             new SchemaDetailsDto('id1', 'name1', 'label1', 'hints1', true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'), [
-                    new FieldDto(1, 'field1', true, true, createProperties('number')),
-                    new FieldDto(2, 'field2', true, true, createProperties('string')),
-                    new FieldDto(3, 'field3', true, true, createProperties('boolean')),
-                    new FieldDto(4, 'field4', true, true, createProperties('dateTime')),
-                    new FieldDto(5, 'field5', true, true, createProperties('json'))
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                new Version('11'),
+                [
+                    new FieldDto(1, 'field1', true, true, createProperties('Number')),
+                    new FieldDto(2, 'field2', true, true, createProperties('String')),
+                    new FieldDto(3, 'field3', true, true, createProperties('Boolean')),
+                    new FieldDto(4, 'field4', true, true, createProperties('DateTime')),
+                    new FieldDto(5, 'field5', true, true, createProperties('Json'))
                 ]));
 
         authService.verifyAll();
@@ -168,7 +181,7 @@ describe('SchemasService', () => {
     it('should make post request to create schema', () => {
         const dto = new CreateSchemaDto('name');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/schemas', dto))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/schemas', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -182,7 +195,7 @@ describe('SchemasService', () => {
 
         let created: EntityCreatedDto | null = null;
 
-        schemasService.postSchema('my-app', dto).subscribe(result => {
+        schemasService.postSchema('my-app', dto, version).subscribe(result => {
             created = result;
         });
 
@@ -193,9 +206,9 @@ describe('SchemasService', () => {
     });
 
     it('should make post request to add field', () => {
-        const dto = new AddFieldDto('name', createProperties('number'));
+        const dto = new AddFieldDto('name', createProperties('Number'));
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/schemas/my-schema/fields', dto))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/schemas/my-schema/fields', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -209,7 +222,7 @@ describe('SchemasService', () => {
 
         let created: EntityCreatedDto | null = null;
 
-        schemasService.postField('my-app', 'my-schema', dto).subscribe(result => {
+        schemasService.postField('my-app', 'my-schema', dto, version).subscribe(result => {
             created = result;
         });
 
@@ -222,7 +235,7 @@ describe('SchemasService', () => {
     it('should make put request to update schema', () => {
         const dto = new UpdateSchemaDto('label', 'hints');
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema', dto))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -230,15 +243,15 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.putSchema('my-app', 'my-schema', dto);
+        schemasService.putSchema('my-app', 'my-schema', dto, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to update field', () => {
-        const dto = new UpdateFieldDto(createProperties('number'));
+        const dto = new UpdateFieldDto(createProperties('Number'));
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1', dto))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -246,13 +259,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.putField('my-app', 'my-schema', 1, dto);
+        schemasService.putField('my-app', 'my-schema', 1, dto, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to publish schema', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/publish', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/publish', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -260,13 +273,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.publishSchema('my-app', 'my-schema');
+        schemasService.publishSchema('my-app', 'my-schema', version);
 
         authService.verifyAll();
     });
 
     it('should make put request to unpublish schema', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/unpublish', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/unpublish', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -274,13 +287,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.unpublishSchema('my-app', 'my-schema');
+        schemasService.unpublishSchema('my-app', 'my-schema', version);
 
         authService.verifyAll();
     });
 
     it('should make put request to enable field', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -288,13 +301,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.enableField('my-app', 'my-schema', 1);
+        schemasService.enableField('my-app', 'my-schema', 1, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to disable field', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -302,13 +315,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.disableField('my-app', 'my-schema', 1);
+        schemasService.disableField('my-app', 'my-schema', 1, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to show field', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/show', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/show', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -316,13 +329,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.showField('my-app', 'my-schema', 1);
+        schemasService.showField('my-app', 'my-schema', 1, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to hide field', () => {
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/hide', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/hide', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -330,13 +343,13 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.hideField('my-app', 'my-schema', 1);
+        schemasService.hideField('my-app', 'my-schema', 1, version);
 
         authService.verifyAll();
     });
 
     it('should make delete request to delete field', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/schemas/my-schema/fields/1'))
+        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/schemas/my-schema/fields/1', version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -344,7 +357,7 @@ describe('SchemasService', () => {
             ))
             .verifiable(Times.once());
 
-        schemasService.deleteField('my-app', 'my-schema', 1);
+        schemasService.deleteField('my-app', 'my-schema', 1, version);
 
         authService.verifyAll();
     });

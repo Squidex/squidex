@@ -28,7 +28,8 @@ import {
     SchemaDetailsDto,
     StringFieldPropertiesDto,
     UsersProviderService,
-    ValidatorsEx
+    ValidatorsEx,
+    Version
 } from 'shared';
 
 @Component({
@@ -38,6 +39,7 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private messageSubscription: Subscription;
+    private version: Version;
 
     public schema: SchemaDetailsDto;
 
@@ -94,9 +96,9 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
             if (this.isNewMode) {
                 this.appName()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, this.version))
                     .subscribe(created => {
-                        this.messageBus.publish(new ContentCreated(created.id, data));
+                        this.messageBus.publish(new ContentCreated(created.id, data, this.version.value));
 
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }, error => {
@@ -105,9 +107,9 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     });
             } else {
                 this.appName()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data))
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data, this.version))
                     .subscribe(() => {
-                        this.messageBus.publish(new ContentUpdated(this.contentId, data));
+                        this.messageBus.publish(new ContentUpdated(this.contentId, data, this.version.value));
 
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }, error => {

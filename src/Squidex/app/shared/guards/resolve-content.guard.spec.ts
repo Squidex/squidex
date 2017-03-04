@@ -43,7 +43,7 @@ describe('ResolveContentGuard', () => {
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
-        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123', null))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
@@ -59,7 +59,7 @@ describe('ResolveContentGuard', () => {
     });
 
     it('should navigate to 404 page if schema loading fails', (done) => {
-        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123', null))
             .returns(() => Observable.throw(null!));
         const router = new RouterMockup();
 
@@ -77,7 +77,7 @@ describe('ResolveContentGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const schema = {};
 
-        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
+        appsStore.setup(x => x.getContent('my-app', 'my-schema', '123', null))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 

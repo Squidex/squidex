@@ -47,7 +47,7 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
         {
-            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 409 };
+            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 412 };
         }
 
         private static IActionResult OnDomainException(DomainException ex)

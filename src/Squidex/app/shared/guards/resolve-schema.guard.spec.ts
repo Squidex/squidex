@@ -38,7 +38,7 @@ describe('ResolveSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
@@ -54,7 +54,7 @@ describe('ResolveSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema loading fails', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
             .returns(() => Observable.throw(null!));
         const router = new RouterMockup();
 
@@ -72,7 +72,7 @@ describe('ResolveSchemaGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const schema = {};
 
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 

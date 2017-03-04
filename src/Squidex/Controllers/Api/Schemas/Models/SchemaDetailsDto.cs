@@ -72,5 +72,10 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// The date and time when the schema has been modified last.
         /// </summary>
         public Instant LastModified { get; set; }
+
+        /// <summary>
+        /// The version of the schema.
+        /// </summary>
+        public int Version { get; set; }
     }
 }

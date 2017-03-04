@@ -22,7 +22,8 @@ import {
     NotificationService,
     SchemaDto,
     SchemasService,
-    UsersProviderService
+    UsersProviderService,
+    Version
 } from 'shared';
 
 import { SchemaUpdated } from './../messages';
@@ -130,6 +131,7 @@ function updateSchema(schema: SchemaDto, authService: AuthService, message: Sche
         message.label,
         message.isPublished,
         schema.createdBy, me,
-        schema.created, DateTime.now());
+        schema.created, DateTime.now(),
+        new Version(message.version));
 }
 

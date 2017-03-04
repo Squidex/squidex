@@ -23,20 +23,21 @@ namespace Squidex.Write.Contents
     {
         private readonly IAggregateHandler handler;
         private readonly IAppProvider appProvider;
-        private readonly ISchemaProvider schemaProvider;
+        private readonly ISchemaProvider schemas;
 
         public ContentCommandHandler(
             IAggregateHandler handler,
             IAppProvider appProvider, 
-            ISchemaProvider schemaProvider)
+            ISchemaProvider schemas)
         {
             Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(schemas, nameof(schemas));
             Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(schemaProvider, nameof(schemaProvider));
 
             this.handler = handler;
+            this.schemas = schemas;
+
             this.appProvider = appProvider;
-            this.schemaProvider = schemaProvider;
         }
 
         protected async Task On(CreateContent command, CommandContext context)
@@ -88,7 +89,7 @@ namespace Squidex.Write.Contents
                 appProvider.FindAppByIdAsync(command.AppId.Id);
 
             var taskForSchema = 
-                schemaProvider.FindSchemaByIdAsync(command.SchemaId.Id);
+                schemas.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);
 

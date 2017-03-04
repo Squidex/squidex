@@ -13,7 +13,8 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
-    EntityCreatedDto
+    EntityCreatedDto,
+    Version
 } from 'framework';
 
 import { AuthService } from './auth.service';
@@ -34,7 +35,8 @@ export class ContentDto {
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly data: any
+        public readonly data: any,
+        public readonly version: Version
     ) {
     }
 }
@@ -83,16 +85,17 @@ export class ContentsService {
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
-                            item.data);
+                            item.data,
+                            new Version(item.version.toString()));
                     }));
                 })
                 .catchError('Failed to load contents. Please reload.');
     }
 
-    public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
+    public getContent(appName: string, schemaName: string, id: string, version: Version): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?hidden=true`);
 
-        return this.authService.authGet(url)
+        return this.authService.authGet(url, version)
                 .map(response => response.json())
                 .map(response => {
                     return new ContentDto(
@@ -102,15 +105,16 @@ export class ContentsService {
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),
                         DateTime.parseISO_UTC(response.lastModified),
-                        response.data);
+                        response.data,
+                        new Version(response.version.toString()));
                 })
                 .catchError('Failed to load content. Please reload.');
     }
 
-    public postContent(appName: string, schemaName: string, dto: any): Observable<EntityCreatedDto> {
+    public postContent(appName: string, schemaName: string, dto: any, version: Version): Observable<EntityCreatedDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}`);
 
-        return this.authService.authPost(url, dto)
+        return this.authService.authPost(url, dto, version)
                 .map(response => response.json())
                 .map(response => {
                     return new EntityCreatedDto(response.id);
@@ -118,31 +122,31 @@ export class ContentsService {
                 .catchError('Failed to create content. Please reload.');
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any): Observable<any> {
+    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return this.authService.authPut(url, dto)
+        return this.authService.authPut(url, dto, version)
                 .catchError('Failed to update content. Please reload.');
     }
 
-    public publishContent(appName: string, schemaName: string, id: string): Observable<any> {
+    public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
 
-        return this.authService.authPut(url, {})
+        return this.authService.authPut(url, {}, version)
                 .catchError('Failed to publish content. Please reload.');
     }
 
-    public unpublishContent(appName: string, schemaName: string, id: string): Observable<any> {
+    public unpublishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
 
-        return this.authService.authPut(url, {})
+        return this.authService.authPut(url, {}, version)
                 .catchError('Failed to unpublish content. Please reload.');
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string): Observable<any> {
+    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return this.authService.authDelete(url)
+        return this.authService.authDelete(url, version)
                 .catchError('Failed to delete content. Please reload.');
     }
 }

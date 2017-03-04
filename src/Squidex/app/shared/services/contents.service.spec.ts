@@ -16,12 +16,14 @@ import {
     ContentDto,
     ContentsDto,
     ContentsService,
-    DateTime
+    DateTime,
+    Version
 } from './../';
 
 describe('ContentsService', () => {
     let authService: IMock<AuthService>;
     let contentsService: ContentsService;
+    let version = new Version('1');
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);
@@ -42,6 +44,7 @@ describe('ContentsService', () => {
                                 createdBy: 'Created1',
                                 lastModified: '2017-12-12T10:10',
                                 lastModifiedBy: 'LastModifiedBy1',
+                                version: 11,
                                 data: {}
                             }, {
                                 id: 'id2',
@@ -50,6 +53,7 @@ describe('ContentsService', () => {
                                 createdBy: 'Created2',
                                 lastModified: '2017-10-12T10:10',
                                 lastModifiedBy: 'LastModifiedBy2',
+                                version: 22,
                                 data: {}
                             }]
                         }
@@ -66,8 +70,16 @@ describe('ContentsService', () => {
 
         expect(contents).toEqual(
             new ContentsDto(10, [
-                new ContentDto('id1', true, 'Created1', 'LastModifiedBy1', DateTime.parseISO_UTC('2016-12-12T10:10'), DateTime.parseISO_UTC('2017-12-12T10:10'), {}),
-                new ContentDto('id2', true, 'Created2', 'LastModifiedBy2', DateTime.parseISO_UTC('2016-10-12T10:10'), DateTime.parseISO_UTC('2017-10-12T10:10'), {})
+                new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+                    DateTime.parseISO_UTC('2016-12-12T10:10'),
+                    DateTime.parseISO_UTC('2017-12-12T10:10'),
+                    {},
+                    new Version('11')),
+                new ContentDto('id2', true, 'Created2', 'LastModifiedBy2',
+                    DateTime.parseISO_UTC('2016-10-12T10:10'),
+                    DateTime.parseISO_UTC('2017-10-12T10:10'),
+                    {},
+                    new Version('22'))
         ]));
 
         authService.verifyAll();
@@ -118,7 +130,7 @@ describe('ContentsService', () => {
     });
 
     it('should make get request to get content', () => {
-        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema/content1?hidden=true'))
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema/content1?hidden=true', version))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -129,6 +141,7 @@ describe('ContentsService', () => {
                             createdBy: 'Created1',
                             lastModified: '2017-12-12T10:10',
                             lastModifiedBy: 'LastModifiedBy1',
+                            version: 11,
                             data: {}
                         }
                     })
@@ -138,12 +151,16 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.getContent('my-app', 'my-schema', 'content1').subscribe(result => {
+        contentsService.getContent('my-app', 'my-schema', 'content1', version).subscribe(result => {
             content = result;
         }).unsubscribe();
 
         expect(content).toEqual(
-            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1', DateTime.parseISO_UTC('2016-12-12T10:10'), DateTime.parseISO_UTC('2017-12-12T10:10'), {}));
+            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+                DateTime.parseISO_UTC('2016-12-12T10:10'),
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                {},
+                new Version('11')));
 
         authService.verifyAll();
     });
@@ -151,7 +168,7 @@ describe('ContentsService', () => {
     it('should make post request to create content', () => {
         const dto = {};
 
-        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema', dto))
+        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -165,7 +182,7 @@ describe('ContentsService', () => {
 
         let created: EntityCreatedDto | null = null;
 
-        contentsService.postContent('my-app', 'my-schema', dto).subscribe(result => {
+        contentsService.postContent('my-app', 'my-schema', dto, version).subscribe(result => {
             created = result;
         });
 
@@ -178,7 +195,7 @@ describe('ContentsService', () => {
     it('should make put request to update content', () => {
         const dto = {};
 
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1', dto))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -186,13 +203,13 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        contentsService.putContent('my-app', 'my-schema', 'content1', dto);
+        contentsService.putContent('my-app', 'my-schema', 'content1', dto, version);
 
         authService.verifyAll();
     });
 
     it('should make put request to publish content', () => {
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/publish', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/publish', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -200,13 +217,13 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        contentsService.publishContent('my-app', 'my-schema', 'content1');
+        contentsService.publishContent('my-app', 'my-schema', 'content1', version);
 
         authService.verifyAll();
     });
 
     it('should make put request to unpublish content', () => {
-        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/unpublish', It.isAny()))
+        authService.setup(x => x.authPut('http://service/p/api/content/my-app/my-schema/content1/unpublish', It.isAny(), version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -214,13 +231,13 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        contentsService.unpublishContent('my-app', 'my-schema', 'content1');
+        contentsService.unpublishContent('my-app', 'my-schema', 'content1', version);
 
         authService.verifyAll();
     });
 
     it('should make delete request to delete content', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/content/my-app/my-schema/content1'))
+        authService.setup(x => x.authDelete('http://service/p/api/content/my-app/my-schema/content1', version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -228,7 +245,7 @@ describe('ContentsService', () => {
             ))
             .verifiable(Times.once());
 
-        contentsService.deleteContent('my-app', 'my-schema', 'content1');
+        contentsService.deleteContent('my-app', 'my-schema', 'content1', version);
 
         authService.verifyAll();
     });

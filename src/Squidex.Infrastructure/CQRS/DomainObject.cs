@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.CQRS
         protected DomainObject(Guid id, int version)
         {
             Guard.NotEmpty(id, nameof(id));
-            Guard.GreaterEquals(version, 0, nameof(version));
+            Guard.GreaterEquals(version, -1, nameof(version));
 
             this.id = id;
 

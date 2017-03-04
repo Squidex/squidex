@@ -82,6 +82,7 @@
                 <sqx-schema-edit-form
                     [appName]="appName() | async"
                     [schema]="schemaProperties"
+                    [version]="version"
                     (saved)="onSchemaSaved($event)"
                     (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>

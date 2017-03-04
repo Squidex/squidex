@@ -16,12 +16,14 @@ import {
     AppClientsService,
     AuthService,
     CreateAppClientDto,
-    UpdateAppClientDto
+    UpdateAppClientDto,
+    Version
 } from './../';
 
 describe('AppClientsService', () => {
     let authService: IMock<AuthService>;
     let appClientsService: AppClientsService;
+    let version = new Version('1');
     let http: IMock<Http>;
 
     beforeEach(() => {
@@ -32,7 +34,7 @@ describe('AppClientsService', () => {
     });
 
     it('should make get request to get app clients', () => {
-        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/clients'))
+        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/clients', version))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -52,7 +54,7 @@ describe('AppClientsService', () => {
 
         let clients: AppClientDto[] | null = null;
 
-        appClientsService.getClients('my-app').subscribe(result => {
+        appClientsService.getClients('my-app', version).subscribe(result => {
             clients = result;
         }).unsubscribe();
 
@@ -68,7 +70,7 @@ describe('AppClientsService', () => {
     it('should make post request to create client', () => {
         const dto = new CreateAppClientDto('client1');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', dto))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -84,7 +86,7 @@ describe('AppClientsService', () => {
 
         let client: AppClientDto | null = null;
 
-        appClientsService.postClient('my-app', dto).subscribe(result => {
+        appClientsService.postClient('my-app', dto, version).subscribe(result => {
             client = result;
         });
 
@@ -97,7 +99,7 @@ describe('AppClientsService', () => {
     it('should make put request to rename client', () => {
         const dto = new UpdateAppClientDto('Client 1 New');
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', dto))
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -105,13 +107,13 @@ describe('AppClientsService', () => {
             ))
             .verifiable(Times.once());
 
-        appClientsService.updateClient('my-app', 'client1', dto);
+        appClientsService.updateClient('my-app', 'client1', dto, version);
 
         authService.verifyAll();
     });
 
     it('should make delete request to remove client', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/clients/client1'))
+        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/clients/client1', version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -119,7 +121,7 @@ describe('AppClientsService', () => {
             ))
             .verifiable(Times.once());
 
-        appClientsService.deleteClient('my-app', 'client1');
+        appClientsService.deleteClient('my-app', 'client1', version);
 
         authService.verifyAll();
     });

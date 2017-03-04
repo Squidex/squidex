@@ -26,10 +26,10 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var headers = httpContextAccessor.HttpContext.Request.GetTypedHeaders();
-            var headerMatch = headers.IfMatch?.FirstOrDefault();
+            var headers = httpContextAccessor.HttpContext.Request.Headers;
+            var headerMatch = headers["If-Match"].ToString();
 
-            if (!string.IsNullOrWhiteSpace(headerMatch?.Tag) && long.TryParse(headerMatch.Tag, NumberStyles.Any, CultureInfo.InvariantCulture, out long expectedVersion))
+            if (!string.IsNullOrWhiteSpace(headerMatch) && long.TryParse(headerMatch, NumberStyles.Any, CultureInfo.InvariantCulture, out long expectedVersion))
             {
                 context.Command.ExpectedVersion = expectedVersion;
             }

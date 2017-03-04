@@ -27,7 +27,7 @@ namespace Squidex.Read.MongoDb.Contents
     {
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
-        private readonly ISchemaProvider schemaProvider;
+        private readonly ISchemaProvider schemas;
         private readonly EdmModelBuilder modelBuilder;
 
         protected static IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
@@ -38,15 +38,15 @@ namespace Squidex.Read.MongoDb.Contents
             }
         }
 
-        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemaProvider, EdmModelBuilder modelBuilder)
+        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas, EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(database, nameof(database));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
-            Guard.NotNull(schemaProvider, nameof(schemaProvider));
+            Guard.NotNull(schemas, nameof(schemas));
 
+            this.schemas = schemas;
             this.database = database;
             this.modelBuilder = modelBuilder;
-            this.schemaProvider = schemaProvider;
         }
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
@@ -142,7 +142,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var collection = GetCollection(schemaId);
 
-            var schemaEntity = await schemaProvider.FindSchemaByIdAsync(schemaId);
+            var schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
 
             if (schemaEntity == null)
             {

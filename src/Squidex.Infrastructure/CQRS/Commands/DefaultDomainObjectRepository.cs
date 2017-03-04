@@ -74,8 +74,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id);
 
             var versionCurrent = domainObject.Version;
-            var versionBefore = versionCurrent - events.Count;
-            var versionExpected = versionBefore == 0 ? -1 : versionBefore - 1;
+            var versionExpected = versionCurrent - events.Count;
 
             var eventsToSave = events.Select(x => formatter.ToEventData(x, commitId)).ToList();
 

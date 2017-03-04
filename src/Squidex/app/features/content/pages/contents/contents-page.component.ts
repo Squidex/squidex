@@ -29,7 +29,8 @@ import {
     MessageBus,
     NotificationService,
     SchemaDetailsDto,
-    UsersProviderService
+    UsersProviderService,
+    Version
 } from 'shared';
 
 @Component({
@@ -86,12 +87,12 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             this.messageBus.of(ContentCreated).subscribe(message => {
                 this.itemLast++;
                 this.contentTotal++;
-                this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data));
+                this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
             });
 
         this.messageUpdatedSubscription =
             this.messageBus.of(ContentUpdated).subscribe(message => {
-                this.updateContents(message.id, undefined, message.data);
+                this.updateContents(message.id, undefined, message.data, message.version);
             });
 
         this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
@@ -115,9 +116,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public publishContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, true, content.data);
+                this.updateContents(content.id, true, content.data, content.version.value);
             }, error => {
                 this.notifyError(error);
             });
@@ -125,9 +126,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public unpublishContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, false, content.data);
+                this.updateContents(content.id, false, content.data, content.version.value);
             }, error => {
                 this.notifyError(error);
             });
@@ -135,7 +136,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public deleteContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
 
@@ -204,11 +205,11 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.canGoPrev = this.currentPage > 0;
     }
 
-    private updateContents(id: string, p: boolean | undefined, data: any) {
-        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data));
+    private updateContents(id: string, p: boolean | undefined, data: any, version: string) {
+        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data, version));
     }
 
-    private createContent(id: string, data: any): ContentDto {
+    private createContent(id: string, data: any, version: string): ContentDto {
         const me = `subject:${this.authService.user!.id}`;
 
         const newContent =
@@ -217,12 +218,13 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 me, me,
                 DateTime.now(),
                 DateTime.now(),
-                data);
+                data,
+                new Version(version));
 
         return newContent;
     }
 
-    private updateContent(content: ContentDto, isPublished: boolean, data: any): ContentDto {
+    private updateContent(content: ContentDto, isPublished: boolean, data: any, version: string): ContentDto {
         const me = `subject:${this.authService.user!.id}`;
 
         const newContent =
@@ -230,7 +232,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 content.id, isPublished,
                 content.createdBy, me,
                 content.created, DateTime.now(),
-                data);
+                data,
+                new Version(version));
 
         return newContent;
     }

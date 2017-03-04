@@ -32,13 +32,14 @@ namespace Squidex.Controllers.ContentApi
     [ServiceFilter(typeof(AppFilterAttribute))]
     public class ContentsController : ControllerBase
     {
-        private readonly ISchemaProvider schemaProvider;
+        private readonly ISchemaProvider schemas;
         private readonly IContentRepository contentRepository;
 
-        public ContentsController(ICommandBus commandBus, ISchemaProvider schemaProvider, IContentRepository contentRepository) 
+        public ContentsController(ICommandBus commandBus, ISchemaProvider schemas, IContentRepository contentRepository) 
             : base(commandBus)
         {
-            this.schemaProvider = schemaProvider;
+            this.schemas = schemas;
+
             this.contentRepository = contentRepository;
         }
 
@@ -46,7 +47,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}")]
         public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
         {
-            var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
 
             if (schemaEntity == null)
             {
@@ -85,7 +86,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
         {
-            var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
 
             if (schemaEntity == null)
             {

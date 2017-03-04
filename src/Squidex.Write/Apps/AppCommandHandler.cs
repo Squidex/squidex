@@ -52,10 +52,7 @@ namespace Squidex.Write.Apps
                 throw new ValidationException("Cannot create a new app", error);
             }
 
-            await handler.CreateAsync<AppDomainObject>(context, x =>
-            {
-                context.Succeed(command.AggregateId);
-            });
+            await handler.CreateAsync<AppDomainObject>(context, x => x.Create(command));
         }
 
         protected async Task On(AssignContributor command, CommandContext context)
@@ -69,10 +66,7 @@ namespace Squidex.Write.Apps
                 throw new ValidationException("Cannot assign contributor to app", error);
             }
 
-            await handler.UpdateAsync<AppDomainObject>(context, x =>
-            {
-                context.Succeed(new EntitySavedResult(x.Version));
-            });
+            await handler.UpdateAsync<AppDomainObject>(context, x => x.AssignContributor(command));
         }
 
         protected Task On(AttachClient command, CommandContext context)
@@ -81,7 +75,7 @@ namespace Squidex.Write.Apps
             {
                 x.AttachClient(command, keyGenerator.GenerateKey());
 
-                context.Succeed(x.Clients[command.Id]);
+                context.Succeed(new EntityCreatedResult<AppClient>(x.Clients[command.Id], x.Version));
             });
         }
 

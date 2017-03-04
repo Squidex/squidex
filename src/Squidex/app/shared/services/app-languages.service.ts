@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig, Version } from 'framework';
 import { AuthService } from './auth.service';
 
 export class AppLanguageDto {
@@ -44,10 +44,10 @@ export class AppLanguagesService {
     ) {
     }
 
-    public getLanguages(appName: string): Observable<AppLanguageDto[]> {
+    public getLanguages(appName: string, version: Version): Observable<AppLanguageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return this.authService.authGet(url)
+        return this.authService.authGet(url, version)
                 .map(response => response.json())
                 .map(response => {
                     const items: any[] = response;
@@ -62,10 +62,10 @@ export class AppLanguagesService {
                 .catchError('Failed to load languages. Please reload.');
     }
 
-    public postLanguages(appName: string, dto: AddAppLanguageDto): Observable<AppLanguageDto> {
+    public postLanguages(appName: string, dto: AddAppLanguageDto, version: Version): Observable<AppLanguageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return this.authService.authPost(url, dto)
+        return this.authService.authPost(url, dto, version)
                 .map(response => response.json())
                 .map(response => {
                     return new AppLanguageDto(
@@ -76,17 +76,17 @@ export class AppLanguagesService {
                 .catchError('Failed to add language. Please reload.');
     }
 
-    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto): Observable<any> {
+    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
-        return this.authService.authPut(url, dto)
+        return this.authService.authPut(url, dto, version)
                 .catchError('Failed to change language. Please reload.');
     }
 
-    public deleteLanguage(appName: string, languageCode: string): Observable<any> {
+    public deleteLanguage(appName: string, languageCode: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
-        return this.authService.authDelete(url)
+        return this.authService.authDelete(url, version)
                 .catchError('Failed to add language. Please reload.');
     }
 }
