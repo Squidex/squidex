@@ -118,7 +118,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/")]
         public async Task<IActionResult> PostContent([FromBody] ContentData request)
         {
-            var command = new CreateContent { Data = request, ContentId = Guid.NewGuid() };
+            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -132,7 +132,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PutContent(Guid id, [FromBody] ContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Data = request };
+            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
             await CommandBus.PublishAsync(command);
 
@@ -143,7 +143,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PatchContent(Guid id, [FromBody] ContentData request)
         {
-            var command = new PatchContent { ContentId = id, Data = request };
+            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
             await CommandBus.PublishAsync(command);
 

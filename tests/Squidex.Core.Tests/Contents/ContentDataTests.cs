@@ -156,7 +156,28 @@ namespace Squidex.Core.Contents
 
             Assert.Equal(expected, actual);
         }
-        
+
+        [Fact]
+        public void Should_remove_null_values_when_cleaning()
+        {
+            var expected =
+                new ContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var input =
+                new ContentData()
+                    .AddField("field1", null)
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var actual = input.ToCleaned();
+
+            Assert.Equal(expected, actual);
+        }
+
         [Fact]
         public void Should_provide_invariant_from_first_language()
         {

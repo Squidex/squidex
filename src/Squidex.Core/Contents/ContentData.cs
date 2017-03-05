@@ -62,6 +62,18 @@ namespace Squidex.Core.Contents
             return result;
         }
 
+        public ContentData ToCleaned()
+        {
+            var result = new ContentData();
+
+            foreach (var fieldValue in this.Where(x => x.Value != null))
+            {
+                result[fieldValue.Key] = fieldValue.Value;
+            }
+
+            return result;
+        }
+
         public ContentData ToIdModel(Schema schema)
         {
             Guard.NotNull(schema, nameof(schema));
