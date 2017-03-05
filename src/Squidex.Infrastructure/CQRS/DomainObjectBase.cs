@@ -12,7 +12,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.CQRS
 {
-    public abstract class DomainObject : IAggregate, IEquatable<IAggregate>
+    public abstract class DomainObjectBase : IAggregate, IEquatable<IAggregate>
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly Guid id;
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.CQRS
             get { return id; }
         }
 
-        protected DomainObject(Guid id, int version)
+        protected DomainObjectBase(Guid id, int version)
         {
             Guard.NotEmpty(id, nameof(id));
             Guard.GreaterEquals(version, -1, nameof(version));

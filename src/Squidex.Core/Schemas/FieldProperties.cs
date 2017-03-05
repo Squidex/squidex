@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    public abstract class FieldProperties : NamedElementProperties, IValidatable
+    public abstract class FieldProperties : NamedElementPropertiesBase, IValidatable
     {
         private bool isRequired;
         private bool isLocalizable;

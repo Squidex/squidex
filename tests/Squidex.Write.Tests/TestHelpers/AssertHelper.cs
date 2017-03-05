@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Write.TestHelpers

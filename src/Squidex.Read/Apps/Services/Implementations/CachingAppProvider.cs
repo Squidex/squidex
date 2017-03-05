@@ -18,7 +18,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Apps.Services.Implementations
 {
-    public class CachingAppProvider : CachingProvider, IAppProvider
+    public class CachingAppProvider : CachingProviderBase, IAppProvider
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
         private readonly IAppRepository repository;

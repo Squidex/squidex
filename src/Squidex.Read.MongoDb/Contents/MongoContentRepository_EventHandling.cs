@@ -12,7 +12,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Events.Contents;
 using Squidex.Events.Schemas;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;

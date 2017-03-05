@@ -8,7 +8,7 @@
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class SchemaProperties : NamedElementProperties
+    public sealed class SchemaProperties : NamedElementPropertiesBase
     {
     }
 }

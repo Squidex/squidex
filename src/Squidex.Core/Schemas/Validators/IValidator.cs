@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Core.Schemas.Validators
 {
     public interface IValidator
     {

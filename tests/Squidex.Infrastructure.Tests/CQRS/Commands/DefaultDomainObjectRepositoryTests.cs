@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
         }
 
-        public sealed class MyDomainObject : DomainObject
+        public sealed class MyDomainObject : DomainObjectBase
         {
             private readonly List<IEvent> appliedEvents = new List<IEvent>();
 

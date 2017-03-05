@@ -19,7 +19,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Schemas.Services.Implementations
 {
-    public class CachingSchemaProvider : CachingProvider, ISchemaProvider
+    public class CachingSchemaProvider : CachingProviderBase, ISchemaProvider
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly ISchemaRepository repository;

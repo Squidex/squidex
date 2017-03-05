@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Read.MongoDb.Utils

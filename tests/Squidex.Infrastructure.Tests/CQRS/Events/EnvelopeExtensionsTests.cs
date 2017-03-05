@@ -11,7 +11,7 @@ using System.Globalization;
 using NodaTime;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class EnvelopeExtensionsTests
     {

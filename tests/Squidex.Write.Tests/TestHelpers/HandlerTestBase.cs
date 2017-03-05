@@ -15,7 +15,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Write.TestHelpers
 {
-    public abstract class HandlerTestBase<T> where T : DomainObject
+    public abstract class HandlerTestBase<T> where T : DomainObjectBase
     {
         private sealed class MockupHandler : IAggregateHandler
         {

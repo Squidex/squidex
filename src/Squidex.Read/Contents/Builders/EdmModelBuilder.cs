@@ -19,7 +19,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Contents.Builders
 {
-    public sealed class EdmModelBuilder : CachingProvider
+    public sealed class EdmModelBuilder : CachingProviderBase
     {
         public EdmModelBuilder(IMemoryCache cache) 
             : base(cache)

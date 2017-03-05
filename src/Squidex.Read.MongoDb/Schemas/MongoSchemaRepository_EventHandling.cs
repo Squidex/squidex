@@ -14,7 +14,6 @@ using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Events.Schemas.Utils;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;

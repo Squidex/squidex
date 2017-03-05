@@ -22,7 +22,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class Schema : Cloneable
+    public sealed class Schema : CloneableBase
     {
         private readonly string name;
         private readonly SchemaProperties properties;

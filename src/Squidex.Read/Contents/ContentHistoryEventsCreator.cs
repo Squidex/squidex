@@ -9,7 +9,6 @@
 using System.Threading.Tasks;
 using Squidex.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.History;
 

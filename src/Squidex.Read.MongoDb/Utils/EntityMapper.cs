@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using Squidex.Events;
-using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression

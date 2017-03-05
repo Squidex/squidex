@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnumExtensions.cs
+//  DisposableObjectBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Infrastructure
 {
-    public abstract class DisposableObject : IDisposable
+    public abstract class DisposableObjectBase : IDisposable
     {
         private readonly object disposeLock = new object();
         private bool isDisposed;

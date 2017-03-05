@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             public long? ExpectedVersion { get; set; }
         }
 
-        private sealed class MyDomainObject : DomainObject
+        private sealed class MyDomainObject : DomainObjectBase
         {
             public MyDomainObject(Guid id, int version)
                 : base(id, version)

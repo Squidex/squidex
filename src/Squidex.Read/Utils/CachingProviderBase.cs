@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CachingProvider.cs
+//  CachingProviderBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Read.Utils
 {
-    public abstract class CachingProvider
+    public abstract class CachingProviderBase
     {
         private readonly IMemoryCache cache;
 
@@ -20,7 +20,7 @@ namespace Squidex.Read.Utils
             get { return cache; }
         }
 
-        protected CachingProvider(IMemoryCache cache)
+        protected CachingProviderBase(IMemoryCache cache)
         {
             Guard.NotNull(cache, nameof(cache));
 

@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure
         [InlineData("en ", "en")]
         public void Should_parse_valid_languages(string input, string languageCode)
         {
-            var language = Language.TryParse(input);
+            var language = Language.ParseOrNull(input);
             
             Assert.Equal(language, Language.GetLanguage(languageCode));
         }
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure
         [InlineData(null)]
         public void Should_parse_invalid_languages(string input)
         {
-            var language = Language.TryParse(input);
+            var language = Language.ParseOrNull(input);
 
             Assert.Null(language);
         }

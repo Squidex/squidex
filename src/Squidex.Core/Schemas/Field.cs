@@ -14,6 +14,7 @@ using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Core.Contents;
+using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
@@ -22,7 +23,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    public abstract class Field : Cloneable
+    public abstract class Field : CloneableBase
     {
         private readonly Lazy<List<IValidator>> validators;
         private readonly long id;

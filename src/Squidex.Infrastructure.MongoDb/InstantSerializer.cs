@@ -9,6 +9,7 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
+using System;
 
 // ReSharper disable InvertIf
 
@@ -16,26 +17,16 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer
     {
-        private static bool isRegistered;
-        private static readonly object LockObject = new object();
+        private static readonly Lazy<bool> Registerer = new Lazy<bool>(() =>
+        {
+            BsonSerializer.RegisterSerializer(new InstantSerializer());
+
+            return true;
+        });
 
         public static bool Register()
         {
-            if (!isRegistered)
-            {
-                lock (LockObject)
-                {
-                    if (!isRegistered)
-                    {
-                        BsonSerializer.RegisterSerializer(new InstantSerializer());
-
-                        isRegistered = true;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return !Registerer.IsValueCreated && Registerer.Value;
         }
 
         public bool IsDiscriminatorCompatibleWithObjectSerializer

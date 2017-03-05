@@ -19,7 +19,7 @@ using Squidex.Write.Schemas.Commands;
 
 namespace Squidex.Write.Schemas
 {
-    public class SchemaDomainObject : DomainObject
+    public class SchemaDomainObject : DomainObjectBase
     {
         private readonly FieldRegistry registry;
         private bool isDeleted;

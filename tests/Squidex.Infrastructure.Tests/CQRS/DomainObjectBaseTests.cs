@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DomainObjectTest.cs
+//  DomainObjectBaseTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -15,13 +15,13 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.CQRS
 {
-    public class DomainObjectTest
+    public class DomainObjectBaseTests
     {
         private sealed class MyEvent : IEvent
         {
         }
 
-        private sealed class DO : DomainObject
+        private sealed class DO : DomainObjectBase
         {
             public DO(Guid id, int version) 
                 : base(id, version)

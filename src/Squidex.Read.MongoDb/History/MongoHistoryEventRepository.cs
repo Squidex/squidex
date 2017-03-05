@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Events;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.History;

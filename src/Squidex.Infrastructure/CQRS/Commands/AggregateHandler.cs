@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {

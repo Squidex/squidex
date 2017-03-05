@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Squidex.Pipeline
 {
-    public class RandomErrorAttribute : ActionFilterAttribute
+    public sealed class RandomErrorAttribute : ActionFilterAttribute
     {
         private static readonly Random random = new Random();
 

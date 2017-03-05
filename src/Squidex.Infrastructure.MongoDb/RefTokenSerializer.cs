@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
@@ -15,26 +16,16 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class RefTokenSerializer : SerializerBase<RefToken>
     {
-        private static bool isRegistered;
-        private static readonly object LockObject = new object();
+        private static readonly Lazy<bool> Registerer = new Lazy<bool>(() =>
+        {
+            BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+
+            return true;
+        });
 
         public static bool Register()
         {
-            if (!isRegistered)
-            {
-                lock (LockObject)
-                {
-                    if (!isRegistered)
-                    {
-                        BsonSerializer.RegisterSerializer(new RefTokenSerializer());
-
-                        isRegistered = true;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return !Registerer.IsValueCreated && Registerer.Value;
         }
 
         public override RefToken Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

@@ -18,7 +18,7 @@ using Squidex.Write.Contents.Commands;
 
 namespace Squidex.Write.Contents
 {
-    public class ContentDomainObject : DomainObject
+    public class ContentDomainObject : DomainObjectBase
     {
         private bool isDeleted;
         private bool isCreated;

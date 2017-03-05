@@ -9,7 +9,7 @@
 using System.Linq;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class EnvelopeHeaderTests
     {

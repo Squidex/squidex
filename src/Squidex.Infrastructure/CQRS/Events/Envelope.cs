@@ -9,7 +9,7 @@
 using System;
 using NodaTime;
 
-namespace Squidex.Infrastructure.CQRS
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class Envelope<TPayload> where TPayload : class
     {

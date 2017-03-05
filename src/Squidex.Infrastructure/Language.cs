@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure
             return allLanguages.TryGetValue(iso2Code, out language);
         }
 
-        public static Language TryParse(string input)
+        public static Language ParseOrNull(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {

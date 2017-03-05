@@ -23,11 +23,6 @@ namespace Squidex.Controllers
             CommandBus = commandBus;
         }
 
-        protected ControllerBase()
-        {
-            throw new NotImplementedException();
-        }
-
         protected IAppEntity App
         {
             get

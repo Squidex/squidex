@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Timers
 {
-    public sealed class CompletionTimer : DisposableObject
+    public sealed class CompletionTimer : DisposableObjectBase
     {
         private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Task runTask;

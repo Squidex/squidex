@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  NamedElementProperties.cs
+//  NamedElementPropertiesBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Core.Schemas
 {
-    public abstract class NamedElementProperties
+    public abstract class NamedElementPropertiesBase
     {
         private string label;
         private string hints;

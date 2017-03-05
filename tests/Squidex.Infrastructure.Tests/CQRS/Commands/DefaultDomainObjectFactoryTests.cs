@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class DefaultDomainObjectFactoryTests
     {
-        private sealed class DO : DomainObject
+        private sealed class DO : DomainObjectBase
         {
             public DO(Guid id, int version) : base(id, version)
             {

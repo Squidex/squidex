@@ -18,7 +18,7 @@ using Squidex.Controllers.Api;
 
 namespace Squidex.Pipeline
 {
-    public class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
+    public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
     {
         private static readonly List<Func<Exception, IActionResult>> handlers = new List<Func<Exception, IActionResult>>();
 

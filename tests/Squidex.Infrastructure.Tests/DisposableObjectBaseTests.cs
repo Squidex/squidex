@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DisposableObjectTest.cs
+//  DisposableObjectBaseTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,9 +11,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public class DisposableObjectTests
+    public class DisposableObjectBaseTests
     {
-        public sealed class MyDisposableObject : DisposableObject
+        public sealed class MyDisposableObject : DisposableObjectBase
         {
             public int DisposeCallCount { get; set; }
 

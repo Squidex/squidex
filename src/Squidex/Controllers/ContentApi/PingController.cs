@@ -16,7 +16,7 @@ namespace Squidex.Controllers.ContentApi
     [Authorize(Roles = SquidexRoles.AppEditor)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    public class PingController : ControllerBase
+    public class PingController : Controller
     {
         [HttpGet]
         [Route("ping/{app}/")]

@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable ConvertIfStatementToReturnStatement
