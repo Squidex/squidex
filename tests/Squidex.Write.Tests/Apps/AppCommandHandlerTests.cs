@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Users;
@@ -74,7 +75,7 @@ namespace Squidex.Write.Apps
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(AppId, context.Result<Guid>());
+            Assert.Equal(AppId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
         }
 
         [Fact]
@@ -154,7 +155,7 @@ namespace Squidex.Write.Apps
 
             keyGenerator.VerifyAll();
 
-            context.Result<AppClient>().ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
+            context.Result<EntityCreatedResult<AppClient>>().IdOrValue.ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
         }
 
         [Fact]

@@ -143,6 +143,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
+                this.contentTotal--;
+
+                this.updatePaging();
 
                 this.messageBus.publish(new ContentDeleted(content.id));
             }, error => {

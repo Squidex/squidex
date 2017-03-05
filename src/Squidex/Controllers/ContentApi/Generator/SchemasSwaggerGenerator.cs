@@ -44,7 +44,6 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly string schemaBodyDescription;
         private HashSet<Language> languages;
         private JsonSchema4 errorDtoSchema;
-        private JsonSchema4 entityCreatedDtoSchema;
         private string appBasePath;
         private IAppEntity app;
 
@@ -137,11 +136,6 @@ namespace Squidex.Controllers.ContentApi.Generator
             var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
 
             errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
-
-            var entityCreatedType = typeof(EntityCreatedDto);
-            var entityCreatedSchema = JsonObjectTypeDescription.FromType(entityCreatedType, new Attribute[0], EnumHandling.String);
-
-            entityCreatedDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(entityCreatedType, entityCreatedSchema.IsNullable, null);
         }
 
         private void GenerateSecurityRequirements()
@@ -269,8 +263,10 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 operation.Summary = $"Create a {schemaName} content.";
 
+                var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
+
                 operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-                operation.AddResponse("201", $"{schemaName} created.",  entityCreatedDtoSchema);
+                operation.AddResponse("201", $"{schemaName} created.", responseSchema);
             });
         }
 
@@ -380,27 +376,34 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         private JsonSchema4 CreateContentSchema(string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
-            var CreateProperty = 
-                new Func<string, string, JsonProperty>((d, f) => 
-                    new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
-            
             var dataProperty = new JsonProperty { Description = schemaBodyDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
             {
                 Properties =
                 {
-                    ["id"] = CreateProperty($"The id of the {schemaName} content.", null),
+                    ["id"] = CreateProperty($"The id of the {schemaName} content."),
                     ["data"] = dataProperty,
+                    ["version"] = CreateProperty($"The version of the {schemaName}", JsonObjectType.Number),
                     ["created"] = CreateProperty($"The date and time when the {schemaName} content has been created.", "date-time"),
-                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content.", null),
+                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content."),
                     ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content has been modified last.", "date-time"),
-                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.", null)
+                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.")
                 },
                 Type = JsonObjectType.Object
             };
 
             return AppendSchema($"{schemaIdentifier}ContentDto", schema);
+        }
+
+        private static JsonProperty CreateProperty(string description, JsonObjectType type)
+        {
+            return new JsonProperty { Description = description, IsRequired = true, Type = type };
+        }
+
+        private static JsonProperty CreateProperty(string description, string format = null)
+        {
+            return new JsonProperty { Description = description, Format = format, IsRequired = true, Type = JsonObjectType.String };
         }
 
         private JsonSchema4 AppendSchema(string name, JsonSchema4 schema)

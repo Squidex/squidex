@@ -54,14 +54,17 @@ export function catchError(message: string): Observable<any> {
         let result = new ErrorDto(500, message);
 
         if (error instanceof Response) {
-            const body = error.json();
+            try {
+                const body = error.json();
 
-            if (error.status === 412) {
-                result = new ErrorDto(error.status, 'Failed to make the update. Another user has made a change. Please reload.');
-            } else if (error.status !== 500) {
-                result = new ErrorDto(error.status, body.message, body.details);
+                if (error.status === 412) {
+                    result = new ErrorDto(error.status, 'Failed to make the update. Another user has made a change. Please reload.');
+                } else if (error.status !== 500) {
+                    result = new ErrorDto(error.status, body.message, body.details);
+                }
+            } catch (e) {
+                result = result;
             }
-
         }
 
         return Observable.throw(result);

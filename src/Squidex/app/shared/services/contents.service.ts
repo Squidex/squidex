@@ -13,7 +13,6 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
-    EntityCreatedDto,
     Version
 } from 'framework';
 
@@ -111,13 +110,21 @@ export class ContentsService {
                 .catchError('Failed to load content. Please reload.');
     }
 
-    public postContent(appName: string, schemaName: string, dto: any, version: Version): Observable<EntityCreatedDto> {
+    public postContent(appName: string, schemaName: string, dto: any, version: Version): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}`);
 
         return this.authService.authPost(url, dto, version)
                 .map(response => response.json())
                 .map(response => {
-                    return new EntityCreatedDto(response.id);
+                    return new ContentDto(
+                        response.id,
+                        response.isPublished,
+                        response.createdBy,
+                        response.lastModifiedBy,
+                        DateTime.parseISO_UTC(response.created),
+                        DateTime.parseISO_UTC(response.lastModified),
+                        response.data,
+                        new Version(response.version.toString()));
                 })
                 .catchError('Failed to create content. Please reload.');
     }

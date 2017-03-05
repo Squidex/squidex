@@ -42,7 +42,12 @@ namespace Squidex.Write.Schemas
                 throw new ValidationException("Cannot create a new schema", error);
             }
 
-            await handler.CreateAsync<SchemaDomainObject>(context, s => s.Create(command));
+            await handler.CreateAsync<SchemaDomainObject>(context, s =>
+            {
+                s.Create(command);
+
+                context.Succeed(EntityCreatedResult.Create(s.Id, s.Version));
+            });
         }
 
         protected Task On(AddField command, CommandContext context)
@@ -51,7 +56,7 @@ namespace Squidex.Write.Schemas
             {
                 s.AddField(command);
 
-                context.Succeed(new EntityCreatedResult<long>(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id, s.Version));
+                context.Succeed(EntityCreatedResult.Create(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 

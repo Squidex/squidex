@@ -42,9 +42,14 @@ namespace Squidex.Write.Contents
 
         protected async Task On(CreateContent command, CommandContext context)
         {
-            await ValidateAsync(command, () => "Failed to create content");
+            await ValidateAsync(command, () => "Failed to create content", true);
 
-            await handler.CreateAsync<ContentDomainObject>(context, c => c.Create(command));
+            await handler.CreateAsync<ContentDomainObject>(context, c =>
+            {
+                c.Create(command);
+
+                context.Succeed(EntityCreatedResult.Create(command.Data, c.Version));
+            });
         }
 
         protected async Task On(UpdateContent command, CommandContext context)
@@ -81,15 +86,13 @@ namespace Squidex.Write.Contents
             return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
         }
 
-        private async Task ValidateAsync(ContentDataCommand command, Func<string> message)
+        private async Task ValidateAsync(ContentDataCommand command, Func<string> message, bool enrich = false)
         {
             Guard.Valid(command, nameof(command), message);
 
-            var taskForApp = 
-                appProvider.FindAppByIdAsync(command.AppId.Id);
+            var taskForApp = appProvider.FindAppByIdAsync(command.AppId.Id);
 
-            var taskForSchema = 
-                schemas.FindSchemaByIdAsync(command.SchemaId.Id);
+            var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);
 
@@ -100,11 +103,14 @@ namespace Squidex.Write.Contents
 
             await schemaObject.ValidateAsync(command.Data, schemaErrors, languages);
 
-            schemaObject.Enrich(command.Data, languages);
-
             if (schemaErrors.Count > 0)
             {
                 throw new ValidationException(message(), schemaErrors);
+            }
+
+            if (enrich)
+            {
+                schemaObject.Enrich(command.Data, languages);
             }
         }
     }

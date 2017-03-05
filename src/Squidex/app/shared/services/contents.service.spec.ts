@@ -12,7 +12,6 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     ApiUrlConfig,
     AuthService,
-    EntityCreatedDto,
     ContentDto,
     ContentsDto,
     ContentsService,
@@ -173,21 +172,32 @@ describe('ContentsService', () => {
                new Response(
                     new ResponseOptions({
                         body: {
-                            id: 'content1'
+                            id: 'id1',
+                            isPublished: true,
+                            created: '2016-12-12T10:10',
+                            createdBy: 'Created1',
+                            lastModified: '2017-12-12T10:10',
+                            lastModifiedBy: 'LastModifiedBy1',
+                            version: 11,
+                            data: {}
                         }
                     })
                 )
             ))
             .verifiable(Times.once());
 
-        let created: EntityCreatedDto | null = null;
+        let content: ContentDto | null = null;
 
         contentsService.postContent('my-app', 'my-schema', dto, version).subscribe(result => {
-            created = result;
+            content = result;
         });
 
-        expect(created).toEqual(
-            new EntityCreatedDto('content1'));
+        expect(content).toEqual(
+            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+                DateTime.parseISO_UTC('2016-12-12T10:10'),
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                {},
+                new Version('11')));
 
         authService.verifyAll();
     });

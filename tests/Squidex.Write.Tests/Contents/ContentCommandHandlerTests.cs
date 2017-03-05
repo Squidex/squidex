@@ -12,6 +12,7 @@ using Moq;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Schemas;
@@ -73,6 +74,8 @@ namespace Squidex.Write.Contents
             {
                 await sut.HandleAsync(context);
             });
+
+            Assert.Equal(data, context.Result<EntityCreatedResult<ContentData>>().IdOrValue);
         }
 
         [Fact]

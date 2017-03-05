@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.Api;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
 using Squidex.Core.Identity;
@@ -122,10 +121,12 @@ namespace Squidex.Controllers.ContentApi
 
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<Guid>>().IdOrValue;
-            var response = new EntityCreatedDto { Id = result.ToString() };
+            var result = context.Result<EntityCreatedResult<ContentData>>();
+            var response = ContentDto.Create(command, result);
 
-            return CreatedAtAction(nameof(GetContent), new { id = result }, response);
+            Response.Headers["ETag"] = new StringValues(response.Version.ToString());
+
+            return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
         }
 
         [HttpPut]

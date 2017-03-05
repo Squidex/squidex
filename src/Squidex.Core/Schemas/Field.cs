@@ -74,9 +74,12 @@ namespace Squidex.Core.Schemas
 
             var defaultValue = RawProperties.GetDefaultValue();
 
-            if (!RawProperties.IsRequired && defaultValue != null && fieldData.GetOrDefault(language.Iso2Code) == null)
+            if (!RawProperties.IsRequired && defaultValue != null)
             {
-                fieldData.AddValue(language.Iso2Code, defaultValue);
+                if (!fieldData.TryGetValue(language.Iso2Code, out JToken value) || value == null || value.Type == JTokenType.Null)
+                {
+                    fieldData.AddValue(language.Iso2Code, defaultValue);
+                }
             }
         }
 

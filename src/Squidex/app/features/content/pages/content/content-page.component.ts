@@ -102,7 +102,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                 this.appName()
                     .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, this.version))
                     .subscribe(created => {
-                        this.messageBus.publish(new ContentCreated(created.id, data, this.version.value));
+                        this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value));
 
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }, error => {

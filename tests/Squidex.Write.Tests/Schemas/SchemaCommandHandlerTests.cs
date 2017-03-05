@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Core.Schemas;
@@ -66,6 +67,8 @@ namespace Squidex.Write.Schemas
             {
                 await sut.HandleAsync(context);
             });
+
+            Assert.Equal(SchemaId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
         }
 
         [Fact]
