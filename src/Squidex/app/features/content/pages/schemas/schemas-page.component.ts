@@ -26,8 +26,8 @@ import {
 export class SchemasPageComponent extends AppComponentBase {
     public schemasFilter = new FormControl();
     public schemasFiltered =
-        Observable.of(null)
-            .merge(this.schemasFilter.valueChanges)
+        this.schemasFilter.valueChanges
+            .startWith(null)
             .distinctUntilChanged()
             .debounceTime(300)
             .combineLatest(this.loadSchemas(),

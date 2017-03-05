@@ -84,27 +84,31 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public ngOnInit() {
         this.messageCreatedSubscription =
-            this.messageBus.of(ContentCreated).subscribe(message => {
-                this.itemLast++;
-                this.contentTotal++;
-                this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
-            });
+            this.messageBus.of(ContentCreated)
+                .subscribe(message => {
+                    this.itemLast++;
+                    this.contentTotal++;
+                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
+                });
 
         this.messageUpdatedSubscription =
-            this.messageBus.of(ContentUpdated).subscribe(message => {
-                this.updateContents(message.id, undefined, message.data, message.version);
+            this.messageBus.of(ContentUpdated)
+                .subscribe(message => {
+                    this.updateContents(message.id, undefined, message.data, message.version);
+                });
+
+        this.route.data.map(p => p['appLanguages'])
+            .subscribe((languages: AppLanguageDto[]) => {
+                this.languages = languages;
             });
 
-        this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
-            this.languages = languages;
-        });
+        this.route.data.map(p => p['schema'])
+            .subscribe(schema => {
+                this.schema = schema;
 
-        this.route.data.map(p => p['schema']).subscribe(schema => {
-            this.schema = schema;
-
-            this.reset();
-            this.load();
-        });
+                this.reset();
+                this.load();
+            });
     }
 
     public search() {

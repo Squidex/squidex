@@ -7,7 +7,6 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
@@ -41,8 +40,8 @@ export class AppFormComponent {
         });
 
     public appName =
-        Observable.of(FALLBACK_NAME)
-            .merge(this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME));
+        this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME)
+            .startWith(FALLBACK_NAME);
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,

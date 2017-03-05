@@ -67,21 +67,22 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.debounceTime(1000).subscribe(() => {
-            const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+        this.valueChanged.debounceTime(1000)
+            .subscribe(() => {
+                const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
 
-            if (!isValid) {
-                this.changeCallback(null);
-            } else {
-                try {
-                    const value = JSON.parse(this.aceEditor.getValue());
-
-                    this.changeCallback(value);
-                } catch (e) {
+                if (!isValid) {
                     this.changeCallback(null);
+                } else {
+                    try {
+                        const value = JSON.parse(this.aceEditor.getValue());
+
+                        this.changeCallback(value);
+                    } catch (e) {
+                        this.changeCallback(null);
+                    }
                 }
-            }
-        });
+            });
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

@@ -74,9 +74,10 @@ export class AppsStoreService {
     }
 
     private load() {
-        this.appsService.getApps().subscribe(apps => {
-            this.apps$.next(apps);
-        });
+        this.appsService.getApps()
+            .subscribe(apps => {
+                this.apps$.next(apps);
+            });
     }
 
     public selectApp(name: string | null): Promise<boolean> {

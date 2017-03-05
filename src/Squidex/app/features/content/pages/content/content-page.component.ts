@@ -67,23 +67,27 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
     public ngOnInit() {
         this.messageSubscription =
-            this.messageBus.of(ContentDeleted).subscribe(message => {
-                if (message.id === this.contentId) {
-                    this.router.navigate(['../'], { relativeTo: this.route });
-                }
+            this.messageBus.of(ContentDeleted)
+                .subscribe(message => {
+                    if (message.id === this.contentId) {
+                        this.router.navigate(['../'], { relativeTo: this.route });
+                    }
+                });
+
+        this.route.parent.data.map(p => p['appLanguages'])
+            .subscribe((languages: AppLanguageDto[]) => {
+                this.languages = languages;
             });
 
-        this.route.parent.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
-            this.languages = languages;
-        });
+        this.route.parent.data.map(p => p['schema'])
+            .subscribe((schema: SchemaDetailsDto) => {
+                this.setupForm(schema);
+            });
 
-        this.route.parent.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
-            this.setupForm(schema);
-        });
-
-        this.route.data.map(p => p['content']).subscribe((content: ContentDto) => {
-            this.populateForm(content);
-        });
+        this.route.data.map(p => p['content'])
+            .subscribe((content: ContentDto) => {
+                this.populateForm(content);
+            });
     }
 
     public saveContent() {

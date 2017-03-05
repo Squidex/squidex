@@ -49,13 +49,13 @@ export class StringValidationComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.hideDefaultValue =
-            Observable.of(false)
-                .merge(this.editForm.get('isRequired').valueChanges)
+            this.editForm.get('isRequired').valueChanges
+                .startWith(this.properties.isRequired)
                 .map(x => !!x);
 
         this.hidePatternMessage =
-            Observable.of(false)
-                .merge(this.editForm.get('pattern').valueChanges)
+            this.editForm.get('pattern').valueChanges
+                .startWith('')
                 .map(x => !x || x.trim().length === 0);
 
         this.patternSubscription =

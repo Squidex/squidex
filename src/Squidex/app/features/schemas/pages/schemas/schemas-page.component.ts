@@ -67,11 +67,12 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 this.updateSchemas(this.schemas, this.schemaQuery = q);
             });
 
-        this.route.params.map(q => q['showDialog']).subscribe(showDialog => {
-            if (showDialog) {
-                this.addSchemaDialog.show();
-            }
-        });
+        this.route.params.map(q => q['showDialog'])
+            .subscribe(showDialog => {
+                if (showDialog) {
+                    this.addSchemaDialog.show();
+                }
+            });
 
         this.messageSubscription =
             this.messageBus.of(SchemaUpdated)

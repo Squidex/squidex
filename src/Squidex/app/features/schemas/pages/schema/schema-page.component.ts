@@ -84,15 +84,16 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public ngOnInit() {
-        this.route.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
-            this.schemaName = schema.name;
-            this.schemaFields = ImmutableArray.of(schema.fields);
-            this.schemaProperties = new SchemaPropertiesDto(schema.name, schema.label, schema.hints);
+        this.route.data.map(p => p['schema'])
+            .subscribe((schema: SchemaDetailsDto) => {
+                this.schemaName = schema.name;
+                this.schemaFields = ImmutableArray.of(schema.fields);
+                this.schemaProperties = new SchemaPropertiesDto(schema.name, schema.label, schema.hints);
 
-            this.version = schema.version;
+                this.version = schema.version;
 
-            this.isPublished = schema.isPublished;
-        });
+                this.isPublished = schema.isPublished;
+            });
     }
 
     public publish() {

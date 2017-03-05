@@ -46,15 +46,16 @@ export class StringUIComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.allowedValues));
 
         this.hideAllowedValues =
-            Observable.of(this.properties.editor)
-                .merge(this.editForm.get('editor').valueChanges)
+            this.editForm.get('editor').valueChanges
+                .startWith(this.properties.editor)
                 .map(x => !x || x === 'Input' || x === 'TextArea' || x === 'RichText' || x === 'Markdown');
 
         this.editorSubscription =
-            this.hideAllowedValues.subscribe(isSelection => {
-                if (isSelection) {
-                    this.editForm.get('allowedValues').setValue(undefined);
-                }
-            });
+            this.hideAllowedValues
+                .subscribe(isSelection => {
+                    if (isSelection) {
+                        this.editForm.get('allowedValues').setValue(undefined);
+                    }
+                });
     }
 }
