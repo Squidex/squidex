@@ -361,4 +361,18 @@ describe('SchemasService', () => {
 
         authService.verifyAll();
     });
+
+    it('should make delete request to delete schema', () => {
+        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/schemas/my-schema', version))
+            .returns(() => Observable.of(
+               new Response(
+                    new ResponseOptions()
+                )
+            ))
+            .verifiable(Times.once());
+
+        schemasService.deleteSchema('my-app', 'my-schema', version);
+
+        authService.verifyAll();
+    });
 });

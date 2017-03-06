@@ -376,4 +376,11 @@ export class SchemasService {
         return this.authService.authDelete(url, version)
                 .catchError('Failed to delete field. Please reload.');
     }
+
+    public deleteSchema(appName: string, schemaName: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
+
+        return this.authService.authDelete(url, version)
+                .catchError('Failed to delete schema. Please reload.');
+    }
 }

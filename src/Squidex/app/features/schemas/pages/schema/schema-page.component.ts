@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     AddFieldDto,
@@ -30,7 +30,7 @@ import {
 } from 'shared';
 
 import { SchemaPropertiesDto } from './schema-properties';
-import { SchemaUpdated } from './../messages';
+import { SchemaDeleted, SchemaUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-schema-page',
@@ -55,6 +55,9 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     public version = new Version('');
 
+    public confirmDeleteDialog = new ModalView();
+
+    public editOptionsDropdown = new ModalView();
     public editSchemaDialog = new ModalView();
 
     public isPublished: boolean;
@@ -78,7 +81,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        private readonly router: Router
     ) {
         super(notifications, users, apps);
     }
@@ -175,6 +179,21 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, request, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, newField.properties));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public deleteSchema() {
+        this.appName()
+            .switchMap(app => this.schemasService.deleteSchema(app, this.schemaName, this.version)).retry(2)
+            .finally(() => {
+                this.confirmDeleteDialog.hide();
+            })
+            .subscribe(() => {
+                this.messageBus.publish(new SchemaDeleted(this.schemaName));
+
+                this.router.navigate(['../'], { relativeTo: this.route });
             }, error => {
                 this.notifyError(error);
             });

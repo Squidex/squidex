@@ -14,3 +14,10 @@ export class SchemaUpdated {
     ) {
     }
 }
+
+export class SchemaDeleted {
+    constructor(
+        public readonly name: string
+    ) {
+    }
+}

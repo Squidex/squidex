@@ -26,7 +26,7 @@ import {
     Version
 } from 'shared';
 
-import { SchemaUpdated } from './../messages';
+import { SchemaDeleted, SchemaUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -37,7 +37,8 @@ import { SchemaUpdated } from './../messages';
     ]
 })
 export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private messageSubscription: Subscription;
+    private messageUpdatedSubscription: Subscription;
+    private messageDeletedSubscription: Subscription;
 
     public addSchemaDialog = new ModalView();
 
@@ -56,7 +57,8 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnDestroy() {
-        this.messageSubscription.unsubscribe();
+        this.messageUpdatedSubscription.unsubscribe();
+        this.messageDeletedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -74,10 +76,16 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 }
             });
 
-        this.messageSubscription =
+        this.messageUpdatedSubscription =
             this.messageBus.of(SchemaUpdated)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.map(s => s.name === m.name ? updateSchema(s, this.authService, m) : s));
+                });
+
+        this.messageDeletedSubscription =
+            this.messageBus.of(SchemaDeleted)
+                .subscribe(m => {
+                    this.updateSchemas(this.schemas.filter(s => s.name !== m.name));
                 });
 
         this.load();
