@@ -16,7 +16,7 @@ export class Notification {
     constructor(
         public readonly message: string,
         public readonly messageType: string,
-        public readonly displayTime: number = 10000
+        public readonly displayTime: number = 5000
     ) {
     }
 

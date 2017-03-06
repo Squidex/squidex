@@ -28,6 +28,7 @@ import {
     ImmutableArray,
     MessageBus,
     NotificationService,
+    Pager,
     SchemaDetailsDto,
     UsersProviderService,
     Version
@@ -46,23 +47,12 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public contentItems: ImmutableArray<ContentDto>;
     public contentFields: FieldDto[];
-    public contentTotal = 0;
+    public contentsFilter = new FormControl();
+    public contentsQuery = '';
+    public contentsPager = new Pager(0);
 
     public languages: AppLanguageDto[] = [];
     public languageSelected: AppLanguageDto;
-
-    public contentsFilter = new FormControl();
-
-    public pageSize = 10;
-
-    public canGoNext = false;
-    public canGoPrev = false;
-
-    public itemFirst = 0;
-    public itemLast = 0;
-
-    public currentPage = 0;
-    public currentQuery = '';
 
     public get columnWidth() {
         return 100 / this.contentFields.length;
@@ -86,9 +76,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.messageCreatedSubscription =
             this.messageBus.of(ContentCreated)
                 .subscribe(message => {
-                    this.itemLast++;
-                    this.contentTotal++;
                     this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
+                    this.contentsPager = this.contentsPager.incrementCount();
                 });
 
         this.messageUpdatedSubscription =
@@ -112,10 +101,18 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public search() {
-        this.currentPage = 0;
-        this.currentQuery = this.contentsFilter.value;
+        this.contentsQuery = this.contentsFilter.value;
+        this.contentsPager = new Pager(0);
 
         this.load();
+    }
+
+    private reset() {
+        this.contentItems = ImmutableArray.empty<ContentDto>();
+        this.contentsFilter.setValue('');
+        this.contentsPager = new Pager(0);
+
+        this.loadFields();
     }
 
     public publishContent(content: ContentDto) {
@@ -143,9 +140,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
-                this.contentTotal--;
-
-                this.updatePaging();
+                this.contentsPager = this.contentsPager.decrementCount();
 
                 this.messageBus.publish(new ContentDeleted(content.id));
             }, error => {
@@ -155,12 +150,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public selectLanguage(language: AppLanguageDto) {
         this.languageSelected = language;
-    }
-
-    private reset() {
-        this.loadFields();
-
-        this.currentPage = 0;
     }
 
     private loadFields() {
@@ -173,43 +162,26 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     private load() {
         this.appName()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.pageSize, this.currentPage * this.pageSize, this.currentQuery))
+            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
                .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(dtos.items);
-                    this.contentTotal = dtos.total;
 
-                    this.updatePaging();
+                    this.contentsPager = this.contentsPager.setCount(dtos.total);
                 }, error => {
                     this.notifyError(error);
                 });
     }
 
     public goNext() {
-        if (this.canGoNext) {
-            this.currentPage++;
+        this.contentsPager = this.contentsPager.goNext();
 
-            this.updatePaging();
-            this.load();
-        }
+        this.load();
     }
 
     public goPrev() {
-        if (this.canGoPrev) {
-            this.currentPage--;
+        this.contentsPager = this.contentsPager.goPrev();
 
-            this.updatePaging();
-            this.load();
-        }
-    }
-
-    private updatePaging() {
-        const totalPages = Math.ceil(this.contentTotal / this.pageSize);
-
-        this.itemFirst = this.currentPage * this.pageSize + 1;
-        this.itemLast = Math.min(this.contentTotal, (this.currentPage + 1) * this.pageSize);
-
-        this.canGoNext = this.currentPage < totalPages - 1;
-        this.canGoPrev = this.currentPage > 0;
+        this.load();
     }
 
     private updateContents(id: string, p: boolean | undefined, data: any, version: string) {

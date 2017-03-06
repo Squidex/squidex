@@ -7,12 +7,19 @@
 
 import { Directive, HostListener, Input } from '@angular/core';
 
+import { Notification, NotificationService } from './../services/notification.service';
+
 @Directive({
     selector: '[sqxCopy]'
 })
 export class CopyDirective {
     @Input('sqxCopy')
     public inputElement: any;
+
+    constructor(
+        private readonly notifications: NotificationService
+    ) {
+    }
 
     @HostListener('click')
     public onClick() {
@@ -35,6 +42,8 @@ export class CopyDirective {
 
         try {
             document.execCommand('copy');
+
+            this.notifications.notify(Notification.info('Value has been added to your clipboard.'));
         } catch (e) {
             console.log('Copy failed');
         }

@@ -72,14 +72,14 @@
                 </tbody>
             </table>
 
-            <div class="clearfix" *ngIf="usersTotal > 0">
+            <div class="clearfix" *ngIf="usersPager.numberOfItems > 0">
                 <div class="float-right pagination">
-                    <span class="pagination-text">{{itemFirst}}-{{itemLast}} of {{usersTotal}}</span>
+                    <span class="pagination-text">{{usersPager.itemFirst}}-{{usersPager.itemLast}} of {{usersPager.numberOfItems}}</span>
 
-                    <button class="btn btn-simple pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
+                    <button class="btn btn-simple pagination-button" [disabled]="!usersPager.canGoPrev" (click)="goPrev()">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-simple pagination-button" [disabled]="!canGoNext" (click)="goNext()">
+                    <button class="btn btn-simple pagination-button" [disabled]="!usersPager.canGoNext" (click)="goNext()">
                         <i class="icon-angle-right"></i>
                     </button>
                 </div>
