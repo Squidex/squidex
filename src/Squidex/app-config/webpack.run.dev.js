@@ -43,6 +43,9 @@ module.exports = webpackMerge(runConfig, {
                     loader: 'css-loader'
                 }, {
                     loader: 'sass-loader?sourceMap',
+                    options: {
+                        includePaths: [helpers.root('app', 'theme')]
+                    }
                 }],
                 include: helpers.root('app', 'theme')
             }

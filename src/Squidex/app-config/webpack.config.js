@@ -79,7 +79,10 @@ module.exports = {
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
+                    options: {
+                        includePaths: [helpers.root('app', 'theme')]
+                    }
                 }],
                 exclude: helpers.root('app', 'theme')
             }
@@ -108,9 +111,6 @@ module.exports = {
                      * See: https://github.com/webpack/html-loader#Advanced_Options
                      */
                     root: helpers.root('app', 'images')
-                },
-                sassLoader: {
-                    includePaths: [helpers.root('app', 'theme')]
                 },
                 context: '/'
             }

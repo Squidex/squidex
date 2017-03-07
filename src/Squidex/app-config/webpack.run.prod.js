@@ -70,7 +70,10 @@ module.exports = webpackMerge(runConfig, {
                 }, {
                     loader: helpers.root('app-config', 'clean-css-loader')
                 }, {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
+                    options: {
+                        includePaths: [helpers.root('app', 'theme')]
+                    }
                 }],
                 exclude: helpers.root('app', 'theme'),
             }, { 
