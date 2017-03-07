@@ -71,11 +71,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 ]],
             name: ['',
                 [
-                    Validators.required,
                     Validators.maxLength(40),
                     ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
                 ]]
         });
+
+    public get hasName() {
+        return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
+    }
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly schemasService: SchemasService,

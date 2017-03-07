@@ -47,12 +47,15 @@ export class ControlErrorsComponent implements OnChanges {
     @Input()
     public submitted: boolean;
 
+    @Input()
+    public submitOnly = false;
+
     public get errorMessages(): string[] | null {
         if (!this.control) {
             return null;
         }
 
-        if (this.control.invalid && (this.control.touched || this.submitted)) {
+        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted)) {
             const errors: string[] = [];
 
             for (let key in <any>this.control.errors) {

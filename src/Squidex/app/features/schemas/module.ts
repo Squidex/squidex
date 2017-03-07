@@ -60,7 +60,7 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '04-guides/schemas'
+                            helpPage: '05-integrated/schemas'
                         }
                     }
                 ]
