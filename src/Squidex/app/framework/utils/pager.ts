@@ -21,7 +21,11 @@ export class Pager {
     ) {
         const totalPages = Math.ceil(numberOfItems / this.pageSize);
 
-        this.itemFirst = page * this.pageSize + 1;
+        if (page >= totalPages && page > 0) {
+            page = this.page = totalPages - 1;
+        }
+
+        this.itemFirst = numberOfItems === 0 ? 0 : page * this.pageSize + 1;
         this.itemLast = Math.min(numberOfItems, (page + 1) * this.pageSize);
 
         this.canGoNext = page < totalPages - 1;
