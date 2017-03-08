@@ -127,6 +127,13 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
+        protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
+        {
+            var collectionName = $"{Prefix}{@event.SchemaId.Id}";
+
+            return database.DropCollectionAsync(collectionName);
+        }
+
         private async Task ForSchemaIdAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
         {
             var collection = GetCollection(schemaId);
