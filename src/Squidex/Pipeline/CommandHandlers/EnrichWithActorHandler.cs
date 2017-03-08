@@ -30,15 +30,20 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var squidexCommand = context.Command as SquidexCommand;
-
-            if (squidexCommand != null)
+            if (context.Command is SquidexCommand squidexCommand)
             {
                 var actorToken = 
                     FindActorFromSubject() ?? 
                     FindActorFromClient();
 
-                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available");
+#pragma warning disable
+                if (actorToken == null)
+                {
+                    throw new SecurityException("No actor with subject or client id available");
+                }
+#pragma warning enable
+
+                squidexCommand.Actor = actorToken;
             }
 
             return TaskHelper.False;

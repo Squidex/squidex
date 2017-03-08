@@ -30,22 +30,18 @@ namespace Squidex.Core.Schemas.Validators
 
         public Task ValidateAsync(object value, ICollection<string> errors)
         {
-            var stringValue = value as string;
-
-            if (stringValue == null)
+            if (value is string stringValue)
             {
-                return TaskHelper.Done;
-            }
-
-            if (!regex.IsMatch(stringValue))
-            {
-                if (string.IsNullOrWhiteSpace(errorMessage))
+                if (!regex.IsMatch(stringValue))
                 {
-                    errors.Add("<FIELD> is not valid");
-                }
-                else
-                {
-                    errors.Add(errorMessage);
+                    if (string.IsNullOrWhiteSpace(errorMessage))
+                    {
+                        errors.Add("<FIELD> is not valid");
+                    }
+                    else
+                    {
+                        errors.Add(errorMessage);
+                    }
                 }
             }
 

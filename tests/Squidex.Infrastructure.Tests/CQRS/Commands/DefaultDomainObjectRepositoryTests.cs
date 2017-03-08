@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 122, It.Is<IEnumerable<EventData>>(e => e.Count() == 2)))
+            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, It.Is<IEnumerable<EventData>>(e => e.Count() == 2)))
                 .Returns(TaskHelper.Done)
                 .Verifiable();
 
@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 122, new List<EventData> { eventData1, eventData2 }))
+            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, new List<EventData> { eventData1, eventData2 }))
                 .Throws(new WrongEventVersionException(1, 2))
                 .Verifiable();
 

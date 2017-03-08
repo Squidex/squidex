@@ -58,9 +58,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         private static void SetVersion(EnvelopeHeaders headers, MongoEntity entity)
         {
-            var withVersion = entity as IEntityWithVersion;
-
-            if (withVersion != null)
+            if (entity is IEntityWithVersion withVersion)
             {
                 withVersion.Version = headers.EventStreamNumber();
             }
@@ -68,9 +66,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         private static void SetCreatedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var withCreatedBy = entity as IEntityWithCreatedBy;
-
-            if (withCreatedBy != null)
+            if (entity is IEntityWithCreatedBy withCreatedBy)
             {
                 withCreatedBy.CreatedBy = @event.Actor;
             }
@@ -78,9 +74,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         private static void SetLastModifiedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var withModifiedBy = entity as IEntityWithLastModifiedBy;
-
-            if (withModifiedBy != null)
+            if (entity is IEntityWithLastModifiedBy withModifiedBy)
             {
                 withModifiedBy.LastModifiedBy = @event.Actor;
             }
@@ -88,10 +82,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         private static void SetAppId(SquidexEvent @event, MongoEntity entity)
         {
-            var appEntity = entity as IAppRefEntity;
-            var appEvent = @event as AppEvent;
-
-            if (appEntity != null && appEvent != null)
+            if (entity is IAppRefEntity appEntity && @event is AppEvent appEvent)
             {
                 appEntity.AppId = appEvent.AppId.Id;
             }

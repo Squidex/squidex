@@ -29,9 +29,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var appCommand = context.Command as AppCommand;
-
-            if (appCommand != null)
+            if (context.Command is AppCommand appCommand)
             {
                 var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
 

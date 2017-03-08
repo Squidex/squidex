@@ -13,6 +13,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
+#pragma warning disable IDE0019
+
 namespace Squidex.Write.TestHelpers
 {
     public abstract class HandlerTestBase<T> where T : DomainObjectBase
@@ -146,3 +148,6 @@ namespace Squidex.Write.TestHelpers
         }
     }
 }
+
+
+#pragma warning restore IDE0019

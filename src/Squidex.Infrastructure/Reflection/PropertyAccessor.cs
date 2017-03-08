@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Reflection
                 }
                 else
                 {
-                    getMethod = x => throw new NotSupportedException();
+                    getMethod = x => { throw new NotSupportedException(); };
                 }
 
                 if (propertyInfo.CanWrite)
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Reflection
                 }
                 else
                 {
-                    setMethod = (x, y) => throw new NotSupportedException();
+                    setMethod = (x, y) => { throw new NotSupportedException(); };
                 }
             }
 

@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Json
 
             var json = JsonConvert.SerializeObject(new MyClass { MyProperty = value }, serializerSettings);
 
-            Assert.Equal(@"{ ""MyProperty"": ""TODAY"" }", json);
+            Assert.Equal(@"{""myProperty"":""TODAY""}", json);
         }
 
         [Fact]

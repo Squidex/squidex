@@ -25,9 +25,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var result = context.Result<object>() as EntitySavedResult;
-
-            if (result != null)
+            if (context.Result<object>() is EntitySavedResult result)
             {
                 httpContextAccessor.HttpContext.Response.Headers["ETag"] = new StringValues(result.Version.ToString());
             }

@@ -64,25 +64,21 @@ namespace Squidex.Read.Schemas
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            var schemaEvent = @event.Payload as SchemaEvent;
-
-            if (schemaEvent == null)
+            if (@event.Payload is SchemaEvent schemaEvent)
             {
-                return Task.FromResult<HistoryEventToStore>(null);
+                string channel = $"schemas.{schemaEvent.SchemaId.Name}";
+
+                var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaEvent.SchemaId.Name);
+
+                if (schemaEvent is FieldEvent fieldEvent)
+                {
+                    result.AddParameter("Field", fieldEvent.FieldId.Name);
+                }
+
+                return Task.FromResult(result);
             }
 
-            string channel = $"schemas.{schemaEvent.SchemaId.Name}";
-
-            var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaEvent.SchemaId.Name);
-
-            var fieldEvent = schemaEvent as FieldEvent;
-
-            if (fieldEvent != null)
-            {
-                result.AddParameter("Field", fieldEvent.FieldId.Name);
-            }
-
-            return Task.FromResult(result);
+            return Task.FromResult<HistoryEventToStore>(null);
         }
     }
 }

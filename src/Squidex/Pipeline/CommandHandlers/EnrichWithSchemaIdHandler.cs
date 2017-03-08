@@ -33,9 +33,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public async Task<bool> HandleAsync(CommandContext context)
         {
-            var schemaCommand = context.Command as SchemaCommand;
-
-            if (schemaCommand != null)
+            if (context.Command is SchemaCommand schemaCommand)
             {
                 var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
 
