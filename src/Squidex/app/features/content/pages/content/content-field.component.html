@@ -22,6 +22,7 @@
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
+                                    <option></option>
                                     <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
                                 </select>
                             </div>
