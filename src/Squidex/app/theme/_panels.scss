@@ -134,7 +134,7 @@
     }
 
     &-close {
-        @include absolute($panel-padding - .3rem, $panel-padding - .8rem, auto, auto);
+        @include absolute($panel-padding - .2rem, $panel-padding - .8rem, auto, auto);
         @include panel-icon;
         font-size: 1rem;
         font-weight: 300;
