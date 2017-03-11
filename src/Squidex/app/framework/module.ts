@@ -47,6 +47,7 @@ import {
     TagEditorComponent,
     TitleService,
     TitleComponent,
+    ToggleComponent,
     UserReportComponent
 } from './declarations';
 
@@ -86,6 +87,7 @@ import {
         SliderComponent,
         TagEditorComponent,
         TitleComponent,
+        ToggleComponent,
         UserReportComponent
     ],
     exports: [
@@ -116,6 +118,7 @@ import {
         SliderComponent,
         TagEditorComponent,
         TitleComponent,
+        ToggleComponent,
         UserReportComponent,
         HttpModule,
         FormsModule,

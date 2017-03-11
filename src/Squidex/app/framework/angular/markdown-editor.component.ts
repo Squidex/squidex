@@ -12,8 +12,7 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var SimpleMDE: any;
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true

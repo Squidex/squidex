@@ -68,9 +68,12 @@
                             <div *ngSwitchCase="'Checkbox'">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="checkbox" [formControlName]="language">
+                                        <input class="form-check-input" type="checkbox" [formControlName]="language" [indeterminate]="true">
                                     </label>
                                 </div>
+                            </div>
+                            <div *ngSwitchCase="'Toggle'">
+                                <sqx-toggle [formControlName]="language"></sqx-toggle>
                             </div>
                         </div>
                     </div>

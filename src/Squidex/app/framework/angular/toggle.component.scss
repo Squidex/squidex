@@ -1,0 +1,60 @@
+@import '_mixins';
+@import '_vars';
+
+$toggle-width: 3.2rem;
+$toggle-height: 2rem;
+$toggle-button-size: $toggle-height - .3rem;
+
+.toggle {
+    &-button {
+        @include circle($toggle-button-size);
+        @include box-shadow(0, 2px, 2px, .2);
+        @include absolute($toggle-height * .5, auto, auto, $toggle-width * .5);
+        @include transition(left .3s ease);
+        background: $color-accent-dark;
+        border: 0;
+        margin-left: -$toggle-button-size * .5;
+        margin-top: -$toggle-button-size * .5;
+    }
+
+    &-container {
+        & {
+            @include border-radius($toggle-height * .5);
+            @include box-shadow-inner;
+            @include transition(background-color .3s ease);
+            position: relative;
+            background: lighten($color-border, 6%);
+            border: 0;
+            height: $toggle-height;
+            width: $toggle-width;
+        }
+
+        &.checked {
+            & {
+                background: $color-theme-green-dark;
+            }
+
+            .toggle-button {
+                left: $toggle-height * .5;
+            }
+        }
+
+        &.unchecked {
+            & {
+                background: $color-theme-error;
+            }
+
+            .toggle-button {
+                left: $toggle-width - $toggle-height * .5;
+            }
+        }
+
+        &.disabled {
+            & {
+                background: $color-disabled;
+                border: 0;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

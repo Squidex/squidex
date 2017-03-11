@@ -16,6 +16,7 @@ export * from './angular/date-time.pipes';
 export * from './angular/focus-on-change.directive';
 export * from './angular/focus-on-init.directive';
 export * from './angular/http-utils';
+export * from './angular/indeterminate.directive';
 export * from './angular/json-editor.component';
 export * from './angular/markdown-editor.component';
 export * from './angular/modal-view.directive';
@@ -29,6 +30,7 @@ export * from './angular/shortcut.component';
 export * from './angular/slider.component';
 export * from './angular/tag-editor.component';
 export * from './angular/title.component';
+export * from './angular/toggle.component';
 export * from './angular/user-report.component';
 export * from './configurations';
 

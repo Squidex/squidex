@@ -11,8 +11,7 @@ import * as moment from 'moment';
 
 let Pikaday = require('pikaday/pikaday');
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true

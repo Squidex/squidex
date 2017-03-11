@@ -13,8 +13,7 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var ace: any;
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JsonEditorComponent), multi: true

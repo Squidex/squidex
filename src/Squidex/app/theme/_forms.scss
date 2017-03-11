@@ -79,6 +79,10 @@ select {
     &:last-child {
         margin-bottom: 0;
     }
+
+    &~.hidden {
+        margin-bottom: 0;
+    }
 }
 
 .search-form {
