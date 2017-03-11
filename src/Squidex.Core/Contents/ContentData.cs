@@ -68,7 +68,17 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this.Where(x => x.Value != null))
             {
-                result[fieldValue.Key] = fieldValue.Value;
+                var resultValue = new ContentFieldData();
+
+                foreach (var languageValue in fieldValue.Value.Where(x => x.Value != null && x.Value.Type != JTokenType.Null))
+                {
+                    resultValue[languageValue.Key] = languageValue.Value;
+                }
+
+                if (resultValue.Count > 0)
+                {
+                    result[fieldValue.Key] = resultValue;
+                }
             }
 
             return result;

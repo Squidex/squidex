@@ -164,14 +164,15 @@ namespace Squidex.Core.Contents
                 new ContentData()
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddValue("en", 2));
 
             var input =
                 new ContentData()
                     .AddField("field1", null)
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddValue("en", 2)
+                            .AddValue("it", null));
 
             var actual = input.ToCleaned();
 

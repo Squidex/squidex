@@ -16,6 +16,7 @@ using NJsonSchema;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
@@ -74,7 +75,7 @@ namespace Squidex.Core.Schemas
 
             var defaultValue = RawProperties.GetDefaultValue();
 
-            if (!RawProperties.IsRequired && defaultValue != null)
+            if (!RawProperties.IsRequired && !defaultValue.IsNull())
             {
                 if (!fieldData.TryGetValue(language.Iso2Code, out JToken value) || value == null || value.Type == JTokenType.Null)
                 {
@@ -90,7 +91,7 @@ namespace Squidex.Core.Schemas
             var rawErrors = new List<string>();
             try
             {
-                var typedValue = value.Type == JTokenType.Null ? null : ConvertValue(value);
+                var typedValue = value.IsNull() ? null : ConvertValue(value);
 
                 foreach (var validator in validators.Value)
                 {
@@ -194,7 +195,7 @@ namespace Squidex.Core.Schemas
 
             foreach (var language in languages)
             {
-                var languageProperty = new JsonProperty { Description = language.EnglishName };
+                var languageProperty = new JsonProperty { Description = language.EnglishName, IsRequired = RawProperties.IsRequired };
 
                 PrepareJsonSchema(languageProperty, schemaResolver);
 
