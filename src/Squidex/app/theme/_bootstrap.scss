@@ -56,6 +56,11 @@ body {
             &:active {
                 background: $color-theme-error-dark;
                 border: 0;
+            }
+        }
+
+        &.dropdown-item {
+            &:active {
                 color: $color-accent-dark;
             }
         }

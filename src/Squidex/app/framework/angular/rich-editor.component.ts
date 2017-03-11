@@ -70,6 +70,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
             tinymce.init({
                 setup: (editor: any) => {
                     self.tinyEditor = editor;
+                    self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
 
                     self.tinyEditor.on('change', () => {
                         const value = editor.getContent();

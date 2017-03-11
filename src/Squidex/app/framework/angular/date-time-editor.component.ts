@@ -52,6 +52,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     @ViewChild('dateInput')
     public dateInput: ElementRef;
 
+    public isDisabled = false;
+
     public ngOnInit() {
         this.timeControl.valueChanges.subscribe(value => {
             if (!value || value.length === 0) {
@@ -92,6 +94,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     }
 
     public setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
+
         if (isDisabled) {
             this.dateControl.disable({ emitEvent: false });
             this.timeControl.disable({ emitEvent: false });

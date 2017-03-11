@@ -7,7 +7,7 @@
             <input type="text" class="form-control" [formControl]="timeControl" (blur)="touched()" />
         </div>
         <div class="form-group" [class.hidden]="!hasValue">
-            <button class="btn btn-link clear" (click)="reset()">Clear</button>
+            <button class="btn btn-link clear" [disabled]="isDisabled" (click)="reset()">Clear</button>
         </div>
     </div>
 </div>

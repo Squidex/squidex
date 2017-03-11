@@ -48,10 +48,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 ]]
         });
 
-    public isDisabled = false;
-
     @ViewChild('editor')
     public editor: ElementRef;
+
+    public isDisabled = false;
 
     constructor(
         private readonly resourceLoader: ResourceLoaderService,
@@ -69,6 +69,34 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        if (isDisabled) {
+            if (this.map) {
+                this.map.zoomControl.disable();
+                this.map._handlers.forEach((handler: any) => {
+                    handler.disable();
+                });
+            }
+
+            if (this.marker) {
+                this.marker.dragging.disable();
+            }
+
+            this.geolocationForm.disable();
+        } else {
+            if (this.map) {
+                this.map.zoomControl.enable();
+                this.map._handlers.forEach((handler: any) => {
+                    handler.enable();
+                });
+            }
+
+            if (this.marker) {
+                this.marker.dragging.enable();
+            }
+
+            this.geolocationForm.enable();
+        }
     }
 
     public registerOnChange(fn: any) {
@@ -101,12 +129,21 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }).addTo(this.map);
 
             this.map.on('click', (event: any) => {
-                this.value = { latitude: event.latlng.lat, longitude: event.latlng.lng };
+                if (!this.marker) {
+                    this.value = { latitude: event.latlng.lat, longitude: event.latlng.lng };
 
-                this.updateMarker(false, true);
+                    this.updateMarker(false, true);
+                }
             });
 
             this.updateMarker(true, false);
+
+            if (this.isDisabled) {
+                this.map.zoomControl.disable();
+                this.map._handlers.forEach((handler: any) => {
+                    handler.disable();
+                });
+            }
         });
     }
 
@@ -128,6 +165,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.marker.on('dragend', (event: any) => {
                     this.updateMarker(false, true);
                 });
+
+                if (this.isDisabled) {
+                    this.marker.dragging.disable();
+                }
             }
 
             const latLng = L.latLng(this.value.latitude, this.value.longitude);
