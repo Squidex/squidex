@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="client-header">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
                         <div class="form-group mr-2">
                             <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
                             

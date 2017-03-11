@@ -6,5 +6,7 @@
         <span class="stars" (mouseleave)="stopPreview()" [class.disabled]="isDisabled">
             <span class="star" *ngFor="let star of starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= stars"></span>
         </span>
+
+        <button class="btn btn-link" [class.hidden]="!value" (click)="reset()">Clear</button>
     </div>
 </div>

@@ -23,13 +23,14 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
 export class StarsComponent implements ControlValueAccessor {
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
-    private value = 1;
     private maximumStarsValue = 5;
 
     public isDisabled = false;
 
     public stars: number;
     public starsArray: number[] = [1, 2, 3, 4, 5];
+
+    public value: number | null = 1;
 
     public get maximumStars() {
         return this.maximumStarsValue;
@@ -71,11 +72,33 @@ export class StarsComponent implements ControlValueAccessor {
     }
 
     public setPreview(value: number) {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.stars = value;
     }
 
     public stopPreview() {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.stars = this.value;
+    }
+
+    public reset() {
+        if (this.isDisabled) {
+            return;
+        }
+
+        this.value = null;
+        this.stars = 0;
+
+        this.changeCallback(this.value);
+        this.touchedCallback();
+
+        return false;
     }
 
     public setValue(value: number) {
@@ -87,5 +110,7 @@ export class StarsComponent implements ControlValueAccessor {
 
         this.changeCallback(this.value);
         this.touchedCallback();
+
+        return false;
     }
 }

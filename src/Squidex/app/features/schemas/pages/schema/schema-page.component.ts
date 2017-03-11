@@ -44,6 +44,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public fieldTypes: string[] = [
         'Boolean',
         'DateTime',
+        'Geolocation',
         'Json',
         'Number',
         'String'

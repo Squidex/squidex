@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?y7zcsi');
-  src:  url('fonts/icomoon.eot?y7zcsi#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?y7zcsi') format('truetype'),
-    url('fonts/icomoon.woff?y7zcsi') format('woff'),
-    url('fonts/icomoon.svg?y7zcsi#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?gbczp5');
+  src:  url('fonts/icomoon.eot?gbczp5#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?gbczp5') format('truetype'),
+    url('fonts/icomoon.woff?gbczp5') format('woff'),
+    url('fonts/icomoon.svg?gbczp5#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -32,9 +32,6 @@
 }
 .icon-control-RichText:before {
   content: "\e939";
-}
-.icon-control-Date:before {
-  content: "\e936";
 }
 .icon-control-Markdown:before {
   content: "\e938";
@@ -178,6 +175,12 @@
   content: "\e91a";
 }
 .icon-location:before {
+  content: "\e91b";
+}
+.icon-control-Map:before {
+  content: "\e91b";
+}
+.icon-type-Geolocation:before {
   content: "\e91b";
 }
 .icon-logo:before {

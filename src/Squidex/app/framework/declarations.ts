@@ -15,6 +15,7 @@ export * from './angular/date-time-editor.component';
 export * from './angular/date-time.pipes';
 export * from './angular/focus-on-change.directive';
 export * from './angular/focus-on-init.directive';
+export * from './angular/geolocation-editor.component';
 export * from './angular/http-utils';
 export * from './angular/indeterminate.directive';
 export * from './angular/json-editor.component';

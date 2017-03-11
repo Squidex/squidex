@@ -7,18 +7,20 @@ $color-gold: #ffd700;
     color: $color-empty;
 }
 
-.stars-container {
-    height: 1.8rem;
-}
-
 .stars {
     & {
         display: inline-block;
         border: 0;
+        height: 2.4rem;
+        line-height: 2.4rem;
     }
 
     &.disabled {
         cursor: not-allowed;
+    }
+
+    &-container {
+        height: 2.4rem;
     }
 }
 
@@ -26,6 +28,7 @@ $color-gold: #ffd700;
     & {
         background: transparent;
         border: 0;
+        line-height: 1px;
     }
 
     &::before {
@@ -33,7 +36,7 @@ $color-gold: #ffd700;
         color: $color-gold;
         content: '☆';
         font-size: 1.8rem;
-        line-height: 2rem;
+        line-height: 1px;
     }
 
     &.selected {

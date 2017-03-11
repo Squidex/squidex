@@ -50,6 +50,9 @@ export function createProperties(fieldType: string, values: Object | null = null
         case 'Json':
             properties = new JsonFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
             break;
+        case 'Geolocation':
+            properties = new GeolocationFieldPropertiesDto(undefined, undefined, undefined, false, false, false, 'Map');
+            break;
         default:
             throw 'Invalid properties type';
     }
@@ -179,6 +182,19 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         super(label, hints, placeholder, isRequired, isListField, isLocalizable);
 
         this['fieldType'] = 'Boolean';
+    }
+}
+
+export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean,
+        public readonly editor: string
+    ) {
+        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
+
+        this['fieldType'] = 'Geolocation';
     }
 }
 

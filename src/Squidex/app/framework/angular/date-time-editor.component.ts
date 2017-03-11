@@ -45,6 +45,10 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     @Input()
     public enforceTime: boolean;
 
+    public get hasValue() {
+        return this.dateValue !== null;
+    }
+
     @ViewChild('dateInput')
     public dateInput: ElementRef;
 
@@ -123,6 +127,18 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     public touched() {
         this.touchedCallback();
+    }
+
+    public reset() {
+        this.timeControl.setValue(null, { emitEvent: false });
+        this.dateControl.setValue(null, { emitEvent: false });
+
+        this.dateValue = null;
+
+        this.changeCallback(null);
+        this.touchedCallback();
+
+        return false;
     }
 
     private updateValue() {

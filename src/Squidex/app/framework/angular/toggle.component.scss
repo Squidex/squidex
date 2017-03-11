@@ -50,11 +50,9 @@ $toggle-button-size: $toggle-height - .3rem;
         }
 
         &.disabled {
-            & {
-                background: $color-disabled;
-                border: 0;
-                cursor: not-allowed;
-            }
+            background: $color-disabled;
+            border: 0;
+            cursor: not-allowed;
         }
     }
 }

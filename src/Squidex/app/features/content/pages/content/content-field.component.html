@@ -83,6 +83,9 @@
                     <div *ngSwitchCase="'DateTime'">
                         <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
                     </div>
+                    <div *ngSwitchCase="'Geolocation'">
+                        <sqx-geolocation-editor [formControlName]="language"></sqx-geolocation-editor>
+                    </div>
                     <div *ngSwitchCase="'Json'">
                         <sqx-json-editor [formControlName]="language"></sqx-json-editor>
                     </div>
