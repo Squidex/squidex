@@ -67,7 +67,7 @@ namespace Squidex.Core.Schemas
 
         public override JToken GetDefaultValue()
         {
-            return DefaultValue != null ? DefaultValue.ToString() : null;
+            return DefaultValue?.ToString();
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

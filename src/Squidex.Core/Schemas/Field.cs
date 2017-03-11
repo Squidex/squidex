@@ -196,7 +196,7 @@ namespace Squidex.Core.Schemas
             {
                 var languageProperty = new JsonProperty { Description = language.EnglishName };
 
-                PrepareJsonSchema(languageProperty);
+                PrepareJsonSchema(languageProperty, schemaResolver);
 
                 languagesObject.Properties.Add(language.Iso2Code, languageProperty);
             }
@@ -231,7 +231,7 @@ namespace Squidex.Core.Schemas
 
         protected abstract IEdmTypeReference CreateEdmType();
 
-        protected abstract void PrepareJsonSchema(JsonProperty jsonProperty);
+        protected abstract void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver);
 
         protected abstract object ConvertValue(JToken value);
     }

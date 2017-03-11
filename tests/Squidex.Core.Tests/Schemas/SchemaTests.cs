@@ -290,7 +290,9 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new DateTimeField(6, "my-datetime",
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
                     .AddOrUpdateField(new DateTimeField(7, "my-date",
-                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }));
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
+                    .AddOrUpdateField(new GeolocationField(8, "my-geolocation",
+                        new GeolocationFieldProperties()));
 
             return schema;
         }

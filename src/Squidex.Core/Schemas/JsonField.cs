@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
@@ -34,7 +35,7 @@ namespace Squidex.Core.Schemas
             return value;
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.Object;
         }

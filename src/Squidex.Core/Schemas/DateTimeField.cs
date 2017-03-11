@@ -65,7 +65,7 @@ namespace Squidex.Core.Schemas
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.String;
 

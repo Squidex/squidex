@@ -38,6 +38,10 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             {
                 typeof(BooleanFieldProperties),
                 p => Convert((BooleanFieldProperties)p)
+            },
+            {
+                typeof(GeolocationFieldProperties),
+                p => Convert((GeolocationFieldProperties)p)
             }
         };
 
@@ -81,6 +85,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         private static FieldPropertiesDto Convert(JsonFieldProperties source)
         {
             var result = SimpleMapper.Map(source, new JsonFieldPropertiesDto());
+
+            return result;
+        }
+
+        private static FieldPropertiesDto Convert(GeolocationFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new GeolocationFieldPropertiesDto());
 
             return result;
         }
