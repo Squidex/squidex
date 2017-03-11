@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?y1amtc');
-  src:  url('fonts/icomoon.eot?y1amtc#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?y1amtc') format('truetype'),
-    url('fonts/icomoon.woff?y1amtc') format('woff'),
-    url('fonts/icomoon.svg?y1amtc#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?y7zcsi');
+  src:  url('fonts/icomoon.eot?y7zcsi#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?y7zcsi') format('truetype'),
+    url('fonts/icomoon.woff?y7zcsi') format('woff'),
+    url('fonts/icomoon.svg?y7zcsi#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,8 +24,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-control-Stars:before {
+  content: "\e93a";
+}
+.icon-browser:before {
+  content: "\e935";
+}
 .icon-control-RichText:before {
   content: "\e939";
+}
+.icon-control-Date:before {
+  content: "\e936";
 }
 .icon-control-Markdown:before {
   content: "\e938";
@@ -62,9 +71,6 @@
 }
 .icon-angle-left:before {
   content: "\e901";
-}
-.icon-browser:before {
-  content: "\e935";
 }
 .icon-unlocked:before {
   content: "\e933";

@@ -35,6 +35,13 @@
 
                 <span class="radio-label">Radio</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Stars'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Stars" />
+
+                <i class="icon-control-Stars"></i>
+
+                <span class="radio-label">Stars</span>
+            </label>
         </div>
     </div>
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">

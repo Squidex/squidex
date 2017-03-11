@@ -20,6 +20,9 @@
                             <div *ngSwitchCase="'Input'">
                                 <input class="form-control" type="number" [formControlName]="language">
                             </div>
+                            <div *ngSwitchCase="'Stars'">
+                                <sqx-stars [formControlName]="language" [maximumStars]="field.properties.maxValue"></sqx-stars>
+                            </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
                                     <option></option>
