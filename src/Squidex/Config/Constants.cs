@@ -8,7 +8,7 @@
 
 namespace Squidex.Config
 {
-    public class Constants
+    public static class Constants
     {
         public static readonly string SecurityDefinition = "oauth-client-auth";
 

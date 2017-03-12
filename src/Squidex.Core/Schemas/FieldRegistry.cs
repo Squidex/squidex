@@ -75,7 +75,7 @@ namespace Squidex.Core.Schemas
                 (id, name, p) => new GeolocationField(id, name, (GeolocationFieldProperties)p));
         }
 
-        public void Add<TFieldProperties>(FactoryFunction fieldFactory)
+        private void Add<TFieldProperties>(FactoryFunction fieldFactory)
         {
             Guard.NotNull(fieldFactory, nameof(fieldFactory));
 

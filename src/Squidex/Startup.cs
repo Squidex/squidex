@@ -37,9 +37,9 @@ namespace Squidex
             "/account"
         };
 
-        public IConfigurationRoot Configuration { get; }
+        private IConfigurationRoot Configuration { get; }
 
-        public IHostingEnvironment Environment { get; }
+        private IHostingEnvironment Environment { get; }
 
         public Startup(IHostingEnvironment env)
         {
@@ -60,7 +60,7 @@ namespace Squidex
             services.AddMyEventFormatter();
             services.AddMyDataProtectection(Configuration);
             services.AddMyIdentity();
-            services.AddMyIdentityServer(Environment);
+            services.AddMyIdentityServer();
             services.AddMyMvc();
 
             services.AddLogging();

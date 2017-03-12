@@ -58,7 +58,7 @@ namespace Squidex.Core
             }
         }
 
-        private void Enrich(Field field, ContentFieldData fieldData, Language language)
+        private static void Enrich(Field field, ContentFieldData fieldData, Language language)
         {
             Guard.NotNull(fieldData, nameof(fieldData));
             Guard.NotNull(language, nameof(language));

@@ -10,11 +10,13 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Pipeline;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Config.Web
 {
     public class WebModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public WebModule(IConfiguration configuration)
         {

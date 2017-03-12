@@ -18,11 +18,13 @@ using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Read.Schemas.Services.Implementations;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Config.Domain
 {
     public sealed class ReadModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public ReadModule(IConfiguration configuration)
         {

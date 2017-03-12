@@ -15,11 +15,13 @@ using Squidex.Write.Apps;
 using Squidex.Write.Contents;
 using Squidex.Write.Schemas;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Config.Domain
 {
     public class WriteModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public WriteModule(IConfiguration configuration)
         {

@@ -18,7 +18,7 @@ namespace Squidex.Config.Domain
 {
     public class ClusterModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public ClusterModule(IConfiguration configuration)
         {

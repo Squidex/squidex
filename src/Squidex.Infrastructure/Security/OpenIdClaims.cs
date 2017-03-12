@@ -8,7 +8,7 @@
 
 namespace Squidex.Infrastructure.Security
 {
-    public class OpenIdClaims
+    public static class OpenIdClaims
     {
         /// <summary>
         /// Unique Identifier for the End-User at the Issuer.

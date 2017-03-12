@@ -34,7 +34,7 @@ namespace Squidex.Config.Domain
     {
         private const string MongoDatabaseName = "string";
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public StoreMongoDbModule(IConfiguration configuration)
         {

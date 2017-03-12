@@ -20,11 +20,11 @@ namespace Squidex.Pipeline
 {
     public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
     {
-        private static readonly List<Func<Exception, IActionResult>> handlers = new List<Func<Exception, IActionResult>>();
+        private static readonly List<Func<Exception, IActionResult>> Handlers = new List<Func<Exception, IActionResult>>();
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
-            handlers.Add(ex =>
+            Handlers.Add(ex =>
             {
                 var typed = ex as T;
 
@@ -74,7 +74,7 @@ namespace Squidex.Pipeline
         {
             IActionResult result = null;
 
-            foreach (var handler in handlers)
+            foreach (var handler in Handlers)
             {
                 result = handler(context.Exception);
 

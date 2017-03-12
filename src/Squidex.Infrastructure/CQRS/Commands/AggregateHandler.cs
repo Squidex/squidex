@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             }
         }
 
-        private IAggregateCommand GetCommand(CommandContext context)
+        private static IAggregateCommand GetCommand(CommandContext context)
         {
             var command = context.Command as IAggregateCommand;
 

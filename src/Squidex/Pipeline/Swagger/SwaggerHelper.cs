@@ -19,11 +19,11 @@ namespace Squidex.Pipeline.Swagger
 {
     public static class SwaggerHelper
     {
-        private static readonly ConcurrentDictionary<string, string> docs = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> Docs = new ConcurrentDictionary<string, string>();
 
         public static string LoadDocs(string name)
         {
-            return docs.GetOrAdd(name, x =>
+            return Docs.GetOrAdd(name, x =>
             {
                 var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
 

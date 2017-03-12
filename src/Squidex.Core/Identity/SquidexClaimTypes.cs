@@ -8,7 +8,7 @@
 
 namespace Squidex.Core.Identity
 {
-    public class SquidexClaimTypes
+    public static class SquidexClaimTypes
     {
         public static readonly string SquidexDisplayName = "urn:squidex:name";
 

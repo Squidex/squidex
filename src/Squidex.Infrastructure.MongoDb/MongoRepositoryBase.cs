@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected ProjectionDefinitionBuilder<TEntity> Projection
+        protected static ProjectionDefinitionBuilder<TEntity> Projection
         {
             get
             {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected SortDefinitionBuilder<TEntity> Sort
+        protected static SortDefinitionBuilder<TEntity> Sort
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected UpdateDefinitionBuilder<TEntity> Update
+        protected static UpdateDefinitionBuilder<TEntity> Update
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected FilterDefinitionBuilder<TEntity> Filter
+        protected static FilterDefinitionBuilder<TEntity> Filter
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected IndexKeysDefinitionBuilder<TEntity> IndexKeys
+        protected static IndexKeysDefinitionBuilder<TEntity> IndexKeys
         {
             get
             {
@@ -136,7 +136,7 @@ namespace Squidex.Infrastructure.MongoDb
             return Collection.DeleteManyAsync(new BsonDocument());
         }
 
-        public async Task<bool> TryDropCollectionAsync()
+        public async Task<bool> DropCollectionIfExistsAsync()
         {
             try
             {

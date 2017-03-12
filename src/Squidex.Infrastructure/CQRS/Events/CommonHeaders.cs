@@ -8,7 +8,7 @@
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class CommonHeaders
+    public static class CommonHeaders
     {
         public static readonly string AggregateId = "AggregateId";
 

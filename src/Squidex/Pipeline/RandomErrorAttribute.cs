@@ -14,11 +14,11 @@ namespace Squidex.Pipeline
 {
     public sealed class RandomErrorAttribute : ActionFilterAttribute
     {
-        private static readonly Random random = new Random();
+        private static readonly Random Random = new Random();
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            if (random.Next(10) < 5)
+            if (Random.Next(10) < 5)
             {
                 context.Result = new StatusCodeResult(500);
             }

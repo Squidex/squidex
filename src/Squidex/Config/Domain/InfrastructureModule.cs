@@ -20,11 +20,13 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Config.Domain
 {
     public class InfrastructureModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public InfrastructureModule(IConfiguration configuration)
         {

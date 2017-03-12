@@ -20,11 +20,11 @@ namespace Squidex.Config.Domain
 {
     public static class Serializers
     {
-        private static readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+        private static readonly TypeNameRegistry TypeNameRegistry = new TypeNameRegistry();
 
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
-            settings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
+            settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
             settings.ContractResolver = new ConverterContractResolver(
                 new InstantConverter(),
@@ -50,7 +50,7 @@ namespace Squidex.Config.Domain
 
         static Serializers()
         {
-            typeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
+            TypeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
         }
 
         private static JsonSerializerSettings CreateSettings()
@@ -65,7 +65,7 @@ namespace Squidex.Config.Domain
 
         public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)
         {
-            services.AddSingleton(t => typeNameRegistry);
+            services.AddSingleton(t => TypeNameRegistry);
             services.AddSingleton(t => CreateSettings());
             services.AddSingleton(t => CreateSerializer(t.GetRequiredService<JsonSerializerSettings>()));
 
