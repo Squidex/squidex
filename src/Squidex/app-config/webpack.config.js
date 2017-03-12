@@ -73,7 +73,7 @@ module.exports = {
                  * 
                  * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
                  */
-                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
+                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
                 use: [{
