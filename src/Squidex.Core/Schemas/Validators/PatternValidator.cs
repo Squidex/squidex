@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
@@ -28,7 +28,7 @@ namespace Squidex.Core.Schemas.Validators
             regex = new Regex("^" + pattern + "$");
         }
 
-        public Task ValidateAsync(object value, ICollection<string> errors)
+        public Task ValidateAsync(object value, Action<string> addError)
         {
             if (value is string stringValue)
             {
@@ -36,11 +36,11 @@ namespace Squidex.Core.Schemas.Validators
                 {
                     if (string.IsNullOrWhiteSpace(errorMessage))
                     {
-                        errors.Add("<FIELD> is not valid");
+                        addError("<FIELD> is not valid");
                     }
                     else
                     {
-                        errors.Add(errorMessage);
+                        addError(errorMessage);
                     }
                 }
             }

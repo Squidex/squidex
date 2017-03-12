@@ -1,27 +1,22 @@
 ﻿// ==========================================================================
-//  RequiredValidator.cs
+//  ValidationTestExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
+using Newtonsoft.Json.Linq;
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Core.Schemas
 {
-    public class RequiredValidator : IValidator
+    public static class ValidationTestExtensions
     {
-        public Task ValidateAsync(object value, Action<string> addError)
+        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors)
         {
-            if (value == null)
-            {
-                addError("<FIELD> is required");
-            }
-
-            return TaskHelper.Done;
+            return field.ValidateAsync(value, errors.Add);
         }
     }
 }

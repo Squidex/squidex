@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SchemaValidationTests.cs
+//  ContentValidationTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,19 +9,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NodaTime;
-using NodaTime.Text;
 using Squidex.Core.Contents;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Core
 {
-    public class SchemaValidationTests
+    public class ContentValidationTests
     {
         private readonly HashSet<Language> languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
         private readonly List<ValidationError> errors = new List<ValidationError>();
-        private Schema sut = Schema.Create("my-name", new SchemaProperties());
+        private Schema schema = Schema.Create("my-name", new SchemaProperties());
 
         [Fact]
         public async Task Should_add_error_if_validating_data_with_unknown_field()
@@ -31,7 +30,7 @@ namespace Squidex.Core.Schemas
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -43,7 +42,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_field()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
                 new ContentData()
@@ -51,7 +50,7 @@ namespace Squidex.Core.Schemas
                         new ContentFieldData()
                             .SetValue(1000));
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -63,7 +62,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_non_localizable_data_field_contains_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
 
             var data =
                 new ContentData()
@@ -72,7 +71,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -84,12 +83,12 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_localizable_field()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
 
             var data =
                 new ContentData();
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -102,12 +101,12 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_required_data_field_is_not_in_bag()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
 
             var data =
                 new ContentData();
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -119,7 +118,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_data_contains_invalid_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
                 new ContentData()
@@ -128,7 +127,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -140,7 +139,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_data_contains_unsupported_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
                 new ContentData()
@@ -149,7 +148,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await sut.ValidateAsync(data, errors, languages);
+            await data.ValidateAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -167,7 +166,7 @@ namespace Squidex.Core.Schemas
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -179,7 +178,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_validating_partial_data_with_invalid_field()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
                 new ContentData()
@@ -187,7 +186,7 @@ namespace Squidex.Core.Schemas
                         new ContentFieldData()
                             .SetValue(1000));
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -199,7 +198,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_non_localizable_partial_data_field_contains_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties()));
 
             var data =
                 new ContentData()
@@ -208,7 +207,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -220,12 +219,12 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_validating_partial_data_with_invalid_localizable_field()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true, IsLocalizable = true }));
 
             var data =
                 new ContentData();
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -233,12 +232,12 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_required_partial_data_field_is_not_in_bag()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsRequired = true }));
 
             var data =
                 new ContentData();
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -246,7 +245,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_invalid_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
                 new ContentData()
@@ -255,7 +254,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -267,7 +266,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_unsupported_language()
         {
-            sut = sut.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
+            schema = schema.AddOrUpdateField(new NumberField(1, "my-field", new NumberFieldProperties { IsLocalizable = true }));
 
             var data =
                 new ContentData()
@@ -276,7 +275,7 @@ namespace Squidex.Core.Schemas
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await sut.ValidatePartialAsync(data, errors, languages);
+            await data.ValidatePartialAsync(schema, languages, errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -284,45 +283,6 @@ namespace Squidex.Core.Schemas
                     new ValidationError("my-field has an unsupported language 'es'", "my-field"),
                     new ValidationError("my-field has an unsupported language 'it'", "my-field")
                 });
-        }
-
-        [Fact]
-        private void Should_enrich_with_default_values()
-        {
-            var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
-
-            var schema =
-                Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new JsonField(1, "my-json", 
-                        new JsonFieldProperties()))
-                    .AddOrUpdateField(new StringField(2, "my-string", 
-                        new StringFieldProperties { DefaultValue = "EN-String", IsLocalizable = true }))
-                    .AddOrUpdateField(new NumberField(3, "my-number", 
-                        new NumberFieldProperties { DefaultValue = 123 }))
-                    .AddOrUpdateField(new BooleanField(4, "my-boolean", 
-                        new BooleanFieldProperties { DefaultValue = true }))
-                    .AddOrUpdateField(new DateTimeField(5, "my-datetime", 
-                        new DateTimeFieldProperties { DefaultValue = now }));
-            
-            var data =
-                new ContentData()
-                    .AddField("my-string",
-                        new ContentFieldData()
-                            .AddValue("de", "DE-String"))
-                    .AddField("my-number",
-                        new ContentFieldData()
-                            .AddValue("iv", 456));
-            
-            schema.Enrich(data, languages);
-
-            Assert.Equal(456, (int)data["my-number"]["iv"]);
-
-            Assert.Equal("DE-String", (string)data["my-string"]["de"]);
-            Assert.Equal("EN-String", (string)data["my-string"]["en"]);
-
-            Assert.Equal(now, InstantPattern.General.Parse((string)data["my-datetime"]["iv"]).Value);
-
-            Assert.Equal(true, (bool)data["my-boolean"]["iv"]);
         }
     }
 }

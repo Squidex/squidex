@@ -6,13 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace Squidex.Core.Schemas.Validators
 {
     public interface IValidator
     {
-        Task ValidateAsync(object value, ICollection<string> errors);
+        Task ValidateAsync(object value, Action<string> addError);
     }
 }

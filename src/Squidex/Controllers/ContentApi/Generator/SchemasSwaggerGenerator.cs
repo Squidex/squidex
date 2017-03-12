@@ -181,7 +181,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                     Name = schemaName, Description = $"API to managed {schemaName} contents."
                 });
 
-            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildSchema(languages, AppendSchema));
+            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildJsonSchema(languages, AppendSchema));
 
             var schemaOperations = new List<SwaggerOperations>
             {

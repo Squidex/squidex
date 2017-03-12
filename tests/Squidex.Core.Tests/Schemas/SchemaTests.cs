@@ -256,7 +256,7 @@ namespace Squidex.Core.Schemas
         {
             var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
 
-            var jsonSchema = BuildMixedSchema().BuildSchema(languages, (n, s) => new JsonSchema4 { SchemaReference = s });
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languages, (n, s) => new JsonSchema4 { SchemaReference = s });
 
             Assert.NotNull(jsonSchema);
         }

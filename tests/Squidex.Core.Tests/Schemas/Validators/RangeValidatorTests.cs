@@ -23,7 +23,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(100, 200);
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(min, max);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(1500, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -55,7 +55,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(2000, null);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(1500, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be greater than '2000'" });
@@ -66,7 +66,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(null, 1000);
 
-            await sut.ValidateAsync(1500, errors);
+            await sut.ValidateAsync(1500, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be less than '1000'" });

@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_null_boolean_is_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_boolean_is_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
             await sut.ValidateAsync(CreateValue(true), errors);
 
@@ -57,23 +57,23 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_boolean_is_required()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean", IsRequired = true });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "My-Boolean is required" });
+                new[] { "<FIELD> is required" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { Label = "My-Boolean" });
+            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "My-Boolean is not a valid value" });
+                new[] { "<FIELD> is not a valid value" });
         }
 
         private static JValue CreateValue(object v)

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
@@ -101,7 +102,7 @@ namespace Squidex.Write.Contents
             var schemaObject = taskForSchema.Result.Schema;
             var schemaErrors = new List<ValidationError>();
 
-            await schemaObject.ValidateAsync(command.Data, schemaErrors, languages);
+            await command.Data.ValidateAsync(schemaObject, languages, schemaErrors);
 
             if (schemaErrors.Count > 0)
             {
@@ -110,7 +111,7 @@ namespace Squidex.Write.Contents
 
             if (enrich)
             {
-                schemaObject.Enrich(command.Data, languages);
+                command.Data.Enrich(schemaObject, languages);
             }
         }
     }

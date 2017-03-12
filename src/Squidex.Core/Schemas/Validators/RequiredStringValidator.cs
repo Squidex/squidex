@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
@@ -21,7 +21,7 @@ namespace Squidex.Core.Schemas.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object value, ICollection<string> errors)
+        public Task ValidateAsync(object value, Action<string> addError)
         {
             if (value != null && !(value is string))
             {
@@ -32,7 +32,7 @@ namespace Squidex.Core.Schemas.Validators
 
             if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
             {
-                errors.Add("<FIELD> is required");
+                addError("<FIELD> is required");
             }
 
             return TaskHelper.Done;

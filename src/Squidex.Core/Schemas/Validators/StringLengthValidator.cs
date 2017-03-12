@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
@@ -31,18 +30,18 @@ namespace Squidex.Core.Schemas.Validators
             this.maxLength = maxLength;
         }
 
-        public Task ValidateAsync(object value, ICollection<string> errors)
+        public Task ValidateAsync(object value, Action<string> addError)
         {
             if (value is string stringValue)
             {
                 if (minLength.HasValue && stringValue.Length < minLength.Value)
                 {
-                    errors.Add($"<FIELD> must have more than '{minLength}' characters");
+                    addError($"<FIELD> must have more than '{minLength}' characters");
                 }
 
                 if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                 {
-                    errors.Add($"<FIELD> must have less than '{maxLength}' characters");
+                    addError($"<FIELD> must have less than '{maxLength}' characters");
                 }
             }
 

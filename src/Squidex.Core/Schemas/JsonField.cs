@@ -30,7 +30,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(JToken value)
+        public override object ConvertValue(JToken value)
         {
             return value;
         }

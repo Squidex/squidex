@@ -8,15 +8,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
-using Squidex.Core.Contents;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
@@ -52,6 +49,11 @@ namespace Squidex.Core.Schemas
             get { return isDisabled; }
         }
 
+        public IReadOnlyList<IValidator> Validators
+        {
+            get { return validators.Value; }
+        }
+
         public abstract FieldProperties RawProperties { get; }
 
         protected Field(long id, string name)
@@ -68,56 +70,7 @@ namespace Squidex.Core.Schemas
 
         public abstract Field Update(FieldProperties newProperties);
 
-        public void Enrich(ContentFieldData fieldData, Language language)
-        {
-            Guard.NotNull(fieldData, nameof(fieldData));
-            Guard.NotNull(language, nameof(language));
-
-            var defaultValue = RawProperties.GetDefaultValue();
-
-            if (!RawProperties.IsRequired && !defaultValue.IsNull())
-            {
-                if (!fieldData.TryGetValue(language.Iso2Code, out JToken value) || value == null || value.Type == JTokenType.Null)
-                {
-                    fieldData.AddValue(language.Iso2Code, defaultValue);
-                }
-            }
-        }
-
-        public async Task ValidateAsync(JToken value, ICollection<string> errors, Language language = null)
-        {
-            Guard.NotNull(value, nameof(value));
-
-            var rawErrors = new List<string>();
-            try
-            {
-                var typedValue = value.IsNull() ? null : ConvertValue(value);
-
-                foreach (var validator in validators.Value)
-                {
-                    await validator.ValidateAsync(typedValue, rawErrors);
-                }
-            }
-            catch
-            {
-                rawErrors.Add("<FIELD> is not a valid value");
-            }
-
-            if (rawErrors.Count > 0)
-            {
-                var displayName = !string.IsNullOrWhiteSpace(RawProperties.Label) ? RawProperties.Label : name;
-
-                if (language != null)
-                {
-                    displayName += $" ({language.Iso2Code})";
-                }
-
-                foreach (var error in rawErrors)
-                {
-                    errors.Add(error.Replace("<FIELD>", displayName));
-                }
-            }
-        }
+        public abstract object ConvertValue(JToken value);
 
         public Field Hide()
         {
@@ -179,7 +132,7 @@ namespace Squidex.Core.Schemas
             edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(languageType, false));
         }
 
-        public void AddToSchema(JsonSchema4 schema, IEnumerable<Language> languages, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public void AddToJsonSchema(JsonSchema4 schema, IEnumerable<Language> languages, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(languages, nameof(languages));
@@ -233,7 +186,5 @@ namespace Squidex.Core.Schemas
         protected abstract IEdmTypeReference CreateEdmType();
 
         protected abstract void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver);
-
-        protected abstract object ConvertValue(JToken value);
     }
 }

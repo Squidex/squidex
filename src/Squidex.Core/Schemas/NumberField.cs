@@ -62,7 +62,7 @@ namespace Squidex.Core.Schemas
             return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Double, !Properties.IsRequired);
         }
 
-        protected override object ConvertValue(JToken value)
+        public override object ConvertValue(JToken value)
         {
             return (double?)value;
         }
