@@ -15,9 +15,8 @@ module.exports = webpackMerge(commonConfig, {
      * See: https://webpack.js.org/configuration/entry-context/
      */
     entry: {
-        'polyfills': './app/polyfills.ts',
-           'vendor': './app/vendor.ts',
-              'app': './app/main.ts'
+        'shims': './app/shims.ts',
+          'app': './app/app.ts'
     },
 
     plugins: [
@@ -27,7 +26,7 @@ module.exports = webpackMerge(commonConfig, {
          * See: https://webpack.js.org/plugins/commons-chunk-plugin/
          */
         new webpack.optimize.CommonsChunkPlugin({
-            name: ['app', 'vendor', 'polyfills']
+            name: ['app', 'shims']
         }),
 
         /**
@@ -38,7 +37,7 @@ module.exports = webpackMerge(commonConfig, {
          * See: https://github.com/ampedandwired/html-webpack-plugin
          */
         new HtmlWebpackPlugin({
-            template: 'wwwroot/index.html'
+            template: 'wwwroot/index.html', hash: true
         })
     ]
 });

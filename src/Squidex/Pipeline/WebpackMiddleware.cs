@@ -20,8 +20,8 @@ namespace Squidex.Pipeline
     {
         private const string Host = "localhost";
         private const string Port = "3000";
-        private static readonly string[] Scripts = { "polyfills.js", "vendor.js", "app.js" };
-        private static readonly string[] Styles = { "vendor.css" };
+        private static readonly string[] Scripts = { "shims.js", "app.js" };
+        private static readonly string[] Styles = new string[0];
         private readonly RequestDelegate next;
         private readonly ILogger logger;
 

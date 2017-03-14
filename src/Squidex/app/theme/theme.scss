@@ -1,4 +1,19 @@
+@import '_bootstrap-vars.scss';
+
+// Bootstrap
+@import './../../node_modules/bootstrap/scss/bootstrap.scss';
+
+// Pikaday
+@import './../../node_modules/pikaday/css/pikaday.css';
+
+// Bootstrap Overrides
+@import '_bootstrap.scss';
+
+// icomoon
+@import './icomoon/style.css';
+
 @import '_common';
 @import '_panels';
 @import '_forms';
 @import '_lists';
+@import '_static';

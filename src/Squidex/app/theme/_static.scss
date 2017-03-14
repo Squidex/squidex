@@ -1,0 +1,38 @@
+@import '_mixins';
+@import '_vars';
+
+img {
+    vertical-align: middle;
+}
+
+.splash {
+    &-h1,
+    &-text {
+        text-align: center;
+    }
+}
+
+.redirect-button {
+    display: none;
+}
+
+.loading {
+    & {
+        text-align: center;
+        margin-top: 200px;
+        margin-bottom: 20px;
+    }
+
+    div {
+        font-size: 30px;
+        font-weight: lighter;
+    }
+}
+
+noscript {
+    display: block;
+    color: $color-theme-error;
+    font-size: 30px;
+    font-weight: lighter;
+    margin-bottom: 20px;
+}

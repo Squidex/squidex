@@ -3,34 +3,21 @@
 @using Microsoft.AspNetCore.Http.Authentication
 @model Squidex.Controllers.UI.Account.LoginVM
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <base href="/">
+@{
+    ViewBag.Title = "Login";
+}
 
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
+    <div>
+        <p>
+            @foreach (var provider in Model.ExternalProviders)
+            {
+                <button class="redirect-button" type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+            }
+        </p>
+    </div>
+</form>
 
-        <title>Squidex - Login</title>
-        
-        <link href="/styles/static.css" rel="stylesheet" />
-    </head>
-    <body>
-        <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
-            <div>
-                <p>
-                    @foreach (var provider in Model.ExternalProviders)
-                    {
-                        <button class="redirect-button" type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
-                    }
-                </p>
-            </div>
-        </form>
-
-        <script>
-            document.getElementById("loginButton").click();
-        </script>
-    </body>
-</html>
-
-
+<script>
+    document.getElementById("loginButton").click();
+</script>

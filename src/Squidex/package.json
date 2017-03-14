@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "2.4.9",
     "@angular/router": "3.4.9",
     "babel-polyfill": "6.23.0",
-    "bootstrap": "4.0.0-alpha.2",
+    "bootstrap": "4.0.0-alpha.6",
     "core-js": "2.4.1",
     "moment": "2.17.1",
     "mousetrap": "1.6.0",
