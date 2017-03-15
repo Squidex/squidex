@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { NgModule, ApplicationRef } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -62,14 +62,14 @@ export function configUserReport() {
         { provide: TitlesConfig, useFactory: configTitles },
         { provide: UserReportConfig, useFactory: configUserReport }
     ],
-    entryComponents: [AppComponent]
+    bootstrap: [AppComponent]
 })
 export class AppModule {
-    public ngDoBootstrap(appRef: ApplicationRef) {
+    /*public ngDoBootstrap(appRef: ApplicationRef) {
         try {
             appRef.bootstrap(AppComponent);
         } catch (e) {
             console.log('Application element not found');
         }
-    }
+    }*/
 }

@@ -1,9 +1,80 @@
 @import '_mixins';
 @import '_vars';
 
+$color-footer: #f7f8fa;
+$color-google: #d34736;
+$color-google-dark: #af2c1a;
+
+.card-footer {
+    background: $color-footer;
+    padding-left: 5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    position: relative;
+    border-top: 0;
+    font-size: .8rem;
+}
+
+.card-block {
+    padding: 4rem 1rem;
+}
+
+.icon-info {
+    @include absolute(2rem, auto, auto, 2rem);
+    color: $color-text-decent;
+    font-weight: normal;
+    font-size: 1.4rem;
+}
+
+.icon-google {
+    color: $color-google-dark;
+    font-size: 1.4rem;
+    font-weight: normal;
+    margin-right: .5rem;
+    vertical-align: middle;
+}
+
+.logo {
+    height: 1.4rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 .login {
+    &-area {
+        max-width: 40rem;
+        margin: 4rem auto 0;
+        padding: 0 1rem;
+    }
+
     &-button {
-        margin: 2.5rem 0;
+        & {
+            @include border-radius(1.5rem);
+            color: $color-accent-dark;
+            cursor: pointer;
+            margin-top: 4rem;
+            height: 3rem;
+            padding-left: 1.4rem;
+            padding-right: 1.4rem;
+            background: $color-google;
+            text-transform: uppercase;
+        }
+
+        &:hover {
+            background: darken($color-google, 5%);
+        }
+
+        &:focus {
+            @include box-shadow-none;
+        }
+    }
+
+    &-icon {
+        text-align: center;
+    }
+
+    &-button-text {
+        vertical-align: middle;
     }
 
     &-hint {
@@ -12,7 +83,8 @@
 }
 
 .proudly-made {
-    margin-top: 16rem;
+    line-height: 3.4rem;
     font-size: .8rem;
-    font-style: italic;
+    font-style: normal;
+    color: $color-text-decent;
 }

@@ -67,7 +67,6 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddOptions();
             services.AddRouting();
-            services.AddWebpackBuilder();
 
             services.Configure<MyUrlsOptions>(
                 Configuration.GetSection("squidex:urls"));
