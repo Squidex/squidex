@@ -106,7 +106,7 @@ module.exports = {
                 },
                 htmlLoader: {
                     /**
-                     * Define the root for images, so that we can use absolute urls
+                     * Define the root for images, so that we can use absolute url's
                      * 
                      * See: https://github.com/webpack/html-loader#Advanced_Options
                      */
