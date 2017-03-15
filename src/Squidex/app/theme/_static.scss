@@ -1,19 +1,11 @@
 @import '_mixins';
 @import '_vars';
 
-img {
-    vertical-align: middle;
-}
-
 .splash {
     &-h1,
     &-text {
         text-align: center;
     }
-}
-
-.redirect-button {
-    display: none;
 }
 
 .loading {
@@ -35,4 +27,8 @@ noscript {
     font-size: 30px;
     font-weight: lighter;
     margin-bottom: 20px;
+}
+
+.redirect-button {
+    display: none;
 }
