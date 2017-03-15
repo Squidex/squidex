@@ -12,9 +12,9 @@
     <ProjectReference Include="..\..\src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="4.19.0" />
+    <PackageReference Include="FluentAssertions" Version="4.19.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.4.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
     <PackageReference Include="Moq" Version="4.7.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
