@@ -42,7 +42,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 201 => Schema field created.
         /// 409 => Schema field name already in use.
         /// 404 => App or schema not found.
-        /// 404 => Schema field properties not valid.
+        /// 400 => Schema field properties not valid.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
@@ -72,7 +72,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 204 => Schema field created.
         /// 409 => Schema field name already in use.
         /// 404 => App, schema or field not found.
-        /// 404 => Schema field properties not valid.
+        /// 400 => Schema field properties not valid.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
