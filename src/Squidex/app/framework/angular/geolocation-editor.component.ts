@@ -130,7 +130,9 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
             this.map.on('click', (event: any) => {
                 if (!this.marker) {
-                    this.value = { latitude: event.latlng.lat, longitude: event.latlng.lng };
+                    const latlng = event.latlng.wrap();
+
+                    this.value = { latitude: latlng.lat, longitude: latlng.lng };
 
                     this.updateMarker(false, true);
                 }
@@ -159,7 +161,9 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.marker = L.marker([0, 90], { draggable: true }).addTo(this.map);
 
                 this.marker.on('drag', (event: any) => {
-                    this.value = { latitude: event.latlng.lat, longitude: event.latlng.lng };
+                    const latlng = event.latlng.wrap();
+
+                    this.value = { latitude: latlng.lat, longitude: latlng.lng };
                 });
 
                 this.marker.on('dragend', (event: any) => {

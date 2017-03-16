@@ -43,7 +43,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         this.value = value;
 
         if (this.tinyEditor) {
-            this.tinyEditor.setContent(value);
+            this.tinyEditor.setContent(value || '');
         }
     }
 
