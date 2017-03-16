@@ -158,6 +158,26 @@ namespace Squidex.Core.Contents
         }
 
         [Fact]
+        public void Should_provide_master_language_from_invariant()
+        {
+            var expected =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", 3));
+
+            var input =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
+
+            var actual = input.ToApiModel(schema, languages, masterLanguage);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void Should_remove_null_values_when_cleaning()
         {
             var expected =

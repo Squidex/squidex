@@ -152,6 +152,10 @@ namespace Squidex.Core.Contents
                         {
                             fieldResult.Add(languageCode, value);
                         }
+                        else if (language.Equals(masterLanguage) && fieldValues.TryGetValue(invariantCode, out value))
+                        {
+                            fieldResult.Add(languageCode, value);
+                        }
                     }
                 }
                 else
