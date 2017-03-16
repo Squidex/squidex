@@ -13,7 +13,7 @@
         body {
             margin: 0;
             padding: 0;
-            position: fixed;
+            position: static;
         }
 
         h1,
@@ -31,8 +31,8 @@
     </style>
 </head>
 <body>
-    <redoc lazy-rendering="true" spec-url="@Url.Content(ViewBag.Specification)"></redoc>
+    <redoc spec-url="@Url.Content(ViewBag.Specification)"></redoc>
 
-    <script src="https://rebilly.github.io/ReDoc/releases/v1.10.1/redoc.min.js"></script>
+    <script src="/scripts/redoc.min.js"></script>
 </body>
 </html>
