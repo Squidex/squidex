@@ -15,21 +15,23 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Write.Assets.Commands;
 
+// ReSharper disable UnusedParameter.Local
+
 namespace Squidex.Write.Assets
 {
-    public class AssetDomainObject : DomainObject
+    public class AssetDomainObject : DomainObjectBase
     {
         private bool isDeleted;
-        private string name;
+        private string fileName;
 
         public bool IsDeleted
         {
             get { return isDeleted; }
         }
 
-        public string Name
+        public string FileName
         {
-            get { return name; }
+            get { return fileName; }
         }
 
         public AssetDomainObject(Guid id, int version) 
@@ -39,12 +41,12 @@ namespace Squidex.Write.Assets
 
         protected void On(AssetCreated @event)
         {
-            name = @event.Name;
+            fileName = @event.Name;
         }
 
         protected void On(AssetRenamed @event)
         {
-            name = @event.Name;
+            fileName = @event.Name;
         }
 
         protected void On(AssetDeleted @event)
@@ -54,11 +56,11 @@ namespace Squidex.Write.Assets
 
         public AssetDomainObject Create(CreateAsset command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create content");
+            Guard.NotNull(command, nameof(command));
 
             VerifyNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetCreated()));
+            RaiseEvent(SimpleMapper.Map(command, new AssetCreated { Name = command.FileName }));
 
             return this;
         }
@@ -88,7 +90,7 @@ namespace Squidex.Write.Assets
 
         private void VerifyDifferentNames(string newName, Func<string> message)
         {
-            if (string.Equals(name, newName))
+            if (string.Equals(fileName, newName))
             {
                 throw new ValidationException(message(), new ValidationError("The asset already has this name.", "Name"));
             }
@@ -96,7 +98,7 @@ namespace Squidex.Write.Assets
 
         private void VerifyNotCreated()
         {
-            if (!string.IsNullOrWhiteSpace(name))
+            if (!string.IsNullOrWhiteSpace(fileName))
             {
                 throw new DomainException("Asset has already been created.");
             }
@@ -104,7 +106,7 @@ namespace Squidex.Write.Assets
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (isDeleted || !string.IsNullOrWhiteSpace(name))
+            if (isDeleted || !string.IsNullOrWhiteSpace(fileName))
             {
                 throw new DomainException("Asset has already been deleted or not created yet.");
             }

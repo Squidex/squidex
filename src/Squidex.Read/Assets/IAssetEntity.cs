@@ -1,17 +1,19 @@
 ﻿// ==========================================================================
-//  AssertEvent.cs
+//  IAssetEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Events.Assets
+namespace Squidex.Read.Assets
 {
-    public abstract class AssetEvent : AppEvent
+    public interface IAssetEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {
-        public Guid AssetId { get; set; }
+        string MimeType { get; }
+
+        string Name { get; }
+
+        long FileSize { get; }
     }
 }

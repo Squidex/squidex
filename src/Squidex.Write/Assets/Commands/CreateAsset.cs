@@ -6,21 +6,16 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure;
-
 namespace Squidex.Write.Assets.Commands
 {
-    public sealed class CreateAsset : AssetAggregateCommand, IValidatable
+    public sealed class CreateAsset : AssetAggregateCommand
     {
-        public string Name { get; set; }
+        public string FileName { get; set; }
 
-        public void Validate(IList<ValidationError> errors)
-        {
-            if (!Name.IsSlug())
-            {
-                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
-            }
-        }
+        public string MimeType { get; set; }
+
+        public long FileSize { get; set; }
+
+        public bool IsImage { get; set; }
     }
 }

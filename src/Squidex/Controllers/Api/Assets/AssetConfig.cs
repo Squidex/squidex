@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  AssertEvent.cs
+//  AssetConfig.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Events.Assets
+namespace Squidex.Controllers.Api.Assets
 {
-    public abstract class AssetEvent : AppEvent
+    public sealed class AssetConfig
     {
-        public Guid AssetId { get; set; }
+        public long MaxSize { get; set; } = 5 * 1024 * 1024;
     }
 }

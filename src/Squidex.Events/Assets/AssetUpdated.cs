@@ -1,17 +1,22 @@
 ﻿// ==========================================================================
-//  AssertEvent.cs
+//  AssetUpdated.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Events.Assets
 {
-    public abstract class AssetEvent : AppEvent
+    [TypeName("AssetUpdated")]
+    public class AssetUpdated : AssetEvent
     {
-        public Guid AssetId { get; set; }
+        public string MimeType { get; set; }
+
+        public long FileSize { get; set; }
+
+        public bool IsImage { get; set; }
     }
 }

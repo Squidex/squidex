@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssertEvent.cs
+//  IAssetStorage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,11 +7,15 @@
 // ==========================================================================
 
 using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Squidex.Events.Assets
+namespace Squidex.Infrastructure.Images
 {
-    public abstract class AssetEvent : AppEvent
+    public interface IAssetStorage
     {
-        public Guid AssetId { get; set; }
+        Task<Stream> GetAssetAsync(Guid id, string tags = null);
+
+        Task UploadAssetAsync(Guid id, Stream stream, string tags = null);
     }
 }

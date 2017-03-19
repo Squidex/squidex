@@ -7,6 +7,10 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha4-00031" />
+    <PackageReference Include="ImageSharp.Formats.Jpeg" Version="1.0.0-alpha2-00158" />
+    <PackageReference Include="ImageSharp.Formats.Png" Version="1.0.0-alpha2-00154" />
+    <PackageReference Include="ImageSharp.Processing" Version="1.0.0-alpha2-00146" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.2-beta2" />

@@ -1,17 +1,18 @@
 ﻿// ==========================================================================
-//  AssertEvent.cs
+//  IThumbnailGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Squidex.Events.Assets
+namespace Squidex.Infrastructure.Images
 {
-    public abstract class AssetEvent : AppEvent
+    public interface IThumbnailGenerator
     {
-        public Guid AssetId { get; set; }
+        Task<Stream> GetThumbnailOrNullAsync(Stream input, int dimension);
     }
 }
