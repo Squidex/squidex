@@ -1,8 +1,17 @@
 @import '_vars';
 @import '_mixins';
 
-content {
+.apps {
+    @include clearfix();
     padding: 1.25rem;
+    padding-left: $size-sidebar-width + .25rem;
+    display: block;
+}
+
+.app {
+    float: left;
+    width: 20rem;
+    margin: .625rem;
 }
 
 .empty {
@@ -14,10 +23,4 @@ content {
         margin: 1.25rem;
         margin-top: 6.25rem;
     }
-}
-
-.app {
-    float: left;
-    width: 20rem;
-    margin: .625rem;
 }

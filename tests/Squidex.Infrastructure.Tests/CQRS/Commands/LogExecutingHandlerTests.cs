@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
@@ -17,6 +18,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         private readonly MyLogger logger = new MyLogger();
         private readonly LogExecutingHandler sut;
+        private readonly ICommand command = new Mock<ICommand>().Object;
 
         private sealed class MyLogger : ILogger<LogExecutingHandler>
         {
@@ -37,11 +39,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 return null;
             }
         }
-
-        private sealed class MyCommand : ICommand
-        {
-        }
-
+        
         public LogExecutingHandlerTests()
         {
             sut = new LogExecutingHandler(logger);
@@ -50,7 +48,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_log_once()
         {
-            var context = new CommandContext(new MyCommand());
+            var context = new CommandContext(command);
 
             var isHandled = await sut.HandleAsync(context);
 

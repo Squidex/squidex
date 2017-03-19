@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class DefaultMemoryEventNotifier : IEventNotifier
     {
-        private readonly string ChannelName = typeof(DefaultMemoryEventNotifier).Name;
+        private static readonly string ChannelName = typeof(DefaultMemoryEventNotifier).Name;
 
         private readonly IPubSub invalidator;
 

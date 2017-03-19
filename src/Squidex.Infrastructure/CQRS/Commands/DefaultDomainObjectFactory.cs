@@ -28,7 +28,14 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var factoryFunctionType = typeof(DomainObjectFactoryFunction<>).MakeGenericType(type);
             var factoryFunction = (Delegate)serviceProvider.GetService(factoryFunctionType);
 
-            return (IAggregate)factoryFunction.DynamicInvoke(id);
+            var aggregate = (IAggregate)factoryFunction.DynamicInvoke(id);
+
+            if (aggregate.Version != -1)
+            {
+                throw new InvalidOperationException("Must have a version of -1");
+            }
+
+            return aggregate;
         }
     }
 }

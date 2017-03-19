@@ -33,7 +33,7 @@ describe('ResolveAppLanguagesGuard', () => {
     });
 
     it('should navigate to 404 page if languages are not found', (done) => {
-        appLanguagesService.setup(x => x.getLanguages('my-app'))
+        appLanguagesService.setup(x => x.getLanguages('my-app', null))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
@@ -49,7 +49,7 @@ describe('ResolveAppLanguagesGuard', () => {
     });
 
     it('should navigate to 404 page if languages loading fails', (done) => {
-        appLanguagesService.setup(x => x.getLanguages('my-app'))
+        appLanguagesService.setup(x => x.getLanguages('my-app', null))
             .returns(() => Observable.throw(null!));
         const router = new RouterMockup();
 
@@ -67,7 +67,7 @@ describe('ResolveAppLanguagesGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const languages: AppLanguageDto[] = [];
 
-        appLanguagesService.setup(x => x.getLanguages('my-app'))
+        appLanguagesService.setup(x => x.getLanguages('my-app', null))
             .returns(() => Observable.of(languages));
         const router = new RouterMockup();
 

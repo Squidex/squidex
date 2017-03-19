@@ -10,6 +10,7 @@ namespace Squidex.Core.Schemas
 {
     public enum BooleanFieldEditor
     {
-        Checkbox
+        Checkbox,
+        Toggle
     }
 }

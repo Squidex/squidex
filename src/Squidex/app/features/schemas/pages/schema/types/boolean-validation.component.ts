@@ -30,8 +30,8 @@ export class BooleanValidationComponent implements OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.hideDefaultValue =
-            Observable.of(this.properties.isRequired)
-                .merge(this.editForm.get('isRequired').valueChanges)
+            this.editForm.get('isRequired').valueChanges
+                .startWith(this.properties.isRequired)
                 .map(x => !!x);
     }
 }

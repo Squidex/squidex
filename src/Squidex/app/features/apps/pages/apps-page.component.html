@@ -1,22 +1,20 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
-<content>
+<div class="apps">
     <div class="empty" *ngIf="(apps | async)?.length === 0">
         <h3 class="empty-headline">You are not collaborating to any app yet</h3>
 
         <button class="apps-empty-button btn btn-success" (click)="addAppDialog.show()"><i class="icon-plus"></i> Create New App</button>
     </div>
 
-    <div class="apps">
-        <div class="app card" *ngFor="let app of (apps | async)">
-            <div class="card-block">
-                <h4 class="card-title">{{app.name}}</h4>
+    <div class="app card" *ngFor="let app of (apps | async)">
+        <div class="card-block">
+            <h4 class="card-title">{{app.name}}</h4>
 
-                <a [routerLink]="['/app', app.name]">Edit</a>
-            </div>
+            <a [routerLink]="['/app', app.name]">Edit</a>
         </div>
     </div>
-</content>
+</div>
 
 <div class="modal" *sqxModalView="addAppDialog" [@fade]>
     <div class="modal-backdrop"></div>

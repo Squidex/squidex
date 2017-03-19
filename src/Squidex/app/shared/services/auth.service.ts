@@ -16,7 +16,7 @@ import {
     UserManager
 } from 'oidc-client';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig, Version } from 'framework';
 
 export class Profile {
     public get id(): string {
@@ -169,46 +169,56 @@ export class AuthService {
         return resultPromise;
     }
 
-    public authGet(url: string, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options);
+    public authGet(url: string, version?: Version, options?: RequestOptions): Observable<Response> {
+        options = this.setRequestOptions(options, version);
 
-        return this.checkResponse(this.http.get(url, options));
+        return this.checkResponse(this.http.get(url, options), version);
     }
 
-    public authPut(url: string, data: any, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options);
+    public authPut(url: string, data: any, version?: Version, options?: RequestOptions): Observable<Response> {
+        options = this.setRequestOptions(options, version);
 
-        return this.checkResponse(this.http.put(url, data, options));
+        return this.checkResponse(this.http.put(url, data, options), version);
     }
 
-    public authDelete(url: string, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options);
+    public authDelete(url: string, version?: Version, options?: RequestOptions): Observable<Response> {
+        options = this.setRequestOptions(options, version);
 
-        return this.checkResponse(this.http.delete(url, options));
+        return this.checkResponse(this.http.delete(url, options), version);
     }
 
-    public authPost(url: string, data: any, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options);
+    public authPost(url: string, data: any, version?: Version, options?: RequestOptions): Observable<Response> {
+        options = this.setRequestOptions(options, version);
 
-        return this.checkResponse(this.http.post(url, data, options));
+        return this.checkResponse(this.http.post(url, data, options), version);
     }
 
-    private checkResponse(response: Observable<Response>) {
-        return response.catch((error: Response) => {
-            if (error.status === 401 || error.status === 404) {
-                this.logoutRedirect();
+    private checkResponse(responseStream: Observable<Response>, version?: Version) {
+        return responseStream
+            .do((response: Response) => {
+                if (version && response.status.toString().indexOf('2') === 0) {
+                    const etag = response.headers.get('etag');
 
-                return Observable.empty<Response>();
-            } else if (error.status === 403) {
-                this.router.navigate(['/404']);
+                    if (etag) {
+                        version.update(etag);
+                    }
+                }
+            })
+            .catch((error: Response) => {
+                if (error.status === 401 || error.status === 404) {
+                    this.logoutRedirect();
 
-                return Observable.empty<Response>();
-            }
-            return Observable.throw(error);
-        });
+                    return Observable.empty<Response>();
+                } else if (error.status === 403) {
+                    this.router.navigate(['/404']);
+
+                    return Observable.empty<Response>();
+                }
+                return Observable.throw(error);
+            });
     }
 
-    private setRequestOptions(options?: RequestOptions) {
+    private setRequestOptions(options?: RequestOptions, version?: Version) {
         if (!options) {
             options = new RequestOptions();
         }
@@ -219,11 +229,16 @@ export class AuthService {
         }
 
         options.headers.append('Accept-Language', '*');
-        options.headers.append('Pragma', 'no-cache');
+
+        if (version && version.value.length > 0) {
+            options.headers.append('If-Match', version.value);
+        }
 
         if (this.currentUser && this.currentUser.user) {
             options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);
         }
+
+        options.headers.append('Pragma', 'no-cache');
 
         return options;
     }

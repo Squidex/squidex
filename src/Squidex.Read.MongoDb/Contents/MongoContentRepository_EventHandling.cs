@@ -12,7 +12,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Events.Contents;
 using Squidex.Events.Schemas;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -68,24 +67,24 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.CreateAsync(@event, headers, x =>
                 {
                     SimpleMapper.Map(@event, x);
 
-                    x.SetData(schema, @event.Data);
+                    x.SetData(schemaEntity.Schema, @event.Data);
                 });
             });
         }
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.SetData(schema, @event.Data);
+                    x.SetData(schemaEntity.Schema, @event.Data);
                 });
             });
         }
@@ -112,19 +111,19 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
-            {
-                return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
-            });
-        }
-
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
             return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
             {
                 return collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
+            });
+        }
+
+        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
+        {
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            {
+                return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
             });
         }
 

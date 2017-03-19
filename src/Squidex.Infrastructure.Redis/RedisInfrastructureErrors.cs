@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Redis
 {
-    public class RedisInfrastructureErrors
+    public static class RedisInfrastructureErrors
     {
         public static readonly EventId InvalidatingReceivedFailed = new EventId(50001, "InvalidingReceivedFailed");
 

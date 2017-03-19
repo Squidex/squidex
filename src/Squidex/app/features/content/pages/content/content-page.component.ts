@@ -28,7 +28,8 @@ import {
     SchemaDetailsDto,
     StringFieldPropertiesDto,
     UsersProviderService,
-    ValidatorsEx
+    ValidatorsEx,
+    Version
 } from 'shared';
 
 @Component({
@@ -38,6 +39,7 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private messageSubscription: Subscription;
+    private version: Version = new Version('');
 
     public schema: SchemaDetailsDto;
 
@@ -65,23 +67,27 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
     public ngOnInit() {
         this.messageSubscription =
-            this.messageBus.of(ContentDeleted).subscribe(message => {
-                if (message.id === this.contentId) {
-                    this.router.navigate(['../'], { relativeTo: this.route });
-                }
+            this.messageBus.of(ContentDeleted)
+                .subscribe(message => {
+                    if (message.id === this.contentId) {
+                        this.router.navigate(['../'], { relativeTo: this.route });
+                    }
+                });
+
+        this.route.parent.data.map(p => p['appLanguages'])
+            .subscribe((languages: AppLanguageDto[]) => {
+                this.languages = languages;
             });
 
-        this.route.parent.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
-            this.languages = languages;
-        });
+        this.route.parent.data.map(p => p['schema'])
+            .subscribe((schema: SchemaDetailsDto) => {
+                this.setupForm(schema);
+            });
 
-        this.route.parent.data.map(p => p['schema']).subscribe((schema: SchemaDetailsDto) => {
-            this.setupForm(schema);
-        });
-
-        this.route.data.map(p => p['content']).subscribe((content: ContentDto) => {
-            this.populateForm(content);
-        });
+        this.route.data.map(p => p['content'])
+            .subscribe((content: ContentDto) => {
+                this.populateForm(content);
+            });
     }
 
     public saveContent() {
@@ -94,9 +100,9 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
             if (this.isNewMode) {
                 this.appName()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data))
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, this.version))
                     .subscribe(created => {
-                        this.messageBus.publish(new ContentCreated(created.id, data));
+                        this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value));
 
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }, error => {
@@ -105,9 +111,9 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     });
             } else {
                 this.appName()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data))
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data, this.version))
                     .subscribe(() => {
-                        this.messageBus.publish(new ContentUpdated(this.contentId, data));
+                        this.messageBus.publish(new ContentUpdated(this.contentId, data, this.version.value));
 
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }, error => {

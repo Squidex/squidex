@@ -13,8 +13,7 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var ace: any;
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JsonEditorComponent), multi: true
@@ -67,21 +66,22 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.debounceTime(1000).subscribe(() => {
-            const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+        this.valueChanged.debounceTime(1000)
+            .subscribe(() => {
+                const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
 
-            if (!isValid) {
-                this.changeCallback(null);
-            } else {
-                try {
-                    const value = JSON.parse(this.aceEditor.getValue());
-
-                    this.changeCallback(value);
-                } catch (e) {
+                if (!isValid) {
                     this.changeCallback(null);
+                } else {
+                    try {
+                        const value = JSON.parse(this.aceEditor.getValue());
+
+                        this.changeCallback(value);
+                    } catch (e) {
+                        this.changeCallback(null);
+                    }
                 }
-            }
-        });
+            });
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);

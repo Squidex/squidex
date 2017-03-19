@@ -22,13 +22,14 @@ export class LogoutPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.auth.logoutRedirectComplete().subscribe(
-            () => {
-                this.router.navigate(['/'], { replaceUrl: true });
-            },
-            () => {
-                this.router.navigate(['/'], { replaceUrl: true });
-            }
-        );
+        this.auth.logoutRedirectComplete()
+            .subscribe(
+                () => {
+                    this.router.navigate(['/'], { replaceUrl: true });
+                },
+                () => {
+                    this.router.navigate(['/'], { replaceUrl: true });
+                }
+            );
     }
 }

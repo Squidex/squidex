@@ -1,13 +1,29 @@
-<div class="landing-page">
-    <img class="logo" src="/images/logo.png" />
+<div class="login-area">
+    <div class="card">
+        <div class="card-block text-center">
+            <img class="login-icon" src="/images/login-icon.png" />
 
-    <button class="btn btn-primary btn-lg login-button" (click)="login()">Login to Squidex</button>
+            <div>
+                <button class="btn login-button" (click)="login()">
+                    <i class="icon-google"></i> <span class="login-button-text">Continue with Google</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-footer text-muted" *ngIf="!isIE()">
+            <i class="icon-info"></i>
 
-    <p class="login-hint" *ngIf="!isIE()">
-        The login button will open a new popup. Once you are logged in successfull we will redirect you to the squidex management portal.
-    </p>
+            The login button will open a new popup. Once you are logged in successfull we will redirect you to the squidex management portal.
+        </div>
+    </div>
 
-    <p class="proudly-made">
-        Proudly made by Quaisar Ahmad &amp; Sebastian Stehle, 2016-2017
-    <p>
+    <div class="row">
+        <div class="col">
+            <div class="float-left">
+                <img class="logo" src="/images/logo-small.png" />
+            </div>
+            <div class="float-right proudly-made">
+                Proudly made by Qaisar Ahmad &amp; Sebastian Stehle, 2016-2017
+            </div>
+        </div>
+    </div>
 </div>

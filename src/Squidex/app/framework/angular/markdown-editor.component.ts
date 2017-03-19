@@ -12,8 +12,7 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var SimpleMDE: any;
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true
@@ -77,6 +76,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         this.resourceLoader.loadScript('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js').then(() => {
             this.simplemde = new SimpleMDE({ element: this.editor.nativeElement });
             this.simplemde.value(this.value || '');
+            this.simplemde.codemirror.setOption('readOnly', this.isDisabled);
 
             this.simplemde.codemirror.on('change', () => {
                 const value = this.simplemde.value();

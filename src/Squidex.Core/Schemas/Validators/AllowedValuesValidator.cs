@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
@@ -25,7 +25,7 @@ namespace Squidex.Core.Schemas.Validators
             this.allowedValues = allowedValues;
         }
 
-        public Task ValidateAsync(object value, ICollection<string> errors)
+        public Task ValidateAsync(object value, Action<string> addError)
         {
             if (value == null)
             {
@@ -36,7 +36,7 @@ namespace Squidex.Core.Schemas.Validators
 
             if (!allowedValues.Contains(typedValue))
             {
-                errors.Add("<FIELD> is not an allowed value");
+                addError("<FIELD> is not an allowed value");
             }
 
             return TaskHelper.Done;

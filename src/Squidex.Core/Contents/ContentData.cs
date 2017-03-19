@@ -62,6 +62,28 @@ namespace Squidex.Core.Contents
             return result;
         }
 
+        public ContentData ToCleaned()
+        {
+            var result = new ContentData();
+
+            foreach (var fieldValue in this.Where(x => x.Value != null))
+            {
+                var resultValue = new ContentFieldData();
+
+                foreach (var languageValue in fieldValue.Value.Where(x => x.Value != null && x.Value.Type != JTokenType.Null))
+                {
+                    resultValue[languageValue.Key] = languageValue.Value;
+                }
+
+                if (resultValue.Count > 0)
+                {
+                    result[fieldValue.Key] = resultValue;
+                }
+            }
+
+            return result;
+        }
+
         public ContentData ToIdModel(Schema schema)
         {
             Guard.NotNull(schema, nameof(schema));
@@ -127,6 +149,10 @@ namespace Squidex.Core.Contents
                         var languageCode = language.Iso2Code;
 
                         if (fieldValues.TryGetValue(languageCode, out JToken value))
+                        {
+                            fieldResult.Add(languageCode, value);
+                        }
+                        else if (language.Equals(masterLanguage) && fieldValues.TryGetValue(invariantCode, out value))
                         {
                             fieldResult.Add(languageCode, value);
                         }

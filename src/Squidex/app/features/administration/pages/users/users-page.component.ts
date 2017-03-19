@@ -13,6 +13,7 @@ import {
     ComponentBase,
     ImmutableArray,
     NotificationService,
+    Pager,
     UserDto,
     UserManagementService,
     UsersProviderService
@@ -27,20 +28,9 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     public currentUserId: string;
 
     public usersItems = ImmutableArray.empty<UserDto>();
-    public usersTotal = 0;
-
-    public pageSize = 10;
-
-    public canGoNext = false;
-    public canGoPrev = false;
-
-    public itemFirst = 0;
-    public itemLast = 0;
-
-    public currentPage = 0;
-    public currentQuery = '';
-
+    public usersPager = new Pager(0);
     public usersFilter = new FormControl();
+    public usersQuery = '';
 
     constructor(notifications: NotificationService, users: UsersProviderService,
         private readonly userManagementService: UserManagementService,
@@ -56,19 +46,17 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     }
 
     public search() {
-        this.currentPage = 0;
-        this.currentQuery = this.usersFilter.value;
+        this.usersPager = new Pager(0);
+        this.usersQuery = this.usersFilter.value;
 
         this.load();
     }
 
     private load() {
-        this.userManagementService.getUsers(this.pageSize, this.currentPage * this.pageSize, this.currentQuery)
+        this.userManagementService.getUsers(this.usersPager.pageSize, this.usersPager.skip, this.usersQuery)
             .subscribe(dtos => {
                 this.usersItems = ImmutableArray.of(dtos.items);
-                this.usersTotal = dtos.total;
-
-                this.updatePaging();
+                this.usersPager = this.usersPager.setCount(dtos.total);
             }, error => {
                 this.notifyError(error);
             });
@@ -105,31 +93,15 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     }
 
     public goNext() {
-        if (this.canGoNext) {
-            this.currentPage++;
+        this.usersPager = this.usersPager.goNext();
 
-            this.updatePaging();
-            this.load();
-        }
+        this.load();
     }
 
     public goPrev() {
-        if (this.canGoPrev) {
-            this.currentPage--;
+        this.usersPager = this.usersPager.goPrev();
 
-            this.updatePaging();
-            this.load();
-        }
-    }
-
-    private updatePaging() {
-        const totalPages = Math.ceil(this.usersTotal / this.pageSize);
-
-        this.itemFirst = this.currentPage * this.pageSize + 1;
-        this.itemLast = Math.min(this.usersTotal, (this.currentPage + 1) * this.pageSize);
-
-        this.canGoNext = this.currentPage < totalPages - 1;
-        this.canGoPrev = this.currentPage > 0;
+        this.load();
     }
 }
 

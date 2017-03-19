@@ -69,15 +69,17 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             {
                 await Collection.Find(x => x.EventStream == streamName).ForEachAsync(commit =>
                 {
-                    var position = commit.EventStreamOffset;
+                    var eventNumber = commit.EventsOffset;
+                    var eventStreamNumber = commit.EventStreamOffset;
 
                     foreach (var @event in commit.Events)
                     {
+                        eventNumber++;
+                        eventStreamNumber++;
+
                         var eventData = SimpleMapper.Map(@event, new EventData());
 
-                        observer.OnNext(new StoredEvent(position, eventData));
-
-                        position++;
+                        observer.OnNext(new StoredEvent(eventNumber, eventStreamNumber, eventData));
                     }
                 }, ct);
             });
@@ -92,16 +94,18 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 await Collection.Find(x => x.EventsOffset >= commitOffset).SortBy(x => x.EventsOffset).ForEachAsync(commit =>
                 {
                     var eventNumber = commit.EventsOffset;
+                    var eventStreamNumber = commit.EventStreamOffset;
 
                     foreach (var @event in commit.Events)
                     {
                         eventNumber++;
+                        eventStreamNumber++;
 
                         if (eventNumber > lastReceivedEventNumber)
                         {
                             var eventData = SimpleMapper.Map(@event, new EventData());
 
-                            observer.OnNext(new StoredEvent(eventNumber, eventData));
+                            observer.OnNext(new StoredEvent(eventNumber, eventStreamNumber, eventData));
                         }
                     }
                 }, ct);

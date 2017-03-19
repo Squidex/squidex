@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using Squidex.Events;
-using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
@@ -23,6 +23,7 @@ namespace Squidex.Read.MongoDb.Utils
 
             SetId(headers, entity);
 
+            SetVersion(headers, entity);
             SetCreated(headers, entity);
             SetCreatedBy(@event, entity);
 
@@ -33,6 +34,7 @@ namespace Squidex.Read.MongoDb.Utils
 
         public static T Update<T>(SquidexEvent @event, EnvelopeHeaders headers, T entity) where T : MongoEntity, new()
         {
+            SetVersion(headers, entity);
             SetLastModified(headers, entity);
             SetLastModifiedBy(@event, entity);
 
@@ -54,32 +56,33 @@ namespace Squidex.Read.MongoDb.Utils
             entity.LastModified = headers.Timestamp();
         }
 
+        private static void SetVersion(EnvelopeHeaders headers, MongoEntity entity)
+        {
+            if (entity is IEntityWithVersion withVersion)
+            {
+                withVersion.Version = headers.EventStreamNumber();
+            }
+        }
+
         private static void SetCreatedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var createdBy = entity as ITrackCreatedByEntity;
-
-            if (createdBy != null)
+            if (entity is IEntityWithCreatedBy withCreatedBy)
             {
-                createdBy.CreatedBy = @event.Actor;
+                withCreatedBy.CreatedBy = @event.Actor;
             }
         }
 
         private static void SetLastModifiedBy(SquidexEvent @event, MongoEntity entity)
         {
-            var modifiedBy = entity as ITrackLastModifiedByEntity;
-
-            if (modifiedBy != null)
+            if (entity is IEntityWithLastModifiedBy withModifiedBy)
             {
-                modifiedBy.LastModifiedBy = @event.Actor;
+                withModifiedBy.LastModifiedBy = @event.Actor;
             }
         }
 
         private static void SetAppId(SquidexEvent @event, MongoEntity entity)
         {
-            var appEntity = entity as IAppRefEntity;
-            var appEvent = @event as AppEvent;
-
-            if (appEntity != null && appEvent != null)
+            if (entity is IAppRefEntity appEntity && @event is AppEvent appEvent)
             {
                 appEntity.AppId = appEvent.AppId.Id;
             }

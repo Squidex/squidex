@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Write;
 
 // ReSharper disable InvertIf
@@ -28,9 +29,7 @@ namespace Squidex.Pipeline.CommandHandlers
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            var appCommand = context.Command as AppCommand;
-
-            if (appCommand != null)
+            if (context.Command is AppCommand appCommand)
             {
                 var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
 
@@ -42,7 +41,7 @@ namespace Squidex.Pipeline.CommandHandlers
                 appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
             }
 
-            return Task.FromResult(false);
+            return TaskHelper.False;
         }
     }
 }

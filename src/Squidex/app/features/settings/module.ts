@@ -46,7 +46,7 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '04-guides/clients'
+                            helpPage: '05-integrated/clients'
                         }
                     }
                 ]
@@ -65,7 +65,7 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '04-guides/contributors'
+                            helpPage: '05-integrated/contributors'
                         }
                     }
                 ]
@@ -84,7 +84,7 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '04-guides/languages'
+                            helpPage: '05-integrated/languages'
                         }
                     }
                 ]

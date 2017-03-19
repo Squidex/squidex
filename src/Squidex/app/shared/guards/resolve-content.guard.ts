@@ -28,7 +28,7 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
         }
 
         const result =
-            this.contentsService.getContent(appName, schemaName, contentId).toPromise()
+            this.contentsService.getContent(appName, schemaName, contentId, null).toPromise()
                 .then(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);

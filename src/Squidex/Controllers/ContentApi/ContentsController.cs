@@ -12,7 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Controllers.Api;
+using Microsoft.Extensions.Primitives;
+using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
 using Squidex.Core.Identity;
@@ -29,15 +30,17 @@ namespace Squidex.Controllers.ContentApi
     [Authorize(Roles = SquidexRoles.AppEditor)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
+    [SwaggerIgnore]
     public class ContentsController : ControllerBase
     {
-        private readonly ISchemaProvider schemaProvider;
+        private readonly ISchemaProvider schemas;
         private readonly IContentRepository contentRepository;
 
-        public ContentsController(ICommandBus commandBus, ISchemaProvider schemaProvider, IContentRepository contentRepository) 
+        public ContentsController(ICommandBus commandBus, ISchemaProvider schemas, IContentRepository contentRepository) 
             : base(commandBus)
         {
-            this.schemaProvider = schemaProvider;
+            this.schemas = schemas;
+
             this.contentRepository = contentRepository;
         }
 
@@ -45,7 +48,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}")]
         public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
         {
-            var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
 
             if (schemaEntity == null)
             {
@@ -84,26 +87,28 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
         {
-            var schemaEntity = await schemaProvider.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
 
             if (schemaEntity == null)
             {
                 return NotFound();
             }
 
-            var content = await contentRepository.FindContentAsync(schemaEntity.Id, id);
+            var entity = await contentRepository.FindContentAsync(schemaEntity.Id, id);
 
-            if (content == null)
+            if (entity == null)
             {
                 return NotFound();
             }
 
-            var model = SimpleMapper.Map(content, new ContentDto());
+            var model = SimpleMapper.Map(entity, new ContentDto());
 
-            if (content.Data != null)
+            if (entity.Data != null)
             {
-                model.Data = content.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
+                model.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
             }
+
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
             return Ok(model);
         }
@@ -112,19 +117,23 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/")]
         public async Task<IActionResult> PostContent([FromBody] ContentData request)
         {
-            var command = new CreateContent { Data = request, ContentId = Guid.NewGuid() };
+            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
-            var result = context.Result<Guid>();
 
-            return CreatedAtAction(nameof(GetContent), new { id = result }, new EntityCreatedDto { Id = result.ToString() });
+            var result = context.Result<EntityCreatedResult<ContentData>>();
+            var response = ContentDto.Create(command, result);
+
+            Response.Headers["ETag"] = new StringValues(response.Version.ToString());
+
+            return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
         }
 
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PutContent(Guid id, [FromBody] ContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Data = request };
+            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
             await CommandBus.PublishAsync(command);
 
@@ -135,7 +144,7 @@ namespace Squidex.Controllers.ContentApi
         [Route("content/{app}/{name}/{id}")]
         public async Task<IActionResult> PatchContent(Guid id, [FromBody] ContentData request)
         {
-            var command = new PatchContent { ContentId = id, Data = request };
+            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
             await CommandBus.PublishAsync(command);
 

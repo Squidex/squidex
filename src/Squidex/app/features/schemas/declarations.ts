@@ -9,6 +9,8 @@ export * from './pages/schema/types/boolean-ui.component';
 export * from './pages/schema/types/boolean-validation.component';
 export * from './pages/schema/types/date-time-ui.component';
 export * from './pages/schema/types/date-time-validation.component';
+export * from './pages/schema/types/geolocation-ui.component';
+export * from './pages/schema/types/geolocation-validation.component';
 export * from './pages/schema/types/json-ui.component';
 export * from './pages/schema/types/json-validation.component';
 export * from './pages/schema/types/number-ui.component';

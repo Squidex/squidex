@@ -14,5 +14,7 @@ namespace Squidex.Write
     public abstract class SquidexCommand : ICommand
     {
         public RefToken Actor { get; set; }
+
+        public long? ExpectedVersion { get; set; }
     }
 }

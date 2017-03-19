@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -38,7 +39,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_datetime_is_valid()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime" });
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -48,50 +49,61 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_datetime_is_required()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime", IsRequired = true });
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "My-DateTime is required" });
+                new[] { "<FIELD> is required" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_datetime_is_less_than_min()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime", MinValue = FutureDays(10) });
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MinValue = FutureDays(10) });
 
             await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"My-DateTime must be greater than '{FutureDays(10)}'" });
+                new[] { $"<FIELD> must be greater than '{FutureDays(10)}'" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_datetime_is_greater_than_max()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime", MaxValue = FutureDays(10) });
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MaxValue = FutureDays(10) });
 
             await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"My-DateTime must be less than '{FutureDays(10)}'" });
+                new[] { $"<FIELD> must be less than '{FutureDays(10)}'" });
         }
 
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { Label = "My-DateTime" });
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "My-DateTime is not a valid value" });
+                new[] { "<FIELD> is not a valid value" });
+        }
+
+        [Fact]
+        public async Task Should_add_errors_if_value_is_another_type()
+        {
+            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+
+            await sut.ValidateAsync(CreateValue(123), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> is not a valid value" });
         }
 
         private static Instant FutureDays(int days)
         {
-            return SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(days));
+            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
         }
 
         private static JValue CreateValue(object v)

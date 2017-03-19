@@ -42,6 +42,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             inputEvent.SetCommitId(commitId);
             inputEvent.SetEventId(Guid.NewGuid());
             inputEvent.SetEventNumber(1);
+            inputEvent.SetEventStreamNumber(1);
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
             var sut = new EventDataFormatter(typeNameRegistry, serializerSettings);

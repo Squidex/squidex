@@ -73,13 +73,16 @@ module.exports = {
                  * 
                  * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
                  */
-                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
+                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?sourceMap' })
             }, {
                 test: /\.scss$/,
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
+                    options: {
+                        includePaths: [helpers.root('app', 'theme')]
+                    }
                 }],
                 exclude: helpers.root('app', 'theme')
             }
@@ -103,14 +106,11 @@ module.exports = {
                 },
                 htmlLoader: {
                     /**
-                     * Define the root for images, so that we can use absolute urls
+                     * Define the root for images, so that we can use absolute url's
                      * 
                      * See: https://github.com/webpack/html-loader#Advanced_Options
                      */
                     root: helpers.root('app', 'images')
-                },
-                sassLoader: {
-                    includePaths: [helpers.root('app', 'theme')]
                 },
                 context: '/'
             }

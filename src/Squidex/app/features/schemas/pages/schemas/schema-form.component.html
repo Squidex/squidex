@@ -13,7 +13,7 @@
 		<input type="text" class="form-control" id="schema-name" formControlName="name" sqxFocusOnInit />
         
         <span class="form-hint">
-            The schema name becomes part of the api url,<br /> e.g https://{{appName}}.squidex.io/<b>{{schemaName | async}}</b>/.
+            The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appName}}/<b>{{schemaName | async}}</b>/.
         </span>
         <span class="form-hint">
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.

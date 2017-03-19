@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
@@ -24,7 +25,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             logger.LogInformation("Handling {0} command", context.Command);
 
-            return Task.FromResult(false);
+            return TaskHelper.False;
         }
     }
 }

@@ -25,11 +25,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private sealed class MyCommand : IAggregateCommand
         {
             public Guid AggregateId { get; set; }
+
+            public long? ExpectedVersion { get; set; }
         }
 
-        private sealed class MyDomainObject : DomainObject
+        private sealed class MyDomainObject : DomainObjectBase
         {
-            public MyDomainObject(Guid id, int version) 
+            public MyDomainObject(Guid id, int version)
                 : base(id, version)
             {
             }
@@ -48,19 +50,16 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private readonly Mock<IDomainObjectFactory> factory = new Mock<IDomainObjectFactory>();
         private readonly Mock<IDomainObjectRepository> repository = new Mock<IDomainObjectRepository>();
-        private readonly Mock<IEventProcessor> processor1 = new Mock<IEventProcessor>();
-        private readonly Mock<IEventProcessor> processor2 = new Mock<IEventProcessor>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
+        private readonly CommandContext context;
         private readonly MyCommand command;
         private readonly AggregateHandler sut;
         private readonly MyDomainObject domainObject;
 
         public AggregateHandlerTests()
         {
-            var processors = new[] { processor1.Object, processor2.Object };
-
-            sut = new AggregateHandler(factory.Object, repository.Object, processors);
+            sut = new AggregateHandler(factory.Object, repository.Object);
 
             domainObject =
                 new MyDomainObject(Guid.NewGuid(), 1)
@@ -68,6 +67,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                     .RaiseNewEvent(event2);
 
             command = new MyCommand { AggregateId = domainObject.Id };
+            context = new CommandContext(command);
         }
 
         [Fact]
@@ -83,27 +83,35 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
+        public Task Create_async_should_throw_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
+        }
+
+        [Fact]
         public async Task Create_async_should_create_domain_object_and_save()
         {
             factory.Setup(x => x.CreateNew(typeof(MyDomainObject), domainObject.Id))
                 .Returns(domainObject)
                 .Verifiable();
 
-            await TestFlowAsync(async () =>
+            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            MyDomainObject passedDomainObject = null;
+
+            await sut.CreateAsync<MyDomainObject>(context, async x =>
             {
-                MyDomainObject passedDomainObject = null;
+                await Task.Delay(1);
 
-                await sut.CreateAsync<MyDomainObject>(command, x =>
-                {
-                    passedDomainObject = x;
-
-                    return TaskHelper.Done;
-                });
-
-                Assert.Equal(domainObject, passedDomainObject);
+                passedDomainObject = x;
             });
 
-            factory.VerifyAll();
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
+
+            repository.VerifyAll();
         }
 
         [Fact]
@@ -113,95 +121,75 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 .Returns(domainObject)
                 .Verifiable();
 
-            await TestFlowAsync(async () =>
+            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            MyDomainObject passedDomainObject = null;
+
+            await sut.CreateAsync<MyDomainObject>(context, x =>
             {
-                MyDomainObject passedDomainObject = null;
-
-                await sut.CreateAsync<MyDomainObject>(command, x =>
-                {
-                    passedDomainObject = x;
-                });
-
-                Assert.Equal(domainObject, passedDomainObject);
+                passedDomainObject = x;
             });
 
-            factory.VerifyAll();
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
+
+            repository.VerifyAll();
+        }
+
+        [Fact]
+        public Task Update_async_should_throw_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
         }
 
         [Fact]
         public async Task Update_async_should_create_domain_object_and_save()
         {
-            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, int.MaxValue))
+            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
                 .Returns(Task.FromResult(domainObject))
                 .Verifiable();
 
-            await TestFlowAsync(async () =>
+            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            MyDomainObject passedDomainObject = null;
+
+            await sut.UpdateAsync<MyDomainObject>(context, async x =>
             {
-                MyDomainObject passedDomainObject = null;
+                await Task.Delay(1);
 
-                await sut.UpdateAsync<MyDomainObject>(command, x =>
-                {
-                    passedDomainObject = x;
-
-                    return TaskHelper.Done;
-                });
-
-                Assert.Equal(domainObject, passedDomainObject);
+                passedDomainObject = x;
             });
+
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntitySavedResult>());
+
+            repository.VerifyAll();
         }
 
         [Fact]
         public async Task Update_sync_should_create_domain_object_and_save()
         {
-            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, int.MaxValue))
+            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
                 .Returns(Task.FromResult(domainObject))
                 .Verifiable();
 
-            await TestFlowAsync(async () =>
+            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            MyDomainObject passedDomainObject = null;
+
+            await sut.UpdateAsync<MyDomainObject>(context, x =>
             {
-                MyDomainObject passedDomainObject = null;
-
-                await sut.UpdateAsync<MyDomainObject>(command, x =>
-                {
-                    passedDomainObject = x;
-                });
-
-                Assert.Equal(domainObject, passedDomainObject);
+                passedDomainObject = x;
             });
-        }
 
-        private async Task TestFlowAsync(Func<Task> action)
-        {
-            repository.Setup(x => x.SaveAsync(domainObject,
-                    It.IsAny<ICollection<Envelope<IEvent>>>(),
-                    It.IsAny<Guid>()))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
-
-            processor1.Setup(x => x.ProcessEventAsync(
-                    It.Is<Envelope<IEvent>>(y => y.Payload == event1.Payload), domainObject, command))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
-
-            processor2.Setup(x => x.ProcessEventAsync(
-                    It.Is<Envelope<IEvent>>(y => y.Payload == event1.Payload), domainObject, command))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
-
-            processor1.Setup(x => x.ProcessEventAsync(
-                    It.Is<Envelope<IEvent>>(y => y.Payload == event2.Payload), domainObject, command))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
-
-            processor2.Setup(x => x.ProcessEventAsync(
-                    It.Is<Envelope<IEvent>>(y => y.Payload == event2.Payload), domainObject, command))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
-
-            await action();
-
-            processor1.VerifyAll();
-            processor2.VerifyAll();
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntitySavedResult>());
 
             repository.VerifyAll();
         }

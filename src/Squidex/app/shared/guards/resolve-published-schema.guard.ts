@@ -27,7 +27,7 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
         }
 
         const result =
-            this.schemasService.getSchema(appName, schemaName).toPromise()
+            this.schemasService.getSchema(appName, schemaName, null).toPromise()
                 .then(dto => {
                     if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Moq;
 using System;
 using Xunit;
 
@@ -13,11 +14,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class CommandContextTests
     {
-        private readonly MyCommand command = new MyCommand();
-
-        private sealed class MyCommand : ICommand
-        {
-        }
+        private readonly ICommand command = new Mock<ICommand>().Object;
 
         [Fact]
         public void Should_instantiate_and_provide_command()

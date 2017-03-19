@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
             {
                 if (item != null)
                 {
-                    hashCode = hashCode * 23 + item.GetHashCode();
+                    hashCode = hashCode * 23 + comparer.GetHashCode(item);
                 }
             }
 

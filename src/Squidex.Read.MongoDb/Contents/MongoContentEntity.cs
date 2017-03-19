@@ -38,6 +38,10 @@ namespace Squidex.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement]
+        public long Version { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public Guid AppId { get; set; }
 
         [BsonRequired]

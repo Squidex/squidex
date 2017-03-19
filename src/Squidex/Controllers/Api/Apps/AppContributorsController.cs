@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -59,6 +60,8 @@ namespace Squidex.Controllers.Api.Apps
             }
 
             var response = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
+
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
             return Ok(response);
         }

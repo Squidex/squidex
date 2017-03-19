@@ -13,6 +13,11 @@
     }
 }
 
+.btn-sm,
+.btn-group-sm {
+    margin-top: .25rem;
+}
+
 .schema {
     &-edit {
         color: $color-border-dark;

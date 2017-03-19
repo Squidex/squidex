@@ -7,9 +7,8 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
 
-import { ValidatorsEx } from 'framework';
+import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
 import { AppsStoreService }     from './../services/apps-store.service';
 import { AppDto, CreateAppDto } from './../services/apps.service';
@@ -41,10 +40,11 @@ export class AppFormComponent {
         });
 
     public appName =
-        Observable.of(FALLBACK_NAME)
-            .merge(this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME));
+        this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME)
+            .startWith(FALLBACK_NAME);
 
     constructor(
+        public readonly apiUrl: ApiUrlConfig,
         private readonly appsStore: AppsStoreService,
         private readonly formBuilder: FormBuilder
     ) {

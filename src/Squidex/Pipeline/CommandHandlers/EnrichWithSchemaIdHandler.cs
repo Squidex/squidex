@@ -21,21 +21,19 @@ namespace Squidex.Pipeline.CommandHandlers
 {
     public sealed class EnrichWithSchemaIdHandler : ICommandHandler
     {
-        private readonly ISchemaProvider schemaProvider;
+        private readonly ISchemaProvider schemas;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithSchemaIdHandler(ISchemaProvider schemaProvider, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaIdHandler(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
         {
-            this.schemaProvider = schemaProvider;
+            this.schemas = schemas;
 
             this.actionContextAccessor = actionContextAccessor;
         }
 
         public async Task<bool> HandleAsync(CommandContext context)
         {
-            var schemaCommand = context.Command as SchemaCommand;
-
-            if (schemaCommand != null)
+            if (context.Command is SchemaCommand schemaCommand)
             {
                 var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
 
@@ -43,7 +41,7 @@ namespace Squidex.Pipeline.CommandHandlers
                 {
                     var schemaName = routeValues["name"].ToString();
 
-                    var schema = await schemaProvider.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
+                    var schema = await schemas.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
 
                     if (schema == null)
                     {

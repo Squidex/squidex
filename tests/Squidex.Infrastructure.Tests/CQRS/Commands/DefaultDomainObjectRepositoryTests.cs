@@ -14,6 +14,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
@@ -46,7 +47,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
         }
 
-        public sealed class MyDomainObject : DomainObject
+        public sealed class MyDomainObject : DomainObjectBase
         {
             private readonly List<IEvent> appliedEvents = new List<IEvent>();
 
@@ -89,8 +90,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, eventData1),
-                new StoredEvent(1, eventData2)
+                new StoredEvent(0, 0, eventData1),
+                new StoredEvent(1, 1, eventData2)
             };
 
             eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
@@ -114,8 +115,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, eventData1),
-                new StoredEvent(1, eventData2)
+                new StoredEvent(0, 0, eventData1),
+                new StoredEvent(1, 1, eventData2)
             };
 
             eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
@@ -140,8 +141,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 122, It.Is<IEnumerable<EventData>>(e => e.Count() == 2)))
-                .Returns(Task.FromResult(true)).Verifiable();
+            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, It.Is<IEnumerable<EventData>>(e => e.Count() == 2)))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
 
             domainObject.AddEvent(event1);
             domainObject.AddEvent(event2);
@@ -165,8 +167,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 122, new List<EventData> { eventData1, eventData2 }))
-                .Throws(new WrongEventVersionException(1, 2)).Verifiable();
+            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, new List<EventData> { eventData1, eventData2 }))
+                .Throws(new WrongEventVersionException(1, 2))
+                .Verifiable();
 
             domainObject.AddEvent(event1);
             domainObject.AddEvent(event2);

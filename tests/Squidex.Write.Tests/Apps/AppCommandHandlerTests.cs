@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Users;
@@ -48,7 +49,9 @@ namespace Squidex.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName)).Returns(Task.FromResult(new Mock<IAppEntity>().Object)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(AppName))
+                .Returns(Task.FromResult(new Mock<IAppEntity>().Object))
+                .Verifiable();
 
             await TestCreate(app, async _ =>
             {
@@ -63,14 +66,16 @@ namespace Squidex.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName)).Returns(Task.FromResult<IAppEntity>(null)).Verifiable();
+            appRepository.Setup(x => x.FindAppAsync(AppName))
+                .Returns(Task.FromResult<IAppEntity>(null))
+                .Verifiable();
 
             await TestCreate(app, async _ =>
             {
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(AppId, context.Result<Guid>());
+            Assert.Equal(AppId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
         }
 
         [Fact]
@@ -135,7 +140,9 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AttachClient_should_update_domain_object()
         {
-            keyGenerator.Setup(x => x.GenerateKey()).Returns(clientSecret).Verifiable();
+            keyGenerator.Setup(x => x.GenerateKey())
+                .Returns(clientSecret)
+                .Verifiable();
 
             CreateApp();
 
@@ -148,7 +155,7 @@ namespace Squidex.Write.Apps
 
             keyGenerator.VerifyAll();
 
-            context.Result<AppClient>().ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
+            context.Result<EntityCreatedResult<AppClient>>().IdOrValue.ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
         }
 
         [Fact]

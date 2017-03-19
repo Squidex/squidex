@@ -35,6 +35,10 @@ namespace Squidex.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
+        public long Version { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public Guid AppId { get; set; }
 
         [BsonRequired]
@@ -48,6 +52,10 @@ namespace Squidex.Read.MongoDb.Schemas
         [BsonRequired]
         [BsonElement]
         public bool IsPublished { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public bool IsDeleted { get; set; }
 
         Schema ISchemaEntityWithSchema.Schema
         {

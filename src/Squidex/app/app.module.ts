@@ -64,4 +64,12 @@ export function configUserReport() {
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+    /*public ngDoBootstrap(appRef: ApplicationRef) {
+        try {
+            appRef.bootstrap(AppComponent);
+        } catch (e) {
+            console.log('Application element not found');
+        }
+    }*/
+}

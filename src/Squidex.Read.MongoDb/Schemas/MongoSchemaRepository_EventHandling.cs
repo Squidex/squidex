@@ -14,7 +14,6 @@ using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Events.Schemas.Utils;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -92,7 +91,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            await Collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
+            await Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
 
             SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }

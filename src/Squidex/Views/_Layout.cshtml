@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <base href="/">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Squidex - @ViewBag.Title</title>
+
+    <environment names="Production">
+        <link rel="stylesheet" asp-append-version="true" href="~/build/app.css" />
+    </environment>
+    
+    @if (IsSectionDefined("header"))
+    {
+        @RenderSection("header")
+    }
+</head>
+<body>
+    @RenderBody()
+    
+    <environment names="Development">
+        <script type="text/javascript" src="http://localhost:3000/shims.js"></script>
+        <script type="text/javascript" src="http://localhost:3000/app.js"></script>
+    </environment>
+</body>
+</html>

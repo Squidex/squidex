@@ -22,7 +22,7 @@ using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Write.Apps
 {
-    public class AppDomainObject : DomainObject
+    public class AppDomainObject : DomainObjectBase
     {
         private static readonly Language DefaultLanguage = Language.EN;
         private readonly AppContributors contributors = new AppContributors();

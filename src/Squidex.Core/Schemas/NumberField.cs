@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OData.Edm;
@@ -41,7 +42,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.Number;
 
@@ -61,7 +62,7 @@ namespace Squidex.Core.Schemas
             return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Double, !Properties.IsRequired);
         }
 
-        protected override object ConvertValue(JToken value)
+        public override object ConvertValue(JToken value)
         {
             return (double?)value;
         }

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -28,7 +28,7 @@ import {
         fadeAnimation
     ]
 })
-export class ContentItemComponent extends AppComponentBase implements OnInit {
+export class ContentItemComponent extends AppComponentBase implements OnInit, OnChanges {
     public dropdown = new ModalView(false, true);
 
     @Output()
@@ -58,7 +58,15 @@ export class ContentItemComponent extends AppComponentBase implements OnInit {
         super(notifications, users, apps);
     }
 
+    public ngOnChanges() {
+        this.updateValues();
+    }
+
     public ngOnInit() {
+        this.updateValues();
+    }
+
+    private updateValues() {
         this.values = [];
 
         for (let field of this.fields) {

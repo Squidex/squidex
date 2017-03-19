@@ -12,6 +12,7 @@ namespace Squidex.Core.Schemas
     {
         Input,
         Radio,
-        Dropdown
+        Dropdown,
+        Stars
     }
 }

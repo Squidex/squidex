@@ -26,13 +26,13 @@ namespace Squidex.Config.Swagger
         {
             services.AddSingleton(typeof(SwaggerOwinSettings), s =>
             {
-                var options = s.GetService<IOptions<MyUrlsOptions>>().Value;
+                var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
 
                 var settings =
                     new SwaggerOwinSettings { Title = "Squidex API Specification", IsAspNetCore = false }
-                        .ConfigurePaths()
+                        .ConfigurePaths(urlOptions)
                         .ConfigureSchemaSettings()
-                        .ConfigureIdentity(options);
+                        .ConfigureIdentity(urlOptions);
 
                 return settings;
             });
@@ -43,20 +43,24 @@ namespace Squidex.Config.Swagger
         private static SwaggerOwinSettings ConfigureIdentity(this SwaggerOwinSettings settings, MyUrlsOptions urlOptions)
         {
             settings.DocumentProcessors.Add(
-                new SecurityDefinitionAppender("OAuth2", SwaggerHelper.CreateOAuthSchema(urlOptions)));
+                new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
-            settings.OperationProcessors.Add(new OperationSecurityScopeProcessor("roles"));
+            settings.OperationProcessors.Add(new OperationSecurityScopeProcessor(Constants.SecurityDefinition));
 
             return settings;
         }
 
-        private static SwaggerOwinSettings ConfigurePaths(this SwaggerOwinSettings settings)
+        private static SwaggerOwinSettings ConfigurePaths(this SwaggerOwinSettings settings, MyUrlsOptions urlOptions)
         {
             settings.SwaggerRoute = $"{Constants.ApiPrefix}/swagger/v1/swagger.json";
 
             settings.PostProcess = document =>
             {
                 document.BasePath = Constants.ApiPrefix;
+                document.Info.ExtensionData = new Dictionary<string, object>
+                {
+                    ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
+                };
             };
 
             settings.MiddlewareBasePath = Constants.ApiPrefix;

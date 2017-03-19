@@ -10,11 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.OData.Edm.Library;
-using Newtonsoft.Json.Linq;
 using NJsonSchema;
-using Squidex.Core.Contents;
 using Squidex.Infrastructure;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
@@ -22,7 +19,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class Schema : Cloneable
+    public sealed class Schema : CloneableBase
     {
         private readonly string name;
         private readonly SchemaProperties properties;
@@ -189,177 +186,21 @@ namespace Squidex.Core.Schemas
             return edmType;
         }
 
-        public JsonSchema4 BuildSchema(HashSet<Language> languages, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public JsonSchema4 BuildJsonSchema(HashSet<Language> languages, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotEmpty(languages, nameof(languages));
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
             var schemaName = Name.ToPascalCase();
 
-            var schema = new JsonSchema4 { Id = schemaName, Type = JsonObjectType.Object };
+            var schema = new JsonSchema4 { Type = JsonObjectType.Object };
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
-                field.AddToSchema(schema, languages, schemaName, schemaResolver);
+                field.AddToJsonSchema(schema, languages, schemaName, schemaResolver);
             }
 
             return schema;
-        }
-
-        public async Task ValidatePartialAsync(ContentData data, IList<ValidationError> errors, HashSet<Language> languages)
-        {
-            Guard.NotNull(data, nameof(data));
-            Guard.NotNull(errors, nameof(errors));
-
-            foreach (var fieldData in data)
-            {
-                if (!fieldsByName.TryGetValue(fieldData.Key, out Field field))
-                {
-                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
-                }
-                else
-                {
-                    var fieldErrors = new List<string>();
-
-                    if (field.RawProperties.IsLocalizable)
-                    {
-                        foreach (var languageValue in fieldData.Value)
-                        {
-                            if (!Language.TryGetLanguage(languageValue.Key, out Language language))
-                            {
-                                fieldErrors.Add($"{field.Name} has an invalid language '{languageValue.Key}'");
-                            }
-                            else if (!languages.Contains(language))
-                            {
-                                fieldErrors.Add($"{field.Name} has an unsupported language '{languageValue.Key}'");
-                            }
-                            else
-                            {
-                                await field.ValidateAsync(languageValue.Value, fieldErrors, language);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (fieldData.Value.Keys.Any(x => x != Language.Invariant.Iso2Code))
-                        {
-                            fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
-                        }
-
-                        if (fieldData.Value.TryGetValue(Language.Invariant.Iso2Code, out JToken value))
-                        {
-                            await field.ValidateAsync(value, fieldErrors);
-                        }
-                    }
-
-                    foreach (var error in fieldErrors)
-                    {
-                        errors.Add(new ValidationError(error, field.Name));
-                    }
-                }
-            }
-        }
-
-        public async Task ValidateAsync(ContentData data, IList<ValidationError> errors, HashSet<Language> languages)
-        {
-            Guard.NotNull(data, nameof(data));
-            Guard.NotNull(errors, nameof(errors));
-            Guard.NotEmpty(languages, nameof(languages));
-
-            ValidateUnknownFields(data, errors);
-
-            foreach (var field in fieldsByName.Values)
-            {
-                var fieldErrors = new List<string>();
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
-
-                if (field.RawProperties.IsLocalizable)
-                {
-                    await ValidateLocalizableFieldAsync(languages, fieldData, fieldErrors, field);
-                }
-                else
-                {
-                    await ValidateNonLocalizableField(fieldData, fieldErrors, field);
-                }
-
-                foreach (var error in fieldErrors)
-                {
-                    errors.Add(new ValidationError(error, field.Name));
-                }
-            }
-        }
-
-        private void ValidateUnknownFields(ContentData data, IList<ValidationError> errors)
-        {
-            foreach (var fieldData in data)
-            {
-                if (!fieldsByName.ContainsKey(fieldData.Key))
-                {
-                    errors.Add(new ValidationError($"{fieldData.Key} is not a known field", fieldData.Key));
-                }
-            }
-        }
-
-        private static async Task ValidateLocalizableFieldAsync(HashSet<Language> languages, ContentFieldData fieldData, List<string> fieldErrors, Field field)
-        {
-            foreach (var valueLanguage in fieldData.Keys)
-            {
-                if (!Language.TryGetLanguage(valueLanguage, out Language language))
-                {
-                    fieldErrors.Add($"{field.Name} has an invalid language '{valueLanguage}'");
-                }
-                else if (!languages.Contains(language))
-                {
-                    fieldErrors.Add($"{field.Name} has an unsupported language '{valueLanguage}'");
-                }
-            }
-
-            foreach (var language in languages)
-            {
-                var value = fieldData.GetOrCreate(language.Iso2Code, k => JValue.CreateNull());
-
-                await field.ValidateAsync(value, fieldErrors, language);
-            }
-        }
-
-        private static async Task ValidateNonLocalizableField(ContentFieldData fieldData, List<string> fieldErrors, Field field)
-        {
-            if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
-            {
-                fieldErrors.Add($"{field.Name} can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})");
-            }
-
-            var value = fieldData.GetOrCreate(Language.Invariant.Iso2Code, k => JValue.CreateNull());
-
-            await field.ValidateAsync(value, fieldErrors);
-        }
-
-        public void Enrich(ContentData data, HashSet<Language> languages)
-        {
-            Guard.NotNull(data, nameof(data));
-            Guard.NotEmpty(languages, nameof(languages));
-
-            foreach (var field in fieldsByName.Values)
-            {
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
-
-                if (field.RawProperties.IsLocalizable)
-                {
-                    foreach (var language in languages)
-                    {
-                        field.Enrich(fieldData, language);
-                    }
-                }
-                else
-                {
-                    field.Enrich(fieldData, Language.Invariant);
-                }
-
-                if (fieldData.Count > 0)
-                {
-                    data.AddField(field.Name, fieldData);
-                }
-            }
         }
     }
 }

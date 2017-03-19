@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="client-header">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm"  (ngSubmit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
                         <div class="form-group mr-2">
                             <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
                             
@@ -22,7 +22,7 @@
 
                         <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid">Save</button>
 
-                        <button class="btn btn-default btn-cancel" (click)="cancelRename()">
+                        <button class="btn btn-simple btn-cancel" (click)="cancelRename()">
                             <i class="icon-close"></i>
                         </button>
                     </form>
@@ -39,7 +39,7 @@
                 <div class="client-expires">Access tokens expire after 30 days</div>
             </td>
             <td class="client-delete">
-                <button type="button" class="btn btn-link btn-danger" (click)="revoked.emit()">
+                <button type="button" class="btn btn-link btn-danger" (click)="revoking.emit()">
                     <i class="icon-bin2"></i>
                 </button>
             </td>

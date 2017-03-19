@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class EventReceiver : DisposableObject
+    public sealed class EventReceiver : DisposableObjectBase
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
@@ -176,6 +176,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 var @event = formatter.Parse(storedEvent.Data);
 
                 @event.SetEventNumber(storedEvent.EventNumber);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
             }

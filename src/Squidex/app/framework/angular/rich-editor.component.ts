@@ -12,8 +12,7 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var tinymce: any;
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
@@ -44,7 +43,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         this.value = value;
 
         if (this.tinyEditor) {
-            this.tinyEditor.setContent(value);
+            this.tinyEditor.setContent(value || '');
         }
     }
 
@@ -71,6 +70,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
             tinymce.init({
                 setup: (editor: any) => {
                     self.tinyEditor = editor;
+                    self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
 
                     self.tinyEditor.on('change', () => {
                         const value = editor.getContent();

@@ -22,10 +22,11 @@ import {
     NotificationService,
     SchemaDto,
     SchemasService,
-    UsersProviderService
+    UsersProviderService,
+    Version
 } from 'shared';
 
-import { SchemaUpdated } from './../messages';
+import { SchemaDeleted, SchemaUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -36,7 +37,8 @@ import { SchemaUpdated } from './../messages';
     ]
 })
 export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private messageSubscription: Subscription;
+    private messageUpdatedSubscription: Subscription;
+    private messageDeletedSubscription: Subscription;
 
     public addSchemaDialog = new ModalView();
 
@@ -55,7 +57,8 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnDestroy() {
-        this.messageSubscription.unsubscribe();
+        this.messageUpdatedSubscription.unsubscribe();
+        this.messageDeletedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -66,16 +69,23 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 this.updateSchemas(this.schemas, this.schemaQuery = q);
             });
 
-        this.route.params.map(q => q['showDialog']).subscribe(showDialog => {
-            if (showDialog) {
-                this.addSchemaDialog.show();
-            }
-        });
+        this.route.params.map(q => q['showDialog'])
+            .subscribe(showDialog => {
+                if (showDialog) {
+                    this.addSchemaDialog.show();
+                }
+            });
 
-        this.messageSubscription =
+        this.messageUpdatedSubscription =
             this.messageBus.of(SchemaUpdated)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.map(s => s.name === m.name ? updateSchema(s, this.authService, m) : s));
+                });
+
+        this.messageDeletedSubscription =
+            this.messageBus.of(SchemaDeleted)
+                .subscribe(m => {
+                    this.updateSchemas(this.schemas.filter(s => s.name !== m.name));
                 });
 
         this.load();
@@ -130,6 +140,7 @@ function updateSchema(schema: SchemaDto, authService: AuthService, message: Sche
         message.label,
         message.isPublished,
         schema.createdBy, me,
-        schema.created, DateTime.now());
+        schema.created, DateTime.now(),
+        new Version(message.version));
 }
 

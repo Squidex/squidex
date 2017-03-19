@@ -13,9 +13,11 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
+#pragma warning disable IDE0019
+
 namespace Squidex.Write.TestHelpers
 {
-    public abstract class HandlerTestBase<T> where T : DomainObject
+    public abstract class HandlerTestBase<T> where T : DomainObjectBase
     {
         private sealed class MockupHandler : IAggregateHandler
         {
@@ -32,14 +34,14 @@ namespace Squidex.Write.TestHelpers
                 IsUpdated = false;
             }
 
-            public Task CreateAsync<V>(IAggregateCommand command, Func<V, Task> creator) where V : class, IAggregate
+            public Task CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IAggregate
             {
                 IsCreated = true;
 
                 return creator(domainObject as V);
             }
 
-            public Task UpdateAsync<V>(IAggregateCommand command, Func<V, Task> updater) where V : class, IAggregate
+            public Task UpdateAsync<V>(CommandContext context, Func<V, Task> updater) where V : class, IAggregate
             {
                 IsUpdated = true;
 
@@ -146,3 +148,6 @@ namespace Squidex.Write.TestHelpers
         }
     }
 }
+
+
+#pragma warning restore IDE0019

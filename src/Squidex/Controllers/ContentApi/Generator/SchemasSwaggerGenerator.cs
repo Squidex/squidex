@@ -44,7 +44,6 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly string schemaBodyDescription;
         private HashSet<Language> languages;
         private JsonSchema4 errorDtoSchema;
-        private JsonSchema4 entityCreatedDtoSchema;
         private string appBasePath;
         private IAppEntity app;
 
@@ -80,6 +79,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             GenerateSecurityDefinitions();
             GenerateSecurityRequirements();
             GenerateDefaultErrors();
+            GeneratePing();
 
             return document;
         }
@@ -104,6 +104,10 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             document.Info = new SwaggerInfo
             {
+                ExtensionData = new Dictionary<string, object>
+                {
+                    ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
+                },
                 Title = $"Suidex API for {app.Name} App"
             };
         }
@@ -132,11 +136,6 @@ namespace Squidex.Controllers.ContentApi.Generator
             var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
 
             errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
-
-            var entityCreatedType = typeof(EntityCreatedDto);
-            var entityCreatedSchema = JsonObjectTypeDescription.FromType(entityCreatedType, new Attribute[0], EnumHandling.String);
-
-            entityCreatedDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(entityCreatedType, entityCreatedSchema.IsNullable, null);
         }
 
         private void GenerateSecurityRequirements()
@@ -145,7 +144,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             {
                 new SwaggerSecurityRequirement
                 {
-                    { "roles", new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
+                    { Constants.SecurityDefinition, new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
                 }
             };
 
@@ -165,7 +164,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntityWithSchema> schemas)
         {
-            foreach (var schema in schemas.Select(x => x.Schema))
+            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
             {
                 GenerateSchemaOperations(schema);
             }
@@ -173,26 +172,27 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         private void GenerateSchemaOperations(Schema schema)
         {
-            var schemaName = schema.Properties.Label ?? schema.Name;
+            var schemaIdentifier = schema.Name.ToPascalCase();
+            var schemaName = !string.IsNullOrWhiteSpace(schema.Properties.Label) ? schema.Properties.Label.Trim() : schema.Name;
 
             document.Tags.Add(
                 new SwaggerTag
                 {
-                    Name = schemaName, Description = $"API to managed {schemaName} content."
+                    Name = schemaName, Description = $"API to managed {schemaName} contents."
                 });
 
-            var dataSchem = AppendSchema($"{schema.Name}Dto", schema.BuildSchema(languages, AppendSchema));
+            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildJsonSchema(languages, AppendSchema));
 
             var schemaOperations = new List<SwaggerOperations>
             {
-                GenerateSchemaQueryOperation(schema, schemaName, dataSchem),
-                GenerateSchemaCreateOperation(schema, schemaName, dataSchem),
-                GenerateSchemaGetOperation(schema, schemaName, dataSchem),
-                GenerateSchemaUpdateOperation(schema, schemaName, dataSchem),
-                GenerateSchemaPatchOperation(schema, schemaName, dataSchem),
-                GenerateSchemaPublishOperation(schema, schemaName),
-                GenerateSchemaUnpublishOperation(schema, schemaName),
-                GenerateSchemaDeleteOperation(schema, schemaName)
+                GenerateSchemaQueryOperation(schema, schemaName, schemaIdentifier, dataSchema),
+                GenerateSchemaCreateOperation(schema, schemaName, schemaIdentifier, dataSchema),
+                GenerateSchemaGetOperation(schema, schemaName, schemaIdentifier, dataSchema),
+                GenerateSchemaUpdateOperation(schema, schemaName, schemaIdentifier, dataSchema),
+                GenerateSchemaPatchOperation(schema, schemaName, schemaIdentifier, dataSchema),
+                GenerateSchemaPublishOperation(schema, schemaName, schemaIdentifier),
+                GenerateSchemaUnpublishOperation(schema, schemaName, schemaIdentifier),
+                GenerateSchemaDeleteOperation(schema, schemaName, schemaIdentifier)
             };
 
             foreach (var operation in schemaOperations.SelectMany(x => x.Values).Distinct())
@@ -201,11 +201,31 @@ namespace Squidex.Controllers.ContentApi.Generator
             }
         }
 
-        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
+        private void GeneratePing()
+        {
+            var swaggerOperation = AddOperation(SwaggerOperationMethod.Get, null, $"ping/{app.Name}", operation =>
+            {
+                operation.OperationId = "MakePingTest";
+
+                operation.Description = "Make a simple request, e.g. to test credentials.";
+
+                operation.Summary = "Make Test";
+
+            });
+
+            foreach (var operation in swaggerOperation.Values)
+            {
+                operation.Tags = new List<string> { "PingTest" };
+            }
+        }
+
+        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
             {
-                operation.Summary = $"Queries {schemaName} content.";
+                operation.OperationId = $"Query{schemaIdentifier}Contents";
+
+                operation.Summary = $"Queries {schemaName} contents.";
 
                 operation.Description = schemaQueryDescription;
 
@@ -221,78 +241,91 @@ namespace Squidex.Controllers.ContentApi.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
+        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
+                operation.OperationId = $"Get{schemaIdentifier}Content";
+
                 operation.Summary = $"Get a {schemaName} content.";
 
-                var responseSchema = CreateContentSchema(schemaName, schema.Name, dataSchema);
+                var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
 
                 operation.AddResponse("200", $"{schemaName} content found.", responseSchema);
             });
         }
 
-        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
+        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appBasePath}/{schema.Name}", operation =>
             {
+                operation.OperationId = $"Create{schemaIdentifier}Content";
+
                 operation.Summary = $"Create a {schemaName} content.";
 
-                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
+                var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
 
-                operation.AddResponse("201", $"{schemaName} created.",  entityCreatedDtoSchema);
+                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
+                operation.AddResponse("201", $"{schemaName} created.", responseSchema);
             });
         }
 
-        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
+        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
+                operation.OperationId = $"Update{schemaIdentifier}Content";
+
                 operation.Summary = $"Update a {schemaName} content.";
 
                 operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-
                 operation.AddResponse("204", $"{schemaName} element updated.");
             });
         }
 
-        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName, JsonSchema4 dataSchema)
+        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
             {
+                operation.OperationId = $"Path{schemaIdentifier}Content";
+
                 operation.Summary = $"Patchs a {schemaName} content.";
 
                 operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-
                 operation.AddResponse("204", $"{schemaName} element updated.");
             });
         }
 
-        private SwaggerOperations GenerateSchemaPublishOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaPublishOperation(Schema schema, string schemaName, string schemaIdentifier)
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/publish", operation =>
             {
+                operation.OperationId = $"Publish{schemaIdentifier}Content";
+
                 operation.Summary = $"Publish a {schemaName} content.";
                 
                 operation.AddResponse("204", $"{schemaName} element published.");
             });
         }
 
-        private SwaggerOperations GenerateSchemaUnpublishOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaUnpublishOperation(Schema schema, string schemaName, string schemaIdentifier)
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/unpublish", operation =>
             {
+                operation.OperationId = $"Unpublish{schemaIdentifier}Content";
+
                 operation.Summary = $"Unpublish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} element unpublished.");
             });
         }
 
-        private SwaggerOperations GenerateSchemaDeleteOperation(Schema schema, string schemaName)
+        private SwaggerOperations GenerateSchemaDeleteOperation(Schema schema, string schemaName, string schemaIdentifier)
         {
             return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/", operation =>
             {
+                operation.OperationId = $"Delete{schemaIdentifier}Content";
+
                 operation.Summary = $"Delete a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content deleted.");
@@ -310,7 +343,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             if (entityName != null)
             {
-                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} (GUID).");
+                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} content (GUID).");
 
                 operation.AddResponse("404", $"App, schema or {entityName} content not found.");
             }
@@ -341,29 +374,36 @@ namespace Squidex.Controllers.ContentApi.Generator
             return schema;
         }
 
-        private JsonSchema4 CreateContentSchema(string schemaName, string id, JsonSchema4 dataSchema)
+        private JsonSchema4 CreateContentSchema(string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
         {
-            var CreateProperty = 
-                new Func<string, string, JsonProperty>((d, f) => 
-                    new JsonProperty { Description = d, Format = f, IsRequired = true, Type = JsonObjectType.String });
-            
             var dataProperty = new JsonProperty { Description = schemaBodyDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
 
             var schema = new JsonSchema4
             {
                 Properties =
                 {
-                    ["id"] = CreateProperty($"The id of the {schemaName} content.", null),
+                    ["id"] = CreateProperty($"The id of the {schemaName} content."),
                     ["data"] = dataProperty,
+                    ["version"] = CreateProperty($"The version of the {schemaName}", JsonObjectType.Number),
                     ["created"] = CreateProperty($"The date and time when the {schemaName} content has been created.", "date-time"),
-                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content.", null),
+                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content."),
                     ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content has been modified last.", "date-time"),
-                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.", null)
+                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.")
                 },
                 Type = JsonObjectType.Object
             };
 
-            return AppendSchema($"{id}ContentDto", schema);
+            return AppendSchema($"{schemaIdentifier}ContentDto", schema);
+        }
+
+        private static JsonProperty CreateProperty(string description, JsonObjectType type)
+        {
+            return new JsonProperty { Description = description, IsRequired = true, Type = type };
+        }
+
+        private static JsonProperty CreateProperty(string description, string format = null)
+        {
+            return new JsonProperty { Description = description, Format = format, IsRequired = true, Type = JsonObjectType.String };
         }
 
         private JsonSchema4 AppendSchema(string name, JsonSchema4 schema)

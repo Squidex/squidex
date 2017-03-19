@@ -12,7 +12,7 @@ using Squidex.Core.Schemas;
 
 namespace Squidex.Events.Schemas.Utils
 {
-    public class SchemaEventDispatcher
+    public static class SchemaEventDispatcher
     {
         public static Schema Dispatch(SchemaCreated @event)
         {

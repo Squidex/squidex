@@ -22,7 +22,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -32,7 +32,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(100, errors);
+            await sut.ValidateAsync(100, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(50, errors);
+            await sut.ValidateAsync(50, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not an allowed value" });

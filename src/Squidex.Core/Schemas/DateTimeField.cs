@@ -17,6 +17,7 @@ using NodaTime.Text;
 using Squidex.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
+// ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable ConvertIfStatementToSwitchStatement
 
@@ -43,7 +44,7 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(JToken value)
+        public override object ConvertValue(JToken value)
         {
             if (value.Type == JTokenType.String)
             {
@@ -57,15 +58,10 @@ namespace Squidex.Core.Schemas
                 return parseResult.Value;
             }
 
-            if (value.Type == JTokenType.Null)
-            {
-                return null;
-            }
-
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.String;
 

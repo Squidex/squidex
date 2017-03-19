@@ -1,0 +1,23 @@
+﻿// ==========================================================================
+//  WebpackUsages.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using Microsoft.AspNetCore.Builder;
+using Squidex.Pipeline;
+
+namespace Squidex.Config.Web
+{
+    public static class WebpackUsages
+    {
+        public static IApplicationBuilder UseWebpackProxy(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<WebpackMiddleware>();
+
+            return app;
+        }
+    }
+}

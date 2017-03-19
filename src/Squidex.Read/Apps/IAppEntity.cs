@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Read.Apps
 {
-    public interface IAppEntity : IEntity
+    public interface IAppEntity : IEntity, IEntityWithVersion
     {
         string Name { get; }
 

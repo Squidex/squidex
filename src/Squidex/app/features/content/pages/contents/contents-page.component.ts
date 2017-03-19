@@ -28,8 +28,10 @@ import {
     ImmutableArray,
     MessageBus,
     NotificationService,
+    Pager,
     SchemaDetailsDto,
-    UsersProviderService
+    UsersProviderService,
+    Version
 } from 'shared';
 
 @Component({
@@ -45,23 +47,12 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public contentItems: ImmutableArray<ContentDto>;
     public contentFields: FieldDto[];
-    public contentTotal = 0;
+    public contentsFilter = new FormControl();
+    public contentsQuery = '';
+    public contentsPager = new Pager(0);
 
     public languages: AppLanguageDto[] = [];
     public languageSelected: AppLanguageDto;
-
-    public contentsFilter = new FormControl();
-
-    public pageSize = 10;
-
-    public canGoNext = false;
-    public canGoPrev = false;
-
-    public itemFirst = 0;
-    public itemLast = 0;
-
-    public currentPage = 0;
-    public currentQuery = '';
 
     public get columnWidth() {
         return 100 / this.contentFields.length;
@@ -83,41 +74,52 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public ngOnInit() {
         this.messageCreatedSubscription =
-            this.messageBus.of(ContentCreated).subscribe(message => {
-                this.itemLast++;
-                this.contentTotal++;
-                this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data));
-            });
+            this.messageBus.of(ContentCreated)
+                .subscribe(message => {
+                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
+                    this.contentsPager = this.contentsPager.incrementCount();
+                });
 
         this.messageUpdatedSubscription =
-            this.messageBus.of(ContentUpdated).subscribe(message => {
-                this.updateContents(message.id, undefined, message.data);
+            this.messageBus.of(ContentUpdated)
+                .subscribe(message => {
+                    this.updateContents(message.id, undefined, message.data, message.version);
+                });
+
+        this.route.data.map(p => p['appLanguages'])
+            .subscribe((languages: AppLanguageDto[]) => {
+                this.languages = languages;
             });
 
-        this.route.data.map(p => p['appLanguages']).subscribe((languages: AppLanguageDto[]) => {
-            this.languages = languages;
-        });
+        this.route.data.map(p => p['schema'])
+            .subscribe(schema => {
+                this.schema = schema;
 
-        this.route.data.map(p => p['schema']).subscribe(schema => {
-            this.schema = schema;
-
-            this.reset();
-            this.load();
-        });
+                this.reset();
+                this.load();
+            });
     }
 
     public search() {
-        this.currentPage = 0;
-        this.currentQuery = this.contentsFilter.value;
+        this.contentsQuery = this.contentsFilter.value;
+        this.contentsPager = new Pager(0);
 
         this.load();
     }
 
+    private reset() {
+        this.contentItems = ImmutableArray.empty<ContentDto>();
+        this.contentsFilter.setValue('');
+        this.contentsPager = new Pager(0);
+
+        this.loadFields();
+    }
+
     public publishContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, true, content.data);
+                this.updateContents(content.id, true, content.data, content.version.value);
             }, error => {
                 this.notifyError(error);
             });
@@ -125,9 +127,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public unpublishContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, false, content.data);
+                this.updateContents(content.id, false, content.data, content.version.value);
             }, error => {
                 this.notifyError(error);
             });
@@ -135,9 +137,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public deleteContent(content: ContentDto) {
         this.appName()
-            .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id))
+            .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
+                this.contentsPager = this.contentsPager.decrementCount();
 
                 this.messageBus.publish(new ContentDeleted(content.id));
             }, error => {
@@ -147,12 +150,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public selectLanguage(language: AppLanguageDto) {
         this.languageSelected = language;
-    }
-
-    private reset() {
-        this.loadFields();
-
-        this.currentPage = 0;
     }
 
     private loadFields() {
@@ -165,50 +162,33 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     private load() {
         this.appName()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.pageSize, this.currentPage * this.pageSize, this.currentQuery))
+            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
                .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(dtos.items);
-                    this.contentTotal = dtos.total;
 
-                    this.updatePaging();
+                    this.contentsPager = this.contentsPager.setCount(dtos.total);
                 }, error => {
                     this.notifyError(error);
                 });
     }
 
     public goNext() {
-        if (this.canGoNext) {
-            this.currentPage++;
+        this.contentsPager = this.contentsPager.goNext();
 
-            this.updatePaging();
-            this.load();
-        }
+        this.load();
     }
 
     public goPrev() {
-        if (this.canGoPrev) {
-            this.currentPage--;
+        this.contentsPager = this.contentsPager.goPrev();
 
-            this.updatePaging();
-            this.load();
-        }
+        this.load();
     }
 
-    private updatePaging() {
-        const totalPages = Math.ceil(this.contentTotal / this.pageSize);
-
-        this.itemFirst = this.currentPage * this.pageSize + 1;
-        this.itemLast = Math.min(this.contentTotal, (this.currentPage + 1) * this.pageSize);
-
-        this.canGoNext = this.currentPage < totalPages - 1;
-        this.canGoPrev = this.currentPage > 0;
+    private updateContents(id: string, p: boolean | undefined, data: any, version: string) {
+        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data, version));
     }
 
-    private updateContents(id: string, p: boolean | undefined, data: any) {
-        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data));
-    }
-
-    private createContent(id: string, data: any): ContentDto {
+    private createContent(id: string, data: any, version: string): ContentDto {
         const me = `subject:${this.authService.user!.id}`;
 
         const newContent =
@@ -217,12 +197,13 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 me, me,
                 DateTime.now(),
                 DateTime.now(),
-                data);
+                data,
+                new Version(version));
 
         return newContent;
     }
 
-    private updateContent(content: ContentDto, isPublished: boolean, data: any): ContentDto {
+    private updateContent(content: ContentDto, isPublished: boolean, data: any, version: string): ContentDto {
         const me = `subject:${this.authService.user!.id}`;
 
         const newContent =
@@ -230,7 +211,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 content.id, isPublished,
                 content.createdBy, me,
                 content.created, DateTime.now(),
-                data);
+                data,
+                new Version(version));
 
         return newContent;
     }

@@ -21,6 +21,13 @@
 
                 <span class="radio-label">Checkbox</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Toggle'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Toggle" />
+
+                <i class="icon-control-Toggle"></i>
+
+                <span class="radio-label">Toggle</span>
+            </label>
         </div>
     </div>
 </div>

@@ -39,6 +39,7 @@
         font-weight: normal;
         line-height: 1.1rem;
         padding: .3rem .4rem;
+        padding-bottom: .5rem;
         background: $color-theme-error;
     }
 }
@@ -76,6 +77,10 @@ select {
 
 .form-group {
     &:last-child {
+        margin-bottom: 0;
+    }
+
+    &~.hidden {
         margin-bottom: 0;
     }
 }

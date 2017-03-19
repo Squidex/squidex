@@ -17,9 +17,10 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class DefaultDomainObjectFactoryTests
     {
-        private sealed class DO : DomainObject
+        private sealed class DO : DomainObjectBase
         {
-            public DO(Guid id, int version) : base(id, version)
+            public DO(Guid id, int version) 
+                : base(id, version)
             {
             }
 
@@ -35,7 +36,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var factoryFunction = new DomainObjectFactoryFunction<DO>(passedId =>
             {
-                return new DO(passedId, 0);
+                return new DO(passedId, -1);
             });
 
             serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>))).Returns(factoryFunction);
@@ -47,7 +48,24 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var domainObject = sut.CreateNew(typeof(DO), id);
 
             Assert.Equal(id, domainObject.Id);
-            Assert.Equal(0, domainObject.Version);
+            Assert.Equal(-1, domainObject.Version);
+        }
+
+        [Fact]
+        public void Should_throw_if_new_entity_has_invalid_version()
+        {
+            var serviceProvider = new Mock<IServiceProvider>();
+
+            var factoryFunction = new DomainObjectFactoryFunction<DO>(passedId =>
+            {
+                return new DO(passedId, 0);
+            });
+
+            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>))).Returns(factoryFunction);
+
+            var sut = new DefaultDomainObjectFactory(serviceProvider.Object);
+
+            Assert.Throws<InvalidOperationException>(() => sut.CreateNew(typeof(DO), Guid.NewGuid()));
         }
     }
 }

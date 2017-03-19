@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure
         private static readonly Regex CultureRegex = new Regex("([a-z]{2})(\\-[a-z]{2})?");
         private readonly string iso2Code;
         private readonly string englishName;
-        private static readonly Dictionary<string, Language> allLanguages = new Dictionary<string, Language>();
+        private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>();
 
         public static readonly Language Invariant = AddLanguage("iv", "Invariant");
 
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure
         {
             var language = new Language(iso2Code, englishName);
 
-            allLanguages[iso2Code] = language;
+            AllLanguagesField[iso2Code] = language;
 
             return language;
         }
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure
 
             try
             {
-                return allLanguages[iso2Code];
+                return AllLanguagesField[iso2Code];
             }
             catch (KeyNotFoundException)
             {
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure
 
         public static IEnumerable<Language> AllLanguages
         {
-            get { return allLanguages.Values; }
+            get { return AllLanguagesField.Values; }
         }
 
         public string EnglishName
@@ -72,17 +72,17 @@ namespace Squidex.Infrastructure
         {
             Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
 
-            return allLanguages.ContainsKey(iso2Code);
+            return AllLanguagesField.ContainsKey(iso2Code);
         }
 
         public static bool TryGetLanguage(string iso2Code, out Language language)
         {
             Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
 
-            return allLanguages.TryGetValue(iso2Code, out language);
+            return AllLanguagesField.TryGetValue(iso2Code, out language);
         }
 
-        public static Language TryParse(string input)
+        public static Language ParseOrNull(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {

@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <title>API Docs</title>
@@ -6,22 +10,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
+        body { margin: 0; padding: 0; }
 
         h1,
         .menu-header,
         .menu-cat-header:hover,
-        .menu-cat-header.active {
+        .menu-cat-header.active,
+        .menu-item-depth-1 > .menu-item-header:not(.disabled):hover,
+        .menu-item-depth-1.active > .menu-item-header {
             color: #3f83df !important;
+        }
+
+        .method-content a {
+            color: #3d7dd5 !important;
         }
     </style>
 </head>
 <body>
     <redoc spec-url="@Url.Content(ViewBag.Specification)"></redoc>
 
-    <script src="https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"></script>
+    <script src="/scripts/redoc.min.js"></script>
 </body>
 </html>

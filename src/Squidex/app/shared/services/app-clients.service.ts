@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig, Version } from 'framework';
 import { AuthService } from './auth.service';
 
 export class AppClientDto {
@@ -54,10 +54,10 @@ export class AppClientsService {
     ) {
     }
 
-    public getClients(appName: string): Observable<AppClientDto[]> {
+    public getClients(appName: string, version: Version): Observable<AppClientDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return this.authService.authGet(url)
+        return this.authService.authGet(url, version)
                 .map(response => response.json())
                 .map(response => {
                     const items: any[] = response;
@@ -72,10 +72,10 @@ export class AppClientsService {
                 .catchError('Failed to load clients. Please reload.');
     }
 
-    public postClient(appName: string, dto: CreateAppClientDto): Observable<AppClientDto> {
+    public postClient(appName: string, dto: CreateAppClientDto, version: Version): Observable<AppClientDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return this.authService.authPost(url, dto)
+        return this.authService.authPost(url, dto, version)
                 .map(response => response.json())
                 .map(response => {
                     return new AppClientDto(
@@ -86,17 +86,17 @@ export class AppClientsService {
                 .catchError('Failed to add client. Please reload.');
     }
 
-    public updateClient(appName: string, id: string, dto: UpdateAppClientDto): Observable<any> {
+    public updateClient(appName: string, id: string, dto: UpdateAppClientDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
-        return this.authService.authPut(url, dto)
+        return this.authService.authPut(url, dto, version)
                 .catchError('Failed to revoke client. Please reload.');
     }
 
-    public deleteClient(appName: string, id: string): Observable<any> {
+    public deleteClient(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
-        return this.authService.authDelete(url)
+        return this.authService.authDelete(url, version)
                 .catchError('Failed to revoke client. Please reload.');
     }
 

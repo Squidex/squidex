@@ -18,13 +18,13 @@ using Squidex.Controllers.Api;
 
 namespace Squidex.Pipeline
 {
-    public class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
+    public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
     {
-        private static readonly List<Func<Exception, IActionResult>> handlers = new List<Func<Exception, IActionResult>>();
+        private static readonly List<Func<Exception, IActionResult>> Handlers = new List<Func<Exception, IActionResult>>();
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
-            handlers.Add(ex =>
+            Handlers.Add(ex =>
             {
                 var typed = ex as T;
 
@@ -35,6 +35,7 @@ namespace Squidex.Pipeline
         static ApiExceptionFilterAttribute()
         {
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
+            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
         }
@@ -42,6 +43,11 @@ namespace Squidex.Pipeline
         private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
         {
             return new NotFoundResult();
+        }
+
+        private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
+        {
+            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 412 };
         }
 
         private static IActionResult OnDomainException(DomainException ex)
@@ -68,7 +74,7 @@ namespace Squidex.Pipeline
         {
             IActionResult result = null;
 
-            foreach (var handler in handlers)
+            foreach (var handler in Handlers)
             {
                 result = handler(context.Exception);
 

@@ -19,7 +19,7 @@ namespace Squidex.Config.Domain
 {
     public class EventStoreModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public EventStoreModule(IConfiguration configuration)
         {

@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace Squidex.Infrastructure.Dispatching
 {
-    internal class ActionDispatcherFactory
+    internal static class ActionDispatcherFactory
     {
         public static Tuple<Type, Action<T, object>> CreateActionHandler<T>(MethodInfo methodInfo)
         {

@@ -22,7 +22,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredValidator();
 
-            await sut.ValidateAsync(true, errors);
+            await sut.ValidateAsync(true, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -32,7 +32,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredValidator();
 
-            await sut.ValidateAsync(string.Empty, errors);
+            await sut.ValidateAsync(string.Empty, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredValidator();
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });

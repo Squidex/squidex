@@ -42,7 +42,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 201 => Schema field created.
         /// 409 => Schema field name already in use.
         /// 404 => App or schema not found.
-        /// 404 => Schema field properties not valid.
+        /// 400 => Schema field properties not valid.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
@@ -54,9 +54,11 @@ namespace Squidex.Controllers.Api.Schemas
             var command = new AddField { Name = request.Name, Properties = request.Properties.ToProperties() };
 
             var context = await CommandBus.PublishAsync(command);
-            var result = context.Result<long>();
 
-            return StatusCode(201, new EntityCreatedDto { Id = result.ToString() });
+            var result = context.Result<EntityCreatedResult<long>>().IdOrValue;
+            var response = new EntityCreatedDto { Id = result.ToString() };
+
+            return StatusCode(201, response);
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 204 => Schema field created.
         /// 409 => Schema field name already in use.
         /// 404 => App, schema or field not found.
-        /// 404 => Schema field properties not valid.
+        /// 400 => Schema field properties not valid.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]

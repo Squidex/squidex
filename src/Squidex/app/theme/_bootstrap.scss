@@ -37,9 +37,34 @@ body {
 }
 
 .dropdown-menu {
-    @include box-shadow(0, 3px, 16px, .2px);
-    border: 0;
-    background: $panel-light-background;
+    & {
+        @include box-shadow(0, 3px, 16px, .2px);
+        border: 0;
+        background: $panel-light-background;
+    }
+
+    a {
+        &.dropdown-item-delete {
+            & {
+                color: $color-theme-error;
+            }
+
+            &:hover {
+                color: $color-theme-error-dark;
+            }
+
+            &:active {
+                background: $color-theme-error-dark;
+                border: 0;
+            }
+        }
+
+        &.dropdown-item {
+            &:active {
+                color: $color-accent-dark;
+            }
+        }
+    }
 }
 
 .nav-dark {
@@ -151,8 +176,8 @@ body {
     }
 
     &-cancel {
-        padding: .2rem;
-        font-size: 1.5rem;
+        padding: .4rem;
+        font-size: 1.1rem;
         font-weight: normal;
     }
 

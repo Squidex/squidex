@@ -28,7 +28,7 @@ module.exports = webpackMerge(runConfig, {
          *
          * See: https://webpack.js.org/configuration/output/#output-filename
          */
-        filename: '[name].[hash].js',
+        filename: '[name].js',
 
         /**
          * The filename of non-entry chunks as relative path
@@ -58,7 +58,7 @@ module.exports = webpackMerge(runConfig, {
                  * 
                  * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
                  */
-                use: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader!sass-loader?sourceMap' }),
+                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?minimize!sass-loader?sourceMap' }),
                 /*
                  * Do not include component styles
                  */
@@ -68,9 +68,10 @@ module.exports = webpackMerge(runConfig, {
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: helpers.root('app-config', 'clean-css-loader')
-                }, {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
+                    options: {
+                        includePaths: [helpers.root('app', 'theme')]
+                    }
                 }],
                 exclude: helpers.root('app', 'theme'),
             }, { 
@@ -91,7 +92,7 @@ module.exports = webpackMerge(runConfig, {
          * 
          * See: https://github.com/webpack/extract-text-webpack-plugin
          */
-        new ExtractTextPlugin('[name].[hash].css'),
+        new ExtractTextPlugin('[name].css'),
 
         new webpack.optimize.UglifyJsPlugin({
             beautify: false,

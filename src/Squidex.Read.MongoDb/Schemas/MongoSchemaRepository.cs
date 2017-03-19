@@ -49,14 +49,14 @@ namespace Squidex.Read.MongoDb.Schemas
 
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.AppId == appId).ToListAsync();
+            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
 
             return entities.OfType<ISchemaEntity>().ToList();
         }
 
         public async Task<IReadOnlyList<ISchemaEntityWithSchema>> QueryAllWithSchemaAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.AppId == appId).ToListAsync();
+            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
 
             entities.ForEach(x => x.DeserializeSchema(serializer));
 
@@ -66,7 +66,7 @@ namespace Squidex.Read.MongoDb.Schemas
         public async Task<ISchemaEntityWithSchema> FindSchemaAsync(Guid appId, string name)
         {
             var entity = 
-                await Collection.Find(s => s.Name == name && s.AppId == appId)
+                await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
             entity?.DeserializeSchema(serializer);
@@ -83,15 +83,6 @@ namespace Squidex.Read.MongoDb.Schemas
             entity?.DeserializeSchema(serializer);
 
             return entity;
-        }
-
-        public async Task<Guid?> FindSchemaIdAsync(Guid appId, string name)
-        {
-            var entity = 
-                await Collection.Find(s => s.Name == name & s.AppId == appId)
-                    .Project<MongoSchemaEntity>(Projection.Include(x => x.Id)).FirstOrDefaultAsync();
-
-            return entity?.Id;
         }
     }
 }

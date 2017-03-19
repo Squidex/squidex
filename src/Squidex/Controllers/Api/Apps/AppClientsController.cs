@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Core.Identity;
@@ -64,6 +65,8 @@ namespace Squidex.Controllers.Api.Apps
 
             var response = entity.Clients.Select(x => SimpleMapper.Map(x, new ClientDto())).ToList();
 
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+
             return Ok(response);
         }
 
@@ -82,15 +85,15 @@ namespace Squidex.Controllers.Api.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/clients/")]
-        [ProducesResponseType(typeof(ClientDto[]), 201)]
+        [ProducesResponseType(typeof(ClientDto), 201)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
             var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new AttachClient()));
-            var result = context.Result<AppClient>();
 
+            var result = context.Result<EntityCreatedResult<AppClient>>().IdOrValue;
             var response = SimpleMapper.Map(result, new ClientDto());
 
-            return StatusCode(201, response);
+            return CreatedAtAction(nameof(GetClients), new { app }, response);
         }
 
         /// <summary>
@@ -105,7 +108,6 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
-        [ProducesResponseType(typeof(ClientDto[]), 201)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
@@ -29,7 +28,7 @@ namespace Squidex.Core.Schemas.Validators
             this.max = max;
         }
 
-        public Task ValidateAsync(object value, ICollection<string> errors)
+        public Task ValidateAsync(object value, Action<string> addError)
         {
             if (value == null)
             {
@@ -40,12 +39,12 @@ namespace Squidex.Core.Schemas.Validators
 
             if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
             {
-                errors.Add($"<FIELD> must be greater than '{min}'");
+                addError($"<FIELD> must be greater than '{min}'");
             }
 
             if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
             {
-                errors.Add($"<FIELD> must be less than '{max}'");
+                addError($"<FIELD> must be less than '{max}'");
             }
 
             return TaskHelper.Done;

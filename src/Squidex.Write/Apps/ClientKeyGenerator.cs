@@ -16,14 +16,21 @@ namespace Squidex.Write.Apps
 {
     public class ClientKeyGenerator
     {
-        public virtual string GenerateKey()
+        private readonly Func<HashAlgorithm> algorithmFactory;
+
+        public ClientKeyGenerator()
         {
-            return Sha256(Guid.NewGuid().ToString());
+            algorithmFactory = SHA256.Create;
         }
 
-        private static string Sha256(string input)
+        public virtual string GenerateKey()
         {
-            using (var sha = SHA256.Create())
+            return Hash(Guid.NewGuid().ToString());
+        }
+
+        private string Hash(string input)
+        {
+            using (var sha = algorithmFactory())
             {
                 var bytes = Encoding.UTF8.GetBytes(input);
                 var hash = sha.ComputeHash(bytes);

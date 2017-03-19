@@ -20,7 +20,8 @@ import {
     NotificationService,
     UpdateAppClientDto,
     UsersProviderService,
-    ValidatorsEx
+    ValidatorsEx,
+    Version
 } from 'shared';
 
 @Component({
@@ -29,17 +30,22 @@ import {
     templateUrl: './clients-page.component.html'
 })
 export class ClientsPageComponent extends AppComponentBase implements OnInit {
+    private version = new Version();
+
     public appClients: ImmutableArray<AppClientDto>;
 
     public addClientForm: FormGroup =
         this.formBuilder.group({
             name: ['',
                 [
-                    Validators.required,
                     Validators.maxLength(40),
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
                 ]]
         });
+
+    public get hasName() {
+        return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
+    }
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly appClientsService: AppClientsService,
@@ -55,7 +61,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public load() {
         this.appName()
-            .switchMap(app => this.appClientsService.getClients(app).retry(2))
+            .switchMap(app => this.appClientsService.getClients(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateClients(ImmutableArray.of(dtos));
             }, error => {
@@ -65,7 +71,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public revokeClient(client: AppClientDto) {
         this.appName()
-            .switchMap(app => this.appClientsService.deleteClient(app, client.id))
+            .switchMap(app => this.appClientsService.deleteClient(app, client.id, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.remove(client));
             }, error => {
@@ -77,7 +83,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         const request = new UpdateAppClientDto(name);
 
         this.appName()
-            .switchMap(app => this.appClientsService.updateClient(app, client.id, request))
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.replace(client, rename(client, name)));
             }, error => {
@@ -103,7 +109,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             };
 
             this.appName()
-                .switchMap(app => this.appClientsService.postClient(app, requestDto))
+                .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.push(dto));
                     reset();

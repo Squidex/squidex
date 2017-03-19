@@ -10,5 +10,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface ICommand
     {
+        long? ExpectedVersion { get; set; }
     }
 }

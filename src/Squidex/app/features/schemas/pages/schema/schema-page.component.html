@@ -12,6 +12,17 @@
                         Unpublished
                     </button>
                 </div>
+
+               <div class="dropdown dropdown-options">
+                    <button type="button" class="btn btn-simple btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async">
+                        <i class="icon-dots"></i>
+                    </button>
+                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [@fade]>
+                        <a class="dropdown-item dropdown-item-delete" (click)="confirmDeleteDialog.show()">
+                            Delete
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <h3 class="panel-title">
@@ -50,7 +61,7 @@
                         <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" />
                     </div>
 
-                    <button type="submit" class="btn btn-success" [disabled]="addFieldForm.invalid">Add Field</button>
+                    <button type="submit" class="btn btn-success" [disabled]="!hasName">Add Field</button>
                     <button type="reset" class="btn btn-link" (click)="resetFieldForm()">Cancel</button>
                 </form>
             </div>
@@ -65,6 +76,30 @@
         </div>
     </div>
 </sqx-panel>
+
+<div class="modal" *sqxModalView="confirmDeleteDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete schema</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="confirmDeleteDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                Do you really want to delete the schema?
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="deleteSchema()">Yes</button>
+                <button type="button" class="btn btn-secondary" (click)="confirmDeleteDialog.hide()">No</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal" *sqxModalView="editSchemaDialog" [@fade]>
     <div class="modal-backdrop"></div>
@@ -82,6 +117,7 @@
                 <sqx-schema-edit-form
                     [appName]="appName() | async"
                     [schema]="schemaProperties"
+                    [version]="version"
                     (saved)="onSchemaSaved($event)"
                     (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>

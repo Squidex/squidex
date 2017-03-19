@@ -13,6 +13,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps;
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+
 namespace Squidex.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity
@@ -24,6 +26,10 @@ namespace Squidex.Read.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public string MasterLanguage { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public long Version { get; set; }
 
         [BsonRequired]
         [BsonElement]

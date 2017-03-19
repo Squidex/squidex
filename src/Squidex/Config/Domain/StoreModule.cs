@@ -15,7 +15,7 @@ namespace Squidex.Config.Domain
 {
     public class StoreModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public StoreModule(IConfiguration configuration)
         {

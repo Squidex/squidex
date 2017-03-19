@@ -11,7 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     Notification,
     NotificationService,
-    SchemasService
+    SchemasService,
+    Version
 } from 'shared';
 
 import { SchemaPropertiesDto } from './schema-properties';
@@ -30,6 +31,9 @@ export class SchemaEditFormComponent implements OnInit {
 
     @Input()
     public schema: SchemaPropertiesDto;
+
+    @Input()
+    public version: Version;
 
     @Input()
     public appName: string;
@@ -72,7 +76,7 @@ export class SchemaEditFormComponent implements OnInit {
 
             const requestDto = this.editForm.value;
 
-            this.schemas.putSchema(this.appName, this.schema.name, requestDto)
+            this.schemas.putSchema(this.appName, this.schema.name, requestDto, this.version)
                 .subscribe(dto => {
                     this.reset();
                     this.saved.emit(new SchemaPropertiesDto(this.schema.name, requestDto.label, requestDto.hints));

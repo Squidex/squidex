@@ -13,16 +13,17 @@ using NJsonSchema;
 using NSwag;
 using Squidex.Config;
 using System.Reflection;
+using Squidex.Core.Identity;
 
 namespace Squidex.Pipeline.Swagger
 {
     public static class SwaggerHelper
     {
-        private static readonly ConcurrentDictionary<string, string> docs = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> Docs = new ConcurrentDictionary<string, string>();
 
         public static string LoadDocs(string name)
         {
-            return docs.GetOrAdd(name, x =>
+            return Docs.GetOrAdd(name, x =>
             {
                 var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
 
@@ -50,7 +51,10 @@ namespace Squidex.Pipeline.Swagger
                     Flow = SwaggerOAuth2Flow.Application,
                     Scopes = new Dictionary<string, string>
                     {
-                        { Constants.ApiScope, "Read and write access to the API" }
+                        { Constants.ApiScope, "Read and write access to the API" },
+                        { SquidexRoles.AppOwner, "You get this scope / role when you are owner of the app you are accessing." },
+                        { SquidexRoles.AppEditor, "You get this scope / role when you are owner of the app you are accessing or when the subject is a client." },
+                        { SquidexRoles.AppDeveloper, "You get this scope / role when you are owner of the app you are accessing." }
                     },
                     Description = securityDescription
                 };
@@ -81,8 +85,6 @@ namespace Squidex.Pipeline.Swagger
 
             parameter.IsRequired = true;
             parameter.IsNullableRaw = false;
-
-            operation.Parameters.Add(parameter);
 
             operation.Parameters.Add(parameter);
         }

@@ -38,7 +38,7 @@
                             <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden">
                                 Show
                             </a>
-                            <a class="dropdown-item" (click)="deleting.emit()">
+                            <a class="dropdown-item dropdown-item-delete" (click)="deleting.emit()">
                                 Delete
                             </a>
                         </div>
@@ -141,6 +141,9 @@
                     <div *ngSwitchCase="'DateTime'">
                         <sqx-date-time-validation [editForm]="editForm" [properties]="field.properties"></sqx-date-time-validation>
                     </div>
+                    <div *ngSwitchCase="'Geolocation'">
+                        <sqx-geolocation-validation [editForm]="editForm" [properties]="field.properties"></sqx-geolocation-validation>
+                    </div>
                     <div *ngSwitchCase="'Json'">
                         <sqx-json-validation [editForm]="editForm" [properties]="field.properties"></sqx-json-validation>
                     </div>
@@ -160,6 +163,9 @@
                     </div>
                     <div *ngSwitchCase="'DateTime'">
                         <sqx-date-time-ui [editForm]="editForm" [properties]="field.properties"></sqx-date-time-ui>
+                    </div>
+                    <div *ngSwitchCase="'Geolocation'">
+                        <sqx-geolocation-ui [editForm]="editForm" [properties]="field.properties"></sqx-geolocation-ui>
                     </div>
                     <div *ngSwitchCase="'Json'">
                         <sqx-json-ui [editForm]="editForm" [properties]="field.properties"></sqx-json-ui>

@@ -32,9 +32,10 @@ namespace Squidex.Config.Domain
 {
     public class StoreMongoDbModule : Module
     {
-        private const string MongoDatabaseName = "string";
+        private const string MongoDatabaseName = "MongoDatabaseName";
+        private const string MongoDatabaseNameContent = "MongoDatabaseNameContent";
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public StoreMongoDbModule(IConfiguration configuration)
         {
@@ -57,13 +58,24 @@ namespace Squidex.Config.Domain
                 throw new ConfigurationException("You must specify the MongoDB connection string in the 'squidex:stores:mongoDb:connectionString' configuration section.");
             }
 
-            builder.Register(c =>
-            {
-                var mongoDbClient = new MongoClient(connectionString);
-                var mongoDatabase = mongoDbClient.GetDatabase(databaseName);
+            var databaseNameContent = Configuration.GetValue<string>("squidex:stores:mongoDb:databaseNameContent");
 
-                return mongoDatabase;
-            }).Named<IMongoDatabase>(MongoDatabaseName).SingleInstance();
+            if (string.IsNullOrWhiteSpace(databaseNameContent))
+            {
+                databaseNameContent = databaseName;
+            }
+
+            builder.Register(c => new MongoClient(connectionString))
+                .As<IMongoClient>()
+                .SingleInstance();
+
+            builder.Register(c => c.Resolve<IMongoClient>().GetDatabase(databaseName))
+                .Named<IMongoDatabase>(MongoDatabaseName)
+                .SingleInstance();
+
+            builder.Register(c => c.Resolve<IMongoClient>().GetDatabase(databaseNameContent))
+                .Named<IMongoDatabase>(MongoDatabaseNameContent)
+                .SingleInstance();
 
             builder.Register<IUserStore<IdentityUser>>(c =>
             {
@@ -100,7 +112,7 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<MongoContentRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseNameContent))
                 .As<IContentRepository>()
                 .As<IEventConsumer>()
                 .AsSelf()

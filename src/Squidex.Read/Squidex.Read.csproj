@@ -13,7 +13,12 @@
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.1" />
     <PackageReference Include="NodaTime" Version="2.0.0-beta20170123" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="IdentityServer4">
+      <HintPath>C:\Users\mail2\.nuget\packages\identityserver4\1.1.1\lib\netstandard1.4\IdentityServer4.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

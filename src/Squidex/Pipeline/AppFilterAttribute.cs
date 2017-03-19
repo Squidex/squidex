@@ -22,6 +22,7 @@ using Squidex.Read.Apps.Services;
 
 namespace Squidex.Pipeline
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class AppFilterAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly IAppProvider appProvider;

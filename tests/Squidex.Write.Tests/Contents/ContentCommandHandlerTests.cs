@@ -12,6 +12,7 @@ using Moq;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Schemas;
@@ -50,7 +51,7 @@ namespace Squidex.Write.Contents
             appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);
-            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId)).Returns(Task.FromResult(schemaEntity.Object));
+            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId, true)).Returns(Task.FromResult(schemaEntity.Object));
         }
 
         [Fact]
@@ -74,7 +75,7 @@ namespace Squidex.Write.Contents
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(contentId, context.Result<Guid>());
+            Assert.Equal(data, context.Result<EntityCreatedResult<ContentData>>().IdOrValue);
         }
 
         [Fact]

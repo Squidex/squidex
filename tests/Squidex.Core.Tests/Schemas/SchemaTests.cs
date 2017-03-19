@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -255,9 +256,9 @@ namespace Squidex.Core.Schemas
         {
             var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
 
-            var json = BuildMixedSchema().BuildSchema(languages, (n, s) => s).ToJson();
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languages, (n, s) => new JsonSchema4 { SchemaReference = s });
 
-            Assert.NotNull(json);
+            Assert.NotNull(jsonSchema);
         }
 
         [Fact]
@@ -276,20 +277,22 @@ namespace Squidex.Core.Schemas
 
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new JsonField(0, "my-json", 
+                    .AddOrUpdateField(new JsonField(1, "my-json", 
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new StringField(1, "my-string1",
+                    .AddOrUpdateField(new StringField(2, "my-string1",
                         new StringFieldProperties { Label = "My String1", IsLocalizable = true, IsRequired = true, AllowedValues = allowedValues }))
-                    .AddOrUpdateField(new StringField(2, "my-string2",
+                    .AddOrUpdateField(new StringField(3, "my-string2",
                         new StringFieldProperties { Hints = "My String1" }))
-                    .AddOrUpdateField(new NumberField(3, "my-number",
+                    .AddOrUpdateField(new NumberField(4, "my-number",
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                    .AddOrUpdateField(new BooleanField(4, "my-boolean",
+                    .AddOrUpdateField(new BooleanField(5, "my-boolean",
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new DateTimeField(5, "my-datetime",
+                    .AddOrUpdateField(new DateTimeField(6, "my-datetime",
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
-                    .AddOrUpdateField(new DateTimeField(6, "my-date",
-                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }));
+                    .AddOrUpdateField(new DateTimeField(7, "my-date",
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
+                    .AddOrUpdateField(new GeolocationField(8, "my-geolocation",
+                        new GeolocationFieldProperties()));
 
             return schema;
         }

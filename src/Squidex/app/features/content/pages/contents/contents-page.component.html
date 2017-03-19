@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Contents" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<sqx-panel panelWidth="51rem">
+<sqx-panel panelWidth="60rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -67,14 +67,14 @@
                 </tbody>
             </table>
 
-            <div class="clearfix" *ngIf="contentTotal > 0">
+            <div class="clearfix" *ngIf="contentsPager.numberOfItems > 0">
                 <div class="float-right pagination">
-                    <span class="pagination-text">{{itemFirst}}-{{itemLast}} of {{contentTotal}}</span>
+                    <span class="pagination-text">{{contentsPager.itemFirst}}-{{contentsPager.itemLast}} of {{contentsPager.numberOfItems}}</span>
 
-                    <button class="btn btn-simple pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
+                    <button class="btn btn-simple pagination-button" [disabled]="!contentsPager.canGoPrev" (click)="goPrev()">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-simple pagination-button" [disabled]="!canGoNext" (click)="goNext()">
+                    <button class="btn btn-simple pagination-button" [disabled]="!contentsPager.canGoNext" (click)="goNext()">
                         <i class="icon-angle-right"></i>
                     </button>
                 </div>

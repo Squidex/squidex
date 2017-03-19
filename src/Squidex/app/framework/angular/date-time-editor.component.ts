@@ -11,8 +11,7 @@ import * as moment from 'moment';
 
 let Pikaday = require('pikaday/pikaday');
 
-/* tslint:disable:no-empty */
-const NOOP = () => { };
+const NOOP = () => { /* NOOP */ };
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true
@@ -46,8 +45,14 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     @Input()
     public enforceTime: boolean;
 
+    public get hasValue() {
+        return this.dateValue !== null;
+    }
+
     @ViewChild('dateInput')
     public dateInput: ElementRef;
+
+    public isDisabled = false;
 
     public ngOnInit() {
         this.timeControl.valueChanges.subscribe(value => {
@@ -89,6 +94,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     }
 
     public setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
+
         if (isDisabled) {
             this.dateControl.disable({ emitEvent: false });
             this.timeControl.disable({ emitEvent: false });
@@ -124,6 +131,18 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     public touched() {
         this.touchedCallback();
+    }
+
+    public reset() {
+        this.timeControl.setValue(null, { emitEvent: false });
+        this.dateControl.setValue(null, { emitEvent: false });
+
+        this.dateValue = null;
+
+        this.changeCallback(null);
+        this.touchedCallback();
+
+        return false;
     }
 
     private updateValue() {

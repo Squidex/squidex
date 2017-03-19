@@ -27,6 +27,9 @@ $button-size: calc(2.5rem - 2px);
 
     &-modified {
         text-align: right;
+        width: auto;
+        white-space: nowrap;
+        padding-left: 0;
     }
 
     &-user {

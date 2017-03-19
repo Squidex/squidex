@@ -15,7 +15,6 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +58,7 @@ namespace Squidex.Config.Identity
             return services;
         }
 
-        public static IServiceCollection AddMyIdentityServer(this IServiceCollection services, IHostingEnvironment env)
+        public static IServiceCollection AddMyIdentityServer(this IServiceCollection services)
         {
             X509Certificate2 certificate;
 

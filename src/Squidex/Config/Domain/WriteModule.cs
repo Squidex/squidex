@@ -10,17 +10,18 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline.CommandHandlers;
 using Squidex.Write.Apps;
 using Squidex.Write.Contents;
 using Squidex.Write.Schemas;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
 namespace Squidex.Config.Domain
 {
     public class WriteModule : Module
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public WriteModule(IConfiguration configuration)
         {
@@ -29,6 +30,10 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<EnrichWithExpectedVersionHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
             builder.RegisterType<EnrichWithTimestampHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
@@ -43,10 +48,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<EnrichWithSchemaIdHandler>()
                 .As<ICommandHandler>()
-                .SingleInstance();
-
-            builder.RegisterType<EnrichWithAggregateIdProcessor>()
-                .As<IEventProcessor>()
                 .SingleInstance();
 
             builder.RegisterType<ClientKeyGenerator>()
@@ -69,11 +70,15 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, 0)))
+            builder.RegisterType<SetVersionAsETagHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
+            builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)))
                 .AsSelf()
                 .SingleInstance();
 
-            builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, 0)))
+            builder.Register<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, -1)))
                 .AsSelf()
                 .SingleInstance();
 
@@ -81,7 +86,7 @@ namespace Squidex.Config.Domain
                 {
                     var fieldRegistry = c.Resolve<FieldRegistry>();
 
-                    return (id => new SchemaDomainObject(id, 0, fieldRegistry));
+                    return (id => new SchemaDomainObject(id, -1, fieldRegistry));
                 })
                 .AsSelf()
                 .SingleInstance();

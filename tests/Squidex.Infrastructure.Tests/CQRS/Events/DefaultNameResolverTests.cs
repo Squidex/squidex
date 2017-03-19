@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private readonly DefaultNameResolver sut = new DefaultNameResolver();
 
-        private sealed class MyUser : DomainObject
+        private sealed class MyUser : DomainObjectBase
         {
             public MyUser(Guid id, int version)
                 : base(id, version)
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        private sealed class MyUserDomainObject : DomainObject
+        private sealed class MyUserDomainObject : DomainObjectBase
         {
             public MyUserDomainObject(Guid id, int version) 
                 : base(id, version)

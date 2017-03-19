@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
@@ -30,12 +31,12 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        protected override object ConvertValue(JToken value)
+        public override object ConvertValue(JToken value)
         {
             return (bool?)value;
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty)
+        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.Boolean;
         }

@@ -70,9 +70,12 @@ namespace Squidex.Core.Schemas
 
             Add<JsonFieldProperties>(
                 (id, name, p) => new JsonField(id, name, (JsonFieldProperties)p));
+
+            Add<GeolocationFieldProperties>(
+                (id, name, p) => new GeolocationField(id, name, (GeolocationFieldProperties)p));
         }
 
-        public void Add<TFieldProperties>(FactoryFunction fieldFactory)
+        private void Add<TFieldProperties>(FactoryFunction fieldFactory)
         {
             Guard.NotNull(fieldFactory, nameof(fieldFactory));
 

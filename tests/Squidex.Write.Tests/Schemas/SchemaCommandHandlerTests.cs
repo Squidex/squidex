@@ -6,10 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Schemas.Commands;
@@ -40,7 +42,9 @@ namespace Squidex.Write.Schemas
         {
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
-            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName)).Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
+                .Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object))
+                .Verifiable();
 
             await TestCreate(schema, async _ =>
             {
@@ -55,14 +59,16 @@ namespace Squidex.Write.Schemas
         {
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
-            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName)).Returns(Task.FromResult<ISchemaEntityWithSchema>(null)).Verifiable();
+            schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
+                .Returns(Task.FromResult<ISchemaEntityWithSchema>(null))
+                .Verifiable();
 
             await TestCreate(schema, async _ =>
             {
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(SchemaName, context.Result<string>());
+            Assert.Equal(SchemaId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
         }
 
         [Fact]
@@ -130,7 +136,7 @@ namespace Squidex.Write.Schemas
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(1, context.Result<long>());
+            Assert.Equal(1, context.Result<EntityCreatedResult<long>>().IdOrValue);
         }
 
         [Fact]

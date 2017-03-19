@@ -14,14 +14,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public static class CommandingExtensions
     {
-        public static T CreateNew<T>(this IDomainObjectFactory factory, Guid id) where T : IAggregate
+        public static Task CreateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IAggregate
         {
-            return (T)factory.CreateNew(typeof(T), id);
-        }
-
-        public static Task CreateAsync<T>(this IAggregateHandler handler, IAggregateCommand command, Action<T> creator) where T : class, IAggregate
-        {
-            return handler.CreateAsync<T>(command, x =>
+            return handler.CreateAsync<T>(context, x =>
             {
                 creator(x);
 
@@ -29,12 +24,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
             });
         }
 
-        public static Task UpdateAsync<T>(this IAggregateHandler handler, IAggregateCommand command, Action<T> creator) where T : class, IAggregate
+        public static Task UpdateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IAggregate
         {
-            return handler.UpdateAsync<T>(command, x =>
+            return handler.UpdateAsync<T>(context, x =>
             {
-                creator(x);
-
+                updater(x);
+                
                 return TaskHelper.Done;
             });
         }

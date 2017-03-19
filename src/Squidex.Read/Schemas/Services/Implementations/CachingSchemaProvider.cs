@@ -19,7 +19,7 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Schemas.Services.Implementations
 {
-    public class CachingSchemaProvider : CachingProvider, ISchemaProvider
+    public class CachingSchemaProvider : CachingProviderBase, ISchemaProvider
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly ISchemaRepository repository;
@@ -32,7 +32,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
             this.repository = repository;
         }
 
-        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id)
+        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id, bool provideDeleted = false)
         {
             var cacheKey = BuildIdCacheKey(id);
 
@@ -46,6 +46,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
                 {
                     Cache.Set(BuildNameCacheKey(result.AppId, result.Name), result, CacheDuration);
                 }
+            }
+
+            if (result != null && result.IsDeleted && !provideDeleted)
+            {
+                result = null;
             }
 
             return result;
@@ -67,6 +72,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
                 {
                     Cache.Set(BuildIdCacheKey(result.Id), result, CacheDuration);
                 }
+            }
+
+            if (result != null && result.IsDeleted)
+            {
+                result = null;
             }
 
             return result;

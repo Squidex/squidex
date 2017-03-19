@@ -28,6 +28,10 @@
             font-weight: normal;
             border: 0;
             padding-top: 0;
+
+            & > span {
+                @include truncate;
+            }
         }
     }
 

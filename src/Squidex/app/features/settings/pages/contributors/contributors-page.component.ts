@@ -22,7 +22,8 @@ import {
     MessageBus,
     NotificationService,
     UsersProviderService,
-    UsersService
+    UsersService,
+    Version
 } from 'shared';
 
 export class UsersDataSource implements AutocompleteSource {
@@ -58,6 +59,8 @@ export class UsersDataSource implements AutocompleteSource {
     templateUrl: './contributors-page.component.html'
 })
 export class ContributorsPageComponent extends AppComponentBase implements OnInit {
+    private version = new Version();
+
     public appContributors = ImmutableArray.empty<AppContributorDto>();
 
     public currentUserId: string;
@@ -96,7 +99,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     public load() {
         this.appName()
-            .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
+            .switchMap(app => this.appContributorsService.getContributors(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateContributors(ImmutableArray.of(dtos));
             }, error => {
@@ -106,7 +109,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     public removeContributor(contributor: AppContributorDto) {
         this.appName()
-            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId))
+            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.remove(contributor));
             }, error => {
@@ -118,7 +121,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         const newContributor = new AppContributorDto(this.addContributorForm.get('user').value.model.id, 'Editor');
 
         this.appName()
-            .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
+            .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.push(newContributor));
             }, error => {
@@ -132,7 +135,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         const newContributor = changePermission(contributor, permission);
 
         this.appName()
-            .switchMap(app => this.appContributorsService.postContributor(app, newContributor))
+            .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.replace(contributor, newContributor));
             }, error => {

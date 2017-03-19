@@ -13,12 +13,14 @@ import {
     ApiUrlConfig,
     AppContributorDto,
     AppContributorsService,
-    AuthService
+    AuthService,
+    Version
 } from './../';
 
 describe('AppContributorsService', () => {
     let authService: IMock<AuthService>;
     let appContributorsService: AppContributorsService;
+    let version = new Version('1');
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);
@@ -26,7 +28,7 @@ describe('AppContributorsService', () => {
     });
 
     it('should make get request to get app contributors', () => {
-        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/contributors'))
+        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/contributors', version))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -44,7 +46,7 @@ describe('AppContributorsService', () => {
 
         let contributors: AppContributorDto[] | null = null;
 
-        appContributorsService.getContributors('my-app').subscribe(result => {
+        appContributorsService.getContributors('my-app', version).subscribe(result => {
             contributors = result;
         }).unsubscribe();
 
@@ -60,7 +62,7 @@ describe('AppContributorsService', () => {
     it('should make post request to assign contributor', () => {
         const dto = new AppContributorDto('123', 'Owner');
 
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', dto))
+        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/contributors', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -68,13 +70,13 @@ describe('AppContributorsService', () => {
             ))
             .verifiable(Times.once());
 
-        appContributorsService.postContributor('my-app', dto);
+        appContributorsService.postContributor('my-app', dto, version);
 
         authService.verifyAll();
     });
 
     it('should make delete request to remove contributor', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/contributors/123'))
+        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/contributors/123', version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions()
@@ -82,7 +84,7 @@ describe('AppContributorsService', () => {
             ))
             .verifiable(Times.once());
 
-        appContributorsService.deleteContributor('my-app', '123');
+        appContributorsService.deleteContributor('my-app', '123', version);
 
         authService.verifyAll();
     });

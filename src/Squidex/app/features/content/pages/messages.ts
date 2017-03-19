@@ -8,7 +8,8 @@
 export class ContentCreated {
     constructor(
         public readonly id: string,
-        public readonly data: any
+        public readonly data: any,
+        public readonly version: string
     ) {
     }
 }
@@ -16,7 +17,8 @@ export class ContentCreated {
 export class ContentUpdated {
     constructor(
         public readonly id: string,
-        public readonly data: any
+        public readonly data: any,
+        public readonly version: string
     ) {
     }
 }
