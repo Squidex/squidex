@@ -35,10 +35,12 @@ namespace Squidex.Config.Domain
         {
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<AppHistoryEventsCreator>()

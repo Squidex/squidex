@@ -207,7 +207,7 @@ namespace Squidex.Write.Apps
                 @event.AppId = new NamedId<Guid>(Id, name);
             }
 
-            base.RaiseEvent(Envelope<IEvent>.Create(@event));
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)

@@ -9,8 +9,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Squidex.Events;
+using Squidex.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Utils;
 
@@ -18,10 +22,15 @@ using Squidex.Read.Utils;
 
 namespace Squidex.Read.Apps.Services.Implementations
 {
-    public class CachingAppProvider : CachingProviderBase, IAppProvider
+    public class CachingAppProvider : CachingProviderBase, IAppProvider, IEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
         private readonly IAppRepository repository;
+
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
 
         public CachingAppProvider(IMemoryCache cache, IAppRepository repository)
             : base(cache)
@@ -71,16 +80,34 @@ namespace Squidex.Read.Apps.Services.Implementations
             return result;
         }
 
-        public void Remove(NamedId<Guid> id)
+        public Task On(Envelope<IEvent> @event)
         {
-            var cacheKeyById = BuildIdCacheKey(id.Id);
-            var cacheKeyByName = BuildNameCacheKey(id.Name);
+            void Remove(NamedId<Guid> id)
+            {
+                var cacheKeyById = BuildIdCacheKey(id.Id);
+                var cacheKeyByName = BuildNameCacheKey(id.Name);
 
-            Cache.Remove(cacheKeyById);
-            Cache.Remove(cacheKeyByName);
+                Cache.Remove(cacheKeyById);
+                Cache.Remove(cacheKeyByName);
 
-            Cache.Invalidate(cacheKeyById);
-            Cache.Invalidate(cacheKeyByName);
+                Cache.Invalidate(cacheKeyById);
+                Cache.Invalidate(cacheKeyByName);
+            }
+
+            if (@event.Payload is AppClientAttached ||
+                @event.Payload is AppClientRenamed ||
+                @event.Payload is AppClientRevoked ||
+                @event.Payload is AppContributorAssigned ||
+                @event.Payload is AppContributorRemoved ||
+                @event.Payload is AppCreated ||
+                @event.Payload is AppLanguageAdded ||
+                @event.Payload is AppLanguageRemoved ||
+                @event.Payload is AppMasterLanguageSet)
+            {
+                Remove(((AppEvent)@event.Payload).AppId);
+            }
+
+            return TaskHelper.Done;
         }
 
         private static string BuildNameCacheKey(string name)
@@ -91,6 +118,11 @@ namespace Squidex.Read.Apps.Services.Implementations
         private static string BuildIdCacheKey(Guid schemaId)
         {
             return $"App_Names_{schemaId}";
+        }
+
+        public Task ClearAsync()
+        {
+            return TaskHelper.Done;
         }
     }
 }

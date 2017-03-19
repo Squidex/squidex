@@ -90,6 +90,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events.ToObservable());
 
+            eventConsumer.Setup(x => x.Name).Returns(consumerName);
             eventConsumerInfoRepository.Setup(x => x.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
 
             formatter.Setup(x => x.Parse(eventData1)).Returns(envelope1);

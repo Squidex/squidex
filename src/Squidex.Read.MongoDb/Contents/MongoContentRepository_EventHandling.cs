@@ -32,6 +32,11 @@ namespace Squidex.Read.MongoDb.Contents
             }
         }
 
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
         public async Task ClearAsync()
         {
             using (var collections = await database.ListCollectionsAsync())
@@ -127,11 +132,11 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
-        private async Task ForSchemaIdAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
+        private Task ForSchemaIdAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
         {
             var collection = GetCollection(schemaId);
 
-            await action(collection);
+            return action(collection);
         }
 
         private IMongoCollection<MongoContentEntity> GetCollection(Guid schemaId)
