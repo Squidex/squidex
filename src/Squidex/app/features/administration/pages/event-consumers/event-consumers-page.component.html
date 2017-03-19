@@ -39,7 +39,7 @@
                         <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
                             <td>
                                 <span class="truncate">
-                                    <i class="faulted-icon icon icon-warning" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
+                                    <i class="faulted-icon icon icon-bug" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
 
                                     {{eventConsumer.name}}
                                 </span>

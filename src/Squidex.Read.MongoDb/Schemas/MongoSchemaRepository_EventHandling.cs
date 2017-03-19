@@ -91,7 +91,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            await Collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
+            await Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
 
             SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
         }

@@ -142,7 +142,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var collection = GetCollection(schemaId);
 
-            var schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
+            var schemaEntity = await schemas.FindSchemaByIdAsync(schemaId, true);
 
             if (schemaEntity == null)
             {

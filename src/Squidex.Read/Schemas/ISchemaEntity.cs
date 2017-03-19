@@ -15,5 +15,7 @@ namespace Squidex.Read.Schemas
         string Label { get; }
 
         bool IsPublished { get; }
+        
+        bool IsDeleted { get; }
     }
 }

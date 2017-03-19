@@ -53,6 +53,10 @@ namespace Squidex.Read.MongoDb.Schemas
         [BsonElement]
         public bool IsPublished { get; set; }
 
+        [BsonRequired]
+        [BsonElement]
+        public bool IsDeleted { get; set; }
+
         Schema ISchemaEntityWithSchema.Schema
         {
             get { return schema.Value; }
