@@ -111,14 +111,6 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
-        {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
-            {
-                return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
-            });
-        }
-
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
             return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
@@ -127,11 +119,12 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
+        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
-            var collectionName = $"{Prefix}{@event.SchemaId.Id}";
-
-            return database.DropCollectionAsync(collectionName);
+            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            {
+                return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
+            });
         }
 
         private async Task ForSchemaIdAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
