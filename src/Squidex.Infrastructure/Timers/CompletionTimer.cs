@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +46,7 @@ namespace Squidex.Infrastructure.Timers
                 }
                 catch (TaskCanceledException)
                 {
-                    Console.WriteLine("Task in TriggerTimer has been cancelled.");
+                    Debug.WriteLine("Task in TriggerTimer has been cancelled.");
                 }
             }
         }

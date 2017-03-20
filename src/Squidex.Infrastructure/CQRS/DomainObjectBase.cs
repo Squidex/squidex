@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.CQRS
 
         protected void RaiseEvent(IEvent @event)
         {
-            RaiseEvent(Envelope<IEvent>.Create(@event));
+            RaiseEvent(Envelope.Create(@event));
         }
 
         protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent

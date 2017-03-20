@@ -17,6 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Apps.Services.Implementations;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.History.Repositories;
 using Squidex.Read.MongoDb.Apps;
@@ -26,6 +27,7 @@ using Squidex.Read.MongoDb.Infrastructure;
 using Squidex.Read.MongoDb.Schemas;
 using Squidex.Read.MongoDb.Users;
 using Squidex.Read.Schemas.Repositories;
+using Squidex.Read.Schemas.Services.Implementations;
 using Squidex.Read.Users.Repositories;
 
 namespace Squidex.Config.Domain
@@ -78,23 +80,25 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.Register<IUserStore<IdentityUser>>(c =>
-            {
-                var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityUser>("Identity_Users");
+                {
+                    var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityUser>("Identity_Users");
 
-                IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
-                IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
+                    IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
+                    IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
 
-                return new UserStore<IdentityUser>(usersCollection);
-            }).SingleInstance();
+                    return new UserStore<IdentityUser>(usersCollection);
+                })
+                .SingleInstance();
 
             builder.Register<IRoleStore<IdentityRole>>(c =>
-            {
-                var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityRole>("Identity_Roles");
+                {
+                    var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityRole>("Identity_Roles");
 
-                IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
+                    IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
 
-                return new RoleStore<IdentityRole>(rolesCollection);
-            }).SingleInstance();
+                    return new RoleStore<IdentityRole>(rolesCollection);
+                })
+                .SingleInstance();
 
             builder.RegisterType<MongoUserRepository>()
                 .As<IUserRepository>()
@@ -129,7 +133,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoSchemaRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
                 .As<ISchemaRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -139,6 +142,22 @@ namespace Squidex.Config.Domain
                 .As<IAppRepository>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoSchemaRepository>(), 
+                    c.Resolve<CachingSchemaProvider>()))
+                .As<IEventConsumer>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoAppRepository>(),
+                    c.Resolve<CachingAppProvider>()))
+                .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
         }

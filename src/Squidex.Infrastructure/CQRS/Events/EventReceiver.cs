@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return;
             }
 
-            var consumerName = eventConsumer.GetType().Name;
+            var consumerName = eventConsumer.Name;
             var consumerStarted = false;
             
             timer = new CompletionTimer(delay, async ct =>

@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Moq;
+using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Schemas.Services.Implementations;
 using Xunit;
@@ -83,7 +85,7 @@ namespace Squidex.Read.Schemas
 
             await ProvideSchemaById(schemaV1);
 
-            sut.Remove(appId, schemaId);
+            sut.On(Envelope.Create(new FieldAdded { AppId = appId, SchemaId = schemaId })).Wait();
 
             await ProvideSchemaById(schemaV2);
 
@@ -99,7 +101,7 @@ namespace Squidex.Read.Schemas
 
             await ProvideSchemaByName(schemaV1);
 
-            sut.Remove(appId, schemaId);
+            sut.On(Envelope.Create(new SchemaUpdated { AppId = appId, SchemaId = schemaId })).Wait();
 
             await ProvideSchemaByName(schemaV2);
 

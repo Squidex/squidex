@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { BooleanFieldPropertiesDto } from 'shared';
@@ -13,7 +13,8 @@ import { BooleanFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
-    templateUrl: 'boolean-ui.component.html'
+    templateUrl: 'boolean-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BooleanUIComponent implements OnInit {
     @Input()

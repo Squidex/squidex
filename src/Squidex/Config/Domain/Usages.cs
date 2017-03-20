@@ -11,10 +11,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Read.Apps.Repositories;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.Schemas.Services;
 
 namespace Squidex.Config.Domain
 {
@@ -30,20 +26,6 @@ namespace Squidex.Config.Domain
 
                 receiver?.Subscribe(catchConsumer);
             }
-
-            var appProvider = app.ApplicationServices.GetRequiredService<IAppProvider>();
-
-            app.ApplicationServices.GetRequiredService<IAppRepository>().AppSaved += appId =>
-            {
-                appProvider.Remove(appId);
-            };
-            
-            var schemaProvider = app.ApplicationServices.GetRequiredService<ISchemaProvider>();
-
-            app.ApplicationServices.GetRequiredService<ISchemaRepository>().SchemaSaved += (appId, schemaId) =>
-            {
-                schemaProvider.Remove(appId, schemaId);
-            };
 
             return app;
         }

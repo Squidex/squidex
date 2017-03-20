@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,7 +14,8 @@ import { BooleanFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-boolean-validation',
     styleUrls: ['boolean-validation.component.scss'],
-    templateUrl: 'boolean-validation.component.html'
+    templateUrl: 'boolean-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BooleanValidationComponent implements OnInit {
     @Input()

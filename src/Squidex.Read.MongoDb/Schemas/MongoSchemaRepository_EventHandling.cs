@@ -8,12 +8,10 @@
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Driver;
 using Squidex.Core.Schemas;
 using Squidex.Events;
 using Squidex.Events.Schemas;
 using Squidex.Events.Schemas.Utils;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -23,20 +21,21 @@ namespace Squidex.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
     {
-        public event Action<NamedId<Guid>, NamedId<Guid>> SchemaSaved;
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
 
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
         }
 
-        protected async Task On(SchemaCreated @event, EnvelopeHeaders headers)
+        protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
             var schema = SchemaEventDispatcher.Dispatch(@event);
 
-            await Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
-
-            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
+            return Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
@@ -89,18 +88,14 @@ namespace Squidex.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
-        protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
+        protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            await Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
-
-            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
+            return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
         }
 
-        private async Task UpdateSchema(SchemaEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        private Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
         {
-            await Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
-
-            SchemaSaved?.Invoke(@event.AppId, @event.SchemaId);
+            return Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
         }
 
         private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)

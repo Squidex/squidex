@@ -67,6 +67,11 @@ namespace Squidex.Read.MongoDb.History
             return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
         }
 
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
         public async Task On(Envelope<IEvent> @event)
         {
             foreach (var creator in creators)

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,7 +14,8 @@ import { NumberFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
-    templateUrl: 'number-validation.component.html'
+    templateUrl: 'number-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NumberValidationComponent implements OnInit {
     @Input()
