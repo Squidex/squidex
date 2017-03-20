@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
@@ -14,7 +14,8 @@ import { StringFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
-    templateUrl: 'string-validation.component.html'
+    templateUrl: 'string-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StringValidationComponent implements OnDestroy, OnInit {
     private patternSubscription: Subscription;

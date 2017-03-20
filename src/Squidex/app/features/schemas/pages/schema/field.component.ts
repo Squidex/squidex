@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
@@ -19,6 +19,7 @@ import {
     selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         fadeAnimation
     ]

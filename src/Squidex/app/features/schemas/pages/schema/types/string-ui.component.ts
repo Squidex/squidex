@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
@@ -14,7 +14,8 @@ import { StringFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
-    templateUrl: 'string-ui.component.html'
+    templateUrl: 'string-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StringUIComponent implements OnDestroy, OnInit {
     private editorSubscription: Subscription;
