@@ -51,7 +51,7 @@ namespace Squidex.Write.Contents
             appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);
-            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId, true)).Returns(Task.FromResult(schemaEntity.Object));
+            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity.Object));
         }
 
         [Fact]
