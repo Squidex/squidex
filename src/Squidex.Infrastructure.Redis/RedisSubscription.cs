@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Redis
         {
             try
             {
-                var message = string.Join("#", (notifySelf ? Guid.Empty : InstanceId).ToString());
+                var message = string.Join("#", (notifySelf ? Guid.Empty : InstanceId).ToString(), token);
 
                 subscriber.Publish(channelName, message);
             }
