@@ -108,6 +108,10 @@ namespace Squidex.Read.Schemas.Services.Implementations
             {
                 Remove(fieldEvent.AppId, fieldEvent.SchemaId);
             }
+            else if (@event.Payload is SchemaCreated schemaCreatedEvent)
+            {
+                Remove(schemaCreatedEvent.AppId, schemaCreatedEvent.SchemaId);
+            }
             else if (@event.Payload is SchemaDeleted schemaDeletedEvent)
             {
                 Remove(schemaDeletedEvent.AppId, schemaDeletedEvent.SchemaId);

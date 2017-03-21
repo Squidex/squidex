@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DefaultMemoryEventNotifierTests.cs
+//  DefaultEventNotifierTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,9 +10,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class DefaultMemoryEventNotifierTests
+    public sealed class DefaultEventNotifierTests
     {
-        private readonly DefaultMemoryEventNotifier sut = new DefaultMemoryEventNotifier(new InMemoryPubSub());
+        private readonly DefaultEventNotifier sut = new DefaultEventNotifier(new InMemoryPubSub());
 
         [Fact]
         public void Should_invalidate_all_actions()

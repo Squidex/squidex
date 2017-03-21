@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  InMemoryEventNotifier.cs
+//  DefaultEventNotifier.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,13 +10,13 @@ using System;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class DefaultMemoryEventNotifier : IEventNotifier
+    public sealed class DefaultEventNotifier : IEventNotifier
     {
-        private static readonly string ChannelName = typeof(DefaultMemoryEventNotifier).Name;
+        private static readonly string ChannelName = typeof(DefaultEventNotifier).Name;
 
         private readonly IPubSub invalidator;
 
-        public DefaultMemoryEventNotifier(IPubSub invalidator)
+        public DefaultEventNotifier(IPubSub invalidator)
         {
             Guard.NotNull(invalidator, nameof(invalidator));
 

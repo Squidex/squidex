@@ -63,7 +63,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultMemoryEventNotifier>()
+            builder.RegisterType<DefaultEventNotifier>()
                 .As<IEventNotifier>()
                 .SingleInstance();
 
