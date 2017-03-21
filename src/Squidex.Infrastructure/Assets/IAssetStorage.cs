@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Images
+namespace Squidex.Infrastructure.Assets
 {
     public interface IAssetStorage
     {

@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Images.Physical
+namespace Squidex.Infrastructure.Assets.Physical
 {
     public sealed class PhysicalAssetStorage : IAssetStorage, IExternalSystem
     {

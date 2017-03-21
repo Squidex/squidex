@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ImageSharpThumbnailGenerator.cs
+//  ImageSharpAssetThumbnailGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,11 +12,11 @@ using ImageSharp;
 using ImageSharp.Formats;
 using ImageSharp.Processing;
 
-namespace Squidex.Infrastructure.Images.ImageSharp
+namespace Squidex.Infrastructure.Assets.ImageSharp
 {
-    public sealed class ImageSharpThumbnailGenerator : IThumbnailGenerator
+    public sealed class ImageSharpAssetThumbnailGenerator : IAssetThumbnailGenerator
     {
-        public ImageSharpThumbnailGenerator()
+        public ImageSharpAssetThumbnailGenerator()
         {
             Configuration.Default.AddImageFormat(new JpegFormat());
             Configuration.Default.AddImageFormat(new PngFormat());

@@ -17,7 +17,7 @@ using NSwag.Annotations;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Images;
+using Squidex.Infrastructure.Assets;
 using Squidex.Pipeline;
 using Squidex.Write.Assets.Commands;
 
@@ -34,12 +34,12 @@ namespace Squidex.Controllers.Api.Assets
     {
         private readonly IAssetStorage assetStorage;
         private readonly AssetConfig assetsConfig;
-        private readonly IThumbnailGenerator thumbnailGenerator;
+        private readonly IAssetThumbnailGenerator thumbnailGenerator;
 
         public AssetsController(
             ICommandBus commandBus, 
             IAssetStorage assetStorage, 
-            IThumbnailGenerator thumbnailGenerator,
+            IAssetThumbnailGenerator thumbnailGenerator,
             IOptions<AssetConfig> assetsConfig) 
             : base(commandBus)
         {

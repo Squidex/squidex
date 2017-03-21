@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IThumbnailGenerator.cs
+//  IAssetThumbnailGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,9 +9,9 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Images
+namespace Squidex.Infrastructure.Assets
 {
-    public interface IThumbnailGenerator
+    public interface IAssetThumbnailGenerator
     {
         Task<Stream> GetThumbnailOrNullAsync(Stream input, int dimension);
     }
