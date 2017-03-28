@@ -4,6 +4,7 @@
 .panel-container {
     @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 @mixin panel-icon {
@@ -56,6 +57,7 @@
         @include flex-box;
         @include flex-flow(row);
         @include flex-grow(1);
+        overflow: hidden;
     }
 
     &-content {
@@ -90,7 +92,6 @@
     &-sidebar {
         & {
             background: $panel-light-background;
-            border-top: 1px solid $color-border;
             border-left: 1px solid $color-border;
             min-width: $panel-sidebar;
             max-width: $panel-sidebar;
@@ -98,21 +99,21 @@
 
         & .panel-link {
             & {
+                @include transition(background-color .3s ease);
                 @include panel-icon;
                 display: block;
                 padding-top: .6rem;
                 padding-bottom: .6rem;
-                margin-top: -1px;
-                margin-right: -1px;
-                border-top: 1px solid transparent;
-                border-bottom: 1px solid transparent;
-                border-right: 1px solid $color-border;
+            }
+
+            &:hover {
+                color: $color-theme-blue-dark;
             }
 
             &.active {
-                border-top-color: $color-border;
-                border-bottom-color: $color-border;
-                border-right-color: $panel-light-background;
+                color: $color-accent-dark;
+                border: 0;
+                background: $color-theme-blue;
             }
         }
     }
