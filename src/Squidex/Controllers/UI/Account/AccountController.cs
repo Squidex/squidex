@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Core.Identity;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
@@ -33,12 +34,11 @@ namespace Squidex.Controllers.UI.Account
     [SwaggerIgnore]
     public sealed class AccountController : Controller
     {
-        private static readonly EventId IdentityEventId = new EventId(8000, "IdentityEventId");
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
-        private readonly ILogger<AccountController> logger;
+        private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
@@ -46,10 +46,10 @@ namespace Squidex.Controllers.UI.Account
             UserManager<IdentityUser> userManager,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
-            ILogger<AccountController> logger,
+            ISemanticLog log,
             IIdentityServerInteractionService interactions)
         {
-            this.logger = logger;
+            this.log = log;
             this.urlOptions = urlOptions;
             this.userManager = userManager;
             this.interactions = interactions;
@@ -264,14 +264,19 @@ namespace Squidex.Controllers.UI.Account
                         errorMessageBuilder.AppendLine(error.Description);
                     }
 
-                    logger.LogError(IdentityEventId, "Operation '{0}' failed with errors: {1}", operationName, errorMessageBuilder.ToString());
+                    log.LogError(w => w
+                        .WriteProperty("action", operationName)
+                        .WriteProperty("status", "Failed")
+                        .WriteProperty("message", errorMessageBuilder.ToString()));
                 }
 
                 return result.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError(IdentityEventId, e, "Operation '{0}' failed with exception", operationName);
+                log.LogError(ex, w => w
+                    .WriteProperty("action", operationName)
+                    .WriteProperty("status", "Failed"));
 
                 return false;
             }

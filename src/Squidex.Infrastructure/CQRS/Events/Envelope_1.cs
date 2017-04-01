@@ -6,9 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using NodaTime;
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class Envelope<TPayload> where TPayload : class
@@ -43,18 +40,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             this.payload = payload;
             this.headers = headers;
-        }
-
-        public static Envelope<TPayload> Create(TPayload payload)
-        {
-            var eventId = Guid.NewGuid();
-
-            var envelope =
-                new Envelope<TPayload>(payload)
-                    .SetEventId(eventId)
-                    .SetTimestamp(SystemClock.Instance.GetCurrentInstant());
-
-            return envelope;
         }
 
         public Envelope<TOther> To<TOther>() where TOther : class

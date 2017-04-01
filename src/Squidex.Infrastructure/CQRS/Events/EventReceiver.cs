@@ -9,7 +9,7 @@
 using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
 // ReSharper disable MethodSupportsCancellation
@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly IEventStore eventStore;
         private readonly IEventNotifier eventNotifier;
         private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
-        private readonly ILogger<EventReceiver> logger;
+        private readonly ISemanticLog log;
         private CompletionTimer timer;
 
         public EventReceiver(
@@ -32,15 +32,15 @@ namespace Squidex.Infrastructure.CQRS.Events
             IEventStore eventStore, 
             IEventNotifier eventNotifier,
             IEventConsumerInfoRepository eventConsumerInfoRepository,
-            ILogger<EventReceiver> logger)
+            ISemanticLog log)
         {
-            Guard.NotNull(logger, nameof(logger));
+            Guard.NotNull(log, nameof(log));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventNotifier, nameof(eventNotifier));
             Guard.NotNull(eventConsumerInfoRepository, nameof(eventConsumerInfoRepository));
 
-            this.logger = logger;
+            this.log = log;
             this.formatter = formatter;
             this.eventStore = eventStore;
             this.eventNotifier = eventNotifier;
@@ -57,7 +57,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
                 catch (Exception ex)
                 {
-                    logger.LogCritical(InfrastructureErrors.EventHandlingFailed, ex, "Event stream {0} has been aborted");
+                    log.LogWarning(ex, w => w
+                        .WriteProperty("action", "DisposeEventReceiver")
+                        .WriteProperty("state", "Failed"));
                 }
             }
         }
@@ -115,7 +117,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "Failed to handle events");
+                    log.LogFatal(ex, w => w.WriteProperty("action", "EventHandlingFailed"));
 
                     await eventConsumerInfoRepository.StopAsync(consumerName, ex.ToString());
                 }
@@ -134,18 +136,31 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName)
         {
+            var actionId = Guid.NewGuid().ToString();
             try
             {
-                logger.LogDebug("[{0}]: Reset started", eventConsumer);
+                log.LogInformation(w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 await eventConsumer.ClearAsync();
                 await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, -1);
 
-                logger.LogDebug("[{0}]: Reset completed", eventConsumer);
+                log.LogInformation(w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.EventResetFailed, ex, "[{0}]: Reset failed", eventConsumer);
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 throw;
             }
@@ -153,17 +168,37 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer)
         {
+            var eventId = @event.Headers.EventId().ToString();
+            var eventType = @event.Payload.GetType().Name;
             try
             {
-                logger.LogDebug("[{0}]: Handling event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+                log.LogInformation(w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 await eventConsumer.On(@event);
 
-                logger.LogDebug("[{0}]: Handled event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+                log.LogInformation(w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.EventHandlingFailed, ex, "[{0}]: Failed to handle event {1} ({2})", eventConsumer, @event.Payload, @event.Headers.EventId());
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 throw;
             }
@@ -182,7 +217,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
             catch (Exception ex)
             {
-                logger.LogError(InfrastructureErrors.EventDeserializationFailed, ex, "Failed to parse event {0}", storedEvent.Data.EventId);
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "ParseEvent")
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("eventId", storedEvent.Data.EventId.ToString())
+                    .WriteProperty("eventNumber", storedEvent.EventNumber));
 
                 throw;
             }

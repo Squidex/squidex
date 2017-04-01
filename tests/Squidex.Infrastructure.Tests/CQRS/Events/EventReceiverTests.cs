@@ -10,8 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Moq;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -30,33 +30,26 @@ namespace Squidex.Infrastructure.CQRS.Events
             public long LastHandledEventNumber { get; set; }
 
             public bool IsStopped { get; set; }
-
             public bool IsResetting { get; set; }
 
             public string Name { get; set; }
-
             public string Error { get; set; }
         }
 
-        private sealed class MyLogger : ILogger<EventReceiver>
+        private sealed class MyLog : ISemanticLog
         {
-            public Dictionary<LogLevel, int> LogCount { get; } = new Dictionary<LogLevel, int>();
+            public Dictionary<SemanticLogLevel, int> LogCount { get; } = new Dictionary<SemanticLogLevel, int>();
 
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
+            public void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action)
             {
                 var count = LogCount.GetOrDefault(logLevel);
 
                 LogCount[logLevel] = count + 1;
             }
 
-            public bool IsEnabled(LogLevel logLevel)
+            public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
             {
-                return false;
-            }
-
-            public IDisposable BeginScope<TState>(TState state)
-            {
-                return null;
+                throw new NotSupportedException();
             }
         }
 
@@ -72,7 +65,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly Envelope<IEvent> envelope2 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> envelope3 = new Envelope<IEvent>(new MyEvent());
         private readonly EventReceiver sut;
-        private readonly MyLogger logger = new MyLogger();
+        private readonly MyLog log = new MyLog();
         private readonly StoredEvent[] events;
         private readonly MyEventConsumerInfo consumerInfo = new MyEventConsumerInfo();
         private readonly string consumerName;
@@ -97,7 +90,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
             formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
 
-            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, eventConsumerInfoRepository.Object, logger);
+            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, eventConsumerInfoRepository.Object, log);
         }
 
         public void Dispose()
@@ -123,8 +116,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await Task.Delay(20);
 
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(6, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(1, log.LogCount.Count);
+            Assert.Equal(6, log.LogCount[SemanticLogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -143,9 +136,9 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await Task.Delay(20);
 
-            Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(3, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(2, log.LogCount.Count);
+            Assert.Equal(2, log.LogCount[SemanticLogLevel.Error]);
+            Assert.Equal(3, log.LogCount[SemanticLogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -165,9 +158,9 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await Task.Delay(20);
 
-            Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(2, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(2, log.LogCount.Count);
+            Assert.Equal(2, log.LogCount[SemanticLogLevel.Error]);
+            Assert.Equal(2, log.LogCount[SemanticLogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Never());
@@ -188,8 +181,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await Task.Delay(20);
 
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(8, logger.LogCount[LogLevel.Debug]);
+            Assert.Equal(1, log.LogCount.Count);
+            Assert.Equal(8, log.LogCount[SemanticLogLevel.Debug]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());

@@ -22,6 +22,8 @@ using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Log.Adapter;
 
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
@@ -95,8 +97,7 @@ namespace Squidex
         
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(LogLevel.Debug);
-            loggerFactory.AddDebug();
+            loggerFactory.AddSemanticLog(app.ApplicationServices.GetRequiredService<ISemanticLog>());
 
             app.TestExternalSystems();
 

@@ -9,7 +9,7 @@
 using System;
 using System.Linq;
 using System.Reactive.Subjects;
-using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
 // ReSharper disable InvertIf
@@ -22,11 +22,11 @@ namespace Squidex.Infrastructure.Redis
         private readonly Subject<string> subject = new Subject<string>();
         private readonly ISubscriber subscriber;
         private readonly string channelName;
-        private readonly ILogger<RedisPubSub> logger;
+        private readonly ISemanticLog log;
 
-        public RedisSubscription(ISubscriber subscriber, string channelName, ILogger<RedisPubSub> logger)
+        public RedisSubscription(ISubscriber subscriber, string channelName, ISemanticLog log)
         {
-            this.logger = logger;
+            this.log = log;
 
             this.subscriber = subscriber;
             this.subscriber.Subscribe(channelName, (channel, value) => HandleInvalidation(value));
@@ -44,7 +44,10 @@ namespace Squidex.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                logger.LogError(RedisInfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to send invalidation message {0}", token);
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "PublishRedisMessage")
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("token", token));
             }
         }
 
@@ -78,7 +81,9 @@ namespace Squidex.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                logger.LogError(RedisInfrastructureErrors.InvalidatingReceivedFailed, ex, "Failed to receive invalidation message.");
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "ReceiveRedisMessage")
+                    .WriteProperty("state", "Failed"));
             }
         }
 
