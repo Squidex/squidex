@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await Task.Delay(20);
 
             Assert.Equal(1, log.LogCount.Count);
-            Assert.Equal(6, log.LogCount[SemanticLogLevel.Debug]);
+            Assert.Equal(6, log.LogCount[SemanticLogLevel.Information]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -136,9 +136,10 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await Task.Delay(20);
 
-            Assert.Equal(2, log.LogCount.Count);
-            Assert.Equal(2, log.LogCount[SemanticLogLevel.Error]);
-            Assert.Equal(3, log.LogCount[SemanticLogLevel.Debug]);
+            Assert.Equal(3, log.LogCount.Count);
+            Assert.Equal(1, log.LogCount[SemanticLogLevel.Error]);
+            Assert.Equal(1, log.LogCount[SemanticLogLevel.Fatal]);
+            Assert.Equal(3, log.LogCount[SemanticLogLevel.Information]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -159,8 +160,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             await Task.Delay(20);
 
             Assert.Equal(2, log.LogCount.Count);
-            Assert.Equal(2, log.LogCount[SemanticLogLevel.Error]);
-            Assert.Equal(2, log.LogCount[SemanticLogLevel.Debug]);
+            Assert.Equal(2, log.LogCount[SemanticLogLevel.Fatal]);
+            Assert.Equal(2, log.LogCount[SemanticLogLevel.Information]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Never());
@@ -182,7 +183,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await Task.Delay(20);
 
             Assert.Equal(1, log.LogCount.Count);
-            Assert.Equal(8, log.LogCount[SemanticLogLevel.Debug]);
+            Assert.Equal(8, log.LogCount[SemanticLogLevel.Information]);
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
