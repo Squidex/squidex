@@ -8,15 +8,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventStore
     {
-        IObservable<StoredEvent> GetEventsAsync(long lastReceivedEventNumber = -1);
+        IObservable<StoredEvent> GetEventsAsync(string streamName = null, long lastReceivedEventNumber = -1);
 
-        IObservable<StoredEvent> GetEventsAsync(string streamName);
+        Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamName = null, long lastReceivedEventNumber = -1);
 
         Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events);
     }

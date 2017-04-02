@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Infrastructure.Log;
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             consumerName = eventConsumer.Object.GetType().Name;
 
-            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events.ToObservable());
+            ExceptEvents(2);
 
             eventConsumer.Setup(x => x.Name).Returns(consumerName);
             eventConsumerInfoRepository.Setup(x => x.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
@@ -175,8 +175,8 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.IsResetting = true;
             consumerInfo.LastHandledEventNumber = 2L;
-            
-            eventStore.Setup(x => x.GetEventsAsync(-1)).Returns(events.ToObservable());
+
+            ExceptEvents(-1);
 
             sut.Subscribe(eventConsumer.Object);
 
@@ -190,6 +190,21 @@ namespace Squidex.Infrastructure.CQRS.Events
             eventConsumer.Verify(x => x.On(envelope3), Times.Once());
 
             eventConsumer.Verify(x => x.ClearAsync(), Times.Once());
+        }
+
+        private void ExceptEvents(int eventNumber)
+        {
+            eventStore.Setup(x => x.GetEventsAsync(It.IsAny<Func<StoredEvent, Task>>(), CancellationToken.None, null, eventNumber))
+                .Callback<Func<StoredEvent, Task>, CancellationToken, string, long>(ReturnEvents)
+                .Returns(TaskHelper.Done);
+        }
+
+        private void ReturnEvents(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamName, long lastReceivedEventNumber)
+        {
+            foreach (var storedEvent in events)
+            {
+                callback(storedEvent).Wait(cancellationToken);
+            }
         }
     }
 }

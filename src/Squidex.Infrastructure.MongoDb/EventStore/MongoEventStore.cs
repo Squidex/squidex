@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -55,61 +56,75 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             var indexNames =
                 await Task.WhenAll(
+                    collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
+                    collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }),
                     collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
                     collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }));
 
             eventsOffsetIndex = indexNames[0];
         }
 
-        public IObservable<StoredEvent> GetEventsAsync(string streamName)
+        public IObservable<StoredEvent> GetEventsAsync(string streamName, long lastReceivedEventNumber = -1)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-
-            return Observable.Create<StoredEvent>(async (observer, ct) =>
+            return Observable.Create<StoredEvent>((observer, ct) =>
             {
-                await Collection.Find(x => x.EventStream == streamName).ForEachAsync(commit =>
+                return GetEventsAsync(storedEvent =>
                 {
-                    var eventNumber = commit.EventsOffset;
-                    var eventStreamNumber = commit.EventStreamOffset;
+                    observer.OnNext(storedEvent);
 
-                    foreach (var @event in commit.Events)
-                    {
-                        eventNumber++;
-                        eventStreamNumber++;
-
-                        var eventData = SimpleMapper.Map(@event, new EventData());
-
-                        observer.OnNext(new StoredEvent(eventNumber, eventStreamNumber, eventData));
-                    }
-                }, ct);
+                    return Tasks.TaskHelper.Done;
+                }, ct, streamName, lastReceivedEventNumber);
             });
         }
 
-        public IObservable<StoredEvent> GetEventsAsync(long lastReceivedEventNumber = -1)
+        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamName = null, long lastReceivedEventNumber = -1)
         {
-            return Observable.Create<StoredEvent>(async (observer, ct) =>
+            Guard.NotNull(callback, nameof(callback));
+            
+            var filters = new List<FilterDefinition<MongoEventCommit>>();
+
+            if (lastReceivedEventNumber >= 0)
             {
-                var commitOffset = await GetPreviousOffset(lastReceivedEventNumber);
+                var commitOffset = await GetPreviousOffsetAsync(lastReceivedEventNumber);
 
-                await Collection.Find(x => x.EventsOffset >= commitOffset).SortBy(x => x.EventsOffset).ForEachAsync(commit =>
+                filters.Add(Filter.Gte(x => x.EventsOffset, commitOffset));
+            }
+
+            if (!string.IsNullOrWhiteSpace(streamName))
+            {
+                filters.Add(Filter.Eq(x => x.EventStream, streamName));
+            }
+
+            FilterDefinition<MongoEventCommit> filter = new BsonDocument();
+
+            if (filters.Count > 1)
+            {
+                filter = Filter.And(filters);
+            }
+            else if (filters.Count == 1)
+            {
+                filter = filters[0];
+            }
+
+            await Collection.Find(filter).SortBy(x => x.EventsOffset).ForEachAsync(async commit =>
+            {
+                var eventNumber = commit.EventsOffset;
+                var eventStreamNumber = commit.EventStreamOffset;
+
+                foreach (var mongoEvent in commit.Events)
                 {
-                    var eventNumber = commit.EventsOffset;
-                    var eventStreamNumber = commit.EventStreamOffset;
+                    eventNumber++;
+                    eventStreamNumber++;
 
-                    foreach (var @event in commit.Events)
+                    if (eventNumber > lastReceivedEventNumber)
                     {
-                        eventNumber++;
-                        eventStreamNumber++;
+                        var eventData = SimpleMapper.Map(mongoEvent, new EventData());
 
-                        if (eventNumber > lastReceivedEventNumber)
-                        {
-                            var eventData = SimpleMapper.Map(@event, new EventData());
-
-                            observer.OnNext(new StoredEvent(eventNumber, eventStreamNumber, eventData));
-                        }
+                        await callback(new StoredEvent(eventNumber, eventStreamNumber, eventData));
                     }
-                }, ct);
-            });
+
+                }
+            }, cancellationToken);
         }
 
         public async Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events)
@@ -130,7 +145,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
             if (commitEvents.Any())
             {
-                var offset = await GetEventOffset();
+                var offset = await GetEventOffsetAsync();
 
                 var commit = new MongoEventCommit
                 {
@@ -157,7 +172,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     {
                         if (ex.Message.IndexOf(eventsOffsetIndex, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            commit.EventsOffset = await GetEventOffset();
+                            commit.EventsOffset = await GetEventOffsetAsync();
                         }
                         else if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                         {
@@ -174,25 +189,24 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             }
         }
 
-        private async Task<long> GetPreviousOffset(long startEventNumber)
+        private async Task<long> GetPreviousOffsetAsync(long startEventNumber)
         {
             var document =
                 await Collection.Find(x => x.EventsOffset <= startEventNumber)
                     .Project<BsonDocument>(Projection
-                        .Include(x => x.EventStreamOffset)
-                        .Include(x => x.EventsCount))
+                        .Include(x => x.EventsOffset))
                     .SortByDescending(x => x.EventsOffset).Limit(1)
                     .FirstOrDefaultAsync();
 
             if (document != null)
             {
-                return document["EventStreamOffset"].ToInt64();
+                return document["EventsOffset"].ToInt64();
             }
 
             return -1;
         }
 
-        private async Task<long> GetEventOffset()
+        private async Task<long> GetEventOffsetAsync()
         {
             var document =
                 await Collection.Find(new BsonDocument())
