@@ -22,6 +22,7 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Log;
+using Squidex.Pipeline;
 using IntrospectionExtensions = System.Reflection.IntrospectionExtensions;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -56,7 +57,11 @@ namespace Squidex.Config.Domain
                 .As<ILogAppender>()
                 .SingleInstance();
 
-            builder.Register(c => new TimestampLogAppender())
+            builder.RegisterType<ActionContextLogAppender>()
+                .As<ILogAppender>()
+                .SingleInstance();
+
+            builder.RegisterType<TimestampLogAppender>()
                 .As<ILogAppender>()
                 .SingleInstance();
 

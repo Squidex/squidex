@@ -8,6 +8,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
+using Squidex.Pipeline;
 
 namespace Squidex.Config.Web
 {
@@ -15,7 +16,10 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvc(this IServiceCollection services)
         {
-            services.AddMvc().AddMySerializers();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(LogPerformanceAttribute));
+            }).AddMySerializers();
         }
     }
 }

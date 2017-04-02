@@ -16,7 +16,6 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
 using Microsoft.Extensions.Options;
 using Squidex.Config;

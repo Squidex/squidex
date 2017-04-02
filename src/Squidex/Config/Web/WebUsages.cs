@@ -21,7 +21,12 @@ namespace Squidex.Config.Web
     {
         public static void UseMyForwardingRules(this IApplicationBuilder app)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, RequireHeaderSymmetry = false });
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedProto,
+                ForwardLimit = null,
+                RequireHeaderSymmetry = false
+            });
 
             app.UseMiddleware<EnforceHttpsMiddleware>();
         }
