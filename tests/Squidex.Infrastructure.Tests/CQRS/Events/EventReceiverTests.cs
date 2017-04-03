@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         public void Should_subscribe_to_consumer_and_handle_events()
         {
             consumerInfo.LastHandledEventNumber = 2L;
-            
+
             sut.Subscribe(eventConsumer.Object);
             sut.Next();
             sut.Dispose();
@@ -169,7 +169,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.IsResetting = true;
             consumerInfo.LastHandledEventNumber = 2L;
-            
+
             sut.Subscribe(eventConsumer.Object, autoTrigger: false);
             sut.Next();
             sut.Dispose();

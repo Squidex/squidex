@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events.Internal;
 using Squidex.Infrastructure.Log;
 
@@ -28,6 +27,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private DispatchEventBlock dispatchEventBlock;
         private UpdateStateBlock updateStateBlock;
         private ParseEventBlock parseEventBlock;
+        private IEventReceiverBlock[] blocks;
         private Timer timer;
 
         public EventReceiver(
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public void Next()
         {
-            queryEventsBlock.NextOrThrowAway(null);
+            queryEventsBlock.NextOrThrowAway();
         }
 
         public void Subscribe(IEventConsumer eventConsumer, int delay = 5000, bool autoTrigger = true)
@@ -85,33 +85,60 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return;
             }
 
-            updateStateBlock = new UpdateStateBlock(eventConsumer, eventConsumerInfoRepository, log);
+            var onError = new Action<Exception>(ex => Stop(ex, eventConsumer));
 
-            dispatchEventBlock = new DispatchEventBlock(eventConsumer, eventConsumerInfoRepository, log);
+            updateStateBlock = new UpdateStateBlock(eventConsumerInfoRepository, eventConsumer, log);
+            updateStateBlock.OnError = onError;
+
+            dispatchEventBlock = new DispatchEventBlock(eventConsumer, log);
+            dispatchEventBlock.OnError = onError;
             dispatchEventBlock.LinkTo(updateStateBlock.Target);
 
-            parseEventBlock = new ParseEventBlock(eventConsumer, eventConsumerInfoRepository, log, formatter);
+            parseEventBlock = new ParseEventBlock(formatter, log);
+            parseEventBlock.OnError = onError;
             parseEventBlock.LinkTo(dispatchEventBlock.Target);
 
-            queryEventsBlock = new QueryEventsBlock(eventConsumer, eventConsumerInfoRepository, log, eventStore);
+            queryEventsBlock = new QueryEventsBlock(eventConsumerInfoRepository, eventConsumer, eventStore, log);
             queryEventsBlock.OnEvent = parseEventBlock.NextAsync;
             queryEventsBlock.OnReset = Reset;
+            queryEventsBlock.OnError = onError;
             queryEventsBlock.Completion.ContinueWith(x => parseEventBlock.Complete());
+
+            blocks = new IEventReceiverBlock[] { updateStateBlock, dispatchEventBlock, parseEventBlock, queryEventsBlock };
 
             if (autoTrigger)
             {
-                timer = new Timer(x => queryEventsBlock.NextOrThrowAway(null), null, 0, delay);
+                timer = new Timer(x => queryEventsBlock.NextOrThrowAway(), null, 0, delay);
             }
 
-            eventNotifier.Subscribe(() => queryEventsBlock.NextOrThrowAway(null));
+            eventNotifier.Subscribe(() => queryEventsBlock.NextOrThrowAway());
+        }
+
+        private void Stop(Exception ex, IEventConsumer eventConsumer)
+        {
+            foreach (var block in blocks)
+            {
+                block.Stop();
+            }
+
+            try
+            {
+                eventConsumerInfoRepository.StopAsync(eventConsumer.Name, ex.ToString()).Wait();
+            }
+            catch (Exception ex2)
+            {
+                log.LogFatal(ex2, w => w
+                    .WriteProperty("action", "StopConsumer")
+                    .WriteProperty("state", "Failed"));
+            }
         }
 
         private void Reset()
         {
-            dispatchEventBlock.Reset();
-            parseEventBlock.Reset();
-            queryEventsBlock.Reset();
-            updateStateBlock.Reset();
+            foreach (var block in blocks)
+            {
+                block.Reset();
+            }
         }
     }
 }
