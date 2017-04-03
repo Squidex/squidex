@@ -56,10 +56,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
                     .WriteProperty("eventId", eventId)
                     .WriteProperty("eventType", eventType)
                     .WriteProperty("eventConsumer", consumerName));
-               
-            }
 
-            return null;
+                throw;
+            }
         }
 
         protected override long GetEventNumber(Envelope<IEvent> input)

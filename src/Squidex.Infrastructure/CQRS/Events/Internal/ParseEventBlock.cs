@@ -24,13 +24,14 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
 
         protected override Task<Envelope<IEvent>> On(StoredEvent input)
         {
-            Envelope<IEvent> result = null;
             try
             {
-                result = formatter.Parse(input.Data);
+                var result = formatter.Parse(input.Data);
 
                 result.SetEventNumber(input.EventNumber);
                 result.SetEventStreamNumber(input.EventStreamNumber);
+
+                return Task.FromResult(result);
             }
             catch (Exception ex)
             {
@@ -39,9 +40,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventId", input.Data.EventId.ToString())
                     .WriteProperty("eventNumber", input.EventNumber));
-            }
 
-            return Task.FromResult(result);
+                throw;
+            }
         }
 
         protected override long GetEventNumber(StoredEvent input)

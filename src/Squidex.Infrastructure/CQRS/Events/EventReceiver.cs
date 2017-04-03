@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events.Internal;
 using Squidex.Infrastructure.Log;
 
@@ -70,11 +71,16 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000)
+        public void Next()
+        {
+            queryEventsBlock.NextOrThrowAway(null);
+        }
+
+        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000, bool autoTrigger = true)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            if (timer != null)
+            if (updateStateBlock != null)
             {
                 return;
             }
@@ -83,18 +89,19 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             dispatchEventBlock = new DispatchEventBlock(eventConsumer, eventConsumerInfoRepository, log);
             dispatchEventBlock.LinkTo(updateStateBlock.Target);
-            dispatchEventBlock.Completion.ContinueWith(t => updateStateBlock.Complete());
 
             parseEventBlock = new ParseEventBlock(eventConsumer, eventConsumerInfoRepository, log, formatter);
             parseEventBlock.LinkTo(dispatchEventBlock.Target);
-            parseEventBlock.Completion.ContinueWith(t => dispatchEventBlock.Complete());
 
             queryEventsBlock = new QueryEventsBlock(eventConsumer, eventConsumerInfoRepository, log, eventStore);
             queryEventsBlock.OnEvent = parseEventBlock.NextAsync;
             queryEventsBlock.OnReset = Reset;
-            queryEventsBlock.Completion.ContinueWith(t => parseEventBlock.Complete());
-            
-            timer = new Timer(x => queryEventsBlock.NextOrThrowAway(null), null, 0, delay);
+            queryEventsBlock.Completion.ContinueWith(x => parseEventBlock.Complete());
+
+            if (autoTrigger)
+            {
+                timer = new Timer(x => queryEventsBlock.NextOrThrowAway(null), null, 0, delay);
+            }
 
             eventNotifier.Subscribe(() => queryEventsBlock.NextOrThrowAway(null));
         }

@@ -39,9 +39,15 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
 
             if (transform)
             {
-                Target =
+                var nullHandlerBlock =
+                    new ActionBlock<TOutput>(_ => { });
+
+                var transformBlock =
                     new TransformBlock<TInput, TOutput>(new Func<TInput, Task<TOutput>>(HandleAsync),
                         new ExecutionDataflowBlockOptions { BoundedCapacity = 1 });
+                transformBlock.LinkTo(nullHandlerBlock, new DataflowLinkOptions { PropagateCompletion = true }, x => x == null);
+
+                Target = transformBlock;
             }
             else
             {
@@ -75,7 +81,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
         {
             if (Target is TransformBlock<TInput, TOutput> transformBlock)
             {
-                transformBlock.LinkTo(other, e => e != null);
+                transformBlock.LinkTo(other, new DataflowLinkOptions { PropagateCompletion = true }, e => e != null);
             }
         }
 
