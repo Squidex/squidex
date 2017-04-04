@@ -21,6 +21,6 @@ namespace Squidex.Infrastructure.Log
         IArrayWriter WriteValue(DateTime value);
         IArrayWriter WriteValue(DateTimeOffset value);
 
-        IArrayWriter WriteObject(string property, Action<IObjectWriter> objectWriter);
+        IArrayWriter WriteObject(Action<IObjectWriter> objectWriter);
     }
 }

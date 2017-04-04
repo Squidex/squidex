@@ -156,9 +156,8 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
-        IArrayWriter IArrayWriter.WriteObject(string property, Action<IObjectWriter> objectWriter)
+        IArrayWriter IArrayWriter.WriteObject(Action<IObjectWriter> objectWriter)
         {
-            jsonWriter.WritePropertyName(property);
             jsonWriter.WriteStartObject();
 
             objectWriter?.Invoke(this);

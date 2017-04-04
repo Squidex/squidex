@@ -115,6 +115,14 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_write_object_in_array()
+        {
+            var result = sut.WriteArray("property1", a => a.WriteObject(b => b.WriteProperty("property2", 120))).ToString();
+
+            Assert.Equal(@"{""property1"":[{""property2"":120}]}", result);
+        }
+
+        [Fact]
         public void Should_write_datetimeoffset_value()
         {
             var value = DateTimeOffset.UtcNow;
@@ -131,7 +139,7 @@ namespace Squidex.Infrastructure.Log
 
             Assert.Equal($"{{\"property\":[\"{value.ToString("o")}\"]}}", result);
         }
-        
+
         [Fact]
         public void Should_write_nested_object()
         {
