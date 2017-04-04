@@ -29,6 +29,8 @@ namespace Squidex.Pipeline
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             var stopWatch = (Stopwatch)context.HttpContext.Items["Watch"];
+            
+            stopWatch.Stop();
 
             log.LogInformation(w => w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds));
         }
