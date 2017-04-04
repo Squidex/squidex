@@ -109,6 +109,7 @@ export class FieldDto {
 
 export abstract class FieldPropertiesDto {
     constructor(
+        public readonly fieldType: string,
         public readonly label: string,
         public readonly hints: string,
         public readonly placeholder: string,
@@ -132,9 +133,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         public readonly maxLength?: number | null,
         public readonly allowedValues?: string[]
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'String';
+        super('String', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 
@@ -149,9 +148,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         public readonly minValue?: number,
         public readonly allowedValues?: number[]
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'Number';
+        super('Number', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 
@@ -165,9 +162,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         public readonly maxValue?: string,
         public readonly minValue?: string
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'DateTime';
+        super('DateTime', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 
@@ -179,9 +174,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'Boolean';
+        super('Boolean', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 
@@ -192,9 +185,7 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
         isLocalizable: boolean,
         public readonly editor: string
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'Geolocation';
+        super('Geolocation', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 
@@ -204,9 +195,7 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
         isListField: boolean,
         isLocalizable: boolean
     ) {
-        super(label, hints, placeholder, isRequired, isListField, isLocalizable);
-
-        this['fieldType'] = 'Json';
+        super('Json', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 

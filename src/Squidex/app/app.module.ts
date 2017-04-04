@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { NgModule } from '@angular/core';
+import { ApplicationRef, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 
@@ -47,6 +48,7 @@ export function configUserReport() {
 @NgModule({
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,
@@ -62,14 +64,14 @@ export function configUserReport() {
         { provide: TitlesConfig, useFactory: configTitles },
         { provide: UserReportConfig, useFactory: configUserReport }
     ],
-    bootstrap: [AppComponent]
+    entryComponents: [AppComponent]
 })
 export class AppModule {
-    /*public ngDoBootstrap(appRef: ApplicationRef) {
+    public ngDoBootstrap(appRef: ApplicationRef) {
         try {
             appRef.bootstrap(AppComponent);
         } catch (e) {
             console.log('Application element not found');
         }
-    }*/
+    }
 }

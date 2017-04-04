@@ -34,6 +34,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public appClients: ImmutableArray<AppClientDto>;
 
+    public addClientFormSubmitted = false;
     public addClientForm: FormGroup =
         this.formBuilder.group({
             name: ['',
@@ -92,10 +93,12 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public resetClientForm() {
+        this.addClientFormSubmitted = false;
         this.addClientForm.reset();
     }
 
     public attachClient() {
+        this.addClientFormSubmitted = true;
         this.addClientForm.markAsDirty();
 
         if (this.addClientForm.valid) {
@@ -104,6 +107,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             const requestDto = new CreateAppClientDto(this.addClientForm.get('name').value);
 
             const reset = () => {
+                this.addClientFormSubmitted = false;
                 this.addClientForm.reset();
                 this.addClientForm.enable();
             };

@@ -45,7 +45,7 @@
                 </thead>
 
                 <tbody>
-                    <template ngFor let-user [ngForOf]="usersItems">
+                    <ng-template ngFor let-user [ngForOf]="usersItems">
                         <tr>
                             <td>
                                 <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
@@ -68,7 +68,7 @@
                             </td>
                         </tr>
                         <tr class="spacer"></tr>
-                    </template>
+                    </ng-template>
                 </tbody>
             </table>
 

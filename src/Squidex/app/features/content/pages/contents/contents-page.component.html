@@ -53,7 +53,7 @@
                 </thead>
 
                 <tbody>
-                    <template ngFor let-content [ngForOf]="contentItems">
+                    <ng-template ngFor let-content [ngForOf]="contentItems">
                         <tr [routerLink]="[content.id]" routerLinkActive="active" class="content" 
                             [sqxContent]="content" 
                             [language]="languageSelected"
@@ -63,7 +63,7 @@
                             (publishing)="publishContent(content)"
                             (deleting)="deleteContent(content)"></tr>
                         <tr class="spacer"></tr>
-                    </template>
+                    </ng-template>
                 </tbody>
             </table>
 

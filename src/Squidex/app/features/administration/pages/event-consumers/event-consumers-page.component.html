@@ -35,7 +35,7 @@
                 </thead>
 
                 <tbody>
-                    <template ngFor let-eventConsumer [ngForOf]="eventConsumers">
+                    <ng-template ngFor let-eventConsumer [ngForOf]="eventConsumers">
                         <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
                             <td>
                                 <span class="truncate">
@@ -60,7 +60,7 @@
                             </td>
                         </tr>
                         <tr class="spacer"></tr>
-                    </template>
+                    </ng-template>
                 </tbody>
             </table>
         </div>
