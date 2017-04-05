@@ -115,6 +115,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Internal
                     }, ct.Token, null, lastReceivedEventNumber);
                 }
             }
+            catch (OperationCanceledException)
+            {
+            }
             catch (Exception ex)
             {
                 OnError?.Invoke(ex);
