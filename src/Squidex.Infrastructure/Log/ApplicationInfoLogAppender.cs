@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Reflection;
 
 namespace Squidex.Infrastructure.Log
@@ -14,6 +15,7 @@ namespace Squidex.Infrastructure.Log
     {
         private readonly string applicationName;
         private readonly string applicationVersion;
+        private readonly string applicationSessionId;
 
         public ApplicationInfoLogAppender(Assembly assembly)
         {
@@ -21,12 +23,14 @@ namespace Squidex.Infrastructure.Log
 
             applicationName = assembly.GetName().Name;
             applicationVersion = assembly.GetName().Version.ToString();
+            applicationSessionId = Guid.NewGuid().ToString();
         }
 
         public void Append(IObjectWriter writer)
         {
-            writer.WriteProperty("applicationName", applicationName);
-            writer.WriteProperty("applicationVersion", applicationVersion);
+            writer.WriteProperty("appName", applicationName);
+            writer.WriteProperty("appVersion", applicationVersion);
+            writer.WriteProperty("appSessionId", applicationSessionId);
         }
     }
 }
