@@ -159,7 +159,8 @@ namespace Squidex
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackProxy();
                 
-                app.Use((context, next) => {
+                app.Use((context, next) => 
+                {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/index.html");
@@ -169,7 +170,8 @@ namespace Squidex
             }
             else
             {
-                app.Use((context, next) => {
+                app.Use((context, next) => 
+                {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/build/index.html");
