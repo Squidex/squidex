@@ -23,7 +23,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
-using IntrospectionExtensions = System.Reflection.IntrospectionExtensions;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -53,7 +52,17 @@ namespace Squidex.Config.Domain
                     .SingleInstance();
             }
 
-            builder.Register(c => new ApplicationInfoLogAppender(IntrospectionExtensions.GetTypeInfo(typeof(InfrastructureModule)).Assembly))
+            var logFile = Configuration.GetValue<string>("squidex:logging:file");
+
+            if (!string.IsNullOrWhiteSpace(logFile))
+            {
+                builder.RegisterInstance(new FileChannel(logFile))
+                    .As<ILogChannel>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+            }
+
+            builder.Register(c => new ApplicationInfoLogAppender(GetType(), Guid.NewGuid()))
                 .As<ILogAppender>()
                 .SingleInstance();
 

@@ -12,14 +12,14 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class TimestampLogAppender : ILogAppender
     {
-        private readonly Func<long> timestamp;
+        private readonly Func<DateTime> timestamp;
 
         public TimestampLogAppender()
-            : this(() => DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            : this(() => DateTime.UtcNow)
         {
         }
 
-        public TimestampLogAppender(Func<long> timestamp)
+        public TimestampLogAppender(Func<DateTime> timestamp)
         {
             Guard.NotNull(timestamp, nameof(timestamp));
 

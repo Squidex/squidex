@@ -45,14 +45,16 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_timestamp()
         {
-            appenders.Add(new TimestampLogAppender(() => 1500));
+            var now = DateTime.UtcNow;
+
+            appenders.Add(new TimestampLogAppender(() => now));
 
             Log.LogFatal(w => {});
 
             var expected = 
                 MakeTestCall(w => w
                     .WriteProperty("logLevel", "Fatal")
-                    .WriteProperty("timestamp", 1500));
+                    .WriteProperty("timestamp", now));
 
             Assert.Equal(expected, output);
         }
@@ -75,15 +77,19 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_application_info()
         {
-            appenders.Add(new ApplicationInfoLogAppender(GetType().GetTypeInfo().Assembly));
+            var sessionId = Guid.NewGuid();
+
+            appenders.Add(new ApplicationInfoLogAppender(GetType(), sessionId));
 
             Log.LogFatal(m => { });
 
             var expected =
                 MakeTestCall(w => w
                     .WriteProperty("logLevel", "Fatal")
-                    .WriteProperty("applicationName", "Squidex.Infrastructure.Tests")
-                    .WriteProperty("applicationVersion", "1.0.0.0"));
+                    .WriteObject("app", a => a
+                        .WriteProperty("name", "Squidex.Infrastructure.Tests")
+                        .WriteProperty("version", "1.0.0.0")
+                        .WriteProperty("sessionId", sessionId.ToString())));
 
             Assert.Equal(expected, output);
         }

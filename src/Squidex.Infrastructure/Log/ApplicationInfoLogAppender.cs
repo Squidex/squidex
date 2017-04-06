@@ -17,20 +17,26 @@ namespace Squidex.Infrastructure.Log
         private readonly string applicationVersion;
         private readonly string applicationSessionId;
 
-        public ApplicationInfoLogAppender(Assembly assembly)
+        public ApplicationInfoLogAppender(Type type, Guid applicationSession)
+            : this(type?.GetTypeInfo().Assembly, applicationSession)
+        {
+        }
+
+        public ApplicationInfoLogAppender(Assembly assembly, Guid applicationSession)
         {
             Guard.NotNull(assembly, nameof(assembly));
 
             applicationName = assembly.GetName().Name;
             applicationVersion = assembly.GetName().Version.ToString();
-            applicationSessionId = Guid.NewGuid().ToString();
+            applicationSessionId = applicationSession.ToString();
         }
 
         public void Append(IObjectWriter writer)
         {
-            writer.WriteProperty("appName", applicationName);
-            writer.WriteProperty("appVersion", applicationVersion);
-            writer.WriteProperty("appSessionId", applicationSessionId);
+            writer.WriteObject("app", w => w
+                .WriteProperty("name", applicationName)
+                .WriteProperty("version", applicationVersion)
+                .WriteProperty("sessionId", applicationSessionId));
         }
     }
 }

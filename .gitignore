@@ -18,3 +18,5 @@ node_modules/
 
 # Scripts (should be copied from node_modules on build)
 **/wwwroot/scripts/**/*.*
+
+/src/Squidex/appsettings.Development.json
