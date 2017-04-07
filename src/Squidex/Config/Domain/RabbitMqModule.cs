@@ -8,6 +8,7 @@
 
 using Autofac;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.RabbitMq;
@@ -37,7 +38,7 @@ namespace Squidex.Config.Domain
             {
                 var streamFilter = Configuration.GetValue<string>("squidex:eventPublishers:rabbitMq:streamFilter");
 
-                builder.Register(c => new RabbitMqEventConsumer(connectionString, exchange, streamFilter))
+                builder.Register(c => new RabbitMqEventConsumer(c.Resolve<JsonSerializerSettings>(), connectionString, exchange, streamFilter))
                     .As<IEventConsumer>()
                     .As<IExternalSystem>()
                     .SingleInstance();

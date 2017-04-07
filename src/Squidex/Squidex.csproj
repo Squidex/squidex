@@ -23,9 +23,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Core\Squidex.Core.csproj" />
     <ProjectReference Include="..\Squidex.Events\Squidex.Events.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj" />
     <ProjectReference Include="..\Squidex.Read\Squidex.Read.csproj" />
     <ProjectReference Include="..\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj" />
