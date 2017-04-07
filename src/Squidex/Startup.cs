@@ -80,6 +80,7 @@ namespace Squidex
             builder.RegisterModule(new ClusterModule(Configuration));
             builder.RegisterModule(new EventStoreModule(Configuration));
             builder.RegisterModule(new InfrastructureModule(Configuration));
+            builder.RegisterModule(new RabbitMqModule(Configuration));
             builder.RegisterModule(new ReadModule(Configuration));
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));

@@ -66,12 +66,16 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public void Next()
         {
+            ThrowIfDisposed();
+
             timer?.Trigger();
         }
 
         public void Subscribe(IEventConsumer eventConsumer, int delay = 5000)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
+
+            ThrowIfDisposed();
 
             if (timer != null)
             {
