@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 this.storedEvents = storedEvents;
             }
 
-            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamName = null, long lastReceivedEventNumber = -1)
+            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, long lastReceivedEventNumber = -1)
             {
                 foreach (var @event in storedEvents)
                 {
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
             }
 
-            public IObservable<StoredEvent> GetEventsAsync(string streamName = null, long lastReceivedEventNumber = -1)
+            public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, long lastReceivedEventNumber = -1)
             {
                 throw new NotSupportedException();
             }
@@ -170,7 +170,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             consumerInfo.IsResetting = true;
             consumerInfo.LastHandledEventNumber = 2L;
 
-            sut.Subscribe(eventConsumer.Object, autoTrigger: false);
+            sut.Subscribe(eventConsumer.Object);
             sut.Next();
             sut.Dispose();
 

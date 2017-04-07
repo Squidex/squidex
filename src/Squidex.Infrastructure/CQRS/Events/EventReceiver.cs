@@ -7,12 +7,14 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
-using Squidex.Infrastructure.CQRS.Events.Internal;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Timers;
 
+// ReSharper disable MethodSupportsCancellation
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
-// ReSharper disable UseObjectOrCollectionInitializer
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
@@ -23,16 +25,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly IEventNotifier eventNotifier;
         private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
         private readonly ISemanticLog log;
-        private QueryEventsBlock queryEventsBlock;
-        private DispatchEventBlock dispatchEventBlock;
-        private UpdateStateBlock updateStateBlock;
-        private ParseEventBlock parseEventBlock;
-        private IEventReceiverBlock[] blocks;
-        private Timer timer;
+        private CompletionTimer timer;
 
         public EventReceiver(
             EventDataFormatter formatter,
-            IEventStore eventStore, 
+            IEventStore eventStore,
             IEventNotifier eventNotifier,
             IEventConsumerInfoRepository eventConsumerInfoRepository,
             ISemanticLog log)
@@ -56,11 +53,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             {
                 try
                 {
-                    queryEventsBlock?.Complete();
-
                     timer?.Dispose();
-
-                    updateStateBlock?.Completion.Wait();
                 }
                 catch (Exception ex)
                 {
@@ -73,71 +66,159 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public void Next()
         {
-            queryEventsBlock.NextOrThrowAway();
+            timer?.Trigger();
         }
 
-        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000, bool autoTrigger = true)
+        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            if (updateStateBlock != null)
+            if (timer != null)
             {
                 return;
             }
 
-            var onError = new Action<Exception>(ex => Stop(ex, eventConsumer));
+            var consumerName = eventConsumer.Name;
+            var consumerStarted = false;
 
-            updateStateBlock = new UpdateStateBlock(eventConsumerInfoRepository, eventConsumer, log);
-            updateStateBlock.OnError = onError;
-
-            dispatchEventBlock = new DispatchEventBlock(eventConsumer, log);
-            dispatchEventBlock.OnError = onError;
-            dispatchEventBlock.LinkTo(updateStateBlock.Target);
-
-            parseEventBlock = new ParseEventBlock(formatter, log);
-            parseEventBlock.OnError = onError;
-            parseEventBlock.LinkTo(dispatchEventBlock.Target);
-
-            queryEventsBlock = new QueryEventsBlock(eventConsumerInfoRepository, eventConsumer, eventStore, log);
-            queryEventsBlock.OnEvent = parseEventBlock.NextAsync;
-            queryEventsBlock.OnReset = Reset;
-            queryEventsBlock.OnError = onError;
-            queryEventsBlock.Completion.ContinueWith(x => parseEventBlock.Complete());
-
-            blocks = new IEventReceiverBlock[] { updateStateBlock, dispatchEventBlock, parseEventBlock, queryEventsBlock };
-
-            if (autoTrigger)
+            timer = new CompletionTimer(delay, async ct =>
             {
-                timer = new Timer(x => queryEventsBlock.NextOrThrowAway(), null, 0, delay);
-            }
+                if (!consumerStarted)
+                {
+                    await eventConsumerInfoRepository.CreateAsync(consumerName);
 
-            eventNotifier.Subscribe(() => queryEventsBlock.NextOrThrowAway());
+                    consumerStarted = true;
+                }
+
+                try
+                {
+                    var status = await eventConsumerInfoRepository.FindAsync(consumerName);
+
+                    var lastHandledEventNumber = status.LastHandledEventNumber;
+
+                    if (status.IsResetting)
+                    {
+                        await ResetAsync(eventConsumer, consumerName);
+
+                        lastHandledEventNumber = -1;
+                    }
+                    else if (status.IsStopped)
+                    {
+                        return;
+                    }
+
+                    await eventStore.GetEventsAsync(se => HandleEventAsync(eventConsumer, se, consumerName), ct, 
+                        eventConsumer.StreamFilter, lastHandledEventNumber);
+                }
+                catch (Exception ex)
+                {
+                    log.LogFatal(ex, w => w.WriteProperty("action", "EventHandlingFailed"));
+
+                    await eventConsumerInfoRepository.StopAsync(consumerName, ex.ToString());
+                }
+            });
+
+            eventNotifier.Subscribe(timer.Trigger);
         }
 
-        private void Stop(Exception ex, IEventConsumer eventConsumer)
+        private async Task HandleEventAsync(IEventConsumer eventConsumer, StoredEvent storedEvent, string consumerName)
         {
-            foreach (var block in blocks)
-            {
-                block.Stop();
-            }
+            var @event = ParseEvent(storedEvent);
 
+            await DispatchConsumer(@event, eventConsumer);
+            await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventNumber);
+        }
+
+        private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName)
+        {
+            var actionId = Guid.NewGuid().ToString();
             try
             {
-                eventConsumerInfoRepository.StopAsync(eventConsumer.Name, ex.ToString()).Wait();
+                log.LogInformation(w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+
+                await eventConsumer.ClearAsync();
+                await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, -1);
+
+                log.LogInformation(w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
             }
-            catch (Exception ex2)
+            catch (Exception ex)
             {
-                log.LogFatal(ex2, w => w
-                    .WriteProperty("action", "StopConsumer")
-                    .WriteProperty("state", "Failed"));
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "EventConsumerReset")
+                    .WriteProperty("actionId", actionId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+
+                throw;
             }
         }
 
-        private void Reset()
+        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer)
         {
-            foreach (var block in blocks)
+            var eventId = @event.Headers.EventId().ToString();
+            var eventType = @event.Payload.GetType().Name;
+            try
             {
-                block.Reset();
+                log.LogInformation(w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+
+                await eventConsumer.On(@event);
+
+                log.LogInformation(w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Completed")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("actionId", eventId)
+                    .WriteProperty("state", "Started")
+                    .WriteProperty("eventId", eventId)
+                    .WriteProperty("eventType", eventType)
+                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+
+                throw;
+            }
+        }
+
+        private Envelope<IEvent> ParseEvent(StoredEvent storedEvent)
+        {
+            try
+            {
+                var @event = formatter.Parse(storedEvent.Data);
+
+                @event.SetEventNumber(storedEvent.EventNumber);
+                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
+
+                return @event;
+            }
+            catch (Exception ex)
+            {
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "ParseEvent")
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("eventId", storedEvent.Data.EventId.ToString())
+                    .WriteProperty("eventNumber", storedEvent.EventNumber));
+
+                throw;
             }
         }
     }

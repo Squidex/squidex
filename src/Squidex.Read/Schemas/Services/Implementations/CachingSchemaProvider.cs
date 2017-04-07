@@ -32,6 +32,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
             get { return GetType().Name; }
         }
 
+        public string StreamFilter
+        {
+            get { return "*"; }
+        }
+
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
             : base(cache)
         {

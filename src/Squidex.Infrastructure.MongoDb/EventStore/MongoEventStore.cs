@@ -18,6 +18,7 @@ using NodaTime;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InvertIf
@@ -64,7 +65,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             eventsOffsetIndex = indexNames[0];
         }
 
-        public IObservable<StoredEvent> GetEventsAsync(string streamName, long lastReceivedEventNumber = -1)
+        public IObservable<StoredEvent> GetEventsAsync(string streamFilter, long lastReceivedEventNumber = -1)
         {
             return Observable.Create<StoredEvent>((observer, ct) =>
             {
@@ -73,11 +74,11 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     observer.OnNext(storedEvent);
 
                     return Tasks.TaskHelper.Done;
-                }, ct, streamName, lastReceivedEventNumber);
+                }, ct, streamFilter, lastReceivedEventNumber);
             });
         }
 
-        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamName = null, long lastReceivedEventNumber = -1)
+        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, long lastReceivedEventNumber = -1)
         {
             Guard.NotNull(callback, nameof(callback));
             
@@ -90,9 +91,16 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 filters.Add(Filter.Gte(x => x.EventsOffset, commitOffset));
             }
 
-            if (!string.IsNullOrWhiteSpace(streamName))
+            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, "*", StringComparison.OrdinalIgnoreCase))
             {
-                filters.Add(Filter.Eq(x => x.EventStream, streamName));
+                if (streamFilter.StartsWith("^"))
+                {
+                    filters.Add(Filter.Regex(x => x.EventStream, streamFilter));
+                }
+                else
+                {
+                    filters.Add(Filter.Eq(x => x.EventStream, streamFilter));
+                }
             }
 
             FilterDefinition<MongoEventCommit> filter = new BsonDocument();

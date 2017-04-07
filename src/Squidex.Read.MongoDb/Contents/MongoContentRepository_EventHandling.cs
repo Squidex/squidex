@@ -37,6 +37,11 @@ namespace Squidex.Read.MongoDb.Contents
             get { return GetType().Name; }
         }
 
+        public string StreamFilter
+        {
+            get { return "^content-"; }
+        }
+
         public async Task ClearAsync()
         {
             using (var collections = await database.ListCollectionsAsync())
