@@ -31,10 +31,6 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
-    public get showTime() {
-        return this.mode === 'DateTime';
-    }
-
     public timeControl = new FormControl();
 
     public dateControl = new FormControl();
@@ -44,6 +40,10 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     @Input()
     public enforceTime: boolean;
+
+    public get showTime() {
+        return this.mode === 'DateTime';
+    }
 
     public get hasValue() {
         return this.dateValue !== null;
@@ -131,6 +131,16 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     public touched() {
         this.touchedCallback();
+    }
+
+    public writeNow() {
+        this.writeValue(new Date().toUTCString());
+
+        this.updateControls();
+        this.updateValue();
+        this.touched();
+
+        return false;
     }
 
     public reset() {

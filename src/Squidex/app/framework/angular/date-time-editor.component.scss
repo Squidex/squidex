@@ -35,6 +35,10 @@ $form-color: #fff;
 }
 
 .time-group {
+    & {
+        padding-right: .25rem;
+    }
+
     .form-control {
         width: 7.5rem;
     }
