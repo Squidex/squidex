@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
 namespace Squidex.Config
 {
@@ -18,6 +19,11 @@ namespace Squidex.Config
 
         public string BuildUrl(string path, bool trailingSlash = true)
         {
+            if (string.IsNullOrWhiteSpace(BaseUrl))
+            {
+                throw new ConfigurationException("Configure BaseUrl with 'urls:baseUrl'.");
+            }
+
             var url = $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}";
 
             if (trailingSlash &&

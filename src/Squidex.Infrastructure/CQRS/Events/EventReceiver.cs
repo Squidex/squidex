@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     }
 
                     await eventStore.GetEventsAsync(se => HandleEventAsync(eventConsumer, se, consumerName), ct, 
-                        eventConsumer.StreamFilter, lastHandledEventNumber);
+                        eventConsumer.EventsFilter, lastHandledEventNumber);
                 }
                 catch (Exception ex)
                 {

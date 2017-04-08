@@ -32,7 +32,7 @@ namespace Squidex.Read.MongoDb.History
             get { return GetType().Name; }
         }
 
-        public string StreamFilter
+        public string EventsFilter
         {
             get { return "*"; }
         }

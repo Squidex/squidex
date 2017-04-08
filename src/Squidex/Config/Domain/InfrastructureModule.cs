@@ -28,7 +28,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
 {
-    public class InfrastructureModule : Module
+    public sealed class InfrastructureModule : Module
     {
         private IConfiguration Configuration { get; }
 
@@ -39,7 +39,7 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            if (Configuration.GetValue<bool>("squidex:logging:human"))
+            if (Configuration.GetValue<bool>("logging:human"))
             {
                 builder.Register(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)))
                     .AsSelf()
@@ -52,11 +52,11 @@ namespace Squidex.Config.Domain
                     .SingleInstance();
             }
 
-            var logFile = Configuration.GetValue<string>("squidex:logging:file");
+            var loggingFile = Configuration.GetValue<string>("logging:file");
 
-            if (!string.IsNullOrWhiteSpace(logFile))
+            if (!string.IsNullOrWhiteSpace(loggingFile))
             {
-                builder.RegisterInstance(new FileChannel(logFile))
+                builder.RegisterInstance(new FileChannel(loggingFile))
                     .As<ILogChannel>()
                     .As<IExternalSystem>()
                     .SingleInstance();

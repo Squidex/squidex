@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         string Name { get; }
 
-        string StreamFilter { get; }
+        string EventsFilter { get; }
 
         Task ClearAsync();
 

@@ -51,7 +51,7 @@ namespace Squidex
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables("SQUIDEX__");
 
             Configuration = builder.Build();
         }
@@ -71,16 +71,16 @@ namespace Squidex
             services.AddRouting();
 
             services.Configure<MyUrlsOptions>(
-                Configuration.GetSection("squidex:urls"));
+                Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
-                Configuration.GetSection("squidex:identity"));
+                Configuration.GetSection("identity"));
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterModule(new ClusterModule(Configuration));
+            builder.RegisterModule(new EventPublishersModule(Configuration));
             builder.RegisterModule(new EventStoreModule(Configuration));
             builder.RegisterModule(new InfrastructureModule(Configuration));
-            builder.RegisterModule(new RabbitMqModule(Configuration));
+            builder.RegisterModule(new PubSubModule(Configuration));
             builder.RegisterModule(new ReadModule(Configuration));
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));

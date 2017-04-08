@@ -47,11 +47,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             const string filter = "my-inner-filter";
 
-            consumer1.Setup(x => x.StreamFilter).Returns(filter);
+            consumer1.Setup(x => x.EventsFilter).Returns(filter);
 
             var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
 
-            Assert.Equal(filter, sut.StreamFilter);
+            Assert.Equal(filter, sut.EventsFilter);
         }
 
         [Fact]

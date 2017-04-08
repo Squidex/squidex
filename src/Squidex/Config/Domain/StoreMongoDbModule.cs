@@ -34,8 +34,9 @@ namespace Squidex.Config.Domain
 {
     public class StoreMongoDbModule : Module
     {
-        private const string MongoDatabaseName = "MongoDatabaseName";
-        private const string MongoDatabaseNameContent = "MongoDatabaseNameContent";
+        private const string MongoClientRegistration = "StoreMongoClient";
+        private const string MongoDatabaseRegistration = "StoreMongoDatabaseName";
+        private const string MongoContentDatabaseRegistration = "StoreMongoDatabaseNameContent";
 
         private IConfiguration Configuration { get; }
 
@@ -46,42 +47,42 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            var databaseName = Configuration.GetValue<string>("squidex:stores:mongoDb:databaseName");
+            var configuration = Configuration.GetValue<string>("store:mongoDb:configuration");
 
-            if (string.IsNullOrWhiteSpace(databaseName))
+            if (string.IsNullOrWhiteSpace(configuration))
             {
-                throw new ConfigurationException("You must specify the MongoDB database name in the 'squidex:stores:mongoDb:databaseName' configuration section.");
+                throw new ConfigurationException("Configure the Store MongoDb configuration with 'store:mongoDb:configuration'.");
             }
 
-            var connectionString = Configuration.GetValue<string>("squidex:stores:mongoDb:connectionString");
+            var database = Configuration.GetValue<string>("store:mongoDb:database");
 
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(database))
             {
-                throw new ConfigurationException("You must specify the MongoDB connection string in the 'squidex:stores:mongoDb:connectionString' configuration section.");
+                throw new ConfigurationException("Configure the Store MongoDb database with 'store:mongoDb:database'.");
             }
 
-            var databaseNameContent = Configuration.GetValue<string>("squidex:stores:mongoDb:databaseNameContent");
+            var contentDatabase = Configuration.GetValue<string>("store:mongoDb:databaseNameContent");
 
-            if (string.IsNullOrWhiteSpace(databaseNameContent))
+            if (string.IsNullOrWhiteSpace(contentDatabase))
             {
-                databaseNameContent = databaseName;
+                contentDatabase = database;
             }
 
-            builder.Register(c => new MongoClient(connectionString))
-                .As<IMongoClient>()
+            builder.Register(c => Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s)))
+                .Named<IMongoClient>(MongoClientRegistration)
                 .SingleInstance();
 
-            builder.Register(c => c.Resolve<IMongoClient>().GetDatabase(databaseName))
-                .Named<IMongoDatabase>(MongoDatabaseName)
+            builder.Register(c => c.ResolveNamed<IMongoClient>(MongoClientRegistration).GetDatabase(database))
+                .Named<IMongoDatabase>(MongoDatabaseRegistration)
                 .SingleInstance();
 
-            builder.Register(c => c.Resolve<IMongoClient>().GetDatabase(databaseNameContent))
-                .Named<IMongoDatabase>(MongoDatabaseNameContent)
+            builder.Register(c => c.ResolveNamed<IMongoClient>(MongoClientRegistration).GetDatabase(contentDatabase))
+                .Named<IMongoDatabase>(MongoContentDatabaseRegistration)
                 .SingleInstance();
 
             builder.Register<IUserStore<IdentityUser>>(c =>
                 {
-                    var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityUser>("Identity_Users");
+                    var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseRegistration).GetCollection<IdentityUser>("Identity_Users");
 
                     IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
                     IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
@@ -92,7 +93,7 @@ namespace Squidex.Config.Domain
 
             builder.Register<IRoleStore<IdentityRole>>(c =>
                 {
-                    var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseName).GetCollection<IdentityRole>("Identity_Roles");
+                    var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseRegistration).GetCollection<IdentityRole>("Identity_Roles");
 
                     IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
 
@@ -105,25 +106,25 @@ namespace Squidex.Config.Domain
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<MongoPersistedGrantStore>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IPersistedGrantStore>()
                 .SingleInstance();
 
             builder.RegisterType<MongoEventConsumerInfoRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IEventConsumerInfoRepository>()
                 .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoContentRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseNameContent))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoContentDatabaseRegistration))
                 .As<IContentRepository>()
                 .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoHistoryEventRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IHistoryEventRepository>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()
@@ -131,14 +132,14 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<MongoSchemaRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<ISchemaRepository>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoAppRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseName))
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAppRepository>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()

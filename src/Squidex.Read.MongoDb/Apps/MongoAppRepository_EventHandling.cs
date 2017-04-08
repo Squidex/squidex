@@ -23,7 +23,7 @@ namespace Squidex.Read.MongoDb.Apps
             get { return GetType().Name; }
         }
 
-        public string StreamFilter
+        public string EventsFilter
         {
             get { return "^app-"; }
         }

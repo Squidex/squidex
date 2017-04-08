@@ -37,7 +37,7 @@ namespace Squidex.Read.MongoDb.Contents
             get { return GetType().Name; }
         }
 
-        public string StreamFilter
+        public string EventsFilter
         {
             get { return "^content-"; }
         }

@@ -26,7 +26,7 @@ namespace Squidex.Read.MongoDb.Schemas
             get { return GetType().Name; }
         }
 
-        public string StreamFilter
+        public string EventsFilter
         {
             get { return "^schema-"; }
         }

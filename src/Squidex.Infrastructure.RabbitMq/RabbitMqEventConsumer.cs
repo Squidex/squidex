@@ -21,25 +21,27 @@ namespace Squidex.Infrastructure.RabbitMq
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer
     {
         private readonly JsonSerializerSettings serializerSettings;
+        private readonly string eventPublisherName;
         private readonly string exchange;
-        private readonly string streamFilter;
+        private readonly string eventsFilter;
         private readonly ConnectionFactory connectionFactory;
         private readonly Lazy<IConnection> connection;
         private readonly Lazy<IModel> channel;
 
         public string Name
         {
-            get { return GetType().Name; }
+            get { return eventPublisherName; }
         }
 
-        public string StreamFilter
+        public string EventsFilter
         {
-            get { return streamFilter; }
+            get { return eventsFilter; }
         }
 
-        public RabbitMqEventConsumer(JsonSerializerSettings serializerSettings, string uri, string exchange, string streamFilter)
+        public RabbitMqEventConsumer(JsonSerializerSettings serializerSettings, string eventPublisherName, string uri, string exchange, string eventsFilter)
         {
             Guard.NotNullOrEmpty(uri, nameof(uri));
+            Guard.NotNullOrEmpty(eventPublisherName, nameof(eventPublisherName));
             Guard.NotNullOrEmpty(exchange, nameof(exchange));
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
 
@@ -49,8 +51,8 @@ namespace Squidex.Infrastructure.RabbitMq
             channel = new Lazy<IModel>(() => connection.Value.CreateModel());
 
             this.exchange = exchange;
-
-            this.streamFilter = streamFilter;
+            this.eventsFilter = eventsFilter;
+            this.eventPublisherName = eventPublisherName;
             this.serializerSettings = serializerSettings;
         }
 

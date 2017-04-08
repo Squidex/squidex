@@ -17,9 +17,9 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public string Name { get; }
 
-        public string StreamFilter
+        public string EventsFilter
         {
-            get { return inners.FirstOrDefault()?.StreamFilter; }
+            get { return inners.FirstOrDefault()?.EventsFilter; }
         }
 
         public CompoundEventConsumer(IEventConsumer first, params IEventConsumer[] inners)
