@@ -27,6 +27,16 @@ namespace Squidex.Read.MongoDb.History
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
         private int sessionEventCount;
 
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
+        public string EventsFilter
+        {
+            get { return "*"; }
+        }
+
         public MongoHistoryEventRepository(IMongoDatabase database, IEnumerable<IHistoryEventsCreator> creators) 
             : base(database)
         {
@@ -65,11 +75,6 @@ namespace Squidex.Read.MongoDb.History
                     .SortByDescending(x => x.Created).ThenByDescending(x => x.SessionEventIndex).Limit(count).ToListAsync();
 
             return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
-        }
-
-        public string Name
-        {
-            get { return GetType().Name; }
         }
 
         public async Task On(Envelope<IEvent> @event)

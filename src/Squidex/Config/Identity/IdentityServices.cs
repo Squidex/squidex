@@ -1,4 +1,5 @@
-﻿// ==========================================================================
+﻿
+// ==========================================================================
 //  IdentityServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
@@ -30,29 +31,40 @@ namespace Squidex.Config.Identity
         {
             var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
 
-            var clustererType = configuration.GetValue<string>("squidex:clusterer:type");
+            var keyStoreType = configuration.GetValue<string>("identity:keysStore:type");
 
-            if (clustererType.Equals("redis", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(keyStoreType))
             {
-                var connectionString = configuration.GetValue<string>("squidex:clusterer:redis:connectionString");
+                throw new ConfigurationException("Configure KeyStore type with 'identity:keysStore:type'.");
+            }
 
-                if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.Equals(keyStoreType, "Redis", StringComparison.OrdinalIgnoreCase))
+            {
+                var redisConfiguration = configuration.GetValue<string>("identity:keysStore:redis:configuration");
+
+                if (string.IsNullOrWhiteSpace(redisConfiguration))
                 {
-                    throw new ConfigurationException("You must specify the Redis connection string in the 'squidex:clusterer:redis:connectionString' configuration section.");
+                    throw new ConfigurationException("Configure KeyStore Redis configuration with 'identity:keysStore:redis:configuration'.");
                 }
                 
-                var connectionMultiplexer = ConnectionMultiplexer.Connect(connectionString);
+                var connectionMultiplexer = Singletons<ConnectionMultiplexer>.GetOrAdd(redisConfiguration, s => ConnectionMultiplexer.Connect(s));
 
                 dataProtection.PersistKeysToRedis(connectionMultiplexer);
             }
-            else
+            else if (string.Equals(keyStoreType, "Folder", StringComparison.OrdinalIgnoreCase))
             {
-                var keysFolder = configuration.GetValue<string>("squidex:identity:keysFolder");
+                var folderPath = configuration.GetValue<string>("identity:keysStore:folder:path");
 
-                if (!string.IsNullOrWhiteSpace(keysFolder))
+                if (string.IsNullOrWhiteSpace(folderPath))
                 {
-                    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysFolder));
+                    throw new ConfigurationException("Configure KeyStore Folder path with 'identity:keysStore:folder:path'.");
                 }
+
+                dataProtection.PersistKeysToFileSystem(new DirectoryInfo(folderPath));
+            }
+            else if (!string.Equals(keyStoreType, "InMemory", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ConfigurationException($"Unsupported value '{keyStoreType}' for 'identity:keysStore:type', supported: Redis, Folder, InMemory.");
             }
 
             return services;

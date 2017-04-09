@@ -40,7 +40,7 @@
                 </thead>
 
                 <tbody>
-                    <template ngFor let-contributor [ngForOf]="appContributors">
+                    <ng-template ngFor let-contributor [ngForOf]="appContributors">
                         <tr>
                             <td>
                                 <img class="user-picture" [attr.title]="userName(contributor.contributorId) | async" [attr.src]="userPicture(contributor.contributorId) | async" />
@@ -63,14 +63,14 @@
                             </td>
                         </tr>
                         <tr class="spacer"></tr>
-                    </template>
+                    </ng-template>
                 </tbody>
             </table>
             
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
                     <div class="form-group mr-2">
-                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="contributor"></sqx-autocomplete>
+                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'"></sqx-autocomplete>
                     </div>
 
                     <button type="submit" class="btn btn-success" [disabled]="!addContributorForm.valid">Add Contributor</button>

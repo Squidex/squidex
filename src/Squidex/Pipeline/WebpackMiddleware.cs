@@ -10,7 +10,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 // ReSharper disable LoopCanBeConvertedToQuery
 
@@ -23,12 +22,9 @@ namespace Squidex.Pipeline
         private static readonly string[] Scripts = { "shims.js", "app.js" };
         private static readonly string[] Styles = new string[0];
         private readonly RequestDelegate next;
-        private readonly ILogger logger;
 
-        public WebpackMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public WebpackMiddleware(RequestDelegate next)
         {
-            logger = loggerFactory.CreateLogger<WebpackMiddleware>();
-            
             this.next = next;
         }
 
@@ -76,15 +72,13 @@ namespace Squidex.Pipeline
             context.Response.Body = body;
         }
 
-        private string InjectStyles(string response)
+        private static string InjectStyles(string response)
         {
             if (!response.Contains("</head>"))
             {
                 return response;
             }
-
-            logger.LogInformation("A full html page is returned so the necessary styles for webpack will be injected");
-
+            
             var stylesTag = string.Empty;
 
             foreach (var file in Styles)
@@ -94,20 +88,16 @@ namespace Squidex.Pipeline
 
             response = response.Replace("</head>", $"{stylesTag}</head>");
 
-            logger.LogInformation($"Inject style {stylesTag} as a last element in the head ");
-
             return response;
         }
 
-        private string InjectScripts(string response)
+        private static string InjectScripts(string response)
         {
             if (!response.Contains("</body>"))
             {
                 return response;
             }
-
-            logger.LogInformation("A full html page is returned so the necessary script for webpack will be injected");
-
+            
             var scriptsTag = string.Empty;
 
             foreach (var file in Scripts)
@@ -116,8 +106,6 @@ namespace Squidex.Pipeline
             }
 
             response = response.Replace("</body>", $"{scriptsTag}</body>");
-
-            logger.LogInformation($"Inject script {scriptsTag} as a last element in the body ");
 
             return response;
         }

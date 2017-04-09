@@ -32,6 +32,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
             get { return GetType().Name; }
         }
 
+        public string EventsFilter
+        {
+            get { return "*"; }
+        }
+
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
             : base(cache)
         {
@@ -107,6 +112,10 @@ namespace Squidex.Read.Schemas.Services.Implementations
             if (@event.Payload is FieldEvent fieldEvent)
             {
                 Remove(fieldEvent.AppId, fieldEvent.SchemaId);
+            }
+            else if (@event.Payload is SchemaCreated schemaCreatedEvent)
+            {
+                Remove(schemaCreatedEvent.AppId, schemaCreatedEvent.SchemaId);
             }
             else if (@event.Payload is SchemaDeleted schemaDeletedEvent)
             {

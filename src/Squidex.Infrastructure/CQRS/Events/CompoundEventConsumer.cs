@@ -17,6 +17,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public string Name { get; }
 
+        public string EventsFilter
+        {
+            get { return inners.FirstOrDefault()?.EventsFilter; }
+        }
+
         public CompoundEventConsumer(IEventConsumer first, params IEventConsumer[] inners)
         {
             Guard.NotNull(first, nameof(first));
@@ -24,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             this.inners = new[] { first }.Union(inners).ToArray();
 
-            Name = first.GetType().Name;
+            Name = first.Name;
         }
 
         public CompoundEventConsumer(string name, params IEventConsumer[] inners)

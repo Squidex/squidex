@@ -2,7 +2,7 @@
 
 # What is Squidex?
 
-Squidex is an open source headless CMS and content management hub. In contrast to antraditional CMS Squidex provides a rich API with OData filter and Swagger definitions. It is up to you to build your UI on top of it. It can be website, a native app or just another server. 
+Squidex is an open source headless CMS and content management hub. In contrast to a traditional CMS Squidex provides a rich API with OData filter and Swagger definitions. It is up to you to build your UI on top of it. It can be website, a native app or just another server. 
 We built it on top of ASP.NET Core and CQRS and is tested for Windows and Linux on modern Browsers.
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square)](https://gitter.im/squidex-cms/Lobby)

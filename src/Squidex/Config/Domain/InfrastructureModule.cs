@@ -6,12 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Autofac;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
@@ -19,12 +21,14 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Log;
+using Squidex.Pipeline;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
 namespace Squidex.Config.Domain
 {
-    public class InfrastructureModule : Module
+    public sealed class InfrastructureModule : Module
     {
         private IConfiguration Configuration { get; }
 
@@ -35,6 +39,53 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
+            if (Configuration.GetValue<bool>("logging:human"))
+            {
+                builder.Register(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)))
+                    .AsSelf()
+                    .SingleInstance();
+            }
+            else
+            {
+                builder.Register(c => new Func<IObjectWriter>(() => new JsonLogWriter()))
+                    .AsSelf()
+                    .SingleInstance();
+            }
+
+            var loggingFile = Configuration.GetValue<string>("logging:file");
+
+            if (!string.IsNullOrWhiteSpace(loggingFile))
+            {
+                builder.RegisterInstance(new FileChannel(loggingFile))
+                    .As<ILogChannel>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+            }
+
+            builder.Register(c => new ApplicationInfoLogAppender(GetType(), Guid.NewGuid()))
+                .As<ILogAppender>()
+                .SingleInstance();
+
+            builder.RegisterType<ActionContextLogAppender>()
+                .As<ILogAppender>()
+                .SingleInstance();
+
+            builder.RegisterType<TimestampLogAppender>()
+                .As<ILogAppender>()
+                .SingleInstance();
+
+            builder.RegisterType<DebugLogChannel>()
+                .As<ILogChannel>()
+                .SingleInstance();
+
+            builder.RegisterType<ConsoleLogChannel>()
+                .As<ILogChannel>()
+                .SingleInstance();
+
+            builder.RegisterType<SemanticLog>()
+                .As<ISemanticLog>()
+                .SingleInstance();
+
             builder.Register(c => SystemClock.Instance)
                 .As<IClock>()
                 .SingleInstance();
@@ -63,7 +114,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandBus>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultMemoryEventNotifier>()
+            builder.RegisterType<DefaultEventNotifier>()
                 .As<IEventNotifier>()
                 .SingleInstance();
 

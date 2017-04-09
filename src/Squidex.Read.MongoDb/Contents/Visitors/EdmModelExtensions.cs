@@ -19,6 +19,11 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
         {
             var path = model.EntityContainer.EntitySets().First().Path.Path.Last().Split('.').Last();
 
+            if (query.StartsWith("?"))
+            {
+                query = query.Substring(1);
+            }
+
             var parser = new ODataUriParser(model, new Uri($"{path}?{query}", UriKind.Relative));
 
             return parser;

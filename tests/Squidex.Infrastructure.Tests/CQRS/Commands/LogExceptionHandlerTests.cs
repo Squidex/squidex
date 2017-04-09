@@ -8,43 +8,38 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class LogExceptionHandlerTests
     {
-        private readonly MyLogger logger = new MyLogger();
+        private readonly MyLog log = new MyLog();
         private readonly LogExceptionHandler sut;
         private readonly ICommand command = new Mock<ICommand>().Object;
 
-        private sealed class MyLogger : ILogger<LogExceptionHandler>
+        private sealed class MyLog : ISemanticLog
         {
-            public HashSet<LogLevel> LogLevels { get; } = new HashSet<LogLevel>();
+            public HashSet<SemanticLogLevel> LogLevels { get; } = new HashSet<SemanticLogLevel>();
 
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
+            public void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action)
             {
                 LogLevels.Add(logLevel);
             }
 
-            public bool IsEnabled(LogLevel logLevel)
+            public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
             {
-                return false;
-            }
-
-            public IDisposable BeginScope<TState>(TState state)
-            {
-                return null;
+                throw new NotSupportedException();
             }
         }
 
         public LogExceptionHandlerTests()
         {
-            sut = new LogExceptionHandler(logger);
+            sut = new LogExceptionHandler(log);
         }
 
         [Fact]
@@ -57,7 +52,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(0, logger.LogLevels.Count);
+            Assert.Equal(0, log.LogLevels.Count);
         }
 
         [Fact]
@@ -70,7 +65,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(new[] { LogLevel.Error }, logger.LogLevels.ToArray());
+            Assert.Equal(new[] { SemanticLogLevel.Error }, log.LogLevels.ToArray());
         }
 
         [Fact]
@@ -81,7 +76,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(new[] { LogLevel.Critical }, logger.LogLevels.ToArray());
+            Assert.Equal(new[] { SemanticLogLevel.Fatal }, log.LogLevels.ToArray());
         }
     }
 }

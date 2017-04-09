@@ -92,7 +92,6 @@ namespace Squidex.Write.Contents
             Guard.Valid(command, nameof(command), message);
 
             var taskForApp = appProvider.FindAppByIdAsync(command.AppId.Id);
-
             var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);

@@ -36,19 +36,12 @@ namespace Squidex.Infrastructure
                 return;
             }
 
-            if (disposing)
+            lock (disposeLock)
             {
-                lock (disposeLock)
+                if (!isDisposed)
                 {
-                    if (!isDisposed)
-                    {
-                        DisposeObject(true);
-                    }
+                    DisposeObject(disposing);
                 }
-            }
-            else
-            {
-                DisposeObject(false);
             }
 
             isDisposed = true;

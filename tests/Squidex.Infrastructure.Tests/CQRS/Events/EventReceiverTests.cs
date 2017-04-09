@@ -8,10 +8,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Moq;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class EventReceiverTests : IDisposable
+    public class EventReceiverTests
     {
         public sealed class MyEvent : IEvent
         {
@@ -30,40 +30,44 @@ namespace Squidex.Infrastructure.CQRS.Events
             public long LastHandledEventNumber { get; set; }
 
             public bool IsStopped { get; set; }
-
             public bool IsResetting { get; set; }
 
             public string Name { get; set; }
-
             public string Error { get; set; }
         }
 
-        private sealed class MyLogger : ILogger<EventReceiver>
+        private sealed class MyEventStore : IEventStore
         {
-            public Dictionary<LogLevel, int> LogCount { get; } = new Dictionary<LogLevel, int>();
+            private readonly IEnumerable<StoredEvent> storedEvents;
 
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
+            public MyEventStore(IEnumerable<StoredEvent> storedEvents)
             {
-                var count = LogCount.GetOrDefault(logLevel);
-
-                LogCount[logLevel] = count + 1;
+                this.storedEvents = storedEvents;
             }
 
-            public bool IsEnabled(LogLevel logLevel)
+            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, long lastReceivedEventNumber = -1)
             {
-                return false;
+                foreach (var @event in storedEvents)
+                {
+                    await callback(@event);
+                }
             }
 
-            public IDisposable BeginScope<TState>(TState state)
+            public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, long lastReceivedEventNumber = -1)
             {
-                return null;
+                throw new NotSupportedException();
+            }
+
+            public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events)
+            {
+                throw new NotSupportedException();
             }
         }
 
         private readonly Mock<IEventConsumerInfoRepository> eventConsumerInfoRepository = new Mock<IEventConsumerInfoRepository>();
         private readonly Mock<IEventConsumer> eventConsumer = new Mock<IEventConsumer>();
         private readonly Mock<IEventNotifier> eventNotifier = new Mock<IEventNotifier>();
-        private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
+        private readonly Mock<ISemanticLog> log = new Mock<ISemanticLog>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly EventData eventData1 = new EventData();
         private readonly EventData eventData2 = new EventData();
@@ -72,23 +76,21 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly Envelope<IEvent> envelope2 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> envelope3 = new Envelope<IEvent>(new MyEvent());
         private readonly EventReceiver sut;
-        private readonly MyLogger logger = new MyLogger();
-        private readonly StoredEvent[] events;
         private readonly MyEventConsumerInfo consumerInfo = new MyEventConsumerInfo();
         private readonly string consumerName;
 
         public EventReceiverTests()
         {
-            events = new[]
+            var events = new[]
             {
                 new StoredEvent(3, 3, eventData1),
                 new StoredEvent(4, 4, eventData2),
-                new StoredEvent(4, 4, eventData3)
+                new StoredEvent(5, 5, eventData3)
             };
 
             consumerName = eventConsumer.Object.GetType().Name;
 
-            eventStore.Setup(x => x.GetEventsAsync(2)).Returns(events.ToObservable());
+            var eventStore = new MyEventStore(events);
 
             eventConsumer.Setup(x => x.Name).Returns(consumerName);
             eventConsumerInfoRepository.Setup(x => x.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
@@ -97,12 +99,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
             formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
 
-            sut = new EventReceiver(formatter.Object, eventStore.Object, eventNotifier.Object, eventConsumerInfoRepository.Object, logger);
-        }
-
-        public void Dispose()
-        {
-            sut.Dispose();
+            sut = new EventReceiver(formatter.Object, eventStore, eventNotifier.Object, eventConsumerInfoRepository.Object, log.Object);
         }
 
         [Fact]
@@ -110,21 +107,20 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             sut.Subscribe(eventConsumer.Object);
             sut.Subscribe(eventConsumer.Object);
+            sut.Next();
+            sut.Dispose();
 
             eventConsumerInfoRepository.Verify(x => x.CreateAsync(consumerName), Times.Once());
         }
 
         [Fact]
-        public async Task Should_subscribe_to_consumer_and_handle_events()
+        public void Should_subscribe_to_consumer_and_handle_events()
         {
             consumerInfo.LastHandledEventNumber = 2L;
-            
+
             sut.Subscribe(eventConsumer.Object);
-
-            await Task.Delay(20);
-
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(6, logger.LogCount[LogLevel.Debug]);
+            sut.Next();
+            sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -132,7 +128,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public async Task Should_abort_if_handling_failed()
+        public void Should_abort_if_handling_failed()
         {
             consumerInfo.LastHandledEventNumber = 2L;
 
@@ -140,12 +136,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer.Object);
-
-            await Task.Delay(20);
-
-            Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(3, logger.LogCount[LogLevel.Debug]);
+            sut.Next();
+            sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());
@@ -155,19 +147,15 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public async Task Should_abort_if_serialization_failed()
+        public void Should_abort_if_serialization_failed()
         {
             consumerInfo.LastHandledEventNumber = 2L;
 
             formatter.Setup(x => x.Parse(eventData2)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer.Object);
-
-            await Task.Delay(20);
-
-            Assert.Equal(2, logger.LogCount.Count);
-            Assert.Equal(2, logger.LogCount[LogLevel.Error]);
-            Assert.Equal(2, logger.LogCount[LogLevel.Debug]);
+            sut.Next();
+            sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Never());
@@ -177,19 +165,14 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public async Task Should_reset_if_requested()
+        public void Should_reset_if_requested()
         {
             consumerInfo.IsResetting = true;
             consumerInfo.LastHandledEventNumber = 2L;
-            
-            eventStore.Setup(x => x.GetEventsAsync(-1)).Returns(events.ToObservable());
 
             sut.Subscribe(eventConsumer.Object);
-
-            await Task.Delay(20);
-
-            Assert.Equal(1, logger.LogCount.Count);
-            Assert.Equal(8, logger.LogCount[LogLevel.Debug]);
+            sut.Next();
+            sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
             eventConsumer.Verify(x => x.On(envelope2), Times.Once());

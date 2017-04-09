@@ -51,6 +51,10 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             {
                 cursor = cursor.Skip((int)skip.Value);
             }
+            else
+            {
+                cursor = cursor.Skip(null);
+            }
 
             return cursor;
         }

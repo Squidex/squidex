@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Observable.Empty<StoredEvent>());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(Observable.Empty<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
         }
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent(1, 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent(1, 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));

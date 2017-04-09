@@ -24,11 +24,11 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            var storeType = Configuration.GetValue<string>("squidex:stores:type");
+            var storeType = Configuration.GetValue<string>("store:type");
 
             if (string.IsNullOrWhiteSpace(storeType))
             {
-                throw new ConfigurationException("You must specify the store type in the 'squidex:stores:type' configuration section.");
+                throw new ConfigurationException("Configure the Store type with 'store:type'.");
             }
 
             if (string.Equals(storeType, "MongoDB", StringComparison.OrdinalIgnoreCase))
@@ -37,7 +37,7 @@ namespace Squidex.Config.Domain
             }
             else
             {
-                throw new ConfigurationException($"Unsupported store type '{storeType}' for key 'squidex:stores:type', supported: MongoDb.");
+                throw new ConfigurationException($"Unsupported value '{storeType}' for 'stores:type', supported: MongoDb.");
             }
         }
     }

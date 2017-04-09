@@ -23,6 +23,11 @@ namespace Squidex.Read.MongoDb.Apps
             get { return GetType().Name; }
         }
 
+        public string EventsFilter
+        {
+            get { return "^app-"; }
+        }
+
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload, @event.Headers);

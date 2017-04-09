@@ -33,9 +33,25 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_first_inner_name()
         {
+            const string name = "my-inner-consumer";
+
+            consumer1.Setup(x => x.Name).Returns(name);
+
             var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
 
-            Assert.Equal(consumer1.Object.GetType().Name, sut.Name);
+            Assert.Equal(name, sut.Name);
+        }
+
+        [Fact]
+        public void Should_return_first_inner_filter()
+        {
+            const string filter = "my-inner-filter";
+
+            consumer1.Setup(x => x.EventsFilter).Returns(filter);
+
+            var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
+
+            Assert.Equal(filter, sut.EventsFilter);
         }
 
         [Fact]

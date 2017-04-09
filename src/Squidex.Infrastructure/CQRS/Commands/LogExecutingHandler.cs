@@ -7,23 +7,29 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class LogExecutingHandler : ICommandHandler
     {
-        private readonly ILogger<LogExecutingHandler> logger;
+        private readonly ISemanticLog log;
 
-        public LogExecutingHandler(ILogger<LogExecutingHandler> logger)
+        public LogExecutingHandler(ISemanticLog log)
         {
-            this.logger = logger;
+            Guard.NotNull(log, nameof(log));
+
+            this.log = log;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
         {
-            logger.LogInformation("Handling {0} command", context.Command);
+            log.LogInformation(w => w
+                .WriteProperty("action", "HandleCommand.")
+                .WriteProperty("actionId", context.ContextId.ToString())
+                .WriteProperty("state", "Started")
+                .WriteProperty("commandType", context.Command.GetType().Name));
 
             return TaskHelper.False;
         }

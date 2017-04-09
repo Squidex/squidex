@@ -22,6 +22,8 @@ using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Log.Adapter;
 
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
@@ -49,7 +51,7 @@ namespace Squidex
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables("SQUIDEX__");
 
             Configuration = builder.Build();
         }
@@ -69,15 +71,16 @@ namespace Squidex
             services.AddRouting();
 
             services.Configure<MyUrlsOptions>(
-                Configuration.GetSection("squidex:urls"));
+                Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
-                Configuration.GetSection("squidex:identity"));
+                Configuration.GetSection("identity"));
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterModule(new ClusterModule(Configuration));
+            builder.RegisterModule(new EventPublishersModule(Configuration));
             builder.RegisterModule(new EventStoreModule(Configuration));
             builder.RegisterModule(new InfrastructureModule(Configuration));
+            builder.RegisterModule(new PubSubModule(Configuration));
             builder.RegisterModule(new ReadModule(Configuration));
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));
@@ -95,8 +98,7 @@ namespace Squidex
         
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(LogLevel.Debug);
-            loggerFactory.AddDebug();
+            loggerFactory.AddSemanticLog(app.ApplicationServices.GetRequiredService<ISemanticLog>());
 
             app.TestExternalSystems();
 
@@ -158,7 +160,8 @@ namespace Squidex
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackProxy();
                 
-                app.Use((context, next) => {
+                app.Use((context, next) => 
+                {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/index.html");
@@ -168,7 +171,8 @@ namespace Squidex
             }
             else
             {
-                app.Use((context, next) => {
+                app.Use((context, next) => 
+                {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
                         context.Request.Path = new PathString("/build/index.html");

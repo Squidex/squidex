@@ -13,6 +13,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     public sealed class CommandContext
     {
         private readonly ICommand command;
+        private readonly Guid contextId = Guid.NewGuid();
         private Exception exception;
         private Tuple<object> result;
         
@@ -39,6 +40,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         public Exception Exception
         {
             get { return exception; }
+        }
+
+        public Guid ContextId
+        {
+            get { return contextId; }
         }
 
         public CommandContext(ICommand command)

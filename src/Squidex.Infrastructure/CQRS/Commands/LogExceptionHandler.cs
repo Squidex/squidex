@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
@@ -16,11 +16,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class LogExceptionHandler : ICommandHandler
     {
-        private readonly ILogger<LogExceptionHandler> logger;
+        private readonly ISemanticLog log;
 
-        public LogExceptionHandler(ILogger<LogExceptionHandler> logger)
+        public LogExceptionHandler(ISemanticLog log)
         {
-            this.logger = logger;
+            Guard.NotNull(log, nameof(log));
+
+            this.log = log;
         }
 
         public Task<bool> HandleAsync(CommandContext context)
@@ -29,12 +31,20 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             if (exception != null)
             {
-                logger.LogError(InfrastructureErrors.CommandFailed, exception, "Handling {0} command failed", context.Command);
+                log.LogError(exception, w => w
+                    .WriteProperty("action", "HandleCommand.")
+                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("commandType", context.Command.GetType().Name));
             }
 
             if (!context.IsHandled)
             {
-                logger.LogCritical(InfrastructureErrors.CommandUnknown, exception, "Unknown command {0}", context.Command);
+                log.LogFatal(exception, w => w
+                    .WriteProperty("action", "HandleCommand.")
+                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("state", "Unhandled")
+                    .WriteProperty("commandType", context.Command.GetType().Name));
             }
 
             return TaskHelper.False;

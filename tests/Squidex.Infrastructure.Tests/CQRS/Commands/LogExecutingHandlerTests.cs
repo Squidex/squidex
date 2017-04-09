@@ -8,41 +8,36 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Moq;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class LogExecutingHandlerTests
     {
-        private readonly MyLogger logger = new MyLogger();
+        private readonly MyLog log = new MyLog();
         private readonly LogExecutingHandler sut;
         private readonly ICommand command = new Mock<ICommand>().Object;
 
-        private sealed class MyLogger : ILogger<LogExecutingHandler>
+        private sealed class MyLog : ISemanticLog
         {
             public int LogCount { get; private set; }
 
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatterr)
+            public void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action)
             {
                 LogCount++;
             }
 
-            public bool IsEnabled(LogLevel logLevel)
+            public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
             {
-                return false;
-            }
-
-            public IDisposable BeginScope<TState>(TState state)
-            {
-                return null;
+                throw new NotSupportedException();
             }
         }
         
         public LogExecutingHandlerTests()
         {
-            sut = new LogExecutingHandler(logger);
+            sut = new LogExecutingHandler(log);
         }
 
         [Fact]
@@ -53,7 +48,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);
-            Assert.Equal(1, logger.LogCount);
+            Assert.Equal(1, log.LogCount);
         }
     }
 }
