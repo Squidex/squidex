@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ClusterModule.cs
+//  PubSubModule.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -42,7 +42,7 @@ namespace Squidex.Config.Domain
 
                 if (string.IsNullOrWhiteSpace(configuration))
                 {
-                    throw new ConfigurationException("Configure PubSub Redis configuration with pubSub:redis:configuration'.");
+                    throw new ConfigurationException("Configure PubSub Redis configuration with 'pubSub:redis:configuration'.");
                 }
 
                 builder.Register(c => Singletons<IConnectionMultiplexer>.GetOrAdd(configuration, s => ConnectionMultiplexer.Connect(s)))
