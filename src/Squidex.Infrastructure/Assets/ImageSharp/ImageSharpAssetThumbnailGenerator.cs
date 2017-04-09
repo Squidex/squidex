@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             });
         }
 
-        public Task<bool> IsValidImageAsync(Stream input)
+        public Task<ImageInfo> GetImageInfoAsync(Stream input)
         {
             return Task.Run(() =>
             {
@@ -51,11 +51,18 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 {
                     var image = new Image(input);
 
-                    return image.Width > 0 && image.Height > 0;
+                    if (image.Width > 0 && image.Height > 0)
+                    {
+                        return new ImageInfo(image.Width, image.Height);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 catch
                 {
-                    return false;
+                    return null;
                 }
             });
         }

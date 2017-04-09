@@ -41,12 +41,12 @@ namespace Squidex.Write.Assets
 
         protected void On(AssetCreated @event)
         {
-            fileName = @event.Name;
+            fileName = @event.FileName;
         }
 
         protected void On(AssetRenamed @event)
         {
-            fileName = @event.Name;
+            fileName = @event.FileName;
         }
 
         protected void On(AssetDeleted @event)
@@ -60,7 +60,7 @@ namespace Squidex.Write.Assets
 
             VerifyNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetCreated { Name = command.FileName }));
+            RaiseEvent(SimpleMapper.Map(command, new AssetCreated()));
 
             return this;
         }
@@ -76,12 +76,23 @@ namespace Squidex.Write.Assets
             return this;
         }
 
-        public AssetDomainObject Rename(RenameAsset command)
+        public AssetDomainObject Update(UpdateAsset command)
         {
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
-            VerifyDifferentNames(command.Name, () => "Cannot rename asset.");
+
+            RaiseEvent(SimpleMapper.Map(command, new AssetUpdated()));
+
+            return this;
+        }
+
+        public AssetDomainObject Rename(RenameAsset command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot rename asset.");
+
+            VerifyCreatedAndNotDeleted();
+            VerifyDifferentNames(command.FileName, () => "Cannot rename asset.");
 
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
 
@@ -106,7 +117,7 @@ namespace Squidex.Write.Assets
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (isDeleted || !string.IsNullOrWhiteSpace(fileName))
+            if (isDeleted || string.IsNullOrWhiteSpace(fileName))
             {
                 throw new DomainException("Asset has already been deleted or not created yet.");
             }

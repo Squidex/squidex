@@ -82,7 +82,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Update_should_throw_if_schema_is_deleted()
+        public void Update_should_throw_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -108,7 +108,6 @@ namespace Squidex.Write.Contents
         public void Update_should_create_events()
         {
             CreateContent();
-            UpdateContent();
 
             sut.Update(CreateContentCommand(new UpdateContent { Data = otherData }));
 
@@ -139,7 +138,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Patch_should_throw_if_schema_is_deleted()
+        public void Patch_should_throw_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -165,7 +164,6 @@ namespace Squidex.Write.Contents
         public void Patch_should_create_events()
         {
             CreateContent();
-            UpdateContent();
 
             sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
 
@@ -196,7 +194,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Publish_should_throw_if_schema_is_deleted()
+        public void Publish_should_throw_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -232,7 +230,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Unpublish_should_throw_if_schema_is_deleted()
+        public void Unpublish_should_throw_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();

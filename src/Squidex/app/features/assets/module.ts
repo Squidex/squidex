@@ -11,6 +11,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule } from 'shared';
 
 import {
+    AssetComponent,
     AssetsPageComponent
 } from './declarations';
 
@@ -27,6 +28,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        AssetComponent,
         AssetsPageComponent
     ]
 })

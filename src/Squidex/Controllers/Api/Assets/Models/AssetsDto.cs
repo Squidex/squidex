@@ -1,26 +1,23 @@
 ﻿// ==========================================================================
-//  EntityCreatedDto.cs
+//  AssetsDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-
-namespace Squidex.Controllers.Api
+namespace Squidex.Controllers.Api.Assets.Models
 {
-    public class EntityCreatedDto
+    public sealed class AssetsDto
     {
         /// <summary>
-        /// Id of the created entity.
+        /// The total number of assets.
         /// </summary>
-        [Required]
-        public string Id { get; set; }
+        public long Total { get; set; }
 
         /// <summary>
-        /// The new version of the entity.
+        /// The assets.
         /// </summary>
-        public long Version { get; set; }
+        public AssetDto[] Items { get; set; }
     }
 }

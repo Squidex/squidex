@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateAsset.cs
+//  UpdateAssetCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,10 +8,8 @@
 
 namespace Squidex.Write.Assets.Commands
 {
-    public sealed class CreateAsset : AssetAggregateCommand
+    public class UpdateAsset : AssetAggregateCommand
     {
-        public string FileName { get; set; }
-
         public string MimeType { get; set; }
 
         public long FileSize { get; set; }

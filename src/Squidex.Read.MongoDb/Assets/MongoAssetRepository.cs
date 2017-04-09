@@ -12,13 +12,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Assets;
 using Squidex.Read.Assets.Repositories;
 
 namespace Squidex.Read.MongoDb.Assets
 {
-    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
+    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
     {
         public MongoAssetRepository(IMongoDatabase database) 
             : base(database)
@@ -53,7 +54,7 @@ namespace Squidex.Read.MongoDb.Assets
             return entity;
         }
 
-        private static FilterDefinition<MongoAssetEntity> CreateFilter(Guid appId, HashSet<string> mimeTypes, string query)
+        private static FilterDefinition<MongoAssetEntity> CreateFilter(Guid appId, ICollection<string> mimeTypes, string query)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
@@ -67,7 +68,7 @@ namespace Squidex.Read.MongoDb.Assets
 
             if (!string.IsNullOrWhiteSpace(query))
             {
-                filters.Add(Filter.Regex(x => x.Name, new BsonRegularExpression(query, "i")));
+                filters.Add(Filter.Regex(x => x.FileName, new BsonRegularExpression(query, "i")));
             }
 
             var filter = Filter.And(filters);

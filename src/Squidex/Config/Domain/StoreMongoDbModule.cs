@@ -18,9 +18,11 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Read.Assets.Repositories;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.History.Repositories;
 using Squidex.Read.MongoDb.Apps;
+using Squidex.Read.MongoDb.Assets;
 using Squidex.Read.MongoDb.Contents;
 using Squidex.Read.MongoDb.History;
 using Squidex.Read.MongoDb.Infrastructure;
@@ -123,6 +125,22 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.RegisterType<MongoAppRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAppRepository>()
+                .As<IEventConsumer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoAssetRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAssetRepository>()
+                .As<IEventConsumer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<MongoHistoryEventRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IHistoryEventRepository>()
@@ -134,14 +152,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoSchemaRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<ISchemaRepository>()
-                .As<IExternalSystem>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoAppRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<IAppRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();

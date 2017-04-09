@@ -13,13 +13,13 @@ namespace Squidex.Write.Assets.Commands
 {
     public sealed class RenameAsset : AssetAggregateCommand, IValidatable
     {
-        public string Name { get; set; }
+        public string FileName { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!string.IsNullOrWhiteSpace(Name))
+            if (string.IsNullOrWhiteSpace(FileName))
             {
-                errors.Add(new ValidationError("Name must not be null or empty.", nameof(Name)));
+                errors.Add(new ValidationError("File name must not be null or empty.", nameof(FileName)));
             }
         }
     }

@@ -1,0 +1,11 @@
+@import '_vars';
+@import '_mixins';
+
+$card-size: 16rem;
+
+.card {
+    width: $card-size;
+    height: $card-size;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+}

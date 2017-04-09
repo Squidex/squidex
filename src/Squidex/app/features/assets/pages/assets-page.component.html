@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Assets" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<sqx-panel panelWidth="60rem">
+<sqx-panel panelWidth="80rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <h3 class="panel-title">Assets</h3>
@@ -13,7 +13,26 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
+            <div class="file-drop" (sqxFileDrop)="onDrop($event)">
+                <h3 class="file-drop-header">Drop files here to upload</h3>
+
+                <div class="file-drop-or">or</div>
+
+                <div class="file-drop-button">
+                    <button class="btn btn-success">Select Files</button>
+                </div>
+
+                <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
+            </div>
             
+            <div>
+                <span *ngFor="let file of newFiles">
+                    <sqx-asset [initFile]="file"></sqx-asset>
+                </span>
+                <span *ngFor="let asset of assetsItems">
+                    <sqx-asset [asset]="asset"></sqx-asset>
+                </span>
+            </div>
         </div>
     </div>
 </sqx-panel>

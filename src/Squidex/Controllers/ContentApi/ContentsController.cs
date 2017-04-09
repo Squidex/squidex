@@ -64,7 +64,7 @@ namespace Squidex.Controllers.ContentApi
 
             await Task.WhenAll(taskForContents, taskForCount);
 
-            var model = new ContentsDto
+            var model = new AssetsDto
             {
                 Total = taskForCount.Result,
                 Items = taskForContents.Result.Take(200).Select(x =>

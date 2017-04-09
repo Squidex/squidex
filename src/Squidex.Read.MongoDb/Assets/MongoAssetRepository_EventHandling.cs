@@ -1,8 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// ==========================================================================
+//  MongoAssetRepository_EventHandling.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
 using System.Threading.Tasks;
-using Squidex.Events.Apps;
 using Squidex.Events.Assets;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
@@ -13,6 +17,16 @@ namespace Squidex.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository
     {
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
+        public string EventsFilter
+        {
+            get { return "^asset-"; }
+        }
+
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload, @event.Headers);

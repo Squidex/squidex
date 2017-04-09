@@ -1,18 +1,23 @@
 ﻿// ==========================================================================
-//  AssetRenamed.cs
+//  ImageInfo.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-namespace Squidex.Events.Assets
+namespace Squidex.Infrastructure.Assets
 {
-    [TypeName("AssetRenamedEvent")]
-    public class AssetRenamed : AssetEvent
+    public sealed class ImageInfo
     {
-        public string FileName { get; set; }
+        public int PixelWidth { get; }
+
+        public int PixelHeight { get; }
+
+        public ImageInfo(int pixelWidth, int pixelHeight)
+        {
+            PixelWidth = pixelWidth;
+            PixelHeight = pixelHeight;
+        }
     }
 }

@@ -18,5 +18,9 @@ namespace Squidex.Events.Assets
         public long FileSize { get; set; }
 
         public bool IsImage { get; set; }
+
+        public int? PixelWidth { get; set; }
+
+        public int? PixelHeight { get; set; }
     }
 }

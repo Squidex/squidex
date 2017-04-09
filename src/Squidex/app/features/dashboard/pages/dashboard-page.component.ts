@@ -15,7 +15,7 @@ import {
     fadeAnimation,
     NotificationService,
     UsersProviderService
- } from 'shared';
+} from 'shared';
 
 declare var _urq: any;
 

@@ -12,8 +12,14 @@ namespace Squidex.Read.Assets
     {
         string MimeType { get; }
 
-        string Name { get; }
+        string FileName { get; }
 
         long FileSize { get; }
+
+        bool IsImage { get; }
+
+        int? PixelWidth { get; }
+
+        int? PixelHeight { get; }
     }
 }

@@ -63,6 +63,10 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
+            builder.RegisterType<AssetCommandHandler>()
+                .As<ICommandHandler>()
+                .SingleInstance();
+
             builder.RegisterType<ContentCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();

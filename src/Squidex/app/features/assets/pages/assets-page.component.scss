@@ -1,2 +1,24 @@
 @import '_vars';
 @import '_mixins';
+
+.file-drop {
+    & {
+        border: 2px dashed $color-border;
+        background: transparent;
+        padding: 1rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    &-or {
+        font-size: .8rem;
+    }
+
+    &-button {
+        margin: .5rem 0;
+    }
+
+    &-info {
+        color: $color-subtext;
+    }
+}

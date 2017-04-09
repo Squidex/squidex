@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -16,7 +14,7 @@ namespace Squidex.Read.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
-        public string Name { get; set; }
+        public string FileName { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -24,7 +22,19 @@ namespace Squidex.Read.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
+        public bool IsImage { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public long Version { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public int? PixelWidth { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public int? PixelHeight { get; set; }
 
         [BsonRequired]
         [BsonElement]

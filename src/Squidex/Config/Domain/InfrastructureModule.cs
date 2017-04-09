@@ -18,6 +18,8 @@ using NodaTime;
 using Squidex.Core.Schemas;
 using Squidex.Core.Schemas.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
@@ -120,6 +122,10 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<DefaultNameResolver>()
                 .As<IStreamNameResolver>()
+                .SingleInstance();
+
+            builder.RegisterType<ImageSharpAssetThumbnailGenerator>()
+                .As<IAssetThumbnailGenerator>()
                 .SingleInstance();
 
             builder.RegisterType<EventDataFormatter>()

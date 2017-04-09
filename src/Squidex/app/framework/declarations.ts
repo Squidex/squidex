@@ -13,6 +13,7 @@ export * from './angular/control-errors.component';
 export * from './angular/copy.directive';
 export * from './angular/date-time-editor.component';
 export * from './angular/date-time.pipes';
+export * from './angular/file-drop.directive';
 export * from './angular/focus-on-change.directive';
 export * from './angular/focus-on-init.directive';
 export * from './angular/geolocation-editor.component';

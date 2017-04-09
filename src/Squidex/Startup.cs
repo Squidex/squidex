@@ -77,6 +77,7 @@ namespace Squidex
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
+            builder.RegisterModule(new AssetStoreModule(Configuration));
             builder.RegisterModule(new EventPublishersModule(Configuration));
             builder.RegisterModule(new EventStoreModule(Configuration));
             builder.RegisterModule(new InfrastructureModule(Configuration));
