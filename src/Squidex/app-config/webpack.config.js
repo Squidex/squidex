@@ -48,9 +48,16 @@ module.exports = {
                     loader: 'angular2-router-loader'
                 }, {
                     loader: 'angular2-template-loader'
-                },{
+                }, {
                     loader: 'tslint-loader' 
-                }]
+                }],
+                exclude: /node_modules/
+            },{
+                test: /\.ts$/,
+                use: [{
+                    loader: 'awesome-typescript-loader' 
+                }],
+                include: /node_modules/
             }, {
                 test: /\.html$/,
                 use: [{

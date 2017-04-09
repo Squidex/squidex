@@ -32,20 +32,20 @@ namespace Squidex.Controllers.Api.Assets
     [SwaggerTag("Assets")]
     public class AssetsController : ControllerBase
     {
-        private readonly IAssetStorage assetStorage;
+        private readonly IAssetStore assetStorage;
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly AssetConfig assetsConfig;
-        private readonly IAssetThumbnailGenerator thumbnailGenerator;
 
         public AssetsController(
             ICommandBus commandBus, 
-            IAssetStorage assetStorage, 
-            IAssetThumbnailGenerator thumbnailGenerator,
+            IAssetStore assetStorage, 
+            IAssetThumbnailGenerator assetThumbnailGenerator, 
             IOptions<AssetConfig> assetsConfig) 
             : base(commandBus)
         {
             this.assetStorage = assetStorage;
+            this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.assetsConfig = assetsConfig.Value;
-            this.thumbnailGenerator = thumbnailGenerator;
         }
 
         /// <summary>
@@ -72,32 +72,24 @@ namespace Squidex.Controllers.Api.Assets
                 throw new ValidationException("Cannot create asset.", error);
             }
 
+            var fileContent = new MemoryStream();
+
+            await file.OpenReadStream().CopyToAsync(fileContent);
+
+            fileContent.Position = 0;
+
             var command = new CreateAsset
             {
                 AssetId = Guid.NewGuid(),
                 FileSize = file.Length,
                 FileName = file.Name,
-                MimeType = file.ContentType
+                MimeType = file.ContentType,
+                IsImage = await assetThumbnailGenerator.IsValidImageAsync(fileContent)
             };
             
-            var fileContent = new MemoryStream();
-
-            await file.CopyToAsync(fileContent);
-
             fileContent.Position = 0;
 
-            var fileThumbnail = await thumbnailGenerator.GetThumbnailOrNullAsync(fileContent, 200);
-
-            if (fileThumbnail != null)
-            {
-                command.IsImage = true;
-
-                await assetStorage.UploadAssetAsync(command.AssetId, fileThumbnail, "thumbnail");
-            }
-
-            fileContent.Position = 0;
-
-            await assetStorage.UploadAssetAsync(command.AssetId, fileContent);
+            await assetStorage.UploadAssetAsync($"{command.AssetId}_0", fileContent);
 
             var context = await CommandBus.PublishAsync(command);
 

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription} from 'rxjs';
 
 import {
@@ -27,7 +27,7 @@ declare var _urq: any;
         fadeAnimation
     ]
 })
-export class DashboardPageComponent extends AppComponentBase {
+export class DashboardPageComponent extends AppComponentBase implements OnInit, OnDestroy {
     private authenticationSubscription: Subscription;
 
     public profileDisplayName = '';

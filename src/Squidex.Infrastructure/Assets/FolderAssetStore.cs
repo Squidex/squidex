@@ -1,24 +1,28 @@
 ﻿// ==========================================================================
-//  PhysicalAssetStorage.cs
+//  FolderAssetStorage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Log;
 
-namespace Squidex.Infrastructure.Assets.Physical
+namespace Squidex.Infrastructure.Assets
 {
-    public sealed class PhysicalAssetStorage : IAssetStorage, IExternalSystem
+    public sealed class FolderAssetStore : IAssetStore, IExternalSystem
     {
+        private readonly ISemanticLog log;
         private readonly DirectoryInfo directory;
 
-        public PhysicalAssetStorage(string path)
+        public FolderAssetStore(string path, ISemanticLog log)
         {
             Guard.NotNullOrEmpty(path, nameof(path));
+            Guard.NotNull(log, nameof(log));
+
+            this.log = log;
 
             directory = new DirectoryInfo(path);
         }
@@ -31,6 +35,10 @@ namespace Squidex.Infrastructure.Assets.Physical
                 {
                     directory.Create();
                 }
+
+                log.LogInformation(w => w
+                    .WriteProperty("action", "FolderAssetStoreConfigured")
+                    .WriteProperty("path", directory.FullName));
             }
             catch
             {
@@ -41,23 +49,30 @@ namespace Squidex.Infrastructure.Assets.Physical
             }
         }
 
-        public Task<Stream> GetAssetAsync(Guid id, string tags = null)
+        public Task<Stream> GetAssetAsync(string name)
         {
-            var file = GetFile(id, tags);
+            var file = GetFile(name);
 
             Stream stream = null;
 
-            if (file.Exists)
+            try
             {
-                stream = file.OpenRead();
+                if (file.Exists)
+                {
+                    stream = file.OpenRead();
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                stream = null;
             }
 
             return Task.FromResult(stream);
         }
 
-        public async Task UploadAssetAsync(Guid id, Stream stream, string tags = null)
+        public async Task UploadAssetAsync(string name, Stream stream)
         {
-            var file = GetFile(id, tags);
+            var file = GetFile(name);
 
             using (var fileStream = file.OpenWrite())
             {
@@ -65,18 +80,11 @@ namespace Squidex.Infrastructure.Assets.Physical
             }
         }
 
-        private FileInfo GetFile(Guid id, string tags)
+        private FileInfo GetFile(string name)
         {
-            var fileName = id.ToString();
+            Guard.ValidFileName(name, nameof(name));
 
-            if (!string.IsNullOrWhiteSpace(tags))
-            {
-                fileName += tags;
-            }
-
-            Guard.ValidFileName(fileName, tags);
-
-            var file = new FileInfo(Path.Combine(directory.FullName, fileName));
+            var file = new FileInfo(Path.Combine(directory.FullName, name));
 
             return file;
         }

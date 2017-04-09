@@ -26,6 +26,7 @@ export * from './services/app-clients.service';
 export * from './services/app-languages.service';
 export * from './services/apps-store.service';
 export * from './services/apps.service';
+export * from './services/assets.service';
 export * from './services/auth.service';
 export * from './services/contents.service';
 export * from './services/event-consumers.service';

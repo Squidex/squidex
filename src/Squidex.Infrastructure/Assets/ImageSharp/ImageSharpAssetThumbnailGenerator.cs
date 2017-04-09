@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
         public Task<Stream> GetThumbnailOrNullAsync(Stream input, int dimension)
         {
-            return Task.Run<Stream>(() =>
+            return Task.Run(() =>
             {
                 var result = new MemoryStream();
 
@@ -39,7 +39,24 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                 image.Save(result);
 
-                return result;
+                return (Stream)result;
+            });
+        }
+
+        public Task<bool> IsValidImageAsync(Stream input)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    var image = new Image(input);
+
+                    return image.Width > 0 && image.Height > 0;
+                }
+                catch
+                {
+                    return false;
+                }
             });
         }
     }

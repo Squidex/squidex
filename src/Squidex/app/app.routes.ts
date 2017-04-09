@@ -54,6 +54,9 @@ export const routes: Routes = [
                         path: 'schemas',
                         loadChildren: './features/schemas/module#SqxFeatureSchemasModule'
                     }, {
+                        path: 'assets',
+                        loadChildren: './features/assets/module#SqxFeatureAssetsModule'
+                    }, {
                         path: 'settings',
                         loadChildren: './features/settings/module#SqxFeatureSettingsModule'
                     }

@@ -12,6 +12,7 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline.CommandHandlers;
 using Squidex.Write.Apps;
+using Squidex.Write.Assets;
 using Squidex.Write.Contents;
 using Squidex.Write.Schemas;
 
@@ -75,6 +76,10 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)))
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register<DomainObjectFactoryFunction<AssetDomainObject>>(c => (id => new AssetDomainObject(id, -1)))
                 .AsSelf()
                 .SingleInstance();
 

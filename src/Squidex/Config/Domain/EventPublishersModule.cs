@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RabbitMqModule.cs
+//  EventPublishersModule.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
