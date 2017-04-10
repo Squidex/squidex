@@ -105,7 +105,6 @@ namespace Squidex.Controllers.Api.Assets
         [HttpPost]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostAsset(string app, List<IFormFile> files)
         {

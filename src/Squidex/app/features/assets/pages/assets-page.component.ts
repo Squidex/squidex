@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+// tslint:disable:prefer-for-of
+
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -32,7 +34,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
     public newFiles = ImmutableArray.empty<File>();
 
     public assetsItems = ImmutableArray.empty<AssetDto>();
-    public assetsPager = new Pager(0);
+    public assetsPager = new Pager(0, 0, 12);
     public assetsFilter = new FormControl();
     public assertQuery = '';
 
@@ -47,7 +49,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public search() {
-        this.assetsPager = new Pager(0);
+        this.assetsPager = new Pager(0, 0, 12);
         this.assertQuery = this.assetsFilter.value;
 
         this.load();
@@ -76,9 +78,9 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
         this.load();
     }
 
-    public onDrop(files: File[]) {
-        for (let file of files) {
-            this.newFiles = this.newFiles.pushFront(file);
+    public addFiles(files: FileList) {
+        for (let i = 0; i < files.length; i++) {
+            this.newFiles = this.newFiles.pushFront(files[i]);
         }
     }
 }

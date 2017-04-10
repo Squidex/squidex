@@ -5,9 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import {
+    ApiUrlConfig,
     AppComponentBase,
     AppsStoreService,
     AssetDto,
@@ -28,6 +30,10 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     @Input()
     public asset: AssetDto;
 
+    public get previewUrl(): Observable<string> {
+        return this.appName().map(app => this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=140&mode=Crop`));
+    }
+
     public get fileInfo(): string {
         let result = '';
 
@@ -43,7 +49,9 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly zone: NgZone
     ) {
         super(notifications, users, apps);
     }
@@ -53,11 +61,13 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
         if (initFile) {
             this.appName()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile))
+                .switchMap(app => this.assetsService.uploadFile(app, initFile)).delay(2000)
                 .subscribe(result => {
-                    if (result instanceof AssetDto) {
-                        this.asset = result;
-                    }
+                    this.zone.run(() => {
+                        if (result instanceof AssetDto) {
+                            this.asset = result;
+                        }
+                    });
                 }, error => {
                     this.notifyError(error);
                 });

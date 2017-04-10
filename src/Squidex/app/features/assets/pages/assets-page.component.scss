@@ -8,6 +8,7 @@
         padding: 1rem;
         text-align: center;
         margin-bottom: 1rem;
+        margin-right: 0;
     }
 
     &-or {
@@ -21,4 +22,27 @@
     &-info {
         color: $color-subtext;
     }
+}
+
+.btn {
+    cursor: pointer;
+}
+
+.btn-input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.col-3 {
+    padding-left: 8px;
+    padding-right: 8px;
 }

@@ -12,7 +12,7 @@ import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 })
 export class FileDropDirective {
     @Output('sqxFileDrop')
-    public drop = new EventEmitter<File[]>();
+    public drop = new EventEmitter<FileList>();
 
     @HostListener('dragenter', ['$event'])
     public onDragEnter(event: DragDropEvent) {
@@ -26,16 +26,7 @@ export class FileDropDirective {
 
     @HostListener('drop', ['$event'])
     public onDrop(event: DragDropEvent) {
-        const files: File[] = [];
-
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < event.dataTransfer.files.length; i++) {
-            const file = event.dataTransfer.files[i];
-
-            files.push(file);
-        }
-
-        this.drop.emit(files);
+        this.drop.emit(event.dataTransfer.files);
 
         this.stopEvent(event);
     }

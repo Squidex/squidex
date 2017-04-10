@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using ImageSharp;
@@ -22,24 +23,46 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             Configuration.Default.AddImageFormat(new PngFormat());
         }
 
-        public Task<Stream> GetThumbnailOrNullAsync(Stream input, int dimension)
+        public Task<Stream> CreateThumbnailAsync(Stream input, int? width, int? height, string mode)
         {
             return Task.Run(() =>
             {
+                if (width == null && height == null)
+                {
+                    return input;
+                }
+
+                if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
+                {
+                    resizeMode = ResizeMode.Max;
+                }
+
+                var w = width ?? int.MaxValue;
+                var h = height ?? int.MaxValue;
+
                 var result = new MemoryStream();
 
-                var options =
-                    new ResizeOptions
+                using (var sourceImage = Image.Load(input))
+                {
+                    if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop)
                     {
-                        Size = new Size(dimension, dimension),
-                        Mode = ResizeMode.Max
-                    };
+                        resizeMode = ResizeMode.BoxPad;
+                    }
 
-                var image = new Image(input).Resize(options);
+                    var options =
+                        new ResizeOptions
+                        {
+                            Size = new Size(w, h),
+                            Mode = resizeMode
+                        };
 
-                image.Save(result);
+                    sourceImage.MetaData.Quality = 0;
+                    sourceImage.Resize(options).Save(result);
+                }
 
-                return (Stream)result;
+                result.Position = 0;
+
+                return result;
             });
         }
 
@@ -47,23 +70,22 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
         {
             return Task.Run(() =>
             {
+                ImageInfo imageInfo = null;
                 try
                 {
-                    var image = new Image(input);
+                    var image = Image.Load(input);
 
                     if (image.Width > 0 && image.Height > 0)
                     {
-                        return new ImageInfo(image.Width, image.Height);
-                    }
-                    else
-                    {
-                        return null;
+                        imageInfo = new ImageInfo(image.Width, image.Height);
                     }
                 }
                 catch
                 {
-                    return null;
+                    imageInfo = null;
                 }
+
+                return imageInfo;
             });
         }
     }

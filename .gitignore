@@ -20,3 +20,4 @@ node_modules/
 **/wwwroot/scripts/**/*.*
 
 /src/Squidex/appsettings.Development.json
+/src/Squidex/Assets

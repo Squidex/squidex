@@ -1,7 +1,12 @@
-<div class="card">
-    <div class="card-block">
-    </div>
-    <div class="card-footer">
-        {{fileInfo}}
+<div class="asset">
+    <div class="card">
+        <div class="card-block">
+            <div *ngIf="asset && asset.isImage">
+                <img [attr.src]="previewUrl | async">
+            </div>
+        </div>
+        <div class="card-footer">
+            {{fileInfo}}
+        </div>
     </div>
 </div>

@@ -26,12 +26,17 @@ namespace Squidex.Read.MongoDb.Assets
         {
         }
 
+        protected override string CollectionName()
+        {
+            return "Projections_Assets";
+        }
+
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, string query = null, int take = 10, int skip = 0)
         {
             var filter = CreateFilter(appId, mimeTypes, query);
 
             var assets =
-                await Collection.Find(filter).Skip(skip).Limit(take).ToListAsync();
+                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.LastModified).ToListAsync();
 
             return assets.OfType<IAssetEntity>().ToList();
         }

@@ -1,11 +1,25 @@
 @import '_vars';
 @import '_mixins';
 
-$card-size: 16rem;
+$card-size: 240px;
+
+:host {
+    padding-bottom: 1rem;
+}
 
 .card {
-    width: $card-size;
-    height: $card-size;
-    margin-right: 1rem;
-    margin-bottom: 1rem;
+    & {
+        height: $card-size;
+    }
+
+    &-block {
+        padding: .8rem .8rem 0;
+    }
+
+    &-footer {
+        border: 0;
+        font-size: .8rem;
+        font-weight: normal;
+        padding: .8rem;
+    }
 }
