@@ -14,6 +14,7 @@ import {
     AppsStoreService,
     AssetDto,
     AssetsService,
+    fadeAnimation,
     NotificationService,
     UsersProviderService
 } from 'shared';
@@ -21,7 +22,10 @@ import {
 @Component({
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
-    templateUrl: './asset.component.html'
+    templateUrl: './asset.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class AssetComponent extends AppComponentBase implements OnInit {
     @Input()
@@ -31,7 +35,27 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public asset: AssetDto;
 
     public get previewUrl(): Observable<string> {
-        return this.appName().map(app => this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=140&mode=Crop`));
+        return this.appName().map(app => this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop`));
+    }
+
+    public get fileType(): string {
+        let result = '';
+
+        if (this.asset != null) {
+            result = this.asset.mimeType.split('/')[1];
+        }
+
+        return result;
+    }
+
+    public get fileName(): string {
+        let result = '';
+
+        if (this.asset != null) {
+            result = this.asset.fileName;
+        }
+
+        return result;
     }
 
     public get fileInfo(): string {

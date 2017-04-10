@@ -5,18 +5,31 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Output, Renderer } from '@angular/core';
 
 @Directive({
     selector: '[sqxFileDrop]'
 })
 export class FileDropDirective {
+    private dragCounter = 0;
+
     @Output('sqxFileDrop')
     public drop = new EventEmitter<FileList>();
 
+    constructor(
+        private readonly elementRef: ElementRef,
+        private readonly renderer: Renderer
+    ) {
+    }
+
+    @HostListener('dragleave', ['$event'])
+    public onDragLeave(event: DragDropEvent) {
+        this.dragEnd();
+    }
+
     @HostListener('dragenter', ['$event'])
     public onDragEnter(event: DragDropEvent) {
-        this.tryStopEvent(event);
+        this.dragStart();
     }
 
     @HostListener('dragover', ['$event'])
@@ -28,12 +41,29 @@ export class FileDropDirective {
     public onDrop(event: DragDropEvent) {
         this.drop.emit(event.dataTransfer.files);
 
+        this.dragEnd(0);
         this.stopEvent(event);
     }
 
     private stopEvent(event: Event) {
         event.preventDefault();
         event.stopPropagation();
+    }
+
+    private dragStart() {
+        this.dragCounter++;
+
+        if (this.dragCounter === 1) {
+            this.renderer.setElementClass(this.elementRef.nativeElement, 'drag', true);
+        }
+    }
+
+    private dragEnd(number?: number ) {
+        this.dragCounter = number || this.dragCounter - 1;
+
+        if (this.dragCounter === 0) {
+            this.renderer.setElementClass(this.elementRef.nativeElement, 'drag', false);
+        }
     }
 
     private tryStopEvent(event: DragDropEvent) {

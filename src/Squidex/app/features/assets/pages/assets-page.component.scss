@@ -3,6 +3,7 @@
 
 .file-drop {
     & {
+        @include transition(border-color .4s ease);
         border: 2px dashed $color-border;
         background: transparent;
         padding: 1rem;
@@ -11,16 +12,22 @@
         margin-right: 0;
     }
 
+    &.drag {
+        border-color: darken($color-border, 10%);
+        border-style: dashed;
+        cursor: copy;
+    }
+
     &-or {
         font-size: .8rem;
     }
 
-    &-button {
-        margin: .5rem 0;
-    }
-
     &-info {
         color: $color-subtext;
+    }
+
+    &-button {
+        margin: .5rem 0;
     }
 }
 

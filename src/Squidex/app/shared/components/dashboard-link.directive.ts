@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { AppsStoreService } from './../services/apps-store.service';
 
 @Directive({
-    selector: '[dashboardLink]'
+    selector: '[sqxDashboardLink]'
 })
 export class DashboardLinkDirective implements OnInit, OnDestroy {
     private appSubscription: Subscription;

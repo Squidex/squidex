@@ -17,6 +17,7 @@ export * from './angular/file-drop.directive';
 export * from './angular/focus-on-change.directive';
 export * from './angular/focus-on-init.directive';
 export * from './angular/geolocation-editor.component';
+export * from './angular/hide-invalid-image.directive';
 export * from './angular/http-utils';
 export * from './angular/indeterminate-value.directive';
 export * from './angular/json-editor.component';

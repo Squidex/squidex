@@ -1,12 +1,21 @@
 <div class="asset">
     <div class="card">
         <div class="card-block">
-            <div *ngIf="asset && asset.isImage">
-                <img [attr.src]="previewUrl | async">
+            <div *ngIf="asset">
+                <div class="file-type">{{fileType}}</div>
+                
+                <div *ngIf="asset.isImage" [@fade]>
+                    <img [attr.src]="previewUrl | async" sqxHideInvalidImage>
+                </div>
             </div>
         </div>
         <div class="card-footer">
-            {{fileInfo}}
+            <div class="file-name">
+                {{fileName}}
+            </div>
+            <div class="file-info">
+                {{fileInfo}}
+            </div>
         </div>
     </div>
 </div>

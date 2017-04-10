@@ -3,6 +3,9 @@
 
 $card-size: 240px;
 
+$color-type-background: #000;
+$color-type-foreground: #fff;
+
 :host {
     padding-bottom: 1rem;
 }
@@ -14,12 +17,38 @@ $card-size: 240px;
 
     &-block {
         padding: .8rem .8rem 0;
+        position: relative;
     }
 
     &-footer {
         border: 0;
+        background: transparent;
+        padding: .8rem;
+        padding-top: .4rem;
+    }
+}
+
+.file {
+    &-info {
+        font-size: .8rem;
+    }
+
+    &-name {
+        @include truncate;
+        font-size: 1rem;
+        font-weight: normal;
+        line-height: 2rem;
+    }
+
+    &-type {
+        @include absolute(1.1rem, auto, auto, 1.1rem);
+        @include border-radius(2px);
+        @include opacity(.8);
+        background: $color-type-background;
+        border: 0;
+        padding: .1rem .3rem;
         font-size: .8rem;
         font-weight: normal;
-        padding: .8rem;
+        color: $color-type-foreground;
     }
 }
