@@ -93,12 +93,12 @@ namespace Squidex.Controllers.Api.Assets.Models
                 CreatedBy = command.Actor,
                 LastModified = now,
                 LastModifiedBy = command.Actor,
-                FileName = command.FileName,
-                FileSize = command.FileSize,
-                MimeType = command.MimeType,
-                IsImage = command.IsImage,
-                PixelWidth = command.PixelWidth,
-                PixelHeight = command.PixelHeight
+                FileName = command.File.FileName,
+                FileSize = command.File.FileSize,
+                MimeType = command.File.MimeType,
+                IsImage = command.ImageInfo != null,
+                PixelWidth = command.ImageInfo?.PixelWidth,
+                PixelHeight = command.ImageInfo?.PixelHeight
             };
 
             return response;

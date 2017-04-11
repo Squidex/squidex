@@ -1,11 +1,14 @@
 <div class="asset">
-    <div class="card">
+    <div class="card" (sqxFileDrop)="updateFile($event)">
         <div class="card-block">
-            <div *ngIf="asset">
+            <div *ngIf="asset" [@fade]>
                 <div class="file-type">{{fileType}}</div>
                 
-                <div *ngIf="asset.isImage" [@fade]>
+                <div *ngIf="asset.isImage">
                     <img [attr.src]="previewUrl | async" sqxHideInvalidImage>
+                </div>
+                <div *ngIf="!asset.isImage" class="file-icon-container">
+                    <img [attr.src]="fileIcon" sqxHideInvalidImage>
                 </div>
             </div>
         </div>
@@ -16,6 +19,11 @@
             <div class="file-info">
                 {{fileInfo}}
             </div>
+        </div>
+        <div class="drop-overlay">
+            <div class="drop-overlay-background"></div>
+
+            <span class="drop-overlay-text">Drop to update</span>
         </div>
     </div>
 </div>

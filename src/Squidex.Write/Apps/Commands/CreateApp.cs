@@ -17,11 +17,16 @@ namespace Squidex.Write.Apps.Commands
     {
         public string Name { get; set; }
 
-        public Guid AggregateId { get; set; }
+        public Guid AppId { get; set; }
+
+        Guid IAggregateCommand.AggregateId
+        {
+            get { return AppId; }
+        }
 
         public CreateApp()
         {
-            AggregateId = Guid.NewGuid();
+            AppId = Guid.NewGuid();
         }
 
         public void Validate(IList<ValidationError> errors)

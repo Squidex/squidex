@@ -60,7 +60,37 @@ namespace Squidex.Write.Assets
 
             VerifyNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetCreated()));
+            var @event = SimpleMapper.Map(command, new AssetCreated
+            {
+                FileName = command.File.FileName,
+                FileSize = command.File.FileSize,
+                MimeType = command.File.MimeType,
+                PixelWidth = command.ImageInfo?.PixelWidth,
+                PixelHeight = command.ImageInfo?.PixelHeight,
+                IsImage = command.ImageInfo != null
+            });
+
+            RaiseEvent(@event);
+
+            return this;
+        }
+
+        public AssetDomainObject Update(UpdateAsset command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            var @event = SimpleMapper.Map(command, new AssetUpdated
+            {
+                FileSize = command.File.FileSize,
+                MimeType = command.File.MimeType,
+                PixelWidth = command.ImageInfo?.PixelWidth,
+                PixelHeight = command.ImageInfo?.PixelHeight,
+                IsImage = command.ImageInfo != null
+            });
+
+            RaiseEvent(@event);
 
             return this;
         }
@@ -72,17 +102,6 @@ namespace Squidex.Write.Assets
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted()));
-
-            return this;
-        }
-
-        public AssetDomainObject Update(UpdateAsset command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new AssetUpdated()));
 
             return this;
         }

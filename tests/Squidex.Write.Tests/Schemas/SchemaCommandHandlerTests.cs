@@ -32,7 +32,7 @@ namespace Squidex.Write.Schemas
 
         public SchemaCommandHandlerTests()
         {
-            schema = new SchemaDomainObject(SchemaId, 0, registry);
+            schema = new SchemaDomainObject(SchemaId, -1, registry);
 
             sut = new SchemaCommandHandler(Handler, schemaProvider.Object);
         }

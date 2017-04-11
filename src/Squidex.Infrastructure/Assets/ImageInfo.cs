@@ -3,7 +3,7 @@
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
-//  All rights reserved.
+//  All rights reserved.d
 // ==========================================================================
 
 namespace Squidex.Infrastructure.Assets
@@ -16,6 +16,9 @@ namespace Squidex.Infrastructure.Assets
 
         public ImageInfo(int pixelWidth, int pixelHeight)
         {
+            Guard.GreaterThan(pixelWidth, 0, nameof(pixelWidth));
+            Guard.GreaterThan(pixelHeight, 0, nameof(pixelHeight));
+
             PixelWidth = pixelWidth;
             PixelHeight = pixelHeight;
         }

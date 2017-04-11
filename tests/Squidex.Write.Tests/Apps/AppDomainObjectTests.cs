@@ -56,7 +56,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AggregateId = AppId }));
+            sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
 
             Assert.Equal(AppName, sut.Name);
 

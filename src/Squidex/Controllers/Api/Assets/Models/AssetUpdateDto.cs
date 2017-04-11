@@ -1,19 +1,21 @@
 ﻿// ==========================================================================
-//  UpdateAssetCommand.cs
+//  AssetUpdateDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.Assets;
+using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Write.Assets.Commands
+namespace Squidex.Controllers.Api.Assets.Models
 {
-    public class UpdateAsset : AssetAggregateCommand
+    public class AssetUpdateDto
     {
-        public AssetFile File { get; set; }
-
-        public ImageInfo ImageInfo { get; set; }
+        /// <summary>
+        /// The new name of the asset.
+        /// </summary>
+        [Required]
+        public string Name { get; set; }
     }
 }

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
@@ -49,9 +50,9 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task<Stream> GetAssetAsync(string name)
+        public Task<Stream> GetAssetAsync(Guid id, long version, string suffix = null)
         {
-            var file = GetFile(name);
+            var file = GetFile(id, version, suffix);
 
             Stream stream = null;
 
@@ -70,9 +71,9 @@ namespace Squidex.Infrastructure.Assets
             return Task.FromResult(stream);
         }
 
-        public async Task UploadAssetAsync(string name, Stream stream)
+        public async Task UploadAssetAsync(Guid id, long version, Stream stream, string suffix = null)
         {
-            var file = GetFile(name);
+            var file = GetFile(id, version, suffix);
 
             using (var fileStream = file.OpenWrite())
             {
@@ -80,13 +81,16 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        private FileInfo GetFile(string name)
+        private FileInfo GetFile(Guid id, long version, string suffix)
         {
-            Guard.ValidFileName(name, nameof(name));
+            var path = Path.Combine(directory.FullName, $"{id}_{version}");
 
-            var file = new FileInfo(Path.Combine(directory.FullName, name));
+            if (!string.IsNullOrWhiteSpace(suffix))
+            {
+                path += "_" + suffix;
+            }
 
-            return file;
+            return new FileInfo(path);
         }
     }
 }

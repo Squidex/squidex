@@ -39,7 +39,7 @@ namespace Squidex.Write.Apps
 
         public AppCommandHandlerTests()
         {
-            app = new AppDomainObject(AppId, 0);
+            app = new AppDomainObject(AppId, -1);
 
             sut = new AppCommandHandler(Handler, appRepository.Object, userRepository.Object, keyGenerator.Object);
         }
@@ -47,7 +47,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task Create_should_throw_if_a_name_with_same_name_already_exists()
         {
-            var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
+            var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
             appRepository.Setup(x => x.FindAppAsync(AppName))
                 .Returns(Task.FromResult(new Mock<IAppEntity>().Object))
@@ -64,7 +64,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task Create_should_create_app_if_name_is_free()
         {
-            var context = CreateContextForCommand(new CreateApp { Name = AppName, AggregateId = AppId });
+            var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
             appRepository.Setup(x => x.FindAppAsync(AppName))
                 .Returns(Task.FromResult<IAppEntity>(null))

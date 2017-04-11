@@ -10,9 +10,40 @@ $color-type-foreground: #fff;
     padding-bottom: 1rem;
 }
 
+.drop-overlay {
+    & {
+        @include transition(opacity.4s ease);
+        @include absolute(0, 0, 0, 0);
+        @include opacity(0);
+        pointer-events: none;
+    }
+
+    &-text {
+        @include absolute(0, 0, 0, 0);
+        text-align: center;
+        line-height: 14rem;
+        font-size: 1.2rem;
+        font-weight: lighter;
+        color: $color-type-foreground;
+    }
+
+    &-background {
+        @include absolute(0, 0, 0, 0);
+        @include opacity(.7);
+        background: $color-type-background;
+    }
+}
+
 .card {
     & {
+        position: relative;
         height: $card-size;
+    }
+
+    &.drag {
+        .drop-overlay {
+            @include opacity(1);
+        }
     }
 
     &-block {
@@ -33,6 +64,13 @@ $color-type-foreground: #fff;
         font-size: .8rem;
     }
 
+    &-icon {
+        &-container {
+            background: $color-border;
+            height: 155px;
+        }
+    }
+
     &-name {
         @include truncate;
         font-size: 1rem;
@@ -47,7 +85,8 @@ $color-type-foreground: #fff;
         background: $color-type-background;
         border: 0;
         padding: .1rem .3rem;
-        font-size: .8rem;
+        text-transform: uppercase;
+        font-size: .7rem;
         font-weight: normal;
         color: $color-type-foreground;
     }

@@ -7,8 +7,10 @@
 // ==========================================================================
 
 using System;
+using System.IO;
 using Squidex.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Write.Assets.Commands;
 using Squidex.Write.TestHelpers;
@@ -21,9 +23,8 @@ namespace Squidex.Write.Assets
     public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject>
     {
         private readonly AssetDomainObject sut;
-        private readonly string fileName = "my-image.png";
-        private readonly string mimeType = "image/png";
-        private readonly long fileSize = 1024;
+        private readonly ImageInfo image = new ImageInfo(2048, 2048);
+        private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
 
         public Guid AssetId { get; } = Guid.NewGuid();
 
@@ -35,22 +36,30 @@ namespace Squidex.Write.Assets
         [Fact]
         public void Create_should_throw_if_created()
         {
-            sut.Create(new CreateAsset { FileName = fileName, FileSize = fileSize, MimeType = mimeType });
+            sut.Create(new CreateAsset { File = file });
 
             Assert.Throws<DomainException>(() =>
             {
-                sut.Create(CreateAssetCommand(new CreateAsset { FileName = fileName, FileSize = fileSize, MimeType = mimeType }));
+                sut.Create(CreateAssetCommand(new CreateAsset { File = file }));
             });
         }
 
         [Fact]
         public void Create_should_create_events()
         {
-            sut.Create(CreateAssetCommand(new CreateAsset { FileName = fileName, FileSize = fileSize, MimeType = mimeType }));
+            sut.Create(CreateAssetCommand(new CreateAsset { File = file, ImageInfo = image }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetCreated { FileName = fileName, FileSize = fileSize, MimeType = mimeType })
+                    CreateAssetEvent(new AssetCreated
+                    {
+                        IsImage = true,
+                        FileName = file.FileName,
+                        FileSize = file.FileSize,
+                        MimeType = file.MimeType,
+                        PixelWidth = image.PixelWidth,
+                        PixelHeight = image.PixelHeight
+                    })
                 );
         }
 
@@ -59,7 +68,7 @@ namespace Squidex.Write.Assets
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.Update(CreateAssetCommand(new UpdateAsset { FileSize = fileSize, MimeType = mimeType }));
+                sut.Update(CreateAssetCommand(new UpdateAsset { File = file }));
             });
         }
 
@@ -80,11 +89,18 @@ namespace Squidex.Write.Assets
         {
             CreateAsset();
 
-            sut.Update(CreateAssetCommand(new UpdateAsset { FileSize = fileSize, MimeType = mimeType }));
+            sut.Update(CreateAssetCommand(new UpdateAsset { File = file, ImageInfo = image }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetUpdated { FileSize = fileSize, MimeType = mimeType })
+                    CreateAssetEvent(new AssetUpdated
+                    {
+                        IsImage = true,
+                        FileSize = file.FileSize,
+                        MimeType = file.MimeType,
+                        PixelWidth = image.PixelWidth,
+                        PixelHeight = image.PixelHeight
+                    })
                 );
         }
 
@@ -93,7 +109,7 @@ namespace Squidex.Write.Assets
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.Update(CreateAssetCommand(new UpdateAsset { FileSize = fileSize, MimeType = mimeType }));
+                sut.Rename(CreateAssetCommand(new RenameAsset { FileName = "new-file.png" }));
             });
         }
 
@@ -127,7 +143,7 @@ namespace Squidex.Write.Assets
             
             Assert.Throws<ValidationException>(() =>
             {
-                sut.Rename(CreateAssetCommand(new RenameAsset { FileName = fileName }));
+                sut.Rename(CreateAssetCommand(new RenameAsset { FileName = file.FileName }));
             });
         }
 
@@ -182,7 +198,7 @@ namespace Squidex.Write.Assets
 
         private void CreateAsset()
         {
-            sut.Create(CreateAssetCommand(new CreateAsset { FileName = fileName, FileSize = fileSize, MimeType = mimeType }));
+            sut.Create(CreateAssetCommand(new CreateAsset { File = file }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

@@ -101,7 +101,7 @@ namespace Squidex.Write.Apps
 
             ThrowIfCreated();
 
-            var appId = new NamedId<Guid>(command.AggregateId, command.Name);
+            var appId = new NamedId<Guid>(command.AppId, command.Name);
 
             RaiseEvent(SimpleMapper.Map(command, new AppCreated { AppId = appId }));
 

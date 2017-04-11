@@ -20,12 +20,9 @@ using Squidex.Read.Assets.Repositories;
 
 namespace Squidex.Controllers.Api.Assets
 {
-    /// <summary>
-    /// Uploads and retrieves assets.
-    /// </summary>
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
-    [SwaggerTag("Assets")]
+    [SwaggerIgnore]
     public class AssetContentController : ControllerBase
     {
         private readonly IAssetStore assetStorage;
@@ -44,18 +41,6 @@ namespace Squidex.Controllers.Api.Assets
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
-        /// <summary>
-        /// Gets the content of the asset.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
-        /// <param name="mode">The resize mode.</param>
-        /// <param name="width">The target width of the image.</param>
-        /// <param name="height">The target width of the image.</param>
-        /// <returns>
-        /// 200 => Asset content returned.
-        /// 404 => App or Asset not found.
-        /// </returns>
         [HttpGet]
         [Route("assets/{id}/")]
         public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
@@ -71,13 +56,13 @@ namespace Squidex.Controllers.Api.Assets
 
             if (asset.IsImage && (width.HasValue || height.HasValue))
             {
-                var name = $"{asset.Id}_{asset.Version}_{width}_{height}_{mode}";
+                var suffix = $"{width}_{height}_{mode}";
 
-                content = await assetStorage.GetAssetAsync(name);
+                content = await assetStorage.GetAssetAsync(asset.Id, asset.Version, suffix);
 
                 if (content == null)
                 {
-                    var fullSizeContent = await assetStorage.GetAssetAsync($"{asset.Id}_{asset.Version}");
+                    var fullSizeContent = await assetStorage.GetAssetAsync(asset.Id, asset.Version);
 
                     if (fullSizeContent == null)
                     {
@@ -86,14 +71,14 @@ namespace Squidex.Controllers.Api.Assets
 
                     content = await assetThumbnailGenerator.CreateThumbnailAsync(fullSizeContent, width, height, mode);
 
-                    await assetStorage.UploadAssetAsync(name, content);
+                    await assetStorage.UploadAssetAsync(asset.Id, asset.Version, content, suffix);
 
                     content.Position = 0;
                 }
             }
             else
             {
-                content = await assetStorage.GetAssetAsync($"{asset.Id}_{asset.Version}");
+                content = await assetStorage.GetAssetAsync(asset.Id, asset.Version);
             }
 
             if (content == null)

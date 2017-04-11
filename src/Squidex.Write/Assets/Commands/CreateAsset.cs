@@ -6,20 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure.Assets;
+
 namespace Squidex.Write.Assets.Commands
 {
     public sealed class CreateAsset : AssetAggregateCommand
     {
-        public string FileName { get; set; }
+        public AssetFile File { get; set; }
 
-        public string MimeType { get; set; }
-
-        public long FileSize { get; set; }
-
-        public bool IsImage { get; set; }
-
-        public int? PixelWidth { get; set; }
-
-        public int? PixelHeight { get; set; }
+        public ImageInfo ImageInfo { get; set; }
     }
 }

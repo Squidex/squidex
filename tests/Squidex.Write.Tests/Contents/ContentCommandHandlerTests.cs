@@ -43,7 +43,7 @@ namespace Squidex.Write.Contents
                     .AddOrUpdateField(new NumberField(1, "my-field",
                         new NumberFieldProperties { IsRequired = true }));
 
-            content = new ContentDomainObject(contentId, 0);
+            content = new ContentDomainObject(contentId, -1);
 
             sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
 

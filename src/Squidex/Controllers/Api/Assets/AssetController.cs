@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -26,8 +25,6 @@ using Squidex.Pipeline;
 using Squidex.Read.Assets.Repositories;
 using Squidex.Write.Assets.Commands;
 
-#pragma warning disable 1573
-
 namespace Squidex.Controllers.Api.Assets
 {
     /// <summary>
@@ -39,28 +36,26 @@ namespace Squidex.Controllers.Api.Assets
     [SwaggerTag("Assets")]
     public class AssetController : ControllerBase
     {
-        private readonly IAssetStore assetStorage;
         private readonly IAssetRepository assetRepository;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly AssetConfig assetsConfig;
 
         public AssetController(
             ICommandBus commandBus, 
-            IAssetStore assetStorage,
             IAssetRepository assetRepository,
-            IAssetThumbnailGenerator assetThumbnailGenerator, 
             IOptions<AssetConfig> assetsConfig) 
             : base(commandBus)
         {
-            this.assetStorage = assetStorage;
             this.assetsConfig = assetsConfig.Value;
             this.assetRepository = assetRepository;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
         /// <summary>
         /// Get assets.
         /// </summary>
+        /// <param name="skip">The number of assets to skip.</param>
+        /// <param name="take">The number of assets to take.</param>
+        /// <param name="query">The query to limit the files by name.</param>
+        /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
         /// 200 => assets returned.
         /// </returns>
@@ -96,7 +91,8 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Creates and uploads a new asset.
         /// </summary>
-        /// <param name="app">The name of the app.</param>
+        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 201 => Asset created.
         /// 404 => App not found.
@@ -106,53 +102,104 @@ namespace Squidex.Controllers.Api.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostAsset(string app, List<IFormFile> files)
+        public async Task<IActionResult> PostAsset(string app, List<IFormFile> file)
         {
-            if (files.Count != 1)
-            {
-                var error = new ValidationError($"Can only upload one file, found ${files.Count}.");
+            var assetFile = GetAssetFile(file);
 
-                throw new ValidationException("Cannot create asset.", error);
-            }
-
-            var file = files[0];
-
-            if (file.Length > assetsConfig.MaxSize)
-            {
-                var error = new ValidationError($"File size cannot be longer than ${assetsConfig.MaxSize}.");
-
-                throw new ValidationException("Cannot create asset.", error);
-            }
-
-            var fileContent = new MemoryStream();
-
-            await file.OpenReadStream().CopyToAsync(fileContent);
-
-            fileContent.Position = 0;
-
-            var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(fileContent);
-
-            var command = new CreateAsset
-            {
-                AssetId = Guid.NewGuid(),
-                FileSize = file.Length,
-                FileName = file.FileName,
-                MimeType = file.ContentType,
-                IsImage = imageInfo != null,
-                PixelWidth = imageInfo?.PixelWidth,
-                PixelHeight = imageInfo?.PixelHeight
-            };
-            
-            fileContent.Position = 0;
-
-            await assetStorage.UploadAssetAsync($"{command.AssetId}_0", fileContent);
-
+            var command = new CreateAsset { File = assetFile };
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
             var response = AssetDto.Create(command, result);
 
             return StatusCode(201, response);
+        }
+
+        /// <summary>
+        /// Replaces the content of the asset with a newer version.
+        /// </summary>
+        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <param name="file">The file to upload.</param>
+        /// <returns>
+        /// 201 => Asset updated.
+        /// 404 => App or Asset not found.
+        /// 400 => Asset exceeds the maximum size.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/assets/{id}/content")]
+        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
+        {
+            var assetFile = GetAssetFile(file);
+            
+            await CommandBus.PublishAsync(new UpdateAsset { File = assetFile });
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Updates the asset.
+        /// </summary>
+        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <param name="request">The asset object that needs to updated.</param>
+        /// <returns>
+        /// 201 => Asset updated.
+        /// 404 => App or Asset not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/assets/{id}/content")]
+        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody]  AssetUpdateDto request)
+        {
+            var command = SimpleMapper.Map(request, new RenameAsset());
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Delete an asset.
+        /// </summary>
+        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="id">The id of the asset to delete.</param>
+        /// <returns>
+        /// 204 => Asset has been deleted.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/schemas/{name}/")]
+        public async Task<IActionResult> DeleteSchema(string app, Guid id)
+        {
+            await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
+
+            return NoContent();
+        }
+
+        private AssetFile GetAssetFile(IReadOnlyList<IFormFile> file)
+        {
+            if (file.Count != 1)
+            {
+                var error = new ValidationError($"Can only upload one file, found ${file.Count}.");
+
+                throw new ValidationException("Cannot create asset.", error);
+            }
+
+            var formFile = file[0];
+
+            if (formFile.Length > assetsConfig.MaxSize)
+            {
+                var error = new ValidationError($"File size cannot be longer than ${assetsConfig.MaxSize}.");
+
+                throw new ValidationException("Cannot create asset.", error);
+            }
+
+            var assetFile = new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
+
+            return assetFile;
         }
     }
 }

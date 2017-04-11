@@ -64,6 +64,7 @@
     <PackageReference Include="ReportGenerator" Version="2.5.6" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.1" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">

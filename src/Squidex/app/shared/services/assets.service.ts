@@ -116,7 +116,7 @@ export class AssetsService {
                 'Authorization': `${this.authService.user.user.token_type} ${this.authService.user.user.access_token}`
             });
 
-            content.append('files', file);
+            content.append('file', file);
 
             this.http
                 .post(url, content, { headers })
