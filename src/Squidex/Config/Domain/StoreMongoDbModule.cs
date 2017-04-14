@@ -61,7 +61,7 @@ namespace Squidex.Config.Domain
                 throw new ConfigurationException("Configure the Store MongoDb database with 'store:mongoDb:database'.");
             }
 
-            var contentDatabase = Configuration.GetValue<string>("store:mongoDb:databaseNameContent");
+            var contentDatabase = Configuration.GetValue<string>("store:mongoDb:contentDatabase");
 
             if (string.IsNullOrWhiteSpace(contentDatabase))
             {
