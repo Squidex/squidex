@@ -10,7 +10,7 @@
         
         <sqx-control-errors for="name" [submitted]="createFormSubmitted"></sqx-control-errors>
 
-		<input type="text" class="form-control" id="app-name" formControlName="name" />
+		<input type="text" class="form-control" id="app-name" formControlName="name" autocomplete="off" sqxLowerCaseInput />
         
         <span class="form-hint">
             The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{appName | async}}</b>/.
