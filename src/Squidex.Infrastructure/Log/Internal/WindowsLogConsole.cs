@@ -16,13 +16,20 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             if (level >= SemanticLogLevel.Error)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine(message);
-                Console.ResetColor();
+                try
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+
+                    Console.Error.WriteLine(message);
+                }
+                finally
+                {
+                    Console.ResetColor();
+                }
             }
             else
             {
-                Console.Out.WriteLine(message);
+                Console.WriteLine(message);
             }
         }
     }

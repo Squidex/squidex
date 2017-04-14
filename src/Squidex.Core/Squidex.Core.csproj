@@ -14,7 +14,7 @@
     <PackageReference Include="protobuf-net" Version="2.1.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
     <PackageReference Include="NodaTime" Version="2.0.0" />
-    <PackageReference Include="NJsonSchema" Version="8.27.6302.16041" />
+    <PackageReference Include="NJsonSchema" Version="8.30.6304.31883" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="Microsoft.OData.Core" Version="6.15.0" />

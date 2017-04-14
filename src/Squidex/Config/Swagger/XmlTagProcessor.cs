@@ -20,7 +20,7 @@ namespace Squidex.Config.Swagger
 {
     public sealed class XmlTagProcessor : IOperationProcessor, IDocumentProcessor
     {
-        public void Process(DocumentProcessorContext context)
+        public Task ProcessAsync(DocumentProcessorContext context)
         {
             foreach (var controllerType in context.ControllerTypes)
             {
@@ -46,6 +46,8 @@ namespace Squidex.Config.Swagger
                     }
                 }
             }
+
+            return TaskHelper.Done;
         }
 
         public Task<bool> ProcessAsync(OperationProcessorContext context)
