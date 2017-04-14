@@ -265,7 +265,7 @@ namespace Squidex.Write.Schemas
 
             sut.AddField(CreateCommand(new AddField { Name = fieldName, Properties = properties }));
 
-            Assert.Equal(properties, sut.Schema.Fields[1].RawProperties);
+            Assert.Equal(properties, sut.Schema.FieldsById[1].RawProperties);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -324,7 +324,7 @@ namespace Squidex.Write.Schemas
 
             sut.UpdateField(CreateCommand(new UpdateField { FieldId = 1, Properties = properties }));
 
-            Assert.Equal(properties, sut.Schema.Fields[1].RawProperties);
+            Assert.Equal(properties, sut.Schema.FieldsById[1].RawProperties);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -372,7 +372,7 @@ namespace Squidex.Write.Schemas
 
             sut.HideField(CreateCommand(new HideField { FieldId = 1 }));
 
-            Assert.True(sut.Schema.Fields[1].IsHidden);
+            Assert.True(sut.Schema.FieldsById[1].IsHidden);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -421,7 +421,7 @@ namespace Squidex.Write.Schemas
             sut.HideField(CreateCommand(new HideField { FieldId = 1 }));
             sut.ShowField(CreateCommand(new ShowField { FieldId = 1 }));
 
-            Assert.False(sut.Schema.Fields[1].IsHidden);
+            Assert.False(sut.Schema.FieldsById[1].IsHidden);
 
             sut.GetUncomittedEvents().Skip(1)
                 .ShouldHaveSameEvents(
@@ -469,7 +469,7 @@ namespace Squidex.Write.Schemas
 
             sut.DisableField(CreateCommand(new DisableField { FieldId = 1 }));
 
-            Assert.True(sut.Schema.Fields[1].IsDisabled);
+            Assert.True(sut.Schema.FieldsById[1].IsDisabled);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -518,7 +518,7 @@ namespace Squidex.Write.Schemas
             sut.DisableField(CreateCommand(new DisableField { FieldId = 1 }));
             sut.EnableField(CreateCommand(new EnableField { FieldId = 1 }));
 
-            Assert.False(sut.Schema.Fields[1].IsDisabled);
+            Assert.False(sut.Schema.FieldsById[1].IsDisabled);
 
             sut.GetUncomittedEvents().Skip(1)
                 .ShouldHaveSameEvents(
@@ -555,7 +555,7 @@ namespace Squidex.Write.Schemas
 
             sut.DeleteField(CreateCommand(new DeleteField { FieldId = 1 }));
 
-            Assert.False(sut.Schema.Fields.ContainsKey(1));
+            Assert.False(sut.Schema.FieldsById.ContainsKey(1));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

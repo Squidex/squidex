@@ -56,7 +56,7 @@ namespace Squidex.Write.Schemas
             {
                 s.AddField(command);
 
-                context.Succeed(EntityCreatedResult.Create(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id, s.Version));
+                context.Succeed(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 

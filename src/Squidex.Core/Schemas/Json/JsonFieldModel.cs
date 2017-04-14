@@ -12,6 +12,8 @@ namespace Squidex.Core.Schemas.Json
     {
         public string Name { get; set; }
 
+        public long Id { get; set; }
+
         public bool IsHidden { get; set; }
 
         public bool IsDisabled { get; set; }

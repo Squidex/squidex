@@ -18,9 +18,9 @@ namespace Squidex.Core
     {
         public static ContentData Enrich(this ContentData data, Schema schema, HashSet<Language> languages)
         {
-            var validator = new ContentEnricher(languages, schema);
+            var enricher = new ContentEnricher(languages, schema);
 
-            validator.Enrich(data);
+            enricher.Enrich(data);
 
             return data;
         }

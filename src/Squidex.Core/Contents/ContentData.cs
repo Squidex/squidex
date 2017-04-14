@@ -111,7 +111,7 @@ namespace Squidex.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                if (!long.TryParse(fieldValue.Key, out long fieldId) || !schema.Fields.TryGetValue(fieldId, out Field field))
+                if (!long.TryParse(fieldValue.Key, out long fieldId) || !schema.FieldsById.TryGetValue(fieldId, out Field field))
                 {
                     continue;
                 }

@@ -18,6 +18,6 @@ namespace Squidex.Core.Schemas.Json
 
         public SchemaProperties Properties { get; set; }
 
-        public Dictionary<long, JsonFieldModel> Fields { get; set; }
+        public List<JsonFieldModel> Fields { get; set; }
     }
 }
