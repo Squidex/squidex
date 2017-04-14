@@ -65,6 +65,7 @@ namespace Squidex
             services.AddMyIdentityServer();
             services.AddMyMvc();
 
+            services.AddCors();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();
@@ -102,6 +103,7 @@ namespace Squidex
 
             app.TestExternalSystems();
 
+            app.UseMyCors();
             app.UseMyForwardingRules();
 
             MapAndUseIdentity(app);
