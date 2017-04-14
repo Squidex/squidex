@@ -6,10 +6,15 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Infrastructure;
+
+// ReSharper disable ConvertIfStatementToSwitchStatement
+// ReSharper disable RedundantIfElseBlock
+// ReSharper disable InvertIf
 
 namespace Squidex.Core.Schemas
 {
@@ -17,6 +22,7 @@ namespace Squidex.Core.Schemas
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         private DateTimeFieldEditor editor;
+        private DateTimeCalculatedDefaultValue? calculatedDefaultValue;
         private Instant? maxValue;
         private Instant? minValue;
         private Instant? defaultValue;
@@ -54,6 +60,17 @@ namespace Squidex.Core.Schemas
             }
         }
 
+        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue
+        {
+            get { return calculatedDefaultValue; }
+            set
+            {
+                ThrowIfFrozen();
+
+                calculatedDefaultValue = value;
+            }
+        }
+
         public DateTimeFieldEditor Editor
         {
             get { return editor; }
@@ -67,14 +84,25 @@ namespace Squidex.Core.Schemas
 
         public override JToken GetDefaultValue()
         {
-            return DefaultValue?.ToString();
+            if (CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
+            {
+                return DateTime.UtcNow.ToString("o");
+            }
+            else if (CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
+            {
+                return DateTime.UtcNow.Date.ToString("o");
+            }
+            else
+            {
+                return DefaultValue?.ToString();
+            }
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()
         {
             if (!Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor ist not a valid value", nameof(Editor));
+                yield return new ValidationError("Editor is not a valid value", nameof(Editor));
             }
 
             if (MaxValue.HasValue && MinValue.HasValue && MinValue.Value >= MaxValue.Value)
@@ -90,6 +118,19 @@ namespace Squidex.Core.Schemas
             if (DefaultValue.HasValue && MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
             {
                 yield return new ValidationError("Default value must be less than max value", nameof(DefaultValue));
+            }
+
+            if (CalculatedDefaultValue.HasValue)
+            {
+                if (!CalculatedDefaultValue.Value.IsEnumValue())
+                {
+                    yield return new ValidationError("Calculated default value is not valid", nameof(CalculatedDefaultValue));
+                }
+
+                if (DefaultValue.HasValue)
+                {
+                    yield return new ValidationError("Calculated default value and default value cannot be used together", nameof(CalculatedDefaultValue), nameof(DefaultValue));
+                }
             }
         }
     }

@@ -51,7 +51,7 @@
                 <form class="form-inline" [formGroup]="addFieldForm" (ngSubmit)="addField()">
                     <div class="form-group mr-2">
                         <select class="form-control" formControlName="type">
-                            <option *ngFor="let type of fieldTypes">{{type}}</option>
+                            <option *ngFor="let type of fieldTypes" [ngValue]="type">{{type}}</option>
                         </select>
                     </div>
 

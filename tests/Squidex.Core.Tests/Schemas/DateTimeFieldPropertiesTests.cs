@@ -88,8 +88,60 @@ namespace Squidex.Core.Schemas
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Editor ist not a valid value", "Editor")
+                    new ValidationError("Editor is not a valid value", "Editor")
                 });
+        }
+
+        [Fact]
+        public void Should_add_error_if_calculated_default_value_is_not_valid()
+        {
+            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = (DateTimeCalculatedDefaultValue)123 };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Calculated default value is not valid", "CalculatedDefaultValue")
+                });
+        }
+
+        [Fact]
+        public void Should_add_error_if_calculated_default_value_default_value_is_defined()
+        {
+            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now, DefaultValue = FutureDays(10) };
+
+            sut.Validate(errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Calculated default value and default value cannot be used together", "CalculatedDefaultValue", "DefaultValue")
+                });
+        }
+
+        [Fact]
+        public void Should_provide_today_default_value()
+        {
+            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today };
+
+            Assert.Equal(DateTime.UtcNow.Date.ToString("o"), sut.GetDefaultValue().ToString());
+        }
+
+        [Fact]
+        public void Should_provide_now_default_value()
+        {
+            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now };
+
+            Assert.Equal(DateTime.UtcNow.ToString("o").Substring(0, 16), sut.GetDefaultValue().ToString().Substring(0, 16));
+        }
+
+        [Fact]
+        public void Should_provide_specific_default_value()
+        {
+            var sut = new DateTimeFieldProperties { DefaultValue = FutureDays(15) };
+
+            Assert.Equal(FutureDays(15).ToString(), sut.GetDefaultValue());
         }
 
         [Fact]

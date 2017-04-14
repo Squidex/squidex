@@ -87,7 +87,7 @@ namespace Squidex.Core.Schemas
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Editor ist not a valid value", "Editor")
+                    new ValidationError("Editor is not a valid value", "Editor")
                 });
         }
 

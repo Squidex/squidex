@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { NumberFieldPropertiesDto, ValidatorsEx } from 'shared';
+import { DateTimeFieldPropertiesDto, ValidatorsEx } from 'shared';
 
 @Component({
     selector: 'sqx-date-time-validation',
@@ -22,11 +22,17 @@ export class DateTimeValidationComponent implements OnInit {
     public editForm: FormGroup;
 
     @Input()
-    public properties: NumberFieldPropertiesDto;
+    public properties: DateTimeFieldPropertiesDto;
 
+    public hideDefaultValues: Observable<boolean>;
     public hideDefaultValue: Observable<boolean>;
 
+    public calculatedDefaultValues = ['Now', 'Today'];
+
     public ngOnInit() {
+        this.editForm.addControl('calculatedDefaultValue',
+            new FormControl(this.properties.calculatedDefaultValue));
+
         this.editForm.addControl('maxValue',
             new FormControl(this.properties.maxValue, [
                 ValidatorsEx.validDateTime()
@@ -42,9 +48,14 @@ export class DateTimeValidationComponent implements OnInit {
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.hideDefaultValue =
+        this.hideDefaultValues =
             this.editForm.get('isRequired').valueChanges
                 .startWith(this.properties.isRequired)
+                .map(x => !!x);
+
+        this.hideDefaultValue =
+            this.editForm.get('calculatedDefaultValue').valueChanges
+                .startWith(this.properties.calculatedDefaultValue)
                 .map(x => !!x);
     }
 }

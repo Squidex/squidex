@@ -160,7 +160,8 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly maxValue?: string,
-        public readonly minValue?: string
+        public readonly minValue?: string,
+        public readonly calculatedDefaultValue?: string
     ) {
         super('DateTime', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
