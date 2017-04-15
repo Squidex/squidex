@@ -37,6 +37,9 @@ namespace Squidex.Read.Schemas
             AddEventMessage<SchemaUnpublished>(
                 "unpublished schema {[Name]}");
 
+            AddEventMessage<SchemaFieldsReordered>(
+                "reordered fields of schema {[Name]}");
+
             AddEventMessage<FieldAdded>(
                 "added field {[Field]} to schema {[Name]}");
 
