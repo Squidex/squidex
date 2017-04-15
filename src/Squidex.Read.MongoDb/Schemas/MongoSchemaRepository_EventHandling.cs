@@ -73,6 +73,11 @@ namespace Squidex.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
+        protected Task On(SchemaFieldsReordered @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+        }
+
         protected Task On(SchemaUpdated @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));

@@ -7,6 +7,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DndModule } from 'ng2-dnd';
 
 import {
     HelpComponent,
@@ -15,6 +16,8 @@ import {
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
+
+import { SortedDirective } from './utils/sorted.directive';
 
 import {
     FieldComponent,
@@ -74,6 +77,7 @@ const routes: Routes = [
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
+        DndModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
@@ -92,6 +96,7 @@ const routes: Routes = [
         SchemaFormComponent,
         SchemaPageComponent,
         SchemasPageComponent,
+        SortedDirective,
         StringUIComponent,
         StringValidationComponent
     ]

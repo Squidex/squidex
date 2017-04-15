@@ -72,7 +72,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 400 => Schema field ids do not cover the fields of the schema.
         /// 404 => Schema or app not found.
         /// </returns>
-        [HttpPost]
+        [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ordering")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFields request)

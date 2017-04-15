@@ -327,6 +327,13 @@ export class SchemasService {
                 .catchError('Failed to update schema. Please reload.');
     }
 
+    public putFieldOrdering(appName: string, schemaName: string, dto: number[], version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/ordering`);
+
+        return this.authService.authPut(url, { fieldIds: dto }, version)
+                .catchError('Failed to reorder fields. Please reload.');
+    }
+
     public publishSchema(appName: string, schemaName: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 

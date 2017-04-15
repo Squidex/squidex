@@ -273,6 +273,22 @@ describe('SchemasService', () => {
         authService.verifyAll();
     });
 
+    it('should make put request to update field ordering', () => {
+        const dto = [1, 2, 3]
+
+        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering', It.isAny(), version))
+            .returns(() => Observable.of(
+               new Response(
+                    new ResponseOptions()
+                )
+            ))
+            .verifiable(Times.once());
+
+        schemasService.putFieldOrdering('my-app', 'my-schema', dto, version);
+
+        authService.verifyAll();
+    });
+
     it('should make put request to publish schema', () => {
         authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/publish', It.isAny(), version))
             .returns(() => Observable.of(
