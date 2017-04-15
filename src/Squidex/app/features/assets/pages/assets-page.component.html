@@ -36,7 +36,7 @@
             </div>
             
             <div class="row">
-                <sqx-asset class="col-3" *ngFor="let file of newFiles" [initFile]="file"></sqx-asset>
+                <sqx-asset class="col-3" *ngFor="let file of newFiles" [initFile]="file" (failed)="removeFile(file)"></sqx-asset>
                 <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"></sqx-asset>
             </div>
 

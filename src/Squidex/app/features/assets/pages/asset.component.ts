@@ -5,16 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, NgZone, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     ApiUrlConfig,
     AppComponentBase,
     AppsStoreService,
     AssetDto,
+    AssetUpdatedDto,
     AssetsService,
     fadeAnimation,
+    MathHelper,
     NotificationService,
     UsersProviderService
 } from 'shared';
@@ -28,44 +29,36 @@ import {
     ]
 })
 export class AssetComponent extends AppComponentBase implements OnInit {
+    private assetVersion = MathHelper.guid();
+
     @Input()
     public initFile: File;
 
     @Input()
     public asset: AssetDto;
 
-    public get previewUrl(): Observable<string> {
-        return this.appName().map(app => this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop`));
+    @Output()
+    public deleting = new EventEmitter();
+
+    @Output()
+    public failed = new EventEmitter();
+
+    public progress = 0;
+
+    public get previewUrl(): string {
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop&q=${this.assetVersion}`);
     }
 
     public get fileType(): string {
-        let result = '';
-
-        if (this.asset != null) {
-            result = this.asset.mimeType.split('/')[1];
-        }
-
-        return result;
-    }
-
-    public get fileIcon(): string {
-        let result = '';
-
-        if (this.asset != null) {
-            result = fileIcon(this.fileType);
-        }
-
-        return result;
+        return this.asset.mimeType.split('/')[1];
     }
 
     public get fileName(): string {
-        let result = '';
+        return this.asset.fileName;
+    }
 
-        if (this.asset != null) {
-            result = this.asset.fileName;
-        }
-
-        return result;
+    public get fileIcon(): string {
+        return fileIcon(this.asset.mimeType);
     }
 
     public get fileInfo(): string {
@@ -84,8 +77,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly assetsService: AssetsService,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly zone: NgZone
+        private readonly apiUrl: ApiUrlConfig
     ) {
         super(notifications, users, apps);
     }
@@ -95,14 +87,55 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
         if (initFile) {
             this.appName()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile)).delay(2000)
+                .switchMap(app => this.assetsService.uploadFile(app, initFile))
                 .subscribe(result => {
-                    this.zone.run(() => {
-                        if (result instanceof AssetDto) {
+                    if (result instanceof AssetDto) {
+                        setTimeout(() => {
                             this.asset = result;
-                        }
-                    });
+                            this.assetVersion = MathHelper.guid();
+                            this.progress = 0;
+                        }, 2000);
+                    } else {
+                        this.progress = result;
+                    }
                 }, error => {
+                    this.failed.emit();
+
+                    this.notifyError(error);
+                });
+        }
+    }
+
+    public updateFile(files: FileList) {
+        if (files.length === 1) {
+            this.appName()
+                .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0]))
+                .subscribe(result => {
+                    if (result instanceof AssetUpdatedDto) {
+                        setTimeout(() => {
+                            const asset = new AssetDto(
+                                this.asset.id,
+                                this.asset.createdBy,
+                                result.lastModifiedBy,
+                                this.asset.created,
+                                result.lastModified,
+                                this.asset.fileName,
+                                result.fileSize,
+                                result.mimeType,
+                                result.isImage,
+                                result.pixelWidth,
+                                result.pixelHeight,
+                                result.version);
+                            this.asset = asset;
+                            this.assetVersion = MathHelper.guid();
+                            this.progress = 0;
+                        }, 2000);
+                    } else {
+                        this.progress = result;
+                    }
+                }, error => {
+                    this.progress = 0;
+
                     this.notifyError(error);
                 });
         }
@@ -147,15 +180,18 @@ const mimeMapping = {
 
 function fileIcon(mimeType: string) {
     const mimeParts = mimeType.split('/');
-    const mimePrefix = mimeParts[0].toLowerCase();
-    const mimeSuffix = mimeParts[1].toLowerCase();
 
     let mimeIcon = 'generic';
 
-    if (mimePrefix === 'video') {
-        mimeIcon = 'video';
-    } else {
-        mimeIcon = mimeMapping[mimeSuffix] || 'generic';;
+    if (mimeParts.length === 2) {
+        const mimePrefix = mimeParts[0].toLowerCase();
+        const mimeSuffix = mimeParts[1].toLowerCase();
+
+        if (mimePrefix === 'video') {
+            mimeIcon = 'video';
+        } else {
+            mimeIcon = mimeMapping[mimeSuffix] || 'generic';
+        }
     }
 
     return `/images/asset_${mimeIcon}.png`;

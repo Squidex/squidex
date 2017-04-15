@@ -6,8 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Headers, Http } from '@angular/http';
+import { Headers } from '@angular/http';
 import { Observable } from 'rxjs';
+import { ProgressHttp } from 'angular-progress-http';
 
 import {
     ApiUrlConfig,
@@ -43,10 +44,24 @@ export class AssetDto {
     }
 }
 
+export class AssetUpdatedDto {
+    constructor(
+        public readonly lastModifiedBy: string,
+        public readonly lastModified: DateTime,
+        public readonly fileSize: number,
+        public readonly mimeType: string,
+        public readonly isImage: boolean,
+        public readonly pixelWidth: number | null,
+        public readonly pixelHeight: number | null,
+        public readonly version: Version
+    ) {
+    }
+}
+
 @Injectable()
 export class AssetsService {
     constructor(
-        private readonly http: Http,
+        private readonly http: ProgressHttp,
         private readonly apiUrl: ApiUrlConfig,
         private readonly authService: AuthService
     ) {
@@ -118,7 +133,7 @@ export class AssetsService {
 
             content.append('file', file);
 
-            this.http
+            this.http.withUploadProgressListener(progress => subscriber.next(progress.percentage))
                 .post(url, content, { headers })
                 .map(response => response.json())
                 .map(response => {
@@ -137,6 +152,42 @@ export class AssetsService {
                         new Version(response.version.toString()));
                 })
                 .catchError('Failed to upload asset. Please reload.')
+                .subscribe(value => {
+                    subscriber.next(value);
+                }, err => {
+                    subscriber.error(err);
+                }, () => {
+                    subscriber.complete();
+                });
+        });
+    }
+
+    public replaceFile(appName: string, id: string, file: File): Observable<number | AssetUpdatedDto> {
+        return new Observable<number | AssetDto>(subscriber => {
+            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
+
+            const content = new FormData();
+            const headers = new Headers({
+                'Authorization': `${this.authService.user.user.token_type} ${this.authService.user.user.access_token}`
+            });
+
+            content.append('file', file);
+
+            this.http.withUploadProgressListener(progress => subscriber.next(progress.percentage))
+                .put(url, content, { headers })
+                .map(response => response.json())
+                .map(response => {
+                    return new AssetUpdatedDto(
+                        response.lastModifiedBy,
+                        DateTime.parseISO_UTC(response.lastModified),
+                        response.fileSize,
+                        response.mimeType,
+                        response.isImage,
+                        response.pixelWidth,
+                        response.pixelHeight,
+                        new Version(response.version.toString()));
+                })
+                .catchError('Failed to replace asset. Please reload.')
                 .subscribe(value => {
                     subscriber.next(value);
                 }, err => {

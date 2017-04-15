@@ -7,6 +7,8 @@
 
 import { ModuleWithProviders, NgModule } from '@angular/core';
 
+import { ProgressHttpModule } from 'angular-progress-http';
+
 import { SqxFrameworkModule } from 'framework';
 
 import {
@@ -42,6 +44,7 @@ import {
 
 @NgModule({
     imports: [
+        ProgressHttpModule,
         SqxFrameworkModule
     ],
     declarations: [

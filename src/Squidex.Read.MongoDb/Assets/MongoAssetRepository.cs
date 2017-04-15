@@ -33,7 +33,7 @@ namespace Squidex.Read.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
-            return Collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.LastModified).Ascending(x => x.AppId).Ascending(x => x.FileName).Ascending(x => x.MimeType));
+            return collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.LastModified).Ascending(x => x.AppId).Ascending(x => x.FileName).Ascending(x => x.MimeType));
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, string query = null, int take = 10, int skip = 0)

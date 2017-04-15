@@ -59,6 +59,10 @@ $color-type-foreground: #fff;
     }
 }
 
+.upload-progress {
+    margin: 60px 70px;
+}
+
 .file {
     &-info {
         font-size: .8rem;
@@ -67,7 +71,10 @@ $color-type-foreground: #fff;
     &-icon {
         &-container {
             background: $color-border;
+            border: 0;
             height: 155px;
+            line-height: 155px;
+            text-align: center;
         }
     }
 

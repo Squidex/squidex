@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Write.Assets.Commands
@@ -15,5 +16,10 @@ namespace Squidex.Write.Assets.Commands
         public AssetFile File { get; set; }
 
         public ImageInfo ImageInfo { get; set; }
+
+        public CreateAsset()
+        {
+            AssetId = Guid.NewGuid();
+        }
     }
 }

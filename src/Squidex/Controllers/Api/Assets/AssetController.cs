@@ -57,7 +57,8 @@ namespace Squidex.Controllers.Api.Assets
         /// <param name="query">The query to limit the files by name.</param>
         /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
-        /// 200 => assets returned.
+        /// 200 => Assets returned.
+        /// 404 => App not found.
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/assets/")]
@@ -123,7 +124,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 201 => Asset updated.
-        /// 404 => App or Asset not found.
+        /// 404 => Asset or app not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
         [HttpPut]
@@ -133,10 +134,14 @@ namespace Squidex.Controllers.Api.Assets
         public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
         {
             var assetFile = GetAssetFile(file);
-            
-            await CommandBus.PublishAsync(new UpdateAsset { File = assetFile });
 
-            return NoContent();
+            var command = new UpdateAsset { File = assetFile, AssetId = id };
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<EntitySavedResult>();
+            var response = AssetUpdatedDto.Create(command, result);
+
+            return StatusCode(201, response);
         }
 
         /// <summary>
@@ -146,14 +151,13 @@ namespace Squidex.Controllers.Api.Assets
         /// <param name="id">The id of the asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
-        /// 201 => Asset updated.
-        /// 404 => App or Asset not found.
+        /// 204 => Asset updated.
+        /// 404 => Asset or app not found.
         /// </returns>
-        [HttpPost]
-        [Route("apps/{app}/assets/{id}/content")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [HttpPut]
+        [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody]  AssetUpdateDto request)
+        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
         {
             var command = SimpleMapper.Map(request, new RenameAsset());
 
@@ -169,6 +173,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <param name="id">The id of the asset to delete.</param>
         /// <returns>
         /// 204 => Asset has been deleted.
+        /// 404 => Asset or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/")]
@@ -183,7 +188,7 @@ namespace Squidex.Controllers.Api.Assets
         {
             if (file.Count != 1)
             {
-                var error = new ValidationError($"Can only upload one file, found ${file.Count}.");
+                var error = new ValidationError($"Can only upload one file, found {file.Count}.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }

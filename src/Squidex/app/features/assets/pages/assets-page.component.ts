@@ -78,6 +78,10 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
         this.load();
     }
 
+    public removeFile(file: File) {
+        this.newFiles = this.newFiles.remove(file);
+    }
+
     public addFiles(files: FileList) {
         for (let i = 0; i < files.length; i++) {
             this.newFiles = this.newFiles.pushFront(files[i]);

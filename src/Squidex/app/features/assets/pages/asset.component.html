@@ -1,24 +1,29 @@
 <div class="asset">
     <div class="card" (sqxFileDrop)="updateFile($event)">
-        <div class="card-block">
-            <div *ngIf="asset" [@fade]>
-                <div class="file-type">{{fileType}}</div>
-                
-                <div *ngIf="asset.isImage">
-                    <img [attr.src]="previewUrl | async" sqxHideInvalidImage>
+        <div *ngIf="asset && progress == 0" [@fade]>
+            <div class="card-block">
+                <div>
+                    <div class="file-type">{{fileType}}</div>
+                    
+                    <div *ngIf="asset.isImage">
+                        <img [attr.src]="previewUrl" sqxHideInvalidImage>
+                    </div>
+                    <div *ngIf="!asset.isImage" class="file-icon-container">
+                        <img class="file-icon" [attr.src]="fileIcon" sqxHideInvalidImage>
+                    </div>
                 </div>
-                <div *ngIf="!asset.isImage" class="file-icon-container">
-                    <img [attr.src]="fileIcon" sqxHideInvalidImage>
+            </div>
+            <div class="card-footer">
+                <div class="file-name">
+                    {{fileName}}
+                </div>
+                <div class="file-info">
+                    {{fileInfo}}
                 </div>
             </div>
         </div>
-        <div class="card-footer">
-            <div class="file-name">
-                {{fileName}}
-            </div>
-            <div class="file-info">
-                {{fileInfo}}
-            </div>
+        <div *ngIf="progress > 0">
+            <sqx-progress-bar class="upload-progress" style="width: 120px; height: 120px" mode="Circle" [value]="progress"></sqx-progress-bar>
         </div>
         <div class="drop-overlay">
             <div class="drop-overlay-background"></div>

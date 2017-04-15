@@ -274,7 +274,7 @@ describe('SchemasService', () => {
     });
 
     it('should make put request to update field ordering', () => {
-        const dto = [1, 2, 3]
+        const dto = [1, 2, 3];
 
         authService.setup(x => x.authPut('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering', It.isAny(), version))
             .returns(() => Observable.of(
