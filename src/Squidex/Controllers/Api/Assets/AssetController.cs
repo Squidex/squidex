@@ -90,7 +90,7 @@ namespace Squidex.Controllers.Api.Assets
         }
 
         /// <summary>
-        /// Creates and uploads a new asset.
+        /// Upload a new asset.
         /// </summary>
         /// <param name="app">The app where the asset is a part of.</param>
         /// <param name="file">The file to upload.</param>
@@ -101,7 +101,7 @@ namespace Squidex.Controllers.Api.Assets
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/assets/")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostAsset(string app, List<IFormFile> file)
         {
@@ -111,13 +111,13 @@ namespace Squidex.Controllers.Api.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AssetDto.Create(command, result);
+            var response = AssetCreatedDto.Create(command, result);
 
             return StatusCode(201, response);
         }
 
         /// <summary>
-        /// Replaces the content of the asset with a newer version.
+        /// Replace asset content.
         /// </summary>
         /// <param name="app">The app where the asset is a part of.</param>
         /// <param name="id">The id of the asset.</param>
@@ -129,7 +129,7 @@ namespace Squidex.Controllers.Api.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetReplacedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
         {
@@ -139,7 +139,7 @@ namespace Squidex.Controllers.Api.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntitySavedResult>();
-            var response = AssetUpdatedDto.Create(command, result);
+            var response = AssetReplacedDto.Create(command, result);
 
             return StatusCode(201, response);
         }
@@ -152,6 +152,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 204 => Asset updated.
+        /// 400 => Asset name not valid.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpPut]

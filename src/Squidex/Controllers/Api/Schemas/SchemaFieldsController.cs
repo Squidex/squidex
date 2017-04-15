@@ -33,7 +33,7 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
-        /// Create a new schema field.
+        /// Add a schema field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>

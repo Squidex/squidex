@@ -11,9 +11,12 @@ import {
     ApiUrlConfig,
     AppComponentBase,
     AppsStoreService,
+    AssetCreatedDto,
     AssetDto,
-    AssetUpdatedDto,
+    AssetReplacedDto,
     AssetsService,
+    AuthService,
+    DateTime,
     fadeAnimation,
     MathHelper,
     NotificationService,
@@ -77,6 +80,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly assetsService: AssetsService,
+        private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
         super(notifications, users, apps);
@@ -89,9 +93,24 @@ export class AssetComponent extends AppComponentBase implements OnInit {
             this.appName()
                 .switchMap(app => this.assetsService.uploadFile(app, initFile))
                 .subscribe(result => {
-                    if (result instanceof AssetDto) {
+                    if (result instanceof AssetCreatedDto) {
                         setTimeout(() => {
-                            this.asset = result;
+                            const me = `subject:${this.authService.user!.id}`;
+
+                            const asset = new AssetDto(
+                                this.asset.id,
+                                me, me,
+                                DateTime.now(),
+                                DateTime.now(),
+                                result.fileName,
+                                result.fileSize,
+                                result.mimeType,
+                                result.isImage,
+                                result.pixelWidth,
+                                result.pixelHeight,
+                                result.version);
+
+                            this.asset = asset;
                             this.assetVersion = MathHelper.guid();
                             this.progress = 0;
                         }, 2000);
@@ -111,14 +130,14 @@ export class AssetComponent extends AppComponentBase implements OnInit {
             this.appName()
                 .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0]))
                 .subscribe(result => {
-                    if (result instanceof AssetUpdatedDto) {
+                    if (result instanceof AssetReplacedDto) {
                         setTimeout(() => {
+                            const me = `subject:${this.authService.user!.id}`;
+
                             const asset = new AssetDto(
                                 this.asset.id,
-                                this.asset.createdBy,
-                                result.lastModifiedBy,
-                                this.asset.created,
-                                result.lastModified,
+                                this.asset.createdBy, me,
+                                this.asset.created, DateTime.now(),
                                 this.asset.fileName,
                                 result.fileSize,
                                 result.mimeType,

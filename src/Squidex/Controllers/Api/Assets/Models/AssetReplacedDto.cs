@@ -7,14 +7,12 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using NodaTime;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Write.Assets.Commands;
 
 namespace Squidex.Controllers.Api.Assets.Models
 {
-    public sealed class AssetUpdatedDto
+    public sealed class AssetReplacedDto
     {
         /// <summary>
         /// The mime type.
@@ -43,35 +41,20 @@ namespace Squidex.Controllers.Api.Assets.Models
         public int? PixelHeight { get; set; }
 
         /// <summary>
-        /// The user that has updated the asset.
-        /// </summary>
-        [Required]
-        public RefToken LastModifiedBy { get; set; }
-
-        /// <summary>
-        /// The date and time when the asset has been modified last.
-        /// </summary>
-        public Instant LastModified { get; set; }
-
-        /// <summary>
         /// The version of the asset.
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetUpdatedDto Create(UpdateAsset command, EntitySavedResult result)
+        public static AssetReplacedDto Create(UpdateAsset command, EntitySavedResult result)
         {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var response = new AssetUpdatedDto
+            var response = new AssetReplacedDto
             {
-                Version = result.Version,
-                LastModified = now,
-                LastModifiedBy = command.Actor,
                 FileSize = command.File.FileSize,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
                 PixelWidth = command.ImageInfo?.PixelWidth,
-                PixelHeight = command.ImageInfo?.PixelHeight
+                PixelHeight = command.ImageInfo?.PixelHeight,
+                Version = result.Version
             };
 
             return response;
