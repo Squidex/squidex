@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Events.Schemas
 {
-    [TypeName("SchemaUnpublished")]
+    [TypeName("SchemaUnpublishedEvent")]
     public class SchemaUnpublished : SchemaEvent
     {
     }

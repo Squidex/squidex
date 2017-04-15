@@ -91,6 +91,11 @@ namespace Squidex.Write.Schemas
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
+        protected void On(SchemaFieldsReordered @event)
+        {
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+        }
+
         protected void On(SchemaPublished @event)
         {
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
@@ -112,7 +117,7 @@ namespace Squidex.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(++totalFields, command.Name) }));
+            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(totalFields + 1, command.Name) }));
 
             return this;
         }
@@ -135,6 +140,17 @@ namespace Squidex.Write.Schemas
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(Id, command.Name) }));
+
+            return this;
+        }
+
+        public SchemaDomainObject Reorder(ReorderFields command)
+        {
+            Guard.Valid(command, nameof(command), () => $"Cannot reorder fields for schema '{Id}'");
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new SchemaFieldsReordered()));
 
             return this;
         }

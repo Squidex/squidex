@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Events.Schemas;
@@ -68,6 +69,7 @@ namespace Squidex.Write.Schemas
                     CreateEvent(new SchemaCreated { Name = SchemaName, Properties = properties })
                 );
         }
+
         [Fact]
         public void Update_should_throw_if_not_created()
         {
@@ -83,9 +85,9 @@ namespace Squidex.Write.Schemas
             CreateSchema();
             DeleteSchema();
 
-            Assert.Throws<ValidationException>(() =>
+            Assert.Throws<DomainException>(() =>
             {
-                sut.Update(CreateCommand(new UpdateSchema()));
+                sut.Update(CreateCommand(new UpdateSchema { Properties = new SchemaProperties() }));
             });
         }
 
@@ -114,6 +116,58 @@ namespace Squidex.Write.Schemas
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new SchemaUpdated { Properties = properties })
+                );
+        }
+
+        [Fact]
+        public void Reorder_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Reorder(CreateCommand(new ReorderFields { FieldIds = new List<long>() }));
+            });
+        }
+
+        [Fact]
+        public void Reorder_should_throw_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Reorder(CreateCommand(new ReorderFields { FieldIds = new List<long>() }));
+            });
+        }
+
+        [Fact]
+        public void Reorder_should_throw_if_command_is_not_valid()
+        {
+            CreateSchema();
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Reorder(CreateCommand(new ReorderFields()));
+            });
+        }
+
+        [Fact]
+        public void Reorder_should_refresh_properties_and_create_events()
+        {
+            var fieldIds = new List<long> { 1, 2 };
+
+            CreateSchema();
+
+            sut.AddField(new AddField { Name = "field1", Properties = new StringFieldProperties() });
+            sut.AddField(new AddField { Name = "field2", Properties = new StringFieldProperties() });
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+
+            sut.Reorder(CreateCommand(new ReorderFields { FieldIds = fieldIds }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaFieldsReordered { FieldIds = fieldIds })
                 );
         }
 

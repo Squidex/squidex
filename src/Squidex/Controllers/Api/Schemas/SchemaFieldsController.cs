@@ -40,9 +40,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 201 => Schema field created.
-        /// 409 => Schema field name already in use.
-        /// 404 => App or schema not found.
         /// 400 => Schema field properties not valid.
+        /// 404 => Schema or app not found.
+        /// 409 => Schema field name already in use.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
@@ -62,6 +62,29 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
+        /// Reorders the fields.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The request that contains the field ids.</param>
+        /// <returns>
+        /// 204 => Schema fields reorderd.
+        /// 400 => Schema field ids do not cover the fields of the schema.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/schemas/{name}/fields/ordering")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFields request)
+        {
+            var command = new ReorderFields { FieldIds = request.FieldIds };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Update a schema field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -69,10 +92,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="id">The id of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
-        /// 204 => Schema field created.
-        /// 409 => Schema field name already in use.
-        /// 404 => App, schema or field not found.
+        /// 204 => Schema field updated.
         /// 400 => Schema field properties not valid.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
@@ -94,9 +116,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
-        /// 400 => Schema field already hidden.
         /// 204 => Schema field hidden.
-        /// 404 => App, schema or field not found.
+        /// 400 => Schema field already hidden.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A hidden field is not part of the API response, but can still be edited in the portal.
@@ -120,9 +142,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to shows.</param>
         /// <returns>
-        /// 400 => Schema field already visible.
         /// 204 => Schema field shown.
-        /// 404 => App, schema or field not found.
+        /// 400 => Schema field already visible.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A hidden field is not part of the API response, but can still be edited in the portal.
@@ -146,9 +168,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
-        /// 400 => Schema field already enabled.
         /// 204 => Schema field enabled.
-        /// 404 => App, schema or field not found.
+        /// 400 => Schema field already enabled.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A disabled field cannot not be edited in the squidex portal anymore,
@@ -173,9 +195,9 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 400 => Schema field already disabled.
         /// 204 => Schema field disabled.
-        /// 404 => App, schema or field not found.
+        /// 400 => Schema field already disabled.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A disabled field cannot not be edited in the squidex portal anymore,
@@ -201,7 +223,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
         /// 204 => Schema field deleted.
-        /// 404 => App, schema or field not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]

@@ -90,6 +90,11 @@ namespace Squidex.Write.Schemas
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ShowField(command));
         }
 
+        protected Task On(ReorderFields command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Reorder(command));
+        }
+
         protected Task On(UpdateSchema command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Update(command));
