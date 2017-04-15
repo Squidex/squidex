@@ -103,7 +103,7 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="clientId">The id of the client that must be updated.</param>
         /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
-        /// 201 => Client key generated.
+        /// 204 => Client updated.
         /// 404 => App not found or client not found.
         /// </returns>
         [HttpPut]
@@ -121,8 +121,8 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="clientId">The id of the client that must be deleted.</param>
         /// <returns>
-        /// 404 => App not found or client not found.
         /// 204 => Client revoked.
+        /// 404 => App not found or client not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/clients/{clientId}/")]
