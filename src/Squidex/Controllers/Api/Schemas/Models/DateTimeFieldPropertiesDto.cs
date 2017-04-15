@@ -39,6 +39,12 @@ namespace Squidex.Controllers.Api.Schemas.Models
         [JsonConverter(typeof(StringEnumConverter))]
         public DateTimeFieldEditor Editor { get; set; }
 
+        /// <summary>
+        /// The calculated default value for the field value.
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
+
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new DateTimeFieldProperties());

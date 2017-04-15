@@ -51,7 +51,7 @@ namespace Squidex
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables("SQUIDEX__");
+                .AddEnvironmentVariables();
 
             Configuration = builder.Build();
         }
@@ -65,6 +65,7 @@ namespace Squidex
             services.AddMyIdentityServer();
             services.AddMyMvc();
 
+            services.AddCors();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();
@@ -103,6 +104,7 @@ namespace Squidex
 
             app.TestExternalSystems();
 
+            app.UseMyCors();
             app.UseMyForwardingRules();
 
             MapAndUseIdentity(app);

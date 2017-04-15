@@ -56,7 +56,7 @@ namespace Squidex.Write.Schemas
             {
                 s.AddField(command);
 
-                context.Succeed(EntityCreatedResult.Create(s.Schema.Fields.Values.First(x => x.Name == command.Name).Id, s.Version));
+                context.Succeed(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 
@@ -88,6 +88,11 @@ namespace Squidex.Write.Schemas
         protected Task On(ShowField command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ShowField(command));
+        }
+
+        protected Task On(ReorderFields command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Reorder(command));
         }
 
         protected Task On(UpdateSchema command, CommandContext context)

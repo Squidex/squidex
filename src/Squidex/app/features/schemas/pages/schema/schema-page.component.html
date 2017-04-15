@@ -36,8 +36,8 @@
     </div>
 
     <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div *ngFor="let field of schemaFields">
+        <div class="panel-content panel-content-scroll" dnd-sortable-container [sortableData]="schemaFields.mutableValues">
+            <div *ngFor="let field of schemaFields; let i = index" dnd-sortable [sortableIndex]="i" (sorted)="sortFields($event)">
                 <sqx-field [field]="field"
                     (disabling)="disableField(field)"
                     (deleting)="deleteField(field)"
@@ -51,7 +51,7 @@
                 <form class="form-inline" [formGroup]="addFieldForm" (ngSubmit)="addField()">
                     <div class="form-group mr-2">
                         <select class="form-control" formControlName="type">
-                            <option *ngFor="let type of fieldTypes">{{type}}</option>
+                            <option *ngFor="let type of fieldTypes" [ngValue]="type">{{type}}</option>
                         </select>
                     </div>
 

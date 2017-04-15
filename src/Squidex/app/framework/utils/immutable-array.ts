@@ -23,6 +23,10 @@ export class ImmutableArray<T> implements Iterable<T> {
         return [...this.items];
     }
 
+    public get mutableValues(): T[] {
+        return this.items;
+    }
+
     private constructor(items: T[]) {
         this.items = items;
     }

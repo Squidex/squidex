@@ -26,7 +26,7 @@
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
                                     <option></option>
-                                    <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                    <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
                             </div>
                             <div *ngSwitchCase="'Radio'">
@@ -48,7 +48,7 @@
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
-                                    <option *ngFor="let value of field.properties.allowedValues">{{value}}</option>
+                                    <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
                             </div>
                             <div *ngSwitchCase="'Radio'">

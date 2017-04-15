@@ -160,7 +160,8 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly maxValue?: string,
-        public readonly minValue?: string
+        public readonly minValue?: string,
+        public readonly calculatedDefaultValue?: string
     ) {
         super('DateTime', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
@@ -324,6 +325,13 @@ export class SchemasService {
 
         return this.authService.authPut(url, dto, version)
                 .catchError('Failed to update schema. Please reload.');
+    }
+
+    public putFieldOrdering(appName: string, schemaName: string, dto: number[], version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/ordering`);
+
+        return this.authService.authPut(url, { fieldIds: dto }, version)
+                .catchError('Failed to reorder fields. Please reload.');
     }
 
     public publishSchema(appName: string, schemaName: string, version: Version): Observable<any> {

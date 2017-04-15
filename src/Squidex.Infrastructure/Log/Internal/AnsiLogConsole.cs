@@ -25,15 +25,14 @@ namespace Squidex.Infrastructure.Log.Internal
                 outputBuilder.Append(message);
                 outputBuilder.Append("\x1B[39m\x1B[22m");
                 outputBuilder.AppendLine();
+                outputBuilder.Clear();
 
                 Console.Error.Write(outputBuilder.ToString());
             }
             else
             {
-                Console.Out.Write(outputBuilder.ToString());
+                Console.WriteLine(message);
             }
-
-            outputBuilder.Clear();
         }
     }
 }

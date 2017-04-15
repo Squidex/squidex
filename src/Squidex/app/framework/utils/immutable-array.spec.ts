@@ -154,6 +154,12 @@ describe('ImmutableArray', () => {
         expect(array_2.values).toEqual([1, 2, 3, 4]);
     });
 
+    it('should provide mutable values', () => {
+        const array_1 = ImmutableArray.of([3, 1, 4, 2]);
+
+        expect(array_1.mutableValues).toBe(array_1.mutableValues);
+    });
+
     it('should iterate over array items', () => {
         const array_1 = ImmutableArray.of([3, 1, 4, 2]);
 

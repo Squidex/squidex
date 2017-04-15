@@ -176,6 +176,18 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
+    public sortFields(fields: FieldDto[]) {
+        this.updateFields(ImmutableArray.of(fields));
+
+        this.appName()
+            .switchMap(app => this.schemasService.putFieldOrdering(app, this.schemaName, fields.map(t => t.fieldId), this.version)).retry(2)
+            .subscribe(() => {
+                this.updateFields(ImmutableArray.of(fields));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
     public saveField(field: FieldDto, newField: FieldDto) {
         const request = new UpdateFieldDto(newField.properties);
 

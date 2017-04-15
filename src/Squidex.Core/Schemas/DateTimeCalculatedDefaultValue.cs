@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
-//  SchemaPublished.cs
+//  DateTimeCalculatedDefaultValue.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-namespace Squidex.Events.Schemas
+namespace Squidex.Core.Schemas
 {
-    [TypeName("SchemaPublishedEvent")]
-    public class SchemaPublished : SchemaEvent
+    public enum DateTimeCalculatedDefaultValue
     {
+        Now,
+        Today
     }
 }

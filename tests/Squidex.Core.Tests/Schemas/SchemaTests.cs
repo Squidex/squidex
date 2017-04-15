@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure;
@@ -65,7 +66,7 @@ namespace Squidex.Core.Schemas
         {
             var field = AddField();
 
-            Assert.Equal(field, sut.Fields[1]);
+            Assert.Equal(field, sut.FieldsById[1]);
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Core.Schemas
             sut = sut.HideField(1);
             sut = sut.HideField(1);
 
-            Assert.True(sut.Fields[1].IsHidden);
+            Assert.True(sut.FieldsById[1].IsHidden);
         }
 
         [Fact]
@@ -102,7 +103,7 @@ namespace Squidex.Core.Schemas
             sut = sut.ShowField(1);
             sut = sut.ShowField(1);
 
-            Assert.False(sut.Fields[1].IsHidden);
+            Assert.False(sut.FieldsById[1].IsHidden);
         }
 
         [Fact]
@@ -119,7 +120,7 @@ namespace Squidex.Core.Schemas
             sut = sut.DisableField(1);
             sut = sut.DisableField(1);
 
-            Assert.True(sut.Fields[1].IsDisabled);
+            Assert.True(sut.FieldsById[1].IsDisabled);
         }
 
         [Fact]
@@ -137,7 +138,7 @@ namespace Squidex.Core.Schemas
             sut = sut.EnableField(1);
             sut = sut.EnableField(1);
 
-            Assert.False(sut.Fields[1].IsDisabled);
+            Assert.False(sut.FieldsById[1].IsDisabled);
         }
 
         [Fact]
@@ -153,7 +154,7 @@ namespace Squidex.Core.Schemas
 
             sut = sut.RenameField(1, "new-name");
 
-            Assert.Equal("new-name", sut.Fields[1].Name);
+            Assert.Equal("new-name", sut.FieldsById[1].Name);
         }
 
         [Fact]
@@ -187,7 +188,7 @@ namespace Squidex.Core.Schemas
 
             sut = sut.DeleteField(1);
 
-            Assert.Equal(0, sut.Fields.Count);
+            Assert.Equal(0, sut.FieldsById.Count);
         }
 
         [Fact]
@@ -203,7 +204,7 @@ namespace Squidex.Core.Schemas
 
             sut = sut.UpdateField(1, new NumberFieldProperties { Hints = "my-hints" });
 
-            Assert.Equal("my-hints", sut.Fields[1].RawProperties.Hints);
+            Assert.Equal("my-hints", sut.FieldsById[1].RawProperties.Hints);
         }
 
         [Fact]
@@ -249,6 +250,45 @@ namespace Squidex.Core.Schemas
         public void Should_throw_if_schema_is_not_published()
         {
             Assert.Throws<DomainException>(() => sut.Unpublish());
+        }
+
+        [Fact]
+        public void Should_reorder_fields()
+        {
+            var field1 = new StringField(1, "1", new StringFieldProperties());
+            var field2 = new StringField(2, "2", new StringFieldProperties());
+            var field3 = new StringField(3, "3", new StringFieldProperties());
+
+            sut = sut.AddOrUpdateField(field1);
+            sut = sut.AddOrUpdateField(field2);
+            sut = sut.AddOrUpdateField(field3);
+            sut = sut.ReorderFields(new List<long> { 3, 2, 1 });
+
+            Assert.Equal(new List<Field> { field3, field2, field1 }, sut.Fields.ToList());
+        }
+
+        [Fact]
+        public void Should_throw_if_not_all_fields_are_covered_for_reordering()
+        {
+            var field1 = new StringField(1, "1", new StringFieldProperties());
+            var field2 = new StringField(2, "2", new StringFieldProperties());
+
+            sut = sut.AddOrUpdateField(field1);
+            sut = sut.AddOrUpdateField(field2);
+
+            Assert.Throws<ArgumentException>(() => sut.ReorderFields(new List<long> { 1 }));
+        }
+
+        [Fact]
+        public void Should_throw_if_field_to_reorder_does_not_exist()
+        {
+            var field1 = new StringField(1, "1", new StringFieldProperties());
+            var field2 = new StringField(2, "2", new StringFieldProperties());
+
+            sut = sut.AddOrUpdateField(field1);
+            sut = sut.AddOrUpdateField(field2);
+
+            Assert.Throws<ArgumentException>(() => sut.ReorderFields(new List<long> { 1, 4 }));
         }
 
         [Fact]

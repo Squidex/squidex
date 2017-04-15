@@ -55,14 +55,12 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 
             dto.Fields = new List<FieldDto>();
 
-            foreach (var kvp in entity.Schema.Fields)
+            foreach (var field in entity.Schema.Fields)
             {
-                var fieldPropertiesDto = 
-                    Factories[kvp.Value.RawProperties.GetType()](kvp.Value.RawProperties);
+                var fieldPropertiesDto = Factories[field.RawProperties.GetType()](field.RawProperties);
+                var fieldInstanceDto = SimpleMapper.Map(field, new FieldDto { FieldId = field.Id, Properties = fieldPropertiesDto });
 
-                var fieldDto = SimpleMapper.Map(kvp.Value, new FieldDto { FieldId = kvp.Key, Properties = fieldPropertiesDto });
-
-                dto.Fields.Add(fieldDto);
+                dto.Fields.Add(fieldInstanceDto);
             }
 
             return dto;

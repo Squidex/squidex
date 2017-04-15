@@ -53,7 +53,7 @@
                             </td>
                             <td>
                                 <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
-                                    <option *ngFor="let permission of usersPermissions">{{permission}}</option>
+                                    <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
                                 </select>
                             </td>
                             <td>

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Core.Schemas;
@@ -77,6 +78,19 @@ namespace Squidex.Write.Schemas
             CreateSchema();
 
             var context = CreateContextForCommand(new UpdateSchema { Properties = new SchemaProperties() });
+
+            await TestUpdate(schema, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task ReorderSchema_should_update_domain_object()
+        {
+            CreateSchema();
+
+            var context = CreateContextForCommand(new ReorderFields { FieldIds = new List<long>() });
 
             await TestUpdate(schema, async _ =>
             {

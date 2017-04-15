@@ -8,6 +8,7 @@
 import { ApplicationRef, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DndModule } from 'ng2-dnd';
 
 import { AppComponent } from './app.component';
 
@@ -49,6 +50,7 @@ export function configUserReport() {
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
+        DndModule.forRoot(),
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,

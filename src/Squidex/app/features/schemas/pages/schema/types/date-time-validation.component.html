@@ -23,11 +23,24 @@
         </div>
     </div>
 
-    <div class="form-group row" *ngIf="!(hideDefaultValue | async)">
-        <label class="col col-3 col-form-label" for="field-default-value">Default Value</label>
+    <div *ngIf="!(hideDefaultValues | async)">
+        <div class="form-group row">
+            <label class="col col-3 col-form-label">Default Mode:</label>
 
-        <div class="col col-9">
-            <sqx-date-time-editor enforceTime="true" formControlName="defaultValue"></sqx-date-time-editor>
+            <div class="col col-3">
+                <select class="form-control" formControlName="calculatedDefaultValue">
+                    <option></option>
+                    <option *ngFor="let value of calculatedDefaultValues" [ngValue]="value">{{value}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row" *ngIf="!(hideDefaultValue | async)">
+            <label class="col col-3 col-form-label" for="field-default-value">Default Value</label>
+
+            <div class="col col-9">
+                <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
+            </div>
         </div>
     </div>
 </div>

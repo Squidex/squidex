@@ -49,7 +49,7 @@ namespace Squidex.Core.Schemas
         {
             if (!Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor ist not a valid value", nameof(Editor));
+                yield return new ValidationError("Editor is not a valid value", nameof(Editor));
             }
         }
     }

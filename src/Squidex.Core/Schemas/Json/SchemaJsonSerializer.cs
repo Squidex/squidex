@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
@@ -36,18 +35,16 @@ namespace Squidex.Core.Schemas.Json
         {
             var model = new JsonSchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
 
-            model.Fields =
-                schema.Fields
-                    .Select(x =>
-                        new KeyValuePair<long, JsonFieldModel>(x.Key,
-                            new JsonFieldModel
-                            {
-                                Name = x.Value.Name,
-                                IsHidden = x.Value.IsHidden,
-                                IsDisabled = x.Value.IsDisabled,
-                                Properties = x.Value.RawProperties
-                            }))
-                    .ToDictionary(x => x.Key, x => x.Value);
+            model.Fields = 
+                schema.Fields.Select(x =>
+                    new JsonFieldModel
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        IsHidden = x.IsHidden,
+                        IsDisabled = x.IsDisabled,
+                        Properties = x.RawProperties
+                    }).ToList();
 
             return JToken.FromObject(model, serializer);
         }
@@ -57,11 +54,9 @@ namespace Squidex.Core.Schemas.Json
             var model = token.ToObject<JsonSchemaModel>(serializer);
 
             var fields =
-                model.Fields.Select(kvp =>
+                model.Fields.Select(fieldModel =>
                 {
-                    var fieldModel = kvp.Value;
-
-                    var field = fieldRegistry.CreateField(kvp.Key, fieldModel.Name, fieldModel.Properties);
+                    var field = fieldRegistry.CreateField(fieldModel.Id, fieldModel.Name, fieldModel.Properties);
 
                     if (fieldModel.IsDisabled)
                     {
@@ -74,7 +69,7 @@ namespace Squidex.Core.Schemas.Json
                     }
 
                     return field;
-                }).ToImmutableDictionary(x => x.Id, x => x);
+                }).ToImmutableList();
 
             var schema =
                 new Schema(

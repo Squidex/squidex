@@ -54,6 +54,11 @@ namespace Squidex.Events.Schemas.Utils
             return schema.Update(@event.Properties);
         }
 
+        public static Schema Dispatch(SchemaFieldsReordered @event, Schema schema)
+        {
+            return schema.ReorderFields(@event.FieldIds);
+        }
+
         public static Schema Dispatch(FieldDeleted @event, Schema schema)
         {
             return schema.DeleteField(@event.FieldId.Id);
