@@ -46,6 +46,12 @@
                             <div *ngSwitchCase="'Textarea'">
                                 <textarea class="form-control" [formControlName]="language"></textarea>
                             </div>
+                            <div *ngSwitchCase="'RichText'">
+                                <sqx-rich-editor [formControlName]="language"></sqx-rich-editor>
+                            </div>
+                            <div *ngSwitchCase="'Markdown'">
+                                <sqx-markdown-editor [formControlName]="language"></sqx-markdown-editor>
+                            </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="language">
                                     <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
@@ -58,25 +64,19 @@
                                     </label>
                                 </div>
                             </div>
-                            <div *ngSwitchCase="'RichText'">
-                                <sqx-rich-editor [formControlName]="language"></sqx-rich-editor>
-                            </div>
-                            <div *ngSwitchCase="'Markdown'">
-                                <sqx-markdown-editor [formControlName]="language"></sqx-markdown-editor>
-                            </div>
                         </div>
                     </div>
                     <div *ngSwitchCase="'Boolean'">
                         <div [ngSwitch]="field.properties.editor">
+                            <div *ngSwitchCase="'Toggle'">
+                                <sqx-toggle [formControlName]="language"></sqx-toggle>
+                            </div>
                             <div *ngSwitchCase="'Checkbox'">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
                                         <input class="form-check-input" type="checkbox" [formControlName]="language" sqxIndeterminateValue />
                                     </label>
                                 </div>
-                            </div>
-                            <div *ngSwitchCase="'Toggle'">
-                                <sqx-toggle [formControlName]="language"></sqx-toggle>
                             </div>
                         </div>
                     </div>

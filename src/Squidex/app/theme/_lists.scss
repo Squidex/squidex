@@ -55,6 +55,10 @@
                 background: darken($color-table, 1%);
             }
 
+            &:focus {
+                outline: none;
+            }
+
             &.active {
                 background: $color-theme-blue;
                 border-color: $color-theme-blue;
