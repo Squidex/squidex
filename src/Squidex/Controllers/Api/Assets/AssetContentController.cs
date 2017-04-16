@@ -52,41 +52,53 @@ namespace Squidex.Controllers.Api.Assets
                 return NotFound();
             }
 
-            Stream content;
-
-            if (asset.IsImage && (width.HasValue || height.HasValue))
+            return new FileCallbackResult(asset.MimeType, asset.FileName, async bodyStream =>
             {
-                var suffix = $"{width}_{height}_{mode}";
-
-                content = await assetStorage.GetAssetAsync(asset.Id, asset.Version, suffix);
-
-                if (content == null)
+                if (asset.IsImage && (width.HasValue || height.HasValue))
                 {
-                    var fullSizeContent = await assetStorage.GetAssetAsync(asset.Id, asset.Version);
+                    var suffix = $"{width}_{height}_{mode}";
 
-                    if (fullSizeContent == null)
+                    try
                     {
-                        return NotFound();
+                        await assetStorage.DownloadAsync(asset.Id, asset.Version, suffix, bodyStream);
                     }
+                    catch (AssetNotFoundException)
+                    {
+                        using (var tempStream1 = GetTempStream())
+                        {
+                            using (var tempStream2 = GetTempStream())
+                            {
+                                await assetStorage.DownloadAsync(asset.Id, asset.Version, null, tempStream1);
+                                tempStream1.Position = 0;
 
-                    content = await assetThumbnailGenerator.CreateThumbnailAsync(fullSizeContent, width, height, mode);
+                                await assetThumbnailGenerator.CreateThumbnailAsync(tempStream1, tempStream2, width, height, mode);
+                                tempStream2.Position = 0;
 
-                    await assetStorage.UploadAssetAsync(asset.Id, asset.Version, content, suffix);
+                                await assetStorage.UploadAsync(asset.Id, asset.Version, suffix, tempStream2);
+                                tempStream2.Position = 0;
 
-                    content.Position = 0;
+                                await tempStream2.CopyToAsync(bodyStream);
+                            }
+                        }
+
+                    }
                 }
-            }
-            else
-            {
-                content = await assetStorage.GetAssetAsync(asset.Id, asset.Version);
-            }
 
-            if (content == null)
-            {
-                return NotFound();
-            }
+                await assetStorage.DownloadAsync(asset.Id, asset.Version, null, bodyStream);
+            });
+        }
 
-            return new FileStreamResult(content, asset.MimeType) { FileDownloadName = asset.FileName };
+        private static FileStream GetTempStream()
+        {
+            var tempFileName = Path.GetTempFileName();
+
+            return new FileStream(tempFileName,
+                FileMode.Create,
+                FileAccess.ReadWrite,
+                FileShare.Delete, 1024 * 16,
+                FileOptions.Asynchronous |
+                FileOptions.DeleteOnClose |
+                FileOptions.SequentialScan);
         }
     }
 }

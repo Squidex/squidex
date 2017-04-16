@@ -23,13 +23,13 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             Configuration.Default.AddImageFormat(new PngFormat());
         }
 
-        public Task<Stream> CreateThumbnailAsync(Stream input, int? width, int? height, string mode)
+        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width, int? height, string mode)
         {
             return Task.Run(() =>
             {
                 if (width == null && height == null)
                 {
-                    return input;
+                    source.CopyTo(destination);
                 }
 
                 if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
@@ -40,9 +40,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 var w = width ?? int.MaxValue;
                 var h = height ?? int.MaxValue;
 
-                var result = new MemoryStream();
-
-                using (var sourceImage = Image.Load(input))
+                using (var sourceImage = Image.Load(source))
                 {
                     if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop)
                     {
@@ -57,23 +55,19 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                         };
 
                     sourceImage.MetaData.Quality = 0;
-                    sourceImage.Resize(options).Save(result);
+                    sourceImage.Resize(options).Save(destination);
                 }
-
-                result.Position = 0;
-
-                return result;
             });
         }
 
-        public Task<ImageInfo> GetImageInfoAsync(Stream input)
+        public Task<ImageInfo> GetImageInfoAsync(Stream source)
         {
             return Task.Run(() =>
             {
                 ImageInfo imageInfo = null;
                 try
                 {
-                    var image = Image.Load(input);
+                    var image = Image.Load(source);
 
                     if (image.Width > 0 && image.Height > 0)
                     {

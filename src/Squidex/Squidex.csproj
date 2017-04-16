@@ -15,6 +15,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
+    <EmbeddedResource Remove="Assets\**" />
+    <Compile Remove="Assets\**" />
+    <Content Remove="Assets\**" />
+    <None Remove="Assets\**" />
 	  <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
@@ -23,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Core\Squidex.Core.csproj" />
     <ProjectReference Include="..\Squidex.Events\Squidex.Events.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />

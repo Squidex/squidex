@@ -50,28 +50,24 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task<Stream> GetAssetAsync(Guid id, long version, string suffix = null)
+        public async Task DownloadAsync(Guid id, long version, string suffix, Stream stream)
         {
             var file = GetFile(id, version, suffix);
 
-            Stream stream = null;
-
             try
             {
-                if (file.Exists)
+                using (var fileStream = file.OpenWrite())
                 {
-                    stream = file.OpenRead();
+                    await fileStream.CopyToAsync(stream);
                 }
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException ex)
             {
-                stream = null;
+                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
             }
-
-            return Task.FromResult(stream);
         }
 
-        public async Task UploadAssetAsync(Guid id, long version, Stream stream, string suffix = null)
+        public async Task UploadAsync(Guid id, long version, string suffix, Stream stream)
         {
             var file = GetFile(id, version, suffix);
 

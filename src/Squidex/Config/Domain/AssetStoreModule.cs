@@ -11,6 +11,7 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Log;
 
 // ReSharper disable InvertIf
@@ -49,9 +50,23 @@ namespace Squidex.Config.Domain
                     .As<IExternalSystem>()
                     .SingleInstance();
             }
+            else if (string.Equals(assetStoreType, "GoogleCloud", StringComparison.OrdinalIgnoreCase))
+            {
+                var bucketName = Configuration.GetValue<string>("assetStore:googleCloud:bucket");
+
+                if (string.IsNullOrWhiteSpace(bucketName))
+                {
+                    throw new ConfigurationException("Configure AssetStore GoogleCloud bucket with 'assetStore:googleCloud:bucket'.");
+                }
+
+                builder.Register(c => new GoogleCloudAssetStore(bucketName))
+                    .As<IAssetStore>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+            }
             else
             {
-                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: Folder.");
+                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: Folder, GoogleCloud.");
             }
         }
     }

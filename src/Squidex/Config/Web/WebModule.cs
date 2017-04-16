@@ -28,6 +28,10 @@ namespace Squidex.Config.Web
             builder.RegisterType<AppFilterAttribute>()
                 .AsSelf()
                 .SingleInstance();
+
+            builder.RegisterType<FileCallbackResultExecutor>()
+                .AsSelf()
+                .SingleInstance();
         }
     }
 }

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.Redis", "src\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj", "{D7166C56-178A-4457-B56A-C615C7450DEE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.RabbitMq", "src\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj", "{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.GoogleCloud", "src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj", "{945871B1-77B8-43FB-B53C-27CF385AB756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,18 @@ Global
 		{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}.Release|x64.Build.0 = Release|Any CPU
 		{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}.Release|x86.ActiveCfg = Release|Any CPU
 		{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}.Release|x86.Build.0 = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|x64.Build.0 = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Debug|x86.Build.0 = Debug|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x64.ActiveCfg = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x64.Build.0 = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x86.ActiveCfg = Release|Any CPU
+		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -178,5 +192,6 @@ Global
 		{8B074219-F69A-4E41-83C6-12EE1E647779} = {4C6B06C2-6D77-4E0E-AE32-D7050236433A}
 		{D7166C56-178A-4457-B56A-C615C7450DEE} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+		{945871B1-77B8-43FB-B53C-27CF385AB756} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 	EndGlobalSection
 EndGlobal

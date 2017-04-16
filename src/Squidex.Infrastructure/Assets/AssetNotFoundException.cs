@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAssetStorage.cs
+//  AssetNotFoundException.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,15 +7,23 @@
 // ==========================================================================
 
 using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public interface IAssetStore
+    public class AssetNotFoundException : Exception
     {
-        Task DownloadAsync(Guid id, long version, string suffix, Stream stream);
+        public AssetNotFoundException()
+        {
+        }
 
-        Task UploadAsync(Guid id, long version, string suffix, Stream stream);
+        public AssetNotFoundException(string message) 
+            : base(message)
+        {
+        }
+
+        public AssetNotFoundException(string message, Exception inner) 
+            : base(message, inner)
+        {
+        }
     }
 }
