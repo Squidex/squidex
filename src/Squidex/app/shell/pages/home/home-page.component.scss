@@ -50,7 +50,7 @@ $color-google-dark: #af2c1a;
     &-button {
         & {
             @include border-radius(1.5rem);
-            color: $color-accent-dark;
+            color: $color-dark-foreground;
             cursor: pointer;
             margin-top: 4rem;
             height: 3rem;

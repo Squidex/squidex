@@ -11,7 +11,7 @@ $toggle-button-size: $toggle-height - .3rem;
         @include box-shadow(0, 2px, 2px, .2);
         @include absolute($toggle-height * .5, auto, auto, $toggle-width * .5);
         @include transition(left .3s ease);
-        background: $color-accent-dark;
+        background: $color-dark-foreground;
         border: 0;
         margin-left: -$toggle-button-size * .5;
         margin-top: -$toggle-button-size * .5;

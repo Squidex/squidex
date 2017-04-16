@@ -1,4 +1,4 @@
-    <input type="text" class="form-control" [attr.name]="inputName" (keydown)="onKeyDown($event)" (blur)="onBlur()"
+    <input type="text" class="form-control" [attr.name]="inputName" (keydown)="onKeyDown($event)" (blur)="markTouched()"
         [formControl]="addInput"
         autocomplete="off" 
         autocorrect="off"

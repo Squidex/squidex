@@ -66,6 +66,28 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
+    public onAssetDeleting(asset: AssetDto) {
+        this.appName()
+            .switchMap(app => this.assetsService.deleteAsset(app, asset.id, asset.version))
+            .subscribe(dtos => {
+                this.assetsItems = this.assetsItems.filter(x => x.id !== asset.id);
+                this.assetsPager = this.assetsPager.decrementCount();
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public onAssetLoaded(file: File, asset: AssetDto) {
+        this.newFiles = this.newFiles.remove(file);
+
+        this.assetsItems = this.assetsItems.pushFront(asset);
+        this.assetsPager = this.assetsPager.incrementCount();
+    }
+
+    public onAssetFailed(file: File) {
+        this.newFiles = this.newFiles.remove(file);
+    }
+
     public goNext() {
         this.assetsPager = this.assetsPager.goNext();
 
@@ -76,10 +98,6 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
         this.assetsPager = this.assetsPager.goPrev();
 
         this.load();
-    }
-
-    public removeFile(file: File) {
-        this.newFiles = this.newFiles.remove(file);
     }
 
     public addFiles(files: FileList) {

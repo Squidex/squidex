@@ -170,7 +170,7 @@ export class AssetsService {
         });
     }
 
-    public replaceFile(appName: string, id: string, file: File): Observable<number | AssetReplacedDto> {
+    public replaceFile(appName: string, id: string, file: File, version?: Version): Observable<number | AssetReplacedDto> {
         return new Observable<number | AssetReplacedDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
@@ -178,6 +178,10 @@ export class AssetsService {
             const headers = new Headers({
                 'Authorization': `${this.authService.user.user.token_type} ${this.authService.user.user.access_token}`
             });
+
+            if (version && version.value.length > 0) {
+                headers.append('If-Match', version.value);
+            }
 
             content.append('file', file);
 
@@ -202,5 +206,12 @@ export class AssetsService {
                     subscriber.complete();
                 });
         });
+    }
+
+    public deleteAsset(appName: string, id: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+
+        return this.authService.authDelete(url, version)
+                .catchError('Failed to delete asset. Please reload.');
     }
 }

@@ -62,10 +62,7 @@
             </div>
 
             <div class="modal-body">
-                <sqx-schema-form
-                    [appName]="appName() | async"
-                    (created)="onSchemaCreated($event)"
-                    (cancelled)="addSchemaDialog.hide()"></sqx-schema-form>
+                <sqx-schema-form [appName]="appName() | async" (created)="onSchemaCreated($event)" (cancelled)="addSchemaDialog.hide()"></sqx-schema-form>
             </div>
         </div>
     </div>

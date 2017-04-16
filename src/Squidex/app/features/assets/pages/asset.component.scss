@@ -3,8 +3,51 @@
 
 $card-size: 240px;
 
-$color-type-background: #000;
-$color-type-foreground: #fff;
+@mixin overlay-container {
+    position: relative;
+}
+
+@mixin overlay {
+    & {
+        @include transition(opacity.4s ease);
+        @include absolute(0, 0, 0, 0);
+        @include opacity(0);
+        color: $color-dark-foreground;
+    }
+
+    &-background {
+        @include absolute(0, 0, 0, 0);
+        @include opacity(.7);
+        background: $color-dark-black;
+    }
+}
+
+@mixin asset-type {
+    padding: .1rem .3rem;
+    text-transform: uppercase;
+    font-size: .7rem;
+    font-weight: normal;
+    cursor: none;
+    color: $color-dark-foreground;
+}
+
+@mixin asset-link {
+    & {
+        font-size: 1.1rem;
+        font-weight: normal;
+        cursor: pointer;
+        color: darken($color-dark-foreground, 10%);
+    }
+
+    &:hover {
+        color: $color-dark-foreground;
+    }
+
+    &:focus,
+    &:hover {
+        text-decoration: none;
+    }
+}
 
 :host {
     padding-bottom: 1rem;
@@ -12,31 +55,21 @@ $color-type-foreground: #fff;
 
 .drop-overlay {
     & {
-        @include transition(opacity.4s ease);
-        @include absolute(0, 0, 0, 0);
-        @include opacity(0);
+        @include overlay;
         pointer-events: none;
     }
 
     &-text {
-        @include absolute(0, 0, 0, 0);
+        @include absolute(40%, 0, 0, 0);
         text-align: center;
-        line-height: 14rem;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: lighter;
-        color: $color-type-foreground;
-    }
-
-    &-background {
-        @include absolute(0, 0, 0, 0);
-        @include opacity(.7);
-        background: $color-type-background;
     }
 }
 
 .card {
     & {
-        position: relative;
+        @include overlay-container;
         height: $card-size;
     }
 
@@ -69,7 +102,10 @@ $color-type-foreground: #fff;
     }
 
     &-preview {
-        position: relative;
+        & {
+            @include overlay-container;
+            height: 155px;
+        }
 
         &:hover {
             .file-overlay {
@@ -82,23 +118,6 @@ $color-type-foreground: #fff;
         }
     }
 
-    &-icon {
-        &-container {
-            background: $color-border;
-            border: 0;
-            height: 155px;
-            line-height: 155px;
-            text-align: center;
-        }
-    }
-
-    &-name {
-        @include truncate;
-        font-size: 1rem;
-        font-weight: normal;
-        line-height: 2rem;
-    }
-
     &-user {
         @include absolute(auto, auto, 1.7rem, .5rem);
     }
@@ -108,63 +127,47 @@ $color-type-foreground: #fff;
     }
 
     &-delete {
-        & {
-            @include absolute(.5rem, 1rem, auto, auto);
-            font-size: 1.1rem;
-            font-weight: normal;
-            cursor: pointer;
-            color: $color-accent-dark;
-        }
-
-        &:focus,
-        &:hover {
-            text-decoration: none;
-        }
+        @include asset-link;
+        @include absolute(.5rem, 1rem, auto, auto);
     }
 
     &-download {
-        & {
-            @include absolute(.5rem, 2.5rem, auto, auto);
-            font-size: 1.1rem;
-            font-weight: normal;
-            cursor: pointer;
-            color: $color-accent-dark;
-        }
-
-        &:focus,
-        &:hover {
-            text-decoration: none;
-        }
+        @include asset-link;
+        @include absolute(.5rem, 2.5rem, auto, auto);
     }
 
     &-type {
         @include transition(opacity.4s ease);
-        @include absolute(.5rem, auto, auto, .5rem);
-        @include border-radius(2px);
-        @include opacity(.8);
-        background: $color-type-background;
-        border: 0;
-        padding: .1rem .3rem;
-        text-transform: uppercase;
-        font-size: .7rem;
+        @include absolute(.7rem, auto, auto, .5rem);
+        @include asset-type;
+        @include border-radius(3px);
+        background: $color-dark-black;
+    }
+
+    &-name {
+        @include truncate;
+        font-size: 1rem;
         font-weight: normal;
-        color: $color-type-foreground;
+        line-height: 2rem;
+    }
+
+    &-icon-container {
+        background: $color-border;
+        border: 0;
+        line-height: 155px;
+        text-align: center;
     }
 
     &-overlay {
         & {
-            @include transition(opacity.4s ease);
-            @include absolute(0, 0, 0, 0);
-            @include opacity(0);
-            font-size: .9rem;
+            @include overlay;
+            font-size: .8rem;
             font-weight: normal;
-            color: $color-accent-dark;
         }
 
-        &-background {
-            @include absolute(0, 0, 0, 0);
-            @include opacity(.7);
-            background: $color-type-background;
+        &-type {
+            @include absolute(.7rem, auto, auto, .5rem);
+            @include asset-type;
         }
     }
 }

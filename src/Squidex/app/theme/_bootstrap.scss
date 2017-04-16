@@ -61,7 +61,7 @@ body {
 
         &.dropdown-item {
             &:active {
-                color: $color-accent-dark;
+                color: $color-dark-foreground;
             }
         }
     }
@@ -208,11 +208,11 @@ body {
                 @include box-shadow(0, 0, 10px, .5);
                 background: $color-theme-blue;
                 border-color: $color-theme-blue;
-                color: $color-accent-dark;
+                color: $color-dark-foreground;
             }
 
             &:hover {
-                color: $color-accent-dark;
+                color: $color-dark-foreground;
             }
         }
 

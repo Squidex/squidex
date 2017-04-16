@@ -177,8 +177,8 @@ namespace Squidex.Controllers.Api.Assets
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/schemas/{name}/")]
-        public async Task<IActionResult> DeleteSchema(string app, Guid id)
+        [Route("apps/{app}/assets/{id}/")]
+        public async Task<IActionResult> DeleteAsset(string app, Guid id)
         {
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
 

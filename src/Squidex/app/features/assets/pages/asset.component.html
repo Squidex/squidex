@@ -3,10 +3,12 @@
         <div *ngIf="asset && progress == 0" [@fade]>
             <div class="card-block">
                 <div class="file-preview">
-                    <div class="file-type">{{fileType}}</div>
+                    <span class="file-type">
+                        {{fileType}}
+                    </span>
                     
                     <div *ngIf="asset.isImage">
-                        <img [attr.src]="previewUrl" sqxHideInvalidImage>
+                        <img [attr.src]="previewUrl" sqxHideInvalidImage (error)="retryLoadingImage()">
                     </div>
                     <div *ngIf="!asset.isImage" class="file-icon-container">
                         <img class="file-icon" [attr.src]="fileIcon" sqxHideInvalidImage>
@@ -18,9 +20,13 @@
                         <a class="file-download" [attr.href]="downloadUrl" target="_blank">
                             <i class="icon-download"></i>
                         </a>
-                        <a class="file-delete">
+                        <a class="file-delete" (click)="deleting.emit(asset)">
                             <i class="icon-delete"></i>
                         </a>
+
+                        <span class="file-overlay-type">
+                            {{fileType}}
+                        </span>
                         <span class="file-user">
                             <i class="icon-user"></i> {{userName(asset.lastModifiedBy, true) | async}}
                         </span>

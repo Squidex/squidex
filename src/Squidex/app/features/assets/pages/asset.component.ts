@@ -20,7 +20,8 @@ import {
     fadeAnimation,
     MathHelper,
     NotificationService,
-    UsersProviderService
+    UsersProviderService,
+    Version
 } from 'shared';
 
 @Component({
@@ -32,7 +33,9 @@ import {
     ]
 })
 export class AssetComponent extends AppComponentBase implements OnInit {
-    private assetVersion = MathHelper.guid();
+    private assetUrlVersion = MathHelper.guid();
+    private retries = 0;
+    private version: Version;
 
     @Input()
     public initFile: File;
@@ -41,7 +44,10 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public asset: AssetDto;
 
     @Output()
-    public deleting = new EventEmitter();
+    public loaded = new EventEmitter<AssetDto>();
+
+    @Output()
+    public deleting = new EventEmitter<AssetDto>();
 
     @Output()
     public failed = new EventEmitter();
@@ -49,11 +55,11 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public progress = 0;
 
     public get previewUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop&q=${this.assetVersion}`);
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop&q=${this.assetUrlVersion}`);
     }
 
     public get downloadUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?q=${this.assetVersion}`);
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?q=${this.assetUrlVersion}`);
     }
 
     public get fileType(): string {
@@ -102,7 +108,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                             const me = `subject:${this.authService.user!.id}`;
 
                             const asset = new AssetDto(
-                                this.asset.id,
+                                result.id,
                                 me, me,
                                 DateTime.now(),
                                 DateTime.now(),
@@ -115,9 +121,12 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                                 result.version);
 
                             this.asset = asset;
-                            this.assetVersion = MathHelper.guid();
+                            this.assetUrlVersion = MathHelper.guid();
+                            this.version = result.version;
                             this.progress = 0;
-                        }, 2000);
+
+                            this.loaded.emit(asset);
+                        }, 500);
                     } else {
                         this.progress = result;
                     }
@@ -126,13 +135,15 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
                     this.notifyError(error);
                 });
+        } else {
+            this.version = this.asset.version;
         }
     }
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
             this.appName()
-                .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0]))
+                .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.version))
                 .subscribe(result => {
                     if (result instanceof AssetReplacedDto) {
                         setTimeout(() => {
@@ -149,10 +160,12 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                                 result.pixelWidth,
                                 result.pixelHeight,
                                 result.version);
+
                             this.asset = asset;
-                            this.assetVersion = MathHelper.guid();
+                            this.assetUrlVersion = MathHelper.guid();
                             this.progress = 0;
-                        }, 2000);
+                            this.retries = 0;
+                        }, 500);
                     } else {
                         this.progress = result;
                     }
@@ -161,6 +174,16 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
                     this.notifyError(error);
                 });
+        }
+    }
+
+    public retryLoadingImage() {
+        this.retries++;
+
+        if (this.retries <= 10) {
+            setTimeout(() => {
+                this.assetUrlVersion = MathHelper.guid();
+            }, this.retries * 1000);
         }
     }
 }

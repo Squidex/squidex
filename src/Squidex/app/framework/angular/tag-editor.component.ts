@@ -104,7 +104,7 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
     }
 
-    public onBlur() {
+    public markTouched() {
         this.touchedCallback();
     }
 

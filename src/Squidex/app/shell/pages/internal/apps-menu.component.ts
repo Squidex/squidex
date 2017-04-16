@@ -56,14 +56,6 @@ export class AppsMenuComponent implements OnInit, OnDestroy {
             this.appsStore.selectedApp.subscribe(selectedApp => this.appName = selectedApp ? selectedApp.name : FALLBACK_NAME);
     }
 
-    public onAppCreationCancelled() {
-        this.modalDialog.hide();
-    }
-
-    public onAppCreationCompleted(app: AppDto) {
-        this.modalDialog.hide();
-    }
-
     public createApp() {
         this.modalMenu.hide();
         this.modalDialog.show();

@@ -36,8 +36,13 @@
             </div>
             
             <div class="row">
-                <sqx-asset class="col-3" *ngFor="let file of newFiles" [initFile]="file" (failed)="removeFile(file)"></sqx-asset>
-                <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"></sqx-asset>
+                <sqx-asset class="col-3" *ngFor="let file of newFiles" [initFile]="file" 
+                    (failed)="onAssetFailed(file)" 
+                    (loaded)="onAssetLoaded(file, $event)">
+                </sqx-asset>
+                <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" 
+                    (deleting)="onAssetDeleting($event)">
+                </sqx-asset>
             </div>
 
             <div class="clearfix" *ngIf="assetsPager.numberOfItems > 0">

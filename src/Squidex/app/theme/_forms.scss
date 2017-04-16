@@ -32,7 +32,7 @@
     & {
         @include absolute(auto, auto, .4rem, 0);
         @include border-radius(2px);
-        color: $color-accent-dark;
+        color: $color-dark-foreground;
         cursor: none;
         display: inline-block;
         font-size: .9rem;
@@ -68,7 +68,7 @@ select {
 .form-error {
     @include border-radius(4px);
     @include truncate;
-    color: $color-accent-dark;
+    color: $color-dark-foreground;
     margin-top: .25rem;
     margin-bottom: .5rem;
     padding: .5rem;
@@ -106,10 +106,10 @@ select {
 .form-control-dark {
     & {
         @include transition(background-color .3s ease);
-        @include placeholder-color(darken($color-accent-dark, 30%));
+        @include placeholder-color(darken($color-dark-foreground, 30%));
         background: $color-dark2-control;
         border: 1px solid $color-dark2-control;
-        color: darken($color-accent-dark, 20%);
+        color: darken($color-dark-foreground, 20%);
     }
 
     &:focus {

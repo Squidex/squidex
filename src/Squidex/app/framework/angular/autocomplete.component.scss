@@ -15,7 +15,7 @@ $color-input-border: rgba(0, 0, 0, .15);
         width: 18rem;
         max-height: 12rem;
         border: 1px solid $color-input-border;
-        background: $color-accent-dark;
+        background: $color-dark-foreground;
         padding: .3rem 0;
         overflow-y: auto;
     }
@@ -29,7 +29,7 @@ $color-input-border: rgba(0, 0, 0, .15);
     }
 
     &.active {
-        color: $color-accent-dark;
+        color: $color-dark-foreground;
         background: $color-theme-blue;
     }
 
