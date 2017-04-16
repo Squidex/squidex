@@ -52,6 +52,10 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop&q=${this.assetVersion}`);
     }
 
+    public get downloadUrl(): string {
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?q=${this.assetVersion}`);
+    }
+
     public get fileType(): string {
         return this.asset.mimeType.split('/')[1];
     }

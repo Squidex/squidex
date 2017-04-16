@@ -86,7 +86,7 @@ namespace Squidex.Controllers.Api.Assets
                 return NotFound();
             }
 
-            return new FileStreamResult(content, asset.MimeType);
+            return new FileStreamResult(content, asset.MimeType) { FileDownloadName = asset.FileName };
         }
     }
 }

@@ -68,6 +68,20 @@ $color-type-foreground: #fff;
         font-size: .8rem;
     }
 
+    &-preview {
+        position: relative;
+
+        &:hover {
+            .file-overlay {
+                @include opacity(1);
+            }
+
+            .file-type {
+                @include opacity(0);
+            }
+        }
+    }
+
     &-icon {
         &-container {
             background: $color-border;
@@ -85,8 +99,47 @@ $color-type-foreground: #fff;
         line-height: 2rem;
     }
 
+    &-user {
+        @include absolute(auto, auto, 1.7rem, .5rem);
+    }
+
+    &-modified {
+        @include absolute(auto, auto, .5rem, .5rem);
+    }
+
+    &-delete {
+        & {
+            @include absolute(.5rem, 1rem, auto, auto);
+            font-size: 1.1rem;
+            font-weight: normal;
+            cursor: pointer;
+            color: $color-accent-dark;
+        }
+
+        &:focus,
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    &-download {
+        & {
+            @include absolute(.5rem, 2.5rem, auto, auto);
+            font-size: 1.1rem;
+            font-weight: normal;
+            cursor: pointer;
+            color: $color-accent-dark;
+        }
+
+        &:focus,
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
     &-type {
-        @include absolute(1.1rem, auto, auto, 1.1rem);
+        @include transition(opacity.4s ease);
+        @include absolute(.5rem, auto, auto, .5rem);
         @include border-radius(2px);
         @include opacity(.8);
         background: $color-type-background;
@@ -96,5 +149,22 @@ $color-type-foreground: #fff;
         font-size: .7rem;
         font-weight: normal;
         color: $color-type-foreground;
+    }
+
+    &-overlay {
+        & {
+            @include transition(opacity.4s ease);
+            @include absolute(0, 0, 0, 0);
+            @include opacity(0);
+            font-size: .9rem;
+            font-weight: normal;
+            color: $color-accent-dark;
+        }
+
+        &-background {
+            @include absolute(0, 0, 0, 0);
+            @include opacity(.7);
+            background: $color-type-background;
+        }
     }
 }

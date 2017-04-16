@@ -2,7 +2,7 @@
     <div class="card" (sqxFileDrop)="updateFile($event)">
         <div *ngIf="asset && progress == 0" [@fade]>
             <div class="card-block">
-                <div>
+                <div class="file-preview">
                     <div class="file-type">{{fileType}}</div>
                     
                     <div *ngIf="asset.isImage">
@@ -10,6 +10,24 @@
                     </div>
                     <div *ngIf="!asset.isImage" class="file-icon-container">
                         <img class="file-icon" [attr.src]="fileIcon" sqxHideInvalidImage>
+                    </div>
+
+                    <div class="file-overlay">
+                        <div class="file-overlay-background"></div>
+                        
+                        <a class="file-download" [attr.href]="downloadUrl" target="_blank">
+                            <i class="icon-download"></i>
+                        </a>
+                        <a class="file-delete">
+                            <i class="icon-delete"></i>
+                        </a>
+                        <span class="file-user">
+                            <i class="icon-user"></i> {{userName(asset.lastModifiedBy, true) | async}}
+                        </span>
+                        <span class="file-modified">
+                            {{asset.lastModified | fromNow}}
+                        </span>
+
                     </div>
                 </div>
             </div>
