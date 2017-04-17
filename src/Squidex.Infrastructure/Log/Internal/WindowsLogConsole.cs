@@ -12,6 +12,13 @@ namespace Squidex.Infrastructure.Log.Internal
 {
     public class WindowsLogConsole : IConsole
     {
+        private readonly bool logToStdError;
+
+        public WindowsLogConsole(bool logToStdError)
+        {
+            this.logToStdError = logToStdError;
+        }
+
         public void WriteLine(SemanticLogLevel level, string message)
         {
             if (level >= SemanticLogLevel.Error)
@@ -20,7 +27,14 @@ namespace Squidex.Infrastructure.Log.Internal
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
 
-                    Console.Error.WriteLine(message);
+                    if (logToStdError)
+                    {
+                        Console.Error.WriteLine(message);
+                    }
+                    else
+                    {
+                        Console.Out.WriteLine(message);
+                    }
                 }
                 finally
                 {

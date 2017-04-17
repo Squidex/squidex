@@ -24,11 +24,11 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                console = new WindowsLogConsole();
+                console = new WindowsLogConsole(false);
             }
             else
             {
-                console = new AnsiLogConsole();
+                console = new AnsiLogConsole(false);
             }
 
             outputTask = Task.Factory.StartNew(ProcessLogQueue, this, TaskCreationOptions.LongRunning);

@@ -15,7 +15,13 @@ namespace Squidex.Infrastructure.Log.Internal
 {
     public class AnsiLogConsole : IConsole
     {
+        private readonly bool logToStdError;
         private readonly StringBuilder outputBuilder = new StringBuilder();
+
+        public AnsiLogConsole(bool logToStdError)
+        {
+            this.logToStdError = logToStdError;
+        }
 
         public void WriteLine(SemanticLogLevel level, string message)
         {
@@ -27,7 +33,14 @@ namespace Squidex.Infrastructure.Log.Internal
                 outputBuilder.AppendLine();
                 outputBuilder.Clear();
 
-                Console.Error.Write(outputBuilder.ToString());
+                if (logToStdError)
+                {
+                    Console.Error.Write(outputBuilder.ToString());
+                }
+                else
+                {
+                    Console.Out.WriteLine(outputBuilder.ToString());
+                }
             }
             else
             {
