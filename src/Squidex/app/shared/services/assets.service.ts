@@ -83,42 +83,29 @@ export class AssetReplacedDto {
 @Injectable()
 export class AssetsService {
     constructor(
-        private readonly http: ProgressHttp,
+        private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService
+        private readonly http: ProgressHttp
     ) {
     }
 
     public getAssets(appName: string, take: number, skip: number, query: string, mimeTypes: string[]): Observable<AssetsDto> {
-        let fullQuery = query ? query.trim() : '';
+        let queries: string[] = [];
 
         if (mimeTypes && mimeTypes.length > 0) {
-            let mimeQuery = '&mimeTypes=';
-
-            for (let i = 0; i < mimeTypes.length; i++) {
-                mimeQuery += mimeTypes[0];
-
-                if (i > 0) {
-                    mimeQuery += ',';
-                }
-            }
-
-            fullQuery += mimeQuery;
+            queries.push(`mimeTypes=${mimeTypes.join(',')}`);
         }
 
         if (query && query.length > 0) {
-            fullQuery += `&query=${query}`;
+            queries.push(`query=${query}`);
         }
 
-        if (take > 0) {
-            fullQuery += `&take=${take}`;
-        }
+        queries.push(`take=${take}`);
+        queries.push(`skip=${skip}`);
 
-        if (skip > 0) {
-            fullQuery += `&skip=${skip}`;
-        }
+        const fullQuery = queries.join('&');
 
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/?${fullQuery}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -147,7 +134,7 @@ export class AssetsService {
 
     public uploadFile(appName: string, file: File): Observable<number | AssetCreatedDto> {
         return new Observable<number | AssetCreatedDto>(subscriber => {
-            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/`);
+            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
             const content = new FormData();
             const headers = new Headers({
@@ -221,7 +208,7 @@ export class AssetsService {
         });
     }
 
-    public updateAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<any> {
+    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return this.authService.authPut(url, dto, version)

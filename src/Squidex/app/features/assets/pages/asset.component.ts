@@ -68,11 +68,11 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public progress = 0;
 
     public get previewUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?width=230&height=155&mode=Crop&version=${this.version.value}&q=${this.cacheBuster}`);
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}?width=230&height=155&mode=Crop&version=${this.version.value}&q=${this.cacheBuster}`);
     }
 
     public get downloadUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}/?q=${this.cacheBuster}`);
+        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}?q=${this.cacheBuster}`);
     }
 
     public get fileType(): string {
@@ -190,7 +190,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
             const dto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
             this.appName()
-                .switchMap(app => this.assetsService.updateAsset(app, this.asset.id, dto, this.version))
+                .switchMap(app => this.assetsService.putAsset(app, this.asset.id, dto, this.version))
                 .subscribe(_ => {
                     const me = `subject:${this.authService.user!.id}`;
 

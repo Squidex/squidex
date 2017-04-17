@@ -8,6 +8,21 @@
 import { Pager } from './../';
 
 describe('Pager', () => {
+    it('Should init with default values', () => {
+        const pager_1 = new Pager(0);
+
+        expect(Object.assign({}, pager_1)).toEqual({
+            page: 0,
+            pageSize: 10,
+            itemFirst: 0,
+            itemLast: 0,
+            skip: 0,
+            numberOfItems: 0,
+            canGoNext: false,
+            canGoPrev: false
+        });
+    });
+
     it('Should init with page size and page', () => {
         const pager_1 = new Pager(23, 2, 10);
 

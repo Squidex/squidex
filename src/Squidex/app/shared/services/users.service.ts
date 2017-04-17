@@ -41,7 +41,7 @@ export class UsersService {
     }
 
     public getUsers(query?: string): Observable<UserDto[]> {
-        const url = this.apiUrl.buildUrl(`api/users/?query=${query || ''}`);
+        const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())
@@ -86,7 +86,7 @@ export class UserManagementService {
     }
 
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
-        const url = this.apiUrl.buildUrl(`api/user-management/?take=${take}&skip=${skip}&query=${query || ''}`);
+        const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
         return this.authService.authGet(url)
                 .map(response => response.json())

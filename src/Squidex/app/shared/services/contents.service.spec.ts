@@ -103,6 +103,7 @@ describe('ContentsService', () => {
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
             contents = result;
         }).unsubscribe();
+
         authService.verifyAll();
     });
 
@@ -125,6 +126,7 @@ describe('ContentsService', () => {
         contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe(result => {
             contents = result;
         }).unsubscribe();
+
         authService.verifyAll();
     });
 

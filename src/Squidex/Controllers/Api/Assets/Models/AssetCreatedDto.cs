@@ -69,6 +69,7 @@ namespace Squidex.Controllers.Api.Assets.Models
                 Id = command.AssetId,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
+                FileVersion = result.Version,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
                 PixelWidth = command.ImageInfo?.PixelWidth,

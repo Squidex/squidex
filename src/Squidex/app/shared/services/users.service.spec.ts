@@ -28,7 +28,7 @@ describe('UsersService', () => {
     });
 
     it('should make get request to get many users', () => {
-        authService.setup(x => x.authGet('http://service/p/api/users/?query='))
+        authService.setup(x => x.authGet('http://service/p/api/users?query='))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -66,7 +66,7 @@ describe('UsersService', () => {
     });
 
     it('should make get request with query to get many users', () => {
-        authService.setup(x => x.authGet('http://service/p/api/users/?query=my-query'))
+        authService.setup(x => x.authGet('http://service/p/api/users?query=my-query'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -142,7 +142,7 @@ describe('UserManagementService', () => {
     });
 
     it('should make get request to get many users', () => {
-        authService.setup(x => x.authGet('http://service/p/api/user-management/?take=20&skip=30&query='))
+        authService.setup(x => x.authGet('http://service/p/api/user-management?take=20&skip=30&query='))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -183,7 +183,7 @@ describe('UserManagementService', () => {
     });
 
     it('should make get request with query to get many users', () => {
-        authService.setup(x => x.authGet('http://service/p/api/user-management/?take=20&skip=30&query=my-query'))
+        authService.setup(x => x.authGet('http://service/p/api/user-management?take=20&skip=30&query=my-query'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
