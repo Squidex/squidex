@@ -8,7 +8,7 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ImageSharp" Version="1.0.0-alpha5-00054" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha6-00060" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
