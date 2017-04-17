@@ -131,6 +131,11 @@ $card-size: 240px;
         @include absolute(.5rem, 1rem, auto, auto);
     }
 
+    &-edit {
+        @include asset-link;
+        @include absolute(.5rem, 4rem, auto, auto);
+    }
+
     &-download {
         @include asset-link;
         @include absolute(.5rem, 2.5rem, auto, auto);

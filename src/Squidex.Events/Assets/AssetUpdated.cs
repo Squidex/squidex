@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Events.Assets
@@ -16,6 +17,8 @@ namespace Squidex.Events.Assets
         public string MimeType { get; set; }
 
         public long FileSize { get; set; }
+
+        public long FileVersion { get; set; }
 
         public bool IsImage { get; set; }
 

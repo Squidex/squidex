@@ -17,6 +17,9 @@
                     <div class="file-overlay">
                         <div class="file-overlay-background"></div>
                         
+                        <a class="file-edit" (click)="renameDialog.show()">
+                            <i class="icon-pencil"></i>
+                        </a>
                         <a class="file-download" [attr.href]="downloadUrl" target="_blank">
                             <i class="icon-download"></i>
                         </a>
@@ -38,7 +41,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <div class="file-name">
+                <div class="file-name" [attr.title]="fileName">
                     {{fileName}}
                 </div>
                 <div class="file-info">
@@ -53,6 +56,38 @@
             <div class="drop-overlay-background"></div>
 
             <span class="drop-overlay-text">Drop to update</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="renameDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rename asset</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetRename()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
+                    <div class="form-group">
+                        <label for="asset-name">Name</label>
+                        
+                        <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
+
+                        <input type="text" class="form-control" id="asset-name" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <button type="reset" class="float-left btn btn-secondary" (click)="resetRename()">Cancel</button>
+                        <button type="submit" class="float-right btn btn-success">Rename</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

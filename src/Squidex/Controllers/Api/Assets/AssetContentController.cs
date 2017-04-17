@@ -43,11 +43,11 @@ namespace Squidex.Controllers.Api.Assets
 
         [HttpGet]
         [Route("assets/{id}/")]
-        public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
+        public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int version = -1, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
-            if (asset == null)
+            if (asset == null || asset.FileVersion < version)
             {
                 return NotFound();
             }
@@ -60,31 +60,31 @@ namespace Squidex.Controllers.Api.Assets
 
                     try
                     {
-                        await assetStorage.DownloadAsync(asset.Id, asset.Version, suffix, bodyStream);
+                        await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, suffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
-                        using (var tempStream1 = GetTempStream())
+                        using (var sourceStream = GetTempStream())
                         {
-                            using (var tempStream2 = GetTempStream())
+                            using (var destinationStream = GetTempStream())
                             {
-                                await assetStorage.DownloadAsync(asset.Id, asset.Version, null, tempStream1);
-                                tempStream1.Position = 0;
+                                await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, null, sourceStream);
+                                sourceStream.Position = 0;
 
-                                await assetThumbnailGenerator.CreateThumbnailAsync(tempStream1, tempStream2, width, height, mode);
-                                tempStream2.Position = 0;
+                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
+                                destinationStream.Position = 0;
 
-                                await assetStorage.UploadAsync(asset.Id, asset.Version, suffix, tempStream2);
-                                tempStream2.Position = 0;
+                                await assetStorage.UploadAsync(asset.Id, asset.FileVersion, suffix, destinationStream);
+                                destinationStream.Position = 0;
 
-                                await tempStream2.CopyToAsync(bodyStream);
+                                await destinationStream.CopyToAsync(bodyStream);
                             }
                         }
 
                     }
                 }
 
-                await assetStorage.DownloadAsync(asset.Id, asset.Version, null, bodyStream);
+                await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, null, bodyStream);
             });
         }
 

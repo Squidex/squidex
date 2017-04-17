@@ -44,8 +44,8 @@ namespace Squidex.Write.Assets
         [Fact]
         public async Task Create_should_create_asset()
         {
-            assetStore.Setup(x => x.UploadAsync(assetId, 0, null, stream)).Returns(TaskHelper.Done).Verifiable();
-            assetThumbnailGenerator.Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image)).Verifiable();
+            SetupStore(1);
+            SetupImageInfo();
 
             var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
 
@@ -63,8 +63,8 @@ namespace Squidex.Write.Assets
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            assetStore.Setup(x => x.UploadAsync(assetId, 1, null, stream)).Returns(TaskHelper.Done).Verifiable();
-            assetThumbnailGenerator.Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image)).Verifiable();
+            SetupStore(2);
+            SetupImageInfo();
 
             CreateAsset();
 
@@ -108,6 +108,16 @@ namespace Squidex.Write.Assets
         private void CreateAsset()
         {
             asset.Create(new CreateAsset { File = file });
+        }
+
+        private void SetupImageInfo()
+        {
+            assetThumbnailGenerator.Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image)).Verifiable();
+        }
+
+        private void SetupStore(long version)
+        {
+            assetStore.Setup(x => x.UploadAsync(assetId, version, null, stream)).Returns(TaskHelper.Done).Verifiable();
         }
     }
 }

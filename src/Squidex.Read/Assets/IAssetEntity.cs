@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Read.Assets
 {
     public interface IAssetEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
@@ -15,6 +17,8 @@ namespace Squidex.Read.Assets
         string FileName { get; }
 
         long FileSize { get; }
+
+        long FileVersion { get; }
 
         bool IsImage { get; }
 

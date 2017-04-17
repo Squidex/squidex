@@ -160,7 +160,7 @@ namespace Squidex.Controllers.Api.Assets
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
         {
-            var command = SimpleMapper.Map(request, new RenameAsset());
+            var command = SimpleMapper.Map(request, new RenameAsset { AssetId = id });
 
             await CommandBus.PublishAsync(command);
 

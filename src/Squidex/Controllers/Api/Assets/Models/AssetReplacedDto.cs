@@ -26,6 +26,11 @@ namespace Squidex.Controllers.Api.Assets.Models
         public long FileSize { get; set; }
 
         /// <summary>
+        /// The version of the file.
+        /// </summary>
+        public long FileVersion { get; set; }
+
+        /// <summary>
         /// Determines of the created file is an image.
         /// </summary>
         public bool IsImage { get; set; }
@@ -50,6 +55,7 @@ namespace Squidex.Controllers.Api.Assets.Models
             var response = new AssetReplacedDto
             {
                 FileSize = command.File.FileSize,
+                FileVersion = result.Version,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
                 PixelWidth = command.ImageInfo?.PixelWidth,

@@ -35,6 +35,7 @@ export class AssetDto {
         public readonly lastModified: DateTime,
         public readonly fileName: string,
         public readonly fileSize: number,
+        public readonly fileVersion: number,
         public readonly mimeType: string,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
@@ -44,11 +45,19 @@ export class AssetDto {
     }
 }
 
+export class UpdateAssetDto {
+    constructor(
+        public readonly fileName: string
+    ) {
+    }
+}
+
 export class AssetCreatedDto {
     constructor(
         public readonly id: string,
         public readonly fileName: string,
         public readonly fileSize: number,
+        public readonly fileVersion: number,
         public readonly mimeType: string,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
@@ -61,6 +70,7 @@ export class AssetCreatedDto {
 export class AssetReplacedDto {
     constructor(
         public readonly fileSize: number,
+        public readonly fileVersion: number,
         public readonly mimeType: string,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
@@ -124,6 +134,7 @@ export class AssetsService {
                             DateTime.parseISO_UTC(item.lastModified),
                             item.fileName,
                             item.fileSize,
+                            item.fileVersion,
                             item.mimeType,
                             item.isImage,
                             item.pixelWidth,
@@ -153,6 +164,7 @@ export class AssetsService {
                         response.id,
                         response.fileName,
                         response.fileSize,
+                        response.fileVersion,
                         response.mimeType,
                         response.isImage,
                         response.pixelWidth,
@@ -191,6 +203,7 @@ export class AssetsService {
                 .map(response => {
                     return new AssetReplacedDto(
                         response.fileSize,
+                        response.fileVersion,
                         response.mimeType,
                         response.isImage,
                         response.pixelWidth,
@@ -206,6 +219,13 @@ export class AssetsService {
                     subscriber.complete();
                 });
         });
+    }
+
+    public updateAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+
+        return this.authService.authPut(url, dto, version)
+                .catchError('Failed to delete asset. Please reload.');
     }
 
     public deleteAsset(appName: string, id: string, version: Version): Observable<any> {

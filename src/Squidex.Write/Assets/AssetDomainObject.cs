@@ -22,7 +22,9 @@ namespace Squidex.Write.Assets
     public class AssetDomainObject : DomainObjectBase
     {
         private bool isDeleted;
+        private long fileVersion;
         private string fileName;
+        private Guid fileId;
 
         public bool IsDeleted
         {
@@ -34,6 +36,11 @@ namespace Squidex.Write.Assets
             get { return fileName; }
         }
 
+        public Guid FileId
+        {
+            get { return fileId; }
+        }
+
         public AssetDomainObject(Guid id, int version) 
             : base(id, version)
         {
@@ -41,7 +48,13 @@ namespace Squidex.Write.Assets
 
         protected void On(AssetCreated @event)
         {
+            fileVersion = @event.FileVersion;
             fileName = @event.FileName;
+        }
+
+        protected void On(AssetUpdated @event)
+        {
+            fileVersion = @event.FileVersion;
         }
 
         protected void On(AssetRenamed @event)
@@ -64,6 +77,7 @@ namespace Squidex.Write.Assets
             {
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
+                FileVersion = fileVersion + 1,
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
@@ -83,6 +97,7 @@ namespace Squidex.Write.Assets
 
             var @event = SimpleMapper.Map(command, new AssetUpdated
             {
+                FileVersion = fileVersion + 1,
                 FileSize = command.File.FileSize,
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,

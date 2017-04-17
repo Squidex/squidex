@@ -16,6 +16,6 @@ namespace Squidex.Controllers.Api.Assets.Models
         /// The new name of the asset.
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public string FileName { get; set; }
     }
 }

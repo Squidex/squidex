@@ -22,6 +22,10 @@ namespace Squidex.Read.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
+        public long FileVersion { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public bool IsImage { get; set; }
 
         [BsonRequired]
