@@ -42,7 +42,7 @@ RUN cp -a /tmp/node_modules /src/Squidex/ \
  && npm run build
  
 # Test Backend
-RUN dotnet restore --configfile Nuget.config \
+RUN dotnet restore \
  && dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
  && dotnet test tests/Squidex.Core.Tests/Squidex.Core.Tests.csproj \ 
  && dotnet test tests/Squidex.Read.Tests/Squidex.Read.Tests.csproj \
