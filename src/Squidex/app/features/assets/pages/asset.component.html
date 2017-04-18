@@ -3,7 +3,7 @@
         <div *ngIf="asset && progress == 0" [@fade]>
             <div class="card-block">
                 <div class="file-preview">
-                    <span class="file-type">
+                    <span class="file-type" *ngIf="fileType">
                         {{fileType}}
                     </span>
                     
@@ -20,14 +20,14 @@
                         <a class="file-edit" (click)="renameDialog.show()">
                             <i class="icon-pencil"></i>
                         </a>
-                        <a class="file-download" [attr.href]="downloadUrl" target="_blank">
+                        <a class="file-download" [attr.href]="fileUrl" target="_blank">
                             <i class="icon-download"></i>
                         </a>
                         <a class="file-delete" (click)="deleting.emit(asset)">
                             <i class="icon-delete"></i>
                         </a>
 
-                        <span class="file-overlay-type">
+                        <span class="file-overlay-type" *ngIf="fileType">
                             {{fileType}}
                         </span>
                         <span class="file-user">

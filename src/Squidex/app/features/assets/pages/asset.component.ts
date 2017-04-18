@@ -19,8 +19,8 @@ import {
     AuthService,
     DateTime,
     fadeAnimation,
+    FileHelper,
     ModalView,
-    MathHelper,
     NotificationService,
     UpdateAssetDto,
     UsersProviderService,
@@ -36,7 +36,6 @@ import {
     ]
 })
 export class AssetComponent extends AppComponentBase implements OnInit {
-    private cacheBuster = MathHelper.guid();
     private previewRetries = 0;
     private version: Version;
 
@@ -66,40 +65,12 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public failed = new EventEmitter();
 
     public progress = 0;
-
-    public get previewUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}?width=230&height=155&mode=Crop&version=${this.version.value}&q=${this.cacheBuster}`);
-    }
-
-    public get downloadUrl(): string {
-        return this.apiUrl.buildUrl(`api/assets/${this.asset.id}?q=${this.cacheBuster}`);
-    }
-
-    public get fileType(): string {
-        return this.asset.mimeType.split('/')[1];
-    }
-
-    public get fileName(): string {
-        return this.asset.fileName;
-    }
-
-    public get fileIcon(): string {
-        return fileIcon(this.asset.mimeType);
-    }
-
-    public get fileInfo(): string {
-        let result = '';
-
-        if (this.asset != null) {
-            if (this.asset.pixelWidth) {
-                result = `${this.asset.pixelWidth}x${this.asset.pixelHeight}px, `;
-            }
-
-            result += fileSize(this.asset.fileSize);
-        }
-
-        return result;
-    }
+    public previewUrl: string;
+    public fileUrl: string;
+    public fileName: string;
+    public fileType: string;
+    public fileIcon: string;
+    public fileInfo: string;
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly formBuilder: FormBuilder,
@@ -226,8 +197,13 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     private updateAsset(asset: AssetDto) {
         this.asset = asset;
-        this.cacheBuster = MathHelper.guid();
+        this.fileUrl = FileHelper.assetUrl(this.apiUrl, asset);
+        this.fileInfo = FileHelper.assetInfo(asset);
+        this.fileName = FileHelper.assetName(asset);
+        this.fileType = FileHelper.fileType(asset.mimeType, this.asset.fileName);
+        this.fileIcon = FileHelper.fileIcon(asset.mimeType);
         this.progress = 0;
+        this.previewUrl = FileHelper.assetPreviewUrl(this.apiUrl, asset);
         this.previewRetries = 0;
         this.version = asset.version;
 
@@ -239,63 +215,8 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
         if (this.previewRetries <= 10) {
             setTimeout(() => {
-                this.cacheBuster = MathHelper.guid();
+                this.previewUrl = FileHelper.assetPreviewUrl(this.apiUrl, this.asset);
             }, this.previewRetries * 1000);
         }
     }
-}
-
-function fileSize(b: number) {
-    let u = 0, s = 1024;
-
-    while (b >= s || -b >= s) {
-        b /= s;
-        u++;
-    }
-
-    return (u ? b.toFixed(1) + ' ' : b) + ' kMGTPEZY'[u] + 'B';
-}
-
-const mimeMapping = {
-    'pdf': 'pdf',
-    'vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-    'vnd.openxmlformats-officedocument.wordprocessingml.template': 'docx',
-    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
-    'vnd.openxmlformats-officedocument.spreadsheetml.template': 'xlsx',
-    'vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
-    'vnd.openxmlformats-officedocument.presentationml.template': 'pptx',
-    'vnd.openxmlformats-officedocument.presentationml.slideshow': 'pptx',
-    'msword': 'doc',
-    'vnd.ms-word': 'doc',
-    'vnd.ms-word.document.macroEnabled.12': 'docx',
-    'vnd.ms-word.template.macroEnabled.12': 'docx',
-    'vnd.ms-excel': 'xls',
-    'vnd.ms-excel.sheet.macroEnabled.12': 'xlsx',
-    'vnd.ms-excel.template.macroEnabled.12': 'xlsx',
-    'vnd.ms-excel.addin.macroEnabled.12': 'xlsx',
-    'vnd.ms-excel.sheet.binary.macroEnabled.12': 'xlsx',
-    'vnd.ms-powerpoint': 'ppt',
-    'vnd.ms-powerpoint.addin.macroEnabled.12': 'pptx',
-    'vnd.ms-powerpoint.presentation.macroEnabled.12': 'pptx',
-    'vnd.ms-powerpoint.template.macroEnabled.12': 'pptx',
-    'vnd.ms-powerpoint.slideshow.macroEnabled.12': 'pptx'
-};
-
-function fileIcon(mimeType: string) {
-    const mimeParts = mimeType.split('/');
-
-    let mimeIcon = 'generic';
-
-    if (mimeParts.length === 2) {
-        const mimePrefix = mimeParts[0].toLowerCase();
-        const mimeSuffix = mimeParts[1].toLowerCase();
-
-        if (mimePrefix === 'video') {
-            mimeIcon = 'video';
-        } else {
-            mimeIcon = mimeMapping[mimeSuffix] || 'generic';
-        }
-    }
-
-    return `/images/asset_${mimeIcon}.png`;
 }
