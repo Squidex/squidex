@@ -77,6 +77,10 @@ namespace Squidex.Infrastructure.Redis
                     var token = string.Join("#", parts.Skip(1));
 
                     subject.OnNext(token);
+
+                    log.LogDebug(w => w
+                        .WriteProperty("action", "ReceiveRedisMessage")
+                        .WriteProperty("state", "Received"));
                 }
             }
             catch (Exception ex)
