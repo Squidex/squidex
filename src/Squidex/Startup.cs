@@ -112,6 +112,18 @@ namespace Squidex
             MapAndUseFrontend(app);
 
             app.UseMyEventStore();
+
+            var log = app.ApplicationServices.GetRequiredService<ISemanticLog>();
+
+            log.LogInformation(w => w
+                .WriteProperty("message", "Application started")
+                .WriteObject("environment", c =>
+                {
+                    foreach (var kvp in Configuration.AsEnumerable().Where(kvp => kvp.Value != null))
+                    {
+                        c.WriteProperty(kvp.Key, kvp.Value);
+                    }
+                }));
         }
 
         private void MapAndUseIdentity(IApplicationBuilder app)
