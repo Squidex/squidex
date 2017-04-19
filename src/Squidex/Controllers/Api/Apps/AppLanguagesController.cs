@@ -26,7 +26,6 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [Authorize(Roles = SquidexRoles.AppOwner)]
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Apps")]
@@ -48,6 +47,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 200 => Language configuration returned.
         /// 404 => App not found.
         /// </returns>
+        [Authorize(Roles = SquidexRoles.AppEditor)]
         [HttpGet]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(LanguageDto[]), 200)]
@@ -82,6 +82,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
+        [Authorize(Roles = SquidexRoles.AppOwner)]
         [HttpPost]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguageDto), 201)]
@@ -94,7 +95,7 @@ namespace Squidex.Controllers.Api.Apps
 
             return CreatedAtAction(nameof(GetLanguages), new { app }, response);
         }
-        
+
         /// <summary>
         /// Updates an app language.
         /// </summary>
@@ -106,6 +107,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
+        [Authorize(Roles = SquidexRoles.AppOwner)]
         [HttpPut]
         [Route("apps/{app}/languages/{language}")]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
@@ -128,6 +130,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
+        [Authorize(Roles = SquidexRoles.AppOwner)]
         [HttpDelete]
         [Route("apps/{app}/languages/{language}")]
         public async Task<IActionResult> DeleteLanguage(string app, string language)

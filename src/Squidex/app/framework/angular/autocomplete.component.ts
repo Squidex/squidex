@@ -49,6 +49,9 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     @Input()
     public inputName = 'autocompletion';
 
+    @Input()
+    public placeholder = '';
+
     public items: AutocompleteItem[] = [];
     public itemSelection = -1;
 
