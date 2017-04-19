@@ -84,12 +84,14 @@ namespace Squidex.Pipeline
         {
             var clientId = user.FindFirst(OpenIdClaims.ClientId)?.Value;
 
-            if (clientId == null)
+            var clientIdParts = clientId?.Split(':');
+
+            if (clientIdParts?.Length != 2)
             {
                 return null;
             }
 
-            clientId = clientId.Split(':')[1];
+            clientId = clientIdParts[1];
 
             var contributor = app.Clients.FirstOrDefault(x => string.Equals(x.Id, clientId, StringComparison.OrdinalIgnoreCase));
 
