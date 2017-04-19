@@ -21,6 +21,15 @@ namespace Squidex.Infrastructure.Json
             this.converters = converters;
         }
 
+        protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
+        {
+            var contract = base.CreateDictionaryContract(objectType);
+
+            contract.DictionaryKeyResolver = propertyName => propertyName;
+
+            return contract;
+        }
+
         protected override JsonConverter ResolveContractConverter(Type objectType)
         {
             var result = base.ResolveContractConverter(objectType);
