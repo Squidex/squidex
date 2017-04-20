@@ -24,20 +24,6 @@ export class ContentUpdated {
     }
 }
 
-export class ContentPublished {
-    constructor(
-        public readonly id: string
-    ) {
-    }
-}
-
-export class ContentUnpublished {
-    constructor(
-        public readonly id: string
-    ) {
-    }
-}
-
 export class ContentDeleted {
     constructor(
         public readonly id: string

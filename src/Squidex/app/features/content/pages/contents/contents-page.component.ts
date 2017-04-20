@@ -13,9 +13,7 @@ import { Subscription } from 'rxjs';
 import {
     ContentCreated,
     ContentDeleted,
-    ContentPublished,
-    ContentUpdated,
-    ContentUnpublished
+    ContentUpdated
 } from './../messages';
 
 import {
@@ -122,8 +120,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, true, content.data, content.version.value);
-
-                this.messageBus.publish(new ContentPublished(content.id));
             }, error => {
                 this.notifyError(error);
             });
@@ -134,8 +130,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, false, content.data, content.version.value);
-
-                this.messageBus.publish(new ContentUnpublished(content.id));
             }, error => {
                 this.notifyError(error);
             });

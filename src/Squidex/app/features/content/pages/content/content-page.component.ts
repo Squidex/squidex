@@ -14,9 +14,7 @@ import { Subscription } from 'rxjs';
 import {
     ContentCreated,
     ContentDeleted,
-    ContentPublished,
-    ContentUpdated,
-    ContentUnpublished
+    ContentUpdated
 } from './../messages';
 
 import {
@@ -42,8 +40,6 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
-    private contentPublishedSubscription: Subscription;
-    private contentUnpublishedSubscription: Subscription;
     private version: Version = new Version('');
 
     public schema: SchemaDetailsDto;
@@ -70,8 +66,6 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
     public ngOnDestroy() {
         this.contentDeletedSubscription.unsubscribe();
-        this.contentPublishedSubscription.unsubscribe();
-        this.contentUnpublishedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -80,22 +74,6 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                 .subscribe(message => {
                     if (message.id === this.contentId) {
                         this.router.navigate(['../'], { relativeTo: this.route });
-                    }
-                });
-
-        this.contentPublishedSubscription =
-            this.messageBus.of(ContentPublished)
-                .subscribe(message => {
-                    if (message.id === this.contentId) {
-                        this.isPublished = true;
-                    }
-                });
-
-        this.contentUnpublishedSubscription =
-            this.messageBus.of(ContentUnpublished)
-                .subscribe(message => {
-                    if (message.id === this.contentId) {
-                        this.isPublished = false;
                     }
                 });
 
