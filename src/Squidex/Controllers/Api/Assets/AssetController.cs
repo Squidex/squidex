@@ -52,6 +52,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Get assets.
         /// </summary>
+        /// <param name="app">The app where the assets belong to.</param>
         /// <param name="skip">The number of assets to skip.</param>
         /// <param name="take">The number of assets to take.</param>
         /// <param name="query">The query to limit the files by name.</param>
@@ -63,7 +64,7 @@ namespace Squidex.Controllers.Api.Assets
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
-        public async Task<IActionResult> GetAssets([FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var mimeTypeList = new HashSet<string>();
 

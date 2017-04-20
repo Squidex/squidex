@@ -44,6 +44,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Get schemas.
         /// </summary>
+        /// <param name="app">The name of the app to create the schema to.</param>
         /// <returns>
         /// 200 => Schemas returned.
         /// 404 => App not found.
@@ -51,7 +52,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemaDto[]), 200)]
-        public async Task<IActionResult> GetSchemas()
+        public async Task<IActionResult> GetSchemas(string app)
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
 
@@ -64,6 +65,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// Get a schema by name.
         /// </summary>
         /// <param name="name">The name of the schema to retrieve.</param>
+        /// <param name="app">The name of the app to create the schema to.</param>
         /// <returns>
         /// 200 => Schema found.
         /// 404 => Schema or app not found.
@@ -71,7 +73,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
-        public async Task<IActionResult> GetSchema(string name)
+        public async Task<IActionResult> GetSchema(string app, string name)
         {
             var entity = await schemaRepository.FindSchemaAsync(AppId, name);
 
