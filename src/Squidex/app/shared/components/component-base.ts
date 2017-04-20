@@ -76,6 +76,6 @@ export abstract class ComponentBase {
     }
 
     protected notifyInfo(error: string) {
-        this.notifications.notify(Notification.error(error));
+        this.notifications.notify(Notification.info(error));
     }
 }

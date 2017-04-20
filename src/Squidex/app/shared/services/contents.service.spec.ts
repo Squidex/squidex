@@ -169,7 +169,7 @@ describe('ContentsService', () => {
     it('should make post request to create content', () => {
         const dto = {};
 
-        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema', dto, version))
+        authService.setup(x => x.authPost('http://service/p/api/content/my-app/my-schema?publish=true', dto, version))
             .returns(() => Observable.of(
                new Response(
                     new ResponseOptions({
@@ -190,7 +190,7 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.postContent('my-app', 'my-schema', dto, version).subscribe(result => {
+        contentsService.postContent('my-app', 'my-schema', dto, true, version).subscribe(result => {
             content = result;
         });
 

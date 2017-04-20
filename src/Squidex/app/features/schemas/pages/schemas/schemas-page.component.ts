@@ -37,8 +37,8 @@ import { SchemaDeleted, SchemaUpdated } from './../messages';
     ]
 })
 export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private messageUpdatedSubscription: Subscription;
-    private messageDeletedSubscription: Subscription;
+    private schemaUpdatedSubscription: Subscription;
+    private schemaDeletedSubscription: Subscription;
 
     public addSchemaDialog = new ModalView();
 
@@ -57,8 +57,8 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnDestroy() {
-        this.messageUpdatedSubscription.unsubscribe();
-        this.messageDeletedSubscription.unsubscribe();
+        this.schemaUpdatedSubscription.unsubscribe();
+        this.schemaDeletedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -76,13 +76,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 }
             });
 
-        this.messageUpdatedSubscription =
+        this.schemaUpdatedSubscription =
             this.messageBus.of(SchemaUpdated)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.map(s => s.name === m.name ? updateSchema(s, this.authService, m) : s));
                 });
 
-        this.messageDeletedSubscription =
+        this.schemaDeletedSubscription =
             this.messageBus.of(SchemaDeleted)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.filter(s => s.name !== m.name));

@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -13,7 +14,9 @@ import { Subscription } from 'rxjs';
 import {
     ContentCreated,
     ContentDeleted,
-    ContentUpdated
+    ContentPublished,
+    ContentUpdated,
+    ContentUnpublished
 } from './../messages';
 
 import {
@@ -38,7 +41,9 @@ import {
     templateUrl: './content-page.component.html'
 })
 export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private messageSubscription: Subscription;
+    private contentDeletedSubscription: Subscription;
+    private contentPublishedSubscription: Subscription;
+    private contentUnpublishedSubscription: Subscription;
     private version: Version = new Version('');
 
     public schema: SchemaDetailsDto;
@@ -48,12 +53,14 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     public contentData: any = null;
     public contentId: string;
 
+    public isPublished = false;
     public isNewMode = true;
 
     public languages: AppLanguageDto[] = [];
 
     constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
         private readonly contentsService: ContentsService,
+        private readonly location: Location,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
@@ -62,15 +69,33 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     public ngOnDestroy() {
-        this.messageSubscription.unsubscribe();
+        this.contentDeletedSubscription.unsubscribe();
+        this.contentPublishedSubscription.unsubscribe();
+        this.contentUnpublishedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.messageSubscription =
+        this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
                 .subscribe(message => {
                     if (message.id === this.contentId) {
                         this.router.navigate(['../'], { relativeTo: this.route });
+                    }
+                });
+
+        this.contentPublishedSubscription =
+            this.messageBus.of(ContentPublished)
+                .subscribe(message => {
+                    if (message.id === this.contentId) {
+                        this.isPublished = true;
+                    }
+                });
+
+        this.contentUnpublishedSubscription =
+            this.messageBus.of(ContentUnpublished)
+                .subscribe(message => {
+                    if (message.id === this.contentId) {
+                        this.isPublished = false;
                     }
                 });
 
@@ -90,7 +115,15 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public saveContent() {
+    public saveAndPublish() {
+        this.saveContent(true);
+    }
+
+    public saveAsDraft() {
+        this.saveContent(false);
+    }
+
+    private saveContent(publish: boolean) {
         this.contentFormSubmitted = true;
 
         if (this.contentForm.valid) {
@@ -100,11 +133,17 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
             if (this.isNewMode) {
                 this.appName()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, this.version))
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, publish, this.version))
                     .subscribe(created => {
-                        this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value));
+                        this.contentId = created.id;
 
-                        this.router.navigate(['../'], { relativeTo: this.route });
+                        this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
+
+                        this.enable();
+                        this.finishCreation();
+                        this.updateUrl();
+
+                        this.notifyInfo('Content created successfully.');
                     }, error => {
                         this.notifyError(error);
                         this.enable();
@@ -115,13 +154,25 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     .subscribe(() => {
                         this.messageBus.publish(new ContentUpdated(this.contentId, data, this.version.value));
 
-                        this.router.navigate(['../'], { relativeTo: this.route });
+                        this.enable();
+
+                        this.notifyInfo('Content saved successfully.');
                     }, error => {
                         this.notifyError(error);
                         this.enable();
                     });
             }
         }
+    }
+
+    private finishCreation() {
+        this.isNewMode = false;
+    }
+
+    private updateUrl() {
+        const newUrl = this.router.createUrlTree(['../', this.contentId], { relativeTo: this.route, replaceUrl: true });
+
+        this.location.replaceState(newUrl.toString());
     }
 
     private enable() {
@@ -191,6 +242,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
         } else {
             this.contentData = content.data;
             this.contentId = content.id;
+            this.isPublished = content.isPublished;
             this.isNewMode = false;
         }
 

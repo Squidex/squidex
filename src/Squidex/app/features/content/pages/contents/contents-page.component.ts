@@ -13,7 +13,9 @@ import { Subscription } from 'rxjs';
 import {
     ContentCreated,
     ContentDeleted,
-    ContentUpdated
+    ContentPublished,
+    ContentUpdated,
+    ContentUnpublished
 } from './../messages';
 
 import {
@@ -40,8 +42,8 @@ import {
     templateUrl: './contents-page.component.html'
 })
 export class ContentsPageComponent extends AppComponentBase implements OnDestroy, OnInit {
-    private messageCreatedSubscription: Subscription;
-    private messageUpdatedSubscription: Subscription;
+    private contentCreatedSubscription: Subscription;
+    private contentUpdatedSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
@@ -68,19 +70,19 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public ngOnDestroy() {
-        this.messageCreatedSubscription.unsubscribe();
-        this.messageUpdatedSubscription.unsubscribe();
+        this.contentCreatedSubscription.unsubscribe();
+        this.contentUpdatedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.messageCreatedSubscription =
+        this.contentCreatedSubscription =
             this.messageBus.of(ContentCreated)
                 .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version));
+                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version, message.isPublished));
                     this.contentsPager = this.contentsPager.incrementCount();
                 });
 
-        this.messageUpdatedSubscription =
+        this.contentUpdatedSubscription =
             this.messageBus.of(ContentUpdated)
                 .subscribe(message => {
                     this.updateContents(message.id, undefined, message.data, message.version);
@@ -120,6 +122,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, true, content.data, content.version.value);
+
+                this.messageBus.publish(new ContentPublished(content.id));
             }, error => {
                 this.notifyError(error);
             });
@@ -130,6 +134,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, false, content.data, content.version.value);
+
+                this.messageBus.publish(new ContentUnpublished(content.id));
             }, error => {
                 this.notifyError(error);
             });
@@ -188,12 +194,13 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data, version));
     }
 
-    private createContent(id: string, data: any, version: string): ContentDto {
+    private createContent(id: string, data: any, version: string, isPublished: boolean): ContentDto {
         const me = `subject:${this.authService.user!.id}`;
 
         const newContent =
             new ContentDto(
-                id, false,
+                id,
+                isPublished,
                 me, me,
                 DateTime.now(),
                 DateTime.now(),
@@ -208,7 +215,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
         const newContent =
             new ContentDto(
-                content.id, isPublished,
+                content.id,
+                isPublished,
                 content.createdBy, me,
                 content.created, DateTime.now(),
                 data,

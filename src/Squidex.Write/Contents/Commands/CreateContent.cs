@@ -12,6 +12,8 @@ namespace Squidex.Write.Contents.Commands
 {
     public class CreateContent : ContentDataCommand
     {
+        public bool Publish { get; set; }
+
         public CreateContent()
         {
             ContentId = Guid.NewGuid();

@@ -1,13 +1,24 @@
 <sqx-title message="{app} | Content" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<form [formGroup]="contentForm" (ngSubmit)="saveContent()">
+<form [formGroup]="contentForm" (ngSubmit)="saveAndPublish()">
     <sqx-panel panelWidth="53rem">
         <div class="panel-header">
             <div class="panel-title-row">
                 <div class="float-right">
-                    <button type="submit" class="btn btn-primary">
-                        Save
-                    </button>
+                    <span *ngIf="isNewMode">
+                        <button type="button" class="btn btn-default" (click)="saveAsDraft()">
+                            Save as Draft
+                        </button>
+
+                        <button type="submit" class="btn btn-primary">
+                            Save and Publish
+                        </button>
+                    </span>
+                    <span *ngIf="!isNewMode">
+                        <button type="submit" class="btn btn-primary">
+                            Save
+                        </button>
+                    </span>
                 </div>
                 
                 <h3 class="panel-title" *ngIf="isNewMode">

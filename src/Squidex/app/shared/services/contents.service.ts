@@ -110,8 +110,8 @@ export class ContentsService {
                 .catchError('Failed to load content. Please reload.');
     }
 
-    public postContent(appName: string, schemaName: string, dto: any, version: Version): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}`);
+    public postContent(appName: string, schemaName: string, dto: any, publish: boolean, version: Version): Observable<ContentDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
         return this.authService.authPost(url, dto, version)
                 .map(response => response.json())

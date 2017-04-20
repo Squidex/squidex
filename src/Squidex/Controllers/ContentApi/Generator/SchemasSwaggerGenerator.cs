@@ -266,6 +266,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
 
                 operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
+                operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
                 operation.AddResponse("201", $"{schemaName} created.", responseSchema);
             });
         }

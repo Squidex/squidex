@@ -73,6 +73,18 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
+        public void Create_should_also_publish_if_set_to_true()
+        {
+            sut.Create(CreateContentCommand(new CreateContent { Data = data, Publish = true }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data }),
+                    CreateContentEvent(new ContentPublished())
+                );
+        }
+
+        [Fact]
         public void Update_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() =>

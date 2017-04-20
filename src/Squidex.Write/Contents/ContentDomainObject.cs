@@ -75,6 +75,11 @@ namespace Squidex.Write.Contents
 
             RaiseEvent(SimpleMapper.Map(command, new ContentCreated()));
 
+            if (command.Publish)
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
+            }
+
             return this;
         }
 

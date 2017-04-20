@@ -115,9 +115,9 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPost]
         [Route("content/{app}/{name}/")]
-        public async Task<IActionResult> PostContent([FromBody] ContentData request)
+        public async Task<IActionResult> PostContent([FromBody] ContentData request, [FromQuery] bool publish = false)
         {
-            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned() };
+            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
 
