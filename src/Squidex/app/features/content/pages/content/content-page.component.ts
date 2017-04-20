@@ -140,8 +140,8 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                         this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
 
                         this.enable();
-                        this.finishCreation();
                         this.updateUrl();
+                        this.finishCreation();
 
                         this.notifyInfo('Content created successfully.');
                     }, error => {
