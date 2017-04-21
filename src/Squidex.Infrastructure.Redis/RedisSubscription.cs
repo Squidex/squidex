@@ -80,6 +80,8 @@ namespace Squidex.Infrastructure.Redis
 
                     log.LogDebug(w => w
                         .WriteProperty("action", "ReceiveRedisMessage")
+                        .WriteProperty("channel", channelName)
+                        .WriteProperty("token", token)
                         .WriteProperty("state", "Received"));
                 }
             }
@@ -87,6 +89,7 @@ namespace Squidex.Infrastructure.Redis
             {
                 log.LogError(ex, w => w
                     .WriteProperty("action", "ReceiveRedisMessage")
+                    .WriteProperty("channel", channelName)
                     .WriteProperty("state", "Failed"));
             }
         }

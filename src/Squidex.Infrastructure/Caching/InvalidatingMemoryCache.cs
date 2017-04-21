@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Caching
         {
             if (key is string)
             {
-                invalidator.Publish(ChannelName, key.ToString(), false);
+                invalidator.Publish(ChannelName, key.ToString(), true);
             }
         }
     }
