@@ -15,6 +15,7 @@ using Squidex.Core.Schemas;
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
+    [KnownType(typeof(AssetsFieldPropertiesDto))]
     [KnownType(typeof(BooleanFieldPropertiesDto))]
     [KnownType(typeof(DateTimeFieldPropertiesDto))]
     [KnownType(typeof(GeolocationFieldPropertiesDto))]

@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Read.Assets
 {
     public interface IAssetEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion

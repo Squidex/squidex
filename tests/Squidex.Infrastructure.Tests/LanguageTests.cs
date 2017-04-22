@@ -54,6 +54,18 @@ namespace Squidex.Infrastructure
             Language.DE.SerializeAndDeserialize(new LanguageConverter());
         }
 
+        [Fact]
+        public void Should_return_true_for_valid_language()
+        {
+            Assert.True(Language.IsValidLanguage("de"));
+        }
+
+        [Fact]
+        public void Should_return_false_for_invalid_language()
+        {
+            Assert.False(Language.IsValidLanguage("xx"));
+        }
+
         [Theory]
         [InlineData("de", "German")]
         [InlineData("en", "English")]
@@ -65,6 +77,7 @@ namespace Squidex.Infrastructure
 
             Assert.Equal(key, language.Iso2Code);
             Assert.Equal(englishName, language.EnglishName);
+            Assert.Equal(englishName, language.ToString());
         }
 
         [Theory]

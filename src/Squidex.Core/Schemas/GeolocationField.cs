@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
             var lat = (double)geolocation["latitude"];
             var lon = (double)geolocation["longitude"];
 
-            Guard.Between(lat, -90, 90, "latitude");
+            Guard.Between(lat,  -90,  90, "latitude");
             Guard.Between(lon, -180, 180, "longitude");
 
             return value;

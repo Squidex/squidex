@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using FluentAssertions;
+using Moq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -25,7 +26,7 @@ namespace Squidex.Core.Schemas.Json
             serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
             
-            sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry), serializerSettings);
+            sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry, new Mock<IAssetTester>().Object), serializerSettings);
         }
 
         [Fact]
@@ -45,6 +46,8 @@ namespace Squidex.Core.Schemas.Json
                         new DateTimeFieldProperties()))
                     .AddOrUpdateField(new GeolocationField(6, "my-geolocation",
                         new GeolocationFieldProperties()))
+                    .AddOrUpdateField(new AssetsField(7, "my-asset",
+                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
                     .Publish();
 
             var deserialized = sut.Deserialize(sut.Serialize(schema));

@@ -50,9 +50,10 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public FieldRegistry(TypeNameRegistry typeNameRegistry)
+        public FieldRegistry(TypeNameRegistry typeNameRegistry, IAssetTester assetTester)
         {
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(assetTester, nameof(assetTester));
 
             this.typeNameRegistry = typeNameRegistry;
 
@@ -70,6 +71,9 @@ namespace Squidex.Core.Schemas
 
             Add<JsonFieldProperties>(
                 (id, name, p) => new JsonField(id, name, (JsonFieldProperties)p));
+
+            Add<AssetsFieldProperties>(
+                (id, name, p) => new AssetsField(id, name, (AssetsFieldProperties)p, assetTester));
 
             Add<GeolocationFieldProperties>(
                 (id, name, p) => new GeolocationField(id, name, (GeolocationFieldProperties)p));

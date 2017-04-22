@@ -30,6 +30,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 if (width == null && height == null)
                 {
                     source.CopyTo(destination);
+
+                    return;
                 }
 
                 if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
@@ -64,22 +66,16 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
         {
             return Task.Run(() =>
             {
-                ImageInfo imageInfo = null;
                 try
                 {
                     var image = Image.Load(source);
 
-                    if (image.Width > 0 && image.Height > 0)
-                    {
-                        imageInfo = new ImageInfo(image.Width, image.Height);
-                    }
+                    return new ImageInfo(image.Width, image.Height);
                 }
                 catch
                 {
-                    imageInfo = null;
+                    return null;
                 }
-
-                return imageInfo;
             });
         }
     }

@@ -24,7 +24,6 @@ namespace Squidex.Write.Assets
         private bool isDeleted;
         private long fileVersion;
         private string fileName;
-        private Guid fileId;
 
         public bool IsDeleted
         {
@@ -34,11 +33,6 @@ namespace Squidex.Write.Assets
         public string FileName
         {
             get { return fileName; }
-        }
-
-        public Guid FileId
-        {
-            get { return fileId; }
         }
 
         public AssetDomainObject(Guid id, int version) 

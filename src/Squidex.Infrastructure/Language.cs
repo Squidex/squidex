@@ -16,10 +16,10 @@ namespace Squidex.Infrastructure
 {
     public sealed partial class Language
     {
-        private static readonly Regex CultureRegex = new Regex("([a-z]{2})(\\-[a-z]{2})?");
+        private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$");
         private readonly string iso2Code;
         private readonly string englishName;
-        private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>();
+        private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
 
         public static readonly Language Invariant = AddLanguage("iv", "Invariant");
 

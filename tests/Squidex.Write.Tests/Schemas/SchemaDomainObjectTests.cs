@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using Squidex.Core.Schemas;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
@@ -30,7 +31,7 @@ namespace Squidex.Write.Schemas
         {
             fieldId = new NamedId<long>(1, fieldName);
 
-            var fieldRegistry = new FieldRegistry(new TypeNameRegistry());
+            var fieldRegistry = new FieldRegistry(new TypeNameRegistry(), new Mock<IAssetTester>().Object);
 
             sut = new SchemaDomainObject(SchemaId, 0, fieldRegistry);
         }

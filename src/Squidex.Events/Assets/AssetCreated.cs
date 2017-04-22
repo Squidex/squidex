@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Events.Assets

@@ -56,10 +56,7 @@ namespace Squidex.Infrastructure.GoogleCloud
                 {
                     throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
 

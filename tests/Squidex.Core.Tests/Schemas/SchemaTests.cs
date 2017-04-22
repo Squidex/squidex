@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Moq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure;
@@ -332,7 +333,9 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new DateTimeField(7, "my-date",
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
                     .AddOrUpdateField(new GeolocationField(8, "my-geolocation",
-                        new GeolocationFieldProperties()));
+                        new GeolocationFieldProperties()))
+                    .AddOrUpdateField(new AssetsField(9, "my-assets",
+                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object));
 
             return schema;
         }

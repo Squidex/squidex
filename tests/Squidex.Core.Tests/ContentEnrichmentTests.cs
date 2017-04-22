@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Moq;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Core.Contents;
@@ -38,7 +39,9 @@ namespace Squidex.Core
                     .AddOrUpdateField(new DateTimeField(5, "my-datetime",
                         new DateTimeFieldProperties { DefaultValue = now }))
                     .AddOrUpdateField(new GeolocationField(6, "my-geolocation",
-                        new GeolocationFieldProperties()));
+                        new GeolocationFieldProperties()))
+                    .AddOrUpdateField(new AssetsField(7, "my-assets",
+                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object));
 
             var data =
                 new ContentData()
