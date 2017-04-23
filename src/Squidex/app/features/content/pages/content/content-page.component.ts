@@ -49,7 +49,6 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     public contentData: any = null;
     public contentId: string;
 
-    public isPublished = false;
     public isNewMode = true;
 
     public languages: AppLanguageDto[] = [];
@@ -117,11 +116,10 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
                         this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
 
-                        this.enable();
-                        this.updateUrl();
                         this.finishCreation();
 
                         this.notifyInfo('Content created successfully.');
+                        this.enable();
                     }, error => {
                         this.notifyError(error);
                         this.enable();
@@ -132,9 +130,8 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     .subscribe(() => {
                         this.messageBus.publish(new ContentUpdated(this.contentId, data, this.version.value));
 
-                        this.enable();
-
                         this.notifyInfo('Content saved successfully.');
+                        this.enable();
                     }, error => {
                         this.notifyError(error);
                         this.enable();
@@ -144,13 +141,10 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private finishCreation() {
-        this.isNewMode = false;
-    }
-
-    private updateUrl() {
         const newUrl = this.router.createUrlTree(['../', this.contentId], { relativeTo: this.route, replaceUrl: true });
 
         this.location.replaceState(newUrl.toString());
+        this.isNewMode = false;
     }
 
     private enable() {
@@ -217,12 +211,12 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
             this.contentId = undefined;
             this.isNewMode = true;
             return;
-        } else {
-            this.contentData = content.data;
-            this.contentId = content.id;
-            this.isPublished = content.isPublished;
-            this.isNewMode = false;
         }
+
+        this.contentData = content.data;
+        this.contentId = content.id;
+        this.version = content.version;
+        this.isNewMode = false;
 
         for (const field of this.schema.fields) {
             const fieldValue = content.data[field.name] || {};
