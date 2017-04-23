@@ -5,7 +5,7 @@
         <div class="panel-header">
             <div class="panel-title-row">
                 <div class="float-right">
-                    <span *ngIf="!isPublished">
+                    <span *ngIf="isNewMode">
                         <button type="button" class="btn btn-default" (click)="saveAsDraft()">
                             Save as Draft
                         </button>
@@ -14,7 +14,7 @@
                             Save and Publish
                         </button>
                     </span>
-                    <span *ngIf="isPublished">
+                    <span *ngIf="!isNewMode">
                         <button type="submit" class="btn btn-primary">
                             Save
                         </button>
