@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate(123);
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", It.IsAny<string>(), false), Times.Never());
+            pubsub.Verify(x => x.Publish("CacheInvalidations", It.IsAny<string>(), true), Times.Never());
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate("a-key");
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", false), Times.Once());
+            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", true), Times.Once());
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Caching
         {
             ((IMemoryCache)sut).Invalidate("a-key");
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", false), Times.Once());
+            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", true), Times.Once());
         }
 
         [Fact]
