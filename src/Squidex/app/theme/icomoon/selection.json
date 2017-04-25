@@ -1546,7 +1546,7 @@
       "properties": {
         "order": 30,
         "id": 11,
-        "name": "media",
+        "name": "media, type-Assets",
         "prevSize": 32,
         "code": 59677
       },

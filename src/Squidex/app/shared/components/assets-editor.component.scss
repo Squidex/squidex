@@ -1,0 +1,8 @@
+@import '_vars';
+@import '_mixins';
+
+.assets {
+    &-container {
+        border: 1px solid $color-input;
+    }
+}

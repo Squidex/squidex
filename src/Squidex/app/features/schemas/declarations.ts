@@ -5,6 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+export * from './pages/schema/types/assets-ui.component';
+export * from './pages/schema/types/assets-validation.component';
 export * from './pages/schema/types/boolean-ui.component';
 export * from './pages/schema/types/boolean-validation.component';
 export * from './pages/schema/types/date-time-ui.component';

@@ -42,6 +42,7 @@ import { SchemaDeleted, SchemaUpdated } from './../messages';
 })
 export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public fieldTypes: string[] = [
+        'Assets',
         'Boolean',
         'DateTime',
         'Geolocation',
@@ -66,7 +67,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public addFieldFormSubmitted = false;
     public addFieldForm: FormGroup =
         this.formBuilder.group({
-            type: [this.fieldTypes[0],
+            type: ['String',
                 [
                     Validators.required
                 ]],

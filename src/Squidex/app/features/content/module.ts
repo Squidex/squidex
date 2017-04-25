@@ -42,7 +42,13 @@ const routes: Routes = [
                 children: [
                     {
                         path: 'new',
-                        component: ContentPageComponent
+                        component: ContentPageComponent,
+                        children: [
+                            {
+                                path: 'assets',
+                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
+                            }
+                        ]
                     }, {
                         path: ':contentId',
                         component: ContentPageComponent,
@@ -56,6 +62,9 @@ const routes: Routes = [
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
+                            }, {
+                                path: 'assets',
+                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
                     }

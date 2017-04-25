@@ -7,11 +7,11 @@
                         {{fileType}}
                     </span>
                     
-                    <div *ngIf="asset.isImage">
-                        <img [attr.src]="previewUrl" sqxHideInvalidImage (error)="retryLoadingImage()">
+                    <div *ngIf="asset.isImage" class="file-image">
+                        <img [sqxImageSource]="previewUrl">
                     </div>
                     <div *ngIf="!asset.isImage" class="file-icon-container">
-                        <img class="file-icon" [attr.src]="fileIcon" sqxHideInvalidImage>
+                        <img class="file-icon" [attr.src]="fileIcon">
                     </div>
 
                     <div class="file-overlay">

@@ -19,6 +19,7 @@ import {
     AppsStoreService,
     AppsService,
     AppMustExistGuard,
+    AssetsEditorComponent,
     AssetsService,
     AuthService,
     ContentsService,
@@ -49,6 +50,7 @@ import {
     ],
     declarations: [
         AppFormComponent,
+        AssetsEditorComponent,
         DashboardLinkDirective,
         HelpComponent,
         HistoryComponent,
@@ -56,6 +58,7 @@ import {
     ],
     exports: [
         AppFormComponent,
+        AssetsEditorComponent,
         DashboardLinkDirective,
         HelpComponent,
         HistoryComponent,

@@ -47,11 +47,14 @@ export function createProperties(fieldType: string, values: Object | null = null
                     undefined, undefined, undefined, false, false, false, 'DateTime',
                     undefined, undefined, undefined);
             break;
+        case 'Geolocation':
+            properties = new GeolocationFieldPropertiesDto(undefined, undefined, undefined, false, false, false, 'Map');
+            break;
         case 'Json':
             properties = new JsonFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
             break;
-        case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto(undefined, undefined, undefined, false, false, false, 'Map');
+        case 'Assets':
+            properties = new AssetsFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -187,6 +190,16 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
         public readonly editor: string
     ) {
         super('Geolocation', label, hints, placeholder, isRequired, isListField, isLocalizable);
+    }
+}
+
+export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+        isRequired: boolean,
+        isListField: boolean,
+        isLocalizable: boolean
+    ) {
+        super('Assets', label, hints, placeholder, isRequired, isListField, isLocalizable);
     }
 }
 

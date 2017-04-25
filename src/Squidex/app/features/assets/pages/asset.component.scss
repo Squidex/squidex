@@ -5,6 +5,8 @@ $card-size: 240px;
 
 @mixin overlay-container {
     position: relative;
+    padding: 0;
+    overflow: hidden;
 }
 
 @mixin overlay {
@@ -99,6 +101,10 @@ $card-size: 240px;
 .file {
     &-info {
         font-size: .8rem;
+    }
+
+    &-image {
+        height: 100%;
     }
 
     &-preview {

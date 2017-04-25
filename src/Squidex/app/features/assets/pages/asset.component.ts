@@ -36,7 +36,6 @@ import {
     ]
 })
 export class AssetComponent extends AppComponentBase implements OnInit {
-    private previewRetries = 0;
     private version: Version;
 
     public renameDialog = new ModalView();
@@ -204,19 +203,8 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         this.fileIcon = FileHelper.fileIcon(asset.mimeType);
         this.progress = 0;
         this.previewUrl = FileHelper.assetPreviewUrl(this.apiUrl, asset);
-        this.previewRetries = 0;
         this.version = asset.version;
 
         this.resetRename();
-    }
-
-    public retryLoadingImage() {
-        this.previewRetries++;
-
-        if (this.previewRetries <= 10) {
-            setTimeout(() => {
-                this.previewUrl = FileHelper.assetPreviewUrl(this.apiUrl, this.asset);
-            }, this.previewRetries * 1000);
-        }
     }
 }

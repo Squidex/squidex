@@ -21,6 +21,8 @@ import { SortedDirective } from './utils/sorted.directive';
 
 import {
     FieldComponent,
+    AssetsUIComponent,
+    AssetsValidationComponent,
     BooleanUIComponent,
     BooleanValidationComponent,
     DateTimeUIComponent,
@@ -82,6 +84,8 @@ const routes: Routes = [
     ],
     declarations: [
         FieldComponent,
+        AssetsUIComponent,
+        AssetsValidationComponent,
         BooleanUIComponent,
         BooleanValidationComponent,
         DateTimeUIComponent,

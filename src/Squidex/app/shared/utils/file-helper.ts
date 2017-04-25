@@ -43,7 +43,7 @@ export module FileHelper {
     }
 
     export function assetPreviewUrl(apiUrl: ApiUrlConfig, asset: AssetDto) {
-        return apiUrl.buildUrl(`api/assets/${asset.id}?width=230&height=155&mode=Crop&version=${asset.version.value}&q=${MathHelper.guid()}`);
+        return apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.version.value}`);
     }
 
     export function assetInfo(asset: AssetDto): string {

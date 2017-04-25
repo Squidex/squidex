@@ -147,6 +147,9 @@
                     <div *ngSwitchCase="'Json'">
                         <sqx-json-validation [editForm]="editForm" [properties]="field.properties"></sqx-json-validation>
                     </div>
+                    <div *ngSwitchCase="'Assets'">
+                        <sqx-assets-validation [editForm]="editForm" [properties]="field.properties"></sqx-assets-validation>
+                    </div>
                 </div>
             </div>
 
@@ -169,6 +172,9 @@
                     </div>
                     <div *ngSwitchCase="'Json'">
                         <sqx-json-ui [editForm]="editForm" [properties]="field.properties"></sqx-json-ui>
+                    </div>
+                    <div *ngSwitchCase="'Assets'">
+                        <sqx-assets-ui [editForm]="editForm" [properties]="field.properties"></sqx-assets-ui>
                     </div>
                 </div>
             </div>

@@ -157,6 +157,14 @@ describe('SchemasService', () => {
                                 properties: {
                                     fieldType: 'Geolocation'
                                 }
+                            }, {
+                                fieldId: 7,
+                                name: 'field7',
+                                isHidden: true,
+                                isDisabled: true,
+                                properties: {
+                                    fieldType: 'Assets'
+                                }
                             }]
                         }
                     })
@@ -181,7 +189,8 @@ describe('SchemasService', () => {
                     new FieldDto(3, 'field3', true, true, createProperties('Boolean')),
                     new FieldDto(4, 'field4', true, true, createProperties('DateTime')),
                     new FieldDto(5, 'field5', true, true, createProperties('Json')),
-                    new FieldDto(6, 'field6', true, true, createProperties('Geolocation'))
+                    new FieldDto(6, 'field6', true, true, createProperties('Geolocation')),
+                    new FieldDto(6, 'field6', true, true, createProperties('Assets'))
                 ]));
 
         authService.verifyAll();
