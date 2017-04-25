@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { GeolocationFieldPropertiesDto } from 'shared';
@@ -13,8 +13,7 @@ import { GeolocationFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-geolocation-ui',
     styleUrls: ['geolocation-ui.component.scss'],
-    templateUrl: 'geolocation-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'geolocation-ui.component.html'
 })
 export class GeolocationUIComponent implements OnInit {
     @Input()

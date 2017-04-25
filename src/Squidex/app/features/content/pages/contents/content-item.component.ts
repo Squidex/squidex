@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -25,7 +25,6 @@ import {
     selector: '[sqxContent]',
     styleUrls: ['./content-item.component.scss'],
     templateUrl: './content-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         fadeAnimation
     ]

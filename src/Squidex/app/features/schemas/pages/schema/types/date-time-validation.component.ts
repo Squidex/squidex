@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,8 +14,7 @@ import { DateTimeFieldPropertiesDto, ValidatorsEx } from 'shared';
 @Component({
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
-    templateUrl: 'date-time-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'date-time-validation.component.html'
 })
 export class DateTimeValidationComponent implements OnInit {
     @Input()

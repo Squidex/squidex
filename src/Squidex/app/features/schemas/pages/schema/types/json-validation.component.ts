@@ -13,8 +13,7 @@ import { JsonFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-json-validation',
     styleUrls: ['json-validation.component.scss'],
-    templateUrl: 'json-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'json-validation.component.html'
 })
 export class JsonValidationComponent {
     @Input()
