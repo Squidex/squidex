@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { AppLanguageDto, FieldDto } from 'shared';
@@ -13,8 +13,7 @@ import { AppLanguageDto, FieldDto } from 'shared';
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements OnInit {
     @Input()

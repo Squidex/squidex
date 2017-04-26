@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,8 +14,7 @@ import { FloatConverter, NumberFieldPropertiesDto } from 'shared';
 @Component({
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
-    templateUrl: 'date-time-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'date-time-ui.component.html'
 })
 export class DateTimeUIComponent implements OnInit {
     @Input()

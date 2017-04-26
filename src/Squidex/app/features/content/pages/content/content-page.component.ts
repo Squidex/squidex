@@ -137,6 +137,8 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                         this.enable();
                     });
             }
+        } else {
+            this.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
