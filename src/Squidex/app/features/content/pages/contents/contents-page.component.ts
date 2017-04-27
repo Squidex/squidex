@@ -30,7 +30,6 @@ import {
     NotificationService,
     Pager,
     SchemaDetailsDto,
-    UsersProviderService,
     Version
 } from 'shared';
 
@@ -58,13 +57,13 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         return 100 / this.contentFields.length;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnDestroy() {

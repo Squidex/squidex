@@ -15,17 +15,17 @@ export class FocusOnInitDirective implements OnInit {
     public select: boolean;
 
     constructor(
-        private readonly elementRef: ElementRef,
+        private readonly element: ElementRef,
         private readonly renderer: Renderer
     ) {
     }
 
     public ngOnInit() {
         setTimeout(() => {
-            this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'focus', []);
+            this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
 
             if (this.select) {
-                this.renderer.invokeElementMethod(this.elementRef.nativeElement, 'select', []);
+                this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
             }
         });
     }

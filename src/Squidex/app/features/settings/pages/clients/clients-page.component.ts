@@ -19,7 +19,6 @@ import {
     MessageBus,
     NotificationService,
     UpdateAppClientDto,
-    UsersProviderService,
     ValidatorsEx,
     Version
 } from 'shared';
@@ -48,12 +47,12 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly appClientsService: AppClientsService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnInit() {

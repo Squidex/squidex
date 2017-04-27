@@ -47,7 +47,7 @@ namespace Squidex.Controllers.Api.Assets
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
-            if (asset == null || asset.FileVersion < version)
+            if (asset == null || asset.FileVersion < version || width == 0 || height == 0)
             {
                 return NotFound();
             }

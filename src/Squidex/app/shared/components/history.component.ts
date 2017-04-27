@@ -9,13 +9,17 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { MessageBus, NotificationService } from 'framework';
+import { AppComponentBase } from './app.component-base';
 
-import { AppComponentBase }                 from './app-component-base';
-import { AppsStoreService }                 from './../services/apps-store.service';
-import { HistoryChannelUpdated }            from './../utils/messages';
-import { HistoryEventDto, HistoryService }  from './../services/history.service';
-import { UsersProviderService }             from './../services/users-provider.service';
+import {
+    AppsStoreService,
+    HistoryChannelUpdated,
+    HistoryEventDto,
+    HistoryService,
+    MessageBus,
+    NotificationService,
+    UsersProviderService
+} from './../declarations-base';
 
 const REPLACEMENT_TEMP = '$TEMP$';
 
@@ -46,20 +50,27 @@ export class HistoryComponent extends AppComponentBase {
             .switchMap(() => this.appName())
             .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
-    constructor(appsStore: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(appsStore: AppsStoreService, notifications: NotificationService,
+        private readonly users: UsersProviderService,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(notifications, users, appsStore);
+        super(notifications, appsStore);
     }
 
-    public actorName(actor: string): Observable<string> {
-        return this.userName(actor, true, 'I');
-    }
+    private userName(userId: string): Observable<string> {
+        const parts = userId.split(':');
 
-    public actorPicture(actor: string): Observable<string> {
-        return this.userPicture(actor, true);
+        if (parts[0] === 'subject') {
+            return this.users.getUser(parts[1], 'Me').map(u => u.displayName);
+        } else {
+            if (parts[1].endsWith('client')) {
+                return Observable.of(parts[1]);
+            } else {
+                return Observable.of(`${parts[1]}-client`);
+            }
+        }
     }
 
     public format(message: string): Observable<string> {

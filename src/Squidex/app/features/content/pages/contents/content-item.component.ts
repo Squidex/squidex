@@ -17,8 +17,7 @@ import {
     FieldDto,
     ModalView,
     NotificationService,
-    SchemaDto,
-    UsersProviderService
+    SchemaDto
 } from 'shared';
 
 @Component({
@@ -55,8 +54,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
     public values: any[] = [];
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService) {
-        super(notifications, users, apps);
+    constructor(apps: AppsStoreService, notifications: NotificationService) {
+        super(notifications, apps);
     }
 
     public ngOnChanges() {

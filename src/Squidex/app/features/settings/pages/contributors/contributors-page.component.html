@@ -43,13 +43,13 @@
                     <ng-template ngFor let-contributor [ngForOf]="appContributors">
                         <tr>
                             <td>
-                                <img class="user-picture" [attr.title]="userName(contributor.contributorId) | async" [attr.src]="userPicture(contributor.contributorId) | async" />
+                                <img class="user-picture" [attr.title]="contributor.contributorId | userName" [attr.src]="contributor.contributorId | userPicture" />
                             </td>
                             <td>
-                                <span class="user-name">{{userName(contributor.contributorId) | async}}</span>
+                                <span class="user-name">{{contributor.contributorId | userName}}</span>
                             </td>
                             <td>
-                                <span class="user-email">{{userEmail(contributor.contributorId) | async}}</span>
+                                <span class="user-email">{{contributor.contributorId | userEmail}}</span>
                             </td>
                             <td>
                                 <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">

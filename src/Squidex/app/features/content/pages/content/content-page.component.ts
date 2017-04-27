@@ -28,7 +28,6 @@ import {
     NumberFieldPropertiesDto,
     SchemaDetailsDto,
     StringFieldPropertiesDto,
-    UsersProviderService,
     ValidatorsEx,
     Version
 } from 'shared';
@@ -53,14 +52,14 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
 
     public languages: AppLanguageDto[] = [];
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly contentsService: ContentsService,
         private readonly location: Location,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnDestroy() {

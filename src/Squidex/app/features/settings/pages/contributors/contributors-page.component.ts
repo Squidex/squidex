@@ -21,7 +21,6 @@ import {
     ImmutableArray,
     MessageBus,
     NotificationService,
-    UsersProviderService,
     UsersService,
     Version
 } from 'shared';
@@ -80,13 +79,13 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
                 ]]
         });
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService, usersService: UsersService,
+    constructor(apps: AppsStoreService, notifications: NotificationService, usersService: UsersService,
         private readonly appContributorsService: AppContributorsService,
         private readonly messageBus: MessageBus,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
 
         this.usersDataSource = new UsersDataSource(usersService, this);
     }

@@ -34,7 +34,7 @@
                             </div>
                             <div class="col col-4">
                                 <span class="schema-user">
-                                    <i class="icon-user"></i> {{userName(schema.lastModifiedBy, true) | async}}
+                                    <i class="icon-user"></i> {{schema.lastModifiedBy | userNameRef}}
                                 </span>
                             </div>
                             <div class="col col-4 schema-modified">

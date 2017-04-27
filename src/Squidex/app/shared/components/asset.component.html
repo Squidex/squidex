@@ -1,0 +1,99 @@
+<div class="asset">
+    <div class="card" (sqxFileDrop)="updateFile($event)" sqxSquare dnd-draggable [dragEnabled]="!!asset" [dragData]="asset">
+        <div class="card-block">
+            <div class="file-preview" *ngIf="asset && progress == 0" [@fade]>
+                <span class="file-type" *ngIf="fileType">
+                    {{fileType}}
+                </span>
+                
+                <div *ngIf="asset.isImage" class="file-image">
+                    <img [sqxImageSource]="previewUrl">
+                </div>
+                <div *ngIf="!asset.isImage" class="file-icon-container">
+                    <img class="file-icon" [attr.src]="fileIcon">
+                </div>
+
+                <div class="file-overlay">
+                    <div class="file-overlay-background"></div>
+                    
+                    <a class="file-edit" (click)="renameDialog.show()">
+                        <i class="icon-pencil"></i>
+                    </a>
+                    <a class="file-download" [attr.href]="fileUrl" target="_blank">
+                        <i class="icon-download"></i>
+                    </a>
+
+                    <span *ngIf="!closeMode">
+                        <a class="file-delete" (click)="deleting.emit(asset)">
+                            <i class="icon-delete"></i>
+                        </a>
+                    </span>
+                    <span *ngIf="closeMode">
+                        <a class="file-delete" (click)="closing.emit(asset)">
+                            <i class="icon-close"></i>
+                        </a>
+                    </span>
+
+                    <span class="file-overlay-type" *ngIf="fileType">
+                        {{fileType}}
+                    </span>
+                    <span class="file-user">
+                        <i class="icon-user"></i> {{asset.lastModifiedBy | userNameRef}}
+                    </span>
+                    <span class="file-modified">
+                        {{asset.lastModified | fromNow}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="file-name" [attr.title]="fileName">
+                {{fileName}}
+            </div>
+            <div class="file-info">
+                {{fileInfo}}
+            </div>
+        </div>
+
+        <div *ngIf="progress > 0">
+            <sqx-progress-bar class="upload-progress" style="width: 120px; height: 120px" mode="Circle" [value]="progress"></sqx-progress-bar>
+        </div>
+        <div class="drop-overlay">
+            <div class="drop-overlay-background"></div>
+
+            <span class="drop-overlay-text">Drop to update</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="renameDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rename asset</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetRename()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
+                    <div class="form-group">
+                        <label for="asset-name">Name</label>
+                        
+                        <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
+
+                        <input type="text" class="form-control" id="asset-name" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <button type="reset" class="float-left btn btn-secondary" (click)="resetRename()">Cancel</button>
+                        <button type="submit" class="float-right btn btn-success">Rename</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

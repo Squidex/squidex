@@ -5,14 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, HostListener, Input, OnChanges, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnInit, Renderer } from '@angular/core';
 
 import { MathHelper } from './../utils/math-helper';
 
 @Directive({
     selector: '[sqxImageSource]'
 })
-export class ImageSourceComponent implements OnChanges, OnInit {
+export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
     private retries = 0;
     private query = MathHelper.guid();
 
@@ -26,7 +26,7 @@ export class ImageSourceComponent implements OnChanges, OnInit {
     public parent: any = null;
 
     constructor(
-        private readonly elementRef: ElementRef,
+        private readonly element: ElementRef,
         private readonly renderer: Renderer
     ) {
     }
@@ -37,9 +37,13 @@ export class ImageSourceComponent implements OnChanges, OnInit {
         this.setImageSource();
     }
 
+    public ngAfterViewInit() {
+        this.resize(this.parent);
+    }
+
     public ngOnInit() {
         if (this.parent === null) {
-            this.parent = this.elementRef.nativeElement.parentElement;
+            this.parent = this.element.nativeElement.parentElement;
         }
 
         this.resize(this.parent);
@@ -51,7 +55,7 @@ export class ImageSourceComponent implements OnChanges, OnInit {
 
     @HostListener('error')
     public onError() {
-        this.renderer.setElementStyle(this.elementRef.nativeElement, 'visibility', 'hidden');
+        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'hidden');
 
         this.retryLoadingImage();
     }
@@ -63,25 +67,29 @@ export class ImageSourceComponent implements OnChanges, OnInit {
 
     @HostListener('load')
     public onLoad() {
-        this.renderer.setElementStyle(this.elementRef.nativeElement, 'visibility', 'visible');
+        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
     private resize(parent: any) {
         const size = parent.getBoundingClientRect();
 
-        this.renderer.setElementStyle(this.elementRef.nativeElement, 'width', size.width + 'px');
-        this.renderer.setElementStyle(this.elementRef.nativeElement, 'height', size.height + 'px');
+        this.renderer.setElementStyle(this.element.nativeElement, 'width', size.width + 'px');
+        this.renderer.setElementStyle(this.element.nativeElement, 'height', size.height + 'px');
+
+        this.setImageSource();
     }
 
     private setImageSource() {
-        const size = this.elementRef.nativeElement.getBoundingClientRect();
+        const size = this.element.nativeElement.getBoundingClientRect();
 
         const w = Math.round(size.width);
         const h = Math.round(size.height);
 
-        const source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop&q=${this.query}`;
+        if (w > 0 && h > 0) {
+            const source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop&q=${this.query}`;
 
-        this.renderer.setElementAttribute(this.elementRef.nativeElement, 'src', source);
+            this.renderer.setElementAttribute(this.element.nativeElement, 'src', source);
+        }
     }
 
     private retryLoadingImage() {

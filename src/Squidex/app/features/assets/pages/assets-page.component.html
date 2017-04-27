@@ -40,7 +40,7 @@
                     (failed)="onAssetFailed(file)" 
                     (loaded)="onAssetLoaded(file, $event)">
                 </sqx-asset>
-                <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" 
+                <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"
                     (deleting)="onAssetDeleting($event)">
                 </sqx-asset>
             </div>

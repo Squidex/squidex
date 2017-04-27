@@ -27,20 +27,20 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
 
     constructor(
         private readonly renderer: Renderer,
-        private readonly elementRef: ElementRef
+        private readonly element: ElementRef
     ) {
     }
 
     public writeValue(value: any) {
         if (value === undefined || value === null) {
-            this.renderer.setElementProperty(this.elementRef.nativeElement, 'indeterminate', true);
+            this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', true);
         } else {
-            this.renderer.setElementProperty(this.elementRef.nativeElement, 'checked', value);
+            this.renderer.setElementProperty(this.element.nativeElement, 'checked', value);
         }
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.renderer.setElementProperty(this.elementRef.nativeElement, 'disabled', isDisabled);
+        this.renderer.setElementProperty(this.element.nativeElement, 'disabled', isDisabled);
     }
 
     public registerOnChange(fn: any) {

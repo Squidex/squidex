@@ -15,8 +15,7 @@ import {
     fadeAnimation,
     ImmutableArray,
     ModalView,
-    NotificationService,
-    UsersProviderService
+    NotificationService
 } from 'shared';
 
 @Component({
@@ -34,10 +33,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(notifications: NotificationService, users: UsersProviderService,
+    constructor(notifications: NotificationService,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super(notifications, users);
+        super(notifications);
     }
 
     public ngOnInit() {

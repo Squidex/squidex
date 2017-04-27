@@ -18,8 +18,7 @@ import {
     fadeAnimation,
     ImmutableArray,
     NotificationService,
-    Pager,
-    UsersProviderService
+    Pager
 } from 'shared';
 
 @Component({
@@ -38,10 +37,10 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
     public assetsFilter = new FormControl();
     public assertQuery = '';
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly assetsService: AssetsService
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnInit() {
@@ -57,7 +56,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
 
     private load() {
         this.appName()
-            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery, null))
+            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery, null, null))
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
                 this.assetsPager = this.assetsPager.setCount(dtos.total);

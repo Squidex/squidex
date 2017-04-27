@@ -14,8 +14,7 @@ import {
     AppsStoreService,
     NotificationService,
     SchemaDto,
-    SchemasService,
-    UsersProviderService
+    SchemasService
 } from 'shared';
 
 @Component({
@@ -53,10 +52,10 @@ export class SchemasPageComponent extends AppComponentBase {
                 });
             });
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly schemasService: SchemasService
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {

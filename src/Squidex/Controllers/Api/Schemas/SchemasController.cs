@@ -65,7 +65,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// Get a schema by name.
         /// </summary>
         /// <param name="name">The name of the schema to retrieve.</param>
-        /// <param name="app">The name of the app to create the schema to.</param>
+        /// <param name="app">The name of the app to get the schema from.</param>
         /// <returns>
         /// 200 => Schema found.
         /// 404 => Schema or app not found.

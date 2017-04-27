@@ -1,8 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-$card-size: 240px;
-
 @mixin overlay-container {
     position: relative;
     padding: 0;
@@ -72,7 +70,6 @@ $card-size: 240px;
 .card {
     & {
         @include overlay-container;
-        height: $card-size;
     }
 
     &.drag {
@@ -82,7 +79,6 @@ $card-size: 240px;
     }
 
     &-block {
-        padding: .8rem .8rem 0;
         position: relative;
     }
 
@@ -91,6 +87,7 @@ $card-size: 240px;
         background: transparent;
         padding: .8rem;
         padding-top: .4rem;
+        height: 70px;
     }
 }
 
@@ -109,8 +106,7 @@ $card-size: 240px;
 
     &-preview {
         & {
-            @include overlay-container;
-            height: 155px;
+            @include absolute(.8rem, .8rem, 0, .8rem);
         }
 
         &:hover {
@@ -162,11 +158,17 @@ $card-size: 240px;
         line-height: 2rem;
     }
 
+    &-icon {
+        margin-top: 10%;
+        margin-bottom: 0;
+        height: 70%;
+    }
+
     &-icon-container {
         background: $color-border;
         border: 0;
-        line-height: 155px;
         text-align: center;
+        height: 100%;
     }
 
     &-overlay {

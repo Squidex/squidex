@@ -11,7 +11,8 @@ import { DateTime } from './../utils/date-time';
 import { Duration } from './../utils/duration';
 
 @Pipe({
-    name: 'shortDate'
+    name: 'shortDate',
+    pure: true
 })
 export class ShortDatePipe {
     public transform(value: DateTime): any {
@@ -20,7 +21,8 @@ export class ShortDatePipe {
 }
 
 @Pipe({
-    name: 'month'
+    name: 'month',
+    pure: true
 })
 export class MonthPipe {
     public transform(value: DateTime): any {
@@ -29,7 +31,8 @@ export class MonthPipe {
 }
 
 @Pipe({
-    name: 'fromNow'
+    name: 'fromNow',
+    pure: true
 })
 export class FromNowPipe {
     public transform(value: DateTime): any {
@@ -38,7 +41,8 @@ export class FromNowPipe {
 }
 
 @Pipe({
-    name: 'dayOfWeek'
+    name: 'dayOfWeek',
+    pure: true
 })
 export class DayOfWeekPipe {
     public transform(value: DateTime): any {
@@ -47,7 +51,8 @@ export class DayOfWeekPipe {
 }
 
 @Pipe({
-    name: 'day'
+    name: 'day',
+    pure: true
 })
 export class DayPipe {
     public transform(value: DateTime): any {
@@ -56,7 +61,8 @@ export class DayPipe {
 }
 
 @Pipe({
-    name: 'shortTime'
+    name: 'shortTime',
+    pure: true
 })
 export class ShortTimePipe {
     public transform(value: DateTime): any {
@@ -65,7 +71,8 @@ export class ShortTimePipe {
 }
 
 @Pipe({
-    name: 'duration'
+    name: 'duration',
+    pure: true
 })
 export class DurationPipe {
     public transform(value: Duration): any {

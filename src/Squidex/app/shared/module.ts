@@ -6,6 +6,7 @@
  */
 
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { DndModule } from 'ng2-dnd';
 
 import { ProgressHttpModule } from 'angular-progress-http';
 
@@ -19,6 +20,7 @@ import {
     AppsStoreService,
     AppsService,
     AppMustExistGuard,
+    AssetComponent,
     AssetsEditorComponent,
     AssetsService,
     AuthService,
@@ -38,6 +40,12 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
+    UserEmailPipe,
+    UserEmailRefPipe,
+    UserNamePipe,
+    UserNameRefPipe,
+    UserPicturePipe,
+    UserPictureRefPipe,
     UserManagementService,
     UsersProviderService,
     UsersService
@@ -46,23 +54,38 @@ import {
 @NgModule({
     imports: [
         ProgressHttpModule,
+        DndModule,
         SqxFrameworkModule
     ],
     declarations: [
         AppFormComponent,
+        AssetComponent,
         AssetsEditorComponent,
         DashboardLinkDirective,
         HelpComponent,
         HistoryComponent,
-        LanguageSelectorComponent
+        LanguageSelectorComponent,
+        UserEmailPipe,
+        UserEmailRefPipe,
+        UserNamePipe,
+        UserNameRefPipe,
+        UserPicturePipe,
+        UserPictureRefPipe
     ],
     exports: [
         AppFormComponent,
+        AssetComponent,
         AssetsEditorComponent,
         DashboardLinkDirective,
         HelpComponent,
         HistoryComponent,
-        LanguageSelectorComponent
+        LanguageSelectorComponent,
+        UserEmailPipe,
+        UserEmailRefPipe,
+        UserNamePipe,
+        UserNameRefPipe,
+        UserPicturePipe,
+        UserPictureRefPipe
     ]
 })
 export class SqxSharedModule {

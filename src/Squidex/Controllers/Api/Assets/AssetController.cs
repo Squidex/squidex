@@ -14,8 +14,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
+using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -53,6 +55,7 @@ namespace Squidex.Controllers.Api.Assets
         /// Get assets.
         /// </summary>
         /// <param name="app">The app where the assets belong to.</param>
+        /// <param name="ids">The optional asset ids.</param>
         /// <param name="skip">The number of assets to skip.</param>
         /// <param name="take">The number of assets to take.</param>
         /// <param name="query">The query to limit the files by name.</param>
@@ -64,7 +67,7 @@ namespace Squidex.Controllers.Api.Assets
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var mimeTypeList = new HashSet<string>();
 
@@ -76,8 +79,21 @@ namespace Squidex.Controllers.Api.Assets
                 }
             }
 
-            var taskForAssets = assetRepository.QueryAsync(AppId, mimeTypeList, query, take, skip);
-            var taskForCount = assetRepository.CountAsync(AppId, mimeTypeList, query);
+            var idsList = new HashSet<Guid>();
+
+            if (!string.IsNullOrWhiteSpace(ids))
+            {
+                foreach (var id in ids.Split(','))
+                {
+                    if (Guid.TryParse(id, out var guid))
+                    {
+                        idsList.Add(guid);
+                    }
+                }
+            }
+
+            var taskForAssets = assetRepository.QueryAsync(AppId, mimeTypeList, idsList, query, take, skip);
+            var taskForCount = assetRepository.CountAsync(AppId, mimeTypeList, idsList, query);
 
             await Task.WhenAll(taskForAssets, taskForCount);
 
@@ -86,6 +102,34 @@ namespace Squidex.Controllers.Api.Assets
                 Total = taskForCount.Result,
                 Items = taskForAssets.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
             };
+
+            return Ok(model);
+        }
+
+        /// <summary>
+        /// Get a asset by id.
+        /// </summary>
+        /// <param name="id">The id of the asset to retrieve.</param>
+        /// <param name="app">The name of the app to get the asset from.</param>
+        /// <returns>
+        /// 200 => Asset found.
+        /// 404 => Asset or app not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/assets/{id}")]
+        [ProducesResponseType(typeof(AssetsDto), 200)]
+        public async Task<IActionResult> GetAsset(string app, Guid id)
+        {
+            var entity = await assetRepository.FindAssetAsync(id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            var model = SimpleMapper.Map(entity, new AssetDto());
+
+            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
             return Ok(model);
         }

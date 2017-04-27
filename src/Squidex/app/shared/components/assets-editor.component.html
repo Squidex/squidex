@@ -1,3 +1,11 @@
-<div class="assets-container">
-
+<div class="assets-container" (sqxFileDrop)="addFiles($event)" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)">
+    <div class="row">
+        <sqx-asset class="col-4" *ngFor="let file of newAssets" [initFile]="file" 
+            (failed)="onAssetFailed(file)" 
+            (loaded)="onAssetLoaded(file, $event)">
+        </sqx-asset>
+        <sqx-asset class="col-4" *ngFor="let asset of oldAssets" [asset]="asset" [closeMode]="true"
+            (closing)="onAssetRemoving($event)">
+        </sqx-asset>
+    </div>
 </div>

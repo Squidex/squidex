@@ -11,7 +11,10 @@ import { Directive, ElementRef, OnInit } from '@angular/core';
     selector: '.sqx-cloak'
 })
 export class CloakDirective implements OnInit {
-    constructor(private readonly element: ElementRef) { }
+    constructor(
+        private readonly element: ElementRef
+    ) {
+    }
 
     public ngOnInit() {
         this.element.nativeElement.classList.remove('sqx-cloak');

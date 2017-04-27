@@ -89,11 +89,15 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query: string, mimeTypes: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query: string, mimeTypes: string[], ids: string[]): Observable<AssetsDto> {
         let queries: string[] = [];
 
         if (mimeTypes && mimeTypes.length > 0) {
             queries.push(`mimeTypes=${mimeTypes.join(',')}`);
+        }
+
+        if (ids && ids.length > 0) {
+            queries.push(`ids=${ids.join(',')}`);
         }
 
         if (query && query.length > 0) {
@@ -167,6 +171,30 @@ export class AssetsService {
                     subscriber.complete();
                 });
         });
+    }
+
+    public getAsset(appName: string, id: string, version: Version): Observable<AssetDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+
+        return this.authService.authGet(url)
+                .map(response => response.json())
+                .map(response => {
+                    return new AssetDto(
+                        response.id,
+                        response.createdBy,
+                        response.lastModifiedBy,
+                        DateTime.parseISO_UTC(response.created),
+                        DateTime.parseISO_UTC(response.lastModified),
+                        response.fileName,
+                        response.fileSize,
+                        response.fileVersion,
+                        response.mimeType,
+                        response.isImage,
+                        response.pixelWidth,
+                        response.pixelHeight,
+                        new Version(response.version.toString()));
+                })
+                .catchError('Failed to load assets. Please reload.');
     }
 
     public replaceFile(appName: string, id: string, file: File, version?: Version): Observable<number | AssetReplacedDto> {

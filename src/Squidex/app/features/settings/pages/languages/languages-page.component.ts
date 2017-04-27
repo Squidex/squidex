@@ -21,7 +21,6 @@ import {
     LanguageService,
     NotificationService,
     UpdateAppLanguageDto,
-    UsersProviderService,
     Version
 } from 'shared';
 
@@ -47,13 +46,13 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
         return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly appLanguagesService: AppLanguagesService,
         private readonly languagesService: LanguageService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnInit() {

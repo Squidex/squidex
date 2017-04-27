@@ -10,7 +10,8 @@ import { Pipe } from '@angular/core';
 import { CurrencyConfig, DecimalSeparatorConfig } from './../configurations';
 
 @Pipe({
-    name: 'money'
+    name: 'money',
+    pure: true
 })
 export class MoneyPipe {
     constructor(

@@ -15,8 +15,7 @@ import {
     NotificationService,
     Pager,
     UserDto,
-    UserManagementService,
-    UsersProviderService
+    UserManagementService
 } from 'shared';
 
 @Component({
@@ -32,11 +31,11 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     public usersFilter = new FormControl();
     public usersQuery = '';
 
-    constructor(notifications: NotificationService, users: UsersProviderService,
+    constructor(notifications: NotificationService,
         private readonly userManagementService: UserManagementService,
         private readonly authService: AuthService
     ) {
-        super(notifications, users);
+        super(notifications);
     }
 
     public ngOnInit() {

@@ -8,9 +8,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
+import { AppComponentBase } from './app.component-base';
+
 import {
     ApiUrlConfig,
-    AppComponentBase,
     AppsStoreService,
     AssetCreatedDto,
     AssetDto,
@@ -23,9 +24,8 @@ import {
     ModalView,
     NotificationService,
     UpdateAssetDto,
-    UsersProviderService,
     Version
-} from 'shared';
+} from './../declarations-base';
 
 @Component({
     selector: 'sqx-asset',
@@ -54,8 +54,14 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     @Input()
     public asset: AssetDto;
 
+    @Input()
+    public closeMode = false;
+
     @Output()
     public loaded = new EventEmitter<AssetDto>();
+
+    @Output()
+    public closing = new EventEmitter<AssetDto>();
 
     @Output()
     public deleting = new EventEmitter<AssetDto>();
@@ -71,13 +77,13 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public fileIcon: string;
     public fileInfo: string;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly formBuilder: FormBuilder,
         private readonly assetsService: AssetsService,
         private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnInit() {

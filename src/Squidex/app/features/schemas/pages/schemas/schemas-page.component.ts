@@ -22,7 +22,6 @@ import {
     NotificationService,
     SchemaDto,
     SchemasService,
-    UsersProviderService,
     Version
 } from 'shared';
 
@@ -47,13 +46,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     public schemasFilter = new FormControl();
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly schemasService: SchemasService,
         private readonly authService: AuthService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnDestroy() {

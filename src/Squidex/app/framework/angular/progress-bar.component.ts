@@ -35,7 +35,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     public value = 0;
 
     constructor(
-        private readonly elementRef: ElementRef,
+        private readonly element: ElementRef,
         private readonly renderer: Renderer
     ) {
     }
@@ -48,12 +48,12 @@ export class ProgressBarComponent implements OnChanges, OnInit {
             strokeWidth: this.strokeWidth
         };
 
-        this.renderer.setElementStyle(this.elementRef.nativeElement, 'display', 'block');
+        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'block');
 
         if (this.mode === 'Circle') {
-            this.progressBar = new ProgressBar.Circle(this.elementRef.nativeElement, options);
+            this.progressBar = new ProgressBar.Circle(this.element.nativeElement, options);
         } else {
-            this.progressBar = new ProgressBar.Line(this.elementRef.nativeElement, options);
+            this.progressBar = new ProgressBar.Line(this.element.nativeElement, options);
         }
 
         this.updateValue();

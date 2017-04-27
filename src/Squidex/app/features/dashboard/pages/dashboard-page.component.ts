@@ -13,8 +13,7 @@ import {
     AppsStoreService,
     AuthService,
     fadeAnimation,
-    NotificationService,
-    UsersProviderService
+    NotificationService
 } from 'shared';
 
 declare var _urq: any;
@@ -32,10 +31,10 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
 
     public profileDisplayName = '';
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly auth: AuthService
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnDestroy() {

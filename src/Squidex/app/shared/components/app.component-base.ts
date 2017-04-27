@@ -7,19 +7,15 @@
 
 import { Observable } from 'rxjs';
 
-import {
-    AppsStoreService,
-    NotificationService,
-    UsersProviderService
-} from 'shared';
+import { AppsStoreService, NotificationService } from './../declarations-base';
 
 import { ComponentBase } from './component-base';
 
 export abstract class AppComponentBase extends ComponentBase {
-    constructor(notifications: NotificationService, users: UsersProviderService,
+    constructor(notifications: NotificationService,
         private readonly appsStore: AppsStoreService
     ) {
-        super(notifications, users);
+        super(notifications);
     }
 
     public appName(): Observable<string> {

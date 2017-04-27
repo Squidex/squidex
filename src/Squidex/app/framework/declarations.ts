@@ -33,6 +33,7 @@ export * from './angular/rich-editor.component';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
+export * from './angular/square.directive';
 export * from './angular/stars.component';
 export * from './angular/tag-editor.component';
 export * from './angular/title.component';

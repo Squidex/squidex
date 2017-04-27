@@ -10,7 +10,8 @@ import { Pipe } from '@angular/core';
 import { StringHelper } from './../utils/string-helper';
 
 @Pipe({
-    name: 'displayName'
+    name: 'displayName',
+    pure: true
 })
 export class DisplayNamePipe {
     public transform(value: any, field1 = 'label', field2  = 'name'): any {

@@ -3,6 +3,30 @@
 
 .assets {
     &-container {
-        border: 1px solid $color-input;
+        & {
+            border: 2px solid $color-input;
+            background: $color-input;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 0;
+            height: 240px;
+        }
+
+        &.drag {
+            border-color: darken($color-border, 10%);
+            border-style: dashed;
+            cursor: copy;
+        }
     }
+}
+
+.row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.col-4 {
+    padding-left: 8px;
+    padding-right: 8px;
 }

@@ -26,19 +26,19 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
     private touchedCallback: () => void = NOOP;
 
     constructor(
-        private readonly renderer: Renderer,
-        private readonly elementRef: ElementRef
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer
     ) {
     }
 
     public writeValue(value: any) {
         const normalizedValue = (value == null ? '' : value.toString()).toLowerCase();
 
-        this.renderer.setElementProperty(this.elementRef.nativeElement, 'value', normalizedValue);
+        this.renderer.setElementProperty(this.element.nativeElement, 'value', normalizedValue);
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.renderer.setElementProperty(this.elementRef.nativeElement, 'disabled', isDisabled);
+        this.renderer.setElementProperty(this.element.nativeElement, 'disabled', isDisabled);
     }
 
     public registerOnChange(fn: any) {
@@ -52,7 +52,7 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
     public onChange(value: any) {
         const normalizedValue = (value == null ? '' : value.toString()).toLowerCase();
 
-        this.renderer.setElementProperty(this.elementRef.nativeElement, 'value', normalizedValue);
+        this.renderer.setElementProperty(this.element.nativeElement, 'value', normalizedValue);
         this.changeCallback(normalizedValue);
     }
 

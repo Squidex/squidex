@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { HelpService } from './../services/help.service';
+import { HelpService } from './../declarations-base';
 
 @Component({
     selector: 'sqx-help',

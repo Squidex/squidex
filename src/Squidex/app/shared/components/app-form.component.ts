@@ -10,8 +10,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
-import { AppsStoreService }     from './../services/apps-store.service';
-import { AppDto, CreateAppDto } from './../services/apps.service';
+import {
+    AppDto,
+    AppsStoreService,
+    CreateAppDto
+} from './../declarations-base';
 
 const FALLBACK_NAME = 'my-app';
 

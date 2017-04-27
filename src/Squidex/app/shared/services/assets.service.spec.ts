@@ -61,7 +61,7 @@ describe('AssetsService', () => {
                                 lastModifiedBy: 'LastModifiedBy1',
                                 fileName: 'my-asset1.png',
                                 fileSize: 1024,
-                                fileVersion: 2,
+                                fileVersion: 2000,
                                 mimeType: 'text/plain',
                                 isImage: true,
                                 pixelWidth: 1024,
@@ -75,7 +75,7 @@ describe('AssetsService', () => {
                                 lastModifiedBy: 'LastModifiedBy2',
                                 fileName: 'my-asset2.png',
                                 fileSize: 1024,
-                                fileVersion: 2,
+                                fileVersion: 2000,
                                 mimeType: 'text/plain',
                                 isImage: true,
                                 pixelWidth: 1024,
@@ -90,7 +90,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, null, null).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, null, null, null).subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -101,7 +101,8 @@ describe('AssetsService', () => {
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
                     'my-asset1.png',
-                    1024, 2,
+                    1024,
+                    2000,
                     'text/plain',
                     true,
                     1024,
@@ -111,13 +112,62 @@ describe('AssetsService', () => {
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
                     'my-asset2.png',
-                    1024, 2,
+                    1024,
+                    2000,
                     'text/plain',
                     true,
                     1024,
                     2048,
                     new Version('22'))
         ]));
+
+        authService.verifyAll();
+    });
+
+    it('should make get request to get asset', () => {
+        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/assets/123'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            id: 'id1',
+                            created: '2016-12-12T10:10',
+                            createdBy: 'Created1',
+                            lastModified: '2017-12-12T10:10',
+                            lastModifiedBy: 'LastModifiedBy1',
+                            fileName: 'my-asset1.png',
+                            fileSize: 1024,
+                            fileVersion: 2000,
+                            mimeType: 'text/plain',
+                            isImage: true,
+                            pixelWidth: 1024,
+                            pixelHeight: 2048,
+                            version: 11
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let assets: AssetDto | null = null;
+
+        assetsService.getAsset('my-app', '123', null).subscribe(result => {
+            assets = result;
+        }).unsubscribe();
+
+        expect(assets).toEqual(
+            new AssetDto(
+                'id1', 'Created1', 'LastModifiedBy1',
+                DateTime.parseISO_UTC('2016-12-12T10:10'),
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                'my-asset1.png',
+                1024,
+                2000,
+                'text/plain',
+                true,
+                1024,
+                2048,
+                new Version('11')));
 
         authService.verifyAll();
     });
@@ -138,7 +188,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, 'my-query', null).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, 'my-query', null, null).subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -161,7 +211,30 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, null, ['text/plain', 'image/png']).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, null, ['text/plain', 'image/png'], null).subscribe(result => {
+            assets = result;
+        }).unsubscribe();
+
+        authService.verifyAll();
+    });
+
+    it('should append mime types to find by ids', () => {
+        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/assets?ids=12,23&take=17&skip=13'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            total: 10,
+                            items: []
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let assets: AssetsDto | null = null;
+
+        assetsService.getAssets('my-app', 17, 13, null, null, ['12', '23']).subscribe(result => {
             assets = result;
         }).unsubscribe();
 

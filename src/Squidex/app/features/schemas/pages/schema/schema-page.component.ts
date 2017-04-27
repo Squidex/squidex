@@ -24,7 +24,6 @@ import {
     SchemaDetailsDto,
     SchemasService,
     UpdateFieldDto,
-    UsersProviderService,
     ValidatorsEx,
     Version
 } from 'shared';
@@ -82,14 +81,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, users: UsersProviderService,
+    constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
-        super(notifications, users, apps);
+        super(notifications, apps);
     }
 
     public ngOnInit() {

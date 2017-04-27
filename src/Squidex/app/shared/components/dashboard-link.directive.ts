@@ -9,7 +9,7 @@ import { Directive, ElementRef, HostListener, OnDestroy, OnInit, Renderer } from
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AppsStoreService } from './../services/apps-store.service';
+import { AppsStoreService } from './../declarations-base';
 
 @Directive({
     selector: '[sqxDashboardLink]'

@@ -8,7 +8,7 @@
     <span class="item-modified">{{content.lastModified | fromNow}}</span>
 </td>
 <td>
-    <img class="user-picture" [attr.title]="userName(content.lastModifiedBy, true) | async" [attr.src]="userPicture(content.lastModifiedBy, true) | async" />
+    <img class="user-picture" [attr.title]="content.lastModifiedBy | userNameRef" [attr.src]="content.lastModifiedBy | userPictureRef" />
 </td>
 <td>
     <div class="dropdown dropdown-options" *ngIf="content">

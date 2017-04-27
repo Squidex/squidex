@@ -17,32 +17,48 @@ export class FileDropDirective {
     public drop = new EventEmitter<FileList>();
 
     constructor(
-        private readonly elementRef: ElementRef,
+        private readonly element: ElementRef,
         private readonly renderer: Renderer
     ) {
     }
 
     @HostListener('dragleave', ['$event'])
     public onDragLeave(event: DragDropEvent) {
-        this.dragEnd();
+        const hasFiles = this.hasFiles(event.dataTransfer.types);
+
+        if (hasFiles) {
+            this.dragEnd();
+        }
     }
 
     @HostListener('dragenter', ['$event'])
     public onDragEnter(event: DragDropEvent) {
-        this.dragStart();
+        const hasFiles = this.hasFiles(event.dataTransfer.types);
+
+        if (hasFiles) {
+            this.dragStart();
+        }
     }
 
     @HostListener('dragover', ['$event'])
     public onDragOver(event: DragDropEvent) {
-        this.tryStopEvent(event);
+        const hasFiles = this.hasFiles(event.dataTransfer.types);
+
+        if (hasFiles) {
+            this.stopEvent(event);
+        }
     }
 
     @HostListener('drop', ['$event'])
     public onDrop(event: DragDropEvent) {
-        this.drop.emit(event.dataTransfer.files);
+        const hasFiles = this.hasFiles(event.dataTransfer.types);
 
-        this.dragEnd(0);
-        this.stopEvent(event);
+        if (hasFiles) {
+            this.drop.emit(event.dataTransfer.files);
+
+            this.dragEnd(0);
+            this.stopEvent(event);
+        }
     }
 
     private stopEvent(event: Event) {
@@ -54,7 +70,7 @@ export class FileDropDirective {
         this.dragCounter++;
 
         if (this.dragCounter === 1) {
-            this.renderer.setElementClass(this.elementRef.nativeElement, 'drag', true);
+            this.renderer.setElementClass(this.element.nativeElement, 'drag', true);
         }
     }
 
@@ -62,18 +78,8 @@ export class FileDropDirective {
         this.dragCounter = number || this.dragCounter - 1;
 
         if (this.dragCounter === 0) {
-            this.renderer.setElementClass(this.elementRef.nativeElement, 'drag', false);
+            this.renderer.setElementClass(this.element.nativeElement, 'drag', false);
         }
-    }
-
-    private tryStopEvent(event: DragDropEvent) {
-        const hasFiles = this.hasFiles(event.dataTransfer.types);
-
-        if (!hasFiles) {
-            return;
-        }
-
-        this.stopEvent(event);
     }
 
     private hasFiles(types: any): boolean {
