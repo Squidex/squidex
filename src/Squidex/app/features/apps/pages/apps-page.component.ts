@@ -24,8 +24,7 @@ import {
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new ModalView();
 
-    public apps =
-        this.appsStore.apps.map(a => a || []);
+    public apps = this.appsStore.apps.map(a => a || []);
 
     constructor(
         private readonly appsStore: AppsStoreService

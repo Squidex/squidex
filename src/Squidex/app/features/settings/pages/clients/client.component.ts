@@ -73,7 +73,7 @@ export class ClientComponent {
     }
 
     public resetForm() {
-        this.renameForm.get('name').setValue(this.clientName);
+        this.renameForm.get('name')!.setValue(this.clientName);
     }
 
     public cancelRename() {
@@ -94,7 +94,7 @@ export class ClientComponent {
 
     public rename() {
         try {
-            const newName = this.renameForm.get('name').value;
+            const newName = this.renameForm.get('name')!.value;
 
             if (newName !== this.clientName) {
                 this.renaming.emit(newName);

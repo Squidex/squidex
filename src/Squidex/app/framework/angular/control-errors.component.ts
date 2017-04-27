@@ -55,7 +55,7 @@ export class ControlErrorsComponent implements OnChanges {
             return null;
         }
 
-        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted)) {
+        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             const errors: string[] = [];
 
             for (let key in <any>this.control.errors) {

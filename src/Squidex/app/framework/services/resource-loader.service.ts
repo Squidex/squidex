@@ -52,7 +52,9 @@ export class ResourceLoaderService {
 
                 const node = document.getElementsByTagName('script')[0];
 
-                node.parentNode.insertBefore(script, node);
+                if (node.parentNode) {
+                    node.parentNode.insertBefore(script, node);
+                }
             });
 
             this.cache[key] = result;

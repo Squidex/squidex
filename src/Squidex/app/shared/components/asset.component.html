@@ -1,68 +1,67 @@
-<div class="asset">
-    <div class="card" (sqxFileDrop)="updateFile($event)" sqxSquare dnd-draggable [dragEnabled]="!!asset" [dragData]="asset">
-        <div class="card-block">
-            <div class="file-preview" *ngIf="asset && progress == 0" [@fade]>
-                <span class="file-type" *ngIf="fileType">
+<div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" [dragData]="asset">
+    <div class="card-block">
+        <div class="file-preview" *ngIf="asset && progress == 0" [@fade]>
+            <span class="file-type" *ngIf="fileType">
+                {{fileType}}
+            </span>
+            
+            <div *ngIf="asset.isImage" class="file-image">
+                <img [sqxImageSource]="previewUrl">
+            </div>
+            <div *ngIf="!asset.isImage" class="file-icon-container">
+                <img class="file-icon" [attr.src]="fileIcon">
+            </div>
+
+            <div class="file-overlay">
+                <div class="file-overlay-background"></div>
+                
+                <a class="file-edit" (click)="renameDialog.show()">
+                    <i class="icon-pencil"></i>
+                </a>
+                <a class="file-download" [attr.href]="fileUrl" target="_blank">
+                    <i class="icon-download"></i>
+                </a>
+
+                <span *ngIf="!closeMode">
+                    <a class="file-delete" (click)="deleting.emit(asset)">
+                        <i class="icon-delete"></i>
+                    </a>
+                </span>
+                <span *ngIf="closeMode">
+                    <a class="file-delete" (click)="closing.emit(asset)">
+                        <i class="icon-close"></i>
+                    </a>
+                </span>
+
+                <span class="file-overlay-type" *ngIf="fileType">
                     {{fileType}}
                 </span>
-                
-                <div *ngIf="asset.isImage" class="file-image">
-                    <img [sqxImageSource]="previewUrl">
-                </div>
-                <div *ngIf="!asset.isImage" class="file-icon-container">
-                    <img class="file-icon" [attr.src]="fileIcon">
-                </div>
-
-                <div class="file-overlay">
-                    <div class="file-overlay-background"></div>
-                    
-                    <a class="file-edit" (click)="renameDialog.show()">
-                        <i class="icon-pencil"></i>
-                    </a>
-                    <a class="file-download" [attr.href]="fileUrl" target="_blank">
-                        <i class="icon-download"></i>
-                    </a>
-
-                    <span *ngIf="!closeMode">
-                        <a class="file-delete" (click)="deleting.emit(asset)">
-                            <i class="icon-delete"></i>
-                        </a>
-                    </span>
-                    <span *ngIf="closeMode">
-                        <a class="file-delete" (click)="closing.emit(asset)">
-                            <i class="icon-close"></i>
-                        </a>
-                    </span>
-
-                    <span class="file-overlay-type" *ngIf="fileType">
-                        {{fileType}}
-                    </span>
-                    <span class="file-user">
-                        <i class="icon-user"></i> {{asset.lastModifiedBy | userNameRef}}
-                    </span>
-                    <span class="file-modified">
-                        {{asset.lastModified | fromNow}}
-                    </span>
-                </div>
+                <span class="file-user">
+                    <i class="icon-user"></i> {{asset.lastModifiedBy | userNameRef}}
+                </span>
+                <span class="file-modified">
+                    {{asset.lastModified | fromNow}}
+                </span>
             </div>
         </div>
-        <div class="card-footer">
-            <div class="file-name" [attr.title]="fileName">
-                {{fileName}}
-            </div>
-            <div class="file-info">
-                {{fileInfo}}
-            </div>
+    </div>
+    <div class="card-footer" dnd-draggable-handle>
+        <div class="file-name" [attr.title]="fileName">
+            {{fileName}}
         </div>
+        <div class="file-info">
+            {{fileInfo}}
+        </div>
+    </div>
 
-        <div *ngIf="progress > 0">
-            <sqx-progress-bar class="upload-progress" style="width: 120px; height: 120px" mode="Circle" [value]="progress"></sqx-progress-bar>
-        </div>
-        <div class="drop-overlay">
-            <div class="drop-overlay-background"></div>
+    <div class="upload-progress" *ngIf="progress > 0">
+        <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
+    </div>
 
-            <span class="drop-overlay-text">Drop to update</span>
-        </div>
+    <div class="drop-overlay">
+        <div class="drop-overlay-background"></div>
+
+        <span class="drop-overlay-text">Drop to update</span>
     </div>
 </div>
 

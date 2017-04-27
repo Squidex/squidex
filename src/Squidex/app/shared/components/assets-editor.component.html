@@ -1,5 +1,11 @@
-<div class="assets-container" (sqxFileDrop)="addFiles($event)" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)">
+<div class="assets-container">
     <div class="row">
+        <div class="col-4 drop-area-container">
+            <div class="drop-area" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)" (sqxFileDrop)="addFiles($event)">
+                Drop files or assets here to add them.
+            </div>
+        </div>
+
         <sqx-asset class="col-4" *ngFor="let file of newAssets" [initFile]="file" 
             (failed)="onAssetFailed(file)" 
             (loaded)="onAssetLoaded(file, $event)">

@@ -27,7 +27,7 @@ export class ResolveSchemaGuard implements Resolve<SchemaDetailsDto> {
         }
 
         const result =
-            this.schemasService.getSchema(appName, schemaName, null).toPromise()
+            this.schemasService.getSchema(appName, schemaName).toPromise()
                 .then(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
@@ -51,7 +51,7 @@ export class ResolveSchemaGuard implements Resolve<SchemaDetailsDto> {
         while (route) {
             result = route.params[name];
 
-            if (result) {
+            if (result || !route.parent) {
                 break;
             }
 

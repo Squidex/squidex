@@ -48,11 +48,11 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public writeValue(value: any) {
-        if (!value) {
-            this.oldAssets = ImmutableArray.empty<AssetDto>();
-        } else {
+        this.oldAssets = ImmutableArray.empty<AssetDto>();
+
+        if (value) {
             this.appName()
-                .switchMap(app => this.assetsService.getAssets(app, 10000, 0, null, null, value))
+                .switchMap(app => this.assetsService.getAssets(app, 10000, 0, undefined, undefined, value))
                 .subscribe(dtos => {
                     this.oldAssets = ImmutableArray.of(dtos.items);
                 });
@@ -79,13 +79,13 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
 
     public onAssetLoaded(file: File, asset: AssetDto) {
         this.newAssets = this.newAssets.remove(file);
-        this.oldAssets = this.oldAssets.push(asset);
+        this.oldAssets = this.oldAssets.pushFront(asset);
 
         this.updateValue();
     }
 
     public onAssetDropped(asset: AssetDto) {
-        this.oldAssets = this.oldAssets.push(asset);
+        this.oldAssets = this.oldAssets.pushFront(asset);
 
         this.updateValue();
     }
@@ -99,7 +99,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     private updateValue() {
-        let ids = this.oldAssets.values.map(x => x.id);
+        let ids: string[] | null = this.oldAssets.values.map(x => x.id);
 
         if (ids.length === 0) {
             ids = null;

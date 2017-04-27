@@ -90,11 +90,7 @@
                         <sqx-json-editor [formControlName]="language"></sqx-json-editor>
                     </div>
                     <div *ngSwitchCase="'Assets'">
-                        <div class="assets-container">
-                            <sqx-assets-editor [formControlName]="language"></sqx-assets-editor>
-                            
-                            <a routerLink="assets" class="assets-link">Show Assets</a>
-                        </div>
+                        <sqx-assets-editor [formControlName]="language"></sqx-assets-editor>
                     </div>
                 </div>
             </div>

@@ -196,7 +196,7 @@ export class AuthService {
     private checkResponse(responseStream: Observable<Response>, version?: Version) {
         return responseStream
             .do((response: Response) => {
-                if (version && response.status.toString().indexOf('2') === 0) {
+                if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
                     const etag = response.headers.get('etag');
 
                     if (etag) {

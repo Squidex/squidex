@@ -221,12 +221,12 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         if (this.addFieldForm.valid) {
             this.addFieldForm.disable();
 
-            const properties = createProperties(this.addFieldForm.get('type').value);
+            const properties = createProperties(this.addFieldForm.get('type')!.value);
 
-            const requestDto = new AddFieldDto(this.addFieldForm.get('name').value, properties);
+            const requestDto = new AddFieldDto(this.addFieldForm.get('name')!.value, properties);
 
             const reset = () => {
-                this.addFieldForm.get('name').reset();
+                this.addFieldForm.get('name')!.reset();
                 this.addFieldForm.enable();
                 this.addFieldFormSubmitted = false;
             };
@@ -236,7 +236,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 .subscribe(dto => {
                     const newField =
                         new FieldDto(parseInt(dto.id, 10),
-                            this.addFieldForm.get('name').value,
+                            this.addFieldForm.get('name')!.value,
                             false,
                             false,
                             properties);

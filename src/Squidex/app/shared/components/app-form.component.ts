@@ -43,7 +43,7 @@ export class AppFormComponent {
         });
 
     public appName =
-        this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME)
+        this.createForm.get('name')!.valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);
 
     constructor(
@@ -64,7 +64,7 @@ export class AppFormComponent {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const request = new CreateAppDto(this.createForm.get('name').value);
+            const request = new CreateAppDto(this.createForm.get('name')!.value);
 
             this.appsStore.createApp(request)
                 .subscribe(dto => {

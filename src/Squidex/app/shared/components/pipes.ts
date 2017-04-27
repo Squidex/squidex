@@ -12,7 +12,7 @@ import { UsersProviderService } from './../declarations-base';
 
 class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;
-    private lastValue: string;
+    private lastValue: string | null = null;
     private subscription: Subscription;
 
     constructor(
@@ -27,7 +27,7 @@ class UserAsyncPipe implements OnDestroy {
         }
     }
 
-    protected transformInternal(userId: string, transform: (users: UsersProviderService) => Observable<string>): string {
+    protected transformInternal(userId: string, transform: (users: UsersProviderService) => Observable<string | null>): string | null {
         if (this.lastUserId !== userId) {
             this.lastUserId = userId;
 
@@ -55,7 +55,7 @@ export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string, placeholder = 'Me'): string {
+    public transform(userId: string, placeholder = 'Me'): string | null {
         return super.transformInternal(userId, users => users.getUser(userId, placeholder).map(u => u.displayName));
     }
 }
@@ -69,7 +69,7 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string, placeholder = 'Me'): string {
+    public transform(userId: string, placeholder = 'Me'): string | null {
         return super.transformInternal(userId, users => {
             const parts = userId.split(':');
 
@@ -95,7 +95,7 @@ export class UserEmailPipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string): string {
+    public transform(userId: string): string | null {
         return super.transformInternal(userId, users => users.getUser(userId).map(u => u.email));
     }
 }
@@ -109,14 +109,14 @@ export class UserEmailRefPipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string): string {
+    public transform(userId: string): string | null {
         return super.transformInternal(userId, users => {
             const parts = userId.split(':');
 
             if (parts[0] === 'subject') {
                 return users.getUser(parts[1]).map(u => u.email);
             } else {
-                return null;
+                return Observable.of(null);
             }
         });
     }
@@ -131,7 +131,7 @@ export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string): string {
+    public transform(userId: string): string | null {
         return super.transformInternal(userId, users => users.getUser(userId).map(u => u.pictureUrl));
     }
 }
@@ -145,7 +145,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string): string {
+    public transform(userId: string): string | null {
         return super.transformInternal(userId, users => {
              const parts = userId.split(':');
 

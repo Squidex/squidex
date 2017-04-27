@@ -44,7 +44,7 @@ export class AppLanguagesService {
     ) {
     }
 
-    public getLanguages(appName: string, version: Version): Observable<AppLanguageDto[]> {
+    public getLanguages(appName: string, version?: Version): Observable<AppLanguageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return this.authService.authGet(url, version)
@@ -62,7 +62,7 @@ export class AppLanguagesService {
                 .catchError('Failed to load languages. Please reload.');
     }
 
-    public postLanguages(appName: string, dto: AddAppLanguageDto, version: Version): Observable<AppLanguageDto> {
+    public postLanguages(appName: string, dto: AddAppLanguageDto, version?: Version): Observable<AppLanguageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return this.authService.authPost(url, dto, version)
@@ -76,14 +76,14 @@ export class AppLanguagesService {
                 .catchError('Failed to add language. Please reload.');
     }
 
-    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version: Version): Observable<any> {
+    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return this.authService.authPut(url, dto, version)
                 .catchError('Failed to change language. Please reload.');
     }
 
-    public deleteLanguage(appName: string, languageCode: string, version: Version): Observable<any> {
+    public deleteLanguage(appName: string, languageCode: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return this.authService.authDelete(url, version)

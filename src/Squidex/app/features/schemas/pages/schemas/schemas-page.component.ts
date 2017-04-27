@@ -112,7 +112,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         query = query || this.schemaQuery;
 
         if (query && query.length > 0) {
-            schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+            schemas = schemas.filter(t => t.name.indexOf(query!) >= 0);
         }
 
         schemas =

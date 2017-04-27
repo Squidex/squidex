@@ -89,7 +89,7 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query: string, mimeTypes: string[], ids: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
         let queries: string[] = [];
 
         if (mimeTypes && mimeTypes.length > 0) {
@@ -142,7 +142,7 @@ export class AssetsService {
 
             const content = new FormData();
             const headers = new Headers({
-                'Authorization': `${this.authService.user.user.token_type} ${this.authService.user.user.access_token}`
+                'Authorization': `${this.authService.user!.user.token_type} ${this.authService.user!.user.access_token}`
             });
 
             content.append('file', file);
@@ -173,7 +173,7 @@ export class AssetsService {
         });
     }
 
-    public getAsset(appName: string, id: string, version: Version): Observable<AssetDto> {
+    public getAsset(appName: string, id: string, version?: Version): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return this.authService.authGet(url)
@@ -203,7 +203,7 @@ export class AssetsService {
 
             const content = new FormData();
             const headers = new Headers({
-                'Authorization': `${this.authService.user.user.token_type} ${this.authService.user.user.access_token}`
+                'Authorization': `${this.authService.user!.user.token_type} ${this.authService.user!.user.access_token}`
             });
 
             if (version && version.value.length > 0) {
@@ -236,14 +236,14 @@ export class AssetsService {
         });
     }
 
-    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<any> {
+    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return this.authService.authPut(url, dto, version)
                 .catchError('Failed to delete asset. Please reload.');
     }
 
-    public deleteAsset(appName: string, id: string, version: Version): Observable<any> {
+    public deleteAsset(appName: string, id: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return this.authService.authDelete(url, version)

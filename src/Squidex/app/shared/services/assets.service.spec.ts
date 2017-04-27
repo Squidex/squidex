@@ -37,7 +37,7 @@ describe('AssetsService', () => {
             }
         };
 
-        progressHttp = Mock.ofInstance(new ProgressHttp(null, null, factory, null));
+        progressHttp = Mock.ofInstance(new ProgressHttp(null!, null!, factory, null!));
         progressHttp.setup(x => x.withUploadProgressListener(It.isAny())).returns(() => <any> progressHttp.object);
 
         authService = Mock.ofType(AuthService);
@@ -90,7 +90,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, null, null, null).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13).subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -151,7 +151,7 @@ describe('AssetsService', () => {
 
         let assets: AssetDto | null = null;
 
-        assetsService.getAsset('my-app', '123', null).subscribe(result => {
+        assetsService.getAsset('my-app', '123').subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -188,7 +188,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, 'my-query', null, null).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, 'my-query').subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -211,7 +211,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, null, ['text/plain', 'image/png'], null).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, undefined, ['text/plain', 'image/png']).subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -234,7 +234,7 @@ describe('AssetsService', () => {
 
         let assets: AssetsDto | null = null;
 
-        assetsService.getAssets('my-app', 17, 13, null, null, ['12', '23']).subscribe(result => {
+        assetsService.getAssets('my-app', 17, 13, undefined, undefined, ['12', '23']).subscribe(result => {
             assets = result;
         }).unsubscribe();
 
@@ -264,7 +264,7 @@ describe('AssetsService', () => {
 
         let asset: AssetCreatedDto | null = null;
 
-        assetsService.uploadFile('my-app', null).subscribe(result => {
+        assetsService.uploadFile('my-app', null!).subscribe(result => {
             asset = <AssetCreatedDto>result;
         });
 
@@ -303,7 +303,7 @@ describe('AssetsService', () => {
 
         let asset: AssetReplacedDto | null = null;
 
-        assetsService.replaceFile('my-app', '123', null, version).subscribe(result => {
+        assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
             asset = <AssetReplacedDto>result;
         });
 

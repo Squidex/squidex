@@ -40,9 +40,12 @@
                     <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
                 </div>
             </div>
-            <div class="panel-sidebar" *ngIf="!isNewMode">
-                <a class="panel-link" routerLink="history" routerLinkActive="active">
+            <div class="panel-sidebar">
+                <a class="panel-link" routerLink="history" routerLinkActive="active" *ngIf="!isNewMode">
                     <i class="icon-time"></i>
+                </a>
+                <a class="panel-link" routerLink="assets" routerLinkActive="active">
+                    <i class="icon-media"></i>
                 </a>
             </div>
         </div>

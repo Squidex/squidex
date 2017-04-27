@@ -38,7 +38,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
@@ -54,7 +54,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema loading fails', (done) => {
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.throw(null));
         const router = new RouterMockup();
 
@@ -72,7 +72,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     it('should navigate to 404 page if schema not published', (done) => {
         const schema = { isPublished: false };
 
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 
@@ -90,7 +90,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     it('should return schema if loading succeeded', (done) => {
         const schema = { isPublished: true };
 
-        schemasService.setup(x => x.getSchema('my-app', 'my-schema', null))
+        schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));
         const router = new RouterMockup();
 

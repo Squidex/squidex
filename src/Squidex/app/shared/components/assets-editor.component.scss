@@ -4,29 +4,47 @@
 .assets {
     &-container {
         & {
-            border: 2px solid $color-input;
-            background: $color-input;
+            background: $color-background;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: scroll;
             padding: 1rem;
             padding-bottom: 0;
-            height: 240px;
-        }
-
-        &.drag {
-            border-color: darken($color-border, 10%);
-            border-style: dashed;
-            cursor: copy;
+            height: $asset-height + 2rem;
         }
     }
 }
 
+.drop-area {
+    & {
+        @include transition(border-color .4s ease);
+        border: 2px dashed $color-border;
+        height: $asset-height;
+        font-size: 1.2rem;
+        font-weight: normal;
+        text-align: center;
+        padding: 3rem 2rem;
+        color: darken($color-border, 30%);
+    }
+
+    &-container {
+        padding-bottom: 1rem;
+    }
+
+    &.drag,
+    &.dnd-drag-over,
+    &.dnd-drag-enter {
+        border-color: darken($color-border, 10%);
+        cursor: copy;
+        color: darken($color-border, 40%);
+    }
+}
+
 .row {
-    margin-left: -8px;
-    margin-right: -8px;
+    margin-left: -.5rem;
+    margin-right: -.5rem;
 }
 
 .col-4 {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: .5rem;
+    padding-right: .5rem;
 }

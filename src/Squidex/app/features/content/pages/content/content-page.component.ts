@@ -46,7 +46,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
     public contentData: any = null;
-    public contentId: string;
+    public contentId: string | undefined;
 
     public isNewMode = true;
 
@@ -75,12 +75,12 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     }
                 });
 
-        this.route.parent.data.map(p => p['appLanguages'])
+        this.route.parent!.data.map(p => p['appLanguages'])
             .subscribe((languages: AppLanguageDto[]) => {
                 this.languages = languages;
             });
 
-        this.route.parent.data.map(p => p['schema'])
+        this.route.parent!.data.map(p => p['schema'])
             .subscribe((schema: SchemaDetailsDto) => {
                 this.setupForm(schema);
             });
@@ -125,9 +125,9 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
                     });
             } else {
                 this.appName()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId, data, this.version))
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, data, this.version))
                     .subscribe(() => {
-                        this.messageBus.publish(new ContentUpdated(this.contentId, data, this.version.value));
+                        this.messageBus.publish(new ContentUpdated(this.contentId!, data, this.version.value));
 
                         this.notifyInfo('Content saved successfully.');
                         this.enable();

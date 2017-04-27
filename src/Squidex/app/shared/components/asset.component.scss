@@ -9,7 +9,7 @@
 
 @mixin overlay {
     & {
-        @include transition(opacity.4s ease);
+        @include transition(opacity .4s ease);
         @include absolute(0, 0, 0, 0);
         @include opacity(0);
         color: $color-dark-foreground;
@@ -70,6 +70,7 @@
 .card {
     & {
         @include overlay-container;
+        height: $asset-height;
     }
 
     &.drag {
@@ -92,7 +93,7 @@
 }
 
 .upload-progress {
-    margin: 60px 70px;
+    @include absolute(2rem, 2rem, 2rem, 2rem);
 }
 
 .file {

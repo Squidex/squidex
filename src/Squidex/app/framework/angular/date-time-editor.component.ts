@@ -156,7 +156,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
     }
 
     private updateValue() {
-        let result: string = null;
+        let result: string | null = null;
 
         if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
             result = 'Invalid DateTime';

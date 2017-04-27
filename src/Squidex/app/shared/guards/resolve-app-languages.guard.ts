@@ -26,7 +26,7 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
         }
 
         const result =
-            this.appLanguagesService.getLanguages(appName, null).toPromise()
+            this.appLanguagesService.getLanguages(appName).toPromise()
                 .then(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
@@ -50,7 +50,7 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
         while (route) {
             result = route.params[name];
 
-            if (result) {
+            if (result || !route.parent) {
                 break;
             }
 

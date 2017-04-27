@@ -53,7 +53,7 @@ export class SchemaFormComponent {
         });
 
     public schemaName =
-        this.createForm.get('name').valueChanges.map(n => n || FALLBACK_NAME)
+        this.createForm.get('name')!.valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);
 
     constructor(
@@ -76,7 +76,7 @@ export class SchemaFormComponent {
             this.createForm.disable();
 
             const schemaVersion = new Version();
-            const schemaName = this.createForm.get('name').value;
+            const schemaName = this.createForm.get('name')!.value;
 
             const requestDto = new CreateSchemaDto(schemaName);
 

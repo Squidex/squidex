@@ -43,7 +43,7 @@ export class UsersDataSource implements AutocompleteSource {
                             new AutocompleteItem(
                                 user.displayName,
                                 user.email,
-                                user.pictureUrl,
+                                user.pictureUrl!,
                                 user));
                     }
                 }
@@ -117,7 +117,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public assignContributor() {
-        const newContributor = new AppContributorDto(this.addContributorForm.get('user').value.model.id, 'Editor');
+        const newContributor = new AppContributorDto(this.addContributorForm.get('user')!.value.model.id, 'Editor');
 
         this.appName()
             .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))

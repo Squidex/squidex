@@ -22,8 +22,9 @@ export class FileDropDirective {
     ) {
     }
 
+    @HostListener('dragend', ['$event'])
     @HostListener('dragleave', ['$event'])
-    public onDragLeave(event: DragDropEvent) {
+    public onDragEnd(event: DragDropEvent) {
         const hasFiles = this.hasFiles(event.dataTransfer.types);
 
         if (hasFiles) {

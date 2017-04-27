@@ -56,7 +56,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
 
     private load() {
         this.appName()
-            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery, null, null))
+            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery))
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
                 this.assetsPager = this.assetsPager.setCount(dtos.total);

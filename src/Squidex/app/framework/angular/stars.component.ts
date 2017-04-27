@@ -84,7 +84,7 @@ export class StarsComponent implements ControlValueAccessor {
             return;
         }
 
-        this.stars = this.value;
+        this.stars = this.value || 0;
     }
 
     public reset() {

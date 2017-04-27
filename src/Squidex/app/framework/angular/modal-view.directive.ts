@@ -14,7 +14,7 @@ import { ModalView } from './../utils/modal-view';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
-    private subscription: Subscription;
+    private subscription: Subscription | null;
     private isEnabled = true;
     private clickHandler: Function | null;
     private renderedView: EmbeddedViewRef<any> | null = null;

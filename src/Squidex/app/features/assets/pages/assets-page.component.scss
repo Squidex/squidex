@@ -23,7 +23,7 @@
     }
 
     &-info {
-        color: $color-subtext;
+        color: darken($color-border, 30%);
     }
 
     &-button {
@@ -52,8 +52,4 @@
 .col-3 {
     padding-left: 8px;
     padding-right: 8px;
-}
-
-.dnd-sortable-drag {
-    border: 0;
 }

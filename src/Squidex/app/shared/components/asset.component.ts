@@ -109,8 +109,6 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                             result.pixelWidth,
                             result.pixelHeight,
                             result.version);
-                        this.updateAsset(asset);
-
                         this.loaded.emit(asset);
                     } else {
                         this.progress = result;

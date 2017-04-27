@@ -26,7 +26,7 @@ export class UserDto {
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly pictureUrl: string,
+        public readonly pictureUrl: string | null,
         public readonly isLocked: boolean
     ) {
     }

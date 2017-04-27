@@ -63,7 +63,7 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto | null = null;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, null).subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13).subscribe(result => {
             contents = result;
         }).unsubscribe();
 

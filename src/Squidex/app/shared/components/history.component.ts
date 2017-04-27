@@ -31,7 +31,7 @@ const REPLACEMENT_TEMP = '$TEMP$';
 export class HistoryComponent extends AppComponentBase {
     public get channel(): string {
         let result = this.route.snapshot.data['channel'];
-        let params = this.route.parent.snapshot.params;
+        let params = this.route.parent!.snapshot.params;
 
         for (let key in params) {
             if (params.hasOwnProperty(key)) {
