@@ -5,4 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { AssetDto } from './../services/assets.service';
+
 export class HistoryChannelUpdated { }
+
+export class AssetUpdated {
+    constructor(
+        public readonly assetDto: AssetDto,
+        public readonly sender: any
+    ) {
+    }
+}

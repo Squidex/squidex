@@ -58,7 +58,10 @@ namespace Squidex.Read.MongoDb.Assets
 
         protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
         {
-            return Collection.DeleteOneAsync(Filter.Eq(x => x.Id, @event.AssetId));
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.IsDeleted = true;
+            });
         }
     }
 }

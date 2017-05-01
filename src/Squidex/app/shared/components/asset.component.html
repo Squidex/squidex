@@ -22,16 +22,12 @@
                     <i class="icon-download"></i>
                 </a>
 
-                <span *ngIf="!closeMode">
-                    <a class="file-delete" (click)="deleting.emit(asset)">
-                        <i class="icon-delete"></i>
-                    </a>
-                </span>
-                <span *ngIf="closeMode">
-                    <a class="file-delete" (click)="closing.emit(asset)">
-                        <i class="icon-close"></i>
-                    </a>
-                </span>
+                <a class="file-delete" (click)="deleting.emit(asset)" *ngIf="!closeMode">
+                    <i class="icon-delete"></i>
+                </a>
+                <a class="file-delete" (click)="closing.emit(asset)" *ngIf="closeMode">
+                    <i class="icon-close"></i>
+                </a>
 
                 <span class="file-overlay-type" *ngIf="fileType">
                     {{fileType}}
@@ -45,7 +41,7 @@
             </div>
         </div>
     </div>
-    <div class="card-footer" dnd-draggable-handle>
+    <div class="card-footer" dnd-draggable-handle *ngIf="asset && progress == 0">
         <div class="file-name" [attr.title]="fileName">
             {{fileName}}
         </div>
@@ -58,7 +54,7 @@
         <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
     </div>
 
-    <div class="drop-overlay">
+    <div class="drop-overlay" *ngIf="asset && progress == 0">
         <div class="drop-overlay-background"></div>
 
         <span class="drop-overlay-text">Drop to update</span>

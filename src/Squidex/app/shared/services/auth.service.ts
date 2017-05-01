@@ -7,7 +7,6 @@
 
 import { Injectable } from '@angular/core';
 import { Headers, Http, RequestOptions, Response } from '@angular/http';
-import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -67,8 +66,7 @@ export class AuthService {
     }
 
     constructor(apiUrl: ApiUrlConfig,
-        private readonly http: Http,
-        private readonly router: Router
+        private readonly http: Http
     ) {
         if (!apiUrl) {
             return;
@@ -205,14 +203,16 @@ export class AuthService {
                 }
             })
             .catch((error: Response) => {
-                if (error.status === 401) {
+                if (error.status >= 401 && error.status <= 404 && (!this.user || this.user.user.expired)) {
+                    this.logoutRedirect();
+
+                    return Observable.empty<Response>();
+                } else if (error.status === 401) {
                     this.logoutRedirect();
 
                     return Observable.empty<Response>();
                 } else if (error.status === 403) {
-                    this.router.navigate(['/404']);
-
-                    return Observable.empty<Response>();
+                    error.status = 404;
                 }
                 return Observable.throw(error);
             });

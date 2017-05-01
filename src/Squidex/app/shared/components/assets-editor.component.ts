@@ -7,8 +7,9 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef } from '@angular/core';
+import { Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { AppComponentBase } from './app.component-base';
 
@@ -16,7 +17,9 @@ import {
     AppsStoreService,
     AssetDto,
     AssetsService,
+    AssetUpdated,
     ImmutableArray,
+    MessageBus,
     NotificationService
 } from './../declarations-base';
 
@@ -32,7 +35,9 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './assets-editor.component.html',
     providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor {
+export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
+    private assetUpdatedSubscription: Subscription;
+
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
 
@@ -42,9 +47,24 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     public isDisabled = false;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly messageBus: MessageBus
     ) {
         super(notifications, apps);
+    }
+
+    public ngOnInit() {
+        this.assetUpdatedSubscription =
+            this.messageBus.of(AssetUpdated)
+                .subscribe(event => {
+                    if (event.sender !== this) {
+                        this.oldAssets = this.oldAssets.map(x => x.id === event.assetDto.id ? event.assetDto : x);
+                    }
+                });
+    }
+
+    public ngOnDestroy() {
+        this.assetUpdatedSubscription.unsubscribe();
     }
 
     public writeValue(value: any) {
@@ -88,6 +108,10 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         this.oldAssets = this.oldAssets.pushFront(asset);
 
         this.updateValue();
+    }
+
+    public onAssetUpdated(asset: AssetDto) {
+        this.messageBus.publish(new AssetUpdated(asset, this));
     }
 
     public onAssetRemoving(asset: AssetDto) {

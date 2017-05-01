@@ -64,6 +64,9 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public closing = new EventEmitter<AssetDto>();
 
     @Output()
+    public updated = new EventEmitter<AssetDto>();
+
+    @Output()
     public deleting = new EventEmitter<AssetDto>();
 
     @Output()
@@ -119,7 +122,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                     this.notifyError(error);
                 });
         } else {
-            this.updateAsset(this.asset);
+            this.updateAsset(this.asset, false);
         }
     }
 
@@ -143,7 +146,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                             result.pixelWidth,
                             result.pixelHeight,
                             result.version);
-                        this.updateAsset(asset);
+                        this.updateAsset(asset, true);
                     } else {
                         this.progress = result;
                     }
@@ -181,7 +184,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                         this.asset.pixelHeight,
                         this.asset.version);
 
-                    this.updateAsset(asset);
+                    this.updateAsset(asset, true);
                     this.resetRename();
                 }, error => {
                     this.notifyError(error);
@@ -198,7 +201,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         this.renameDialog.hide();
     }
 
-    private updateAsset(asset: AssetDto) {
+    private updateAsset(asset: AssetDto, emitEvent: boolean) {
         this.asset = asset;
         this.fileUrl = FileHelper.assetUrl(this.apiUrl, asset);
         this.fileInfo = FileHelper.assetInfo(asset);
@@ -208,6 +211,10 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         this.progress = 0;
         this.previewUrl = FileHelper.assetPreviewUrl(this.apiUrl, asset);
         this.version = asset.version;
+
+        if (emitEvent) {
+            this.updated.emit(asset);
+        }
 
         this.resetRename();
     }

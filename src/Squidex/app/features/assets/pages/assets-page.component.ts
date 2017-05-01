@@ -7,16 +7,19 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import {
     AppComponentBase,
     AppsStoreService,
     AssetDto,
     AssetsService,
+    AssetUpdated,
     fadeAnimation,
     ImmutableArray,
+    MessageBus,
     NotificationService,
     Pager
 } from 'shared';
@@ -29,7 +32,9 @@ import {
         fadeAnimation
     ]
 })
-export class AssetsPageComponent extends AppComponentBase implements OnInit {
+export class AssetsPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private assetUpdatedSubscription: Subscription;
+
     public newFiles = ImmutableArray.empty<File>();
 
     public assetsItems = ImmutableArray.empty<AssetDto>();
@@ -38,13 +43,26 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
     public assertQuery = '';
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly messageBus: MessageBus
     ) {
         super(notifications, apps);
     }
 
     public ngOnInit() {
+        this.assetUpdatedSubscription =
+            this.messageBus.of(AssetUpdated)
+                .subscribe(event => {
+                    if (event.sender !== this) {
+                        this.assetsItems = this.assetsItems.map(x => x.id === event.assetDto.id ? event.assetDto : x);
+                    }
+                });
+
         this.load();
+    }
+
+    public ngOnDestroy() {
+        this.assetUpdatedSubscription.unsubscribe();
     }
 
     public search() {
@@ -81,6 +99,10 @@ export class AssetsPageComponent extends AppComponentBase implements OnInit {
 
         this.assetsItems = this.assetsItems.pushFront(asset);
         this.assetsPager = this.assetsPager.incrementCount();
+    }
+
+    public onAssetUpdated(asset: AssetDto) {
+        this.messageBus.publish(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {

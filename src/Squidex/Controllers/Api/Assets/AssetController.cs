@@ -17,7 +17,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
-using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -122,7 +121,7 @@ namespace Squidex.Controllers.Api.Assets
         {
             var entity = await assetRepository.FindAssetAsync(id);
 
-            if (entity == null)
+            if (entity == null || entity.IsDeleted)
             {
                 return NotFound();
             }

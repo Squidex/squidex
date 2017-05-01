@@ -9,8 +9,19 @@ $field-header: #e7ebef;
 
 .field {
     &-summary {
-        padding: 1rem 1.25rem;
+        padding: 1rem 1.25rem 1rem 1.5rem;
+        position: relative;
         line-height: 2.5rem;
+    }
+
+    &-drag {
+        @include absolute(0, auto, 0, 0);
+        z-index: 1000;
+        font-size: 1.4rem;
+        font-weight: normal;
+        line-height: 4.8rem;
+        cursor: move;
+        color: $color-border;
     }
 
     &-icon {

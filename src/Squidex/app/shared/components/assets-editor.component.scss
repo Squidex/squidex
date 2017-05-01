@@ -17,6 +17,7 @@
 .drop-area {
     & {
         @include transition(border-color .4s ease);
+        @include border-radius;
         border: 2px dashed $color-border;
         height: $asset-height;
         font-size: 1.2rem;

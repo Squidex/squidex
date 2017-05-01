@@ -34,7 +34,7 @@ namespace Squidex.Read.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.LastModified).Ascending(x => x.AppId).Ascending(x => x.FileName).Ascending(x => x.MimeType));
+            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId).Ascending(x => x.IsDeleted).Descending(x => x.LastModified).Ascending(x => x.FileName).Ascending(x => x.MimeType));
         }
 
         public async Task<bool> IsValidAsync(Guid assetId)
@@ -74,7 +74,8 @@ namespace Squidex.Read.MongoDb.Assets
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.AppId, appId)
+                Filter.Eq(x => x.AppId, appId),
+                Filter.Eq(x => x.IsDeleted, false)
             };
 
             if (ids != null && ids.Count > 0)

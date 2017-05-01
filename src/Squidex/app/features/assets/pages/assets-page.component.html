@@ -41,7 +41,8 @@
                     (loaded)="onAssetLoaded(file, $event)">
                 </sqx-asset>
                 <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"
-                    (deleting)="onAssetDeleting($event)">
+                    (deleting)="onAssetDeleting($event)"
+                    (updated)="onAssetUpdated($event)">
                 </sqx-asset>
             </div>
 
