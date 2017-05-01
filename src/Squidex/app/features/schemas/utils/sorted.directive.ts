@@ -18,6 +18,8 @@ import {
     selector: '[sorted]'
 })
 export class SortedDirective {
+    private oldArray: any[];
+
     @Output()
     public sorted = new EventEmitter<Array<any>>();
 
@@ -26,13 +28,31 @@ export class SortedDirective {
         sortableContainer: SortableContainer,
         sortableDragDropService: DragDropSortableService
     ) {
-        const oldCallback = sortableComponent._onDropCallback.bind(sortableComponent);
+        const oldDragStartCallback = sortableComponent._onDragStartCallback.bind(sortableComponent);
+
+        sortableComponent._onDragStartCallback = (event: Event) => {
+            oldDragStartCallback();
+
+            this.oldArray = [...sortableContainer.sortableData];
+        };
+
+        const oldDropCallback = sortableComponent._onDropCallback.bind(sortableComponent);
 
         sortableComponent._onDropCallback = (event: Event) => {
-            oldCallback(event);
+            oldDropCallback(event);
 
             if (sortableDragDropService.isDragged) {
-                this.sorted.emit(sortableContainer.sortableData);
+                const newArray = sortableContainer.sortableData;
+                const oldArray = this.oldArray;
+
+                if (newArray && oldArray && newArray.length === oldArray.length) {
+                    for (let i = 0; i < oldArray.length; i++) {
+                        if (oldArray[i] !== newArray[i]) {
+                            this.sorted.emit(newArray);
+                            break;
+                        }
+                    }
+                }
             }
         };
     }
