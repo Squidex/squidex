@@ -190,7 +190,7 @@ describe('SchemasService', () => {
                     new FieldDto(4, 'field4', true, true, createProperties('DateTime')),
                     new FieldDto(5, 'field5', true, true, createProperties('Json')),
                     new FieldDto(6, 'field6', true, true, createProperties('Geolocation')),
-                    new FieldDto(6, 'field6', true, true, createProperties('Assets'))
+                    new FieldDto(7, 'field7', true, true, createProperties('Assets'))
                 ]));
 
         authService.verifyAll();
