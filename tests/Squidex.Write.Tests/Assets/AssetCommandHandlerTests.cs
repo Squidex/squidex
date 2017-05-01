@@ -44,7 +44,7 @@ namespace Squidex.Write.Assets
         [Fact]
         public async Task Create_should_create_asset()
         {
-            SetupStore(1);
+            SetupStore(0);
             SetupImageInfo();
 
             var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
@@ -63,7 +63,7 @@ namespace Squidex.Write.Assets
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            SetupStore(2);
+            SetupStore(1);
             SetupImageInfo();
 
             CreateAsset();
