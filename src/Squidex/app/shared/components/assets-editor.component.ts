@@ -110,12 +110,14 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         this.updateValue();
     }
 
-    public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.publish(new AssetUpdated(asset, this));
-    }
-
     public onAssetRemoving(asset: AssetDto) {
         this.oldAssets = this.oldAssets.remove(asset);
+
+        this.updateValue();
+    }
+
+    public onAssetUpdated(asset: AssetDto) {
+        this.messageBus.publish(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {
