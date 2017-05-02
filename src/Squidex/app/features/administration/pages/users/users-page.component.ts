@@ -51,7 +51,7 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
         this.load();
     }
 
-    private load(showInfo = false) {
+    public load(showInfo = false) {
         this.userManagementService.getUsers(this.usersPager.pageSize, this.usersPager.skip, this.usersQuery)
             .subscribe(dtos => {
                 this.usersItems = ImmutableArray.of(dtos.items);

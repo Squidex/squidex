@@ -159,7 +159,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         }
     }
 
-    private load(showInfo = false) {
+    public load(showInfo = false) {
         this.appName()
             .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
                .subscribe(dtos => {

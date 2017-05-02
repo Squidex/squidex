@@ -72,7 +72,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
         this.load();
     }
 
-    private load(showInfo = false) {
+    public load(showInfo = false) {
         this.appName()
             .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery))
             .subscribe(dtos => {
