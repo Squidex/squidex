@@ -31,7 +31,6 @@ namespace Squidex.Infrastructure.Log.Internal
                 outputBuilder.Append(message);
                 outputBuilder.Append("\x1B[39m\x1B[22m");
                 outputBuilder.AppendLine();
-                outputBuilder.Clear();
 
                 if (logToStdError)
                 {
@@ -41,6 +40,8 @@ namespace Squidex.Infrastructure.Log.Internal
                 {
                     Console.Out.WriteLine(outputBuilder.ToString());
                 }
+
+                outputBuilder.Clear();
             }
             else
             {
