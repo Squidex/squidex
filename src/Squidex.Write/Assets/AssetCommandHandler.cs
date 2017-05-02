@@ -44,7 +44,7 @@ namespace Squidex.Write.Assets
 
                 c.Create(command);
 
-                await assetStore.UploadAsync(c.Id, c.Version, null, command.File.OpenRead());
+                await assetStore.UploadAsync(c.Id, c.FileVersion, null, command.File.OpenRead());
 
                 context.Succeed(EntityCreatedResult.Create(c.Id, c.Version));
             });
@@ -58,7 +58,7 @@ namespace Squidex.Write.Assets
 
                 c.Update(command);
 
-                await assetStore.UploadAsync(c.Id, c.Version, null, command.File.OpenRead());
+                await assetStore.UploadAsync(c.Id, c.FileVersion, null, command.File.OpenRead());
             });
         }
 

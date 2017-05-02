@@ -22,7 +22,7 @@ namespace Squidex.Write.Assets
     public class AssetDomainObject : DomainObjectBase
     {
         private bool isDeleted;
-        private long fileVersion;
+        private long fileVersion = -1;
         private string fileName;
 
         public bool IsDeleted
@@ -33,6 +33,11 @@ namespace Squidex.Write.Assets
         public string FileName
         {
             get { return fileName; }
+        }
+
+        public long FileVersion
+        {
+            get { return fileVersion; }
         }
 
         public AssetDomainObject(Guid id, int version) 

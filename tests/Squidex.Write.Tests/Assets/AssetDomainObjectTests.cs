@@ -56,7 +56,7 @@ namespace Squidex.Write.Assets
                         IsImage = true,
                         FileName = file.FileName,
                         FileSize = file.FileSize,
-                        FileVersion = 1,
+                        FileVersion = 0,
                         MimeType = file.MimeType,
                         PixelWidth = image.PixelWidth,
                         PixelHeight = image.PixelHeight
@@ -98,7 +98,7 @@ namespace Squidex.Write.Assets
                     {
                         IsImage = true,
                         FileSize = file.FileSize,
-                        FileVersion = 2,
+                        FileVersion = 1,
                         MimeType = file.MimeType,
                         PixelWidth = image.PixelWidth,
                         PixelHeight = image.PixelHeight
