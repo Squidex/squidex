@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Internal;
@@ -28,8 +29,10 @@ namespace Squidex.Pipeline
 
                 await result.Callback(context.HttpContext.Response.Body);
             }
-            catch
+            catch (Exception e)
             {
+                Logger.LogCritical(new EventId(99), e, "Failed to send result.");
+
                 context.HttpContext.Response.Headers.Clear();
                 context.HttpContext.Response.StatusCode = 404;
             }
