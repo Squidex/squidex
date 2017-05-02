@@ -43,6 +43,8 @@ export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
     }
 
     public ngOnInit() {
+        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'inline-block');
+
         if (this.parent === null) {
             this.parent = this.element.nativeElement.parentElement;
         }
