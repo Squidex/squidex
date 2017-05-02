@@ -46,7 +46,7 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
     public contentData: any = null;
-    public contentId: string | undefined;
+    public contentId: string | null = null;
 
     public isNewMode = true;
 

@@ -14,7 +14,7 @@ import { MathHelper } from './../utils/math-helper';
 })
 export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
     private retries = 0;
-    private query = MathHelper.guid();
+    private query: string | null = null;
 
     @Input('sqxImageSource')
     public imageSource: string;
@@ -32,6 +32,7 @@ export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
     }
 
     public ngOnChanges() {
+        this.query = null;
         this.retries = 0;
 
         this.setImageSource();
@@ -86,7 +87,11 @@ export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
         const h = Math.round(size.height);
 
         if (w > 0 && h > 0) {
-            const source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop&q=${this.query}`;
+            let source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop`;
+
+            if (this.query !== null) {
+                source += `q=${this.query}`;
+            }
 
             this.renderer.setElementAttribute(this.element.nativeElement, 'src', source);
         }

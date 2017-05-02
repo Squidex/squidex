@@ -51,11 +51,15 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
         this.load();
     }
 
-    private load() {
+    private load(showInfo = false) {
         this.userManagementService.getUsers(this.usersPager.pageSize, this.usersPager.skip, this.usersQuery)
             .subscribe(dtos => {
                 this.usersItems = ImmutableArray.of(dtos.items);
                 this.usersPager = this.usersPager.setCount(dtos.total);
+
+                if (showInfo) {
+                    this.notifyInfo('Users reloaded.');
+                }
             }, error => {
                 this.notifyError(error);
             });

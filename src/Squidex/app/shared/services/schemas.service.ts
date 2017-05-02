@@ -71,7 +71,7 @@ export class SchemaDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly label: string | undefined,
+        public readonly label: string | null,
         public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
@@ -113,9 +113,9 @@ export class FieldDto {
 export abstract class FieldPropertiesDto {
     constructor(
         public readonly fieldType: string,
-        public readonly label: string | undefined,
-        public readonly hints: string | undefined,
-        public readonly placeholder: string | undefined,
+        public readonly label: string | null,
+        public readonly hints: string | null,
+        public readonly placeholder: string | null,
         public readonly isRequired: boolean,
         public readonly isListField: boolean,
         public readonly isLocalizable: boolean
@@ -124,7 +124,7 @@ export abstract class FieldPropertiesDto {
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean,
@@ -141,7 +141,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean,
@@ -156,7 +156,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean,
@@ -171,7 +171,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean,
@@ -183,7 +183,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean,
@@ -194,7 +194,7 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean
@@ -204,7 +204,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class JsonFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | undefined, hints: string | undefined, placeholder: string | undefined,
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
         isLocalizable: boolean

@@ -15,8 +15,11 @@ import { RouterMockup } from './router-mockup';
 
 describe('ResolveAppLanguagesGuard', () => {
     const route = {
-        params: {
-            appName: 'my-app'
+        params: { },
+        parent: {
+            params: {
+                appName: 'my-app'
+            }
         }
     };
 
@@ -64,7 +67,7 @@ describe('ResolveAppLanguagesGuard', () => {
             });
     });
 
-    it('should return schema if loading succeeded', (done) => {
+    it('should return languages if loading succeeded', (done) => {
         const languages: AppLanguageDto[] = [];
 
         appLanguagesService.setup(x => x.getLanguages('my-app'))

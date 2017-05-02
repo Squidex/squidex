@@ -74,7 +74,7 @@ describe('ResolveContentGuard', () => {
             });
     });
 
-    it('should return schema if loading succeeded', (done) => {
+    it('should return content if loading succeeded', (done) => {
         const schema = {};
 
         appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))

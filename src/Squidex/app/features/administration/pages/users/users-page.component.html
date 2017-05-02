@@ -4,6 +4,12 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
+                <button class="btn btn-simple" (click)="load(true)" title="Refresh Users (CTRL + SHIFT + R)">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+
                 <form class="form-inline" (ngSubmit)="search()">
                     <input class="form-control" [formControl]="usersFilter" placeholder="Search for user" />
                 </form>

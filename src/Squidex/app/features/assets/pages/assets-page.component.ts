@@ -72,12 +72,16 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
         this.load();
     }
 
-    private load() {
+    private load(showInfo = false) {
         this.appName()
             .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery))
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
                 this.assetsPager = this.assetsPager.setCount(dtos.total);
+
+                if (showInfo) {
+                    this.notifyInfo('Assets reloaded.');
+                }
             }, error => {
                 this.notifyError(error);
             });

@@ -5,6 +5,10 @@
     text-align: right;
 }
 
+.form-inline {
+    display: inline-block;
+}
+
 .user {
     &-name,
     &-email {
