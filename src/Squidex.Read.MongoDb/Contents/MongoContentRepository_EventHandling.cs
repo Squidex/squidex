@@ -39,7 +39,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         public string EventsFilter
         {
-            get { return "^content-"; }
+            get { return "^(content-)|(schema-)"; }
         }
 
         public async Task ClearAsync()
