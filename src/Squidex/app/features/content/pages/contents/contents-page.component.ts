@@ -106,6 +106,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     private reset() {
         this.contentItems = ImmutableArray.empty<ContentDto>();
+        this.contentsQuery = '';
         this.contentsFilter.setValue('');
         this.contentsPager = new Pager(0);
 
