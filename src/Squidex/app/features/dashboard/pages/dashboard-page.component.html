@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div>
+    <div class="clearfix">
         <a class="card" [routerLink]="['schemas', { showDialog: true }]">
             <div class="card-block">
                 <div class="card-image">
@@ -50,5 +50,19 @@
                 <p class="card-text">Get the source code from Github and report bugs or ask for support.</p>
             </div>
         </a>
+    </div>
+
+    <div>
+        <div class="card card-big">
+            <div class="card-block">
+                <chart type="bar" [data]="chartCount" [options]="chartOptions"></chart>
+            </div>
+        </div>
+
+        <div class="card card-big">
+            <div class="card-block">
+                <chart type="bar" [data]="chartPerformance" [options]="chartOptions"></chart>
+            </div>
+        </div>
     </div>
 </div> 

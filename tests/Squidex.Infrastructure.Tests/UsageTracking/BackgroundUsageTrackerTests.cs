@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(dateFrom.AddDays(1), 10, 15),
                 new StoredUsage(dateFrom.AddDays(3), 13, 18),
                 new StoredUsage(dateFrom.AddDays(5), 15, 20),
-                new StoredUsage(dateFrom.AddDays(7), 17, 22),
+                new StoredUsage(dateFrom.AddDays(7), 17, 22)
             };
 
             usageStore.Setup(x => x.FindAsync("key", dateFrom, dateTo)).Returns(Task.FromResult(originalDate));
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(dateFrom.AddDays(4), 00, 00),
                 new StoredUsage(dateFrom.AddDays(5), 15, 20),
                 new StoredUsage(dateFrom.AddDays(6), 00, 00),
-                new StoredUsage(dateFrom.AddDays(7), 17, 22),
+                new StoredUsage(dateFrom.AddDays(7), 17, 22)
             });
         }
 

@@ -40,6 +40,7 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
+    UsagesService,
     UserEmailPipe,
     UserEmailRefPipe,
     UserNamePipe,
@@ -113,6 +114,7 @@ export class SqxSharedModule {
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
                 SchemasService,
+                UsagesService,
                 UserManagementService,
                 UsersProviderService,
                 UsersService

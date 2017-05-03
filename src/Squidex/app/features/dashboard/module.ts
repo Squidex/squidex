@@ -7,6 +7,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ChartModule } from 'angular2-chartjs';
 
 import { SqxFrameworkModule } from 'shared';
 
@@ -23,6 +24,7 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
+        ChartModule,
         SqxFrameworkModule,
         RouterModule.forChild(routes)
     ],

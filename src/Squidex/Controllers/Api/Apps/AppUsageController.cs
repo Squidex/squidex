@@ -58,11 +58,11 @@ namespace Squidex.Controllers.Api.Apps
                 return BadRequest();
             }
 
-            var entities = await usageTracker.FindAsync(App.Id.ToString(), fromDate, toDate);
+            var entities = await usageTracker.FindAsync(App.Id.ToString(), fromDate.Date, toDate.Date);
 
             var models = entities.Select(x =>
             {
-                var averageMs = x.TotalElapsedMs / x.TotalCount;
+                var averageMs = x.TotalCount == 0 ? 0 : x.TotalElapsedMs / x.TotalCount;
 
                 return new UsageDto { Date = x.Date, Count = x.TotalCount, AverageMs = averageMs };
             }).ToList();

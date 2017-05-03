@@ -12,8 +12,10 @@ import {
     AppComponentBase,
     AppsStoreService,
     AuthService,
+    DateTime,
     fadeAnimation,
-    NotificationService
+    NotificationService,
+    UsagesService
 } from 'shared';
 
 declare var _urq: any;
@@ -31,8 +33,13 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
 
     public profileDisplayName = '';
 
+    public chartCount: any;
+    public chartPerformance: any;
+    public chartOptions = { };
+
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly auth: AuthService
+        private readonly auth: AuthService,
+        private readonly usagesService: UsagesService
     ) {
         super(notifications, apps);
     }
@@ -42,6 +49,38 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     }
 
     public ngOnInit() {
+        this.appName()
+            .switchMap(app => this.usagesService.getUsages(app, DateTime.today().addDays(-30), DateTime.today()))
+            .subscribe(dtos => {
+                const usages: any[] = dtos.map(x => { return { date: x.date.toStringFormat('L'), count: x.count, averageMs: x.averageMs }; });
+
+                this.chartCount = {
+                    labels: usages.map(x => x.date),
+                    datasets: [
+                        {
+                            label: 'Number of API Calls',
+                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                            borderColor: 'rgba(61, 135, 213, 1)',
+                            borderWidth: 1,
+                            data: usages.map(x => x.count)
+                        }
+                    ]
+                };
+
+                this.chartPerformance = {
+                    labels: usages.map(x => x.date),
+                    datasets: [
+                        {
+                            label: 'API Performance (Milliseconds)',
+                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                            borderColor: 'rgba(61, 135, 213, 1)',
+                            borderWidth: 1,
+                            data: usages.map(x => x.averageMs)
+                        }
+                    ]
+                };
+            });
+
         this.authenticationSubscription =
             this.auth.isAuthenticated.subscribe(() => {
                 const user = this.auth.user;
