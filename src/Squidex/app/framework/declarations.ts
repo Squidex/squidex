@@ -7,7 +7,7 @@
 
 export * from './angular/animations';
 export * from './angular/autocomplete.component';
-export * from './angular/validators';
+export * from './angular/can-deactivate.guard';
 export * from './angular/cloak.directive';
 export * from './angular/control-errors.component';
 export * from './angular/copy.directive';
@@ -38,6 +38,7 @@ export * from './angular/tag-editor.component';
 export * from './angular/title.component';
 export * from './angular/toggle.component';
 export * from './angular/user-report.component';
+export * from './angular/validators';
 export * from './configurations';
 
 export * from './services/clipboard.service';

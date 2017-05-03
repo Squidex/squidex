@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 
 import {
     AutocompleteComponent,
+    CanDeactivateGuard,
     ClipboardService,
     CloakDirective,
     ControlErrorsComponent,
@@ -153,6 +154,7 @@ export class SqxFrameworkModule {
         return {
             ngModule: SqxFrameworkModule,
             providers: [
+                CanDeactivateGuard,
                 ClipboardService,
                 LocalStoreService,
                 MessageBus,

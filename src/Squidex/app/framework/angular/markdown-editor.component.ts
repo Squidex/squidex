@@ -81,7 +81,11 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             this.simplemde.codemirror.on('change', () => {
                 const value = this.simplemde.value();
 
-                this.changeCallback(value);
+                if (this.value !== value) {
+                    this.value = value;
+
+                    this.changeCallback(value);
+                }
             });
 
             this.simplemde.codemirror.on('blur', () => {

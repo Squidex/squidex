@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    CanDeactivateGuard,
     HistoryComponent,
     ResolveAppLanguagesGuard,
     ResolveContentGuard,
@@ -43,6 +44,7 @@ const routes: Routes = [
                     {
                         path: 'new',
                         component: ContentPageComponent,
+                        canDeactivate: [CanDeactivateGuard],
                         children: [
                             {
                                 path: 'assets',
@@ -52,6 +54,7 @@ const routes: Routes = [
                     }, {
                         path: ':contentId',
                         component: ContentPageComponent,
+                        canDeactivate: [CanDeactivateGuard],
                         resolve: {
                             content: ResolveContentGuard
                         },

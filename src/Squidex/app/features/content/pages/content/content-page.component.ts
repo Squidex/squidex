@@ -9,7 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
@@ -21,8 +21,11 @@ import {
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
+    CanComponentDeactivate,
     ContentDto,
     ContentsService,
+    fadeAnimation,
+    ModalView,
     MessageBus,
     NotificationService,
     NumberFieldPropertiesDto,
@@ -35,14 +38,19 @@ import {
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
-    templateUrl: './content-page.component.html'
+    templateUrl: './content-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
-export class ContentPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
     private version: Version = new Version('');
+    private cancelPromise: Subject<boolean> | null = null;
 
     public schema: SchemaDetailsDto;
 
+    public cancelDialog = new ModalView();
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
     public contentData: any = null;
@@ -89,6 +97,28 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
             .subscribe((content: ContentDto) => {
                 this.populateForm(content);
             });
+    }
+
+    public canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+        if (!this.contentForm.dirty) {
+            return true;
+        } else {
+            this.cancelDialog.show();
+
+            return this.cancelPromise = new Subject<boolean>();
+        }
+    }
+
+    public confirmLeave() {
+        this.cancelDialog.hide();
+        this.cancelPromise.next(true);
+        this.cancelPromise = null;
+    }
+
+    public cancelLeave() {
+        this.cancelDialog.hide();
+        this.cancelPromise.next(false);
+        this.cancelPromise = null;
     }
 
     public saveAndPublish() {
@@ -149,6 +179,8 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private enable() {
+        this.contentForm.markAsPristine();
+
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
             const fieldForm = this.contentForm.controls[field.name];
 
@@ -207,6 +239,8 @@ export class ContentPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private populateForm(content: ContentDto) {
+        this.contentForm.markAsPristine();
+
         if (!content) {
             this.contentData = undefined;
             this.contentId = undefined;

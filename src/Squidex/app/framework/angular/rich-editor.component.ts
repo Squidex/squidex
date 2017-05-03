@@ -75,7 +75,11 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                     self.tinyEditor.on('change', () => {
                         const value = editor.getContent();
 
-                        self.changeCallback(value);
+                        if (this.value !== value) {
+                            this.value = value;
+
+                            self.changeCallback(value);
+                        }
                     });
 
                     self.tinyEditor.on('blur', () => {

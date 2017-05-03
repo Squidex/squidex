@@ -92,11 +92,13 @@ export class StarsComponent implements ControlValueAccessor {
             return;
         }
 
-        this.value = null;
-        this.stars = 0;
+        if (this.value !== null) {
+            this.value = null;
+            this.stars = 0;
 
-        this.changeCallback(this.value);
-        this.touchedCallback();
+            this.changeCallback(this.value);
+            this.touchedCallback();
+        }
 
         return false;
     }
@@ -106,10 +108,12 @@ export class StarsComponent implements ControlValueAccessor {
             return;
         }
 
-        this.value = this.stars = value;
+        if (this.value !== value) {
+            this.value = this.stars = value;
 
-        this.changeCallback(this.value);
-        this.touchedCallback();
+            this.changeCallback(this.value);
+            this.touchedCallback();
+        }
 
         return false;
     }
