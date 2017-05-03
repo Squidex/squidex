@@ -6,20 +6,23 @@
             <div class="panel-title-row">
                 <div class="float-right">
                     <span *ngIf="isNewMode">
-                        <button type="button" class="btn btn-default" (click)="saveAsDraft()">
+                        <button type="button" class="btn btn-default" (click)="saveAsDraft()" title="CTRL + S">
                             Save as Draft
                         </button>
 
                         <button type="submit" class="btn btn-primary">
                             Save and Publish
                         </button>
+                        t>
                     </span>
                     <span *ngIf="!isNewMode">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" title="CTRL + S">
                             Save
                         </button>
                     </span>
                 </div>
+                    
+                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                 
                 <h3 class="panel-title" *ngIf="isNewMode">
                     New Content
