@@ -19,7 +19,7 @@ export abstract class AppComponentBase extends ComponentBase {
     ) {
         super(notifications);
 
-        this.appName$ = this.appsStore.selectedApp.map(a => a!.name).take(1);
+        this.appName$ = this.appsStore.selectedApp.filter(a => !!a).map(a => a!.name);
     }
 
     public appName(): Observable<string> {
