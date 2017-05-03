@@ -86,7 +86,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                         self.tinyEditor.setContent(this.value || '');
                     }, 500);
                 },
-                target: this.editor.nativeElement
+                removed_menuitems: 'newdocument', plugins: 'code', target: this.editor.nativeElement
             });
         });
     }
