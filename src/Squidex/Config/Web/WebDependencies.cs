@@ -19,6 +19,7 @@ namespace Squidex.Config.Web
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(LogPerformanceAttribute));
+                options.Filters.Add(typeof(AppTrackingFilter));
             }).AddMySerializers();
         }
     }

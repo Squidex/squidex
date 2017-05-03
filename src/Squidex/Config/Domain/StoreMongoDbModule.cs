@@ -17,6 +17,8 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.MongoDb.UsageTracker;
+using Squidex.Infrastructure.UsageTracking;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Apps.Services.Implementations;
 using Squidex.Read.Assets.Repositories;
@@ -111,6 +113,12 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoPersistedGrantStore>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IPersistedGrantStore>()
+                .SingleInstance();
+
+            builder.RegisterType<MongoUsageStore>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IUsageStore>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoEventConsumerInfoRepository>()

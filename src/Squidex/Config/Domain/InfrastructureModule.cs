@@ -24,6 +24,7 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -90,6 +91,10 @@ namespace Squidex.Config.Domain
 
             builder.Register(c => SystemClock.Instance)
                 .As<IClock>()
+                .SingleInstance();
+
+            builder.RegisterType<BackgroundUsageTracker>()
+                .As<IUsageTracker>()
                 .SingleInstance();
 
             builder.RegisterType<HttpContextAccessor>()

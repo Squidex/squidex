@@ -1,0 +1,21 @@
+﻿// ==========================================================================
+//  IUsageTracker.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Squidex.Infrastructure.UsageTracking
+{
+    public interface IUsageTracker
+    {
+        Task TrackAsync(string key, long elapsedMs);
+
+        Task<IReadOnlyList<StoredUsage>> FindAsync(string key, DateTime fromDate, DateTime toDate);
+    }
+}
