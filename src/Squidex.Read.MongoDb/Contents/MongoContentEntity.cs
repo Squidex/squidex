@@ -102,12 +102,17 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 if (text.Type == JTokenType.String)
                 {
-                    stringBuilder.Append(" ");
-                    stringBuilder.Append(text);
+                    var value = text.ToString();
+
+                    if (value.Length < 1000)
+                    {
+                        stringBuilder.Append(" ");
+                        stringBuilder.Append(text);
+                    }
                 }
             }
 
-            return stringBuilder.ToString();
+            return stringBuilder.ToString().Substring(1024 * 1024);
         }
     }
 }
