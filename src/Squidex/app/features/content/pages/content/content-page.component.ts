@@ -138,7 +138,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             const data = this.contentForm.value;
 
             if (this.isNewMode) {
-                this.appName()
+                this.appNameOnce()
                     .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, publish, this.version))
                     .subscribe(created => {
                         this.contentId = created.id;
@@ -154,7 +154,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                         this.enable();
                     });
             } else {
-                this.appName()
+                this.appNameOnce()
                     .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, data, this.version))
                     .subscribe(() => {
                         this.messageBus.publish(new ContentUpdated(this.contentId!, data, this.version.value));

@@ -93,7 +93,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         const initFile = this.initFile;
 
         if (initFile) {
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.assetsService.uploadFile(app, initFile))
                 .subscribe(result => {
                     if (result instanceof AssetCreatedDto) {
@@ -128,7 +128,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.version))
                 .subscribe(result => {
                     if (result instanceof AssetReplacedDto) {
@@ -166,7 +166,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
             const dto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, dto, this.version))
                 .subscribe(_ => {
                     const me = `subject:${this.authService.user!.id}`;

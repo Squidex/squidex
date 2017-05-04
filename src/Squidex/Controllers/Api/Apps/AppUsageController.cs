@@ -37,7 +37,26 @@ namespace Squidex.Controllers.Api.Apps
         }
 
         /// <summary>
-        /// Get app usages.
+        /// Get api calls for this month.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Usage tracking results returned.
+        /// 404 => App not found.
+        /// </returns>
+        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [HttpGet]
+        [Route("apps/{app}/usages/monthly")]
+        [ProducesResponseType(typeof(MonthlyCallsDto), 200)]
+        public async Task<IActionResult> GetMonthlyCalls(string app)
+        {
+            var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
+
+            return Ok(new MonthlyCallsDto { Count = count });
+        }
+
+        /// <summary>
+        /// Get api calls in date range.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="fromDate">The from date.</param>

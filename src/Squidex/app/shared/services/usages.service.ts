@@ -22,12 +22,30 @@ export class UsageDto {
     }
 }
 
+export class MonthlyCallsDto {
+    constructor(
+        public readonly count: number
+    ) {
+    }
+}
+
 @Injectable()
 export class UsagesService {
     constructor(
         private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
+    }
+
+    public getMonthlyCalls(app: string): Observable<MonthlyCallsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/monthly`);
+
+        return this.authService.authGet(url)
+                .map(response => response.json())
+                .map(response => {
+                    return new MonthlyCallsDto(response.count);
+                })
+                .catchError('Failed to load monthly calls. Please reload.');
     }
 
     public getUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<UsageDto[]> {

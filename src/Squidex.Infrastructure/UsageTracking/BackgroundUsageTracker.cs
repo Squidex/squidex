@@ -111,15 +111,14 @@ namespace Squidex.Infrastructure.UsageTracking
             ThrowIfDisposed();
 
             var originalUsages = await usageStore.FindAsync(key, fromDate, toDate);
-
-            var result = new List<StoredUsage>();
+            var enrichedUsages = new List<StoredUsage>();
 
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
-                result.Add(originalUsages.FirstOrDefault(x => x.Date == date) ?? new StoredUsage(date, 0, 0));
+                enrichedUsages.Add(originalUsages.FirstOrDefault(x => x.Date == date) ?? new StoredUsage(date, 0, 0));
             }
 
-            return result;
+            return enrichedUsages;
         }
 
         public async Task<long> GetMonthlyCalls(string key, DateTime date)

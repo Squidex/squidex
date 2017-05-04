@@ -73,7 +73,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public load(showInfo = false) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery))
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
@@ -88,7 +88,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public onAssetDeleting(asset: AssetDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.assetsService.deleteAsset(app, asset.id, asset.version))
             .subscribe(dtos => {
                 this.assetsItems = this.assetsItems.filter(x => x.id !== asset.id);

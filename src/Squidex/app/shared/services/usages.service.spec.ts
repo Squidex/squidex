@@ -13,6 +13,7 @@ import {
     ApiUrlConfig,
     AuthService,
     DateTime,
+    MonthlyCallsDto,
     UsageDto,
     UsagesService
 } from './../';
@@ -56,6 +57,28 @@ describe('UsagesService', () => {
                 new UsageDto(DateTime.parseISO_UTC('2017-10-12'), 1, 130),
                 new UsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
             ]);
+
+        authService.verifyAll();
+    });
+
+    it('should make get request to get monthly calls', () => {
+        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/usages/monthly'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: { count: 130 }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let usages: MonthlyCallsDto | null = null;
+
+        usagesService.getMonthlyCalls('my-app').subscribe(result => {
+            usages = result;
+        }).unsubscribe();
+
+        expect(usages).toEqual(new MonthlyCallsDto(130));
 
         authService.verifyAll();
     });

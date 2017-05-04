@@ -67,7 +67,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public load() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appLanguagesService.getLanguages(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateLanguages(ImmutableArray.of(dtos));
@@ -77,7 +77,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public removeLanguage(language: AppLanguageDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code, this.version))
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.remove(language));
@@ -89,7 +89,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     public addLanguage() {
         const request = new AddAppLanguageDto(this.addLanguageForm.get('language')!.value.iso2Code);
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appLanguagesService.postLanguages(app, request, this.version))
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.push(dto));
@@ -101,7 +101,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     public setMasterLanguage(language: AppLanguageDto) {
         const request = new UpdateAppLanguageDto(true);
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, request, this.version))
             .subscribe(() => {
                 this.updateLanguages(this.appLanguages.map(l => {

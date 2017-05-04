@@ -60,7 +60,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public load() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appClientsService.getClients(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateClients(ImmutableArray.of(dtos));
@@ -70,7 +70,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public revokeClient(client: AppClientDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appClientsService.deleteClient(app, client.id, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.remove(client));
@@ -82,7 +82,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     public renameClient(client: AppClientDto, name: string) {
         const request = new UpdateAppClientDto(name);
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.replace(client, rename(client, name)));
@@ -111,7 +111,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
                 this.addClientForm.enable();
             };
 
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.push(dto));

@@ -114,7 +114,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public publishContent(content: ContentDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, true, content.data, content.version.value);
@@ -124,7 +124,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public unpublishContent(content: ContentDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.updateContents(content.id, false, content.data, content.version.value);
@@ -134,7 +134,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public deleteContent(content: ContentDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
@@ -161,7 +161,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public load(showInfo = false) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
                .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(dtos.items);

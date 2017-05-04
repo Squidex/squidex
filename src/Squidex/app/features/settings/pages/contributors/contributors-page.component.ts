@@ -97,7 +97,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public load() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appContributorsService.getContributors(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateContributors(ImmutableArray.of(dtos));
@@ -107,7 +107,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public removeContributor(contributor: AppContributorDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.remove(contributor));
@@ -119,7 +119,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     public assignContributor() {
         const newContributor = new AppContributorDto(this.addContributorForm.get('user')!.value.model.id, 'Editor');
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.push(newContributor));
@@ -133,7 +133,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     public changePermission(contributor: AppContributorDto, permission: string) {
         const newContributor = changePermission(contributor, permission);
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.replace(contributor, newContributor));

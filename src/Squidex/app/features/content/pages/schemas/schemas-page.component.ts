@@ -59,7 +59,7 @@ export class SchemasPageComponent extends AppComponentBase {
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {
-        return this.appName()
+        return this.appNameOnce()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
             .catch(error => {
                 this.notifyError(error);

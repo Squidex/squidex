@@ -47,7 +47,7 @@ export class HistoryComponent extends AppComponentBase {
     public events: Observable<HistoryEventDto[]> =
         Observable.timer(0, 10000)
             .merge(this.messageBus.of(HistoryChannelUpdated).delay(1000))
-            .switchMap(() => this.appName())
+            .switchMap(() => this.appNameOnce())
             .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
     constructor(appsStore: AppsStoreService, notifications: NotificationService,

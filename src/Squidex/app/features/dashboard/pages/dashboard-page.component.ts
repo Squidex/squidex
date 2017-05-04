@@ -37,6 +37,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public chartPerformance: any;
     public chartOptions = { };
 
+    public monthlyCalls: string = null;
+
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly auth: AuthService,
         private readonly usagesService: UsagesService
@@ -49,6 +51,16 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     }
 
     public ngOnInit() {
+        this.appName()
+            .switchMap(app => this.usagesService.getMonthlyCalls(app))
+            .subscribe(dto => {
+                if (dto.count > 1000) {
+                    this.monthlyCalls = Math.round(dto.count / 1000) + 'k';
+                } else {
+                    this.monthlyCalls = dto.count.toString();
+                }
+            });
+
         this.appName()
             .switchMap(app => this.usagesService.getUsages(app, DateTime.today().addDays(-30), DateTime.today()))
             .subscribe(dtos => {

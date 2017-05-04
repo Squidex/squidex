@@ -91,7 +91,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private load() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.getSchemas(app).retry(2))
             .subscribe(dtos => {
                 this.updateSchemas(ImmutableArray.of(dtos));

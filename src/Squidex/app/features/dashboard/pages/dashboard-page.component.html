@@ -1,6 +1,8 @@
 <sqx-title message="{app} | Dashboard" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
 <div class="dashboard" [@fade]>
+    <div class="dashboard-inner">
+    
     <div>
         <h1>Hi {{profileDisplayName}}</h1>
 
@@ -50,18 +52,24 @@
                 <p class="card-text">Get the source code from Github and report bugs or ask for support.</p>
             </div>
         </a>
-    </div>
 
-    <div>
         <div class="card card-big">
             <div class="card-block">
                 <chart type="bar" [data]="chartCount" [options]="chartOptions"></chart>
             </div>
         </div>
-
         <div class="card card-big">
             <div class="card-block">
                 <chart type="bar" [data]="chartPerformance" [options]="chartOptions"></chart>
+            </div>
+        </div>
+
+        <div class="card card">
+            <div class="card-block">
+                <div class="monthly-calls" *ngIf="monthlyCalls">
+                    <div class="monthly-calls-label">API calls this month</div>
+                    <div class="monthly-calls-value">{{monthlyCalls}}</div>
+                </div>
             </div>
         </div>
     </div>

@@ -71,7 +71,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         this.oldAssets = ImmutableArray.empty<AssetDto>();
 
         if (value) {
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.assetsService.getAssets(app, 10000, 0, undefined, undefined, value))
                 .subscribe(dtos => {
                     this.oldAssets = ImmutableArray.of(dtos.items);

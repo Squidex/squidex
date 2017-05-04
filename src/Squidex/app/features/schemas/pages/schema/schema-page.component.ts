@@ -105,7 +105,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public publish() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.publishSchema(app, this.schemaName, this.version)).retry(2)
             .subscribe(() => {
                 this.isPublished = true;
@@ -116,7 +116,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public unpublish() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.unpublishSchema(app, this.schemaName, this.version)).retry(2)
             .subscribe(() => {
                 this.isPublished = false;
@@ -127,7 +127,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public enableField(field: FieldDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.enableField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, false, field.properties));
@@ -137,7 +137,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public disableField(field: FieldDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.disableField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, true, field.properties));
@@ -147,7 +147,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public showField(field: FieldDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.showField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, false, field.isDisabled, field.properties));
@@ -157,7 +157,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public hideField(field: FieldDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.hideField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, true, field.isDisabled, field.properties));
@@ -167,7 +167,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public deleteField(field: FieldDto) {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.deleteField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
                 this.updateFields(this.schemaFields.remove(field));
@@ -179,7 +179,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public sortFields(fields: FieldDto[]) {
         this.updateFields(ImmutableArray.of(fields));
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.putFieldOrdering(app, this.schemaName, fields.map(t => t.fieldId), this.version)).retry(2)
             .subscribe(() => {
                 this.updateFields(ImmutableArray.of(fields));
@@ -191,7 +191,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public saveField(field: FieldDto, newField: FieldDto) {
         const request = new UpdateFieldDto(newField.properties);
 
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, request, this.version)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, newField.properties));
@@ -201,7 +201,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public deleteSchema() {
-        this.appName()
+        this.appNameOnce()
             .switchMap(app => this.schemasService.deleteSchema(app, this.schemaName, this.version)).retry(2)
             .finally(() => {
                 this.confirmDeleteDialog.hide();
@@ -231,7 +231,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 this.addFieldFormSubmitted = false;
             };
 
-            this.appName()
+            this.appNameOnce()
                 .switchMap(app => this.schemasService.postField(app, this.schemaName, requestDto, this.version))
                 .subscribe(dto => {
                     const newField =
