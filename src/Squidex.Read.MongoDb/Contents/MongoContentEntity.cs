@@ -26,6 +26,7 @@ namespace Squidex.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : MongoEntity, IContentEntity
     {
+        private const int MaxLength = 1024 * 1024;
         private ContentData contentData;
 
         [BsonRequired]
@@ -112,7 +113,14 @@ namespace Squidex.Read.MongoDb.Contents
                 }
             }
 
-            return stringBuilder.ToString().Substring(1024 * 1024);
+            var result = stringBuilder.ToString();
+
+            if (result.Length > MaxLength)
+            {
+                result = result.Substring(MaxLength);
+            }
+
+            return result;
         }
     }
 }
