@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
@@ -20,6 +21,7 @@ namespace Squidex.Infrastructure.UsageTracking
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
         private readonly IUsageStore usageStore;
+        private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<string, Usage> usages = new ConcurrentDictionary<string, Usage>();
 
@@ -41,11 +43,14 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public BackgroundUsageTracker(IUsageStore usageStore)
+        public BackgroundUsageTracker(IUsageStore usageStore, ISemanticLog log)
         {
             Guard.NotNull(usageStore, nameof(usageStore));
+            Guard.NotNull(log, nameof(log));
 
             this.usageStore = usageStore;
+
+            this.log = log;
 
             timer = new CompletionTimer(60 * 1000, ct => TrackAsync());
         }
@@ -65,18 +70,27 @@ namespace Squidex.Infrastructure.UsageTracking
             timer.Trigger();
         }
 
-        private Task TrackAsync()
+        private async Task TrackAsync()
         {
-            var today = DateTime.Today;
+            try
+            {
+                var today = DateTime.Today;
 
-            var localUsages = Interlocked.Exchange(ref usages, new ConcurrentDictionary<string, Usage>());
+                var localUsages = Interlocked.Exchange(ref usages, new ConcurrentDictionary<string, Usage>());
 
-            return Task.WhenAll(localUsages.Select(x => 
-                usageStore.TrackUsagesAsync(
-                    today,
-                    x.Key, 
-                    x.Value.Count, 
-                    x.Value.ElapsedMs)));
+                await Task.WhenAll(localUsages.Select(x =>
+                    usageStore.TrackUsagesAsync(
+                        today,
+                        x.Key,
+                        x.Value.Count,
+                        x.Value.ElapsedMs)));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "TrackUsage")
+                    .WriteProperty("status", "Failed"));
+            }
         }
 
         public Task TrackAsync(string key, long elapsedMs)

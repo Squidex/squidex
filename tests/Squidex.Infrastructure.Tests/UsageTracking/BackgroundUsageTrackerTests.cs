@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -19,11 +20,12 @@ namespace Squidex.Infrastructure.UsageTracking
     public class BackgroundUsageTrackerTests
     {
         private readonly Mock<IUsageStore> usageStore = new Mock<IUsageStore>();
+        private readonly Mock<ISemanticLog> log = new Mock<ISemanticLog>();
         private readonly BackgroundUsageTracker sut;
 
         public BackgroundUsageTrackerTests()
         {
-            sut = new BackgroundUsageTracker(usageStore.Object);
+            sut = new BackgroundUsageTracker(usageStore.Object, log.Object);
         }
 
         [Fact]

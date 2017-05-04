@@ -36,10 +36,13 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
 
         public Task TrackUsagesAsync(DateTime date, string key, long count, long elapsedMs)
         {
-            return Collection.UpdateOneAsync(x => x.Key == key && x.Date == date, 
+            var id = $"{key}_{date:yyyy-MM-dd}";
+
+            return Collection.UpdateOneAsync(x => x.Id == id, 
                 Update
                     .Inc(x => x.TotalCount, count)
                     .Inc(x => x.TotalElapsedMs, elapsedMs)
+                    .SetOnInsert(x => x.Id, id)
                     .SetOnInsert(x => x.Key, key)
                     .SetOnInsert(x => x.Date, date),
                 Upsert);

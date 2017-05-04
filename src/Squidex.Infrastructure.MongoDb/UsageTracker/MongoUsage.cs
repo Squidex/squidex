@@ -17,12 +17,16 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public string Key { get; set; }
+        public string Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
         [BsonDateTimeOptions(DateOnly = true)]
         public DateTime Date { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public string Key { get; set; }
 
         [BsonRequired]
         [BsonElement]
