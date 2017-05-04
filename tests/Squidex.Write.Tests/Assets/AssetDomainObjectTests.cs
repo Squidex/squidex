@@ -187,6 +187,7 @@ namespace Squidex.Write.Assets
         public void Delete_should_update_properties_create_events()
         {
             CreateAsset();
+            UpdateAsset();
 
             sut.Delete(CreateAssetCommand(new DeleteAsset()));
 
@@ -194,13 +195,20 @@ namespace Squidex.Write.Assets
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetDeleted())
+                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
                 );
         }
 
         private void CreateAsset()
         {
             sut.Create(CreateAssetCommand(new CreateAsset { File = file }));
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void UpdateAsset()
+        {
+            sut.Update(CreateAssetCommand(new UpdateAsset { File = file }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

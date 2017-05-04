@@ -1,18 +1,21 @@
 ﻿// ==========================================================================
-//  AssetDeleted.cs
+//  IAssetDaySizeEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using System;
 
-namespace Squidex.Events.Assets
+namespace Squidex.Read.Assets
 {
-    [TypeName("AssetDeletedEvent")]
-    public sealed class AssetDeleted : AssetEvent
+    public interface IAssetStatsEntity
     {
-        public long DeletedSize { get; set; }
+        DateTime Date { get; }
+
+        long TotalSize { get; }
+
+        long TotalCount { get; }
     }
 }

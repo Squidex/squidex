@@ -113,9 +113,11 @@ namespace Squidex.Infrastructure.UsageTracking
             var originalUsages = await usageStore.FindAsync(key, fromDate, toDate);
             var enrichedUsages = new List<StoredUsage>();
 
+            var usagesDictionary = originalUsages.ToDictionary(x => x.Date);
+
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
-                enrichedUsages.Add(originalUsages.FirstOrDefault(x => x.Date == date) ?? new StoredUsage(date, 0, 0));
+                enrichedUsages.Add(usagesDictionary.GetOrDefault(date) ?? new StoredUsage(date, 0, 0));
             }
 
             return enrichedUsages;

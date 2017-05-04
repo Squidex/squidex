@@ -54,10 +54,19 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
         this.appName()
             .switchMap(app => this.usagesService.getMonthlyCalls(app))
             .subscribe(dto => {
-                if (dto.count > 1000) {
-                    this.monthlyCalls = Math.round(dto.count / 1000) + 'k';
+                let count = dto.count;
+
+                if (count > 1000) {
+                    count = count / 1000;
+
+                    if (count < 10) {
+                        count = Math.round(count * 10) / 10;
+                    } else {
+                        count = Math.round(count);
+                    }
+                    this.monthlyCalls = count + 'k';
                 } else {
-                    this.monthlyCalls = dto.count.toString();
+                    this.monthlyCalls = count.toString();
                 }
             });
 

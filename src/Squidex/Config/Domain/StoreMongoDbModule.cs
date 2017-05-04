@@ -142,6 +142,14 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.RegisterType<MongoAssetStatsRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAssetStatsRepository>()
+                .As<IEventConsumer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<MongoAssetRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAssetRepository>()

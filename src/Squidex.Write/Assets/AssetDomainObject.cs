@@ -23,6 +23,7 @@ namespace Squidex.Write.Assets
     {
         private bool isDeleted;
         private long fileVersion = -1;
+        private long totalSize;
         private string fileName;
 
         public bool IsDeleted
@@ -49,11 +50,15 @@ namespace Squidex.Write.Assets
         {
             fileVersion = @event.FileVersion;
             fileName = @event.FileName;
+
+            totalSize += @event.FileSize;
         }
 
         protected void On(AssetUpdated @event)
         {
             fileVersion = @event.FileVersion;
+
+            totalSize += @event.FileSize;
         }
 
         protected void On(AssetRenamed @event)
@@ -115,7 +120,7 @@ namespace Squidex.Write.Assets
 
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted()));
+            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = totalSize }));
 
             return this;
         }
