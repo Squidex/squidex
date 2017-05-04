@@ -121,5 +121,17 @@ namespace Squidex.Infrastructure.UsageTracking
 
             return result;
         }
+
+        public async Task<long> GetMonthlyCalls(string key, DateTime date)
+        {
+            ThrowIfDisposed();
+
+            var dateFrom = new DateTime(date.Year, date.Month, 1);
+            var dateTo = dateFrom.AddMonths(1).AddDays(-1);
+
+            var originalUsages = await usageStore.FindAsync(key, dateFrom, dateTo);
+
+            return originalUsages.Sum(x => x.TotalCount);
+        }
     }
 }

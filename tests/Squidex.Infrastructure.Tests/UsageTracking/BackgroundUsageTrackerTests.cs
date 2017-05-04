@@ -43,14 +43,42 @@ namespace Squidex.Infrastructure.UsageTracking
 
             return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.FindAsync("key1", DateTime.Today, DateTime.Today.AddDays(1)));
         }
-        
+
+        [Fact]
+        public Task Should_throw_if_querying_montly_usage_on_disposed_object()
+        {
+            sut.Dispose();
+
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCalls("key1", DateTime.Today));
+        }
+
+        [Fact]
+        public async Task Should_sum_up_when_getting_monthly_calls()
+        {
+            var date = new DateTime(2016, 1, 15);
+
+            IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
+            {
+                new StoredUsage(date.AddDays(1), 10, 15),
+                new StoredUsage(date.AddDays(3), 13, 18),
+                new StoredUsage(date.AddDays(5), 15, 20),
+                new StoredUsage(date.AddDays(7), 17, 22)
+            };
+
+            usageStore.Setup(x => x.FindAsync("key", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31))).Returns(Task.FromResult(originalData));
+
+            var result = await sut.GetMonthlyCalls("key", date);
+
+            Assert.Equal(55, result);
+        }
+
         [Fact]
         public async Task Should_fill_missing_days()
         {
             var dateFrom = DateTime.Today;
             var dateTo = DateTime.Today.AddDays(7);
 
-            IReadOnlyList<StoredUsage> originalDate = new List<StoredUsage>
+            IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
             {
                 new StoredUsage(dateFrom.AddDays(1), 10, 15),
                 new StoredUsage(dateFrom.AddDays(3), 13, 18),
@@ -58,7 +86,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(dateFrom.AddDays(7), 17, 22)
             };
 
-            usageStore.Setup(x => x.FindAsync("key", dateFrom, dateTo)).Returns(Task.FromResult(originalDate));
+            usageStore.Setup(x => x.FindAsync("key", dateFrom, dateTo)).Returns(Task.FromResult(originalData));
 
             var result = await sut.FindAsync("key", dateFrom, dateTo);
 

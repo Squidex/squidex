@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         Task TrackAsync(string key, long elapsedMs);
 
+        Task<long> GetMonthlyCalls(string key, DateTime date);
+
         Task<IReadOnlyList<StoredUsage>> FindAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }
