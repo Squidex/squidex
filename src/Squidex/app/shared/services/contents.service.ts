@@ -55,7 +55,7 @@ export class ContentsService {
             if (fullQuery.indexOf('$filter') < 0 &&
                 fullQuery.indexOf('$search') < 0 &&
                 fullQuery.indexOf('$orderby') < 0) {
-                fullQuery = `&$search=${fullQuery}`;
+                fullQuery = `&$search="${fullQuery}"`;
             } else {
                 fullQuery = `&${fullQuery}`;
             }

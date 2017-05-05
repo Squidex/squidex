@@ -101,6 +101,6 @@ export class SchemaFormComponent {
         const user = this.authService.user!.token;
         const now = DateTime.now();
 
-        return new SchemaDto(id, name, undefined, false, user, user, now, now, version);
+        return new SchemaDto(id, name, null, false, user, user, now, now, version);
     }
 }

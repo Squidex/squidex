@@ -60,7 +60,7 @@ export module FileHelper {
         return result;
     }
 
-    export function fileType(mimeType: string, fileName: string) {
+    export function fileType(mimeType: string, fileName?: string) {
         if (fileName) {
             const parts = fileName.split('.');
 

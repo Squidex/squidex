@@ -37,7 +37,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public chartPerformance: any;
     public chartOptions = { };
 
-    public monthlyCalls: string = null;
+    public monthlyCalls: string | null = null;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly auth: AuthService,

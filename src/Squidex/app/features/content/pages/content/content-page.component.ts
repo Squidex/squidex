@@ -111,14 +111,20 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     public confirmLeave() {
         this.cancelDialog.hide();
-        this.cancelPromise.next(true);
-        this.cancelPromise = null;
+
+        if (this.cancelPromise) {
+            this.cancelPromise.next(true);
+            this.cancelPromise = null;
+        }
     }
 
     public cancelLeave() {
         this.cancelDialog.hide();
-        this.cancelPromise.next(false);
-        this.cancelPromise = null;
+
+        if (this.cancelPromise) {
+            this.cancelPromise.next(false);
+            this.cancelPromise = null;
+        }
     }
 
     public saveAndPublish() {
@@ -242,8 +248,8 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentForm.markAsPristine();
 
         if (!content) {
-            this.contentData = undefined;
-            this.contentId = undefined;
+            this.contentData = null;
+            this.contentId = null;
             this.isNewMode = true;
             return;
         }

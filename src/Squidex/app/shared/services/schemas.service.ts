@@ -24,37 +24,25 @@ export function createProperties(fieldType: string, values: Object | null = null
 
     switch (fieldType) {
         case 'Number':
-            properties =
-                new NumberFieldPropertiesDto(
-                    undefined, undefined, undefined, false, false, false, 'Input',
-                    undefined, undefined, undefined, undefined);
+            properties = new NumberFieldPropertiesDto(null, null, null, false, false, false, 'Input');
             break;
         case 'String':
-            properties =
-                new StringFieldPropertiesDto(
-                    undefined, undefined, undefined, false, false, false, 'Input',
-                    undefined, undefined, undefined, undefined, undefined, undefined);
+            properties = new StringFieldPropertiesDto(null, null, null, false, false, false, 'Input');
             break;
         case 'Boolean':
-            properties =
-                new BooleanFieldPropertiesDto(
-                    undefined, undefined, undefined, false, false, false, 'Checkbox',
-                    undefined);
+            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, false, 'Checkbox');
             break;
         case 'DateTime':
-            properties =
-                new DateTimeFieldPropertiesDto(
-                    undefined, undefined, undefined, false, false, false, 'DateTime',
-                    undefined, undefined, undefined);
+            properties = new DateTimeFieldPropertiesDto(null, null, null, false, false, false, 'DateTime');
             break;
         case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto(undefined, undefined, undefined, false, false, false, 'Map');
+            properties = new GeolocationFieldPropertiesDto(null, null, null, false, false, false, 'Map');
             break;
         case 'Json':
-            properties = new JsonFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
+            properties = new JsonFieldPropertiesDto(null, null, null, false, false, false);
             break;
         case 'Assets':
-            properties = new AssetsFieldPropertiesDto(undefined, undefined, undefined, false, false, false);
+            properties = new AssetsFieldPropertiesDto(null, null, null, false, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -132,8 +120,8 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         public readonly defaultValue?: string,
         public readonly pattern?: string,
         public readonly patternMessage?: string,
-        public readonly minLength?: number | null,
-        public readonly maxLength?: number | null,
+        public readonly minLength?: number,
+        public readonly maxLength?: number,
         public readonly allowedValues?: string[]
     ) {
         super('String', label, hints, placeholder, isRequired, isListField, isLocalizable);
