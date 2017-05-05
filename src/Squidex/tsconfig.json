@@ -9,7 +9,7 @@
     "noUnusedParameters": false,
     "removeComments": false,
     "sourceMap": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5",
     "paths": {
