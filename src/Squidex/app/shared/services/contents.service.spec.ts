@@ -85,7 +85,7 @@ describe('ContentsService', () => {
     });
 
     it('should append query to get request as search', () => {
-        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$search=my-query&$top=17&$skip=13'))
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$search="my-query"&$top=17&$skip=13'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
