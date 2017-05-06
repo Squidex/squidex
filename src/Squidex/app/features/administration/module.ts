@@ -26,13 +26,16 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                children: [{
-                    path: 'event-consumers',
-                    component: EventConsumersPageComponent
-                }, {
-                    path: 'users',
-                    component: UsersPageComponent
-                }]
+                children: [
+                    {
+                        path: 'event-consumers',
+                        component: EventConsumersPageComponent
+                    },
+                    {
+                        path: 'users',
+                        component: UsersPageComponent
+                    }
+                ]
             }
         ]
     }

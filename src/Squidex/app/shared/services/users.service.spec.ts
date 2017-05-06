@@ -32,19 +32,22 @@ describe('UsersService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: '123',
-                            email: 'mail1@domain.com',
-                            displayName: 'User1',
-                            pictureUrl: 'path/to/image1',
-                            isLocked: true
-                        }, {
-                            id: '456',
-                            email: 'mail2@domain.com',
-                            displayName: 'User2',
-                            pictureUrl: 'path/to/image2',
-                            isLocked: true
-                        }]
+                        body: [
+                            {
+                                id: '123',
+                                email: 'mail1@domain.com',
+                                displayName: 'User1',
+                                pictureUrl: 'path/to/image1',
+                                isLocked: true
+                            },
+                            {
+                                id: '456',
+                                email: 'mail2@domain.com',
+                                displayName: 'User2',
+                                pictureUrl: 'path/to/image2',
+                                isLocked: true
+                            }
+                        ]
                     })
                 )
             ))
@@ -70,19 +73,22 @@ describe('UsersService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: '123',
-                            email: 'mail1@domain.com',
-                            displayName: 'User1',
-                            pictureUrl: 'path/to/image1',
-                            isLocked: true
-                        }, {
-                            id: '456',
-                            email: 'mail2@domain.com',
-                            displayName: 'User2',
-                            pictureUrl: 'path/to/image2',
-                            isLocked: true
-                        }]
+                        body: [
+                            {
+                                id: '123',
+                                email: 'mail1@domain.com',
+                                displayName: 'User1',
+                                pictureUrl: 'path/to/image1',
+                                isLocked: true
+                            },
+                            {
+                                id: '456',
+                                email: 'mail2@domain.com',
+                                displayName: 'User2',
+                                pictureUrl: 'path/to/image2',
+                                isLocked: true
+                            }
+                        ]
                     })
                 )
             ))
@@ -148,19 +154,22 @@ describe('UserManagementService', () => {
                     new ResponseOptions({
                         body: {
                             total: 100,
-                            items: [{
-                                id: '123',
-                                email: 'mail1@domain.com',
-                                displayName: 'User1',
-                                pictureUrl: 'path/to/image1',
-                                isLocked: true
-                            }, {
-                                id: '456',
-                                email: 'mail2@domain.com',
-                                displayName: 'User2',
-                                pictureUrl: 'path/to/image2',
-                                isLocked: true
-                            }]
+                            items: [
+                                {
+                                    id: '123',
+                                    email: 'mail1@domain.com',
+                                    displayName: 'User1',
+                                    pictureUrl: 'path/to/image1',
+                                    isLocked: true
+                                },
+                                {
+                                    id: '456',
+                                    email: 'mail2@domain.com',
+                                    displayName: 'User2',
+                                    pictureUrl: 'path/to/image2',
+                                    isLocked: true
+                                }
+                            ]
                         }
                     })
                 )
@@ -189,19 +198,22 @@ describe('UserManagementService', () => {
                     new ResponseOptions({
                         body: {
                             total: 100,
-                            items: [{
-                                id: '123',
-                                email: 'mail1@domain.com',
-                                displayName: 'User1',
-                                pictureUrl: 'path/to/image1',
-                                isLocked: true
-                            }, {
-                                id: '456',
-                                email: 'mail2@domain.com',
-                                displayName: 'User2',
-                                pictureUrl: 'path/to/image2',
-                                isLocked: true
-                            }]
+                            items: [
+                                {
+                                    id: '123',
+                                    email: 'mail1@domain.com',
+                                    displayName: 'User1',
+                                    pictureUrl: 'path/to/image1',
+                                    isLocked: true
+                                },
+                                {
+                                    id: '456',
+                                    email: 'mail2@domain.com',
+                                    displayName: 'User2',
+                                    pictureUrl: 'path/to/image2',
+                                    isLocked: true
+                                }
+                            ]
                         }
                     })
                 )

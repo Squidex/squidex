@@ -51,7 +51,8 @@ const routes: Routes = [
                                 loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
-                    }, {
+                    },
+                    {
                         path: ':contentId',
                         component: ContentPageComponent,
                         canDeactivate: [CanDeactivateGuard],
@@ -65,7 +66,8 @@ const routes: Routes = [
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
-                            }, {
+                            },
+                            {
                                 path: 'assets',
                                 loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }

@@ -27,13 +27,17 @@ describe('AppClientsService', () => {
                new Response(
                     new ResponseOptions({
                         body: {
-                            sections: [{
-                                content: 'A test content with'
-                            }, {
-                                content: 'A test content with a <a href="https://squidex.io">A Link</a>'
-                            }, {
-                                content: 'A test content with a <a href="../GLOSSARY.html#content">Glossary Link</a>'
-                            }]
+                            sections: [
+                                {
+                                    content: 'A test content with'
+                                },
+                                {
+                                    content: 'A test content with a <a href="https://squidex.io">A Link</a>'
+                                },
+                                {
+                                    content: 'A test content with a <a href="../GLOSSARY.html#content">Glossary Link</a>'
+                                }
+                            ]
                         }
                     })
                 )

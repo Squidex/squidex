@@ -45,29 +45,32 @@ describe('SchemasService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: 'id1',
-                            name: 'name1',
-                            label: 'label1',
-                            isPublished: true,
-                            created: '2016-12-12T10:10',
-                            createdBy: 'Created1',
-                            lastModified: '2017-12-12T10:10',
-                            lastModifiedBy: 'LastModifiedBy1',
-                            version: 11,
-                            data: {}
-                        }, {
-                            id: 'id2',
-                            name: 'name2',
-                            label: 'label2',
-                            isPublished: true,
-                            created: '2016-10-12T10:10',
-                            createdBy: 'Created2',
-                            lastModified: '2017-10-12T10:10',
-                            lastModifiedBy: 'LastModifiedBy2',
-                            version: 22,
-                            data: {}
-                        }]
+                        body: [
+                            {
+                                id: 'id1',
+                                name: 'name1',
+                                label: 'label1',
+                                isPublished: true,
+                                created: '2016-12-12T10:10',
+                                createdBy: 'Created1',
+                                lastModified: '2017-12-12T10:10',
+                                lastModifiedBy: 'LastModifiedBy1',
+                                version: 11,
+                                data: {}
+                            },
+                            {
+                                id: 'id2',
+                                name: 'name2',
+                                label: 'label2',
+                                isPublished: true,
+                                created: '2016-10-12T10:10',
+                                createdBy: 'Created2',
+                                lastModified: '2017-10-12T10:10',
+                                lastModifiedBy: 'LastModifiedBy2',
+                                version: 22,
+                                data: {}
+                            }
+                        ]
                     })
                 )
             ))
@@ -109,63 +112,71 @@ describe('SchemasService', () => {
                             lastModified: '2017-12-12T10:10',
                             lastModifiedBy: 'LastModifiedBy1',
                             version: 11,
-                            fields: [{
-                                fieldId: 1,
-                                name: 'field1',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'Number'
+                            fields: [
+                                {
+                                    fieldId: 1,
+                                    name: 'field1',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'Number'
+                                    }
+                                },
+                                {
+                                    fieldId: 2,
+                                    name: 'field2',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'String'
+                                    }
+                                },
+                                {
+                                    fieldId: 3,
+                                    name: 'field3',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'Boolean'
+                                    }
+                                },
+                                {
+                                    fieldId: 4,
+                                    name: 'field4',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'DateTime'
+                                    }
+                                },
+                                {
+                                    fieldId: 5,
+                                    name: 'field5',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'Json'
+                                    }
+                                },
+                                {
+                                    fieldId: 6,
+                                    name: 'field6',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'Geolocation'
+                                    }
+                                },
+                                {
+                                    fieldId: 7,
+                                    name: 'field7',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    properties: {
+                                        fieldType: 'Assets'
+                                    }
                                 }
-                            }, {
-                                fieldId: 2,
-                                name: 'field2',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'String'
-                                }
-                            }, {
-                                fieldId: 3,
-                                name: 'field3',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'Boolean'
-                                }
-                            }, {
-                                fieldId: 4,
-                                name: 'field4',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'DateTime'
-                                }
-                            }, {
-                                fieldId: 5,
-                                name: 'field5',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'Json'
-                                }
-                            }, {
-                                fieldId: 6,
-                                name: 'field6',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'Geolocation'
-                                }
-                            }, {
-                                fieldId: 7,
-                                name: 'field7',
-                                isHidden: true,
-                                isDisabled: true,
-                                properties: {
-                                    fieldType: 'Assets'
-                                }
-                            }]
+                            ]
                         }
                     })
                 )

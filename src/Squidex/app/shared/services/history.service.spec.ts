@@ -32,17 +32,20 @@ describe('HistoryService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            actor: 'User1',
-                            eventId: '1',
-                            message: 'Message 1',
-                            created: '2016-12-12T10:10'
-                        }, {
-                            actor: 'User2',
-                            eventId: '2',
-                            message: 'Message 2',
-                            created: '2016-12-13T10:10'
-                        }]
+                        body: [
+                            {
+                                actor: 'User1',
+                                eventId: '1',
+                                message: 'Message 1',
+                                created: '2016-12-12T10:10'
+                            },
+                            {
+                                actor: 'User2',
+                                eventId: '2',
+                                message: 'Message 2',
+                                created: '2016-12-13T10:10'
+                            }
+                        ]
                     })
                 )
             ))

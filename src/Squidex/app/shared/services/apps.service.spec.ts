@@ -33,19 +33,22 @@ describe('AppsService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: '123',
-                            name: 'name1',
-                            permission: 'Owner',
-                            created: '2016-01-01',
-                            lastModified: '2016-02-02'
-                        }, {
-                            id: '456',
-                            name: 'name2',
-                            permission: 'Owner',
-                            created: '2017-01-01',
-                            lastModified: '2017-02-02'
-                        }]
+                        body: [
+                            {
+                                id: '123',
+                                name: 'name1',
+                                permission: 'Owner',
+                                created: '2016-01-01',
+                                lastModified: '2016-02-02'
+                            },
+                            {
+                                id: '456',
+                                name: 'name2',
+                                permission: 'Owner',
+                                created: '2017-01-01',
+                                lastModified: '2017-02-02'
+                            }
+                        ]
                     })
                 )
             ))

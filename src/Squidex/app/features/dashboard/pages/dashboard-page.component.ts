@@ -42,9 +42,11 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public chartOptions = {
         responsive: true,
         scales: {
-            xAxes: [{
-                display: true
-            }]
+            xAxes: [
+                {
+                    display: true
+                }
+            ]
         },
         maintainAspectRatio: false
     };
@@ -94,28 +96,32 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
             .subscribe(dtos => {
                 this.chartStorageCount = {
                     labels: createLabels(dtos),
-                    datasets: [{
-                        label: 'Number of Assets',
-                        lineTension: 0,
-                        fill: false,
-                        backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                        borderColor: 'rgba(61, 135, 213, 1)',
-                        borderWidth: 1,
-                        data: dtos.map(x => x.count)
-                    }]
+                    datasets: [
+                        {
+                            label: 'Number of Assets',
+                            lineTension: 0,
+                            fill: false,
+                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                            borderColor: 'rgba(61, 135, 213, 1)',
+                            borderWidth: 1,
+                            data: dtos.map(x => x.count)
+                        }
+                    ]
                 };
 
                 this.chartStorageSize = {
                     labels: createLabels(dtos),
-                    datasets: [ {
-                        label: 'Size of Assets (MB)',
-                        lineTension: 0,
-                        fill: false,
-                        backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                        borderColor: 'rgba(61, 135, 213, 1)',
-                        borderWidth: 1,
-                        data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
-                    }]
+                    datasets: [
+                        {
+                            label: 'Size of Assets (MB)',
+                            lineTension: 0,
+                            fill: false,
+                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                            borderColor: 'rgba(61, 135, 213, 1)',
+                            borderWidth: 1,
+                            data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
+                        }
+                    ]
                 };
             });
 

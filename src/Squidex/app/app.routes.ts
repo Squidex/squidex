@@ -28,7 +28,8 @@ export const routes: Routes = [
         path: '',
         component: HomePageComponent,
         canActivate: [MustBeNotAuthenticatedGuard]
-    }, {
+    },
+    {
         path: 'app',
         component: InternalAreaComponent,
         canActivate: [MustBeAuthenticatedGuard],
@@ -36,10 +37,12 @@ export const routes: Routes = [
             {
                 path: '',
                 loadChildren: './features/apps/module#SqxFeatureAppsModule'
-            }, {
+            },
+            {
                 path: 'administration',
                 loadChildren: './features/administration/module#SqxFeatureAdministrationModule'
-            }, {
+            },
+            {
                 path: ':appName',
                 component: AppAreaComponent,
                 canActivate: [AppMustExistGuard],
@@ -47,16 +50,20 @@ export const routes: Routes = [
                     {
                         path: '',
                         loadChildren: './features/dashboard/module#SqxFeatureDashboardModule'
-                    }, {
+                    },
+                    {
                         path: 'content',
                         loadChildren: './features/content/module#SqxFeatureContentModule'
-                    }, {
+                    },
+                    {
                         path: 'schemas',
                         loadChildren: './features/schemas/module#SqxFeatureSchemasModule'
-                    }, {
+                    },
+                    {
                         path: 'assets',
                         loadChildren: './features/assets/module#SqxFeatureAssetsModule'
-                    }, {
+                    },
+                    {
                         path: 'settings',
                         loadChildren: './features/settings/module#SqxFeatureSettingsModule'
                     }

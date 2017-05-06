@@ -32,13 +32,16 @@ describe('AppContributorsService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            contributorId: '123',
-                            permission: 'Owner'
-                        }, {
-                            contributorId: '456',
-                            permission: 'Owner'
-                        }]
+                        body: [
+                            {
+                                contributorId: '123',
+                                permission: 'Owner'
+                            },
+                            {
+                                contributorId: '456',
+                                permission: 'Owner'
+                            }
+                        ]
                     })
                 )
             ))

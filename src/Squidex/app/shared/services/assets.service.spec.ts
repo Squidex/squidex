@@ -53,35 +53,38 @@ describe('AssetsService', () => {
                     new ResponseOptions({
                         body: {
                             total: 10,
-                            items: [{
-                                id: 'id1',
-                                created: '2016-12-12T10:10',
-                                createdBy: 'Created1',
-                                lastModified: '2017-12-12T10:10',
-                                lastModifiedBy: 'LastModifiedBy1',
-                                fileName: 'my-asset1.png',
-                                fileSize: 1024,
-                                fileVersion: 2000,
-                                mimeType: 'text/plain',
-                                isImage: true,
-                                pixelWidth: 1024,
-                                pixelHeight: 2048,
-                                version: 11
-                            }, {
-                                id: 'id2',
-                                created: '2016-10-12T10:10',
-                                createdBy: 'Created2',
-                                lastModified: '2017-10-12T10:10',
-                                lastModifiedBy: 'LastModifiedBy2',
-                                fileName: 'my-asset2.png',
-                                fileSize: 1024,
-                                fileVersion: 2000,
-                                mimeType: 'text/plain',
-                                isImage: true,
-                                pixelWidth: 1024,
-                                pixelHeight: 2048,
-                                version: 22
-                            }]
+                            items: [
+                                {
+                                    id: 'id1',
+                                    created: '2016-12-12T10:10',
+                                    createdBy: 'Created1',
+                                    lastModified: '2017-12-12T10:10',
+                                    lastModifiedBy: 'LastModifiedBy1',
+                                    fileName: 'my-asset1.png',
+                                    fileSize: 1024,
+                                    fileVersion: 2000,
+                                    mimeType: 'text/plain',
+                                    isImage: true,
+                                    pixelWidth: 1024,
+                                    pixelHeight: 2048,
+                                    version: 11
+                                },
+                                {
+                                    id: 'id2',
+                                    created: '2016-10-12T10:10',
+                                    createdBy: 'Created2',
+                                    lastModified: '2017-10-12T10:10',
+                                    lastModifiedBy: 'LastModifiedBy2',
+                                    fileName: 'my-asset2.png',
+                                    fileSize: 1024,
+                                    fileVersion: 2000,
+                                    mimeType: 'text/plain',
+                                    isImage: true,
+                                    pixelWidth: 1024,
+                                    pixelHeight: 2048,
+                                    version: 22
+                                }
+                            ]
                         }
                     })
                 )

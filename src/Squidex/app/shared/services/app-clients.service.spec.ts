@@ -38,15 +38,18 @@ describe('AppClientsService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            id: 'client1',
-                            name: 'Client 1',
-                            secret: 'secret1'
-                        }, {
-                            id: 'client2',
-                            name: 'Client 2',
-                            secret: 'secret2'
-                        }]
+                        body: [
+                            {
+                                id: 'client1',
+                                name: 'Client 1',
+                                secret: 'secret1'
+                            },
+                            {
+                                id: 'client2',
+                                name: 'Client 2',
+                                secret: 'secret2'
+                            }
+                        ]
                     })
                 )
             ))

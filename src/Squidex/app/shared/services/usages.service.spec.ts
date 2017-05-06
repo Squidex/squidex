@@ -34,15 +34,18 @@ describe('UsagesService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            date: '2017-10-12',
-                            count: 10,
-                            averageMs: 130
-                        }, {
-                            date: '2017-10-13',
-                            count: 13,
-                            averageMs: 170
-                        }]
+                        body: [
+                            {
+                                date: '2017-10-12',
+                                count: 10,
+                                averageMs: 130
+                            },
+                            {
+                                date: '2017-10-13',
+                                count: 13,
+                                averageMs: 170
+                            }
+                        ]
                     })
                 )
             ))
@@ -90,15 +93,18 @@ describe('UsagesService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            date: '2017-10-12',
-                            count: 10,
-                            size: 130
-                        }, {
-                            date: '2017-10-13',
-                            count: 13,
-                            size: 170
-                        }]
+                        body: [
+                            {
+                                date: '2017-10-12',
+                                count: 10,
+                                size: 130
+                            },
+                            {
+                                date: '2017-10-13',
+                                count: 13,
+                                size: 170
+                            }
+                        ]
                     })
                 )
             ))

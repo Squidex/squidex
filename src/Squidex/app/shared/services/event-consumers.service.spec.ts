@@ -30,19 +30,22 @@ describe('EventConsumersService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            name: 'event-consumer1',
-                            lastHandledEventNumber: 13,
-                            isStopped: true,
-                            isResetting: true,
-                            error: 'an error 1'
-                        }, {
-                            name: 'event-consumer2',
-                            lastHandledEventNumber: 29,
-                            isStopped: true,
-                            isResetting: true,
-                            error: 'an error 2'
-                        }]
+                        body: [
+                            {
+                                name: 'event-consumer1',
+                                lastHandledEventNumber: 13,
+                                isStopped: true,
+                                isResetting: true,
+                                error: 'an error 1'
+                            },
+                            {
+                                name: 'event-consumer2',
+                                lastHandledEventNumber: 29,
+                                isStopped: true,
+                                isResetting: true,
+                                error: 'an error 2'
+                            }
+                        ]
                     })
                 )
             ))

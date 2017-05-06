@@ -30,13 +30,16 @@ describe('LanguageService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            iso2Code: 'de',
-                            englishName: 'German'
-                        }, {
-                            iso2Code: 'en',
-                            englishName: 'English'
-                        }]
+                        body: [
+                            {
+                                iso2Code: 'de',
+                                englishName: 'German'
+                            },
+                            {
+                                iso2Code: 'en',
+                                englishName: 'English'
+                            }
+                        ]
                     })
                 )
             ))

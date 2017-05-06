@@ -50,7 +50,8 @@ const routes: Routes = [
                         }
                     }
                 ]
-            }, {
+            },
+            {
                 path: 'contributors',
                 component: ContributorsPageComponent,
                 children: [
@@ -69,7 +70,8 @@ const routes: Routes = [
                         }
                     }
                 ]
-            }, {
+            },
+            {
                 path: 'languages',
                 component: LanguagesPageComponent,
                 children: [

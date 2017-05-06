@@ -34,14 +34,17 @@ describe('AppLanguagesService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [{
-                            iso2Code: 'de',
-                            englishName: 'German',
-                            isMasterLanguage: true
-                        }, {
-                            iso2Code: 'en',
-                            englishName: 'English'
-                        }]
+                        body: [
+                            {
+                                iso2Code: 'de',
+                                englishName: 'German',
+                                isMasterLanguage: true
+                            },
+                            {
+                                iso2Code: 'en',
+                                englishName: 'English'
+                            }
+                        ]
                     })
                 )
             ))

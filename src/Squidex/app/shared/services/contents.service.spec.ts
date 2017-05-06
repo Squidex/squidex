@@ -36,25 +36,28 @@ describe('ContentsService', () => {
                     new ResponseOptions({
                         body: {
                             total: 10,
-                            items: [{
-                                id: 'id1',
-                                isPublished: true,
-                                created: '2016-12-12T10:10',
-                                createdBy: 'Created1',
-                                lastModified: '2017-12-12T10:10',
-                                lastModifiedBy: 'LastModifiedBy1',
-                                version: 11,
-                                data: {}
-                            }, {
-                                id: 'id2',
-                                isPublished: true,
-                                created: '2016-10-12T10:10',
-                                createdBy: 'Created2',
-                                lastModified: '2017-10-12T10:10',
-                                lastModifiedBy: 'LastModifiedBy2',
-                                version: 22,
-                                data: {}
-                            }]
+                            items: [
+                                {
+                                    id: 'id1',
+                                    isPublished: true,
+                                    created: '2016-12-12T10:10',
+                                    createdBy: 'Created1',
+                                    lastModified: '2017-12-12T10:10',
+                                    lastModifiedBy: 'LastModifiedBy1',
+                                    version: 11,
+                                    data: {}
+                                },
+                                {
+                                    id: 'id2',
+                                    isPublished: true,
+                                    created: '2016-10-12T10:10',
+                                    createdBy: 'Created2',
+                                    lastModified: '2017-10-12T10:10',
+                                    lastModifiedBy: 'LastModifiedBy2',
+                                    version: 22,
+                                    data: {}
+                                }
+                            ]
                         }
                     })
                 )
