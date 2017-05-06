@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppController.cs
+//  AppsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
-using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Write.Apps.Commands;
@@ -28,11 +28,11 @@ namespace Squidex.Controllers.Api.Apps
     [Authorize]
     [ApiExceptionFilter]
     [SwaggerTag("Apps")]
-    public class AppController : ControllerBase
+    public class AppsController : ControllerBase
     {
         private readonly IAppRepository appRepository;
 
-        public AppController(ICommandBus commandBus, IAppRepository appRepository) 
+        public AppsController(ICommandBus commandBus, IAppRepository appRepository) 
             : base(commandBus)
         {
             this.appRepository = appRepository;

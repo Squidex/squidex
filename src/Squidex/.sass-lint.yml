@@ -1,5 +1,7 @@
 rules: 
   no-ids:
+    - 1
+  no-important:
     - 0
   final-newline:
     - 0

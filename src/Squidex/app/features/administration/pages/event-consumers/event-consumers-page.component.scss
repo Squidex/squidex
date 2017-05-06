@@ -1,28 +1,22 @@
 @import '_vars';
 @import '_mixins';
 
-button {
-    display: inline-block;
-}
-
-.col-right {
-    text-align: right;
-}
-
-.faulted-icon {
+.faulted {
     & {
-        @include transition(color .3s ease);
-        cursor: pointer;
         color: $color-theme-error;
     }
 
-    &:hover {
-        color: darken($color-theme-error, 10%);
-    }
-}
+    &-icon {
+        & {
+            @include transition(color .3s ease);
+            cursor: pointer;
+            color: $color-theme-error;
+        }
 
-.faulted {
-    color: $color-theme-error;
+        &:hover {
+            color: darken($color-theme-error, 10%);
+        }
+    }
 }
 
 .error-message {

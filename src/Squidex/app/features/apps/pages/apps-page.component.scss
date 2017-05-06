@@ -2,7 +2,7 @@
 @import '_mixins';
 
 .apps {
-    @include clearfix();
+    @include clearfix;
     padding: 1.25rem;
     padding-left: $size-sidebar-width + .25rem;
     display: block;

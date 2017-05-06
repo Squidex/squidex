@@ -16,6 +16,6 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         Task TrackUsagesAsync(DateTime date, string key, long count, long elapsedMs);
 
-        Task<IReadOnlyList<StoredUsage>> FindAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

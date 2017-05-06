@@ -104,13 +104,13 @@ namespace Squidex.Infrastructure.UsageTracking
             return TaskHelper.Done;
         }
 
-        public async Task<IReadOnlyList<StoredUsage>> FindAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             Guard.NotNull(key, nameof(key));
 
             ThrowIfDisposed();
 
-            var originalUsages = await usageStore.FindAsync(key, fromDate, toDate);
+            var originalUsages = await usageStore.QueryAsync(key, fromDate, toDate);
             var enrichedUsages = new List<StoredUsage>();
 
             var usagesDictionary = originalUsages.ToDictionary(x => x.Date);
@@ -130,7 +130,7 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
-            var originalUsages = await usageStore.FindAsync(key, dateFrom, dateTo);
+            var originalUsages = await usageStore.QueryAsync(key, dateFrom, dateTo);
 
             return originalUsages.Sum(x => x.TotalCount);
         }

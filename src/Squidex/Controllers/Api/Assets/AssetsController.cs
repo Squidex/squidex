@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetController.cs
+//  AssetsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -19,8 +19,8 @@ using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Assets.Repositories;
@@ -35,12 +35,12 @@ namespace Squidex.Controllers.Api.Assets
     [ApiExceptionFilter]
     [ServiceFilter(typeof(AppFilterAttribute))]
     [SwaggerTag("Assets")]
-    public class AssetController : ControllerBase
+    public class AssetsController : ControllerBase
     {
         private readonly IAssetRepository assetRepository;
         private readonly AssetConfig assetsConfig;
 
-        public AssetController(
+        public AssetsController(
             ICommandBus commandBus, 
             IAssetRepository assetRepository,
             IOptions<AssetConfig> assetsConfig) 

@@ -7,6 +7,11 @@
         overflow-y: auto;
     }
 
+    &-title {
+        font-weight: light;
+        font-size: 1.4rem;
+    }
+
     &-inner {
         padding: 2rem;
         padding-right: 1rem;
@@ -14,21 +19,14 @@
     }
 }
 
-h1 {
-    font-weight: light;
-    font-size: 1.4rem;
+:host /deep/ canvas {
+    height: 13rem !important;
 }
 
 .subtext {
     margin-top: .5rem;
     margin-bottom: .8rem;
     color: $color-subtext;
-}
-
-a {
-    &.card {
-        cursor: pointer;
-    }
 }
 
 .card {
@@ -39,25 +37,12 @@ a {
         float: left;
     }
 
-    &:hover {
-        @include box-shadow(0, 3px, 16px, .2px);
-    }
-
-    &:hover,
-    &:active {
-        text-decoration: none;
-    }
-
-    h4 {
-        color: $color-title;
-    }
-
-    &-big {
+    &-lg {
         width: 33rem;
     }
 
     &-block {
-        min-height: 14.5rem;
+        min-height: 15.5rem;
     }
 
     &-image {
@@ -71,23 +56,46 @@ a {
     }
 
     &-title {
+        color: $color-title;
         font-weight: light;
         font-size: 1.2rem;
         margin-top: .4rem;
     }
+
+    &-link {
+        & {
+            cursor: pointer;
+        }
+
+        &:hover {
+            @include box-shadow(0, 3px, 16px, .2px);
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            text-decoration: none;
+        }
+    }
 }
 
-.monthly-calls {
+.aggregation {
     & {
         text-align: center;
     }
 
-    &-value {
-        font-size: 5rem;
-    }
-
     &-label {
         color: $color-subtext;
+    }
+
+    &-value {
+        font-size: 3rem;
+        margin-top: 2rem;
+        margin-bottom: .5rem;
     }
 }
 

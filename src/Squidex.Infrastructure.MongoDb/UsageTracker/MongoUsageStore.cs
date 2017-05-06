@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
                 Upsert);
         }
 
-        public async Task<IReadOnlyList<StoredUsage>> FindAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync();
 

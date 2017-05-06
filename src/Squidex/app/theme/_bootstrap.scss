@@ -5,6 +5,10 @@ body {
     background: $color-background;
 }
 
+.col-right {
+    text-align: right;
+}
+
 .navbar {
     & {
         height: $size-navbar-height;

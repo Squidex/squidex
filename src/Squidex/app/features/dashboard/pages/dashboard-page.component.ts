@@ -14,6 +14,7 @@ import {
     AuthService,
     DateTime,
     fadeAnimation,
+    FileHelper,
     NotificationService,
     UsagesService
 } from 'shared';
@@ -33,11 +34,23 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
 
     public profileDisplayName = '';
 
-    public chartCount: any;
-    public chartPerformance: any;
-    public chartOptions = { };
+    public chartStorageCount: any;
+    public chartStorageSize: any;
+    public chartCallsCount: any;
+    public chartCallsPerformance: any;
 
-    public monthlyCalls: string | null = null;
+    public chartOptions = {
+        responsive: true,
+        scales: {
+            xAxes: [{
+                display: true
+            }]
+        },
+        maintainAspectRatio: false
+    };
+
+    public currentStorage: string | null = null;
+    public currentCalls: string | null = null;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly auth: AuthService,
@@ -52,7 +65,13 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
 
     public ngOnInit() {
         this.appName()
-            .switchMap(app => this.usagesService.getMonthlyCalls(app))
+            .switchMap(app => this.usagesService.getTodayStorage(app))
+            .subscribe(dto => {
+                this.currentStorage = FileHelper.fileSize(dto.size);
+            });
+
+        this.appName()
+            .switchMap(app => this.usagesService.getMonthCalls(app))
             .subscribe(dto => {
                 let count = dto.count;
 
@@ -64,39 +83,67 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
                     } else {
                         count = Math.round(count);
                     }
-                    this.monthlyCalls = count + 'k';
+                    this.currentCalls = count + 'k';
                 } else {
-                    this.monthlyCalls = count.toString();
+                    this.currentCalls = count.toString();
                 }
             });
 
         this.appName()
-            .switchMap(app => this.usagesService.getUsages(app, DateTime.today().addDays(-30), DateTime.today()))
+            .switchMap(app => this.usagesService.getStorageUsages(app, DateTime.today().addDays(-30), DateTime.today()))
             .subscribe(dtos => {
-                const usages: any[] = dtos.map(x => { return { date: x.date.toStringFormat('L'), count: x.count, averageMs: x.averageMs }; });
+                this.chartStorageCount = {
+                    labels: createLabels(dtos),
+                    datasets: [{
+                        label: 'Number of Assets',
+                        lineTension: 0,
+                        fill: false,
+                        backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                        borderColor: 'rgba(61, 135, 213, 1)',
+                        borderWidth: 1,
+                        data: dtos.map(x => x.count)
+                    }]
+                };
 
-                this.chartCount = {
-                    labels: usages.map(x => x.date),
+                this.chartStorageSize = {
+                    labels: createLabels(dtos),
+                    datasets: [ {
+                        label: 'Size of Assets (MB)',
+                        lineTension: 0,
+                        fill: false,
+                        backgroundColor: 'rgba(61, 135, 213, 0.6)',
+                        borderColor: 'rgba(61, 135, 213, 1)',
+                        borderWidth: 1,
+                        data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
+                    }]
+                };
+            });
+
+        this.appName()
+            .switchMap(app => this.usagesService.getCallsUsages(app, DateTime.today().addDays(-30), DateTime.today()))
+            .subscribe(dtos => {
+                this.chartCallsCount = {
+                    labels: createLabels(dtos),
                     datasets: [
                         {
                             label: 'Number of API Calls',
                             backgroundColor: 'rgba(61, 135, 213, 0.6)',
                             borderColor: 'rgba(61, 135, 213, 1)',
                             borderWidth: 1,
-                            data: usages.map(x => x.count)
+                            data: dtos.map(x => x.count)
                         }
                     ]
                 };
 
-                this.chartPerformance = {
-                    labels: usages.map(x => x.date),
+                this.chartCallsPerformance = {
+                    labels: createLabels(dtos),
                     datasets: [
                         {
                             label: 'API Performance (Milliseconds)',
                             backgroundColor: 'rgba(61, 135, 213, 0.6)',
                             borderColor: 'rgba(61, 135, 213, 1)',
                             borderWidth: 1,
-                            data: usages.map(x => x.averageMs)
+                            data: dtos.map(x => x.averageMs)
                         }
                     ]
                 };
@@ -115,5 +162,19 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public showForum() {
         _urq.push(['Feedback_Open']);
     }
+}
+
+function createLabels(dtos: { date: DateTime }[]): string[] {
+    const labels: string[] = [];
+
+    for (let dto of dtos) {
+        if (dto.date.weekDay === 1 || dto.date.weekDay === 4) {
+            labels.push(dto.date.toStringFormat('M-DD'));
+        } else {
+            labels.push('');
+        }
+    }
+
+    return labels;
 }
 

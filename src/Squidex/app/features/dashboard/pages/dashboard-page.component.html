@@ -4,7 +4,7 @@
     <div class="dashboard-inner">
     
     <div>
-        <h1>Hi {{profileDisplayName}}</h1>
+        <h1 class="dashboard-title">Hi {{profileDisplayName}}</h1>
 
         <div class="subtext">
             Welcome to <span class="app-name">{{appName() | async}}</span> dashboard.
@@ -12,7 +12,7 @@
     </div>
 
     <div class="clearfix">
-        <a class="card" [routerLink]="['schemas', { showDialog: true }]">
+        <a class="card card-link" [routerLink]="['schemas', { showDialog: true }]">
             <div class="card-block">
                 <div class="card-image">
                     <img src="/images/dashboard-schema.png" />
@@ -22,7 +22,8 @@
                 <p class="card-text">A schema defines the structure of your content element.</p>
             </div>
         </a>
-        <a class="card" href="/api/content/{{appName() | async}}/docs" target="_blank">
+
+        <a class="card card-link" href="/api/content/{{appName() | async}}/docs" target="_blank">
             <div class="card-block">
                 <div class="card-image">
                     <img src="/images/dashboard-api.png" />
@@ -32,7 +33,8 @@
                 <p class="card-text">Swagger compatible documentation for your schemas.</p>
             </div>
         </a>
-        <a class="card" (click)="showForum()">
+
+        <a class="card card-link" (click)="showForum()">
             <div class="card-block">
                 <div class="card-image">
                     <img src="/images/dashboard-feedback.png" />
@@ -42,7 +44,8 @@
                 <p class="card-text">Provide feedback and request features to help us to improve Squidex.</p>
             </div>
         </a>
-        <a class="card" href="https://github.com/squidex/squidex" target="_blank">
+
+        <a class="card card-link" href="https://github.com/squidex/squidex" target="_blank">
             <div class="card-block">
                 <div class="card-image">
                     <img src="/images/dashboard-github.png" />
@@ -53,23 +56,45 @@
             </div>
         </a>
 
-        <div class="card card-big">
+        <div class="card card-lg">
             <div class="card-block">
-                <chart type="bar" [data]="chartCount" [options]="chartOptions"></chart>
+                <chart type="bar" [data]="chartCallsCount" [options]="chartOptions"></chart>
             </div>
         </div>
-        <div class="card card-big">
+
+        <div class="card card-lg">
             <div class="card-block">
-                <chart type="bar" [data]="chartPerformance" [options]="chartOptions"></chart>
+                <chart type="bar" [data]="chartCallsPerformance" [options]="chartOptions"></chart>
             </div>
         </div>
 
         <div class="card card">
             <div class="card-block">
-                <div class="monthly-calls" *ngIf="monthlyCalls">
-                    <div class="monthly-calls-label">API calls this month</div>
-                    <div class="monthly-calls-value">{{monthlyCalls}}</div>
+                <div class="aggregation" *ngIf="currentCalls">
+                    <div class="aggregation-label">API calls this month</div>
+                    <div class="aggregation-value">{{currentCalls}}</div>
                 </div>
+            </div>
+        </div>
+
+        <div class="card card-lg">
+            <div class="card-block">
+                <chart type="line" [data]="chartStorageCount" [options]="chartOptions"></chart>
+            </div>
+        </div>
+
+        <div class="card card">
+            <div class="card-block">
+                <div class="aggregation" *ngIf="currentStorage">
+                    <div class="aggregation-label">Asset size today</div>
+                    <div class="aggregation-value">{{currentStorage}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-lg">
+            <div class="card-block">
+                <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
             </div>
         </div>
     </div>
