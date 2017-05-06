@@ -10,7 +10,6 @@ export * from './components/app-form.component';
 export * from './components/asset.component';
 export * from './components/assets-editor.component';
 export * from './components/component-base';
-export * from './components/dashboard-link.directive';
 export * from './components/help.component';
 export * from './components/history.component';
 export * from './components/language-selector.component';

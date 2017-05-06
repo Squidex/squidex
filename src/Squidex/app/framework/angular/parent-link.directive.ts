@@ -6,34 +6,32 @@
  */
 
 import { Directive, ElementRef, HostListener, OnDestroy, OnInit, Renderer } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AppsStoreService } from './../declarations-base';
-
 @Directive({
-    selector: '[sqxDashboardLink]'
+    selector: '[sqxParentLink]'
 })
-export class DashboardLinkDirective implements OnInit, OnDestroy {
-    private appSubscription: Subscription;
+export class ParentLinkDirective implements OnInit, OnDestroy {
+    private urlSubscription: Subscription;
     private url: string;
 
     constructor(
-        private readonly appsStore: AppsStoreService,
         private readonly router: Router,
+        private readonly route: ActivatedRoute,
         private readonly element: ElementRef,
         private readonly renderer: Renderer
     ) {
     }
 
     public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
+        this.urlSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                this.url = this.router.createUrlTree(['app', app!.name]).toString();
+        this.urlSubscription =
+            this.route.url.subscribe(() => {
+                this.url = this.router.createUrlTree(['.'], { relativeTo: this.route.parent.parent }).toString();
 
                 this.renderer.setElementAttribute(this.element.nativeElement, 'href', this.url);
             });

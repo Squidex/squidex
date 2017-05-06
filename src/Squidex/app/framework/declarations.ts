@@ -28,6 +28,7 @@ export * from './angular/money.pipe';
 export * from './angular/name.pipe';
 export * from './angular/panel.component';
 export * from './angular/panel-container.directive';
+export * from './angular/parent-link.directive';
 export * from './angular/progress-bar.component';
 export * from './angular/rich-editor.component';
 export * from './angular/scroll-active.directive';
