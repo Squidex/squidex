@@ -325,7 +325,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void NotEmpty_should_do_nothing_for_value_collection()
         {
-            Guard.NotEmpty(new [] { 1, 2, 3 }, "parameter");
+            Guard.NotEmpty(new[] { 1, 2, 3 }, "parameter");
         }
 
         [Fact]

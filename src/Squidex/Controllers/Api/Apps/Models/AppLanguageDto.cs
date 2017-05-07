@@ -27,6 +27,11 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// <summary>
         /// Indicates if the language is the master language.
         /// </summary>
-        public bool IsMasterLanguage { get; set; }
+        public bool IsMaster { get; set; }
+
+        /// <summary>
+        /// Indicates if the language is optional.
+        /// </summary>
+        public bool IsOptional { get; set; }
     }
 }

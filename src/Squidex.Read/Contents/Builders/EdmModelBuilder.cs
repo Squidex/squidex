@@ -7,11 +7,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
+using Squidex.Core;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Read.Schemas;
@@ -26,30 +26,32 @@ namespace Squidex.Read.Contents.Builders
         {
         }
 
-        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, HashSet<Language> languages)
+        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, LanguagesConfig languagesConfig)
         {
-            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
             Guard.NotNull(schemaEntity, nameof(schemaEntity));
 
-            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{string.Join(",", languages.Select(x => x.Iso2Code).OrderBy(x => x))}";
+            var isoCodes = string.Join(",", languagesConfig.Select(x => x.Language.Iso2Code).OrderBy(x => x));
+
+            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{isoCodes}";
 
             var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
 
-                return BuildEdmModel(schemaEntity.Schema, languages);
+                return BuildEdmModel(schemaEntity.Schema, languagesConfig);
             });
 
             return result;
         }
 
-        private static EdmModel BuildEdmModel(Schema schema, HashSet<Language> languages)
+        private static EdmModel BuildEdmModel(Schema schema, LanguagesConfig languagesConfig)
         {
             var model = new EdmModel();
 
             var container = new EdmEntityContainer("Squidex", "Container");
 
-            var schemaType = schema.BuildEdmType(languages, x =>
+            var schemaType = schema.BuildEdmType(languagesConfig, x =>
             {
                 model.AddElement(x);
 

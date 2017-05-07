@@ -82,6 +82,16 @@ namespace Squidex.Infrastructure
             return AllLanguagesField.TryGetValue(iso2Code, out language);
         }
 
+        public static implicit operator string(Language language)
+        {
+            return language?.Iso2Code;
+        }
+
+        public static implicit operator Language(string iso2Code)
+        {
+            return GetLanguage(iso2Code);
+        }
+
         public static Language ParseOrNull(string input)
         {
             if (string.IsNullOrWhiteSpace(input))

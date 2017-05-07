@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -15,6 +14,7 @@ using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Moq;
+using Squidex.Core;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -45,11 +45,7 @@ namespace Squidex.Read.MongoDb.Contents
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly IEdmModel edmModel;
-        private readonly HashSet<Language> languages = new HashSet<Language>
-        {
-            Language.EN,
-            Language.DE
-        };
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
         static ODataQueryTests()
         {
@@ -65,7 +61,7 @@ namespace Squidex.Read.MongoDb.Contents
             schemaEntity.Setup(x => x.Version).Returns(3);
             schemaEntity.Setup(x => x.Schema).Returns(schema);
 
-            edmModel = builder.BuildEdmModel(schemaEntity.Object, languages);
+            edmModel = builder.BuildEdmModel(schemaEntity.Object, languagesConfig);
         }
 
         [Fact]

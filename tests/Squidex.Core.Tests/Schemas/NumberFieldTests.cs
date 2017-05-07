@@ -40,7 +40,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             Assert.Empty(errors);
         }
@@ -49,11 +49,11 @@ namespace Squidex.Core.Schemas
         public async Task Should_add_errors_if_number_is_required()
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties { IsRequired = true });
-            
-            await sut.ValidateAsync(CreateValue(null), errors);
+
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             errors.ShouldBeEquivalentTo(
-                new [] { "<FIELD> is required" });
+                new[] { "<FIELD> is required" });
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties { MinValue = 10 });
 
-            await sut.ValidateAsync(CreateValue(5), errors);
+            await sut.ValidateAsync(CreateValue(5), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be greater than '10'" });
@@ -72,7 +72,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties { MaxValue = 10 });
 
-            await sut.ValidateAsync(CreateValue(20), errors);
+            await sut.ValidateAsync(CreateValue(20), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be less than '10'" });
@@ -83,7 +83,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
 
-            await sut.ValidateAsync(CreateValue(20), errors);
+            await sut.ValidateAsync(CreateValue(20), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not an allowed value" });
@@ -94,7 +94,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", new NumberFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("Invalid"), errors);
+            await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });

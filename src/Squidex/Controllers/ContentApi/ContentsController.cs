@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +16,6 @@ using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
 using Squidex.Core.Identity;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -54,13 +52,11 @@ namespace Squidex.Controllers.ContentApi
             {
                 return NotFound();
             }
-
-            var languages = new HashSet<Language>(App.Languages);
-
+            
             var query = Request.QueryString.ToString();
 
-            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, languages);
-            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, languages);
+            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App.LanguagesConfig);
+            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App.LanguagesConfig);
 
             await Task.WhenAll(taskForContents, taskForCount);
 
@@ -73,7 +69,7 @@ namespace Squidex.Controllers.ContentApi
 
                     if (x.Data != null)
                     {
-                        itemModel.Data = x.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage);
+                        itemModel.Data = x.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig);
                     }
 
                     return itemModel;
@@ -105,7 +101,7 @@ namespace Squidex.Controllers.ContentApi
 
             if (entity.Data != null)
             {
-                model.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.Languages, App.MasterLanguage, hidden);
+                model.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
             }
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());

@@ -13,6 +13,6 @@ namespace Squidex.Core.Schemas.Validators
 {
     public interface IValidator
     {
-        Task ValidateAsync(object value, Action<string> addError);
+        Task ValidateAsync(object value, bool isOptional, Action<string> addError);
     }
 }

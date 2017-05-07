@@ -39,7 +39,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             Assert.Empty(errors);
         }
@@ -49,7 +49,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(true), errors);
+            await sut.ValidateAsync(CreateValue(true), false, errors);
 
             Assert.Empty(errors);
         }
@@ -59,7 +59,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -70,7 +70,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("Invalid"), errors);
+            await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });

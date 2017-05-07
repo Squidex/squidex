@@ -6,26 +6,27 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Apps;
 
+// ReSharper disable InvertIf
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
 namespace Squidex.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity
     {
-        [BsonRequired]
-        [BsonElement]
-        public string Name { get; set; }
+        private LanguagesConfig languagesConfig = LanguagesConfig.Empty;
 
         [BsonRequired]
         [BsonElement]
-        public string MasterLanguage { get; set; }
+        public string Name { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -33,7 +34,11 @@ namespace Squidex.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public HashSet<string> Languages { get; set; } = new HashSet<string>(); 
+        public string MasterLanguage { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public List<MongoAppLanguage> Languages { get; set; } = new List<MongoAppLanguage>(); 
 
         [BsonRequired]
         [BsonElement]
@@ -42,6 +47,11 @@ namespace Squidex.Read.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; } = new Dictionary<string, MongoAppContributorEntity>();
+
+        public LanguagesConfig LanguagesConfig
+        {
+            get { return languagesConfig ?? (languagesConfig = CreateLanguagesConfig()); }
+        }
 
         IReadOnlyCollection<IAppClientEntity> IAppEntity.Clients
         {
@@ -53,14 +63,32 @@ namespace Squidex.Read.MongoDb.Apps
             get { return Contributors.Values; }
         }
 
-        IReadOnlyCollection<Language> IAppEntity.Languages
+        public void UpdateLanguages(Func<LanguagesConfig, LanguagesConfig> updater)
         {
-            get { return Languages.Select(Language.GetLanguage).ToList(); }
+            var newConfig = updater(LanguagesConfig);
+
+            if (languagesConfig != newConfig)
+            {
+                languagesConfig = newConfig;
+                Languages = newConfig.Select(FromLanguageConfig).ToList();
+
+                MasterLanguage = newConfig.Master.Language;
+            }
         }
 
-        Language IAppEntity.MasterLanguage
+        private LanguagesConfig CreateLanguagesConfig()
         {
-            get { return Language.GetLanguage(MasterLanguage); }
+            return LanguagesConfig.Create(Languages.Select(ToLanguageConfig).ToList()).MakeMaster(MasterLanguage);
+        }
+
+        private static MongoAppLanguage FromLanguageConfig(LanguageConfig l)
+        {
+            return new MongoAppLanguage { Iso2Code = l.Language, IsOptional = l.IsOptional, Fallback = l.Fallback.Select(x => x.Iso2Code).ToList() };
+        }
+
+        private static LanguageConfig ToLanguageConfig(MongoAppLanguage l)
+        {
+            return new LanguageConfig(l.Iso2Code, l.IsOptional, l.Fallback?.Select<string, Language>(f => f));
         }
     }
 }

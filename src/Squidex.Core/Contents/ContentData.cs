@@ -122,13 +122,13 @@ namespace Squidex.Core.Contents
             return result;
         }
 
-        public ContentData ToApiModel(Schema schema, IReadOnlyCollection<Language> languages, Language masterLanguage, bool excludeHidden = true)
+        public ContentData ToApiModel(Schema schema, LanguagesConfig languagesConfig, IReadOnlyCollection<Language> languagePreferences = null, bool excludeHidden = true)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languages, nameof(languages));
-            Guard.NotNull(masterLanguage, nameof(masterLanguage));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
-            var invariantCode = Language.Invariant.Iso2Code;
+            var codeForInvariant = Language.Invariant.Iso2Code;
+            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
 
             var result = new ContentData();
 
@@ -144,15 +144,15 @@ namespace Squidex.Core.Contents
 
                 if (field.RawProperties.IsLocalizable)
                 {
-                    foreach (var language in languages)
+                    foreach (var languageConfig in languagesConfig)
                     {
-                        var languageCode = language.Iso2Code;
+                        string languageCode = languageConfig.Language;
 
                         if (fieldValues.TryGetValue(languageCode, out JToken value))
                         {
                             fieldResult.Add(languageCode, value);
                         }
-                        else if (language.Equals(masterLanguage) && fieldValues.TryGetValue(invariantCode, out value))
+                        else if (languageConfig == languagesConfig.Master && fieldValues.TryGetValue(codeForInvariant, out value))
                         {
                             fieldResult.Add(languageCode, value);
                         }
@@ -160,17 +160,17 @@ namespace Squidex.Core.Contents
                 }
                 else
                 {
-                    if (fieldValues.TryGetValue(invariantCode, out JToken value))
+                    if (fieldValues.TryGetValue(codeForInvariant, out JToken value))
                     {
-                        fieldResult.Add(invariantCode, value);
+                        fieldResult.Add(codeForInvariant, value);
                     }
-                    else if (fieldValues.TryGetValue(masterLanguage.Iso2Code, out value))
+                    else if (fieldValues.TryGetValue(codeForMasterLanguage, out value))
                     {
-                        fieldResult.Add(invariantCode, value);
+                        fieldResult.Add(codeForInvariant, value);
                     }
                     else if (fieldValues.Count > 0)
                     {
-                        fieldResult.Add(invariantCode, fieldValues.Values.First());
+                        fieldResult.Add(codeForInvariant, fieldValues.Values.First());
                     }
                 }
 
@@ -180,11 +180,18 @@ namespace Squidex.Core.Contents
             return result;
         }
 
-        public object ToLanguageModel(IReadOnlyCollection<Language> languagePreferences = null)
+        public object ToLanguageModel(LanguagesConfig languagesConfig, IReadOnlyCollection<Language> languagePreferences = null)
         {
-            if (languagePreferences == null)
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+
+            if (languagePreferences == null || languagePreferences.Count == 0)
             {
                 return this;
+            }
+
+            if (languagePreferences.Count == 1 && languagesConfig.TryGetConfig(languagePreferences.First(), out var languageConfig))
+            {
+                languagePreferences = languagePreferences.Union(languageConfig.Fallback).ToList();
             }
 
             var result = new Dictionary<string, JToken>();
@@ -195,9 +202,7 @@ namespace Squidex.Core.Contents
 
                 foreach (var language in languagePreferences)
                 {
-                    var languageCode = language.Iso2Code;
-
-                    if (fieldValues.TryGetValue(languageCode, out JToken value) && value != null)
+                    if (fieldValues.TryGetValue(language, out JToken value) && value != null)
                     {
                         result[fieldValue.Key] = value;
 

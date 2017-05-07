@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
+using Squidex.Core;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -34,6 +35,7 @@ namespace Squidex.Write.Contents
         private readonly Mock<ISchemaEntityWithSchema> schemaEntity = new Mock<ISchemaEntityWithSchema>();
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
         private readonly ContentData data = new ContentData().AddField("my-field", new ContentFieldData().SetValue(1));
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
 
         public ContentCommandHandlerTests()
@@ -47,7 +49,7 @@ namespace Squidex.Write.Contents
 
             sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
 
-            appEntity.Setup(x => x.Languages).Returns(new[] { Language.DE });
+            appEntity.Setup(x => x.LanguagesConfig).Returns(languagesConfig);
             appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);

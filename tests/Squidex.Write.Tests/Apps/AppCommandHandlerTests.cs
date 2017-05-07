@@ -227,6 +227,20 @@ namespace Squidex.Write.Apps
             });
         }
 
+        [Fact]
+        public async Task UpdateLanguage_should_update_domain_object()
+        {
+            CreateApp()
+                .AddLanguage(CreateCommand(new AddLanguage { Language = language }));
+
+            var context = CreateContextForCommand(new UpdateLanguage { Language = language });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
         private AppDomainObject CreateApp()
         {
             app.Create(CreateCommand(new CreateApp { Name = AppName }));

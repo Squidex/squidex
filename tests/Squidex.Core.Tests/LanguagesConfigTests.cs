@@ -1,0 +1,213 @@
+﻿// ==========================================================================
+//  LanguagesConfigTests.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using Squidex.Infrastructure;
+using Xunit;
+
+namespace Squidex.Core
+{
+    public class LanguagesConfigTests
+    {
+        [Fact]
+        public void Should_create_initial_config()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE)
+                });
+
+            Assert.Equal(Language.DE, config.Master.Language);
+        }
+
+        [Fact]
+        public void Should_create_initial_config_with_multiple_languages()
+        {
+            var config = LanguagesConfig.Create(Language.DE, Language.EN, Language.IT);
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE),
+                    new LanguageConfig(Language.EN),
+                    new LanguageConfig(Language.IT)
+                });
+
+            Assert.Equal(Language.DE, config.Master.Language);
+        }
+
+        [Fact]
+        public void Should_create_initial_config_with_configs()
+        {
+            var configs = new[]
+            {
+                new LanguageConfig(Language.DE),
+                new LanguageConfig(Language.EN),
+                new LanguageConfig(Language.IT),
+            };
+            var config = LanguagesConfig.Create(configs);
+
+            config.ToList().ShouldBeEquivalentTo(configs);
+
+            Assert.Equal(configs[0], config.Master);
+        }
+
+        [Fact]
+        public void Should_add_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT);
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE),
+                    new LanguageConfig(Language.IT)
+                });
+        }
+
+        [Fact]
+        public void Should_make_first_language_to_master()
+        {
+            var config = LanguagesConfig.Empty.Add(Language.IT);
+
+            Assert.Equal(Language.IT, config.Master.Language);
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_add_already_exists()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<ValidationException>(() => config.Add(Language.DE));
+        }
+
+        [Fact]
+        public void Should_make_master_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).MakeMaster(Language.IT);
+
+            Assert.Equal(Language.IT, config.Master.Language);
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_make_master_is_not_found()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<DomainObjectNotFoundException>(() => config.MakeMaster(Language.EN));
+        }
+
+        [Fact]
+        public void Should_not_throw_exception_if_language_is_already_master_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            config.MakeMaster(Language.DE);
+        }
+
+        [Fact]
+        public void Should_remove_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Add(Language.RU).Remove(Language.IT);
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE),
+                    new LanguageConfig(Language.RU)
+                });
+        }
+
+        [Fact]
+        public void Should_remove_fallbacks_when_removing_language()
+        {
+            var config = 
+                LanguagesConfig.Create(Language.DE)
+                    .Add(Language.IT)
+                    .Add(Language.RU)
+                    .Update(Language.DE, false, new[] { Language.RU, Language.IT })
+                    .Update(Language.RU, false, new[] { Language.DE, Language.IT })
+                    .Remove(Language.IT);
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE, false, Language.RU),
+                    new LanguageConfig(Language.RU, false, Language.DE)
+                });
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_remove_is_not_found()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<DomainObjectNotFoundException>(() => config.Remove(Language.EN));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_remove_is_master_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<ValidationException>(() => config.Remove(Language.DE));
+        }
+
+        [Fact]
+        public void Should_update_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, new[] { Language.DE });
+
+            config.ToList().ShouldBeEquivalentTo(
+                new List<LanguageConfig>
+                {
+                    new LanguageConfig(Language.DE),
+                    new LanguageConfig(Language.IT, true, Language.DE)
+                });
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_update_is_not_found()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<DomainObjectNotFoundException>(() => config.Update(Language.EN, true, null));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_fallback_language_is_invalid()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, new [] { Language.EN }));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_make_optional_is_master_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE);
+
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, null));
+        }
+
+        [Fact]
+        public void Should_provide_enumerators()
+        {
+            var config = LanguagesConfig.Create();
+
+            Assert.NotNull(((IEnumerable)config).GetEnumerator());
+            Assert.NotNull(((IEnumerable<LanguageConfig>)config).GetEnumerator());
+        }
+    }
+}

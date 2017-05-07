@@ -11,29 +11,27 @@ using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
-using System.Collections.Generic;
 
 namespace Squidex.Core
 {
     public sealed class ContentEnricher
     {
         private readonly Schema schema;
-        private readonly HashSet<Language> languages;
+        private readonly LanguagesConfig languagesConfig;
 
-        public ContentEnricher(HashSet<Language> languages, Schema schema)
+        public ContentEnricher(LanguagesConfig languagesConfig, Schema schema)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languages, nameof(languages));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
             this.schema = schema;
 
-            this.languages = languages;
+            this.languagesConfig = languagesConfig;
         }
 
         public void Enrich(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
-            Guard.NotEmpty(languages, nameof(languages));
 
             foreach (var field in schema.FieldsByName.Values)
             {
@@ -41,9 +39,9 @@ namespace Squidex.Core
 
                 if (field.RawProperties.IsLocalizable)
                 {
-                    foreach (var language in languages)
+                    foreach (var languageConfig in languagesConfig)
                     {
-                        Enrich(field, fieldData, language);
+                        Enrich(field, fieldData, languageConfig.Language);
                     }
                 }
                 else
@@ -61,7 +59,6 @@ namespace Squidex.Core
         private static void Enrich(Field field, ContentFieldData fieldData, Language language)
         {
             Guard.NotNull(fieldData, nameof(fieldData));
-            Guard.NotNull(language, nameof(language));
 
             var defaultValue = field.RawProperties.GetDefaultValue();
 
@@ -70,9 +67,9 @@ namespace Squidex.Core
                 return;
             }
 
-            if (!fieldData.TryGetValue(language.Iso2Code, out JToken value) || value == null || value.Type == JTokenType.Null)
+            if (!fieldData.TryGetValue(language, out JToken value) || value == null || value.Type == JTokenType.Null)
             {
-                fieldData.AddValue(language.Iso2Code, defaultValue);
+                fieldData.AddValue(language, defaultValue);
             }
         }
     }

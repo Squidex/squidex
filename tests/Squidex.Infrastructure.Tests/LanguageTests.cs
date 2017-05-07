@@ -66,6 +66,22 @@ namespace Squidex.Infrastructure
             Assert.False(Language.IsValidLanguage("xx"));
         }
 
+        [Fact]
+        public void Should_make_implicit_conversion_to_language()
+        {
+            Language language = "de";
+
+            Assert.Equal(Language.DE, language);
+        }
+
+        [Fact]
+        public void Should_make_implicit_conversion_to_string()
+        {
+            string iso2Code = Language.DE;
+
+            Assert.Equal("de", iso2Code);
+        }
+
         [Theory]
         [InlineData("de", "German")]
         [InlineData("en", "English")]

@@ -9,15 +9,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
+using Squidex.Core;
 
 namespace Squidex.Read.Contents.Repositories
 {
     public interface IContentRepository
     {
-        Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages);
+        Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig);
 
-        Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages);
+        Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig);
 
         Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id);
     }

@@ -95,13 +95,11 @@ namespace Squidex.Write.Contents
             var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);
-
-            var languages = new HashSet<Language>(taskForApp.Result.Languages);
-
+            
             var schemaObject = taskForSchema.Result.Schema;
             var schemaErrors = new List<ValidationError>();
 
-            await command.Data.ValidateAsync(schemaObject, languages, schemaErrors);
+            await command.Data.ValidateAsync(schemaObject, taskForApp.Result.LanguagesConfig, schemaErrors);
 
             if (schemaErrors.Count > 0)
             {
@@ -110,7 +108,7 @@ namespace Squidex.Write.Contents
 
             if (enrich)
             {
-                command.Data.Enrich(schemaObject, languages);
+                command.Data.Enrich(schemaObject, taskForApp.Result.LanguagesConfig);
             }
         }
     }

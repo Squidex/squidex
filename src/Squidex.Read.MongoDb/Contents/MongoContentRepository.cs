@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Core;
 using MongoDB.Driver;
+using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Contents;
@@ -49,7 +50,7 @@ namespace Squidex.Read.MongoDb.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig)
         {
             List<IContentEntity> result = null;
 
@@ -58,7 +59,7 @@ namespace Squidex.Read.MongoDb.Contents
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, languages);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, languagesConfig);
 
                     var parser = model.ParseQuery(odataQuery);
 
@@ -90,7 +91,7 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, HashSet<Language> languages)
+        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig)
         {
             var result = 0L;
 
@@ -99,7 +100,7 @@ namespace Squidex.Read.MongoDb.Contents
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, languages);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, languagesConfig);
 
                     var parser = model.ParseQuery(odataQuery);
 

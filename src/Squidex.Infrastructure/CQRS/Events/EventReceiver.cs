@@ -128,6 +128,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var @event = ParseEvent(storedEvent);
 
+            if (@event == null)
+            {
+                return;
+            }
+
             await DispatchConsumer(@event, eventConsumer);
             await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventNumber);
         }
@@ -212,6 +217,10 @@ namespace Squidex.Infrastructure.CQRS.Events
                 @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
+            }
+            catch (ArgumentException)
+            {
+                return null;
             }
             catch (Exception ex)
             {

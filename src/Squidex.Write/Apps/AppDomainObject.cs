@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Core;
 using Squidex.Core.Apps;
 using Squidex.Events;
 using Squidex.Events.Apps;
@@ -26,8 +27,8 @@ namespace Squidex.Write.Apps
     {
         private static readonly Language DefaultLanguage = Language.EN;
         private readonly AppContributors contributors = new AppContributors();
-        private readonly AppLanguages languages = new AppLanguages();
         private readonly AppClients clients = new AppClients();
+        private LanguagesConfig languagesConfig = LanguagesConfig.Empty;
         private string name;
 
         public string Name
@@ -77,17 +78,22 @@ namespace Squidex.Write.Apps
 
         protected void On(AppLanguageAdded @event)
         {
-            languages.Add(@event.Language);
+            languagesConfig = languagesConfig.Add(@event.Language);
         }
 
         protected void On(AppLanguageRemoved @event)
         {
-            languages.Remove(@event.Language);
+            languagesConfig = languagesConfig.Remove(@event.Language);
+        }
+
+        protected void On(AppLanguageUpdated @event)
+        {
+            languagesConfig = languagesConfig.Update(@event.Language, @event.IsOptional, @event.Fallback);
         }
 
         protected void On(AppMasterLanguageSet @event)
         {
-            languages.SetMasterLanguage(@event.Language);
+            languagesConfig = languagesConfig.MakeMaster(@event.Language);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -107,7 +113,6 @@ namespace Squidex.Write.Apps
 
             RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
-            RaiseEvent(SimpleMapper.Map(command, CreateInitialMasterLanguage(appId)));
 
             return this;
         }
@@ -189,6 +194,17 @@ namespace Squidex.Write.Apps
             return this;
         }
 
+        public AppDomainObject UpdateLanguage(UpdateLanguage command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot update language");
+
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
+
+            return this;
+        }
+
         public AppDomainObject SetMasterLanguage(SetMasterLanguage command)
         {
             Guard.Valid(command, nameof(command), () => "Cannot set master language");
@@ -213,11 +229,6 @@ namespace Squidex.Write.Apps
         private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)
         {
             return new AppLanguageAdded { AppId = id, Language = DefaultLanguage };
-        }
-
-        private static AppMasterLanguageSet CreateInitialMasterLanguage(NamedId<Guid> id)
-        {
-            return new AppMasterLanguageSet { AppId = id, Language = DefaultLanguage };
         }
 
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)

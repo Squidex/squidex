@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -60,12 +61,13 @@ namespace Squidex.Controllers.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.Languages.Select(x =>
-            {
-                var isMasterLanguage = x.Equals(entity.MasterLanguage);
-
-                return SimpleMapper.Map(x, new AppLanguageDto { IsMasterLanguage = isMasterLanguage });
-            }).ToList();
+            var model = entity.LanguagesConfig.Select(x => 
+                SimpleMapper.Map(x.Language, 
+                    new AppLanguageDto
+                    {
+                        IsMaster = x == entity.LanguagesConfig.Master,
+                        IsOptional = x.IsOptional
+                    })).ToList();
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
@@ -112,9 +114,11 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/languages/{language}")]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
         {
-            if (model.IsMasterLanguage)
+            await CommandBus.PublishAsync(SimpleMapper.Map(model, new UpdateLanguage()));
+
+            if (model.IsMaster == true)
             {
-                await CommandBus.PublishAsync(new SetMasterLanguage { Language = Language.GetLanguage(language) });
+                await CommandBus.PublishAsync(new SetMasterLanguage { Language = ParseLanguage(language) });
             }
 
             return NoContent();
@@ -135,9 +139,21 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/languages/{language}")]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {
-            await CommandBus.PublishAsync(new RemoveLanguage { Language = Language.GetLanguage(language) });
+            await CommandBus.PublishAsync(new RemoveLanguage { Language = ParseLanguage(language) });
 
             return NoContent();
+        }
+
+        private static Language ParseLanguage(string language)
+        {
+            try
+            {
+                return Language.GetLanguage(language);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException($"Language '{language}' is not valid.");
+            }
         }
     }
 }

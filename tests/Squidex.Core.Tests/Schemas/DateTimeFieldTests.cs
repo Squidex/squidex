@@ -41,7 +41,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             Assert.Empty(errors);
         }
@@ -51,7 +51,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -62,7 +62,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MinValue = FutureDays(10) });
 
-            await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
+            await sut.ValidateAsync(CreateValue(FutureDays(0)), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { $"<FIELD> must be greater than '{FutureDays(10)}'" });
@@ -73,7 +73,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MaxValue = FutureDays(10) });
 
-            await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
+            await sut.ValidateAsync(CreateValue(FutureDays(20)), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { $"<FIELD> must be less than '{FutureDays(10)}'" });
@@ -84,7 +84,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("Invalid"), errors);
+            await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });
@@ -95,7 +95,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(123), errors);
+            await sut.ValidateAsync(CreateValue(123), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });

@@ -109,6 +109,11 @@ namespace Squidex.Write.Apps
             return handler.UpdateAsync<AppDomainObject>(context, a => a.RemoveLanguage(command));
         }
 
+        protected Task On(UpdateLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateLanguage(command));
+        }
+
         protected Task On(SetMasterLanguage command, CommandContext context)
         {
             return handler.UpdateAsync<AppDomainObject>(context, a => a.SetMasterLanguage(command));

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Contents;
@@ -19,22 +18,22 @@ namespace Squidex.Core
     public sealed class ContentValidator
     {
         private readonly Schema schema;
-        private readonly HashSet<Language> languages;
+        private readonly LanguagesConfig languagesConfig;
         private readonly List<ValidationError> errors = new List<ValidationError>();
-
-        public ContentValidator(Schema schema, HashSet<Language> languages)
-        {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languages, nameof(languages));
-
-            this.schema = schema;
-
-            this.languages = languages;
-        }
 
         public IReadOnlyList<ValidationError> Errors
         {
             get { return errors; }
+        }
+
+        public ContentValidator(Schema schema, LanguagesConfig languagesConfig)
+        {
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+
+            this.schema = schema;
+
+            this.languagesConfig = languagesConfig;
         }
 
         public async Task ValidatePartialAsync(ContentData data)
@@ -47,51 +46,40 @@ namespace Squidex.Core
 
                 if (!schema.FieldsByName.TryGetValue(fieldData.Key, out Field field))
                 {
-                    AddError("<FIELD> is not a known field", fieldName);
+                    errors.AddError("<FIELD> is not a known field", fieldName);
                 }
                 else
                 {
                     if (field.RawProperties.IsLocalizable)
                     {
-                        await ValidateLocalizableFieldPartialAsync(field, fieldData.Value);
+                        await ValidateFieldPartialAsync(field, fieldData.Value, languagesConfig);
                     }
                     else
                     {
-                        await ValidateNonLocalizableFieldPartialAsync(field, fieldData.Value);
+                        await ValidateFieldPartialAsync(field, fieldData.Value, LanguagesConfig.Invariant);
                     }
                 }
             }
         }
 
-        private async Task ValidateLocalizableFieldPartialAsync(Field field, ContentFieldData fieldData)
+        private async Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData, LanguagesConfig languages)
         {
             foreach (var languageValue in fieldData)
             {
-                if (!Language.TryGetLanguage(languageValue.Key, out Language language))
+                if (!Language.TryGetLanguage(languageValue.Key, out var language))
                 {
-                    AddError($"<FIELD> has an invalid language '{languageValue.Key}'", field);
+                    errors.AddError($"<FIELD> has an invalid language '{languageValue.Key}'", field);
                 }
-                else if (!languages.Contains(language))
+                else if (!languages.TryGetConfig(language, out var languageConfig))
                 {
-                    AddError($"<FIELD> has an unsupported language '{languageValue.Key}'", field);
+                    errors.AddError($"<FIELD> has an unsupported language '{languageValue.Key}'", field);
                 }
                 else
                 {
-                    await ValidateAsync(field, languageValue.Value, language);
+                    var config = languageConfig;
+
+                    await field.ValidateAsync(languageValue.Value, config.IsOptional, m => errors.AddError(m, field, config.Language));
                 }
-            }
-        }
-
-        private async Task ValidateNonLocalizableFieldPartialAsync(Field field, ContentFieldData fieldData)
-        {
-            if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
-            {
-                AddError($"<FIELD> can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})", field);
-            }
-
-            if (fieldData.TryGetValue(Language.Invariant.Iso2Code, out JToken value))
-            {
-                await ValidateAsync(field, value);
             }
         }
 
@@ -107,11 +95,11 @@ namespace Squidex.Core
 
                 if (field.RawProperties.IsLocalizable)
                 {
-                    await ValidateLocalizableFieldAsync(field, fieldData);
+                    await ValidateFieldAsync(field, fieldData, languagesConfig);
                 }
                 else
                 {
-                    await ValidateNonLocalizableField(field, fieldData);
+                    await ValidateFieldAsync(field, fieldData, LanguagesConfig.Invariant);
                 }
             }
         }
@@ -122,69 +110,32 @@ namespace Squidex.Core
             {
                 if (!schema.FieldsByName.ContainsKey(fieldData.Key))
                 {
-                    AddError("<FIELD> is not a known field", fieldData.Key);
+                    errors.AddError("<FIELD> is not a known field", fieldData.Key);
                 }
             }
         }
 
-        private async Task ValidateLocalizableFieldAsync(Field field, ContentFieldData fieldData)
+        private async Task ValidateFieldAsync(Field field, ContentFieldData fieldData, LanguagesConfig languages)
         {
             foreach (var valueLanguage in fieldData.Keys)
             {
                 if (!Language.TryGetLanguage(valueLanguage, out Language language))
                 {
-                    AddError($"<FIELD> has an invalid language '{valueLanguage}'", field);
+                    errors.AddError($"<FIELD> has an invalid language '{valueLanguage}'", field);
                 }
                 else if (!languages.Contains(language))
                 {
-                    AddError($"<FIELD> has an unsupported language '{valueLanguage}'", field);
+                    errors.AddError($"<FIELD> has an unsupported language '{valueLanguage}'", field);
                 }
             }
 
-            foreach (var language in languages)
+            foreach (var languageConfig in languages)
             {
-                var value = fieldData.GetOrCreate(language.Iso2Code, k => JValue.CreateNull());
+                var config = languageConfig;
+                var value = fieldData.GetOrCreate(config.Language, k => JValue.CreateNull());
 
-                await ValidateAsync(field, value, language);
+                await field.ValidateAsync(value, config.IsOptional, m => errors.AddError(m, field, config.Language));
             }
-        }
-
-        private async Task ValidateNonLocalizableField(Field field, ContentFieldData fieldData)
-        {
-            if (fieldData.Keys.Any(x => x != Language.Invariant.Iso2Code))
-            {
-                AddError($"<FIELD> can only contain a single entry for invariant language ({Language.Invariant.Iso2Code})", field);
-            }
-
-            var value = fieldData.GetOrCreate(Language.Invariant.Iso2Code, k => JValue.CreateNull());
-
-            await ValidateAsync(field, value);
-        }
-
-        private Task ValidateAsync(Field field, JToken value, Language language = null)
-        {
-            return field.ValidateAsync(value, m => AddError(m, field, language));
-        }
-
-        private void AddError(string message, Field field, Language language = null)
-        {
-            var displayName = !string.IsNullOrWhiteSpace(field.RawProperties.Label) ? field.RawProperties.Label : field.Name;
-
-            if (language != null)
-            {
-                displayName += $" ({language.Iso2Code})";
-            }
-
-            message = message.Replace("<FIELD>", displayName);
-
-            errors.Add(new ValidationError(message, field.Name));
-        }
-
-        private void AddError(string message, string fieldName)
-        {
-            message = message.Replace("<FIELD>", fieldName);
-
-            errors.Add(new ValidationError(message, fieldName));
         }
     }
 }

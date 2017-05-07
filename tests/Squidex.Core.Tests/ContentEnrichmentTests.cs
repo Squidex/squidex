@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Moq;
 using NodaTime;
 using NodaTime.Text;
@@ -19,7 +18,7 @@ namespace Squidex.Core
 {
     public class ContentEnrichmentTests
     {
-        private readonly HashSet<Language> languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
         
         [Fact]
         private void Should_enrich_with_default_values()
@@ -52,7 +51,7 @@ namespace Squidex.Core
                         new ContentFieldData()
                             .AddValue("iv", 456));
 
-            data.Enrich(schema, languages);
+            data.Enrich(schema, languagesConfig);
 
             Assert.Equal(456, (int)data["my-number"]["iv"]);
 

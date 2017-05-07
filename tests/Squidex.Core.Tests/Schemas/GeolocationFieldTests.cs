@@ -39,7 +39,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
+            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), false, errors);
 
             Assert.Empty(errors);
         }
@@ -53,7 +53,7 @@ namespace Squidex.Core.Schemas
                 new JProperty("latitude", 0),
                 new JProperty("longitude", 0));
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(CreateValue(geolocation), false, errors);
 
             Assert.Empty(errors);
         }
@@ -67,7 +67,7 @@ namespace Squidex.Core.Schemas
                 new JProperty("latitude", 200),
                 new JProperty("longitude", 0));
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(CreateValue(geolocation), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });
@@ -83,7 +83,7 @@ namespace Squidex.Core.Schemas
                 new JProperty("latitude", 0),
                 new JProperty("longitude", 0));
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(CreateValue(geolocation), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });
@@ -94,7 +94,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
+            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });

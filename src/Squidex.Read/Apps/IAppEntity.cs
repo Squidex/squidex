@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
+using Squidex.Core;
 
 namespace Squidex.Read.Apps
 {
@@ -15,12 +15,10 @@ namespace Squidex.Read.Apps
     {
         string Name { get; }
 
-        Language MasterLanguage { get; }
+        LanguagesConfig LanguagesConfig { get; }
 
         IReadOnlyCollection<IAppClientEntity> Clients { get; }
 
         IReadOnlyCollection<IAppContributorEntity> Contributors { get; }
-
-        IReadOnlyCollection<Language> Languages { get; }
     }
 }

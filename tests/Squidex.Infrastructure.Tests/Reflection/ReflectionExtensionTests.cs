@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Reflection
         {
             var properties = typeof(IMyMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
 
-            Assert.Equal(new [] { "MainProp", "Sub1Prop", "Sub2Prop" }, properties);
+            Assert.Equal(new[] { "MainProp", "Sub1Prop", "Sub2Prop" }, properties);
         }
 
         [Fact]

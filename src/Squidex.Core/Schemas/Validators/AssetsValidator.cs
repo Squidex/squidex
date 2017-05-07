@@ -23,13 +23,13 @@ namespace Squidex.Core.Schemas.Validators
             this.isRequired = isRequired;
         }
 
-        public async Task ValidateAsync(object value, Action<string> addError)
+        public async Task ValidateAsync(object value, bool isOptional, Action<string> addError)
         {
             var assets = value as AssetsValue;
 
             if (assets == null || assets.AssetIds.Count == 0)
             {
-                if (isRequired)
+                if (isRequired && !isOptional)
                 {
                     addError("<FIELD> is required");
                 }

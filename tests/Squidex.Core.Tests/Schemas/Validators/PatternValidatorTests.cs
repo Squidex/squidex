@@ -22,7 +22,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new PatternValidator("[a-z]{3}:[0-9]{2}");
 
-            await sut.ValidateAsync("abc:12", errors.Add);
+            await sut.ValidateAsync("abc:12", false, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -32,7 +32,17 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new PatternValidator("[a-z]{3}:[0-9]{2}");
 
-            await sut.ValidateAsync(null, errors.Add);
+            await sut.ValidateAsync(null, false, errors.Add);
+
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_value_is_empty()
+        {
+            var sut = new PatternValidator("[a-z]{3}:[0-9]{2}");
+
+            await sut.ValidateAsync("", false, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -42,7 +52,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new PatternValidator("[a-z]{3}:[0-9]{2}");
 
-            await sut.ValidateAsync("foo", errors.Add);
+            await sut.ValidateAsync("foo", false, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not valid" });
@@ -53,7 +63,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new PatternValidator("[a-z]{3}:[0-9]{2}", "Custom Error Message");
 
-            await sut.ValidateAsync("foo", errors.Add);
+            await sut.ValidateAsync("foo", false, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "Custom Error Message" });

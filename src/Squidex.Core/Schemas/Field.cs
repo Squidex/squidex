@@ -104,15 +104,15 @@ namespace Squidex.Core.Schemas
             return Clone<Field>(clone => clone.name = newName);
         }
 
-        public void AddToEdmType(EdmStructuredType edmType, IEnumerable<Language> languages, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
+        public void AddToEdmType(EdmStructuredType edmType, LanguagesConfig languagesConfig, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
         {
             Guard.NotNull(edmType, nameof(edmType));
-            Guard.NotNull(languages, nameof(languages));
             Guard.NotNull(typeResolver, nameof(typeResolver));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
             if (!RawProperties.IsLocalizable)
             {
-                languages = new[] { Language.Invariant };
+                languagesConfig = LanguagesConfig.Invariant;
             }
 
             var edmValueType = CreateEdmType();
@@ -124,35 +124,35 @@ namespace Squidex.Core.Schemas
 
             var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}{Name.ToPascalCase()}Property"));
 
-            foreach (var language in languages)
+            foreach (var languageConfig in languagesConfig)
             {
-                languageType.AddStructuralProperty(language.Iso2Code, edmValueType);
+                languageType.AddStructuralProperty(languageConfig.Language, edmValueType);
             }
 
             edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(languageType, false));
         }
 
-        public void AddToJsonSchema(JsonSchema4 schema, IEnumerable<Language> languages, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public void AddToJsonSchema(JsonSchema4 schema, LanguagesConfig languagesConfig, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languages, nameof(languages));
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
             if (!RawProperties.IsLocalizable)
             {
-                languages = new[] { Language.Invariant };
+                languagesConfig = LanguagesConfig.Invariant;
             }
 
             var languagesProperty = CreateProperty();
             var languagesObject = new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalProperties = false };
 
-            foreach (var language in languages)
+            foreach (var languageConfig in languagesConfig)
             {
-                var languageProperty = new JsonProperty { Description = language.EnglishName, IsRequired = RawProperties.IsRequired };
+                var languageProperty = new JsonProperty { Description = languageConfig.Language.EnglishName, IsRequired = RawProperties.IsRequired };
 
                 PrepareJsonSchema(languageProperty, schemaResolver);
 
-                languagesObject.Properties.Add(language.Iso2Code, languageProperty);
+                languagesObject.Properties.Add(languageConfig.Language, languageProperty);
             }
 
             languagesProperty.SchemaReference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", languagesObject);

@@ -24,7 +24,17 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new StringLengthValidator(100, 200);
 
-            await sut.ValidateAsync(null, errors.Add);
+            await sut.ValidateAsync(null, false, errors.Add);
+
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task Should_not_error_if_value_is_empty()
+        {
+            var sut = new StringLengthValidator(100, 200);
+
+            await sut.ValidateAsync(string.Empty, false, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -38,7 +48,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new StringLengthValidator(min, max);
 
-            await sut.ValidateAsync(CreateString(1500), errors.Add);
+            await sut.ValidateAsync(CreateString(1500), false, errors.Add);
 
             Assert.Equal(0, errors.Count);
         }
@@ -56,7 +66,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new StringLengthValidator(2000, null);
 
-            await sut.ValidateAsync(CreateString(1500), errors.Add);
+            await sut.ValidateAsync(CreateString(1500), false, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must have more than '2000' characters" });
@@ -67,7 +77,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new StringLengthValidator(null, 1000);
 
-            await sut.ValidateAsync(CreateString(1500), errors.Add);
+            await sut.ValidateAsync(CreateString(1500), false, errors.Add);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must have less than '1000' characters" });

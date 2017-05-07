@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  UpdateAppLanguageDto.cs
+//  UpdateLanguage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,23 +9,22 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Controllers.Api.Apps.Models
+namespace Squidex.Write.Apps.Commands
 {
-    public class UpdateAppLanguageDto
+    public sealed class UpdateLanguage : AppAggregateCommand, IValidatable
     {
-        /// <summary>
-        /// Set the value to true to make the language to the master language.
-        /// </summary>
-        public bool? IsMaster { get; set; }
+        public Language Language { get; set; }
 
-        /// <summary>
-        /// Set the value to true to make the language optional.
-        /// </summary>
         public bool IsOptional { get; set; }
 
-        /// <summary>
-        /// Optional fallback languages.
-        /// </summary>
         public List<Language> Fallback { get; set; }
+
+        public void Validate(IList<ValidationError> errors)
+        {
+            if (Language == null)
+            {
+                errors.Add(new ValidationError("Language cannot be null", nameof(Language)));
+            }
+        }
     }
 }

@@ -77,7 +77,7 @@ namespace Squidex.Read.MongoDb.Apps
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.Languages.Add(@event.Language.Iso2Code);
+                a.UpdateLanguages(c => c.Add(@event.Language));
             });
         }
 
@@ -85,7 +85,15 @@ namespace Squidex.Read.MongoDb.Apps
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.Languages.Remove(@event.Language.Iso2Code);
+                a.UpdateLanguages(c => c.Remove(@event.Language));
+            });
+        }
+
+        protected Task On(AppLanguageUpdated @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.UpdateLanguages(c => c.Update(@event.Language, @event.IsOptional, @event.Fallback));
             });
         }
 
@@ -93,7 +101,7 @@ namespace Squidex.Read.MongoDb.Apps
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.MasterLanguage = @event.Language.Iso2Code;
+                a.UpdateLanguages(c => c.MakeMaster(@event.Language));
             });
         }
 

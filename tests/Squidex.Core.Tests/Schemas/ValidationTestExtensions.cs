@@ -14,9 +14,9 @@ namespace Squidex.Core.Schemas
 {
     public static class ValidationTestExtensions
     {
-        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors)
+        public static Task ValidateAsync(this Field field, JToken value, bool isOptional, IList<string> errors)
         {
-            return field.ValidateAsync(value, errors.Add);
+            return field.ValidateAsync(value, isOptional, errors.Add);
         }
     }
 }

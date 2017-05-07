@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure
         {
             Guard.NotNullOrEmpty(input, nameof(input));
 
-            var parts = input.Split(new [] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = input.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 2)
             {

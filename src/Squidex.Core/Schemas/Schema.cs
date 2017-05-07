@@ -202,10 +202,10 @@ namespace Squidex.Core.Schemas
             return new Schema(name, isPublished, properties, newFields);
         }
 
-        public EdmComplexType BuildEdmType(HashSet<Language> languages, Func<EdmComplexType, EdmComplexType> typeResolver)
+        public EdmComplexType BuildEdmType(LanguagesConfig languagesConfig, Func<EdmComplexType, EdmComplexType> typeResolver)
         {
-            Guard.NotEmpty(languages, nameof(languages));
             Guard.NotNull(typeResolver, nameof(typeResolver));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
             var schemaName = Name.ToPascalCase();
 
@@ -213,16 +213,16 @@ namespace Squidex.Core.Schemas
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
-                field.AddToEdmType(edmType, languages, schemaName, typeResolver);
+                field.AddToEdmType(edmType, languagesConfig, schemaName, typeResolver);
             }
 
             return edmType;
         }
 
-        public JsonSchema4 BuildJsonSchema(HashSet<Language> languages, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public JsonSchema4 BuildJsonSchema(LanguagesConfig languagesConfig, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
-            Guard.NotEmpty(languages, nameof(languages));
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
+            Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
             var schemaName = Name.ToPascalCase();
 
@@ -230,7 +230,7 @@ namespace Squidex.Core.Schemas
 
             foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
             {
-                field.AddToJsonSchema(schema, languages, schemaName, schemaResolver);
+                field.AddToJsonSchema(schema, languagesConfig, schemaName, schemaResolver);
             }
 
             return schema;

@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
 
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
 
-            await sut.ValidateAsync(CreateValue(assetId), errors);
+            await sut.ValidateAsync(CreateValue(assetId), false, errors);
 
             Assert.Empty(errors);
         }
@@ -57,7 +57,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             Assert.Empty(errors);
         }
@@ -67,7 +67,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(CreateValue(null), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -78,7 +78,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
 
-            await sut.ValidateAsync(CreateValue(), errors);
+            await sut.ValidateAsync(CreateValue(), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -89,7 +89,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
 
-            await sut.ValidateAsync("invalid", errors);
+            await sut.ValidateAsync("invalid", false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });
@@ -104,7 +104,7 @@ namespace Squidex.Core.Schemas
 
             var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
 
-            await sut.ValidateAsync(CreateValue(assetId), errors);
+            await sut.ValidateAsync(CreateValue(assetId), false, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { $"<FIELD> contains invalid asset '{assetId}'" });

@@ -25,8 +25,7 @@ namespace Squidex.Core.Contents
                 .AddOrUpdateField(new NumberField(3, "field3", 
                     new NumberFieldProperties { IsLocalizable = false }))
                 .HideField(3);
-        private readonly Language[] languages = { Language.DE, Language.EN };
-        private readonly Language masterLanguage = Language.EN;
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
         [Fact]
         public void Should_convert_to_id_model()
@@ -109,7 +108,7 @@ namespace Squidex.Core.Contents
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -131,7 +130,7 @@ namespace Squidex.Core.Contents
                             .AddValue("de", "de_string")
                             .AddValue("it", "it_string"));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -152,7 +151,7 @@ namespace Squidex.Core.Contents
                             .AddValue("de", 2)
                             .AddValue("en", 3));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -172,7 +171,7 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -215,7 +214,7 @@ namespace Squidex.Core.Contents
                             .AddValue("de", 2)
                             .AddValue("it", 3));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -238,7 +237,7 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var actual = input.ToApiModel(schema, languages, masterLanguage);
+            var actual = input.ToApiModel(schema, languagesConfig);
 
             Assert.Equal(expected, actual);
         }
@@ -252,7 +251,43 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("iv", 1));
 
-            Assert.Same(data, data.ToLanguageModel());
+            Assert.Same(data, data.ToLanguageModel(languagesConfig));
+        }
+
+        [Fact]
+        public void Should_return_flat_list_when_single_languages_specified()
+        {
+            var data =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("de", 1)
+                            .AddValue("en", 2))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("de", null)
+                            .AddValue("en", 4))
+                    .AddField("field3",
+                        new ContentFieldData()
+                            .AddValue("en", 6))
+                    .AddField("field4",
+                        new ContentFieldData()
+                            .AddValue("it", 7));
+
+            var fallbackConfig =
+                LanguagesConfig.Create(Language.DE).Add(Language.EN)
+                    .Update(Language.DE, false, new[] { Language.EN });
+
+            var output = (Dictionary<string, JToken>)data.ToLanguageModel(fallbackConfig, new List<Language> { Language.DE });
+
+            var expected = new Dictionary<string, JToken>
+            {
+                { "field1", 1 },
+                { "field2", 4 },
+                { "field3", 6 }
+            };
+
+            Assert.True(expected.EqualsDictionary(output));
         }
 
         [Fact]
@@ -275,7 +310,7 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("it", 7));
 
-            var output = (Dictionary<string, JToken>)data.ToLanguageModel(new List<Language> { Language.DE, Language.EN });
+            var output = (Dictionary<string, JToken>)data.ToLanguageModel(languagesConfig, new List<Language> { Language.DE, Language.EN });
 
             var expected = new Dictionary<string, JToken>
             {

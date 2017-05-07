@@ -295,9 +295,9 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_build_schema()
         {
-            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
+            var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languages, (n, s) => new JsonSchema4 { SchemaReference = s });
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig, (n, s) => new JsonSchema4 { SchemaReference = s });
 
             Assert.NotNull(jsonSchema);
         }
@@ -305,9 +305,9 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_build_edm_model()
         {
-            var languages = new HashSet<Language>(new[] { Language.DE, Language.EN });
+            var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var edmModel = BuildMixedSchema().BuildEdmType(languages, x => x);
+            var edmModel = BuildMixedSchema().BuildEdmType(languagesConfig, x => x);
 
             Assert.NotNull(edmModel);
         }

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Squidex.Core.Apps;
 using Squidex.Events.Apps;
@@ -64,8 +65,7 @@ namespace Squidex.Write.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = PermissionLevel.Owner }),
-                    CreateEvent(new AppLanguageAdded { Language = Language.EN }),
-                    CreateEvent(new AppMasterLanguageSet { Language  = Language.EN })
+                    CreateEvent(new AppLanguageAdded { Language = Language.EN })
                 );
         }
 
@@ -432,7 +432,7 @@ namespace Squidex.Write.Apps
         public void RemoveLanguage_should_create_events()
         {
             CreateApp();
-            CreateLanguage();
+            CreateLanguage(Language.DE);
             
             sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
 
@@ -474,27 +474,72 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void SetMasterLanguage_should_throw_if_already_master_language()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.EN }));
-            });
-        }
-
-        [Fact]
         public void SetMasterLanguage_should_create_events()
         {
             CreateApp();
-            CreateLanguage();
+            CreateLanguage(Language.DE);
 
             sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.DE }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppMasterLanguageSet { Language = Language.DE })
+                );
+        }
+
+        [Fact]
+        public void UpdateLanguage_should_throw_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.EN }));
+            });
+        }
+
+        [Fact]
+        public void UpdateLanguage_should_throw_if_command_is_not_valid()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.UpdateLanguage(CreateCommand(new UpdateLanguage()));
+            });
+        }
+
+        [Fact]
+        public void UpdateLanguage_should_throw_if_language_not_found()
+        {
+            CreateApp();
+
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.DE }));
+            });
+        }
+
+        [Fact]
+        public void UpdateLanguage_should_throw_if_master_language()
+        {
+            CreateApp();
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.EN, IsOptional = true }));
+            });
+        }
+
+        [Fact]
+        public void UpdateLanguage_should_create_events()
+        {
+            CreateApp();
+            CreateLanguage(Language.DE);
+
+            sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new List<Language> { Language.EN } })
                 );
         }
 
@@ -512,9 +557,9 @@ namespace Squidex.Write.Apps
             ((IAggregate)sut).ClearUncommittedEvents();
         }
 
-        private void CreateLanguage()
+        private void CreateLanguage(Language language)
         {
-            sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.DE }));
+            sut.AddLanguage(CreateCommand(new AddLanguage { Language = language }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

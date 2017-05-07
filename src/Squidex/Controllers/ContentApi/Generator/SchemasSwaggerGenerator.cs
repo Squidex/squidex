@@ -42,7 +42,6 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly MyUrlsOptions urlOptions;
         private readonly string schemaQueryDescription;
         private readonly string schemaBodyDescription;
-        private HashSet<Language> languages;
         private JsonSchema4 errorDtoSchema;
         private string appBasePath;
         private IAppEntity app;
@@ -62,15 +61,13 @@ namespace Squidex.Controllers.ContentApi.Generator
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity appEntity, IEnumerable<ISchemaEntityWithSchema> schemas)
+        public async Task<SwaggerDocument> Generate(IAppEntity targetApp, IEnumerable<ISchemaEntityWithSchema> schemas)
         {
-            app = appEntity;
-
-            languages = new HashSet<Language>(appEntity.Languages);
+            app = targetApp;
 
             await GenerateBasicSchemas();
 
-            GenerateBasePath(appEntity);
+            GenerateBasePath();
             GenerateTitle();
             GenerateRequestInfo();
             GenerateContentTypes();
@@ -84,9 +81,9 @@ namespace Squidex.Controllers.ContentApi.Generator
             return document;
         }
 
-        private void GenerateBasePath(IAppEntity appEntity)
+        private void GenerateBasePath()
         {
-            appBasePath = $"/content/{appEntity.Name}";
+            appBasePath = $"/content/{app.Name}";
         }
 
         private void GenerateSchemes()
@@ -181,7 +178,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                     Name = schemaName, Description = $"API to managed {schemaName} contents."
                 });
 
-            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildJsonSchema(languages, AppendSchema));
+            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildJsonSchema(app.LanguagesConfig, AppendSchema));
 
             var schemaOperations = new List<SwaggerOperations>
             {

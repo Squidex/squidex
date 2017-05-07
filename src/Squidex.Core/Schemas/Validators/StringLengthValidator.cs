@@ -30,9 +30,9 @@ namespace Squidex.Core.Schemas.Validators
             this.maxLength = maxLength;
         }
 
-        public Task ValidateAsync(object value, Action<string> addError)
+        public Task ValidateAsync(object value, bool isOptional, Action<string> addError)
         {
-            if (value is string stringValue)
+            if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
                 if (minLength.HasValue && stringValue.Length < minLength.Value)
                 {
