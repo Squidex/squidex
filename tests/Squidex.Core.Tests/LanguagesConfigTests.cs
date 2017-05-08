@@ -136,8 +136,8 @@ namespace Squidex.Core
                 LanguagesConfig.Create(Language.DE)
                     .Add(Language.IT)
                     .Add(Language.RU)
-                    .Update(Language.DE, false, new[] { Language.RU, Language.IT })
-                    .Update(Language.RU, false, new[] { Language.DE, Language.IT })
+                    .Update(Language.DE, false, false, new[] { Language.RU, Language.IT })
+                    .Update(Language.RU, false, false, new[] { Language.DE, Language.IT })
                     .Remove(Language.IT);
 
             config.ToList().ShouldBeEquivalentTo(
@@ -167,7 +167,7 @@ namespace Squidex.Core
         [Fact]
         public void Should_update_language()
         {
-            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, new[] { Language.DE });
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, false, new[] { Language.DE });
 
             config.ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
@@ -178,11 +178,19 @@ namespace Squidex.Core
         }
 
         [Fact]
+        public void Should_also_set_make_master_when_updating_language()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, true, null);
+
+            Assert.Equal(Language.IT, config.Master.Language);
+        }
+
+        [Fact]
         public void Should_throw_exception_if_language_to_update_is_not_found()
         {
             var config = LanguagesConfig.Create(Language.DE);
 
-            Assert.Throws<DomainObjectNotFoundException>(() => config.Update(Language.EN, true, null));
+            Assert.Throws<DomainObjectNotFoundException>(() => config.Update(Language.EN, true, false, null));
         }
 
         [Fact]
@@ -190,7 +198,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE);
 
-            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, new [] { Language.EN }));
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, false, new[] { Language.EN }));
         }
 
         [Fact]
@@ -198,7 +206,15 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE);
 
-            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, null));
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, false, null));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_language_to_make_optional_must_be_set_to_master()
+        {
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT);
+
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, true, null));
         }
 
         [Fact]

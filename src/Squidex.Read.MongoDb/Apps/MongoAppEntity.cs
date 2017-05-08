@@ -22,7 +22,7 @@ namespace Squidex.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity
     {
-        private LanguagesConfig languagesConfig = LanguagesConfig.Empty;
+        private LanguagesConfig languagesConfig;
 
         [BsonRequired]
         [BsonElement]
@@ -78,7 +78,14 @@ namespace Squidex.Read.MongoDb.Apps
 
         private LanguagesConfig CreateLanguagesConfig()
         {
-            return LanguagesConfig.Create(Languages.Select(ToLanguageConfig).ToList()).MakeMaster(MasterLanguage);
+            languagesConfig = LanguagesConfig.Create(Languages.Select(ToLanguageConfig).ToList());
+
+            if (MasterLanguage != null)
+            {
+                languagesConfig = languagesConfig.MakeMaster(MasterLanguage);
+            }
+
+            return languagesConfig;
         }
 
         private static MongoAppLanguage FromLanguageConfig(LanguageConfig l)

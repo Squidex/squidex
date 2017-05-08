@@ -17,7 +17,9 @@ export class AppLanguageDto {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string,
-        public readonly isMasterLanguage: boolean
+        public readonly isMaster: boolean,
+        public readonly isOptional: boolean,
+        public readonly fallback: string[]
     ) {
     }
 }
@@ -31,7 +33,9 @@ export class AddAppLanguageDto {
 
 export class UpdateAppLanguageDto {
     constructor(
-        public readonly isMasterLanguage: boolean
+        public readonly isMaster: boolean,
+        public readonly isOptional: boolean,
+        public readonly fallback: string[]
     ) {
     }
 }
@@ -56,7 +60,9 @@ export class AppLanguagesService {
                         return new AppLanguageDto(
                             item.iso2Code,
                             item.englishName,
-                            item.isMasterLanguage === true);
+                            item.isMaster === true,
+                            item.isOptional === true,
+                            item.fallback);
                     });
                 })
                 .catchError('Failed to load languages. Please reload.');
@@ -71,7 +77,9 @@ export class AppLanguagesService {
                     return new AppLanguageDto(
                         response.iso2Code,
                         response.englishName,
-                        response.isMasterLanguage === true);
+                        response.isMaster === true,
+                        response.isOptional === true,
+                        response.fallback);
                 })
                 .catchError('Failed to add language. Please reload.');
     }

@@ -81,24 +81,25 @@ namespace Squidex.Core
             return new LanguagesConfig(newLanguages, master ?? newLanguages.Values.First());
         }
 
-        public LanguagesConfig Update(Language language, bool isOptional, IEnumerable<Language> fallback)
+        public LanguagesConfig Update(Language language, bool isOptional, bool isMaster, IEnumerable<Language> fallback)
         {
             ThrowIfNotFound(language);
 
             if (isOptional)
             {
-                ThrowIfMaster(language, () => $"Cannot cannot make language '{language.Iso2Code}' optional");
+                ThrowIfMaster(language, isMaster, () => $"Cannot cannot make language '{language.Iso2Code}' optional");
             }
 
-            var newLanguages = ValidateLanguages(languages.SetItem(language, new LanguageConfig(language, isOptional, fallback)));
+            var newLanguage = new LanguageConfig(language, isOptional, fallback);
+            var newLanguages = ValidateLanguages(languages.SetItem(language, newLanguage));
 
-            return new LanguagesConfig(newLanguages, master);
+            return new LanguagesConfig(newLanguages, isMaster ? newLanguage : master);
         }
 
         public LanguagesConfig Remove(Language language)
         {
             ThrowIfNotFound(language);
-            ThrowIfMaster(language, () => $"Cannot remove language '{language.Iso2Code}'");
+            ThrowIfMaster(language, false, () => $"Cannot remove language '{language.Iso2Code}'");
 
             var newLanguages = languages.Remove(language);
 
@@ -171,9 +172,9 @@ namespace Squidex.Core
             }
         }
 
-        private void ThrowIfMaster(Language language, Func<string> message)
+        private void ThrowIfMaster(Language language, bool isMaster, Func<string> message)
         {
-            if (master?.Language == language)
+            if (master?.Language == language || isMaster)
             {
                 var error = new ValidationError("Language is the master language", "Language");
 

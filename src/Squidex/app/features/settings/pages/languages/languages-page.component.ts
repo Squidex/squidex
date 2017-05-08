@@ -20,7 +20,6 @@ import {
     LanguageDto,
     LanguageService,
     NotificationService,
-    UpdateAppLanguageDto,
     Version
 } from 'shared';
 
@@ -33,6 +32,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     private version = new Version();
 
     public allLanguages: LanguageDto[] = [];
+    public newLanguages: LanguageDto[] = [];
     public appLanguages = ImmutableArray.empty<AppLanguageDto>();
 
     public addLanguageForm: FormGroup =
@@ -41,10 +41,6 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
                 Validators.required
             ]
         });
-
-    public get newLanguages(): LanguageDto[] {
-        return this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
-    }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly appLanguagesService: AppLanguagesService,
@@ -76,6 +72,16 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
+    public updateLanguage(language: AppLanguageDto) {
+        this.appNameOnce()
+            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.version))
+            .subscribe(dto => {
+                this.updateLanguages(this.appLanguages.map(l => l.iso2Code === language.iso2Code ? language : l));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
     public removeLanguage(language: AppLanguageDto) {
         this.appNameOnce()
             .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code, this.version))
@@ -98,31 +104,11 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public setMasterLanguage(language: AppLanguageDto) {
-        const request = new UpdateAppLanguageDto(true);
-
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, request, this.version))
-            .subscribe(() => {
-                this.updateLanguages(this.appLanguages.map(l => {
-                    const isMasterLanguage = l === language;
-
-                    if (isMasterLanguage !== l.isMasterLanguage) {
-                        return new AppLanguageDto(l.iso2Code, l.englishName, isMasterLanguage);
-                    } else {
-                        return l;
-                    }
-                }));
-            }, error => {
-                this.notifyError(error);
-            });
-
-        return false;
-    }
-
     private updateLanguages(languages: ImmutableArray<AppLanguageDto>) {
         this.addLanguageForm.reset();
         this.appLanguages = languages;
+
+        this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
 
         this.messageBus.publish(new HistoryChannelUpdated());
     }

@@ -218,7 +218,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 return @event;
             }
-            catch (ArgumentException)
+            catch (TypeNameNotFoundException)
             {
                 return null;
             }

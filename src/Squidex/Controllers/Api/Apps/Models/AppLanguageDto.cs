@@ -6,7 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
@@ -23,6 +25,12 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// </summary>
         [Required]
         public string EnglishName { get; set; }
+
+        /// <summary>
+        /// The fallback languages.
+        /// </summary>
+        [Required]
+        public List<Language> Fallback { get; set; }
 
         /// <summary>
         /// Indicates if the language is the master language.

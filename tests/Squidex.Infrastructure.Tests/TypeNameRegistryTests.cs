@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
 
@@ -83,13 +84,13 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_throw_if_name_is_not_supported()
         {
-            Assert.Throws<ArgumentException>(() => sut.GetType("unsupported"));
+            Assert.Throws<TypeNameNotFoundException>(() => sut.GetType("unsupported"));
         }
 
         [Fact]
         public void Should_throw_if_type_is_not_supported()
         {
-            Assert.Throws<ArgumentException>(() => sut.GetName<Guid>());
+            Assert.Throws<TypeNameNotFoundException>(() => sut.GetName<Guid>());
         }
     }
 }

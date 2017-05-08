@@ -38,7 +38,9 @@ describe('AppLanguagesService', () => {
                             {
                                 iso2Code: 'de',
                                 englishName: 'German',
-                                isMasterLanguage: true
+                                isMaster: true,
+                                isOptional: true,
+                                fallback: ['de', 'en']
                             },
                             {
                                 iso2Code: 'en',
@@ -58,8 +60,8 @@ describe('AppLanguagesService', () => {
 
         expect(languages).toEqual(
             [
-                new AppLanguageDto('de', 'German', true),
-                new AppLanguageDto('en', 'English', false)
+                new AppLanguageDto('de', 'German', true, true, ['de', 'en']),
+                new AppLanguageDto('en', 'English', false, false, undefined)
             ]);
 
         authService.verifyAll();
@@ -88,13 +90,13 @@ describe('AppLanguagesService', () => {
         });
 
         expect(language).toEqual(
-            new AppLanguageDto('de', 'German', false));
+            new AppLanguageDto('de', 'German', false, false, undefined));
 
         authService.verifyAll();
     });
 
     it('should make put request to make master language', () => {
-        const dto = new UpdateAppLanguageDto(true);
+        const dto = new UpdateAppLanguageDto(true, true, []);
 
         authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', dto, version))
             .returns(() => Observable.of(

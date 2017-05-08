@@ -88,12 +88,7 @@ namespace Squidex.Write.Apps
 
         protected void On(AppLanguageUpdated @event)
         {
-            languagesConfig = languagesConfig.Update(@event.Language, @event.IsOptional, @event.Fallback);
-        }
-
-        protected void On(AppMasterLanguageSet @event)
-        {
-            languagesConfig = languagesConfig.MakeMaster(@event.Language);
+            languagesConfig = languagesConfig.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -201,17 +196,6 @@ namespace Squidex.Write.Apps
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
-
-            return this;
-        }
-
-        public AppDomainObject SetMasterLanguage(SetMasterLanguage command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot set master language");
-
-            ThrowIfNotCreated();
-
-            RaiseEvent(SimpleMapper.Map(command, new AppMasterLanguageSet()));
 
             return this;
         }

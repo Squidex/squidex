@@ -93,15 +93,7 @@ namespace Squidex.Read.MongoDb.Apps
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.UpdateLanguages(c => c.Update(@event.Language, @event.IsOptional, @event.Fallback));
-            });
-        }
-
-        protected Task On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, a =>
-            {
-                a.UpdateLanguages(c => c.MakeMaster(@event.Language));
+                a.UpdateLanguages(c => c.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback));
             });
         }
 

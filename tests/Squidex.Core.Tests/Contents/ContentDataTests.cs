@@ -276,7 +276,7 @@ namespace Squidex.Core.Contents
 
             var fallbackConfig =
                 LanguagesConfig.Create(Language.DE).Add(Language.EN)
-                    .Update(Language.DE, false, new[] { Language.EN });
+                    .Update(Language.DE, false, false, new[] { Language.EN });
 
             var output = (Dictionary<string, JToken>)data.ToLanguageModel(fallbackConfig, new List<Language> { Language.DE });
 

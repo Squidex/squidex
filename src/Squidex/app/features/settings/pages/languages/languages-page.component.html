@@ -13,56 +13,11 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
-            <table class="table table-items table-fixed">
-                <colgroup>
-                    <col style="width: 60px" />
-                    <col style="width: 100%" />
-                    <col style="width: 200px" />
-                    <col style="width: 80px" />
-                </colgroup>
-
-                <thead>
-                    <tr>
-                        <th>
-                            Code
-                        </th>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <ng-template ngFor let-language [ngForOf]="appLanguages">
-                        <tr>
-                            <td>
-                                <span class="language-code">
-                                    {{language.iso2Code}}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="language-name">
-                                    {{language.englishName}}
-                                </span>
-                            </td>
-                            <td>
-                                <label class="language-default">
-                                    <input type="radio" [value]="true" [checked]="language.isMasterLanguage" (click)="setMasterLanguage(language)"> Master Language
-                                </label>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-link btn-danger" [disabled]="language.isMasterLanguage" (click)="removeLanguage(language)">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
+            <div *ngFor="let language of appLanguages">
+                <sqx-language [language]="language" [allLanguages]="appLanguages"
+                    (saving)="updateLanguage($event)" 
+                    (removing)="removeLanguage($event)"></sqx-language>
+            </div>
 
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()">

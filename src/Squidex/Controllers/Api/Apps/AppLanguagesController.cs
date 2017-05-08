@@ -66,8 +66,9 @@ namespace Squidex.Controllers.Api.Apps
                     new AppLanguageDto
                     {
                         IsMaster = x == entity.LanguagesConfig.Master,
-                        IsOptional = x.IsOptional
-                    })).ToList();
+                        IsOptional = x.IsOptional,
+                        Fallback = x.Fallback.ToList()
+                    })).OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code).ToList();
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
@@ -114,13 +115,8 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/languages/{language}")]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(model, new UpdateLanguage()));
-
-            if (model.IsMaster == true)
-            {
-                await CommandBus.PublishAsync(new SetMasterLanguage { Language = ParseLanguage(language) });
-            }
-
+            await CommandBus.PublishAsync(SimpleMapper.Map(model, new UpdateLanguage { Language = language }));
+          
             return NoContent();
         }
 

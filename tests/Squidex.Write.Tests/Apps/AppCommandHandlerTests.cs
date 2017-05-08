@@ -214,20 +214,6 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task SetMasterLanguage_should_update_domain_object()
-        {
-            CreateApp()
-                .AddLanguage(CreateCommand(new AddLanguage { Language = language }));
-
-            var context = CreateContextForCommand(new SetMasterLanguage { Language = language });
-
-            await TestUpdate(app, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-        }
-
-        [Fact]
         public async Task UpdateLanguage_should_update_domain_object()
         {
             CreateApp()

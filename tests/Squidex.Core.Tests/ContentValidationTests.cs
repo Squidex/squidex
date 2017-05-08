@@ -141,7 +141,7 @@ namespace Squidex.Core
         public async Task Should_not_add_error_if_required_field_has_no_value_for_optional_language()
         {
             var optionalConfig =
-                LanguagesConfig.Create(Language.ES, Language.IT).Update(Language.IT, true, null);
+                LanguagesConfig.Create(Language.ES, Language.IT).Update(Language.IT, true, false, null);
 
             schema = schema.AddOrUpdateField(new StringField(1, "my-field", new StringFieldProperties { IsLocalizable = true, IsRequired = true }));
 

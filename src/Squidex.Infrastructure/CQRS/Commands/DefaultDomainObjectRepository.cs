@@ -54,9 +54,12 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             foreach (var storedEvent in events)
             {
-                var envelope = formatter.Parse(storedEvent.Data);
+                var envelope = TryParseEvent(storedEvent);
 
-                domainObject.ApplyEvent(envelope);
+                if (envelope != null)
+                {
+                    domainObject.ApplyEvent(envelope);
+                }
             }
 
             if (expectedVersion != null && domainObject.Version != expectedVersion.Value)
@@ -85,6 +88,18 @@ namespace Squidex.Infrastructure.CQRS.Commands
             catch (WrongEventVersionException)
             {
                 throw new DomainObjectVersionException(domainObject.Id.ToString(), domainObject.GetType(), versionCurrent, versionExpected);
+            }
+        }
+
+        private Envelope<IEvent> TryParseEvent(StoredEvent storedEvent)
+        {
+            try
+            {
+                return formatter.Parse(storedEvent.Data);
+            }
+            catch (TypeNameNotFoundException)
+            {
+                return null;
             }
         }
     }

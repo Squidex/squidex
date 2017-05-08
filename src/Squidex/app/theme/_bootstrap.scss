@@ -167,7 +167,7 @@ body {
 }
 
 .btn {
-    &-simple {
+    &-decent {
         & {
             background: transparent;
             color: $color-border-dark;
@@ -230,12 +230,16 @@ body {
     }
 
     &-link {
+        & {
+            @include link-button($color-theme-blue);
+        }
+
         &.btn-danger {
             @include link-button($color-theme-error);
         }
 
-        &.btn-primary {
-            @include link-button($color-theme-blue);
+        &.btn-success {
+            @include link-button($color-theme-green);
         }
     }
 }

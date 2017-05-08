@@ -443,51 +443,6 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void SetMasterLanguage_should_throw_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.EN }));
-            });
-        }
-
-        [Fact]
-        public void SetMasterLanguage_should_throw_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage()));
-            });
-        }
-
-        [Fact]
-        public void SetMasterLanguage_should_throw_if_language_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.DE }));
-            });
-        }
-
-        [Fact]
-        public void SetMasterLanguage_should_create_events()
-        {
-            CreateApp();
-            CreateLanguage(Language.DE);
-
-            sut.SetMasterLanguage(CreateCommand(new SetMasterLanguage { Language = Language.DE }));
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppMasterLanguageSet { Language = Language.DE })
-                );
-        }
-
-        [Fact]
         public void UpdateLanguage_should_throw_if_not_created()
         {
             Assert.Throws<DomainException>(() =>

@@ -17,6 +17,8 @@ namespace Squidex.Write.Apps.Commands
 
         public bool IsOptional { get; set; }
 
+        public bool IsMaster { get; set; }
+
         public List<Language> Fallback { get; set; }
 
         public void Validate(IList<ValidationError> errors)

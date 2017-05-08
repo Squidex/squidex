@@ -114,11 +114,6 @@ namespace Squidex.Write.Apps
             return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateLanguage(command));
         }
 
-        protected Task On(SetMasterLanguage command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.SetMasterLanguage(command));
-        }
-
         public Task<bool> HandleAsync(CommandContext context)
         {
             return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);

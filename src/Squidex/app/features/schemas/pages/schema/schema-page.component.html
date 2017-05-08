@@ -14,7 +14,7 @@
                 </div>
 
                <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-simple btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async">
+                    <button type="button" class="btn btn-decent btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async">
                         <i class="icon-dots"></i>
                     </button>
                     <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [@fade]>

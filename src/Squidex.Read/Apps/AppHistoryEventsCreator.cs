@@ -43,6 +43,9 @@ namespace Squidex.Read.Apps
             AddEventMessage<AppLanguageRemoved>(
                 "removed language {[Language]}");
 
+            AddEventMessage<AppLanguageUpdated>(
+                "updated language {[Language]}");
+
             AddEventMessage<AppMasterLanguageSet>(
                 "changed master language to {[Language]}");
         }
@@ -102,6 +105,15 @@ namespace Squidex.Read.Apps
         }
 
         protected Task<HistoryEventToStore> On(AppLanguageRemoved @event, EnvelopeHeaders headers)
+        {
+            const string channel = "settings.languages";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Language", @event.Language));
+        }
+
+        protected Task<HistoryEventToStore> On(AppLanguageUpdated @event, EnvelopeHeaders headers)
         {
             const string channel = "settings.languages";
 

@@ -1,0 +1,110 @@
+@import '_vars';
+@import '_mixins';
+
+$field-header: #e7ebef;
+
+.table-items-row {
+    padding: 0;
+}
+
+.language {
+    &-summary {
+        padding: 1rem 1.25rem;
+        position: relative;
+        line-height: 2.5rem;
+    }
+
+    &-edit-button {
+        & {
+            color: $color-theme-blue;
+            line-height: 1rem;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        &:hover {
+            color: $color-theme-blue-dark;
+        }
+
+        &.active {
+            background: $color-theme-blue;
+            border-color: $color-theme-blue;
+            color: $color-dark-foreground;
+        }
+    }
+
+    &-name {
+        @include truncate;
+    }
+
+    &-master {
+        font-weight: bold;
+    }
+
+    &-details {
+        & {
+            position: relative;
+        }
+
+        &::before {
+            @include caret-top;
+            @include absolute(-.5rem, 5.5rem, auto, auto);
+            border-color: transparent transparent $color-border;
+            border-width: .6rem;
+        }
+
+        &-tab {
+            padding: 1rem 1.25rem 1.25rem;
+        }
+
+        &-tabs {
+            background: $color-border;
+            position: relative;
+            padding: 1rem 1.25rem;
+        }
+    }
+}
+
+.btn-danger {
+    width: 3.2rem;
+}
+
+.master {
+    font-weight: bold;
+}
+
+.fallback {
+    &-languages {
+        @include border-radius;
+        min-height: 2rem;
+        background: $color-border;
+        border: 0;
+        padding: .5rem;
+    }
+
+    &-language {
+        & {
+            @include border-radius(2px);
+            padding: .5rem;
+            background: $color-dark-foreground;
+            border: 0;
+            margin-bottom: .5rem;
+        }
+
+        &:last-child {
+            margin: 0;
+        }
+    }
+
+    &-label {
+        margin-top: .4rem;
+    }
+
+    &-form {
+        margin-top: .5rem;
+    }
+
+    &-select {
+        width: 14rem;
+    }
+}

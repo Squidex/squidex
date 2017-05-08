@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure
 
             if (result == null)
             {
-                throw new ArgumentException($"There is no name for type '{type}");
+                throw new TypeNameNotFoundException($"There is no name for type '{type}");
             }
 
             return result;
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure
 
             if (result == null)
             {
-                throw new ArgumentException($"There is no type for name '{name}");
+                throw new TypeNameNotFoundException($"There is no type for name '{name}");
             }
 
             return result;

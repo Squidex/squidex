@@ -18,6 +18,8 @@ namespace Squidex.Events.Apps
 
         public bool IsOptional { get; set; }
 
+        public bool IsMaster { get; set; }
+
         public List<Language> Fallback { get; set; }
     }
 }
