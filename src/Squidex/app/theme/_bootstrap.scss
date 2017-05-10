@@ -167,18 +167,6 @@ body {
 }
 
 .btn {
-    &-decent {
-        & {
-            background: transparent;
-            color: $color-border-dark;
-        }
-
-        &:hover,
-        &.active {
-            color: $color-text;
-        }
-    }
-
     &-cancel {
         padding: .4rem;
         font-size: 1.1rem;
@@ -240,6 +228,10 @@ body {
 
         &.btn-success {
             @include link-button($color-theme-green);
+        }
+
+        &.btn-decent {
+            @include link-button($color-subtext);
         }
     }
 }

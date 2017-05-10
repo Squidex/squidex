@@ -4,7 +4,7 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-decent" (click)="load(true)" title="Refresh Users (CTRL + SHIFT + R)">
+                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Users (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
 
@@ -82,10 +82,10 @@
                 <div class="float-right pagination">
                     <span class="pagination-text">{{usersPager.itemFirst}}-{{usersPager.itemLast}} of {{usersPager.numberOfItems}}</span>
 
-                    <button class="btn btn-decent pagination-button" [disabled]="!usersPager.canGoPrev" (click)="goPrev()">
+                    <button class="btn btn-link btn-decent pagination-button" [disabled]="!usersPager.canGoPrev" (click)="goPrev()">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-decent pagination-button" [disabled]="!usersPager.canGoNext" (click)="goNext()">
+                    <button class="btn btn-link btn-decent pagination-button" [disabled]="!usersPager.canGoNext" (click)="goNext()">
                         <i class="icon-angle-right"></i>
                     </button>
                 </div>

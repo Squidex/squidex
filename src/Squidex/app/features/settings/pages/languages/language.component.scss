@@ -11,14 +11,14 @@ $field-header: #e7ebef;
     &-master {
         font-weight: bold;
     }
+
+    &-optional {
+        color: $color-subtext;
+    }
 }
 
 .btn-danger {
     width: 3.2rem;
-}
-
-.master {
-    font-weight: bold;
 }
 
 .fallback {

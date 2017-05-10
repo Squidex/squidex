@@ -22,7 +22,7 @@
                     </button>
 
                     <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-decent" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async">
+                        <button type="button" class="btn btn-link btn-decent" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async">
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [@fade]>
