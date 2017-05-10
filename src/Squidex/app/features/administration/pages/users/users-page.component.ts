@@ -68,13 +68,10 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     public lock(id: string) {
         this.userManagementService.lockUser(id)
             .subscribe(() => {
-                this.usersItems = this.usersItems.map(u => {
-                    if (u.id === id) {
-                        return new UserDto(u.id, u.email, u.displayName, u.pictureUrl, true);
-                    } else {
-                        return u;
-                    }
-                });
+                this.usersItems =
+                    this.usersItems.replaceAll(
+                        u => u.id === id,
+                        u => new UserDto(u.id, u.email, u.displayName, u.pictureUrl, true));
             }, error => {
                 this.notifyError(error);
             });
@@ -83,13 +80,10 @@ export class UsersPageComponent extends ComponentBase implements OnInit {
     public unlock(id: string) {
         this.userManagementService.unlockUser(id)
             .subscribe(() => {
-                this.usersItems = this.usersItems.map(u => {
-                    if (u.id === id) {
-                        return new UserDto(u.id, u.email, u.displayName, u.pictureUrl, false);
-                    } else {
-                        return u;
-                    }
-                });
+                this.usersItems =
+                    this.usersItems.replaceAll(
+                        u => u.id === id,
+                        u => new UserDto(u.id, u.email, u.displayName, u.pictureUrl, false));
             }, error => {
                 this.notifyError(error);
             });

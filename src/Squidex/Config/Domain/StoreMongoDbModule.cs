@@ -137,7 +137,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoAppRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAppRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();

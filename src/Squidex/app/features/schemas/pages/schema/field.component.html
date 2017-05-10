@@ -1,5 +1,5 @@
-<div class="table-items-row field"> 
-    <div class="field-summary">        
+<div class="table-items-row table-items-row-expandable field"> 
+    <div class="table-items-row-summary">        
         <div class="row">
             <div class="col col-6">
                 <span class="field-name">
@@ -17,7 +17,7 @@
             </div>
             <div class="col col-3">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary field-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings2"></i>
                     </button>
 
@@ -48,9 +48,9 @@
         </div>
     </div>
 
-    <div class="field-details" *ngIf="isEditing">
+    <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm" (ngSubmit)="save()">
-            <div class="field-details-tabs clearfix">
+            <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-inline nav-field-tabs">
                     <li class="nav-item">
                         <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="field-details-tab" [class.hidden]="selectedTab !== 0">
+            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
                 <div class="form-group row">
                     <label for="field-label" class="col col-3 col-form-label">Name</label>
 
@@ -131,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="field-details-tab" [class.hidden]="selectedTab !== 1">
+            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'Number'">
                         <sqx-number-validation [editForm]="editForm" [properties]="field.properties"></sqx-number-validation>
@@ -157,7 +157,7 @@
                 </div>
             </div>
 
-            <div class="field-details-tab" [class.hidden]="selectedTab !== 2">
+            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'Number'">
                         <sqx-number-ui [editForm]="editForm" [properties]="field.properties"></sqx-number-ui>

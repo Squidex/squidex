@@ -52,13 +52,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public ngOnInit() {
-        this.languagesService.getLanguages().retry(2)
-            .subscribe(languages => {
-                this.allLanguages = languages;
-            }, error => {
-                this.notifyError(error);
-            });
-
+        this.loadAllLanguages();
         this.load();
     }
 
@@ -67,16 +61,6 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.appLanguagesService.getLanguages(app, this.version).retry(2))
             .subscribe(dtos => {
                 this.updateLanguages(ImmutableArray.of(dtos));
-            }, error => {
-                this.notifyError(error);
-            });
-    }
-
-    public updateLanguage(language: AppLanguageDto) {
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.version))
-            .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.map(l => l.iso2Code === language.iso2Code ? language : l));
             }, error => {
                 this.notifyError(error);
             });
@@ -104,13 +88,58 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    private updateLanguages(languages: ImmutableArray<AppLanguageDto>) {
-        this.addLanguageForm.reset();
-        this.appLanguages = languages;
+    public updateLanguage(language: AppLanguageDto) {
+        this.appNameOnce()
+            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.version))
+            .subscribe(dto => {
+                this.updateLanguages(
+                    this.appLanguages.replaceAll(
+                        l => l.iso2Code === language.iso2Code,
+                        l => language),
+                    language.isMaster ? language.iso2Code : undefined);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
 
-        this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
+    private loadAllLanguages() {
+        this.languagesService.getLanguages().retry(2)
+            .subscribe(languages => {
+                this.allLanguages = languages;
+
+                this.updateNewLanguages();
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    private updateLanguages(languages: ImmutableArray<AppLanguageDto>, masterId?: string) {
+        this.addLanguageForm.reset();
+
+        this.appLanguages =
+            languages.map(l => {
+                return new AppLanguageDto(
+                    l.iso2Code,
+                    l.englishName,
+                    masterId ? l.iso2Code === masterId : l.isMaster,
+                    l.isOptional,
+                    l.fallback.filter(f => !!languages.find(l2 => l2.iso2Code === f))
+                );
+            }).sort((a, b) => {
+                if (a.isMaster === b.isMaster) {
+                    return a.iso2Code.localeCompare(b.iso2Code);
+                } else {
+                    return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
+                }
+            });
+
+        this.updateNewLanguages();
 
         this.messageBus.publish(new HistoryChannelUpdated());
+    }
+
+    private updateNewLanguages() {
+        this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
     }
 }
 

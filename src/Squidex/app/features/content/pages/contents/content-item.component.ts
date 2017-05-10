@@ -74,7 +74,7 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
         }
     }
 
-    public getValue(field: FieldDto): any {
+    private getValue(field: FieldDto): any {
         const contentField = this.content.data[field.name];
 
         if (!contentField) {

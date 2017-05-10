@@ -67,22 +67,74 @@
         }
     }
 
-    &-row,
+    &-row {
+        & {
+            padding: 1rem 1.25rem;
+            background: $color-table;
+            border: 1px solid $color-border;
+            border-bottom-width: 2px;
+            margin-bottom: .25rem;
+        }
+
+        &-summary {
+            padding: 1rem 1.25rem;
+            position: relative;
+            line-height: 2.5rem;
+        }
+
+        &-expandable {
+            padding: 0;
+        }
+
+        &-details {
+            & {
+                position: relative;
+            }
+
+            &::before {
+                @include caret-top;
+                @include absolute(-.5rem, 5.5rem, auto, auto);
+                border-color: transparent transparent $color-border;
+                border-width: .6rem;
+            }
+
+            &-tab {
+                padding: 1rem 1.25rem 1.25rem;
+            }
+
+            &-tabs {
+                background: $color-border;
+                position: relative;
+                padding: 1rem 1.25rem;
+            }
+        }
+    }
+
     &-footer {
         padding: 1rem 1.25rem;
         background: $color-table-footer;
         border: 1px solid $color-border;
         border-bottom-width: 2px;
-    }
-
-    &-row {
-        background: $color-table;
-        margin-bottom: .25rem;
-    }
-
-    &-footer {
-        background: $color-table-footer;
         margin-top: .8rem;
+    }
+
+    &-edit-button {
+        & {
+            color: $color-theme-blue;
+            line-height: 1rem;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        &:hover {
+            color: $color-theme-blue-dark;
+        }
+
+        &.active {
+            background: $color-theme-blue;
+            border-color: $color-theme-blue;
+            color: $color-dark-foreground;
+        }
     }
 
     .spacer {

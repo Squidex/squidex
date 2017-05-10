@@ -78,7 +78,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         this.schemaUpdatedSubscription =
             this.messageBus.of(SchemaUpdated)
                 .subscribe(m => {
-                    this.updateSchemas(this.schemas.map(s => s.name === m.name ? updateSchema(s, this.authService, m) : s));
+                    this.updateSchemas(this.schemas.replaceAll(s => s.name === m.name, s => updateSchema(s, this.authService, m)));
                 });
 
         this.schemaDeletedSubscription =

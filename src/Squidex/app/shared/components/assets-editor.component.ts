@@ -58,7 +58,10 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.sender !== this) {
-                        this.oldAssets = this.oldAssets.map(x => x.id === event.assetDto.id ? event.assetDto : x);
+                        this.oldAssets =
+                            this.oldAssets.replaceAll(
+                                a => a.id === event.assetDto.id,
+                                a => event.assetDto);
                     }
                 });
     }

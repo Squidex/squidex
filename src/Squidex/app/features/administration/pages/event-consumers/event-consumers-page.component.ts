@@ -55,13 +55,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public start(name: string) {
         this.eventConsumersService.startEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.map(e => {
-                    if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, false, e.isResetting, e.error);
-                    } else {
-                        return e;
-                    }
-                });
+                this.eventConsumers =
+                    this.eventConsumers.replaceAll(
+                        e => e.name === name,
+                        e => new EventConsumerDto(name, e.lastHandledEventNumber, false, e.isResetting, e.error));
             }, error => {
                 this.notifyError(error);
             });
@@ -70,13 +67,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public stop(name: string) {
         this.eventConsumersService.stopEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.map(e => {
-                    if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, true, e.isResetting, e.error);
-                    } else {
-                        return e;
-                    }
-                });
+                this.eventConsumers =
+                    this.eventConsumers.replaceAll(
+                        e => e.name === name,
+                        e => new EventConsumerDto(name, e.lastHandledEventNumber, true, e.isResetting, e.error));
             }, error => {
                 this.notifyError(error);
             });
@@ -85,13 +79,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public reset(name: string) {
         this.eventConsumersService.resetEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.map(e => {
-                    if (e.name === name) {
-                        return new EventConsumerDto(name, e.lastHandledEventNumber, e.isStopped, true, e.error);
-                    } else {
-                        return e;
-                    }
-                });
+                this.eventConsumers =
+                    this.eventConsumers.replaceAll(
+                        e => e.name === name,
+                        e => new EventConsumerDto(name, e.lastHandledEventNumber, e.isStopped, true, e.error));
             }, error => {
                 this.notifyError(error);
             });

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -94,7 +95,7 @@ namespace Squidex.Controllers.Api.Apps
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AddLanguage()));
 
-            var response = SimpleMapper.Map(request.Language, new AppLanguageDto());
+            var response = SimpleMapper.Map(request.Language, new AppLanguageDto { Fallback = new List<Language>() });
 
             return CreatedAtAction(nameof(GetLanguages), new { app }, response);
         }

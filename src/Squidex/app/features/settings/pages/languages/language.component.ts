@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import {
     AppLanguageDto,
@@ -22,7 +23,9 @@ import {
         fadeAnimation
     ]
 })
-export class LanguageComponent implements OnInit, OnChanges {
+export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
+    private isMasterSubscription: Subscription;
+
     @Input()
     public language: AppLanguageDto;
 
@@ -40,6 +43,7 @@ export class LanguageComponent implements OnInit, OnChanges {
     public fallbackLanguages: AppLanguageDto[] = [];
 
     public isEditing = false;
+    public isMaster = false;
 
     public editFormSubmitted = false;
     public editForm: FormGroup =
@@ -61,7 +65,18 @@ export class LanguageComponent implements OnInit, OnChanges {
     }
 
     public ngOnInit() {
+        this.isMasterSubscription =
+            this.editForm.get('isMaster').valueChanges
+                .subscribe(v => {
+                    this.isMaster = v;
+                    this.editForm.get('isOptional').setValue(false);
+                });
+
         this.resetForm();
+    }
+
+    public ngOnDestroy() {
+        this.isMasterSubscription.unsubscribe();
     }
 
     public ngOnChanges() {
@@ -122,6 +137,8 @@ export class LanguageComponent implements OnInit, OnChanges {
         }
 
         if (this.language) {
+            this.isMaster = this.language.isMaster;
+
             this.fallbackLanguages =
                 this.allLanguages.filter(l =>
                     this.language.fallback.indexOf(l.iso2Code) >= 0).values;

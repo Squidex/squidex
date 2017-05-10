@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Assets
 
             try
             {
-                using (var fileStream = file.OpenWrite())
+                using (var fileStream = file.OpenRead())
                 {
                     await fileStream.CopyToAsync(stream);
                 }
