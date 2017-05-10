@@ -180,7 +180,7 @@ namespace Squidex.Core
         [Fact]
         public void Should_also_set_make_master_when_updating_language()
         {
-            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, true, null);
+            var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, false, true, null);
 
             Assert.Equal(Language.IT, config.Master.Language);
         }
