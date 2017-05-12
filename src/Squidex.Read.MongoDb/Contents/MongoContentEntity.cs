@@ -10,14 +10,15 @@ using System;
 using System.Linq;
 using System.Text;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Contents;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
@@ -26,6 +27,7 @@ namespace Squidex.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : MongoEntity, IContentEntity
     {
+        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private const int MaxLength = 1024 * 1024;
         private ContentData contentData;
 
@@ -69,7 +71,9 @@ namespace Squidex.Read.MongoDb.Contents
         {
             if (Data != null)
             {
-                contentData = JsonConvert.DeserializeObject<ContentData>(Data.ToJson()).ToNameModel(schema, true);
+                var jsonString = Data.ToJson(Settings);
+
+                contentData = JsonConvert.DeserializeObject<ContentData>(jsonString).ToNameModel(schema, true);
             }
             else
             {
@@ -81,7 +85,9 @@ namespace Squidex.Read.MongoDb.Contents
         {
             if (newContentData != null)
             {
-                Data = BsonDocument.Parse(JsonConvert.SerializeObject(newContentData.ToIdModel(schema, true)));
+                var jsonString = JsonConvert.SerializeObject(newContentData.ToIdModel(schema, true));
+
+                Data = BsonDocument.Parse(jsonString);
             }
             else
             {

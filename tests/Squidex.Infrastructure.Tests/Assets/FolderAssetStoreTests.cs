@@ -42,14 +42,6 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public void Should_throw_if_path_is_not_valid()
-        {
-            var invalidSut = new FolderAssetStore("Z:\\Foo", new Mock<ISemanticLog>().Object);
-
-            Assert.Throws<ConfigurationException>(() => invalidSut.Connect());
-        }
-
-        [Fact]
         public Task Should_throw_exception_if_asset_not_found()
         {
             sut.Connect();

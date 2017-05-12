@@ -145,7 +145,7 @@ namespace Squidex.Core.Contents
                 if (decodeJsonField && field is JsonField)
                 {
                     var encodedValue = new ContentFieldData();
-
+                    
                     foreach (var languageValue in fieldValue.Value)
                     {
                         if (languageValue.Value == null || languageValue.Value.Type == JTokenType.Null)
