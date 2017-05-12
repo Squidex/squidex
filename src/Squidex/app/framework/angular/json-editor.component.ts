@@ -30,7 +30,8 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     private touchedCallback: () => void = NOOP;
     private valueChanged = new Subject();
     private aceEditor: any;
-    private value: any;
+    private oldValue: any;
+    private oldValueString: string;
     private isDisabled = false;
 
     @ViewChild('editor')
@@ -42,7 +43,8 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public writeValue(value: any) {
-        this.value = value;
+        this.oldValue = value;
+        this.oldValueString = JSON.stringify(value);
 
         if (this.aceEditor) {
             this.setValue(value);
@@ -66,21 +68,9 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.debounceTime(1000)
+        this.valueChanged.debounceTime(500)
             .subscribe(() => {
-                const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
-
-                if (!isValid) {
-                    this.changeCallback(null);
-                } else {
-                    try {
-                        const value = JSON.parse(this.aceEditor.getValue());
-
-                        this.changeCallback(value);
-                    } catch (e) {
-                        this.changeCallback(null);
-                    }
-                }
+                this.changeValue();
             });
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
@@ -90,9 +80,10 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
             this.aceEditor.setReadOnly(this.isDisabled);
             this.aceEditor.setFontSize(14);
 
-            this.setValue(this.value);
+            this.setValue(this.oldValue);
 
             this.aceEditor.on('blur', () => {
+                this.changeValue();
                 this.touchedCallback();
             });
 
@@ -100,6 +91,29 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
                 this.valueChanged.next();
             });
         });
+    }
+
+    private changeValue() {
+        const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+
+        let newValue: any = null;
+
+        if (isValid) {
+            try {
+                newValue = JSON.parse(this.aceEditor.getValue());
+            } catch (e) {
+                newValue = null;
+            }
+        }
+
+        const newValueString = JSON.stringify(newValue);
+
+        if (this.oldValueString !== newValueString) {
+            this.changeCallback(newValue);
+        }
+
+        this.oldValue = newValue;
+        this.oldValueString = newValueString;
     }
 
     private setValue(value: any) {

@@ -69,7 +69,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             if (Data != null)
             {
-                contentData = JsonConvert.DeserializeObject<ContentData>(Data.ToJson()).ToNameModel(schema);
+                contentData = JsonConvert.DeserializeObject<ContentData>(Data.ToJson()).ToNameModel(schema, true);
             }
             else
             {
@@ -81,7 +81,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             if (newContentData != null)
             {
-                Data = BsonDocument.Parse(JsonConvert.SerializeObject(newContentData.ToIdModel(schema)));
+                Data = BsonDocument.Parse(JsonConvert.SerializeObject(newContentData.ToIdModel(schema, true)));
             }
             else
             {

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -84,7 +85,7 @@ namespace Squidex.Core.Contents
             return result;
         }
 
-        public ContentData ToIdModel(Schema schema)
+        public ContentData ToIdModel(Schema schema, bool encodeJsonField)
         {
             Guard.NotNull(schema, nameof(schema));
 
@@ -97,13 +98,38 @@ namespace Squidex.Core.Contents
                     continue;
                 }
 
-                result[field.Id.ToString()] = fieldValue.Value;
+                var fieldId = field.Id.ToString();
+
+                if (encodeJsonField && field is JsonField)
+                {
+                    var encodedValue = new ContentFieldData();
+
+                    foreach (var languageValue in fieldValue.Value)
+                    {
+                        if (languageValue.Value == null || languageValue.Value.Type == JTokenType.Null)
+                        {
+                            encodedValue[languageValue.Key] = null;
+                        }
+                        else
+                        {
+                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(languageValue.Value.ToString()));
+
+                            encodedValue[languageValue.Key] = value;
+                        }
+                    }
+
+                    result[fieldId] = encodedValue;
+                }
+                else
+                {
+                    result[fieldId] = fieldValue.Value;
+                }
             }
 
             return result;
         }
 
-        public ContentData ToNameModel(Schema schema)
+        public ContentData ToNameModel(Schema schema, bool decodeJsonField)
         {
             Guard.NotNull(schema, nameof(schema));
 
@@ -116,7 +142,31 @@ namespace Squidex.Core.Contents
                     continue;
                 }
 
-                result[field.Name] = fieldValue.Value;
+                if (decodeJsonField && field is JsonField)
+                {
+                    var encodedValue = new ContentFieldData();
+
+                    foreach (var languageValue in fieldValue.Value)
+                    {
+                        if (languageValue.Value == null || languageValue.Value.Type == JTokenType.Null)
+                        {
+                            encodedValue[languageValue.Key] = null;
+                        }
+                        else
+                        {
+                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(languageValue.Value.ToString()));
+
+                            encodedValue[languageValue.Key] = JToken.Parse(value);
+                        }
+                    }
+
+                    result[field.Name] = encodedValue;
+                }
+                else
+                {
+
+                    result[field.Name] = fieldValue.Value;
+                }
             }
 
             return result;

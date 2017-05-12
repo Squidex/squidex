@@ -24,6 +24,8 @@ namespace Squidex.Core.Contents
                     new NumberFieldProperties { IsLocalizable = false }))
                 .AddOrUpdateField(new NumberField(3, "field3", 
                     new NumberFieldProperties { IsLocalizable = false }))
+                .AddOrUpdateField(new JsonField(4, "json",
+                    new JsonFieldProperties { IsLocalizable = true }))
                 .HideField(3);
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
@@ -43,7 +45,7 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
-            var actual = input.ToIdModel(schema);
+            var actual = input.ToIdModel(schema, false);
 
             var expected =
                 new ContentData()
@@ -57,9 +59,33 @@ namespace Squidex.Core.Contents
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
-        public void Should_convert_to_from_id_model()
+        public void Should_convert_to_encoded_id_model()
+        {
+            var input =
+               new ContentData()
+                    .AddField("json",
+                        new ContentFieldData()
+                            .AddValue("en", new JObject())
+                            .AddValue("de", null)
+                            .AddValue("it", JValue.CreateNull()));
+
+            var actual = input.ToIdModel(schema, true);
+
+            var expected =
+                new ContentData()
+                    .AddField("4",
+                        new ContentFieldData()
+                            .AddValue("en", "e30=")
+                            .AddValue("de", null)
+                            .AddValue("it", null));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_convert_from_id_model()
         {
             var input =
                new ContentData()
@@ -74,7 +100,7 @@ namespace Squidex.Core.Contents
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
-            var actual = input.ToNameModel(schema);
+            var actual = input.ToNameModel(schema, false);
 
             var expected =
                 new ContentData()
@@ -88,6 +114,23 @@ namespace Squidex.Core.Contents
             
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void Should_convert_from_encoded_id_model()
+        {
+            var input =
+               new ContentData()
+                    .AddField("4",
+                        new ContentFieldData()
+                            .AddValue("en", "e30=")
+                            .AddValue("de", null)
+                            .AddValue("it", null));
+
+            var actual = input.ToNameModel(schema, true);
+
+            Assert.True(actual["json"]["en"] is JObject);
+        }
+
         [Fact]
         public void Should_cleanup_old_fields()
         {
@@ -112,6 +155,7 @@ namespace Squidex.Core.Contents
 
             Assert.Equal(expected, actual);
         }
+
         [Fact]
         public void Should_cleanup_old_languages()
         {
