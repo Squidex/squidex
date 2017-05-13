@@ -22,7 +22,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE);
 
-            config.ToList().ShouldBeEquivalentTo(
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE)
@@ -36,7 +36,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE, Language.EN, Language.IT);
 
-            config.ToList().ShouldBeEquivalentTo(
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -54,11 +54,11 @@ namespace Squidex.Core
             {
                 new LanguageConfig(Language.DE),
                 new LanguageConfig(Language.EN),
-                new LanguageConfig(Language.IT),
+                new LanguageConfig(Language.IT)
             };
             var config = LanguagesConfig.Create(configs);
 
-            config.ToList().ShouldBeEquivalentTo(configs);
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(configs);
 
             Assert.Equal(configs[0], config.Master);
         }
@@ -68,7 +68,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE).Add(Language.IT);
 
-            config.ToList().ShouldBeEquivalentTo(
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -140,7 +140,7 @@ namespace Squidex.Core
                     .Update(Language.RU, false, false, new[] { Language.DE, Language.IT })
                     .Remove(Language.IT);
 
-            config.ToList().ShouldBeEquivalentTo(
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE, false, Language.RU),
@@ -169,7 +169,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE).Add(Language.IT).Update(Language.IT, true, false, new[] { Language.DE });
 
-            config.ToList().ShouldBeEquivalentTo(
+            config.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -222,8 +222,10 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create();
 
+            Assert.Equal(0, config.Count);
+
             Assert.NotNull(((IEnumerable)config).GetEnumerator());
-            Assert.NotNull(((IEnumerable<LanguageConfig>)config).GetEnumerator());
+            Assert.NotNull(((IEnumerable<IFieldPartitionItem>)config).GetEnumerator());
         }
     }
 }

@@ -18,8 +18,13 @@ namespace Squidex.Core.Schemas
 {
     public sealed class GeolocationField : Field<GeolocationFieldProperties>
     {
-        public GeolocationField(long id, string name, GeolocationFieldProperties properties)
-            : base(id, name, properties)
+        public GeolocationField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new GeolocationFieldProperties())
+        {
+        }
+
+        public GeolocationField(long id, string name, Partitioning partitioning, GeolocationFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

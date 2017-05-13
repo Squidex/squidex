@@ -17,16 +17,16 @@ namespace Squidex.Core
     public sealed class ContentEnricher
     {
         private readonly Schema schema;
-        private readonly LanguagesConfig languagesConfig;
+        private readonly PartitionResolver partitionResolver;
 
-        public ContentEnricher(LanguagesConfig languagesConfig, Schema schema)
+        public ContentEnricher(Schema schema, PartitionResolver partitionResolver)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
             this.schema = schema;
 
-            this.languagesConfig = languagesConfig;
+            this.partitionResolver = partitionResolver;
         }
 
         public void Enrich(ContentData data)
@@ -36,17 +36,11 @@ namespace Squidex.Core
             foreach (var field in schema.FieldsByName.Values)
             {
                 var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
+                var fieldPartition = partitionResolver(field.Paritioning);
 
-                if (field.RawProperties.IsLocalizable)
+                foreach (var partitionItem in fieldPartition)
                 {
-                    foreach (var languageConfig in languagesConfig)
-                    {
-                        Enrich(field, fieldData, languageConfig.Language);
-                    }
-                }
-                else
-                {
-                    Enrich(field, fieldData, Language.Invariant);
+                    Enrich(field, fieldData, partitionItem);
                 }
 
                 if (fieldData.Count > 0)
@@ -56,7 +50,7 @@ namespace Squidex.Core
             }
         }
 
-        private static void Enrich(Field field, ContentFieldData fieldData, Language language)
+        private static void Enrich(Field field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
         {
             Guard.NotNull(fieldData, nameof(fieldData));
 
@@ -67,9 +61,11 @@ namespace Squidex.Core
                 return;
             }
 
-            if (!fieldData.TryGetValue(language, out JToken value) || value == null || value.Type == JTokenType.Null)
+            var key = partitionItem.Key;
+
+            if (!fieldData.TryGetValue(key, out JToken value) || value == null || value.Type == JTokenType.Null)
             {
-                fieldData.AddValue(language, defaultValue);
+                fieldData.AddValue(key, defaultValue);
             }
         }
     }

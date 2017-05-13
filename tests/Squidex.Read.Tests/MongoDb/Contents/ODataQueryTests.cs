@@ -18,6 +18,7 @@ using Squidex.Core;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Read.Apps;
 using Squidex.Read.Contents.Builders;
 using Squidex.Read.MongoDb.Contents.Visitors;
 using Squidex.Read.Schemas;
@@ -31,15 +32,15 @@ namespace Squidex.Read.MongoDb.Contents
     {
         private readonly Schema schema = 
             Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                .AddOrUpdateField(new StringField(1, "firstName",
-                    new StringFieldProperties { Label = "FirstName", IsLocalizable = true, IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
-                .AddOrUpdateField(new StringField(2, "lastName",
+                .AddOrUpdateField(new StringField(1, "firstName", Partitioning.Language,
+                    new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
+                .AddOrUpdateField(new StringField(2, "lastName", Partitioning.Language,
                     new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }))
-                .AddOrUpdateField(new BooleanField(3, "isAdmin",
+                .AddOrUpdateField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
                     new BooleanFieldProperties()))
-                .AddOrUpdateField(new NumberField(4, "age",
+                .AddOrUpdateField(new NumberField(4, "age", Partitioning.Invariant,
                     new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                .AddOrUpdateField(new DateTimeField(5, "birthday",
+                .AddOrUpdateField(new DateTimeField(5, "birthday", Partitioning.Invariant,
                     new DateTimeFieldProperties()));
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
@@ -61,7 +62,12 @@ namespace Squidex.Read.MongoDb.Contents
             schemaEntity.Setup(x => x.Version).Returns(3);
             schemaEntity.Setup(x => x.Schema).Returns(schema);
 
-            edmModel = builder.BuildEdmModel(schemaEntity.Object, languagesConfig);
+            var appEntity = new Mock<IAppEntity>();
+            appEntity.Setup(x => x.Id).Returns(Guid.NewGuid());
+            appEntity.Setup(x => x.Version).Returns(3);
+            appEntity.Setup(x => x.PartitionResolver).Returns(languagesConfig.ToResolver());
+
+            edmModel = builder.BuildEdmModel(schemaEntity.Object, appEntity.Object);
         }
 
         [Fact]

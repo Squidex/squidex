@@ -21,8 +21,6 @@ namespace Squidex.Infrastructure
         private readonly string englishName;
         private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
 
-        public static readonly Language Invariant = AddLanguage("iv", "Invariant");
-
         private static Language AddLanguage(string iso2Code, string englishName)
         {
             var language = new Language(iso2Code, englishName);

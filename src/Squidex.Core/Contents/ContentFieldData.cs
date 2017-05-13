@@ -22,16 +22,16 @@ namespace Squidex.Core.Contents
 
         public ContentFieldData SetValue(JToken value)
         {
-            this[Language.Invariant] = value;
+            this[InvariantPartitioning.Instance.Master.Key] = value;
 
             return this;
         }
 
-        public ContentFieldData AddValue(string language, JToken value)
+        public ContentFieldData AddValue(string key, JToken value)
         {
-            Guard.NotNullOrEmpty(language, nameof(language));
+            Guard.NotNullOrEmpty(key, nameof(key));
 
-            this[language] = value;
+            this[key] = value;
 
             return this;
         }

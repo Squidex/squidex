@@ -48,6 +48,11 @@ namespace Squidex.Read.MongoDb.Apps
         [BsonElement]
         public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; } = new Dictionary<string, MongoAppContributorEntity>();
 
+        public PartitionResolver PartitionResolver
+        {
+            get { return LanguagesConfig.ToResolver(); }
+        }
+
         public LanguagesConfig LanguagesConfig
         {
             get { return languagesConfig ?? (languagesConfig = CreateLanguagesConfig()); }
@@ -70,7 +75,7 @@ namespace Squidex.Read.MongoDb.Apps
             if (languagesConfig != newConfig)
             {
                 languagesConfig = newConfig;
-                Languages = newConfig.Select(FromLanguageConfig).ToList();
+                Languages = newConfig.OfType<LanguageConfig>().Select(FromLanguageConfig).ToList();
 
                 MasterLanguage = newConfig.Master.Language;
             }

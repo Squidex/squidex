@@ -20,8 +20,13 @@ namespace Squidex.Core.Schemas
 {
     public sealed class StringField : Field<StringFieldProperties>
     {
-        public StringField(long id, string name, StringFieldProperties properties) 
-            : base(id, name, properties)
+        public StringField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new StringFieldProperties())
+        {
+        }
+
+        public StringField(long id, string name, Partitioning partitioning, StringFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

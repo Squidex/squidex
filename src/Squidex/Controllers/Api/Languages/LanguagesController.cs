@@ -38,7 +38,7 @@ namespace Squidex.Controllers.Api.Languages
         [ProducesResponseType(typeof(string[]), 200)]
         public IActionResult GetLanguages()
         {
-            var response = Language.AllLanguages.Where(x => x != Language.Invariant).Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
+            var response = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
 
             return Ok(response);
         }

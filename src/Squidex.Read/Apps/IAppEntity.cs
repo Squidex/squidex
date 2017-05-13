@@ -20,5 +20,7 @@ namespace Squidex.Read.Apps
         IReadOnlyCollection<IAppClientEntity> Clients { get; }
 
         IReadOnlyCollection<IAppContributorEntity> Contributors { get; }
+
+        PartitionResolver PartitionResolver { get; }
     }
 }

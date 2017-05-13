@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Read.Apps;
 using Squidex.Read.Contents;
 using Squidex.Read.Contents.Builders;
 using Squidex.Read.Contents.Repositories;
@@ -50,7 +51,7 @@ namespace Squidex.Read.MongoDb.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity)
         {
             List<IContentEntity> result = null;
 
@@ -59,7 +60,7 @@ namespace Squidex.Read.MongoDb.Contents
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, languagesConfig);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, appEntity);
 
                     var parser = model.ParseQuery(odataQuery);
 
@@ -91,7 +92,7 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, LanguagesConfig languagesConfig)
+        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity)
         {
             var result = 0L;
 
@@ -100,7 +101,7 @@ namespace Squidex.Read.MongoDb.Contents
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, languagesConfig);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, appEntity);
 
                     var parser = model.ParseQuery(odataQuery);
 

@@ -43,6 +43,7 @@ namespace Squidex.Core.Schemas.Json
                         Name = x.Name,
                         IsHidden = x.IsHidden,
                         IsDisabled = x.IsDisabled,
+                        Partitioning = x.Paritioning.Key,
                         Properties = x.RawProperties
                     }).ToList();
 
@@ -56,7 +57,9 @@ namespace Squidex.Core.Schemas.Json
             var fields =
                 model.Fields.Select(fieldModel =>
                 {
-                    var field = fieldRegistry.CreateField(fieldModel.Id, fieldModel.Name, fieldModel.Properties);
+                    var parititonKey = new Partitioning(fieldModel.Partitioning);
+
+                    var field = fieldRegistry.CreateField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties);
 
                     if (fieldModel.IsDisabled)
                     {

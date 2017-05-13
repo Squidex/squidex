@@ -17,6 +17,7 @@ using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Core;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
@@ -62,7 +63,7 @@ namespace Squidex.Controllers.Api.Apps
                 return NotFound();
             }
 
-            var model = entity.LanguagesConfig.Select(x => 
+            var model = entity.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
                 SimpleMapper.Map(x.Language, 
                     new AppLanguageDto
                     {

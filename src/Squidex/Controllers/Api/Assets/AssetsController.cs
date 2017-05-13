@@ -92,7 +92,7 @@ namespace Squidex.Controllers.Api.Assets
             }
 
             var taskForAssets = assetRepository.QueryAsync(AppId, mimeTypeList, idsList, query, take, skip);
-            var taskForCount = assetRepository.CountAsync(AppId, mimeTypeList, idsList, query);
+            var taskForCount  = assetRepository.CountAsync(AppId, mimeTypeList, idsList, query);
 
             await Task.WhenAll(taskForAssets, taskForCount);
 

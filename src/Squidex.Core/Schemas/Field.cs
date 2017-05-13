@@ -24,19 +24,20 @@ namespace Squidex.Core.Schemas
     public abstract class Field : CloneableBase
     {
         private readonly Lazy<List<IValidator>> validators;
-        private readonly long id;
-        private string name;
+        private readonly long fieldId;
+        private readonly Partitioning partitioning;
+        private string fieldName;
         private bool isDisabled;
         private bool isHidden;
 
         public long Id
         {
-            get { return id; }
+            get { return fieldId; }
         }
 
         public string Name
         {
-            get { return name; }
+            get { return fieldName; }
         }
 
         public bool IsHidden
@@ -49,6 +50,11 @@ namespace Squidex.Core.Schemas
             get { return isDisabled; }
         }
 
+        public Partitioning Paritioning
+        {
+            get { return partitioning; }
+        }
+
         public IReadOnlyList<IValidator> Validators
         {
             get { return validators.Value; }
@@ -56,14 +62,16 @@ namespace Squidex.Core.Schemas
 
         public abstract FieldProperties RawProperties { get; }
 
-        protected Field(long id, string name)
+        protected Field(long id, string name, Partitioning partitioning)
         {
             Guard.ValidPropertyName(name, nameof(name));
             Guard.GreaterThan(id, 0, nameof(id));
+            Guard.NotNull(partitioning, nameof(partitioning));
 
-            this.id = id;
+            fieldId = id;
+            fieldName = name;
 
-            this.name = name;
+            this.partitioning = partitioning;
 
             validators = new Lazy<List<IValidator>>(() => new List<IValidator>(CreateValidators()));
         }
@@ -98,22 +106,17 @@ namespace Squidex.Core.Schemas
             {
                 var error = new ValidationError("Name must be a valid slug", "Name");
 
-                throw new ValidationException($"Cannot rename the field '{name}' ({id})", error);
+                throw new ValidationException($"Cannot rename the field '{fieldName}' ({fieldId})", error);
             }
 
-            return Clone<Field>(clone => clone.name = newName);
+            return Clone<Field>(clone => clone.fieldName = newName);
         }
 
-        public void AddToEdmType(EdmStructuredType edmType, LanguagesConfig languagesConfig, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
+        public void AddToEdmType(EdmStructuredType edmType, PartitionResolver partitionResolver, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
         {
             Guard.NotNull(edmType, nameof(edmType));
             Guard.NotNull(typeResolver, nameof(typeResolver));
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
-
-            if (!RawProperties.IsLocalizable)
-            {
-                languagesConfig = LanguagesConfig.Invariant;
-            }
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
             var edmValueType = CreateEdmType();
 
@@ -122,42 +125,39 @@ namespace Squidex.Core.Schemas
                 return;
             }
 
-            var languageType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}{Name.ToPascalCase()}Property"));
+            var partitionType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}{Name.ToPascalCase()}Property"));
+            var partition = partitionResolver(partitioning);
 
-            foreach (var languageConfig in languagesConfig)
+            foreach (var partitionItem in partition)
             {
-                languageType.AddStructuralProperty(languageConfig.Language, edmValueType);
+                partitionType.AddStructuralProperty(partitionItem.Key, edmValueType);
             }
 
-            edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(languageType, false));
+            edmType.AddStructuralProperty(Name, new EdmComplexTypeReference(partitionType, false));
         }
 
-        public void AddToJsonSchema(JsonSchema4 schema, LanguagesConfig languagesConfig, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public void AddToJsonSchema(JsonSchema4 schema, PartitionResolver partitionResolver, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
-            if (!RawProperties.IsLocalizable)
+            var partitionProperty = CreateProperty();
+            var partitionObject = new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalProperties = false };
+            var partition = partitionResolver(partitioning);
+
+            foreach (var partitionItem in partition)
             {
-                languagesConfig = LanguagesConfig.Invariant;
+                var partitionItemProperty = new JsonProperty { Description = partitionItem.Name, IsRequired = RawProperties.IsRequired };
+
+                PrepareJsonSchema(partitionItemProperty, schemaResolver);
+
+                partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);
             }
 
-            var languagesProperty = CreateProperty();
-            var languagesObject = new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalProperties = false };
+            partitionProperty.SchemaReference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", partitionObject);
 
-            foreach (var languageConfig in languagesConfig)
-            {
-                var languageProperty = new JsonProperty { Description = languageConfig.Language.EnglishName, IsRequired = RawProperties.IsRequired };
-
-                PrepareJsonSchema(languageProperty, schemaResolver);
-
-                languagesObject.Properties.Add(languageConfig.Language, languageProperty);
-            }
-
-            languagesProperty.SchemaReference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", languagesObject);
-
-            schema.Properties.Add(Name, languagesProperty);
+            schema.Properties.Add(Name, partitionProperty);
         }
 
         public JsonProperty CreateProperty()

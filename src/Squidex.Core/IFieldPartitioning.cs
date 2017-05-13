@@ -1,19 +1,19 @@
 ﻿// ==========================================================================
-//  IRegisteredField.cs
+//  IFieldPartitioning.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Core
 {
-    public interface IRegisteredField
+    public interface IFieldPartitioning : IReadOnlyCollection<IFieldPartitionItem>
     {
-        Type PropertiesType { get; }
+        IFieldPartitionItem Master { get; }
 
-        Field CreateField(long id, string name, FieldProperties properties);
+        bool TryGetItem(string key, out IFieldPartitionItem item);
     }
 }

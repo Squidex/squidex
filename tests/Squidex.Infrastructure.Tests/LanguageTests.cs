@@ -97,10 +97,10 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
-        [InlineData("iv", "iv")]
         [InlineData("en", "en")]
-        [InlineData("EN", "en")]
         [InlineData("en ", "en")]
+        [InlineData("EN", "en")]
+        [InlineData("EN ", "en")]
         public void Should_parse_valid_languages(string input, string languageCode)
         {
             var language = Language.ParseOrNull(input);

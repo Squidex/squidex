@@ -1,23 +1,23 @@
 ﻿// ==========================================================================
-//  FieldAdded.cs
+//  IFieldPartitionItem.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
-using Squidex.Infrastructure;
+using System.Collections.Generic;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Core
 {
-    [TypeName("FieldAddedEvent")]
-    public class FieldAdded : FieldEvent
+    public interface IFieldPartitionItem
     {
-        public string Name { get; set; }
+        string Key { get; }
 
-        public bool IsLocalizable { get; set; }
+        string Name { get; }
 
-        public FieldProperties Properties { get; set; }
+        bool IsOptional { get; }
+
+        IEnumerable<string> Fallback { get; }
     }
 }

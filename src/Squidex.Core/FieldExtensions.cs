@@ -18,21 +18,21 @@ namespace Squidex.Core
 {
     public static class FieldExtensions
     {
-        public static void AddError(this ICollection<ValidationError> errors, string message, Field field, Language language = null)
+        public static void AddError(this ICollection<ValidationError> errors, string message, Field field, IFieldPartitionItem partitionItem = null)
         {
-            AddError(errors, message, !string.IsNullOrWhiteSpace(field.RawProperties.Label) ? field.RawProperties.Label : field.Name, field.Name, language);
+            AddError(errors, message, !string.IsNullOrWhiteSpace(field.RawProperties.Label) ? field.RawProperties.Label : field.Name, field.Name, partitionItem);
         }
 
-        public static void AddError(this ICollection<ValidationError> errors, string message, string fieldName, Language language = null)
+        public static void AddError(this ICollection<ValidationError> errors, string message, string fieldName, IFieldPartitionItem partitionItem = null)
         {
-            AddError(errors, message, fieldName, fieldName, language);
+            AddError(errors, message, fieldName, fieldName, partitionItem);
         }
 
-        public static void AddError(this ICollection<ValidationError> errors, string message, string displayName, string fieldName, Language language = null)
+        public static void AddError(this ICollection<ValidationError> errors, string message, string displayName, string fieldName, IFieldPartitionItem partitionItem = null)
         {
-            if (language != null && language != Language.Invariant)
+            if (partitionItem != null && partitionItem != InvariantPartitioning.Instance.Master)
             {
-                displayName += $" ({language.Iso2Code})";
+                displayName += $" ({partitionItem.Key})";
             }
 
             errors.Add(new ValidationError(message.Replace("<FIELD>", displayName), fieldName));

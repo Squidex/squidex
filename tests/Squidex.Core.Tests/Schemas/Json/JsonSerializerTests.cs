@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Immutable;
 using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
@@ -33,21 +34,25 @@ namespace Squidex.Core.Schemas.Json
         public void Should_serialize_and_deserialize_schema()
         {
             var schema =
-                Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new StringField(1, "my-string", 
-                        new StringFieldProperties { Label = "My-String", Pattern = "[0-9]{3}" }))
-                    .AddOrUpdateField(new NumberField(2, "my-number", 
-                        new NumberFieldProperties { Hints = "My-Number" }))
-                    .AddOrUpdateField(new BooleanField(3, "my-boolean", 
-                        new BooleanFieldProperties())).HideField(3)
-                    .AddOrUpdateField(new JsonField(4, "my-json",
-                        new JsonFieldProperties())).DisableField(4)
-                    .AddOrUpdateField(new DateTimeField(5, "my-datetime",
-                        new DateTimeFieldProperties()))
-                    .AddOrUpdateField(new GeolocationField(6, "my-geolocation",
-                        new GeolocationFieldProperties()))
-                    .AddOrUpdateField(new AssetsField(7, "my-asset",
+                Schema.Create("user", new SchemaProperties { Hints = "The User" })
+                    .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
+                        new JsonFieldProperties()))
+                    .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                    .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
+                        new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
+                    .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,
+                        new StringFieldProperties { Hints = "My String1" }))
+                    .AddOrUpdateField(new NumberField(5, "my-number", Partitioning.Invariant,
+                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
+                    .AddOrUpdateField(new BooleanField(6, "my-boolean", Partitioning.Invariant,
+                        new BooleanFieldProperties()))
+                    .AddOrUpdateField(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
+                    .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
+                        new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
+                    .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties()))
                     .Publish();
 
             var deserialized = sut.Deserialize(sut.Serialize(schema));

@@ -55,8 +55,8 @@ namespace Squidex.Controllers.ContentApi
             
             var query = Request.QueryString.ToString();
 
-            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App.LanguagesConfig);
-            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App.LanguagesConfig);
+            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App);
+            var taskForCount    = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App);
 
             await Task.WhenAll(taskForContents, taskForCount);
 

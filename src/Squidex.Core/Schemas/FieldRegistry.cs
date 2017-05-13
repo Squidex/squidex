@@ -12,41 +12,32 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core.Schemas
 {
-    public delegate Field FactoryFunction(long id, string name, FieldProperties properties);
-
     public sealed class FieldRegistry
     {
-        private readonly TypeNameRegistry typeNameRegistry;
-        private readonly Dictionary<string, IRegisteredField> fieldsByTypeName = new Dictionary<string, IRegisteredField>();
-        private readonly Dictionary<Type, IRegisteredField> fieldsByPropertyType = new Dictionary<Type, IRegisteredField>();
+        private delegate Field FactoryFunction(long id, string name, Partitioning partitioning, FieldProperties properties);
 
-        private sealed class Registered : IRegisteredField
+        private readonly TypeNameRegistry typeNameRegistry;
+        private readonly Dictionary<Type, Registered> fieldsByPropertyType = new Dictionary<Type, Registered>();
+
+        private sealed class Registered
         {
             private readonly FactoryFunction fieldFactory;
             private readonly Type propertiesType;
-            private readonly string typeName;
 
             public Type PropertiesType
             {
                 get { return propertiesType; }
             }
 
-            public string TypeName
+            public Registered(FactoryFunction fieldFactory, Type propertiesType)
             {
-                get { return typeName; }
-            }
-
-            public Registered(FactoryFunction fieldFactory, Type propertiesType, TypeNameRegistry typeNameRegistry)
-            {
-                typeName = typeNameRegistry.GetName(propertiesType);
-
                 this.fieldFactory = fieldFactory;
                 this.propertiesType = propertiesType;
             }
 
-            Field IRegisteredField.CreateField(long id, string name, FieldProperties properties)
+            public Field CreateField(long id, string name, Partitioning partitioning, FieldProperties properties)
             {
-                return fieldFactory(id, name, properties);
+                return fieldFactory(id, name, partitioning, properties);
             }
         }
 
@@ -58,25 +49,32 @@ namespace Squidex.Core.Schemas
             this.typeNameRegistry = typeNameRegistry;
 
             Add<BooleanFieldProperties>(
-                (id, name, p) => new BooleanField(id, name, (BooleanFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new BooleanField(id, name, partitioning, (BooleanFieldProperties)properties));
 
             Add<NumberFieldProperties>(
-                (id, name, p) => new NumberField(id, name, (NumberFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new NumberField(id, name, partitioning, (NumberFieldProperties)properties));
 
             Add<StringFieldProperties>(
-                (id, name, p) => new StringField(id, name, (StringFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new StringField(id, name, partitioning, (StringFieldProperties)properties));
 
             Add<DateTimeFieldProperties>(
-                (id, name, p) => new DateTimeField(id, name, (DateTimeFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new DateTimeField(id, name, partitioning, (DateTimeFieldProperties)properties));
 
             Add<JsonFieldProperties>(
-                (id, name, p) => new JsonField(id, name, (JsonFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new JsonField(id, name, partitioning, (JsonFieldProperties)properties));
 
             Add<AssetsFieldProperties>(
-                (id, name, p) => new AssetsField(id, name, (AssetsFieldProperties)p, assetTester));
+                (id, name, partitioning, properties) => 
+                    new AssetsField(id, name, partitioning, (AssetsFieldProperties)properties, assetTester));
 
             Add<GeolocationFieldProperties>(
-                (id, name, p) => new GeolocationField(id, name, (GeolocationFieldProperties)p));
+                (id, name, partitioning, properties) => 
+                    new GeolocationField(id, name, partitioning, (GeolocationFieldProperties)properties));
         }
 
         private void Add<TFieldProperties>(FactoryFunction fieldFactory)
@@ -85,13 +83,12 @@ namespace Squidex.Core.Schemas
 
             typeNameRegistry.Map(typeof(TFieldProperties));
            
-            var registered = new Registered(fieldFactory, typeof(TFieldProperties), typeNameRegistry);
-
-            fieldsByTypeName[registered.TypeName] = registered;
+            var registered = new Registered(fieldFactory, typeof(TFieldProperties));
+            
             fieldsByPropertyType[registered.PropertiesType] = registered;
         }
 
-        public Field CreateField(long id, string name, FieldProperties properties)
+        public Field CreateField(long id, string name, Partitioning partitioning, FieldProperties properties)
         {
             var registered = fieldsByPropertyType.GetOrDefault(properties.GetType());
 
@@ -100,35 +97,7 @@ namespace Squidex.Core.Schemas
                 throw new InvalidOperationException($"The field property '{properties.GetType()}' is not supported.");
             }
 
-            return registered.CreateField(id, name, properties);
-        }
-
-        public IRegisteredField FindByPropertiesType(Type type)
-        {
-            Guard.NotNull(type, nameof(type));
-
-            var registered = fieldsByPropertyType.GetOrDefault(type);
-
-            if (registered == null)
-            {
-                throw new InvalidOperationException($"The field property '{type}' is not supported.");
-            }
-
-            return registered;
-        }
-
-        public IRegisteredField FindByTypeName(string typeName)
-        {
-            Guard.NotNullOrEmpty(typeName, nameof(typeName));
-
-            var registered = fieldsByTypeName.GetOrDefault(typeName);
-
-            if (registered == null)
-            {
-                throw new DomainException($"A field with type '{typeName} is not known.");
-            }
-
-            return registered;
+            return registered.CreateField(id, name, partitioning, properties);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "my-bolean", Partitioning.Invariant);
 
             Assert.Equal("my-bolean", sut.Name);
         }
@@ -29,7 +29,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new BooleanField(1, "name", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "name", Partitioning.Invariant);
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_null_boolean_is_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "my-bolean", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_boolean_is_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "my-bolean", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(true), false, errors);
 
@@ -57,7 +57,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_boolean_is_required()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties { IsRequired = true });
+            var sut = new BooleanField(1, "my-bolean", Partitioning.Invariant, new BooleanFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -68,7 +68,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new BooleanField(1, "my-bolean", new BooleanFieldProperties());
+            var sut = new BooleanField(1, "my-bolean", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 

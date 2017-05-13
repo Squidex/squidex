@@ -26,8 +26,13 @@ namespace Squidex.Core.Schemas
     [TypeName("DateTimeField")]
     public sealed class DateTimeField : Field<DateTimeFieldProperties>
     {
-        public DateTimeField(long id, string name, DateTimeFieldProperties properties) 
-            : base(id, name, properties)
+        public DateTimeField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new DateTimeFieldProperties())
+        {
+        }
+
+        public DateTimeField(long id, string name, Partitioning partitioning, DateTimeFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

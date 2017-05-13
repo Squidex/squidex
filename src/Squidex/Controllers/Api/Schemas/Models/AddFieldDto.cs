@@ -8,8 +8,6 @@
 
 using System.ComponentModel.DataAnnotations;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     public sealed class AddFieldDto
@@ -20,6 +18,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         [Required]
         [RegularExpression("^[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*$")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Determines if the field is localizable.
+        /// </summary>
+        public bool IsLocalizable { get; set; }
 
         /// <summary>
         /// The field properties.

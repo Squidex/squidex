@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Core;
 using Squidex.Core.Schemas;
 
 // ReSharper disable UnusedParameter.Global
@@ -14,14 +15,19 @@ namespace Squidex.Events.Schemas.Utils
 {
     public static class SchemaEventDispatcher
     {
+        public static Schema Dispatch(FieldAdded @event, Schema schema, FieldRegistry registry)
+        {
+            var partitioning = 
+                @event.IsLocalizable ? 
+                    Partitioning.Language :
+                    Partitioning.Invariant;
+
+            return schema.AddOrUpdateField(registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties));
+        }
+
         public static Schema Dispatch(SchemaCreated @event)
         {
             return Schema.Create(@event.Name, @event.Properties);
-        }
-
-        public static Schema Dispatch(FieldAdded @event, Schema schema, FieldRegistry registry)
-        {
-            return schema.AddOrUpdateField(registry.CreateField(@event.FieldId.Id, @event.Name, @event.Properties));
         }
 
         public static Schema Dispatch(FieldUpdated @event, Schema schema)

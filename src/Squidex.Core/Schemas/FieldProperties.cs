@@ -15,7 +15,6 @@ namespace Squidex.Core.Schemas
     public abstract class FieldProperties : NamedElementPropertiesBase, IValidatable
     {
         private bool isRequired;
-        private bool isLocalizable;
         private bool isListField;
         private string placeholder;
 
@@ -27,17 +26,6 @@ namespace Squidex.Core.Schemas
                 ThrowIfFrozen();
 
                 isRequired = value;
-            }
-        }
-
-        public bool IsLocalizable
-        {
-            get { return isLocalizable; }
-            set
-            {
-                ThrowIfFrozen();
-
-                isLocalizable = value;
             }
         }
 

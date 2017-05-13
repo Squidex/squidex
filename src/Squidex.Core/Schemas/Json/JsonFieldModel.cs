@@ -6,18 +6,28 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Newtonsoft.Json;
+
 namespace Squidex.Core.Schemas.Json
 {
     public sealed class JsonFieldModel
     {
-        public string Name { get; set; }
-
+        [JsonProperty]
         public long Id { get; set; }
 
+        [JsonProperty]
         public bool IsHidden { get; set; }
 
+        [JsonProperty]
         public bool IsDisabled { get; set; }
 
+        [JsonProperty]
+        public string Name { get; set; }
+
+        [JsonProperty]
+        public string Partitioning { get; set; }
+
+        [JsonProperty]
         public FieldProperties Properties { get; set; }
     }
 }

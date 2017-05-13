@@ -21,7 +21,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties());
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant);
 
             Assert.Equal("my-geolocation", sut.Name);
         }
@@ -29,7 +29,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties());
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant);
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_geolocation_is_valid_null()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties());
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), false, errors);
 
@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_geolocation_is_valid()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties());
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant);
 
             var geolocation = new JObject(
                 new JProperty("latitude", 0),
@@ -61,7 +61,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_geolocation_has_invalid_properties()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties { IsRequired = true });
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant, new GeolocationFieldProperties { IsRequired = true });
 
             var geolocation = new JObject(
                 new JProperty("latitude", 200),
@@ -76,7 +76,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_geolocation_has_too_many_properties()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties { IsRequired = true });
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant, new GeolocationFieldProperties { IsRequired = true });
 
             var geolocation = new JObject(
                 new JProperty("invalid", 0),
@@ -92,7 +92,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_geolocation_is_required()
         {
-            var sut = new GeolocationField(1, "my-geolocation", new GeolocationFieldProperties { IsRequired = true });
+            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant, new GeolocationFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), false, errors);
 

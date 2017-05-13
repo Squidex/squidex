@@ -19,8 +19,13 @@ namespace Squidex.Core.Schemas
 {
     public sealed class NumberField : Field<NumberFieldProperties>
     {
-        public NumberField(long id, string name, NumberFieldProperties properties) 
-            : base(id, name, properties)
+        public NumberField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new NumberFieldProperties())
+        {
+        }
+
+        public NumberField(long id, string name, Partitioning partitioning, NumberFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

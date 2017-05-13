@@ -71,9 +71,9 @@ namespace Squidex.Core.Contents
             {
                 var resultValue = new ContentFieldData();
 
-                foreach (var languageValue in fieldValue.Value.Where(x => x.Value != null && x.Value.Type != JTokenType.Null))
+                foreach (var partitionValue in fieldValue.Value.Where(x => x.Value != null && x.Value.Type != JTokenType.Null))
                 {
-                    resultValue[languageValue.Key] = languageValue.Value;
+                    resultValue[partitionValue.Key] = partitionValue.Value;
                 }
 
                 if (resultValue.Count > 0)
@@ -104,17 +104,17 @@ namespace Squidex.Core.Contents
                 {
                     var encodedValue = new ContentFieldData();
 
-                    foreach (var languageValue in fieldValue.Value)
+                    foreach (var partitionValue in fieldValue.Value)
                     {
-                        if (languageValue.Value == null || languageValue.Value.Type == JTokenType.Null)
+                        if (partitionValue.Value == null || partitionValue.Value.Type == JTokenType.Null)
                         {
-                            encodedValue[languageValue.Key] = null;
+                            encodedValue[partitionValue.Key] = null;
                         }
                         else
                         {
-                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(languageValue.Value.ToString()));
+                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(partitionValue.Value.ToString()));
 
-                            encodedValue[languageValue.Key] = value;
+                            encodedValue[partitionValue.Key] = value;
                         }
                     }
 
@@ -146,17 +146,17 @@ namespace Squidex.Core.Contents
                 {
                     var encodedValue = new ContentFieldData();
                     
-                    foreach (var languageValue in fieldValue.Value)
+                    foreach (var partitionValue in fieldValue.Value)
                     {
-                        if (languageValue.Value == null || languageValue.Value.Type == JTokenType.Null)
+                        if (partitionValue.Value == null || partitionValue.Value.Type == JTokenType.Null)
                         {
-                            encodedValue[languageValue.Key] = null;
+                            encodedValue[partitionValue.Key] = null;
                         }
                         else
                         {
-                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(languageValue.Value.ToString()));
+                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(partitionValue.Value.ToString()));
 
-                            encodedValue[languageValue.Key] = JToken.Parse(value);
+                            encodedValue[partitionValue.Key] = JToken.Parse(value);
                         }
                     }
 
@@ -177,7 +177,7 @@ namespace Squidex.Core.Contents
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(languagesConfig, nameof(languagesConfig));
 
-            var codeForInvariant = Language.Invariant.Iso2Code;
+            var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
             var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
 
             var result = new ContentData();
@@ -192,11 +192,11 @@ namespace Squidex.Core.Contents
                 var fieldResult = new ContentFieldData();
                 var fieldValues = fieldValue.Value;
 
-                if (field.RawProperties.IsLocalizable)
+                if (field.Paritioning.Equals(Partitioning.Language))
                 {
                     foreach (var languageConfig in languagesConfig)
                     {
-                        string languageCode = languageConfig.Language;
+                        var languageCode = languageConfig.Key;
 
                         if (fieldValues.TryGetValue(languageCode, out JToken value))
                         {

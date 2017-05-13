@@ -51,11 +51,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// Determines if the field should be displayed in lists.
         /// </summary>
         public bool IsListField { get; set; }
-        
+
         /// <summary>
-        /// Determines if the field is localizable.
+        /// Gets the partitioning of the language, e.g. invariant or language.
         /// </summary>
-        public bool IsLocalizable { get; set; }
+        public string Partitioning { get; set; }
 
         public abstract FieldProperties ToProperties();
     }

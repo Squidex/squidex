@@ -23,7 +23,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant);
 
             Assert.Equal("my-datetime", sut.Name);
         }
@@ -31,7 +31,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant);
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -39,7 +39,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_datetime_is_valid()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -49,7 +49,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_datetime_is_required()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { IsRequired = true });
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant, new DateTimeFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -60,7 +60,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_datetime_is_less_than_min()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MinValue = FutureDays(10) });
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant, new DateTimeFieldProperties { MinValue = FutureDays(10) });
 
             await sut.ValidateAsync(CreateValue(FutureDays(0)), false, errors);
 
@@ -71,7 +71,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_datetime_is_greater_than_max()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties { MaxValue = FutureDays(10) });
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant, new DateTimeFieldProperties { MaxValue = FutureDays(10) });
 
             await sut.ValidateAsync(CreateValue(FutureDays(20)), false, errors);
 
@@ -82,7 +82,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 
@@ -93,7 +93,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_another_type()
         {
-            var sut = new DateTimeField(1, "my-datetime", new DateTimeFieldProperties());
+            var sut = new DateTimeField(1, "my-datetime", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(123), false, errors);
 

@@ -13,12 +13,14 @@ using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 
+#pragma warning disable 168
+
 namespace Squidex.Core
 {
     public sealed class ContentValidator
     {
         private readonly Schema schema;
-        private readonly LanguagesConfig languagesConfig;
+        private readonly PartitionResolver partitionResolver;
         private readonly List<ValidationError> errors = new List<ValidationError>();
 
         public IReadOnlyList<ValidationError> Errors
@@ -26,14 +28,14 @@ namespace Squidex.Core
             get { return errors; }
         }
 
-        public ContentValidator(Schema schema, LanguagesConfig languagesConfig)
+        public ContentValidator(Schema schema, PartitionResolver partitionResolver)
         {
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
             this.schema = schema;
 
-            this.languagesConfig = languagesConfig;
+            this.partitionResolver = partitionResolver;
         }
 
         public async Task ValidatePartialAsync(ContentData data)
@@ -50,35 +52,27 @@ namespace Squidex.Core
                 }
                 else
                 {
-                    if (field.RawProperties.IsLocalizable)
-                    {
-                        await ValidateFieldPartialAsync(field, fieldData.Value, languagesConfig);
-                    }
-                    else
-                    {
-                        await ValidateFieldPartialAsync(field, fieldData.Value, LanguagesConfig.Invariant);
-                    }
+                    await ValidateFieldPartialAsync(field, fieldData.Value);
                 }
             }
         }
 
-        private async Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData, LanguagesConfig languages)
+        private async Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
         {
-            foreach (var languageValue in fieldData)
+            var partitioning = field.Paritioning;
+            var partition = partitionResolver(partitioning);
+
+            foreach (var partitionValues in fieldData)
             {
-                if (!Language.TryGetLanguage(languageValue.Key, out var language))
+                if (!partition.TryGetItem(partitionValues.Key, out var partitionItem))
                 {
-                    errors.AddError($"<FIELD> has an invalid language '{languageValue.Key}'", field);
-                }
-                else if (!languages.TryGetConfig(language, out var languageConfig))
-                {
-                    errors.AddError($"<FIELD> has an unsupported language '{languageValue.Key}'", field);
+                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
                 }
                 else
                 {
-                    var config = languageConfig;
+                    var item = partitionItem;
 
-                    await field.ValidateAsync(languageValue.Value, config.IsOptional, m => errors.AddError(m, field, config.Language));
+                    await field.ValidateAsync(partitionValues.Value, item.IsOptional, m => errors.AddError(m, field, item));
                 }
             }
         }
@@ -93,14 +87,7 @@ namespace Squidex.Core
             {
                 var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
 
-                if (field.RawProperties.IsLocalizable)
-                {
-                    await ValidateFieldAsync(field, fieldData, languagesConfig);
-                }
-                else
-                {
-                    await ValidateFieldAsync(field, fieldData, LanguagesConfig.Invariant);
-                }
+                await ValidateFieldAsync(field, fieldData);
             }
         }
 
@@ -115,26 +102,24 @@ namespace Squidex.Core
             }
         }
 
-        private async Task ValidateFieldAsync(Field field, ContentFieldData fieldData, LanguagesConfig languages)
+        private async Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
         {
-            foreach (var valueLanguage in fieldData.Keys)
+            var partitioning = field.Paritioning;
+            var partition = partitionResolver(partitioning);
+
+            foreach (var partitionValues in fieldData)
             {
-                if (!Language.TryGetLanguage(valueLanguage, out Language language))
+                if (!partition.TryGetItem(partitionValues.Key, out var partitionItem))
                 {
-                    errors.AddError($"<FIELD> has an invalid language '{valueLanguage}'", field);
-                }
-                else if (!languages.Contains(language))
-                {
-                    errors.AddError($"<FIELD> has an unsupported language '{valueLanguage}'", field);
+                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
                 }
             }
 
-            foreach (var languageConfig in languages)
+            foreach (var partitionItem in partition)
             {
-                var config = languageConfig;
-                var value = fieldData.GetOrCreate(config.Language, k => JValue.CreateNull());
+                var value = fieldData.GetOrCreate(partitionItem.Key, k => JValue.CreateNull());
 
-                await field.ValidateAsync(value, config.IsOptional, m => errors.AddError(m, field, config.Language));
+                await field.ValidateAsync(value, partitionItem.IsOptional, m => errors.AddError(m, field, partitionItem));
             }
         }
     }

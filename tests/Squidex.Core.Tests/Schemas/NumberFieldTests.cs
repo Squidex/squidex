@@ -22,7 +22,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
             Assert.Equal("my-number", sut.Name);
         }
@@ -30,7 +30,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -38,7 +38,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_number_is_valid()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -48,7 +48,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_required()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties { IsRequired = true });
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -59,7 +59,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_less_than_min()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties { MinValue = 10 });
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { MinValue = 10 });
 
             await sut.ValidateAsync(CreateValue(5), false, errors);
 
@@ -70,7 +70,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_greater_than_max()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties { MaxValue = 10 });
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { MaxValue = 10 });
 
             await sut.ValidateAsync(CreateValue(20), false, errors);
 
@@ -81,7 +81,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_number_is_not_allowed()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), false, errors);
 
@@ -92,7 +92,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new NumberField(1, "my-number", new NumberFieldProperties());
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
 

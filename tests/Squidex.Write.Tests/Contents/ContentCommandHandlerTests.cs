@@ -42,7 +42,7 @@ namespace Squidex.Write.Contents
         {
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new NumberField(1, "my-field",
+                    .AddOrUpdateField(new NumberField(1, "my-field", Partitioning.Invariant,
                         new NumberFieldProperties { IsRequired = true }));
 
             content = new ContentDomainObject(contentId, -1);
@@ -50,6 +50,7 @@ namespace Squidex.Write.Contents
             sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
 
             appEntity.Setup(x => x.LanguagesConfig).Returns(languagesConfig);
+            appEntity.Setup(x => x.PartitionResolver).Returns(languagesConfig.ToResolver());
             appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
 
             schemaEntity.Setup(x => x.Schema).Returns(schema);

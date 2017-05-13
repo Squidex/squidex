@@ -25,7 +25,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             Assert.Equal("my-asset", sut.Name);
         }
@@ -33,7 +33,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             Assert.NotEqual(sut, sut.Enable());
         }
@@ -45,7 +45,7 @@ namespace Squidex.Core.Schemas
 
             assetTester.Setup(x => x.IsValidAsync(assetId)).Returns(TaskHelper.True);
 
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             await sut.ValidateAsync(CreateValue(assetId), false, errors);
 
@@ -55,7 +55,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_not_add_error_if_assets_are_null_and_valid()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -65,7 +65,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_assets_are_required_and_null()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
 
             await sut.ValidateAsync(CreateValue(null), false, errors);
 
@@ -76,7 +76,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_assets_are_required_and_empty()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { IsRequired = true }, assetTester.Object);
 
             await sut.ValidateAsync(CreateValue(), false, errors);
 
@@ -87,7 +87,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             await sut.ValidateAsync("invalid", false, errors);
 
@@ -102,7 +102,7 @@ namespace Squidex.Core.Schemas
 
             assetTester.Setup(x => x.IsValidAsync(assetId)).Returns(TaskHelper.False);
 
-            var sut = new AssetsField(1, "my-asset", new AssetsFieldProperties(), assetTester.Object);
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, assetTester.Object);
 
             await sut.ValidateAsync(CreateValue(assetId), false, errors);
 

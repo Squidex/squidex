@@ -19,8 +19,13 @@ namespace Squidex.Core.Schemas
     {
         private readonly IAssetTester assetTester;
 
-        public AssetsField(long id, string name, AssetsFieldProperties properties, IAssetTester assetTester)
-            : base(id, name, properties)
+        public AssetsField(long id, string name, Partitioning partitioning, IAssetTester assetTester)
+            : this(id, name, partitioning, new AssetsFieldProperties(), assetTester)
+        {
+        }
+
+        public AssetsField(long id, string name, Partitioning partitioning, AssetsFieldProperties properties, IAssetTester assetTester)
+            : base(id, name, partitioning, properties)
         {
             this.assetTester = assetTester;
         }

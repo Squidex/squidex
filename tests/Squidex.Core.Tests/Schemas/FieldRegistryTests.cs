@@ -35,7 +35,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_throw_if_creating_field_and_field_is_not_registered()
         {
-            Assert.Throws<InvalidOperationException>(() => sut.CreateField(1, "name", new InvalidProperties()));
+            Assert.Throws<InvalidOperationException>(() => sut.CreateField(1, "name", Partitioning.Invariant, new InvalidProperties()));
         }
 
         [Fact]
@@ -43,37 +43,9 @@ namespace Squidex.Core.Schemas
         {
             var properties = new NumberFieldProperties();
 
-            var field = sut.CreateField(1, "name", properties);
+            var field = sut.CreateField(1, "name", Partitioning.Invariant,  properties);
 
             Assert.Equal(properties, field.RawProperties);
-        }
-
-        [Fact]
-        public void Should_throw_if_getting_by_type_and_field_is_not_registered()
-        {
-            Assert.Throws<InvalidOperationException>(() => sut.FindByPropertiesType(typeof(InvalidProperties)));
-        }
-
-        [Fact]
-        public void Should_find_registration_by_properties_type()
-        {
-            var registry = sut.FindByPropertiesType(typeof(NumberFieldProperties));
-
-            Assert.Equal(typeof(NumberFieldProperties), registry.PropertiesType);
-        }
-
-        [Fact]
-        public void Should_throw_if_getting_by_name_and_field_is_not_registered()
-        {
-            Assert.Throws<DomainException>(() => sut.FindByTypeName("invalid"));
-        }
-
-        [Fact]
-        public void Should_find_registration_by_name()
-        {
-            var registry = sut.FindByTypeName("NumberField");
-
-            Assert.Equal(typeof(NumberFieldProperties), registry.PropertiesType);
         }
     }
 }

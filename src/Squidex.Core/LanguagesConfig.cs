@@ -17,17 +17,26 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Core
 {
-    public sealed class LanguagesConfig : IEnumerable<LanguageConfig>
+    public sealed class LanguagesConfig : IFieldPartitioning
     {
         private readonly ImmutableDictionary<Language, LanguageConfig> languages;
         private readonly LanguageConfig master;
 
         public static readonly LanguagesConfig Empty = Create();
-        public static readonly LanguagesConfig Invariant = Create(Language.Invariant);
 
         public LanguageConfig Master
         {
             get { return master; }
+        }
+
+        public int Count
+        {
+            get { return languages.Count; }
+        }
+
+        IFieldPartitionItem IFieldPartitioning.Master
+        {
+            get { return Master; }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -35,7 +44,7 @@ namespace Squidex.Core
             return languages.Values.GetEnumerator();
         }
 
-        IEnumerator<LanguageConfig> IEnumerable<LanguageConfig>.GetEnumerator()
+        IEnumerator<IFieldPartitionItem> IEnumerable<IFieldPartitionItem>.GetEnumerator()
         {
             return languages.Values.GetEnumerator();
         }
@@ -119,14 +128,28 @@ namespace Squidex.Core
             return new LanguagesConfig(newLanguages, master);
         }
 
-        public bool TryGetConfig(Language language, out LanguageConfig value)
-        {
-            return languages.TryGetValue(language, out value);
-        }
-
         public bool Contains(Language language)
         {
             return language != null && languages.ContainsKey(language);
+        }
+
+        public bool TryGetConfig(Language language, out LanguageConfig config)
+        {
+            return languages.TryGetValue(language, out config);
+        }
+
+        public bool TryGetItem(string key, out IFieldPartitionItem item)
+        {
+            if (Language.IsValidLanguage(key) && languages.TryGetValue(key, out var value))
+            {
+                item = value;
+
+                return true;
+            }
+
+            item = null;
+
+            return false;
         }
 
         private static ImmutableDictionary<Language, LanguageConfig> ValidateLanguages(ImmutableDictionary<Language, LanguageConfig> languages)
@@ -180,6 +203,19 @@ namespace Squidex.Core
 
                 throw new ValidationException(message(), error);
             }
+        }
+
+        public PartitionResolver ToResolver()
+        {
+            return partitioning =>
+            {
+                if (partitioning.Equals(Partitioning.Invariant))
+                {
+                    return InvariantPartitioning.Instance;
+                }
+
+                return this;
+            };
         }
     }
 }

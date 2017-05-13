@@ -27,36 +27,36 @@ namespace Squidex.Core
 
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new JsonField(1, "my-json",
+                    .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new StringField(2, "my-string",
-                        new StringFieldProperties { DefaultValue = "EN-String", IsLocalizable = true }))
-                    .AddOrUpdateField(new NumberField(3, "my-number",
+                    .AddOrUpdateField(new StringField(2, "my-string", Partitioning.Language,
+                        new StringFieldProperties { DefaultValue = "en-string" }))
+                    .AddOrUpdateField(new NumberField(3, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties { DefaultValue = 123 }))
-                    .AddOrUpdateField(new BooleanField(4, "my-boolean",
+                    .AddOrUpdateField(new AssetsField(4, "my-assets", Partitioning.Invariant,
+                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                    .AddOrUpdateField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties { DefaultValue = true }))
-                    .AddOrUpdateField(new DateTimeField(5, "my-datetime",
+                    .AddOrUpdateField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { DefaultValue = now }))
-                    .AddOrUpdateField(new GeolocationField(6, "my-geolocation",
-                        new GeolocationFieldProperties()))
-                    .AddOrUpdateField(new AssetsField(7, "my-assets",
-                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object));
+                    .AddOrUpdateField(new GeolocationField(7, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties()));
 
             var data =
                 new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", "DE-String"))
+                            .AddValue("de", "de-string"))
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddValue("iv", 456));
 
-            data.Enrich(schema, languagesConfig);
+            data.Enrich(schema, languagesConfig.ToResolver());
 
             Assert.Equal(456, (int)data["my-number"]["iv"]);
 
-            Assert.Equal("DE-String", (string)data["my-string"]["de"]);
-            Assert.Equal("EN-String", (string)data["my-string"]["en"]);
+            Assert.Equal("de-string", (string)data["my-string"]["de"]);
+            Assert.Equal("en-string", (string)data["my-string"]["en"]);
 
             Assert.Equal(now, InstantPattern.General.Parse((string)data["my-datetime"]["iv"]).Value);
 

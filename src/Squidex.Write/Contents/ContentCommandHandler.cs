@@ -99,7 +99,7 @@ namespace Squidex.Write.Contents
             var schemaObject = taskForSchema.Result.Schema;
             var schemaErrors = new List<ValidationError>();
 
-            await command.Data.ValidateAsync(schemaObject, taskForApp.Result.LanguagesConfig, schemaErrors);
+            await command.Data.ValidateAsync(schemaObject, taskForApp.Result.PartitionResolver, schemaErrors);
 
             if (schemaErrors.Count > 0)
             {
@@ -108,7 +108,7 @@ namespace Squidex.Write.Contents
 
             if (enrich)
             {
-                command.Data.Enrich(schemaObject, taskForApp.Result.LanguagesConfig);
+                command.Data.Enrich(schemaObject, taskForApp.Result.PartitionResolver);
             }
         }
     }

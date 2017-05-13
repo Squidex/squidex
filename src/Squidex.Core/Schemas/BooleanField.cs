@@ -18,8 +18,13 @@ namespace Squidex.Core.Schemas
 {
     public sealed class BooleanField : Field<BooleanFieldProperties>
     {
-        public BooleanField(long id, string name, BooleanFieldProperties properties)
-            : base(id, name, properties)
+        public BooleanField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new BooleanFieldProperties())
+        {
+        }
+
+        public BooleanField(long id, string name, Partitioning partitioning, BooleanFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

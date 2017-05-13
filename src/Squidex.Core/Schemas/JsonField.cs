@@ -17,8 +17,13 @@ namespace Squidex.Core.Schemas
 {
     public sealed class JsonField : Field<JsonFieldProperties>
     {
-        public JsonField(long id, string name, JsonFieldProperties properties) 
-            : base(id, name, properties)
+        public JsonField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new JsonFieldProperties())
+        {
+        }
+
+        public JsonField(long id, string name, Partitioning partitioning, JsonFieldProperties properties)
+            : base(id, name, partitioning, properties)
         {
         }
 

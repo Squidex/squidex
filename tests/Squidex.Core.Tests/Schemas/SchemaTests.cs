@@ -75,7 +75,7 @@ namespace Squidex.Core.Schemas
         {
             AddField();
 
-            Assert.Throws<ValidationException>(() => sut.AddOrUpdateField(new NumberField(2, "my-field", new NumberFieldProperties())));
+            Assert.Throws<ValidationException>(() => sut.AddOrUpdateField(new NumberField(2, "my-field", Partitioning.Invariant)));
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace Squidex.Core.Schemas
         {
             AddField();
 
-            sut = sut.AddOrUpdateField(new NumberField(2, "other-field", new NumberFieldProperties()));
+            sut = sut.AddOrUpdateField(new NumberField(2, "other-field", Partitioning.Invariant));
 
             Assert.Throws<ValidationException>(() => sut.RenameField(2, "my-field"));
         }
@@ -256,9 +256,9 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_reorder_fields()
         {
-            var field1 = new StringField(1, "1", new StringFieldProperties());
-            var field2 = new StringField(2, "2", new StringFieldProperties());
-            var field3 = new StringField(3, "3", new StringFieldProperties());
+            var field1 = new StringField(1, "1", Partitioning.Invariant);
+            var field2 = new StringField(2, "2", Partitioning.Invariant);
+            var field3 = new StringField(3, "3", Partitioning.Invariant);
 
             sut = sut.AddOrUpdateField(field1);
             sut = sut.AddOrUpdateField(field2);
@@ -271,8 +271,8 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_throw_if_not_all_fields_are_covered_for_reordering()
         {
-            var field1 = new StringField(1, "1", new StringFieldProperties());
-            var field2 = new StringField(2, "2", new StringFieldProperties());
+            var field1 = new StringField(1, "1", Partitioning.Invariant);
+            var field2 = new StringField(2, "2", Partitioning.Invariant);
 
             sut = sut.AddOrUpdateField(field1);
             sut = sut.AddOrUpdateField(field2);
@@ -283,8 +283,8 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_throw_if_field_to_reorder_does_not_exist()
         {
-            var field1 = new StringField(1, "1", new StringFieldProperties());
-            var field2 = new StringField(2, "2", new StringFieldProperties());
+            var field1 = new StringField(1, "1", Partitioning.Invariant);
+            var field2 = new StringField(2, "2", Partitioning.Invariant);
 
             sut = sut.AddOrUpdateField(field1);
             sut = sut.AddOrUpdateField(field2);
@@ -297,7 +297,7 @@ namespace Squidex.Core.Schemas
         {
             var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig, (n, s) => new JsonSchema4 { SchemaReference = s });
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { SchemaReference = s });
 
             Assert.NotNull(jsonSchema);
         }
@@ -307,42 +307,40 @@ namespace Squidex.Core.Schemas
         {
             var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var edmModel = BuildMixedSchema().BuildEdmType(languagesConfig, x => x);
+            var edmModel = BuildMixedSchema().BuildEdmType(languagesConfig.ToResolver(), x => x);
 
             Assert.NotNull(edmModel);
         }
 
         private static Schema BuildMixedSchema()
         {
-            var allowedValues = new[] { "1", "2" }.ToImmutableList();
-
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new JsonField(1, "my-json", 
+                    .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new StringField(2, "my-string1",
-                        new StringFieldProperties { Label = "My String1", IsLocalizable = true, IsRequired = true, AllowedValues = allowedValues }))
-                    .AddOrUpdateField(new StringField(3, "my-string2",
+                    .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
+                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                    .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
+                        new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
+                    .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,
                         new StringFieldProperties { Hints = "My String1" }))
-                    .AddOrUpdateField(new NumberField(4, "my-number",
+                    .AddOrUpdateField(new NumberField(5, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                    .AddOrUpdateField(new BooleanField(5, "my-boolean",
+                    .AddOrUpdateField(new BooleanField(6, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new DateTimeField(6, "my-datetime",
+                    .AddOrUpdateField(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
-                    .AddOrUpdateField(new DateTimeField(7, "my-date",
+                    .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
-                    .AddOrUpdateField(new GeolocationField(8, "my-geolocation",
-                        new GeolocationFieldProperties()))
-                    .AddOrUpdateField(new AssetsField(9, "my-assets",
-                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object));
+                    .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties()));
 
             return schema;
         }
 
         private NumberField AddField()
         {
-            var field = new NumberField(1, "my-field", new NumberFieldProperties());
+            var field = new NumberField(1, "my-field", Partitioning.Invariant);
 
             sut = sut.AddOrUpdateField(field);
 

@@ -16,18 +16,18 @@ namespace Squidex.Core
 {
     public static class ContentExtensions
     {
-        public static ContentData Enrich(this ContentData data, Schema schema, LanguagesConfig languagesConfig)
+        public static ContentData Enrich(this ContentData data, Schema schema, PartitionResolver partitionResolver)
         {
-            var enricher = new ContentEnricher(languagesConfig, schema);
+            var enricher = new ContentEnricher(schema, partitionResolver);
 
             enricher.Enrich(data);
 
             return data;
         }
 
-        public static async Task ValidateAsync(this ContentData data, Schema schema, LanguagesConfig languagesConfig, IList<ValidationError> errors)
+        public static async Task ValidateAsync(this ContentData data, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
         {
-            var validator = new ContentValidator(schema, languagesConfig);
+            var validator = new ContentValidator(schema, partitionResolver);
 
             await validator.ValidateAsync(data);
 
@@ -37,9 +37,9 @@ namespace Squidex.Core
             }
         }
 
-        public static async Task ValidatePartialAsync(this ContentData data, Schema schema, LanguagesConfig languagesConfig, IList<ValidationError> errors)
+        public static async Task ValidatePartialAsync(this ContentData data, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
         {
-            var validator = new ContentValidator(schema, languagesConfig);
+            var validator = new ContentValidator(schema, partitionResolver);
 
             await validator.ValidatePartialAsync(data);
 

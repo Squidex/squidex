@@ -14,6 +14,7 @@ using Microsoft.OData.Edm.Library;
 using Squidex.Core;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Read.Apps;
 using Squidex.Read.Schemas;
 using Squidex.Read.Utils;
 
@@ -26,32 +27,29 @@ namespace Squidex.Read.Contents.Builders
         {
         }
 
-        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, LanguagesConfig languagesConfig)
+        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, IAppEntity app)
         {
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
             Guard.NotNull(schemaEntity, nameof(schemaEntity));
 
-            var isoCodes = string.Join(",", languagesConfig.Select(x => x.Language.Iso2Code).OrderBy(x => x));
-
-            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{isoCodes}";
+            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{app.Id}_{app.Version}";
 
             var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
 
-                return BuildEdmModel(schemaEntity.Schema, languagesConfig);
+                return BuildEdmModel(schemaEntity.Schema, app.PartitionResolver);
             });
 
             return result;
         }
 
-        private static EdmModel BuildEdmModel(Schema schema, LanguagesConfig languagesConfig)
+        private static EdmModel BuildEdmModel(Schema schema, PartitionResolver partitionResolver)
         {
             var model = new EdmModel();
 
             var container = new EdmEntityContainer("Squidex", "Container");
 
-            var schemaType = schema.BuildEdmType(languagesConfig, x =>
+            var schemaType = schema.BuildEdmType(partitionResolver, x =>
             {
                 model.AddElement(x);
 

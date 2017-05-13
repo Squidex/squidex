@@ -18,15 +18,10 @@ namespace Squidex.Core.Contents
     {
         private readonly Schema schema =
             Schema.Create("schema", new SchemaProperties())
-                .AddOrUpdateField(new NumberField(1, "field1", 
-                    new NumberFieldProperties { IsLocalizable = true }))
-                .AddOrUpdateField(new NumberField(2, "field2", 
-                    new NumberFieldProperties { IsLocalizable = false }))
-                .AddOrUpdateField(new NumberField(3, "field3", 
-                    new NumberFieldProperties { IsLocalizable = false }))
-                .AddOrUpdateField(new JsonField(4, "json",
-                    new JsonFieldProperties { IsLocalizable = true }))
-                .HideField(3);
+                .AddOrUpdateField(new NumberField(1, "field1", Partitioning.Language))
+                .AddOrUpdateField(new NumberField(2, "field2", Partitioning.Invariant))
+                .AddOrUpdateField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
+                .AddOrUpdateField(new JsonField(4, "json", Partitioning.Language));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
         [Fact]
