@@ -6,14 +6,23 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+
+using PartitioningOption = Squidex.Core.Partitioning;
 
 namespace Squidex.Write.Schemas.Commands
 {
     public class AddField : FieldCommand, IValidatable
     {
+        private static readonly HashSet<string> AllowedPartitions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            PartitioningOption.Language.Key,
+            PartitioningOption.Invariant.Key
+        };
+
         public string Name { get; set; }
 
         public string Partitioning { get; set; }
@@ -22,9 +31,9 @@ namespace Squidex.Write.Schemas.Commands
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (Partitioning != null && Partitioning != "language")
+            if (Partitioning != null && !AllowedPartitions.Contains(Partitioning))
             {
-                errors.Add(new ValidationError("Partitioning must be invariant or language.", nameof(Partitioning)));
+                errors.Add(new ValidationError($"Partitioning must be one of {string.Join(", ", AllowedPartitions)}.", nameof(Partitioning)));
             }
 
             if (!Name.IsPropertyName())
