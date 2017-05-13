@@ -35,6 +35,12 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public bool IsDisabled { get; set; }
 
         /// <summary>
+        /// Defines the partitioning of the field.
+        /// </summary>
+        [Required]
+        public string Partitioning { get; set; }
+
+        /// <summary>
         /// The field properties.
         /// </summary>
         [Required]

@@ -230,7 +230,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
             const group = new FormGroup({});
 
-            if (field.properties.isLocalizable) {
+            if (field.partitioning === 'language') {
                 for (let language of this.languages) {
                     group.addControl(language.iso2Code, new FormControl(undefined, validators));
                 }
@@ -263,7 +263,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             const fieldValue = content.data[field.name] || {};
             const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
-             if (field.properties.isLocalizable) {
+             if (field.partitioning === 'language') {
                 for (let language of this.languages) {
                     fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                 }

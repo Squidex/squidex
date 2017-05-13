@@ -74,7 +74,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 [
                     Validators.maxLength(40),
                     ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
-                ]]
+                ]],
+            isLocalizable: [false]
         });
 
     public get hasName() {
@@ -130,7 +131,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.enableField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
-                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, false, field.properties));
+                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, false, field.partitioning, field.properties));
             }, error => {
                 this.notifyError(error);
             });
@@ -140,7 +141,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.disableField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
-                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, true, field.properties));
+                this.updateField(field, new FieldDto(field.fieldId, field.name, field.isHidden, true, field.partitioning, field.properties));
             }, error => {
                 this.notifyError(error);
             });
@@ -150,7 +151,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.showField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
-                this.updateField(field, new FieldDto(field.fieldId, field.name, false, field.isDisabled, field.properties));
+                this.updateField(field, new FieldDto(field.fieldId, field.name, false, field.isDisabled, field.partitioning, field.properties));
             }, error => {
                 this.notifyError(error);
             });
@@ -160,7 +161,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.hideField(app, this.schemaName, field.fieldId, this.version)).retry(2)
             .subscribe(() => {
-                this.updateField(field, new FieldDto(field.fieldId, field.name, true, field.isDisabled, field.properties));
+                this.updateField(field, new FieldDto(field.fieldId, field.name, true, field.isDisabled, field.partitioning, field.properties));
             }, error => {
                 this.notifyError(error);
             });
@@ -194,7 +195,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, request, this.version)).retry(2)
             .subscribe(() => {
-                this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, newField.properties));
+                this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, field.partitioning, newField.properties));
             }, error => {
                 this.notifyError(error);
             });
@@ -222,11 +223,12 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             this.addFieldForm.disable();
 
             const properties = createProperties(this.addFieldForm.get('type')!.value);
+            const partitioning = this.addFieldForm.get('isLocalizable')!.value ? 'language' : 'invariant';
 
-            const requestDto = new AddFieldDto(this.addFieldForm.get('name')!.value, properties);
+            const requestDto = new AddFieldDto(this.addFieldForm.get('name')!.value, partitioning, properties);
 
             const reset = () => {
-                this.addFieldForm.get('name')!.reset();
+                this.addFieldForm.reset({ type: 'String' });
                 this.addFieldForm.enable();
                 this.addFieldFormSubmitted = false;
             };
@@ -236,10 +238,11 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 .subscribe(dto => {
                     const newField =
                         new FieldDto(parseInt(dto.id, 10),
-                            this.addFieldForm.get('name')!.value,
+                            requestDto.name,
                             false,
                             false,
-                            properties);
+                            requestDto.partitioning,
+                            requestDto.properties);
 
                     this.updateFields(this.schemaFields.push(newField));
                     reset();
@@ -251,8 +254,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public resetFieldForm() {
+        this.addFieldForm.reset({ type: 'String' });
         this.addFieldFormSubmitted = false;
-        this.addFieldForm.reset();
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto) {

@@ -6,25 +6,25 @@
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
 
     <div [formGroup]="fieldForm">
-        <div *ngIf="field.properties.isLocalizable && languages.length > 1">
+        <div *ngIf="field.partitioning === 'language' && languages.length > 1">
             <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
         </div>
 
-        <div *ngFor="let language of fieldLanguages">
-            <div *ngIf="language == fieldLanguage">
-                <sqx-control-errors [for]="language" fieldName="{{field|displayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
+        <div *ngFor="let partition of fieldPartitions">
+            <div *ngIf="partition == fieldPartition">
+                <sqx-control-errors [for]="partition" fieldName="{{field|displayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
 
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'Number'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="number" [formControlName]="language">
+                                <input class="form-control" type="number" [formControlName]="partition">
                             </div>
                             <div *ngSwitchCase="'Stars'">
-                                <sqx-stars [formControlName]="language" [maximumStars]="field.properties.maxValue"></sqx-stars>
+                                <sqx-stars [formControlName]="partition" [maximumStars]="field.properties.maxValue"></sqx-stars>
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
-                                <select class="form-control" [formControlName]="language">
+                                <select class="form-control" [formControlName]="partition">
                                     <option></option>
                                     <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
@@ -32,7 +32,7 @@
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="language"> {{value}}
+                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="partition"> {{value}}
                                     </label>
                                 </div>
                             </div>
@@ -41,26 +41,26 @@
                     <div *ngSwitchCase="'String'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="text" [formControlName]="language">
+                                <input class="form-control" type="text" [formControlName]="partition">
                             </div>
                             <div *ngSwitchCase="'TextArea'">
-                                <textarea class="form-control" [formControlName]="language"></textarea>
+                                <textarea class="form-control" [formControlName]="partition"></textarea>
                             </div>
                             <div *ngSwitchCase="'RichText'">
-                                <sqx-rich-editor [formControlName]="language"></sqx-rich-editor>
+                                <sqx-rich-editor [formControlName]="partition"></sqx-rich-editor>
                             </div>
                             <div *ngSwitchCase="'Markdown'">
-                                <sqx-markdown-editor [formControlName]="language"></sqx-markdown-editor>
+                                <sqx-markdown-editor [formControlName]="partition"></sqx-markdown-editor>
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
-                                <select class="form-control" [formControlName]="language">
+                                <select class="form-control" [formControlName]="partition">
                                     <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
                             </div>
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="language"> {{value}}
+                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="partition"> {{value}}
                                     </label>
                                 </div>
                             </div>
@@ -69,28 +69,28 @@
                     <div *ngSwitchCase="'Boolean'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Toggle'">
-                                <sqx-toggle [formControlName]="language"></sqx-toggle>
+                                <sqx-toggle [formControlName]="partition"></sqx-toggle>
                             </div>
                             <div *ngSwitchCase="'Checkbox'">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="checkbox" [formControlName]="language" sqxIndeterminateValue />
+                                        <input class="form-check-input" type="checkbox" [formControlName]="partition" sqxIndeterminateValue />
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div *ngSwitchCase="'DateTime'">
-                        <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="language"></sqx-date-time-editor>
+                        <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControlName]="partition"></sqx-date-time-editor>
                     </div>
                     <div *ngSwitchCase="'Geolocation'">
-                        <sqx-geolocation-editor [formControlName]="language"></sqx-geolocation-editor>
+                        <sqx-geolocation-editor [formControlName]="partition"></sqx-geolocation-editor>
                     </div>
                     <div *ngSwitchCase="'Json'">
-                        <sqx-json-editor [formControlName]="language"></sqx-json-editor>
+                        <sqx-json-editor [formControlName]="partition"></sqx-json-editor>
                     </div>
                     <div *ngSwitchCase="'Assets'">
-                        <sqx-assets-editor [formControlName]="language"></sqx-assets-editor>
+                        <sqx-assets-editor [formControlName]="partition"></sqx-assets-editor>
                     </div>
                 </div>
             </div>

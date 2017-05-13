@@ -46,7 +46,7 @@
                         </div>
 
                         <form class="form-inline fallback-form" [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()" *ngIf="otherLanguages.length > 0">
-                            <div class="form-group mr-2">
+                            <div class="form-group mr-1">
                                 <select class="form-control fallback-select" formControlName="language">
                                     <option *ngFor="let language of otherLanguages" [ngValue]="language">{{language.englishName}}</option>
                                 </select>

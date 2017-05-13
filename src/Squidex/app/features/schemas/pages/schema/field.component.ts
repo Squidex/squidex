@@ -66,8 +66,7 @@ export class FieldComponent implements OnInit {
                     Validators.maxLength(100)
                 ]],
             isRequired: [false],
-            isListField: [false],
-            isLocalizable: [false]
+            isListField: [false]
         });
 
     constructor(
@@ -91,6 +90,7 @@ export class FieldComponent implements OnInit {
                     this.field.name,
                     this.field.isHidden,
                     this.field.isHidden,
+                    this.field.partitioning,
                     properties);
 
             this.saving.emit(field);

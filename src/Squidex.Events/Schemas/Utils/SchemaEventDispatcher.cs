@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Core;
 using Squidex.Core.Schemas;
 
@@ -17,8 +18,8 @@ namespace Squidex.Events.Schemas.Utils
     {
         public static Schema Dispatch(FieldAdded @event, Schema schema, FieldRegistry registry)
         {
-            var partitioning = 
-                @event.IsLocalizable ? 
+            var partitioning =
+                string.Equals(@event.Partitioning, "language", StringComparison.OrdinalIgnoreCase) ? 
                     Partitioning.Language :
                     Partitioning.Invariant;
 

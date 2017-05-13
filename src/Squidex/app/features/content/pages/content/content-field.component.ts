@@ -28,11 +28,11 @@ export class ContentFieldComponent implements OnInit {
     @Input()
     public contentFormSubmitted: boolean;
 
-    public fieldLanguages: string[];
-    public fieldLanguage: string;
+    public fieldPartitions: string[];
+    public fieldPartition: string;
 
     public selectLanguage(language: AppLanguageDto) {
-        this.fieldLanguage = language.iso2Code;
+        this.fieldPartition = language.iso2Code;
     }
 
     public ngOnInit() {
@@ -40,12 +40,12 @@ export class ContentFieldComponent implements OnInit {
             this.fieldForm.disable();
         }
 
-        if (this.field.properties.isLocalizable) {
-            this.fieldLanguages = this.languages.map(t => t.iso2Code);
-            this.fieldLanguage = this.fieldLanguages[0];
+        if (this.field.partitioning === 'language') {
+            this.fieldPartitions = this.languages.map(t => t.iso2Code);
+            this.fieldPartition = this.fieldPartitions[0];
         } else {
-            this.fieldLanguages = ['iv'];
-            this.fieldLanguage = 'iv';
+            this.fieldPartitions = ['iv'];
+            this.fieldPartition = 'iv';
         }
     }
 }

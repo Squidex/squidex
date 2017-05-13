@@ -85,7 +85,7 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
         let value: any;
 
-        if (properties.isLocalizable) {
+        if (field.partitioning === 'language') {
             value = contentField[this.language.iso2Code];
         } else {
             value = contentField['iv'];

@@ -93,32 +93,25 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public resetClientForm() {
         this.addClientFormSubmitted = false;
+        this.addClientForm.enable();
         this.addClientForm.reset();
     }
 
     public attachClient() {
-        this.addClientFormSubmitted = true;
-        this.addClientForm.markAsDirty();
-
         if (this.addClientForm.valid) {
+            this.addClientFormSubmitted = true;
             this.addClientForm.disable();
 
             const requestDto = new CreateAppClientDto(this.addClientForm.get('name')!.value);
-
-            const reset = () => {
-                this.addClientFormSubmitted = false;
-                this.addClientForm.reset();
-                this.addClientForm.enable();
-            };
 
             this.appNameOnce()
                 .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.push(dto));
-                    reset();
+                    this.resetClientForm();
                 }, error => {
                     this.notifyError(error);
-                    reset();
+                    this.resetClientForm();
                 });
         }
     }

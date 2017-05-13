@@ -24,25 +24,25 @@ export function createProperties(fieldType: string, values: Object | null = null
 
     switch (fieldType) {
         case 'Number':
-            properties = new NumberFieldPropertiesDto(null, null, null, false, false, false, 'Input');
+            properties = new NumberFieldPropertiesDto(null, null, null, false, false, 'Input');
             break;
         case 'String':
-            properties = new StringFieldPropertiesDto(null, null, null, false, false, false, 'Input');
+            properties = new StringFieldPropertiesDto(null, null, null, false, false, 'Input');
             break;
         case 'Boolean':
-            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, false, 'Checkbox');
+            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, 'Checkbox');
             break;
         case 'DateTime':
-            properties = new DateTimeFieldPropertiesDto(null, null, null, false, false, false, 'DateTime');
+            properties = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'DateTime');
             break;
         case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto(null, null, null, false, false, false, 'Map');
+            properties = new GeolocationFieldPropertiesDto(null, null, null, false, false, 'Map');
             break;
         case 'Json':
-            properties = new JsonFieldPropertiesDto(null, null, null, false, false, false);
+            properties = new JsonFieldPropertiesDto(null, null, null, false, false);
             break;
         case 'Assets':
-            properties = new AssetsFieldPropertiesDto(null, null, null, false, false, false);
+            properties = new AssetsFieldPropertiesDto(null, null, null, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -93,6 +93,7 @@ export class FieldDto {
         public readonly name: string,
         public readonly isHidden: boolean,
         public readonly isDisabled: boolean,
+        public readonly partitioning: string,
         public readonly properties: FieldPropertiesDto
     ) {
     }
@@ -105,8 +106,7 @@ export abstract class FieldPropertiesDto {
         public readonly hints: string | null,
         public readonly placeholder: string | null,
         public readonly isRequired: boolean,
-        public readonly isListField: boolean,
-        public readonly isLocalizable: boolean
+        public readonly isListField: boolean
     ) {
     }
 }
@@ -115,7 +115,6 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly pattern?: string,
@@ -124,7 +123,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         public readonly maxLength?: number,
         public readonly allowedValues?: string[]
     ) {
-        super('String', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('String', label, hints, placeholder, isRequired, isListField);
     }
 }
 
@@ -132,14 +131,13 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: number,
         public readonly maxValue?: number,
         public readonly minValue?: number,
         public readonly allowedValues?: number[]
     ) {
-        super('Number', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('Number', label, hints, placeholder, isRequired, isListField);
     }
 }
 
@@ -147,14 +145,13 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly maxValue?: string,
         public readonly minValue?: string,
         public readonly calculatedDefaultValue?: string
     ) {
-        super('DateTime', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('DateTime', label, hints, placeholder, isRequired, isListField);
     }
 }
 
@@ -162,11 +159,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        isLocalizable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
-        super('Boolean', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('Boolean', label, hints, placeholder, isRequired, isListField);
     }
 }
 
@@ -174,30 +170,27 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        isLocalizable: boolean,
         public readonly editor: string
     ) {
-        super('Geolocation', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('Geolocation', label, hints, placeholder, isRequired, isListField);
     }
 }
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
-        isListField: boolean,
-        isLocalizable: boolean
+        isListField: boolean
     ) {
-        super('Assets', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('Assets', label, hints, placeholder, isRequired, isListField);
     }
 }
 
 export class JsonFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
-        isListField: boolean,
-        isLocalizable: boolean
+        isListField: boolean
     ) {
-        super('Json', label, hints, placeholder, isRequired, isListField, isLocalizable);
+        super('Json', label, hints, placeholder, isRequired, isListField);
     }
 }
 
@@ -212,6 +205,7 @@ export class UpdateSchemaDto {
 export class AddFieldDto {
     constructor(
         public readonly name: string,
+        public readonly partitioning: string,
         public readonly properties: FieldPropertiesDto
     ) {
     }
@@ -280,6 +274,7 @@ export class SchemasService {
                             item.name,
                             item.isHidden,
                             item.isDisabled,
+                            item.partitioning,
                             propertiesDto);
                     });
 

@@ -51,7 +51,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var command = new AddField { Name = request.Name, Properties = request.Properties.ToProperties() };
+            var command = new AddField { Name = request.Name, Partitioning = request.Partitioning, Properties = request.Properties.ToProperties() };
 
             var context = await CommandBus.PublishAsync(command);
 

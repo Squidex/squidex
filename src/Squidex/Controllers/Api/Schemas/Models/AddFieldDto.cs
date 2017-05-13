@@ -20,9 +20,9 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Determines if the field is localizable.
+        /// Determines the optional partitioning of the field.
         /// </summary>
-        public bool IsLocalizable { get; set; }
+        public string Partitioning { get; set; }
 
         /// <summary>
         /// The field properties.

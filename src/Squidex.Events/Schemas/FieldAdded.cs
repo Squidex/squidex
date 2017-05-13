@@ -16,7 +16,7 @@ namespace Squidex.Events.Schemas
     {
         public string Name { get; set; }
 
-        public bool IsLocalizable { get; set; }
+        public string Partitioning { get; set; }
 
         public FieldProperties Properties { get; set; }
     }

@@ -64,7 +64,12 @@ namespace Squidex.Pipeline
         {
             if (!context.ModelState.IsValid)
             {
-                var errors = context.ModelState.Values.SelectMany(g => g.Errors).Select(e => new ValidationError(e.ErrorMessage)).ToList();
+                var errors = 
+                    context.ModelState.SelectMany(m =>
+                        {
+                            return m.Value.Errors.Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))
+                                .Select(e => new ValidationError(e.ErrorMessage, m.Key));
+                        }).ToList();
 
                 throw new ValidationException("The model is not valid.", errors);
             }

@@ -118,6 +118,7 @@ describe('SchemasService', () => {
                                     name: 'field1',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'Number'
                                     }
@@ -127,6 +128,7 @@ describe('SchemasService', () => {
                                     name: 'field2',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'String'
                                     }
@@ -136,6 +138,7 @@ describe('SchemasService', () => {
                                     name: 'field3',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'Boolean'
                                     }
@@ -145,6 +148,7 @@ describe('SchemasService', () => {
                                     name: 'field4',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'DateTime'
                                     }
@@ -154,6 +158,7 @@ describe('SchemasService', () => {
                                     name: 'field5',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'Json'
                                     }
@@ -163,6 +168,7 @@ describe('SchemasService', () => {
                                     name: 'field6',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'Geolocation'
                                     }
@@ -172,6 +178,7 @@ describe('SchemasService', () => {
                                     name: 'field7',
                                     isHidden: true,
                                     isDisabled: true,
+                                    partitioning: 'language',
                                     properties: {
                                         fieldType: 'Assets'
                                     }
@@ -195,13 +202,13 @@ describe('SchemasService', () => {
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('11'),
                 [
-                    new FieldDto(1, 'field1', true, true, createProperties('Number')),
-                    new FieldDto(2, 'field2', true, true, createProperties('String')),
-                    new FieldDto(3, 'field3', true, true, createProperties('Boolean')),
-                    new FieldDto(4, 'field4', true, true, createProperties('DateTime')),
-                    new FieldDto(5, 'field5', true, true, createProperties('Json')),
-                    new FieldDto(6, 'field6', true, true, createProperties('Geolocation')),
-                    new FieldDto(7, 'field7', true, true, createProperties('Assets'))
+                    new FieldDto(1, 'field1', true, true, 'language', createProperties('Number')),
+                    new FieldDto(2, 'field2', true, true, 'language', createProperties('String')),
+                    new FieldDto(3, 'field3', true, true, 'language', createProperties('Boolean')),
+                    new FieldDto(4, 'field4', true, true, 'language', createProperties('DateTime')),
+                    new FieldDto(5, 'field5', true, true, 'language', createProperties('Json')),
+                    new FieldDto(6, 'field6', true, true, 'language', createProperties('Geolocation')),
+                    new FieldDto(7, 'field7', true, true, 'language', createProperties('Assets'))
                 ]));
 
         authService.verifyAll();
@@ -235,7 +242,7 @@ describe('SchemasService', () => {
     });
 
     it('should make post request to add field', () => {
-        const dto = new AddFieldDto('name', createProperties('Number'));
+        const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
         authService.setup(x => x.authPost('http://service/p/api/apps/my-app/schemas/my-schema/fields', dto, version))
             .returns(() => Observable.of(
