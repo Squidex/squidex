@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Core;
 using MongoDB.Driver;
-using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps;

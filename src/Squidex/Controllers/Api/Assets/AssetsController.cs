@@ -66,6 +66,7 @@ namespace Squidex.Controllers.Api.Assets
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var mimeTypeList = new HashSet<string>();
@@ -117,6 +118,7 @@ namespace Squidex.Controllers.Api.Assets
         [HttpGet]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
         {
             var entity = await assetRepository.FindAssetAsync(id);
@@ -175,6 +177,7 @@ namespace Squidex.Controllers.Api.Assets
         [Route("apps/{app}/assets/{id}/content")]
         [ProducesResponseType(typeof(AssetReplacedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
         {
             var assetFile = GetAssetFile(file);
@@ -202,6 +205,7 @@ namespace Squidex.Controllers.Api.Assets
         [HttpPut]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
         {
             var command = SimpleMapper.Map(request, new RenameAsset { AssetId = id });
@@ -222,6 +226,7 @@ namespace Squidex.Controllers.Api.Assets
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/assets/{id}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteAsset(string app, Guid id)
         {
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });

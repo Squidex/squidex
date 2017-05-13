@@ -106,6 +106,7 @@ namespace Squidex
 
             app.UseMyCors();
             app.UseMyForwardingRules();
+            app.UseMyTracking();
 
             MapAndUseIdentity(app);
             MapAndUseApi(app);

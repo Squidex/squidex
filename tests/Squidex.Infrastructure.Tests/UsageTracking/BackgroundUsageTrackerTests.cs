@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync("key1", 1000));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync("key1", 1, 1000));
         }
 
         [Fact]
@@ -104,22 +104,35 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
+        public async Task Should_not_track_if_weight_less_than_zero()
+        {
+            await sut.TrackAsync("key1", -1, 1000);
+            await sut.TrackAsync("key1", 0, 1000);
+
+            sut.Next();
+
+            await Task.Delay(100);
+
+            usageStore.Verify(x => x.TrackUsagesAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<double>(), It.IsAny<long>()), Times.Never());
+        }
+
+        [Fact]
         public async Task Should_aggregate_and_store_on_dispose()
         {
             var today = DateTime.Today;
 
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key1", 1, 1000)).Returns(TaskHelper.Done).Verifiable();
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key2", 2, 5000)).Returns(TaskHelper.Done).Verifiable();
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key3", 3, 15000)).Returns(TaskHelper.Done).Verifiable();
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key1", 1.0, 1000)).Returns(TaskHelper.Done).Verifiable();
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key2", 1.5, 5000)).Returns(TaskHelper.Done).Verifiable();
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key3", 0.9, 15000)).Returns(TaskHelper.Done).Verifiable();
 
-            await sut.TrackAsync("key1", 1000);
+            await sut.TrackAsync("key1", 1, 1000);
 
-            await sut.TrackAsync("key2", 2000);
-            await sut.TrackAsync("key2", 3000);
+            await sut.TrackAsync("key2", 1.0, 2000);
+            await sut.TrackAsync("key2", 0.5, 3000);
 
-            await sut.TrackAsync("key3", 4000);
-            await sut.TrackAsync("key3", 5000);
-            await sut.TrackAsync("key3", 6000);
+            await sut.TrackAsync("key3", 0.3, 4000);
+            await sut.TrackAsync("key3", 0.1, 5000);
+            await sut.TrackAsync("key3", 0.5, 6000);
 
             sut.Next();
 

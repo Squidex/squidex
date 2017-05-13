@@ -30,10 +30,10 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
 
         [BsonRequired]
         [BsonElement]
-        public long TotalCount { get; set; }
+        public double TotalCount { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public long TotalElapsedMs { get; set; }
+        public double TotalElapsedMs { get; set; }
     }
 }

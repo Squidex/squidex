@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Key).Ascending(x => x.Date));
         }
 
-        public Task TrackUsagesAsync(DateTime date, string key, long count, long elapsedMs)
+        public Task TrackUsagesAsync(DateTime date, string key, double count, double elapsedMs)
         {
             var id = $"{key}_{date:yyyy-MM-dd}";
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.MongoDb.UsageTracker
         {
             var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync();
 
-            return entities.Select(x => new StoredUsage(x.Date, x.TotalCount, x.TotalElapsedMs)).ToList();
+            return entities.Select(x => new StoredUsage(x.Date, (long)x.TotalCount, (long)x.TotalElapsedMs)).ToList();
         }
     }
 }

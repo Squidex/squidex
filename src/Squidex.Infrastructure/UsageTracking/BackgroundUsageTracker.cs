@@ -27,19 +27,19 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public sealed class Usage
         {
-            public readonly long Count;
-            public readonly long ElapsedMs;
+            public readonly double Count;
+            public readonly double ElapsedMs;
 
-            public Usage(long elapsed, long count = 1)
+            public Usage(double elapsed, double count)
             {
                 ElapsedMs = elapsed;
 
                 Count = count;
             }
 
-            public Usage Add(long elapsed)
+            public Usage Add(double elapsed, double weight)
             {
-                return new Usage(ElapsedMs + elapsed, Count + 1);
+                return new Usage(ElapsedMs + elapsed, Count + weight);
             }
         }
 
@@ -93,13 +93,16 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(string key, long elapsedMs)
+        public Task TrackAsync(string key, double weight, double elapsedMs)
         {
             Guard.NotNull(key, nameof(key));
 
             ThrowIfDisposed();
 
-            usages.AddOrUpdate(key, _ => new Usage(elapsedMs), (k, x) => x.Add(elapsedMs)); 
+            if (weight > 0)
+            {
+                usages.AddOrUpdate(key, _ => new Usage(elapsedMs, weight), (k, x) => x.Add(elapsedMs, weight));
+            }
 
             return TaskHelper.Done;
         }

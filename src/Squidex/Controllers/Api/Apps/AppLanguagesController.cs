@@ -92,6 +92,7 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguageDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostLanguage(string app, [FromBody] AddAppLanguageDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AddLanguage()));
@@ -115,6 +116,7 @@ namespace Squidex.Controllers.Api.Apps
         [Authorize(Roles = SquidexRoles.AppOwner)]
         [HttpPut]
         [Route("apps/{app}/languages/{language}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(model, new UpdateLanguage { Language = language }));
@@ -135,6 +137,7 @@ namespace Squidex.Controllers.Api.Apps
         [Authorize(Roles = SquidexRoles.AppOwner)]
         [HttpDelete]
         [Route("apps/{app}/languages/{language}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {
             await CommandBus.PublishAsync(new RemoveLanguage { Language = ParseLanguage(language) });

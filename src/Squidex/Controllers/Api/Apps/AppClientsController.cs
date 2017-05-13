@@ -54,6 +54,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpGet]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto[]), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetClients(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -86,6 +87,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPost]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto), 201)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
             var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new AttachClient()));
@@ -108,6 +110,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));
@@ -126,6 +129,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteClient(string app, string clientId)
         {
             await CommandBus.PublishAsync(new RevokeClient { Id = clientId });

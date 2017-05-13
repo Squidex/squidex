@@ -49,6 +49,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
             var command = new AddField { Name = request.Name, Partitioning = request.Partitioning, Properties = request.Properties.ToProperties() };
@@ -75,6 +76,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ordering")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFields request)
         {
             var command = new ReorderFields { FieldIds = request.FieldIds };
@@ -100,6 +102,7 @@ namespace Squidex.Controllers.Api.Schemas
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
             var command = new UpdateField { FieldId = id, Properties = request.Properties.ToProperties() };
@@ -126,6 +129,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> HideField(string app, string name, long id)
         {
             var command = new HideField { FieldId = id };
@@ -152,6 +156,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/show/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> ShowField(string app, string name, long id)
         {
             var command = new ShowField { FieldId = id };
@@ -179,6 +184,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> EnableField(string app, string name, long id)
         {
             var command = new EnableField { FieldId = id };
@@ -206,6 +212,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> DisableField(string app, string name, long id)
         {
             var command = new DisableField { FieldId = id };
@@ -227,6 +234,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
             var command = new DeleteField { FieldId = id };

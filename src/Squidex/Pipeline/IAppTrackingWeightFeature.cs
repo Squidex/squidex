@@ -1,21 +1,15 @@
 ﻿// ==========================================================================
-//  WebDependencies.cs
+//  IAppTrackingWeightFeature.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
-using Squidex.Config.Domain;
-
-namespace Squidex.Config.Web
+namespace Squidex.Pipeline
 {
-    public static class WebDependencies
+    public interface IAppTrackingWeightFeature
     {
-        public static void AddMyMvc(this IServiceCollection services)
-        {
-            services.AddMvc().AddMySerializers();
-        }
+        double Weight { get; }
     }
 }

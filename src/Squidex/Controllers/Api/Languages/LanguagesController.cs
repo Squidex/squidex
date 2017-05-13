@@ -36,6 +36,7 @@ namespace Squidex.Controllers.Api.Languages
         [HttpGet]
         [Route("languages/")]
         [ProducesResponseType(typeof(string[]), 200)]
+        [ApiCosts(0)]
         public IActionResult GetLanguages()
         {
             var response = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();

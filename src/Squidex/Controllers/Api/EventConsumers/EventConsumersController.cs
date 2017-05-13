@@ -33,6 +33,7 @@ namespace Squidex.Controllers.Api.EventConsumers
 
         [HttpGet]
         [Route("event-consumers/")]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetEventConsumers()
         {
             var entities = await eventConsumerRepository.QueryAsync();
@@ -44,6 +45,7 @@ namespace Squidex.Controllers.Api.EventConsumers
 
         [HttpPut]
         [Route("event-consumers/{name}/start")]
+        [ApiCosts(0)]
         public async Task<IActionResult> Start(string name)
         {
             await eventConsumerRepository.StartAsync(name);
@@ -53,6 +55,7 @@ namespace Squidex.Controllers.Api.EventConsumers
 
         [HttpPut]
         [Route("event-consumers/{name}/stop")]
+        [ApiCosts(0)]
         public async Task<IActionResult> Stop(string name)
         {
             await eventConsumerRepository.StopAsync(name);
@@ -62,6 +65,7 @@ namespace Squidex.Controllers.Api.EventConsumers
 
         [HttpPut]
         [Route("event-consumers/{name}/reset")]
+        [ApiCosts(0)]
         public async Task<IActionResult> Reset(string name)
         {
             await eventConsumerRepository.ResetAsync(name);

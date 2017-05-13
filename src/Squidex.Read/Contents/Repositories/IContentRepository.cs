@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Core;
 using Squidex.Read.Apps;
 
 namespace Squidex.Read.Contents.Repositories

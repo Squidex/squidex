@@ -44,6 +44,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/{name}")]
+        [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
         {
             var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
@@ -81,6 +82,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/{name}/{id}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
         {
             var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
@@ -111,6 +113,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPost]
         [Route("content/{app}/{name}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostContent([FromBody] ContentData request, [FromQuery] bool publish = false)
         {
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
@@ -127,6 +130,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutContent(Guid id, [FromBody] ContentData request)
         {
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
@@ -138,6 +142,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPatch]
         [Route("content/{app}/{name}/{id}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(Guid id, [FromBody] ContentData request)
         {
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
@@ -149,6 +154,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(Guid id)
         {
             var command = new PublishContent { ContentId = id };
@@ -160,6 +166,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish")]
+        [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(Guid id)
         {
             var command = new UnpublishContent { ContentId = id };
@@ -171,6 +178,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpDelete]
         [Route("content/{app}/{name}/{id}")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutContent(Guid id)
         {
             var command = new DeleteContent { ContentId = id };

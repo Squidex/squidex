@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;

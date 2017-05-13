@@ -19,5 +19,13 @@ namespace Squidex.Config.Web
 
             return app;
         }
+
+        public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<LogPerformanceMiddleware>();
+            app.UseMiddleware<AppTrackingMiddleware>();
+
+            return app;
+        }
     }
 }

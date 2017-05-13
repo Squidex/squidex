@@ -52,6 +52,7 @@ namespace Squidex.Controllers.Api.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/calls/month")]
         [ProducesResponseType(typeof(CurrentCallsDto), 200)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
             var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
@@ -74,6 +75,7 @@ namespace Squidex.Controllers.Api.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
             if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
@@ -105,6 +107,7 @@ namespace Squidex.Controllers.Api.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/today")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(App.Id);
@@ -127,6 +130,7 @@ namespace Squidex.Controllers.Api.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(StorageUsageDto[]), 200)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)
         {
             if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)

@@ -8,6 +8,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.Docs
 {
@@ -16,6 +17,7 @@ namespace Squidex.Controllers.Api.Docs
     {
         [HttpGet]
         [Route("docs/")]
+        [ApiCosts(0)]
         public IActionResult Docs()
         {
             ViewBag.Specification = "~/swagger/v1/swagger.json";

@@ -52,6 +52,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemaDto[]), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetSchemas(string app)
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
@@ -73,6 +74,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {
             var entity = await schemaRepository.FindSchemaAsync(AppId, name);
@@ -104,6 +106,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
             var command = SimpleMapper.Map(request, new CreateSchema());
@@ -126,6 +129,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto request)
         {
             var properties = SimpleMapper.Map(request, new SchemaProperties());
@@ -148,6 +152,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/publish")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PublishSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new PublishSchema());
@@ -168,6 +173,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/unpublish")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> UnpublishSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new UnpublishSchema());
@@ -186,6 +192,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/")]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteSchema(string app, string name)
         {
             await CommandBus.PublishAsync(new DeleteSchema());

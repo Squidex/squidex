@@ -52,6 +52,7 @@ namespace Squidex.Controllers.Api.History
         [HttpGet]
         [Route("apps/{app}/history/")]
         [ProducesResponseType(typeof(HistoryEventDto), 200)]
+        [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {
             var entity = await appProvider.FindAppByNameAsync(app);

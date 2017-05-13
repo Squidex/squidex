@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  LogPerformanceAttribute.cs
+//  LogPerformanceMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,29 +7,31 @@
 // ==========================================================================
 
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
 {
-    public sealed class LogPerformanceAttribute : ActionFilterAttribute
+    public sealed class LogPerformanceMiddleware : ActionFilterAttribute
     {
+        private readonly RequestDelegate next;
         private readonly ISemanticLog log;
 
-        public LogPerformanceAttribute(ISemanticLog log)
+        public LogPerformanceMiddleware(RequestDelegate next, ISemanticLog log)
         {
+            this.next = next;
+
             this.log = log;
         }
 
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public async Task Invoke(HttpContext context)
         {
-            context.HttpContext.Items["Watch"] = Stopwatch.StartNew();
-        }
+            var stopWatch = Stopwatch.StartNew();
 
-        public override void OnActionExecuted(ActionExecutedContext context)
-        {
-            var stopWatch = (Stopwatch)context.HttpContext.Items["Watch"];
-            
+            await next(context);
+
             stopWatch.Stop();
 
             log.LogInformation(w => w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds));

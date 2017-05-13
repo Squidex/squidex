@@ -36,6 +36,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/docs/")]
+        [ApiCosts(0)]
         public IActionResult Docs(string app)
         {
             ViewBag.Specification = $"~/content/{app}/swagger/v1/swagger.json";
@@ -45,6 +46,7 @@ namespace Squidex.Controllers.ContentApi
 
         [HttpGet]
         [Route("content/{app}/swagger/v1/swagger.json")]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetSwagger(string app)
         {
             var appEntity = await appProvider.FindAppByNameAsync(app);

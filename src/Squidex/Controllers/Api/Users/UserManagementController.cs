@@ -36,6 +36,7 @@ namespace Squidex.Controllers.Api.Users
 
         [HttpGet]
         [Route("user-management")]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetUsers([FromQuery] string query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var taskForUsers = userRepository.QueryByEmailAsync(query, take, skip);
@@ -54,6 +55,7 @@ namespace Squidex.Controllers.Api.Users
 
         [HttpPut]
         [Route("user-management/{id}/lock/")]
+        [ApiCosts(0)]
         public async Task<IActionResult> Lock(string id)
         {
             if (IsSelf(id))
@@ -68,6 +70,7 @@ namespace Squidex.Controllers.Api.Users
 
         [HttpPut]
         [Route("user-management/{id}/unlock/")]
+        [ApiCosts(0)]
         public async Task<IActionResult> Unlock(string id)
         {
             if (IsSelf(id))

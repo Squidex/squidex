@@ -34,6 +34,7 @@ namespace Squidex.Controllers.Api.Ping
         /// </remarks>
         [HttpGet]
         [Route("ping/{app}/")]
+        [ApiCosts(0)]
         public IActionResult GetPing()
         {
             return NoContent();

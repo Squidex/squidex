@@ -51,6 +51,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpGet]
         [Route("apps/")]
         [ProducesResponseType(typeof(AppDto[]), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetApps()
         {
             var subject = HttpContext.User.OpenIdSubject();
@@ -87,6 +88,7 @@ namespace Squidex.Controllers.Api.Apps
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
             var command = SimpleMapper.Map(request, new CreateApp());

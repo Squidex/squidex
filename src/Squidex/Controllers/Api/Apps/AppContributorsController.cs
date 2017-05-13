@@ -50,6 +50,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpGet]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorDto[]), 200)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetContributors(string app)
         {
             var entity = await appProvider.FindAppByNameAsync(app);
@@ -79,6 +80,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpPost]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new AssignContributor()));
@@ -99,6 +101,7 @@ namespace Squidex.Controllers.Api.Apps
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {
             await CommandBus.PublishAsync(new RemoveContributor { ContributorId = id });
