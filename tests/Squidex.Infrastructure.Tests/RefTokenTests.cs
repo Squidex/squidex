@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure
         {
             var token1a = RefToken.Parse("client:client1");
             var token1b = RefToken.Parse("client:client1");
-            var token2a  = RefToken.Parse("client:client2");
+            var token2a = RefToken.Parse("client:client2");
 
             Assert.True(token1a.Equals(token1b));
 
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure
         {
             object token1a = RefToken.Parse("client:client1");
             object token1b = RefToken.Parse("client:client1");
-            object token2a  = RefToken.Parse("client:client2");
+            object token2a = RefToken.Parse("client:client2");
             
             Assert.True(token1a.Equals(token1b));
 

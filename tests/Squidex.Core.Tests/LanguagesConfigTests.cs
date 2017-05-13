@@ -29,6 +29,8 @@ namespace Squidex.Core
                 });
 
             Assert.Equal(Language.DE, config.Master.Language);
+
+            Assert.Equal("de", ((IFieldPartitioning)config).Master.Key);
         }
 
         [Fact]
@@ -198,7 +200,7 @@ namespace Squidex.Core
         {
             var config = LanguagesConfig.Create(Language.DE);
 
-            Assert.Throws<ValidationException>(() => config.Update(Language.DE, true, false, new[] { Language.EN }));
+            Assert.Throws<ValidationException>(() => config.Update(Language.DE, false, false, new[] { Language.EN }));
         }
 
         [Fact]

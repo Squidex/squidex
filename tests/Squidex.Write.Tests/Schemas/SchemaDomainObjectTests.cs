@@ -300,6 +300,15 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
+        public void AddField_should_throw_if_command_contains_invalid_partitioning()
+        {
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.AddField(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
+            });
+        }
+
+        [Fact]
         public void AddField_should_throw_if_schema_is_deleted()
         {
             CreateSchema();
