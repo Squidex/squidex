@@ -22,7 +22,6 @@ namespace Squidex.Pipeline
         public LogPerformanceMiddleware(RequestDelegate next, ISemanticLog log)
         {
             this.next = next;
-
             this.log = log;
         }
 

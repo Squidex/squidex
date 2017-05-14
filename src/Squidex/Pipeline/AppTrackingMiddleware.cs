@@ -23,7 +23,6 @@ namespace Squidex.Pipeline
         public AppTrackingMiddleware(RequestDelegate next, IUsageTracker usageTracker)
         {
             this.next = next;
-
             this.usageTracker = usageTracker;
         }
 

@@ -22,7 +22,6 @@ namespace Squidex.Pipeline
         public EnforceHttpsMiddleware(RequestDelegate next, IOptions<MyUrlsOptions> urls)
         {
             this.next = next;
-
             this.urls = urls;
         }
 
