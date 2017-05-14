@@ -64,12 +64,18 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     public currentUserId: string;
 
+    public maxContributors = -1;
+
     public usersDataSource: UsersDataSource;
     public usersPermissions = [
         'Owner',
         'Developer',
         'Editor'
     ];
+
+    public get canAddContributor() {
+        return this.addContributorForm.valid && (this.maxContributors < -1 || this.appContributors.length < this.maxContributors);
+    }
 
     public addContributorForm: FormGroup =
         this.formBuilder.group({
@@ -99,8 +105,10 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     public load() {
         this.appNameOnce()
             .switchMap(app => this.appContributorsService.getContributors(app, this.version).retry(2))
-            .subscribe(dtos => {
-                this.updateContributors(ImmutableArray.of(dtos));
+            .subscribe(dto => {
+                this.updateContributors(ImmutableArray.of(dto.contributors));
+
+                this.maxContributors = dto.maxContributors;
             }, error => {
                 this.notifyError(error);
             });

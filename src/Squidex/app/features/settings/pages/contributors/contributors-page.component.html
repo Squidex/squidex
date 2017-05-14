@@ -13,6 +13,10 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
+            <div class="contributors-limit" *ngIf="maxContributors > 0">
+                Your plan allows up to {{maxContributors}} contributors.
+            </div>
+            
             <table class="table table-items table-fixed">
                 <colgroup>
                     <col style="width: 70px" />
@@ -56,7 +60,7 @@
                         <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user"></sqx-autocomplete>
                     </div>
 
-                    <button type="submit" class="btn btn-success" [disabled]="!addContributorForm.valid">Add Contributor</button>
+                    <button type="submit" class="btn btn-success" [disabled]="!canAddContributor">Add Contributor</button>
                 </form>
             </div>
         </div>

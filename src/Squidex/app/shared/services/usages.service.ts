@@ -33,14 +33,16 @@ export class StorageUsageDto {
 
 export class CurrentStorageDto {
     constructor(
-        public readonly size: number
+        public readonly size: number,
+        public readonly maxAllowed: number
     ) {
     }
 }
 
 export class CurrentCallsDto {
     constructor(
-        public readonly count: number
+        public readonly count: number,
+        public readonly maxAllowed: number
     ) {
     }
 }
@@ -58,8 +60,17 @@ export class UsagesService {
 
         return this.authService.authGet(url)
                 .map(response => response.json())
-                .map(response => new CurrentCallsDto(response.count))
+                .map(response => new CurrentCallsDto(response.count, response.maxAllowed))
                 .catchError('Failed to load monthly api calls. Please reload.');
+    }
+
+    public getTodayStorage(app: string): Observable<CurrentStorageDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/today`);
+
+        return this.authService.authGet(url)
+                .map(response => response.json())
+                .map(response => new CurrentStorageDto(response.size, response.maxAllowed))
+                .catchError('Failed to load todays storage size. Please reload.');
     }
 
     public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto[]> {
@@ -78,15 +89,6 @@ export class UsagesService {
                     });
                 })
                 .catchError('Failed to load calls usage. Please reload.');
-    }
-
-    public getTodayStorage(app: string): Observable<CurrentStorageDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/today`);
-
-        return this.authService.authGet(url)
-                .map(response => response.json())
-                .map(response => new CurrentStorageDto(response.size))
-                .catchError('Failed to load todays storage size. Please reload.');
     }
 
     public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<StorageUsageDto[]> {

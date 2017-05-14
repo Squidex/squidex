@@ -20,6 +20,11 @@ namespace Squidex.Write.Apps
     {
         private readonly Dictionary<string, PermissionLevel> contributors = new Dictionary<string, PermissionLevel>();
 
+        public int Count
+        {
+            get { return contributors.Count; }
+        }
+
         public void Assign(string contributorId, PermissionLevel permission)
         {
             string Message() => "Cannot assign contributor";

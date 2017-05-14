@@ -71,7 +71,7 @@ describe('UsagesService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: { count: 130 }
+                        body: { count: 130, maxAllowed: 150 }
                     })
                 )
             ))
@@ -83,7 +83,7 @@ describe('UsagesService', () => {
             usages = result;
         }).unsubscribe();
 
-        expect(usages).toEqual(new CurrentCallsDto(130));
+        expect(usages).toEqual(new CurrentCallsDto(130, 150));
 
         authService.verifyAll();
     });
@@ -130,7 +130,7 @@ describe('UsagesService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: { size: 130 }
+                        body: { size: 130, maxAllowed: 150 }
                     })
                 )
             ))
@@ -142,7 +142,7 @@ describe('UsagesService', () => {
             usages = result;
         }).unsubscribe();
 
-        expect(usages).toEqual(new CurrentStorageDto(130));
+        expect(usages).toEqual(new CurrentStorageDto(130, 150));
 
         authService.verifyAll();
     });

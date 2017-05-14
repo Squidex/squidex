@@ -15,6 +15,8 @@ namespace Squidex.Read.Apps
     {
         string Name { get; }
 
+        int PlanId { get; }
+
         LanguagesConfig LanguagesConfig { get; }
 
         IReadOnlyCollection<IAppClientEntity> Clients { get; }

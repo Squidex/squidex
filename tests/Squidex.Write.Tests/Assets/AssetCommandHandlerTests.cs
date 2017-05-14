@@ -112,12 +112,16 @@ namespace Squidex.Write.Assets
 
         private void SetupImageInfo()
         {
-            assetThumbnailGenerator.Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image)).Verifiable();
+            assetThumbnailGenerator
+                .Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image))
+                .Verifiable();
         }
 
         private void SetupStore(long version)
         {
-            assetStore.Setup(x => x.UploadAsync(assetId, version, null, stream)).Returns(TaskHelper.Done).Verifiable();
+            assetStore
+                .Setup(x => x.UploadAsync(assetId, version, null, stream)).Returns(TaskHelper.Done)
+                .Verifiable();
         }
     }
 }

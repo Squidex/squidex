@@ -12,3 +12,12 @@
         font-size: .8rem;
     }
 }
+
+.contributors-limit {
+    margin: -$panel-padding;
+    margin-bottom: $panel-padding;
+    color: $color-dark-foreground;
+    background: $color-theme-green-dark;
+    border: 0;
+    padding: .5 * $panel-padding $panel-padding;
+}

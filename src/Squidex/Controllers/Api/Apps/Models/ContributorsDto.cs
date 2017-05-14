@@ -1,23 +1,26 @@
 ﻿// ==========================================================================
-//  CurrentCallsDto.cs
+//  ContributorsDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.Statistics.Models
+using System.ComponentModel.DataAnnotations;
+
+namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class CurrentCallsDto
+    public class ContributorsDto
     {
         /// <summary>
-        /// The number of calls.
+        /// The contributors.
         /// </summary>
-        public long Count { get; set; }
+        [Required]
+        public ContributorDto[] Contributors { get; set; }
 
         /// <summary>
-        /// The number of maximum allowed calls.
+        /// The maximum number of allowed contributors.
         /// </summary>
-        public long MaxAllowed { get; set; }
+        public int MaxContributors { get; set; }
     }
 }

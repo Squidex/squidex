@@ -32,6 +32,10 @@ namespace Squidex.Read.MongoDb.Apps
         [BsonElement]
         public long Version { get; set; }
 
+        [BsonIgnoreIfDefault]
+        [BsonElement]
+        public int PlanId { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public string MasterLanguage { get; set; }

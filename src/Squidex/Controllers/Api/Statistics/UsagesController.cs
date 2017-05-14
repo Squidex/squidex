@@ -15,6 +15,7 @@ using Squidex.Controllers.Api.Statistics.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
+using Squidex.Read.Apps.Services;
 using Squidex.Read.Assets.Repositories;
 
 namespace Squidex.Controllers.Api.Statistics
@@ -28,13 +29,19 @@ namespace Squidex.Controllers.Api.Statistics
     public class UsagesController : ControllerBase
     {
         private readonly IUsageTracker usageTracker;
+        private readonly IAppLimitsProvider appLimitProvider;
         private readonly IAssetStatsRepository assetStatsRepository;
 
-        public UsagesController(ICommandBus commandBus, IUsageTracker usageTracker, IAssetStatsRepository assetStatsRepository)
+        public UsagesController(
+            ICommandBus commandBus, 
+            IUsageTracker usageTracker,
+            IAppLimitsProvider appLimitProvider, 
+            IAssetStatsRepository assetStatsRepository)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;
 
+            this.appLimitProvider = appLimitProvider;
             this.assetStatsRepository = assetStatsRepository;
         }
 
@@ -55,7 +62,9 @@ namespace Squidex.Controllers.Api.Statistics
         {
             var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
 
-            return Ok(new CurrentCallsDto { Count = count });
+            var plan = appLimitProvider.GetPlanForApp(App);
+
+            return Ok(new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls });
         }
 
         /// <summary>
@@ -110,7 +119,9 @@ namespace Squidex.Controllers.Api.Statistics
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(App.Id);
 
-            return Ok(new CurrentStorageDto { Size = size });
+            var plan = appLimitProvider.GetPlanForApp(App);
+
+            return Ok(new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize });
         }
 
         /// <summary>

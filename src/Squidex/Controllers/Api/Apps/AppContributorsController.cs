@@ -29,12 +29,12 @@ namespace Squidex.Controllers.Api.Apps
     [SwaggerTag("Apps")]
     public class AppContributorsController : ControllerBase
     {
-        private readonly IAppProvider appProvider;
+        private readonly IAppLimitsProvider appLimitsProvider;
 
-        public AppContributorsController(ICommandBus commandBus, IAppProvider appProvider) 
+        public AppContributorsController(ICommandBus commandBus, IAppLimitsProvider appLimitsProvider) 
             : base(commandBus)
         {
-            this.appProvider = appProvider;
+            this.appLimitsProvider = appLimitsProvider;
         }
 
         /// <summary>
@@ -47,20 +47,15 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorDto[]), 200)]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContributors(string app)
+        public IActionResult GetContributors(string app)
         {
-            var entity = await appProvider.FindAppByNameAsync(app);
+            var contributors = App.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToArray();
 
-            if (entity == null)
-            {
-                return NotFound();
-            }
+            var response = new ContributorsDto { Contributors = contributors, MaxContributors = appLimitsProvider.GetPlanForApp(App).MaxContributors };
 
-            var response = entity.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToList();
-
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 
             return Ok(response);
         }

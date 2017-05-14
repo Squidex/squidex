@@ -14,6 +14,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Apps.Services;
+using Squidex.Read.Apps.Services.Implementations;
 using Squidex.Read.Users;
 using Squidex.Read.Users.Repositories;
 using Squidex.Write.Apps.Commands;
@@ -29,6 +31,7 @@ namespace Squidex.Write.Apps
     {
         private readonly Mock<ClientKeyGenerator> keyGenerator = new Mock<ClientKeyGenerator>();
         private readonly Mock<IAppRepository> appRepository = new Mock<IAppRepository>();
+        private readonly Mock<IAppLimitsProvider> appLimitsProvider = new Mock<IAppLimitsProvider>();
         private readonly Mock<IUserRepository> userRepository = new Mock<IUserRepository>();
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
@@ -39,9 +42,11 @@ namespace Squidex.Write.Apps
 
         public AppCommandHandlerTests()
         {
+            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
+
             app = new AppDomainObject(AppId, -1);
 
-            sut = new AppCommandHandler(Handler, appRepository.Object, userRepository.Object, keyGenerator.Object);
+            sut = new AppCommandHandler(Handler, appRepository.Object, appLimitsProvider.Object, userRepository.Object, keyGenerator.Object);
         }
 
         [Fact]
@@ -94,11 +99,28 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
+        public async Task AssignContributor_throw_if_reached_max_contributor_size()
+        {
+            CreateApp()
+                .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "1" }))
+                .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "2" }));
+
+            var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
+
+            userRepository.Setup(x => x.FindUserByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Mock<IUserEntity>().Object));
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
         public async Task AssignContributor_should_throw_if_null_user_not_found()
         {
             CreateApp();
 
-            var context = CreateContextForCommand(new AssignContributor { ContributorId = null });
+            var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
             userRepository.Setup(x => x.FindUserByIdAsync(contributorId)).Returns(Task.FromResult<IUserEntity>(null));
 

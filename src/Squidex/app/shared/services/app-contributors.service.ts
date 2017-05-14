@@ -21,6 +21,14 @@ export class AppContributorDto {
     }
 }
 
+export class AppContributorsDto {
+    constructor(
+        public readonly contributors: AppContributorDto[],
+        public readonly maxContributors: number
+    ) {
+    }
+}
+
 @Injectable()
 export class AppContributorsService {
     constructor(
@@ -29,19 +37,21 @@ export class AppContributorsService {
     ) {
     }
 
-    public getContributors(appName: string, version?: Version): Observable<AppContributorDto[]> {
+    public getContributors(appName: string, version?: Version): Observable<AppContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return this.authService.authGet(url, version)
                 .map(response => response.json())
                 .map(response => {
-                    const items: any[] = response;
+                    const items: any[] = response.contributors;
 
-                    return items.map(item => {
-                        return new AppContributorDto(
-                            item.contributorId,
-                            item.permission);
-                    });
+                    return new AppContributorsDto(
+                        items.map(item => {
+                            return new AppContributorDto(
+                                item.contributorId,
+                                item.permission);
+                        }),
+                        response.maxContributors);
                 })
                 .catchError('Failed to load contributors. Please reload.');
     }

@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
-//  MustBeAppOwnerAttribute.cs
+//  MyUsageOptions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
-using Squidex.Core.Identity;
+using Squidex.Read.Apps.Services.Implementations;
 
-namespace Squidex.Pipeline
+namespace Squidex.Config
 {
-    public sealed class MustBeAppOwnerAttribute : AuthorizeAttribute
+    public class MyUsageOptions
     {
-        public MustBeAppOwnerAttribute()
-        {
-            Roles = SquidexRoles.AppOwner;
-        }
+        public ConfigAppLimitsPlan[] Plans { get; set; }
     }
 }

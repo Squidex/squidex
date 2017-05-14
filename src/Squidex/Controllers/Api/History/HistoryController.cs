@@ -29,14 +29,11 @@ namespace Squidex.Controllers.Api.History
     [SwaggerTag("History")]
     public class HistoryController : ControllerBase
     {
-        private readonly IAppProvider appProvider;
         private readonly IHistoryEventRepository historyEventRepository;
 
-        public HistoryController(ICommandBus commandBus, IAppProvider appProvider, IHistoryEventRepository historyEventRepository) 
+        public HistoryController(ICommandBus commandBus, IHistoryEventRepository historyEventRepository) 
             : base(commandBus)
         {
-            this.appProvider = appProvider;
-
             this.historyEventRepository = historyEventRepository;
         }
 
@@ -55,16 +52,9 @@ namespace Squidex.Controllers.Api.History
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {
-            var entity = await appProvider.FindAppByNameAsync(app);
+            var entities = await historyEventRepository.QueryByChannelAsync(App.Id, channel, 100);
 
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var schemas = await historyEventRepository.QueryByChannelAsync(entity.Id, channel, 100);
-
-            var response = schemas.Select(x => SimpleMapper.Map(x, new HistoryEventDto())).ToList();
+            var response = entities.Select(x => SimpleMapper.Map(x, new HistoryEventDto())).ToList();
 
             return Ok(response);
         }

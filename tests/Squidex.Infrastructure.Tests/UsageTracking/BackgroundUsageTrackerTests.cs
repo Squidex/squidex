@@ -121,9 +121,17 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var today = DateTime.Today;
 
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key1", 1.0, 1000)).Returns(TaskHelper.Done).Verifiable();
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key2", 1.5, 5000)).Returns(TaskHelper.Done).Verifiable();
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key3", 0.9, 15000)).Returns(TaskHelper.Done).Verifiable();
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key1", 1.0, 1000))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key2", 1.5, 5000))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            usageStore.Setup(x => x.TrackUsagesAsync(today, "key3", 0.9, 15000))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
 
             await sut.TrackAsync("key1", 1, 1000);
 

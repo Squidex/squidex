@@ -24,6 +24,7 @@ using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
+using Squidex.Read.Apps.Services.Implementations;
 
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable AccessToModifiedClosure
@@ -75,6 +76,8 @@ namespace Squidex
                 Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 Configuration.GetSection("identity"));
+            services.Configure<MyUsageOptions>(
+                Configuration.GetSection("usage"));
 
             var builder = new ContainerBuilder();
             builder.Populate(services);

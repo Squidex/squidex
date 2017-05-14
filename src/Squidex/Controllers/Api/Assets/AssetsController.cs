@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using Squidex.Read.Apps.Services;
 using Squidex.Read.Assets.Repositories;
 using Squidex.Write.Assets.Commands;
 
@@ -36,16 +37,22 @@ namespace Squidex.Controllers.Api.Assets
     public class AssetsController : ControllerBase
     {
         private readonly IAssetRepository assetRepository;
+        private readonly IAssetStatsRepository assetStatsRepository;
+        private readonly IAppLimitsProvider appLimitProvider;
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
             ICommandBus commandBus, 
             IAssetRepository assetRepository,
+            IAssetStatsRepository assetStatsRepository,
+            IAppLimitsProvider appLimitProvider,
             IOptions<AssetConfig> assetsConfig) 
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
             this.assetRepository = assetRepository;
+            this.assetStatsRepository = assetStatsRepository;
+            this.appLimitProvider = appLimitProvider;
         }
 
         /// <summary>
@@ -149,7 +156,7 @@ namespace Squidex.Controllers.Api.Assets
         [ProducesResponseType(typeof(ErrorDto), 400)]
         public async Task<IActionResult> PostAsset(string app, List<IFormFile> file)
         {
-            var assetFile = GetAssetFile(file);
+            var assetFile = await CheckAssetFileAsync(file);
 
             var command = new CreateAsset { File = assetFile };
             var context = await CommandBus.PublishAsync(command);
@@ -178,7 +185,7 @@ namespace Squidex.Controllers.Api.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
         {
-            var assetFile = GetAssetFile(file);
+            var assetFile = await CheckAssetFileAsync(file);
 
             var command = new UpdateAsset { File = assetFile, AssetId = id };
             var context = await CommandBus.PublishAsync(command);
@@ -232,7 +239,7 @@ namespace Squidex.Controllers.Api.Assets
             return NoContent();
         }
 
-        private AssetFile GetAssetFile(IReadOnlyList<IFormFile> file)
+        private async Task<AssetFile> CheckAssetFileAsync(IReadOnlyList<IFormFile> file)
         {
             if (file.Count != 1)
             {
@@ -246,6 +253,17 @@ namespace Squidex.Controllers.Api.Assets
             if (formFile.Length > assetsConfig.MaxSize)
             {
                 var error = new ValidationError($"File size cannot be longer than ${assetsConfig.MaxSize}.");
+
+                throw new ValidationException("Cannot create asset.", error);
+            }
+
+            var plan = appLimitProvider.GetPlanForApp(App);
+
+            var currentSize = await assetStatsRepository.GetTotalSizeAsync(App.Id);
+
+            if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + formFile.Length)
+            {
+                var error = new ValidationError("You have reached your max asset size.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }

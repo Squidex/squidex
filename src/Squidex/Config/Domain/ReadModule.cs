@@ -6,8 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Apps.Services.Implementations;
@@ -33,8 +36,18 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.Register(c => c.Resolve<IOptions<MyUsageOptions>>().Value?.Plans ?? Enumerable.Empty<ConfigAppLimitsPlan>())
+                .As<IEnumerable<ConfigAppLimitsPlan>>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<ConfigAppLimitsProvider>()
+                .As<IAppLimitsProvider>()
                 .AsSelf()
                 .SingleInstance();
 

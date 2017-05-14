@@ -14,5 +14,10 @@ namespace Squidex.Controllers.Api.Statistics.Models
         /// The size in bytes.
         /// </summary>
         public long Size { get; set; }
+
+        /// <summary>
+        /// The maximum allowed asset size.
+        /// </summary>
+        public long MaxAllowed { get; set; }
     }
 }

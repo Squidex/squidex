@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Core.Apps;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.UsageTracking;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 
@@ -25,10 +26,15 @@ namespace Squidex.Pipeline
     public sealed class AppApiFilter : IAsyncAuthorizationFilter
     {
         private readonly IAppProvider appProvider;
+        private readonly IAppLimitsProvider appLimitProvider;
+        private readonly IUsageTracker usageTracker;
 
-        public AppApiFilter(IAppProvider appProvider)
+        public AppApiFilter(IAppProvider appProvider, IAppLimitsProvider appLimitProvider, IUsageTracker usageTracker)
         {
             this.appProvider = appProvider;
+            this.appLimitProvider = appLimitProvider;
+
+            this.usageTracker = usageTracker;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -56,6 +62,16 @@ namespace Squidex.Pipeline
                     context.Result = new NotFoundResult();
                     return;
                 }
+
+                var plan = appLimitProvider.GetPlanForApp(app);
+
+                var usage = await usageTracker.GetMonthlyCalls(app.Id.ToString(), DateTime.Today);
+
+                if (plan.MaxApiCalls >= 0 && (usage * 1.1) > plan.MaxApiCalls)
+                {
+                    context.Result = new StatusCodeResult(429);
+                    return;
+                }
                 
                 var defaultIdentity = context.HttpContext.User.Identities.First();
 
@@ -63,12 +79,15 @@ namespace Squidex.Pipeline
                 {
                     case PermissionLevel.Owner:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppOwner));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                     case PermissionLevel.Editor:
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                     case PermissionLevel.Developer:
-                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                 }
 

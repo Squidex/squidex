@@ -36,6 +36,16 @@ namespace Squidex.Write.Apps
             get { return name; }
         }
 
+        public int PlanId
+        {
+            get { return 0; }
+        }
+
+        public int ContributorCount
+        {
+            get { return contributors.Count; }
+        }
+
         public IReadOnlyDictionary<string, AppClient> Clients
         {
             get { return clients.Clients; }

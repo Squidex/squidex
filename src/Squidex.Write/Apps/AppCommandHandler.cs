@@ -12,8 +12,11 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Repositories;
+using Squidex.Read.Apps.Services;
 using Squidex.Read.Users.Repositories;
 using Squidex.Write.Apps.Commands;
+
+// ReSharper disable InvertIf
 
 namespace Squidex.Write.Apps
 {
@@ -21,12 +24,14 @@ namespace Squidex.Write.Apps
     {
         private readonly IAggregateHandler handler;
         private readonly IAppRepository appRepository;
+        private readonly IAppLimitsProvider appLimitsProvider;
         private readonly IUserRepository userRepository;
         private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
             IAggregateHandler handler,
             IAppRepository appRepository,
+            IAppLimitsProvider appLimitsProvider,
             IUserRepository userRepository,
             ClientKeyGenerator keyGenerator)
         {
@@ -34,11 +39,13 @@ namespace Squidex.Write.Apps
             Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(userRepository, nameof(userRepository));
+            Guard.NotNull(appLimitsProvider, nameof(appLimitsProvider));
 
             this.handler = handler;
             this.keyGenerator = keyGenerator;
-            this.appRepository = appRepository;
             this.userRepository = userRepository;
+            this.appRepository = appRepository;
+            this.appLimitsProvider = appLimitsProvider;
         }
 
         protected async Task On(CreateApp command, CommandContext context)
@@ -71,7 +78,20 @@ namespace Squidex.Write.Apps
                 throw new ValidationException("Cannot assign contributor to app", error);
             }
 
-            await handler.UpdateAsync<AppDomainObject>(context, a => a.AssignContributor(command));
+            await handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                var oldContributors = a.ContributorCount;
+                var maxContributors = appLimitsProvider.GetPlan(a.PlanId).MaxContributors;
+
+                a.AssignContributor(command);
+
+                if (a.ContributorCount > oldContributors && a.ContributorCount > maxContributors)
+                {
+                    var error = new ValidationError("You have reached your max number of contributors");
+
+                    throw new ValidationException("Cannot assign contributor to app", error);
+                }
+            });
         }
 
         protected Task On(AttachClient command, CommandContext context)

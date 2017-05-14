@@ -1,21 +1,21 @@
 ﻿// ==========================================================================
-//  MustBeAppOwnerAttribute.cs
+//  IAppLimitsProvider.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
-using Squidex.Core.Identity;
+using System.Collections.Generic;
 
-namespace Squidex.Pipeline
+namespace Squidex.Read.Apps.Services
 {
-    public sealed class MustBeAppOwnerAttribute : AuthorizeAttribute
+    public interface IAppLimitsProvider
     {
-        public MustBeAppOwnerAttribute()
-        {
-            Roles = SquidexRoles.AppOwner;
-        }
+        IEnumerable<IAppLimitsPlan> GetAvailablePlans();
+
+        IAppLimitsPlan GetPlanForApp(IAppEntity entity);
+
+        IAppLimitsPlan GetPlan(int planId);
     }
 }

@@ -12,6 +12,7 @@ import { IMock, Mock, Times } from 'typemoq';
 import {
     ApiUrlConfig,
     AppContributorDto,
+    AppContributorsDto,
     AppContributorsService,
     AuthService,
     Version
@@ -32,32 +33,35 @@ describe('AppContributorsService', () => {
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
-                        body: [
-                            {
-                                contributorId: '123',
-                                permission: 'Owner'
-                            },
-                            {
-                                contributorId: '456',
-                                permission: 'Owner'
-                            }
-                        ]
+                        body: {
+                            contributors: [
+                                {
+                                    contributorId: '123',
+                                    permission: 'Owner'
+                                },
+                                {
+                                    contributorId: '456',
+                                    permission: 'Owner'
+                                }
+                            ],
+                            maxContributors: 100
+                        }
                     })
                 )
             ))
             .verifiable(Times.once());
 
-        let contributors: AppContributorDto[] | null = null;
+        let contributors: AppContributorsDto | null = null;
 
         appContributorsService.getContributors('my-app', version).subscribe(result => {
             contributors = result;
         }).unsubscribe();
 
         expect(contributors).toEqual(
-            [
-                new AppContributorDto('123', 'Owner'),
-                new AppContributorDto('456', 'Owner')
-            ]);
+            new AppContributorsDto([
+                    new AppContributorDto('123', 'Owner'),
+                    new AppContributorDto('456', 'Owner')
+                ], 100));
 
         authService.verifyAll();
     });

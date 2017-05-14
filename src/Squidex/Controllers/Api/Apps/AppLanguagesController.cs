@@ -19,7 +19,6 @@ using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Core;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Services;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Apps
@@ -32,12 +31,9 @@ namespace Squidex.Controllers.Api.Apps
     [SwaggerTag("Apps")]
     public class AppLanguagesController : ControllerBase
     {
-        private readonly IAppProvider appProvider;
-
-        public AppLanguagesController(ICommandBus commandBus, IAppProvider appProvider)
+        public AppLanguagesController(ICommandBus commandBus)
             : base(commandBus)
         {
-            this.appProvider = appProvider;
         }
 
         /// <summary>
@@ -52,25 +48,18 @@ namespace Squidex.Controllers.Api.Apps
         [HttpGet]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(LanguageDto[]), 200)]
-        public async Task<IActionResult> GetLanguages(string app)
+        public IActionResult GetLanguages(string app)
         {
-            var entity = await appProvider.FindAppByNameAsync(app);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var model = entity.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
+            var model = App.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
                 SimpleMapper.Map(x.Language, 
                     new AppLanguageDto
                     {
-                        IsMaster = x == entity.LanguagesConfig.Master,
+                        IsMaster = x == App.LanguagesConfig.Master,
                         IsOptional = x.IsOptional,
                         Fallback = x.Fallback.ToList()
                     })).OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code).ToList();
 
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 
             return Ok(model);
         }

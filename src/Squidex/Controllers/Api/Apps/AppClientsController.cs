@@ -15,7 +15,6 @@ using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Services;
 using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 
@@ -30,12 +29,9 @@ namespace Squidex.Controllers.Api.Apps
     [SwaggerTag("Apps")]
     public class AppClientsController : ControllerBase
     {
-        private readonly IAppProvider appProvider;
-
-        public AppClientsController(ICommandBus commandBus, IAppProvider appProvider)
+        public AppClientsController(ICommandBus commandBus)
             : base(commandBus)
         {
-            this.appProvider = appProvider;
         }
 
         /// <summary>
@@ -53,18 +49,11 @@ namespace Squidex.Controllers.Api.Apps
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto[]), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetClients(string app)
+        public IActionResult GetClients(string app)
         {
-            var entity = await appProvider.FindAppByNameAsync(app);
+            var response = App.Clients.Select(x => SimpleMapper.Map(x, new ClientDto())).ToList();
 
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var response = entity.Clients.Select(x => SimpleMapper.Map(x, new ClientDto())).ToList();
-
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 
             return Ok(response);
         }

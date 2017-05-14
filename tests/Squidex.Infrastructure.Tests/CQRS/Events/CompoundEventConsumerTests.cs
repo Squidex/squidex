@@ -57,8 +57,13 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public async Task Should_clear_all_consumers()
         {
-            consumer1.Setup(x => x.ClearAsync()).Returns(TaskHelper.Done).Verifiable();
-            consumer2.Setup(x => x.ClearAsync()).Returns(TaskHelper.Done).Verifiable();
+            consumer1.Setup(x => x.ClearAsync()).
+                Returns(TaskHelper.Done)
+                .Verifiable();
+
+            consumer2.Setup(x => x.ClearAsync())
+                .Returns(TaskHelper.Done)
+                .Verifiable();
 
             var sut = new CompoundEventConsumer("consumer-name", consumer1.Object, consumer2.Object);
 
@@ -73,8 +78,13 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var @event = Envelope.Create(new MyEvent());
 
-            consumer1.Setup(x => x.On(@event)).Returns(TaskHelper.Done).Verifiable();
-            consumer2.Setup(x => x.On(@event)).Returns(TaskHelper.Done).Verifiable();
+            consumer1.Setup(x => x.On(@event))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
+
+            consumer2.Setup(x => x.On(@event))
+                .Returns(TaskHelper.Done)
+                .Verifiable();
 
             var sut = new CompoundEventConsumer("consumer-name", consumer1.Object, consumer2.Object);
 

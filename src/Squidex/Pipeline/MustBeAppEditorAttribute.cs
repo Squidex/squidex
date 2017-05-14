@@ -15,7 +15,7 @@ namespace Squidex.Pipeline
     {
         public MustBeAppEditorAttribute()
         {
-            Roles = $"{SquidexRoles.AppOwner},{SquidexRoles.AppDeveloper},{SquidexRoles.AppEditor}";
+            Roles = SquidexRoles.AppEditor;
         }
     }
 }
