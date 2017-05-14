@@ -16,11 +16,11 @@ namespace Squidex.Infrastructure.Redis
     public class RedisPubSub : IPubSub, IExternalSystem
     {
         private readonly ConcurrentDictionary<string, RedisSubscription> subscriptions = new ConcurrentDictionary<string, RedisSubscription>();
-        private readonly IConnectionMultiplexer redisClient;
+        private readonly Lazy<IConnectionMultiplexer> redisClient;
+        private readonly Lazy<ISubscriber> redisSubscriber;
         private readonly ISemanticLog log;
-        private readonly ISubscriber redisSubscriber;
 
-        public RedisPubSub(IConnectionMultiplexer redis, ISemanticLog log)
+        public RedisPubSub(Lazy<IConnectionMultiplexer> redis, ISemanticLog log)
         {
             Guard.NotNull(redis, nameof(redis));
             Guard.NotNull(log, nameof(log));
@@ -28,18 +28,18 @@ namespace Squidex.Infrastructure.Redis
             this.log = log;
 
             redisClient = redis;
-            redisSubscriber = redis.GetSubscriber();
+            redisSubscriber = new Lazy<ISubscriber>(() => redis.Value.GetSubscriber());
         }
 
         public void Connect()
         {
             try
             {
-                redisClient.GetStatus();
+                redisClient.Value.GetStatus();
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException($"Redis connection failed to connect to database {redisClient.Configuration}", ex);
+                throw new ConfigurationException($"Redis connection failed to connect to database {redisClient.Value.Configuration}", ex);
             }
         }
 
@@ -47,14 +47,14 @@ namespace Squidex.Infrastructure.Redis
         {
             Guard.NotNullOrEmpty(channelName, nameof(channelName));
 
-            subscriptions.GetOrAdd(channelName, c => new RedisSubscription(redisSubscriber, c, log)).Publish(token, notifySelf);
+            subscriptions.GetOrAdd(channelName, c => new RedisSubscription(redisSubscriber.Value, c, log)).Publish(token, notifySelf);
         }
 
         public IDisposable Subscribe(string channelName, Action<string> handler)
         {
             Guard.NotNullOrEmpty(channelName, nameof(channelName));
 
-            return subscriptions.GetOrAdd(channelName, c => new RedisSubscription(redisSubscriber, c, log)).Subscribe(handler);
+            return subscriptions.GetOrAdd(channelName, c => new RedisSubscription(redisSubscriber.Value, c, log)).Subscribe(handler);
         }
     }
 }

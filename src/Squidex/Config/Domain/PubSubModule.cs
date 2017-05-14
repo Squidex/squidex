@@ -45,12 +45,12 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("Configure PubSub Redis configuration with 'pubSub:redis:configuration'.");
                 }
 
-                builder.Register(c => Singletons<IConnectionMultiplexer>.GetOrAdd(configuration, s => ConnectionMultiplexer.Connect(s)))
-                    .Named<IConnectionMultiplexer>(RedisRegistration)
+                builder.Register(c => Singletons<IConnectionMultiplexer>.GetOrAddLazy(configuration, s => ConnectionMultiplexer.Connect(s)))
+                    .Named<Lazy<IConnectionMultiplexer>>(RedisRegistration)
                     .SingleInstance();
 
                 builder.RegisterType<RedisPubSub>()
-                    .WithParameter(ResolvedParameter.ForNamed<IConnectionMultiplexer>(RedisRegistration))
+                    .WithParameter(ResolvedParameter.ForNamed<Lazy<IConnectionMultiplexer>>(RedisRegistration))
                     .As<IPubSub>()
                     .As<IExternalSystem>()
                     .SingleInstance();

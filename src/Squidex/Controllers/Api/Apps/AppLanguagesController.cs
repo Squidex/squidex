@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
@@ -18,7 +17,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Core;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Services;
@@ -30,7 +28,7 @@ namespace Squidex.Controllers.Api.Apps
     /// Manages and configures apps.
     /// </summary>
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("Apps")]
     public class AppLanguagesController : ControllerBase
     {
@@ -50,7 +48,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 200 => Language configuration returned.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(LanguageDto[]), 200)]
@@ -87,7 +85,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppOwner)]
+        [MustBeAppOwner]
         [HttpPost]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguageDto), 201)]
@@ -113,7 +111,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppOwner)]
+        [MustBeAppOwner]
         [HttpPut]
         [Route("apps/{app}/languages/{language}")]
         [ApiCosts(1)]
@@ -134,7 +132,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppOwner)]
+        [MustBeAppOwner]
         [HttpDelete]
         [Route("apps/{app}/languages/{language}")]
         [ApiCosts(1)]

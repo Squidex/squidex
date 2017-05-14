@@ -8,14 +8,12 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
-using Squidex.Core.Identity;
 using Squidex.Pipeline;
 using Squidex.Read.Apps.Services;
 using Squidex.Write.Apps.Commands;
@@ -25,9 +23,9 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [Authorize(Roles = SquidexRoles.AppOwner)]
+    [MustBeAppOwner]
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("Apps")]
     public class AppContributorsController : ControllerBase
     {

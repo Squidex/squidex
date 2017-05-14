@@ -9,11 +9,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
@@ -22,8 +20,8 @@ using Squidex.Read.Users.Repositories;
 
 namespace Squidex.Controllers.Api.Users
 {
+    [MustBeAdministrator]
     [ApiExceptionFilter]
-    [Authorize(Roles = SquidexRoles.Administrator)]
     [SwaggerIgnore]
     public class UserManagementController : Controller
     {

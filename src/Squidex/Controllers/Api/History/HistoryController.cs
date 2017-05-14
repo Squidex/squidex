@@ -25,7 +25,7 @@ namespace Squidex.Controllers.Api.History
     /// </summary>
     [Authorize]
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("History")]
     public class HistoryController : ControllerBase
     {

@@ -6,10 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Core.Identity;
 using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.Ping
@@ -17,9 +15,9 @@ namespace Squidex.Controllers.Api.Ping
     /// <summary>
     /// Makes a ping request.
     /// </summary>
-    [Authorize(Roles = SquidexRoles.AppEditor)]
+    [MustBeAppEditor]
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("Ping")]
     public class PingController : Controller
     {

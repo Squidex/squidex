@@ -9,13 +9,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Core.Contents;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -25,9 +23,9 @@ using Squidex.Write.Contents.Commands;
 
 namespace Squidex.Controllers.ContentApi
 {
-    [Authorize(Roles = SquidexRoles.AppEditor)]
+    [MustBeAppEditor]
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerIgnore]
     public class ContentsController : ControllerBase
     {

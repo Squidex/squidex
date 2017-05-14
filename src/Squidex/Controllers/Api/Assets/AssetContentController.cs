@@ -21,7 +21,7 @@ using Squidex.Read.Assets.Repositories;
 namespace Squidex.Controllers.Api.Assets
 {
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerIgnore]
     public class AssetContentController : ControllerBase
     {

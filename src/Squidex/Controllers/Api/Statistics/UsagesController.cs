@@ -9,11 +9,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Statistics.Models;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
@@ -25,7 +23,7 @@ namespace Squidex.Controllers.Api.Statistics
     /// Retrieves usage information for apps.
     /// </summary>
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("Statistics")]
     public class UsagesController : ControllerBase
     {
@@ -48,7 +46,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 200 => Usage tracking results returned.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/calls/month")]
         [ProducesResponseType(typeof(CurrentCallsDto), 200)]
@@ -71,7 +69,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
@@ -103,7 +101,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 200 => Storage usage returned.
         /// 404 => App not found.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/storage/today")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
@@ -126,7 +124,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
-        [Authorize(Roles = SquidexRoles.AppEditor)]
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(StorageUsageDto[]), 200)]

@@ -25,7 +25,7 @@ namespace Squidex.Config.Web
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<AppFilterAttribute>()
+            builder.RegisterType<AppApiFilter>()
                 .AsSelf()
                 .SingleInstance();
 

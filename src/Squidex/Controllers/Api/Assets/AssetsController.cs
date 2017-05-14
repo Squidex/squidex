@@ -10,14 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -31,9 +29,9 @@ namespace Squidex.Controllers.Api.Assets
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [Authorize(Roles = SquidexRoles.AppEditor)]
+    [MustBeAppEditor]
     [ApiExceptionFilter]
-    [ServiceFilter(typeof(AppFilterAttribute))]
+    [AppApi]
     [SwaggerTag("Assets")]
     public class AssetsController : ControllerBase
     {

@@ -22,12 +22,11 @@ using Squidex.Read.Apps.Services;
 
 namespace Squidex.Pipeline
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class AppFilterAttribute : Attribute, IAsyncAuthorizationFilter
+    public sealed class AppApiFilter : IAsyncAuthorizationFilter
     {
         private readonly IAppProvider appProvider;
 
-        public AppFilterAttribute(IAppProvider appProvider)
+        public AppApiFilter(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
         }
@@ -64,15 +63,12 @@ namespace Squidex.Pipeline
                 {
                     case PermissionLevel.Owner:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppOwner));
-                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
-                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                     case PermissionLevel.Editor:
-                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                     case PermissionLevel.Developer:
-                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         break;
                 }
 
