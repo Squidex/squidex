@@ -4,6 +4,10 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
+                <button type="button" class="btn btn-link btn-sm btn-export" (click)="exportSchemaDialog.show()">
+                    Export
+                </button>
+
                 <div class="btn-group btn-group-sm" data-toggle="buttons">
                     <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="isPublished" [disabled]="isPublished" (click)="publish()">
                         Published
@@ -129,6 +133,25 @@
 
             <div class="modal-body">
                 <sqx-schema-edit-form [appName]="appName() | async" [schema]="schemaProperties" [version]="version" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="exportSchemaDialog" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Export Schema</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="exportSchemaDialog.hide()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
             </div>
         </div>
     </div>
