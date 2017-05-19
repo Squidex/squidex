@@ -53,7 +53,7 @@ namespace Squidex.Write.Schemas
 
         protected void On(SchemaCreated @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event);
+            schema = SchemaEventDispatcher.Dispatch(@event, registry);
         }
 
         protected void On(FieldUpdated @event)

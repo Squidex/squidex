@@ -38,7 +38,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            var schema = SchemaEventDispatcher.Dispatch(@event);
+            var schema = SchemaEventDispatcher.Dispatch(@event, registry);
 
             return Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
         }
