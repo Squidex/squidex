@@ -50,9 +50,9 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         'String'
     ];
 
-    public schemaName: string;
-    public schemaFields = ImmutableArray.empty<FieldDto>();
     public schemaExport: any;
+    public schemaFields = ImmutableArray.empty<FieldDto>();
+    public schemaName: string;
     public schemaProperties: SchemaPropertiesDto;
     public schemaVersion = new Version('');
 

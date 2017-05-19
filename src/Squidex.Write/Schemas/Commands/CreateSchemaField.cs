@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AddField.cs
+//  CreateSchemaField.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,29 +13,35 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Write.Schemas.Commands
 {
-    public class AddField : FieldCommand, IValidatable
+    public sealed class CreateSchemaField
     {
+        public string Partitioning { get; set; }
+
         public string Name { get; set; }
 
-        public string Partitioning { get; set; }
+        public bool IsHidden { get; set; }
+
+        public bool IsDisabled { get; set; }
 
         public FieldProperties Properties { get; set; }
 
-        public void Validate(IList<ValidationError> errors)
+        public void Validate(int index, IList<ValidationError> errors)
         {
+            var prefix = $"Fields.{index}";
+
             if (!Partitioning.IsValidPartitioning())
             {
-                errors.Add(new ValidationError($"Partitioning is not valid.", nameof(Partitioning)));
+                errors.Add(new ValidationError("Partitioning is not valid.", $"{prefix}.{nameof(Partitioning)}"));
             }
 
             if (!Name.IsPropertyName())
             {
-                errors.Add(new ValidationError("Name must be a valid property name", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid property name", $"{prefix}.{nameof(Name)}"));
             }
 
             if (Properties == null)
             {
-                errors.Add(new ValidationError("Properties must be defined.", nameof(Properties)));
+                errors.Add(new ValidationError("Properties must be defined.", $"{prefix}.{nameof(Properties)}"));
             }
         }
     }

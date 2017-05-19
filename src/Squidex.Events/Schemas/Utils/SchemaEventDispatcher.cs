@@ -10,25 +10,57 @@ using System;
 using Squidex.Core;
 using Squidex.Core.Schemas;
 
+// ReSharper disable InvertIf
 // ReSharper disable UnusedParameter.Global
 
 namespace Squidex.Events.Schemas.Utils
 {
     public static class SchemaEventDispatcher
     {
+        public static Schema Dispatch(SchemaCreated @event, FieldRegistry registry)
+        {
+            var schema = Schema.Create(@event.Name, @event.Properties);
+
+            if (@event.Fields != null)
+            {
+                var fieldId = 1;
+
+                foreach (var eventField in @event.Fields)
+                {
+                    var partitioning =
+                        string.Equals(eventField.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
+                            Partitioning.Language :
+                            Partitioning.Invariant;
+
+                    var field = registry.CreateField(fieldId, eventField.Name, partitioning, eventField.Properties);
+
+                    if (eventField.IsHidden)
+                    {
+                        field = field.Hide();
+                    }
+
+                    if (eventField.IsDisabled)
+                    {
+                        field = field.Disable();
+                    }
+
+                    schema = schema.AddOrUpdateField(field);
+
+                    fieldId++;
+                }
+            }
+
+            return schema;
+        }
+
         public static Schema Dispatch(FieldAdded @event, Schema schema, FieldRegistry registry)
         {
             var partitioning =
-                string.Equals(@event.Partitioning, "language", StringComparison.OrdinalIgnoreCase) ? 
+                string.Equals(@event.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
                     Partitioning.Language :
                     Partitioning.Invariant;
 
             return schema.AddOrUpdateField(registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties));
-        }
-
-        public static Schema Dispatch(SchemaCreated @event)
-        {
-            return Schema.Create(@event.Name, @event.Properties);
         }
 
         public static Schema Dispatch(FieldUpdated @event, Schema schema)

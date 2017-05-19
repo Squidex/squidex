@@ -12,27 +12,19 @@ using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 
+using SchemaFields = System.Collections.Generic.List<Squidex.Write.Schemas.Commands.CreateSchemaField>;
+
 namespace Squidex.Write.Schemas.Commands
 {
     public class CreateSchema : AppCommand, IValidatable, IAggregateCommand
     {
-        private SchemaProperties properties;
-
-        public SchemaProperties Properties
-        {
-            get
-            {
-                return properties ?? (properties = new SchemaProperties()); 
-            }
-            set
-            {
-                properties = value;
-            }
-        }
+        public Guid SchemaId { get; set; }
 
         public string Name { get; set; }
 
-        public Guid SchemaId { get; set; }
+        public SchemaFields Fields { get; set; } = new SchemaFields();
+
+        public SchemaProperties Properties { get; set; }
 
         Guid IAggregateCommand.AggregateId
         {
@@ -49,6 +41,11 @@ namespace Squidex.Write.Schemas.Commands
             if (!Name.IsSlug())
             {
                 errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
+            }
+
+            if (Properties == null)
+            {
+                errors.Add(new ValidationError("Properties must be specified", nameof(Properties)));
             }
         }
     }
