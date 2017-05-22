@@ -42,8 +42,6 @@ namespace Squidex.Write.Apps
 
         public AppCommandHandlerTests()
         {
-            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
-
             app = new AppDomainObject(AppId, -1);
 
             sut = new AppCommandHandler(Handler, appRepository.Object, appLimitsProvider.Object, userRepository.Object, keyGenerator.Object);
@@ -101,6 +99,8 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_throw_if_reached_max_contributor_size()
         {
+            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
+
             CreateApp()
                 .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "1" }))
                 .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "2" }));
@@ -133,6 +133,8 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_should_assign_if_user_found()
         {
+            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
+
             CreateApp();
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });

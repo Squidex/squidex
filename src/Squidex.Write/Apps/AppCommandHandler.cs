@@ -85,7 +85,7 @@ namespace Squidex.Write.Apps
 
                 a.AssignContributor(command);
 
-                if (a.ContributorCount > oldContributors && a.ContributorCount > maxContributors)
+                if (maxContributors > 0 && a.ContributorCount > oldContributors && a.ContributorCount > maxContributors)
                 {
                     var error = new ValidationError("You have reached your max number of contributors");
 
