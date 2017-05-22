@@ -20,6 +20,17 @@
         </span>
 	</div>
 
+    <div>
+        <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
+            Import schema
+        </button>
+        <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
+            Hide
+        </button>
+
+        <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
+    </div>
+
     <div class="form-group clearfix">
         <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
         <button type="submit" class="float-right btn btn-success">Create</button>

@@ -35,7 +35,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void Create_should_throw_if_created()
+        public void Create_should_throw_exception_if_created()
         {
             CreateApp();
 
@@ -46,7 +46,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void Create_should_throw_if_command_is_not_valid()
+        public void Create_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -70,7 +70,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_if_not_created()
+        public void AssignContributor_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -79,7 +79,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_if_command_is_not_valid()
+        public void AssignContributor_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -88,7 +88,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_if_single_owner_becomes_non_owner()
+        public void AssignContributor_should_throw_exception_if_single_owner_becomes_non_owner()
         {
             CreateApp();
 
@@ -99,7 +99,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_if_user_already_contributor()
+        public void AssignContributor_should_throw_exception_if_user_already_contributor()
         {
             CreateApp();
             sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
@@ -124,7 +124,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_if_not_created()
+        public void RemoveContributor_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -133,7 +133,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_if_command_is_not_valid()
+        public void RemoveContributor_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -142,7 +142,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_if_all_owners_removed()
+        public void RemoveContributor_should_throw_exception_if_all_owners_removed()
         {
             CreateApp();
 
@@ -153,7 +153,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_if_contributor_not_found()
+        public void RemoveContributor_should_throw_exception_if_contributor_not_found()
         {
             CreateApp();
 
@@ -178,7 +178,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AttachClient_should_throw_if_not_created()
+        public void AttachClient_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -187,7 +187,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AttachClient_should_throw_if_command_is_not_valid()
+        public void AttachClient_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -203,7 +203,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AttachClient_should_throw_if_id_already_exists()
+        public void AttachClient_should_throw_exception_if_id_already_exists()
         {
             CreateApp();
 
@@ -229,7 +229,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RevokeClient_should_throw_if_not_created()
+        public void RevokeClient_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -238,7 +238,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RevokeClient_should_throw_if_command_is_not_valid()
+        public void RevokeClient_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -254,7 +254,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RevokeClient_should_throw_if_client_not_found()
+        public void RevokeClient_should_throw_exception_if_client_not_found()
         {
             CreateApp();
 
@@ -279,7 +279,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RenameClient_should_throw_if_not_created()
+        public void RenameClient_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -288,7 +288,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RenameClient_should_throw_if_command_is_not_valid()
+        public void RenameClient_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -304,7 +304,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RenameClient_should_throw_if_client_not_found()
+        public void RenameClient_should_throw_exception_if_client_not_found()
         {
             CreateApp();
 
@@ -315,7 +315,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RenameClient_should_throw_if_same_client_name()
+        public void RenameClient_should_throw_exception_if_same_client_name()
         {
             CreateApp();
             CreateClient();
@@ -343,7 +343,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AddLanguage_should_throw_if_not_created()
+        public void AddLanguage_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -352,7 +352,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AddLanguage_should_throw_if_command_is_not_valid()
+        public void AddLanguage_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -363,7 +363,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void AddLanguage_should_throw_if_language_already_exists()
+        public void AddLanguage_should_throw_exception_if_language_already_exists()
         {
             CreateApp();
 
@@ -387,7 +387,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveLanguage_should_throw_if_not_created()
+        public void RemoveLanguage_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -396,7 +396,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveLanguage_should_throw_if_command_is_not_valid()
+        public void RemoveLanguage_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -407,7 +407,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveLanguage_should_throw_if_language_not_found()
+        public void RemoveLanguage_should_throw_exception_if_language_not_found()
         {
             CreateApp();
 
@@ -418,7 +418,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void RemoveLanguage_should_throw_if_master_language()
+        public void RemoveLanguage_should_throw_exception_if_master_language()
         {
             CreateApp();
 
@@ -443,7 +443,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void UpdateLanguage_should_throw_if_not_created()
+        public void UpdateLanguage_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -452,7 +452,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void UpdateLanguage_should_throw_if_command_is_not_valid()
+        public void UpdateLanguage_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
@@ -463,7 +463,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void UpdateLanguage_should_throw_if_language_not_found()
+        public void UpdateLanguage_should_throw_exception_if_language_not_found()
         {
             CreateApp();
 
@@ -474,7 +474,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public void UpdateLanguage_should_throw_if_master_language()
+        public void UpdateLanguage_should_throw_exception_if_master_language()
         {
             CreateApp();
 

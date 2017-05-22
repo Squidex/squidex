@@ -48,7 +48,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task Create_should_throw_if_a_name_with_same_name_already_exists()
+        public async Task Create_should_throw_exception_if_a_name_with_same_name_already_exists()
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
@@ -82,7 +82,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task AssignContributor_should_throw_if_user_not_found()
+        public async Task AssignContributor_should_throw_exception_if_user_not_found()
         {
             CreateApp();
 
@@ -97,7 +97,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task AssignContributor_throw_if_reached_max_contributor_size()
+        public async Task AssignContributor_throw_exception_if_reached_max_contributor_size()
         {
             appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
 
@@ -116,7 +116,7 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task AssignContributor_should_throw_if_null_user_not_found()
+        public async Task AssignContributor_should_throw_exception_if_null_user_not_found()
         {
             CreateApp();
 

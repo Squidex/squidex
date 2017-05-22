@@ -42,7 +42,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Create_should_throw_if_created()
+        public void Create_should_throw_exception_if_created()
         {
             sut.Create(new CreateContent { Data = data });
 
@@ -53,7 +53,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Create_should_throw_if_command_is_not_valid()
+        public void Create_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -85,7 +85,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Update_should_throw_if_not_created()
+        public void Update_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -94,7 +94,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Update_should_throw_if_content_is_deleted()
+        public void Update_should_throw_exception_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -106,7 +106,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Update_should_throw_if_command_is_not_valid()
+        public void Update_should_throw_exception_if_command_is_not_valid()
         {
             CreateContent();
 
@@ -141,7 +141,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Patch_should_throw_if_not_created()
+        public void Patch_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -150,7 +150,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Patch_should_throw_if_content_is_deleted()
+        public void Patch_should_throw_exception_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -162,7 +162,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Patch_should_throw_if_command_is_not_valid()
+        public void Patch_should_throw_exception_if_command_is_not_valid()
         {
             CreateContent();
 
@@ -197,7 +197,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Publish_should_throw_if_not_created()
+        public void Publish_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -206,7 +206,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Publish_should_throw_if_content_is_deleted()
+        public void Publish_should_throw_exception_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -233,7 +233,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Unpublish_should_throw_if_not_created()
+        public void Unpublish_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -242,7 +242,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Unpublish_should_throw_if_content_is_deleted()
+        public void Unpublish_should_throw_exception_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
@@ -270,7 +270,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Delete_should_throw_if_not_created()
+        public void Delete_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -279,7 +279,7 @@ namespace Squidex.Write.Contents
         }
 
         [Fact]
-        public void Delete_should_throw_if_already_deleted()
+        public void Delete_should_throw_exception_if_already_deleted()
         {
             CreateContent();
             DeleteContent();

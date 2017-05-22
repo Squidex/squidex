@@ -47,7 +47,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_creating_schema_with_invalid_name()
+        public void Should_throw_exception_if_creating_schema_with_invalid_name()
         {
             Assert.Throws<ValidationException>(() => Schema.Create("Invalid Name", new SchemaProperties()));
         }
@@ -71,7 +71,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_adding_field_with_name_that_already_exists()
+        public void Should_throw_exception_if_adding_field_with_name_that_already_exists()
         {
             AddField();
 
@@ -90,7 +90,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_hide_does_not_exist()
+        public void Should_throw_exception_if_field_to_hide_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.HideField(1));
         }
@@ -108,7 +108,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_show_does_not_exist()
+        public void Should_throw_exception_if_field_to_show_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.ShowField(2));
         }
@@ -125,7 +125,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_disable_does_not_exist()
+        public void Should_throw_exception_if_field_to_disable_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.DisableField(1));
         }
@@ -143,7 +143,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_enable_does_not_exist()
+        public void Should_throw_exception_if_field_to_enable_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.EnableField(1));
         }
@@ -159,7 +159,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_new_field_already_exists()
+        public void Should_throw_exception_if_new_field_already_exists()
         {
             AddField();
 
@@ -169,7 +169,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_new_field_name_is_not_valid()
+        public void Should_throw_exception_if_new_field_name_is_not_valid()
         {
             AddField();
 
@@ -177,7 +177,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_rename_does_not_exist()
+        public void Should_throw_exception_if_field_to_rename_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.RenameField(1, "new-name"));
         }
@@ -193,7 +193,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_not_throw_if_field_to_delete_does_not_exist()
+        public void Should_not_throw_exception_if_field_to_delete_does_not_exist()
         {
             sut.DeleteField(1);
         }
@@ -209,7 +209,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_updating_field_with_invalid_property_type()
+        public void Should_throw_exception_if_updating_field_with_invalid_property_type()
         {
             AddField();
 
@@ -217,7 +217,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_update_does_not_exist()
+        public void Should_throw_exception_if_field_to_update_does_not_exist()
         {
             Assert.Throws<DomainObjectNotFoundException>(() => sut.UpdateField(1, new NumberFieldProperties()));
         }
@@ -231,7 +231,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_schema_is_already_published()
+        public void Should_throw_exception_if_schema_is_already_published()
         {
             sut = sut.Publish();
 
@@ -248,7 +248,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_schema_is_not_published()
+        public void Should_throw_exception_if_schema_is_not_published()
         {
             Assert.Throws<DomainException>(() => sut.Unpublish());
         }
@@ -269,7 +269,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_not_all_fields_are_covered_for_reordering()
+        public void Should_throw_exception_if_not_all_fields_are_covered_for_reordering()
         {
             var field1 = new StringField(1, "1", Partitioning.Invariant);
             var field2 = new StringField(2, "2", Partitioning.Invariant);
@@ -281,7 +281,7 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_if_field_to_reorder_does_not_exist()
+        public void Should_throw_exception_if_field_to_reorder_does_not_exist()
         {
             var field1 = new StringField(1, "1", Partitioning.Invariant);
             var field2 = new StringField(2, "2", Partitioning.Invariant);

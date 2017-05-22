@@ -139,7 +139,7 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntityWithSchema, Task> action)
+        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
         {
             var collection = GetCollection(schemaId);
 

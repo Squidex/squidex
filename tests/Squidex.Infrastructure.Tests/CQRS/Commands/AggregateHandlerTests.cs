@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public Task Create_async_should_throw_if_not_aggregate_command()
+        public Task Create_async_should_throw_exception_if_not_aggregate_command()
         {
             return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
         }
@@ -139,7 +139,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public Task Update_async_should_throw_if_not_aggregate_command()
+        public Task Update_async_should_throw_exception_if_not_aggregate_command()
         {
             return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
         }

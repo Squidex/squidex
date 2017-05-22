@@ -20,6 +20,7 @@ import {
     FieldDto,
     SchemaDetailsDto,
     SchemaDto,
+    SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
     UpdateSchemaDto,
@@ -49,7 +50,10 @@ describe('SchemasService', () => {
                             {
                                 id: 'id1',
                                 name: 'name1',
-                                label: 'label1',
+                                properties: {
+                                    label: 'label1',
+                                    hints: 'hints1'
+                                },
                                 isPublished: true,
                                 created: '2016-12-12T10:10',
                                 createdBy: 'Created1',
@@ -61,7 +65,10 @@ describe('SchemasService', () => {
                             {
                                 id: 'id2',
                                 name: 'name2',
-                                label: 'label2',
+                                properties: {
+                                    label: 'label2',
+                                    hints: 'hints2'
+                                },
                                 isPublished: true,
                                 created: '2016-10-12T10:10',
                                 createdBy: 'Created2',
@@ -83,11 +90,11 @@ describe('SchemasService', () => {
         }).unsubscribe();
 
         expect(schemas).toEqual([
-            new SchemaDto('id1', 'name1', 'label1', true, 'Created1', 'LastModifiedBy1',
+            new SchemaDto('id1', 'name1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('11')),
-            new SchemaDto('id2', 'name2', 'label2', true, 'Created2', 'LastModifiedBy2',
+            new SchemaDto('id2', 'name2', new SchemaPropertiesDto('label2', 'hints2'), true, 'Created2', 'LastModifiedBy2',
                 DateTime.parseISO_UTC('2016-10-12T10:10'),
                 DateTime.parseISO_UTC('2017-10-12T10:10'),
                 new Version('22'))
@@ -104,8 +111,10 @@ describe('SchemasService', () => {
                         body: {
                             id: 'id1',
                             name: 'name1',
-                            label: 'label1',
-                            hints: 'hints1',
+                            properties: {
+                                label: 'label1',
+                                hints: 'hints1'
+                            },
                             isPublished: true,
                             created: '2016-12-12T10:10',
                             createdBy: 'Created1',
@@ -197,7 +206,7 @@ describe('SchemasService', () => {
         }).unsubscribe();
 
         expect(schema).toEqual(
-            new SchemaDetailsDto('id1', 'name1', 'label1', 'hints1', true, 'Created1', 'LastModifiedBy1',
+            new SchemaDetailsDto('id1', 'name1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('11'),

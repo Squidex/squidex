@@ -63,13 +63,13 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_throw_if_setting_unknown_property()
+        public void Should_throw_exception_if_setting_unknown_property()
         {
             Assert.Throws<ArgumentException>(() => accessor.SetValue(target, "Unknown", 123));
         }
 
         [Fact]
-        public void Should_throw_if_setting_readonly()
+        public void Should_throw_exception_if_setting_readonly()
         {
             Assert.Throws<NotSupportedException>(() => accessor.SetValue(target, "Read", 123));
         }
@@ -91,13 +91,13 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_throw_if_getting_unknown_property()
+        public void Should_throw_exception_if_getting_unknown_property()
         {
             Assert.Throws<ArgumentException>(() => accessor.GetValue(target, "Unknown"));
         }
 
         [Fact]
-        public void Should_throw_if_getting_readonly_property()
+        public void Should_throw_exception_if_getting_readonly_property()
         {
             Assert.Throws<NotSupportedException>(() => accessor.GetValue(target, "Write"));
         }

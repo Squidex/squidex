@@ -90,6 +90,8 @@ namespace Squidex.Core.Schemas
 
         public Field CreateField(long id, string name, Partitioning partitioning, FieldProperties properties)
         {
+            Guard.NotNull(properties, nameof(properties));
+
             var registered = fieldsByPropertyType.GetOrDefault(properties.GetType());
 
             if (registered == null)

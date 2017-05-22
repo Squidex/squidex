@@ -39,12 +39,12 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public async Task Create_should_throw_if_a_name_with_same_name_already_exists()
+        public async Task Create_should_throw_exception_if_a_name_with_same_name_already_exists()
         {
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
-                .Returns(Task.FromResult(new Mock<ISchemaEntityWithSchema>().Object))
+                .Returns(Task.FromResult(new Mock<ISchemaEntity>().Object))
                 .Verifiable();
 
             await TestCreate(schema, async _ =>
@@ -61,7 +61,7 @@ namespace Squidex.Write.Schemas
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             schemaProvider.Setup(x => x.FindSchemaByNameAsync(AppId, SchemaName))
-                .Returns(Task.FromResult<ISchemaEntityWithSchema>(null))
+                .Returns(Task.FromResult<ISchemaEntity>(null))
                 .Verifiable();
 
             await TestCreate(schema, async _ =>

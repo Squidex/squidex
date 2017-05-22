@@ -136,7 +136,7 @@ function updateSchema(schema: SchemaDto, authService: AuthService, message: Sche
     return new SchemaDto(
         schema.id,
         schema.name,
-        message.label,
+        message.properties,
         message.isPublished,
         schema.createdBy, me,
         schema.created, DateTime.now(),

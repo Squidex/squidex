@@ -30,7 +30,7 @@
                     <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
                         <div class="row">
                             <div class="col col-4">
-                                <span class="schema-name">{{schema|displayName}}</span> 
+                                <span class="schema-name">{{schema | displayName:'properties.label':'name'}}</span> 
                             </div>
                             <div class="col col-4">
                                 <span class="schema-user">

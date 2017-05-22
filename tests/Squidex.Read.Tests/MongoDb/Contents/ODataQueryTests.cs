@@ -57,7 +57,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
-            var schemaEntity = new Mock<ISchemaEntityWithSchema>();
+            var schemaEntity = new Mock<ISchemaEntity>();
             schemaEntity.Setup(x => x.Id).Returns(Guid.NewGuid());
             schemaEntity.Setup(x => x.Version).Returns(3);
             schemaEntity.Setup(x => x.Schema).Returns(schema);

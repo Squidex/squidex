@@ -32,7 +32,7 @@ namespace Squidex.Write.Contents
         private readonly ContentDomainObject content;
         private readonly Mock<ISchemaProvider> schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IAppProvider> appProvider = new Mock<IAppProvider>();
-        private readonly Mock<ISchemaEntityWithSchema> schemaEntity = new Mock<ISchemaEntityWithSchema>();
+        private readonly Mock<ISchemaEntity> schemaEntity = new Mock<ISchemaEntity>();
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
         private readonly ContentData data = new ContentData().AddField("my-field", new ContentFieldData().SetValue(1));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);

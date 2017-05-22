@@ -37,7 +37,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Create_should_throw_if_created()
+        public void Create_should_throw_exception_if_created()
         {
             sut.Create(new CreateSchema { Name = SchemaName });
 
@@ -48,11 +48,32 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Create_should_throw_if_command_is_not_valid()
+        public void Create_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
                 sut.Create(CreateCommand(new CreateSchema()));
+            });
+        }
+
+        [Fact]
+        public void Create_should_throw_exception_if_fields_are_not_valid()
+        {
+            var properties = new SchemaProperties();
+
+            var fields = new List<CreateSchemaField>
+            {
+                new CreateSchemaField
+                {
+                    Name = null,
+                    Properties = null,
+                    Partitioning = "invalid"
+                }
+            };
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
             });
         }
 
@@ -67,12 +88,31 @@ namespace Squidex.Write.Schemas
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Name = SchemaName, Properties = properties })
+                    CreateEvent(new SchemaCreated { Name = SchemaName, Properties = properties, Fields = new List<SchemaCreatedField>() })
                 );
         }
 
         [Fact]
-        public void Update_should_throw_if_not_created()
+        public void Create_should_create_schema_with_initial_fields()
+        {
+            var properties = new SchemaProperties();
+
+            var fields = new List<CreateSchemaField>
+            {
+                new CreateSchemaField { Name = "field1", Properties = new GeolocationFieldProperties() },
+                new CreateSchemaField { Name = "field2", Properties = new StringFieldProperties() }
+            };
+
+            sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields  }));
+
+            var @event = (SchemaCreated)sut.GetUncomittedEvents().Single().Payload;
+
+            Assert.Equal(SchemaName, sut.Schema.Name);
+            Assert.Equal(2, @event.Fields.Count);
+        }
+
+        [Fact]
+        public void Update_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -81,7 +121,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Update_should_throw_if_schema_is_deleted()
+        public void Update_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -93,7 +133,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Update_should_throw_if_command_is_not_valid()
+        public void Update_should_throw_exception_if_command_is_not_valid()
         {
             CreateSchema();
 
@@ -121,7 +161,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Reorder_should_throw_if_not_created()
+        public void Reorder_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -130,7 +170,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Reorder_should_throw_if_schema_is_deleted()
+        public void Reorder_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -142,7 +182,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Reorder_should_throw_if_command_is_not_valid()
+        public void Reorder_should_throw_exception_if_command_is_not_valid()
         {
             CreateSchema();
 
@@ -173,7 +213,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Publish_should_throw_if_not_created()
+        public void Publish_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -182,7 +222,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Publish_should_throw_if_schema_is_deleted()
+        public void Publish_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -209,7 +249,7 @@ namespace Squidex.Write.Schemas
         }
     
         [Fact]
-        public void Unpublish_should_throw_if_not_created()
+        public void Unpublish_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -218,7 +258,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Unpublish_should_throw_if_schema_is_deleted()
+        public void Unpublish_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -246,7 +286,7 @@ namespace Squidex.Write.Schemas
         }
     
         [Fact]
-        public void Delete_should_throw_if_not_created()
+        public void Delete_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -255,7 +295,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void Delete_should_throw_if_already_deleted()
+        public void Delete_should_throw_exception_if_already_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -282,7 +322,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void AddField_should_throw_if_not_created()
+        public void AddField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -291,7 +331,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void AddField_should_throw_if_command_is_not_valid()
+        public void AddField_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -300,7 +340,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void AddField_should_throw_if_command_contains_invalid_partitioning()
+        public void AddField_should_throw_exception_if_command_contains_invalid_partitioning()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -309,7 +349,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void AddField_should_throw_if_schema_is_deleted()
+        public void AddField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -338,7 +378,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void UpdateField_should_throw_if_not_created()
+        public void UpdateField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -347,7 +387,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void UpdateField_should_throw_if_command_is_not_valid()
+        public void UpdateField_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -356,7 +396,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void UpdateField_should_throw_if_field_is_not_found()
+        public void UpdateField_should_throw_exception_if_field_is_not_found()
         {
             CreateSchema();
 
@@ -367,7 +407,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void UpdateField_should_throw_if_schema_is_deleted()
+        public void UpdateField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -397,7 +437,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void HideField_should_throw_if_not_created()
+        public void HideField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -406,7 +446,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void HideField_should_throw_if_field_is_not_found()
+        public void HideField_should_throw_exception_if_field_is_not_found()
         {
             CreateSchema();
 
@@ -417,7 +457,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void HideField_should_throw_if_schema_is_deleted()
+        public void HideField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -445,7 +485,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void ShowField_should_throw_if_not_created()
+        public void ShowField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -454,7 +494,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void ShowField_should_throw_if_field_is_not_found()
+        public void ShowField_should_throw_exception_if_field_is_not_found()
         {
             CreateSchema();
 
@@ -465,7 +505,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void ShowField_should_throw_if_schema_is_deleted()
+        public void ShowField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -494,7 +534,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void DisableField_should_throw_if_not_created()
+        public void DisableField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -503,7 +543,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void DisableField_should_throw_if_field_is_not_found()
+        public void DisableField_should_throw_exception_if_field_is_not_found()
         {
             CreateSchema();
 
@@ -514,7 +554,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void DisableField_should_throw_if_schema_is_deleted()
+        public void DisableField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -542,7 +582,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void EnableField_should_throw_if_not_created()
+        public void EnableField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -551,7 +591,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void EnableField_should_throw_if_field_is_not_found()
+        public void EnableField_should_throw_exception_if_field_is_not_found()
         {
             CreateSchema();
 
@@ -562,7 +602,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void EnableField_should_throw_if_schema_is_deleted()
+        public void EnableField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -591,7 +631,7 @@ namespace Squidex.Write.Schemas
         }
         
         [Fact]
-        public void DeleteField_should_throw_if_not_created()
+        public void DeleteField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -600,7 +640,7 @@ namespace Squidex.Write.Schemas
         }
 
         [Fact]
-        public void DeleteField_should_throw_if_schema_is_deleted()
+        public void DeleteField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();

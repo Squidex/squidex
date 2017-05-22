@@ -1,33 +1,27 @@
 ﻿// ==========================================================================
-//  CreateSchemaDto.cs
+//  SchemaPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public sealed class CreateSchemaDto
+    public class SchemaPropertiesDto
     {
         /// <summary>
-        /// The name of the schema.
+        /// Optional label for the editor.
         /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
-        public string Name { get; set; }
+        [StringLength(100)]
+        public string Label { get; set; }
 
         /// <summary>
-        /// The optional properties.
+        /// Hints to describe the schema.
         /// </summary>
-        public SchemaPropertiesDto Properties { get; set; }
-
-        /// <summary>
-        /// Optional fields.
-        /// </summary>
-        public List<CreateSchemaFieldDto> Fields { get; set; }
+        [StringLength(1000)]
+        public string Hints { get; set; }
     }
 }
