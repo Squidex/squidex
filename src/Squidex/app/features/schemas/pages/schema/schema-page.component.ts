@@ -22,13 +22,13 @@ import {
     ModalView,
     NotificationService,
     SchemaDetailsDto,
+    SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
     ValidatorsEx,
     Version
 } from 'shared';
 
-import { SchemaPropertiesDto } from './schema-properties';
 import { SchemaDeleted, SchemaUpdated } from './../messages';
 
 @Component({
@@ -51,10 +51,11 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     ];
 
     public schemaExport: any;
-    public schemaFields = ImmutableArray.empty<FieldDto>();
     public schemaName: string;
-    public schemaProperties: SchemaPropertiesDto;
+    public schemaFields = ImmutableArray.empty<FieldDto>();
     public schemaVersion = new Version('');
+    public schemaProperties: SchemaPropertiesDto;
+    public schemaInformation: any;
 
     public confirmDeleteDialog = new ModalView();
 
@@ -99,8 +100,9 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             .subscribe((schema: SchemaDetailsDto) => {
                 this.schemaName = schema.name;
                 this.schemaFields = ImmutableArray.of(schema.fields);
-                this.schemaProperties = new SchemaPropertiesDto(schema.name, schema.label, schema.hints);
                 this.schemaVersion = schema.version;
+                this.schemaProperties = schema.properties;
+                this.schemaInformation = { properties: schema.properties, name: schema.name };
 
                 this.isPublished = schema.isPublished;
 
@@ -269,6 +271,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     private updateProperties(properties: SchemaPropertiesDto) {
         this.schemaProperties = properties;
+        this.schemaInformation = { properties: properties, name: this.schemaName };
 
         this.notify();
         this.export();
@@ -304,15 +307,16 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 }
 
                 return copy;
-            })
+            }),
+            properties: {}
         };
 
         if (this.schemaProperties.label) {
-            result.label = this.schemaProperties.label;
+            result.properties.label = this.schemaProperties.label;
         }
 
         if (this.schemaProperties.hints) {
-            result.hints = this.schemaProperties.hints;
+            result.properties.hints = this.schemaProperties.hints;
         }
 
         this.schemaExport = result;
@@ -320,7 +324,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     private notify() {
         this.messageBus.publish(new HistoryChannelUpdated());
-        this.messageBus.publish(new SchemaUpdated(this.schemaName, this.schemaProperties.label, this.isPublished, this.schemaVersion.value));
+        this.messageBus.publish(new SchemaUpdated(this.schemaName, this.schemaProperties, this.isPublished, this.schemaVersion.value));
     }
 }
 

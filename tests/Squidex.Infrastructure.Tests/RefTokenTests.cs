@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure
         [InlineData(" ")]
         [InlineData(":")]
         [InlineData("user")]
-        public void Should_throw_if_parsing_invalid_input(string input)
+        public void Should_throw_exception_if_parsing_invalid_input(string input)
         {
             Assert.Throws<ArgumentException>(() => RefToken.Parse(input));
         }

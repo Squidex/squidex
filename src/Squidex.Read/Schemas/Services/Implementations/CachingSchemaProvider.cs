@@ -45,11 +45,11 @@ namespace Squidex.Read.Schemas.Services.Implementations
             this.repository = repository;
         }
 
-        public async Task<ISchemaEntityWithSchema> FindSchemaByIdAsync(Guid id, bool provideDeleted = false)
+        public async Task<ISchemaEntity> FindSchemaByIdAsync(Guid id, bool provideDeleted = false)
         {
             var cacheKey = BuildIdCacheKey(id);
 
-            if (!Cache.TryGetValue(cacheKey, out ISchemaEntityWithSchema result))
+            if (!Cache.TryGetValue(cacheKey, out ISchemaEntity result))
             {
                 result = await repository.FindSchemaAsync(id);
 
@@ -69,13 +69,13 @@ namespace Squidex.Read.Schemas.Services.Implementations
             return result;
         }
 
-        public async Task<ISchemaEntityWithSchema> FindSchemaByNameAsync(Guid appId, string name)
+        public async Task<ISchemaEntity> FindSchemaByNameAsync(Guid appId, string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var cacheKey = BuildNameCacheKey(appId, name);
 
-            if (!Cache.TryGetValue(cacheKey, out ISchemaEntityWithSchema result))
+            if (!Cache.TryGetValue(cacheKey, out ISchemaEntity result))
             {
                 result = await repository.FindSchemaAsync(appId, name);
 

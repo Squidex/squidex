@@ -59,7 +59,7 @@ export class SchemaDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly label: string | null,
+        public readonly properties: SchemaPropertiesDto,
         public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
@@ -74,8 +74,7 @@ export class SchemaDetailsDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly label: string,
-        public readonly hints: string,
+        public readonly properties: SchemaPropertiesDto,
         public readonly isPublished: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
@@ -194,6 +193,14 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
+export class SchemaPropertiesDto {
+    constructor(
+        public readonly label: string,
+        public readonly hints: string
+    ) {
+    }
+}
+
 export class UpdateSchemaDto {
     constructor(
         public readonly label?: string,
@@ -242,10 +249,11 @@ export class SchemasService {
                     const items: any[] = response;
 
                     return items.map(item => {
+                        const properties = new SchemaPropertiesDto(item.properties.label, item.properties.hints);
+
                         return new SchemaDto(
                             item.id,
-                            item.name,
-                            item.label,
+                            item.name, properties,
                             item.isPublished,
                             item.createdBy,
                             item.lastModifiedBy,
@@ -278,11 +286,11 @@ export class SchemasService {
                             propertiesDto);
                     });
 
+                    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
+
                     return new SchemaDetailsDto(
                         response.id,
-                        response.name,
-                        response.label,
-                        response.hints,
+                        response.name, properties,
                         response.isPublished,
                         response.createdBy,
                         response.lastModifiedBy,

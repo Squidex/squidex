@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public Task Should_throw_if_tracking_on_disposed_object()
+        public Task Should_throw_exception_if_tracking_on_disposed_object()
         {
             sut.Dispose();
 
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public Task Should_throw_if_querying_on_disposed_object()
+        public Task Should_throw_exception_if_querying_on_disposed_object()
         {
             sut.Dispose();
 
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public Task Should_throw_if_querying_montly_usage_on_disposed_object()
+        public Task Should_throw_exception_if_querying_montly_usage_on_disposed_object()
         {
             sut.Dispose();
 

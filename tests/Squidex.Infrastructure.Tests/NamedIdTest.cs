@@ -126,20 +126,20 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_if_string_id_is_not_valid()
+        public void Should_throw_exception_if_string_id_is_not_valid()
         {
             JsonHelper.DoesNotDeserialize<NamedId<string>>("123", new NamedStringIdConverter());
         }
 
         [Fact]
-        public void Should_throw_if_long_id_is_not_valid()
+        public void Should_throw_exception_if_long_id_is_not_valid()
         {
             JsonHelper.DoesNotDeserialize<NamedId<long>>("123", new NamedLongIdConverter());
             JsonHelper.DoesNotDeserialize<NamedId<long>>("invalid-long,name", new NamedLongIdConverter());
         }
 
         [Fact]
-        public void Should_throw_if_guid_id_is_not_valid()
+        public void Should_throw_exception_if_guid_id_is_not_valid()
         {
             JsonHelper.DoesNotDeserialize<NamedId<Guid>>("123", new NamedGuidIdConverter());
             JsonHelper.DoesNotDeserialize<NamedId<Guid>>("invalid-guid,name", new NamedGuidIdConverter());

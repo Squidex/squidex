@@ -19,19 +19,19 @@ namespace Squidex.Infrastructure
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
-        public void Should_throw_if_getting_by_empty_key(string key)
+        public void Should_throw_exception_if_getting_by_empty_key(string key)
         {
             Assert.Throws<ArgumentException>(() => Language.GetLanguage(key));
         }
 
         [Fact]
-        public void Should_throw_if_getting_by_null_key()
+        public void Should_throw_exception_if_getting_by_null_key()
         {
             Assert.Throws<ArgumentNullException>(() => Language.GetLanguage(null));
         }
 
         [Fact]
-        public void Should_throw_if_getting_by_unsupported_language()
+        public void Should_throw_exception_if_getting_by_unsupported_language()
         {
             Assert.Throws<NotSupportedException>(() => Language.GetLanguage("xy"));
         }

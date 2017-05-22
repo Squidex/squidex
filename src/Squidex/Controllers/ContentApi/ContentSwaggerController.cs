@@ -56,7 +56,7 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
            
-            var schemas = await schemaRepository.QueryAllWithSchemaAsync(appEntity.Id);
+            var schemas = await schemaRepository.QueryAllAsync(appEntity.Id);
             
             var swaggerDocument = await schemasSwaggerGenerator.Generate(appEntity, schemas);
 

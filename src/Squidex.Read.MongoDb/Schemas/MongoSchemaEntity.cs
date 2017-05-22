@@ -17,17 +17,13 @@ using Squidex.Read.Schemas;
 
 namespace Squidex.Read.MongoDb.Schemas
 {
-    public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntityWithSchema
+    public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntity
     {
         private Lazy<Schema> schema;
 
         [BsonRequired]
         [BsonElement]
         public string Name { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public string Label { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -57,15 +53,13 @@ namespace Squidex.Read.MongoDb.Schemas
         [BsonElement]
         public bool IsDeleted { get; set; }
 
-        Schema ISchemaEntityWithSchema.Schema
+        Schema ISchemaEntity.Schema
         {
             get { return schema.Value; }
         }
 
         public void SerializeSchema(Schema newSchema, SchemaJsonSerializer serializer)
         {
-            Label = newSchema.Properties.Label ?? newSchema.Name;
-
             Schema = serializer.Serialize(newSchema).ToString();
             schema = new Lazy<Schema>(() => newSchema);
 

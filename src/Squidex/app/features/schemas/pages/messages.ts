@@ -5,10 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { SchemaPropertiesDto } from 'shared';
+
 export class SchemaUpdated {
     constructor(
         public readonly name: string,
-        public readonly label: string,
+        public readonly properties: SchemaPropertiesDto,
         public readonly isPublished: boolean,
         public readonly version: string
     ) {

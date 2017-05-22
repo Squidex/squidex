@@ -12,6 +12,9 @@ using System.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Schemas;
+using Squidex.Write.Schemas.Commands;
+
+// ReSharper disable InvertIf
 
 namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
@@ -49,13 +52,24 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
         };
 
-        public static SchemaDetailsDto ToModel(this ISchemaEntityWithSchema entity)
+        public static SchemaDto ToModel(this ISchemaEntity entity)
         {
-            var dto = new SchemaDetailsDto();
+            var dto = new SchemaDto { Properties = new SchemaPropertiesDto() };
 
             SimpleMapper.Map(entity, dto);
             SimpleMapper.Map(entity.Schema, dto);
-            SimpleMapper.Map(entity.Schema.Properties, dto);
+            SimpleMapper.Map(entity.Schema.Properties, dto.Properties);
+
+            return dto;
+        }
+
+        public static SchemaDetailsDto ToDetailsModel(this ISchemaEntity entity)
+        {
+            var dto = new SchemaDetailsDto { Properties = new SchemaPropertiesDto() };
+
+            SimpleMapper.Map(entity, dto);
+            SimpleMapper.Map(entity.Schema, dto);
+            SimpleMapper.Map(entity.Schema.Properties, dto.Properties);
 
             dto.Fields = new List<FieldDto>();
 
@@ -74,6 +88,31 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
 
             return dto;
+        }
+
+        public static CreateSchema ToCommand(this CreateSchemaDto dto)
+        {
+            var command = new CreateSchema();
+
+            SimpleMapper.Map(dto, command);
+
+            if (dto.Properties != null)
+            {
+                SimpleMapper.Map(dto.Properties, command.Properties);
+            }
+
+            if (dto.Fields != null)
+            {
+                foreach (var fieldDto in dto.Fields)
+                {
+                    var fieldProperties = fieldDto?.Properties.ToProperties();
+                    var fieldInstance = SimpleMapper.Map(fieldDto, new CreateSchemaField { Properties = fieldProperties });
+
+                    command.Fields.Add(fieldInstance);
+                }
+            }
+
+            return command;
         }
 
         private static FieldPropertiesDto Convert(BooleanFieldProperties source)

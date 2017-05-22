@@ -11,10 +11,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     ApiUrlConfig,
     AuthService,
-    CreateSchemaDto,
     DateTime,
     fadeAnimation,
     SchemaDto,
+    SchemaPropertiesDto,
     SchemasService,
     ValidatorsEx,
     Version
@@ -40,6 +40,8 @@ export class SchemaFormComponent {
     @Output()
     public cancelled = new EventEmitter();
 
+    public showImport = false;
+
     public creationError = '';
     public createFormSubmitted = false;
     public createForm: FormGroup =
@@ -49,7 +51,8 @@ export class SchemaFormComponent {
                     Validators.required,
                     Validators.maxLength(40),
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes only (not at the end).')
-                ]]
+                ]],
+            import: [{}]
         });
 
     public schemaName =
@@ -62,6 +65,12 @@ export class SchemaFormComponent {
         private readonly formBuilder: FormBuilder,
         private readonly authService: AuthService
     ) {
+    }
+
+    public toggleImport() {
+        this.showImport = !this.showImport;
+
+        return false;
     }
 
     public cancel() {
@@ -78,12 +87,14 @@ export class SchemaFormComponent {
             const schemaVersion = new Version();
             const schemaName = this.createForm.get('name')!.value;
 
-            const requestDto = new CreateSchemaDto(schemaName);
+            const requestDto = Object.assign(this.createForm.get('import')!.value || {}, {});
+
+            requestDto.name = schemaName;
 
             this.schemas.postSchema(this.appName, requestDto, schemaVersion)
                 .subscribe(dto => {
                     this.reset();
-                    this.created.emit(this.createSchemaDto(dto.id, schemaName, schemaVersion));
+                    this.created.emit(this.createSchemaDto(dto.id, requestDto.properties || {}, schemaName, schemaVersion));
                 }, error => {
                     this.createForm.enable();
                     this.creationError = error.displayMessage;
@@ -97,10 +108,10 @@ export class SchemaFormComponent {
         this.createFormSubmitted = false;
     }
 
-    private createSchemaDto(id: string, name: string, version: Version) {
+    private createSchemaDto(id: string, properties: SchemaPropertiesDto, name: string, version: Version) {
         const user = this.authService.user!.token;
         const now = DateTime.now();
 
-        return new SchemaDto(id, name, null, false, user, user, now, now, version);
+        return new SchemaDto(id, name, properties, false, user, user, now, now, version);
     }
 }

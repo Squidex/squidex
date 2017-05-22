@@ -1,2 +1,13 @@
 @import '_vars';
 @import '_mixins';
+
+.btn-link {
+    margin-top: -1rem;
+    margin-left: -.5rem;
+}
+
+:host /deep/ .editor {
+    height: 15rem !important;
+    margin-bottom: .5rem;
+    margin-top: 0;
+}

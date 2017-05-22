@@ -55,7 +55,7 @@ namespace Squidex.Controllers.Api.Schemas
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
 
-            var model = schemas.Select(s => SimpleMapper.Map(s, new SchemaDto())).ToList();
+            var model = schemas.Select(s => s.ToModel()).ToList();
 
             return Ok(model);
         }
@@ -82,7 +82,7 @@ namespace Squidex.Controllers.Api.Schemas
                 return NotFound();
             }
 
-            var model = entity.ToModel();
+            var model = entity.ToDetailsModel();
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
-            var command = SimpleMapper.Map(request, new CreateSchema());
+            var command = request.ToCommand();
 
             await CommandBus.PublishAsync(command);
 

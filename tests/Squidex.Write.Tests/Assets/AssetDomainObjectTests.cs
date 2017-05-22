@@ -34,7 +34,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Create_should_throw_if_created()
+        public void Create_should_throw_exception_if_created()
         {
             sut.Create(new CreateAsset { File = file });
 
@@ -65,7 +65,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Update_should_throw_if_not_created()
+        public void Update_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -74,7 +74,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Update_should_throw_if_asset_is_deleted()
+        public void Update_should_throw_exception_if_asset_is_deleted()
         {
             CreateAsset();
             DeleteAsset();
@@ -107,7 +107,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Rename_should_throw_if_not_created()
+        public void Rename_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -116,7 +116,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Rename_should_throw_if_asset_is_deleted()
+        public void Rename_should_throw_exception_if_asset_is_deleted()
         {
             CreateAsset();
             DeleteAsset();
@@ -128,7 +128,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Rename_should_throw_if_command_is_not_valid()
+        public void Rename_should_throw_exception_if_command_is_not_valid()
         {
             CreateAsset();
 
@@ -139,7 +139,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Rename_should_throw_if_new_name_is_equal_to_old_name()
+        public void Rename_should_throw_exception_if_new_name_is_equal_to_old_name()
         {
             CreateAsset();
             
@@ -163,7 +163,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Delete_should_throw_if_not_created()
+        public void Delete_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
@@ -172,7 +172,7 @@ namespace Squidex.Write.Assets
         }
 
         [Fact]
-        public void Delete_should_throw_if_already_deleted()
+        public void Delete_should_throw_exception_if_already_deleted()
         {
             CreateAsset();
             DeleteAsset();

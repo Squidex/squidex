@@ -16,6 +16,7 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Write.Schemas.Commands;
+using System.Collections.Generic;
 
 namespace Squidex.Write.Schemas
 {
@@ -53,7 +54,7 @@ namespace Squidex.Write.Schemas
 
         protected void On(SchemaCreated @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event);
+            schema = SchemaEventDispatcher.Dispatch(@event, registry);
         }
 
         protected void On(FieldUpdated @event)
@@ -111,6 +112,31 @@ namespace Squidex.Write.Schemas
             isDeleted = true;
         }
 
+        public SchemaDomainObject Create(CreateSchema command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot create schema");
+
+            VerifyNotCreated();
+
+            var @event = SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(Id, command.Name) });
+
+            if (command.Fields != null)
+            {
+                @event.Fields = new List<SchemaCreatedField>();
+
+                foreach (var commandField in command.Fields)
+                {
+                    var eventField = SimpleMapper.Map(commandField, new SchemaCreatedField());
+
+                    @event.Fields.Add(eventField);
+                }
+            }
+
+            RaiseEvent(@event);
+
+            return this;
+        }
+
         public SchemaDomainObject AddField(AddField command)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
@@ -129,17 +155,6 @@ namespace Squidex.Write.Schemas
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
-
-            return this;
-        }
-
-        public SchemaDomainObject Create(CreateSchema command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot create schema");
-
-            VerifyNotCreated();
-
-            RaiseEvent(SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(Id, command.Name) }));
 
             return this;
         }

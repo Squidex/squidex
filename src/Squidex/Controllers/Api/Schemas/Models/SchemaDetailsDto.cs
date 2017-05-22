@@ -40,16 +40,10 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public List<FieldDto> Fields { get; set; }
 
         /// <summary>
-        /// Optional label for the editor.
+        /// The schema properties.
         /// </summary>
-        [StringLength(100)]
-        public string Label { get; set; }
-
-        /// <summary>
-        /// Hints to describe the schema.
-        /// </summary>
-        [StringLength(1000)]
-        public string Hints { get; set; }
+        [Required]
+        public SchemaPropertiesDto Properties { get; set; }
 
         /// <summary>
         /// The user that has created the schema.

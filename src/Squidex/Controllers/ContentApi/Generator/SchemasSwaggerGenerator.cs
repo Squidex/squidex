@@ -61,7 +61,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity targetApp, IEnumerable<ISchemaEntityWithSchema> schemas)
+        public async Task<SwaggerDocument> Generate(IAppEntity targetApp, IEnumerable<ISchemaEntity> schemas)
         {
             app = targetApp;
 
@@ -159,7 +159,7 @@ namespace Squidex.Controllers.ContentApi.Generator
             }
         }
 
-        private void GenerateSchemasOperations(IEnumerable<ISchemaEntityWithSchema> schemas)
+        private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas)
         {
             foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
             {

@@ -58,14 +58,14 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_not_throw_if_type_is_already_registered_with_same_name()
+        public void Should_not_throw_exception_if_type_is_already_registered_with_same_name()
         {
             sut.Map(typeof(long), "long");
             sut.Map(typeof(long), "long");
         }
 
         [Fact]
-        public void Should_throw_if_type_is_already_registered()
+        public void Should_throw_exception_if_type_is_already_registered()
         {
             sut.Map(typeof(long), "long");
 
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_if_name_is_already_registered()
+        public void Should_throw_exception_if_name_is_already_registered()
         {
             sut.Map(typeof(short), "short");
 
@@ -81,13 +81,13 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_if_name_is_not_supported()
+        public void Should_throw_exception_if_name_is_not_supported()
         {
             Assert.Throws<TypeNameNotFoundException>(() => sut.GetType("unsupported"));
         }
 
         [Fact]
-        public void Should_throw_if_type_is_not_supported()
+        public void Should_throw_exception_if_type_is_not_supported()
         {
             Assert.Throws<TypeNameNotFoundException>(() => sut.GetName<Guid>());
         }

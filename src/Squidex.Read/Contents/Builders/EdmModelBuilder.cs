@@ -26,7 +26,7 @@ namespace Squidex.Read.Contents.Builders
         {
         }
 
-        public IEdmModel BuildEdmModel(ISchemaEntityWithSchema schemaEntity, IAppEntity app)
+        public IEdmModel BuildEdmModel(ISchemaEntity schemaEntity, IAppEntity app)
         {
             Guard.NotNull(schemaEntity, nameof(schemaEntity));
 

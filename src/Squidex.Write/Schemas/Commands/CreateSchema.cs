@@ -18,13 +18,36 @@ namespace Squidex.Write.Schemas.Commands
 {
     public class CreateSchema : AppCommand, IValidatable, IAggregateCommand
     {
+        private SchemaProperties properties;
+        private SchemaFields fields;
+
         public Guid SchemaId { get; set; }
 
+        public SchemaProperties Properties
+        {
+            get
+            {
+                return properties ?? (properties = new SchemaProperties());
+            }
+            set
+            {
+                properties = value;
+            }
+        }
+
+        public SchemaFields Fields
+        {
+            get
+            {
+                return fields ?? (fields = new SchemaFields());
+            }
+            set
+            {
+                fields = value;
+            }
+        }
+
         public string Name { get; set; }
-
-        public SchemaFields Fields { get; set; } = new SchemaFields();
-
-        public SchemaProperties Properties { get; set; }
 
         Guid IAggregateCommand.AggregateId
         {
@@ -46,6 +69,13 @@ namespace Squidex.Write.Schemas.Commands
             if (Properties == null)
             {
                 errors.Add(new ValidationError("Properties must be specified", nameof(Properties)));
+            }
+
+            var index = 0;
+
+            foreach (var field in Fields)
+            {
+                field.Validate(index++, errors);
             }
         }
     }

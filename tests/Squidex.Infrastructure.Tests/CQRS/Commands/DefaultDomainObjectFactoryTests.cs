@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         [Fact]
-        public void Should_throw_if_new_entity_has_invalid_version()
+        public void Should_throw_exception_if_new_entity_has_invalid_version()
         {
             var serviceProvider = new Mock<IServiceProvider>();
 

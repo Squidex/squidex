@@ -5,7 +5,7 @@
         <div class="panel-title-row">
             <div class="float-right">
                 <button type="button" class="btn btn-link btn-sm btn-export" (click)="exportSchemaDialog.show()">
-                    Export
+                    JSON
                 </button>
 
                 <div class="btn-group btn-group-sm" data-toggle="buttons">
@@ -30,7 +30,7 @@
             </div>
 
             <h3 class="panel-title">
-                {{schemaProperties|displayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
+                {{schemaInformation | displayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
             </h3>
         </div>
 
@@ -132,7 +132,7 @@
             </div>
 
             <div class="modal-body">
-                <sqx-schema-edit-form [appName]="appName() | async" [schema]="schemaProperties" [version]="schemaVersion" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
+                <sqx-schema-edit-form [appName]="appName() | async" [name]="schemaName" [properties]="schemaProperties" [version]="schemaVersion" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>
         </div>
     </div>

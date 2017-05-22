@@ -347,13 +347,13 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Valid_should_throw_if_null()
+        public void Valid_should_throw_exception_if_null()
         {
             Assert.Throws<ArgumentNullException>(() => Guard.Valid(null, "Parameter", () => "Message"));
         }
 
         [Fact]
-        public void Valid_should_throw_if_invalid()
+        public void Valid_should_throw_exception_if_invalid()
         {
             Assert.Throws<ValidationException>(() => Guard.Valid(new MyValidatableInvalid(), "Parameter", () => "Message"));
         }

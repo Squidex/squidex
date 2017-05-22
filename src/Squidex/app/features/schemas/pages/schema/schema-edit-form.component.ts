@@ -11,11 +11,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     Notification,
     NotificationService,
+    SchemaPropertiesDto,
     SchemasService,
     Version
 } from 'shared';
-
-import { SchemaPropertiesDto } from './schema-properties';
 
 @Component({
     selector: 'sqx-schema-edit-form',
@@ -30,7 +29,10 @@ export class SchemaEditFormComponent implements OnInit {
     public cancelled = new EventEmitter();
 
     @Input()
-    public schema: SchemaPropertiesDto;
+    public name: string;
+
+    @Input()
+    public properties: SchemaPropertiesDto;
 
     @Input()
     public version: Version;
@@ -41,7 +43,6 @@ export class SchemaEditFormComponent implements OnInit {
     public editFormSubmitted = false;
     public editForm: FormGroup =
         this.formBuilder.group({
-            name: '',
             label: ['',
                 [
                     Validators.maxLength(100)
@@ -60,7 +61,7 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.editForm.patchValue(this.schema);
+        this.editForm.patchValue(this.properties);
     }
 
     public cancel() {
@@ -76,10 +77,10 @@ export class SchemaEditFormComponent implements OnInit {
 
             const requestDto = this.editForm.value;
 
-            this.schemas.putSchema(this.appName, this.schema.name, requestDto, this.version)
+            this.schemas.putSchema(this.appName, this.name, requestDto, this.version)
                 .subscribe(dto => {
                     this.reset();
-                    this.saved.emit(new SchemaPropertiesDto(this.schema.name, requestDto.label, requestDto.hints));
+                    this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
                 }, error => {
                     this.editForm.enable();
                     this.notifications.notify(Notification.error(error.displayMessage));

@@ -28,15 +28,15 @@ namespace Squidex.Read.Schemas
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly Mock<ISchemaRepository> repository = new Mock<ISchemaRepository>();
         private readonly CachingSchemaProvider sut;
-        private readonly ISchemaEntityWithSchema schemaV1;
-        private readonly ISchemaEntityWithSchema schemaV2;
+        private readonly ISchemaEntity schemaV1;
+        private readonly ISchemaEntity schemaV2;
         private readonly NamedId<Guid> schemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema");
         private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
         public CachingSchemaProviderTests()
         {
-            var schemaV1Mock = new Mock<ISchemaEntityWithSchema>();
-            var schemaV2Mock = new Mock<ISchemaEntityWithSchema>();
+            var schemaV1Mock = new Mock<ISchemaEntity>();
+            var schemaV2Mock = new Mock<ISchemaEntity>();
 
             schemaV1Mock.Setup(x => x.Id).Returns(schemaId.Id);
             schemaV1Mock.Setup(x => x.Name).Returns(schemaId.Name);
@@ -108,12 +108,12 @@ namespace Squidex.Read.Schemas
             repository.Verify(x => x.FindSchemaAsync(appId.Id, schemaId.Name), Times.Exactly(2));
         }
 
-        private async Task ProvideSchemaById(ISchemaEntityWithSchema schema)
+        private async Task ProvideSchemaById(ISchemaEntity schema)
         {
             Assert.Equal(schema, await sut.FindSchemaByIdAsync(schemaId.Id));
         }
 
-        private async Task ProvideSchemaByName(ISchemaEntityWithSchema schema)
+        private async Task ProvideSchemaByName(ISchemaEntity schema)
         {
             Assert.Equal(schema, await sut.FindSchemaByNameAsync(appId.Id, schemaId.Name));
         }
