@@ -82,11 +82,11 @@ namespace Squidex.Pipeline
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
-                    case PermissionLevel.Editor:
+                    case PermissionLevel.Developer:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
-                    case PermissionLevel.Developer:
+                    case PermissionLevel.Editor:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
                         break;
                 }

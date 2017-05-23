@@ -6,7 +6,6 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -62,7 +61,6 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly contentsService: ContentsService,
-        private readonly location: Location,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
@@ -151,10 +149,8 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
                         this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
 
-                        this.finishCreation();
-
                         this.notifyInfo('Content created successfully.');
-                        this.enable();
+                        this.finish();
                     }, error => {
                         this.notifyError(error);
                         this.enable();
@@ -177,11 +173,8 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         }
     }
 
-    private finishCreation() {
-        const newUrl = this.router.createUrlTree(['../', this.contentId], { relativeTo: this.route, replaceUrl: true });
-
-        this.location.replaceState(newUrl.toString());
-        this.isNewMode = false;
+    private finish() {
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 
     private enable() {

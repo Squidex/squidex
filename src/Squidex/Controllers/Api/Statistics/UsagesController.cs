@@ -23,6 +23,7 @@ namespace Squidex.Controllers.Api.Statistics
     /// <summary>
     /// Retrieves usage information for apps.
     /// </summary>
+    [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Statistics")]
@@ -53,7 +54,6 @@ namespace Squidex.Controllers.Api.Statistics
         /// 200 => Usage tracking results returned.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/calls/month")]
         [ProducesResponseType(typeof(CurrentCallsDto), 200)]
@@ -78,7 +78,6 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
-        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
@@ -110,7 +109,6 @@ namespace Squidex.Controllers.Api.Statistics
         /// 200 => Storage usage returned.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/storage/today")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
@@ -135,7 +133,6 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
-        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}")]
         [ProducesResponseType(typeof(StorageUsageDto[]), 200)]

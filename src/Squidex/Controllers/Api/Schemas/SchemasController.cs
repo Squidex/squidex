@@ -25,7 +25,6 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [MustBeAppDeveloper]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Schemas")]
@@ -47,6 +46,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 200 => Schemas returned.
         /// 404 => App not found.
         /// </returns>
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemaDto[]), 200)]
@@ -69,6 +69,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 200 => Schema found.
         /// 404 => Schema or app not found.
         /// </returns>
+        [MustBeAppEditor]
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
@@ -99,6 +100,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 400 => Schema name or properties are not valid.
         /// 409 => Schema name already in use.
         /// </returns>
+        [MustBeAppDeveloper]
         [HttpPost]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
@@ -125,6 +127,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 400 => Schema properties are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
+        [MustBeAppDeveloper]
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/")]
         [ApiCosts(1)]
@@ -147,6 +150,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 400 => Schema is already published.
         /// 404 => Schema or app not found.
         /// </returns>
+        [MustBeAppDeveloper]
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/publish")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
@@ -168,6 +172,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 400 => Schema is not published.
         /// 404 => Schema or app not found.
         /// </returns>
+        [MustBeAppDeveloper]
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/unpublish")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
@@ -188,6 +193,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 204 => Schema has been deleted.
         /// 404 => Schema or app not found.
         /// </returns>
+        [MustBeAppDeveloper]
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/")]
         [ApiCosts(1)]

@@ -74,7 +74,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     ];
 
     public get canAddContributor() {
-        return this.addContributorForm.valid && (this.maxContributors < -1 || this.appContributors.length < this.maxContributors);
+        return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.length < this.maxContributors);
     }
 
     public addContributorForm: FormGroup =

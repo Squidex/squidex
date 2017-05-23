@@ -25,12 +25,12 @@ namespace Squidex.Write.Schemas.Commands
         {
             if (!Partitioning.IsValidPartitioning())
             {
-                errors.Add(new ValidationError($"Partitioning is not valid.", nameof(Partitioning)));
+                errors.Add(new ValidationError("Partitioning is not valid.", nameof(Partitioning)));
             }
 
             if (!Name.IsPropertyName())
             {
-                errors.Add(new ValidationError("Name must be a valid property name", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid property name.", nameof(Name)));
             }
 
             if (Properties == null)

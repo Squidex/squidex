@@ -15,7 +15,6 @@ using Squidex.Controllers.Api.History.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Services;
 using Squidex.Read.History.Repositories;
 
 namespace Squidex.Controllers.Api.History
@@ -23,7 +22,7 @@ namespace Squidex.Controllers.Api.History
     /// <summary>
     /// Readonly API to get an event stream.
     /// </summary>
-    [Authorize]
+    [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("History")]

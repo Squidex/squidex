@@ -7,7 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -59,6 +59,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
         super(notifications, apps);
@@ -185,6 +186,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentsPager = this.contentsPager.goPrev();
 
         this.load();
+    }
+
+    public gotoNew() {
+        this.router.navigate(['./new'], { relativeTo: this.route });
     }
 
     private updateContents(id: string, p: boolean | undefined, data: any, version: string) {

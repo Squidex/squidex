@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, HostListener, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -15,6 +15,9 @@ import { Subscription } from 'rxjs';
 export class ParentLinkDirective implements OnInit, OnDestroy {
     private urlSubscription: Subscription;
     private url: string;
+
+    @Input()
+    public isLazyLoaded = false;
 
     constructor(
         private readonly router: Router,
@@ -31,7 +34,9 @@ export class ParentLinkDirective implements OnInit, OnDestroy {
     public ngOnInit() {
         this.urlSubscription =
             this.route.url.subscribe(() => {
-                this.url = this.router.createUrlTree(['.'], { relativeTo: this.route.parent.parent }).toString();
+                this.url = this.isLazyLoaded ?
+                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent.parent }).toString() :
+                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent }).toString();
 
                 this.renderer.setElementAttribute(this.element.nativeElement, 'href', this.url);
             });

@@ -203,16 +203,14 @@ export class AuthService {
                 }
             })
             .catch((error: Response) => {
-                if (error.status >= 401 && error.status <= 404 && (!this.user || this.user.user.expired)) {
+                if (error.status === 404 && (!this.user || this.user.user.expired)) {
                     this.logoutRedirect();
 
                     return Observable.empty<Response>();
-                } else if (error.status === 401) {
+                } else if (error.status === 401 || error.status === 403) {
                     this.logoutRedirect();
 
                     return Observable.empty<Response>();
-                } else if (error.status === 403) {
-                    error.status = 404;
                 }
                 return Observable.throw(error);
             });

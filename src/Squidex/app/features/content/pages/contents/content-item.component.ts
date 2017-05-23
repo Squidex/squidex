@@ -93,12 +93,18 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
         if (value) {
             if (properties.fieldType === 'Json') {
-                value = 'Json';
+                value = '<Json />';
             } else if (properties.fieldType === 'Geolocation') {
                 value = `${value.longitude}, ${value.latitude}`;
             } else if (properties.fieldType === 'Boolean') {
                 value = value ? '✔' : '-';
-            } else if (properties.fieldType === 'DateTime') {
+            }else if (properties.fieldType === 'Assets') {
+                try {
+                    value = `${value.length} Assets`;
+                } catch (ex) {
+                    value = '0 Assets';
+                }
+            }  else if (properties.fieldType === 'DateTime') {
                 try {
                     const parsed = DateTime.parseISO_UTC(value);
 
