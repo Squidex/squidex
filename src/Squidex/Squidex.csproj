@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="1.0.0-rc1-final" />
     <PackageReference Include="Autofac" Version="4.5.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.1.0" />
     <PackageReference Include="IdentityServer4" Version="1.5.0" />

@@ -110,8 +110,7 @@ namespace Squidex.Config.Identity
 
         public static IServiceCollection AddMyIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
 
             return services;
         }

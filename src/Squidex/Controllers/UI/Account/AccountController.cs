@@ -169,16 +169,29 @@ namespace Squidex.Controllers.UI.Account
 
             if (!isLoggedIn)
             {
-                var user = CreateUser(externalLogin);
+                var email = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
-                var isFirst = userManager.Users.LongCount() == 0;
+                var user = await userManager.FindByEmailAsync(email);
 
-                isLoggedIn =
-                    await AddUserAsync(user) &&
-                    await AddLoginAsync(user, externalLogin) &&
-                    await MakeAdminAsync(user, isFirst) &&
-                    await LockAsync(user, isFirst) &&
-                    await LoginAsync(externalLogin);
+                if (user != null)
+                {
+                    isLoggedIn =
+                        await AddLoginAsync(user, externalLogin) &&
+                        await LoginAsync(externalLogin);
+                }
+                else
+                {
+                    user = CreateUser(externalLogin, email);
+
+                    var isFirst = userManager.Users.LongCount() == 0;
+
+                    isLoggedIn =
+                        await AddUserAsync(user) &&
+                        await AddLoginAsync(user, externalLogin) &&
+                        await MakeAdminAsync(user, isFirst) &&
+                        await LockAsync(user, isFirst) &&
+                        await LoginAsync(externalLogin);
+                }
             }
 
             if (!isLoggedIn)
@@ -232,11 +245,9 @@ namespace Squidex.Controllers.UI.Account
             return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
         }
 
-        private static IdentityUser CreateUser(ExternalLoginInfo externalLogin)
+        private static IdentityUser CreateUser(ExternalLoginInfo externalLogin, string email)
         {
-            var mail = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
-
-            var user = new IdentityUser { Email = mail, UserName = mail };
+            var user = new IdentityUser { Email = email, UserName = email };
 
             foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix)))
             {

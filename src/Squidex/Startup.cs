@@ -143,6 +143,7 @@ namespace Squidex
                 identityApp.UseAdminRole();
                 identityApp.UseMyApiProtection();
                 identityApp.UseMyGoogleAuthentication();
+                identityApp.UseMyGithubAuthentication();
                 identityApp.UseStaticFiles();
 
                 identityApp.MapWhen(x => IsIdentityRequest(x), mvcApp =>

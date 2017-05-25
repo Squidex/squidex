@@ -10,16 +10,37 @@ namespace Squidex.Config.Identity
 {
     public sealed class MyIdentityOptions
     {
-        public string DefaultUsername { get; set; }
+        public string AdminEmail { get; set; }
 
-        public string DefaultPassword { get; set; }
+        public string AdminPassword { get; set; }
 
         public string GoogleClient { get; set; }
 
         public string GoogleSecret { get; set; }
 
+        public string GithubClient { get; set; }
+
+        public string GithubSecret { get; set; }
+
+        public bool EnforceAdmin { get; set; }
+
         public bool RequiresHttps { get; set; }
 
         public bool LockAutomatically { get; set; }
+
+        public bool IsAdminConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(AdminEmail) && !string.IsNullOrWhiteSpace(AdminPassword);
+        }
+
+        public bool IsGithubAuthConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(GithubClient) && !string.IsNullOrWhiteSpace(GithubSecret);
+        }
+
+        public bool IsGoogleAuthConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(GoogleClient) && !string.IsNullOrWhiteSpace(GoogleSecret);
+        }
     }
 }

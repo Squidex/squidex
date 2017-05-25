@@ -12,12 +12,17 @@
         <p>
             @foreach (var provider in Model.ExternalProviders)
             {
-                <button class="redirect-button" type="submit" name="provider" id="loginButton" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+                <button class="redirect-button" type="submit" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
             }
         </p>
     </div>
 </form>
 
 <script>
-    document.getElementById("loginButton").click();
+    var redirectButtons = document.getElementsByClassName("redirect-button");
+
+    if (redirectButtons.length === 1) {
+        debugger;
+        redirectButtons[0].click();
+    }
 </script>

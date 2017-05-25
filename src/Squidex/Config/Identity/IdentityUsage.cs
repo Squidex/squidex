@@ -6,20 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using Squidex.Core.Identity;
-using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
@@ -41,56 +35,53 @@ namespace Squidex.Config.Identity
             return app;
         }
 
-        public static IApplicationBuilder UseMyDefaultUser(this IApplicationBuilder app)
-        {
-            var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
-
-            var username = options.DefaultUsername;
-            var userManager = app.ApplicationServices.GetService<UserManager<IdentityUser>>();
-
-            if (!string.IsNullOrWhiteSpace(options.DefaultUsername) &&
-                !string.IsNullOrWhiteSpace(options.DefaultPassword))
-            {
-                Task.Run(async () =>
-                {
-                    if (userManager.SupportsQueryableUsers && !userManager.Users.Any())
-                    {
-                        var user = new IdentityUser { UserName = username, Email = username, EmailConfirmed = true };
-
-                        await userManager.CreateAsync(user, options.DefaultPassword);
-                    }
-                }).Wait();
-            }
-
-            return app;
-        }
-
-        public static IApplicationBuilder UseMyGoogleAuthentication(this IApplicationBuilder app)
-        {
-            var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
-
-            if (!string.IsNullOrWhiteSpace(options.GoogleClient) &&
-                !string.IsNullOrWhiteSpace(options.GoogleSecret))
-            {
-                var googleOptions =
-                    new GoogleOptions
-                    {
-                        Events = new GoogleHandler(),
-                        ClientId = options.GoogleClient,
-                        ClientSecret = options.GoogleSecret
-                    };
-
-                app.UseGoogleAuthentication(googleOptions);
-            }
-
-            return app;
-        }
-
         public static IApplicationBuilder UseAdminRole(this IApplicationBuilder app)
         {
             var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IdentityRole>>();
 
             roleManager.CreateAsync(new IdentityRole { Name = SquidexRoles.Administrator, NormalizedName = SquidexRoles.Administrator }).Wait();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseMyAdmin(this IApplicationBuilder app)
+        {
+            var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
+
+            var userManager = app.ApplicationServices.GetService<UserManager<IdentityUser>>();
+
+            if (options.IsAdminConfigured())
+            {
+                var adminEmail = options.AdminEmail;
+                var adminPass = options.AdminPassword;
+
+                Task.Run(async () =>
+                {
+                    var user = await userManager.FindByEmailAsync(adminPass);
+
+                    async Task userInitAsync(IdentityUser theUser)
+                    {
+                        await userManager.RemovePasswordAsync(theUser);
+                        await userManager.ChangePasswordAsync(theUser, null, adminEmail);
+                        await userManager.AddToRoleAsync(theUser, SquidexRoles.Administrator);
+                    }
+
+                    if (user != null)
+                    {
+                        if (options.EnforceAdmin)
+                        {
+                            await userInitAsync(user);
+                        }
+                    }
+                    else if ((userManager.SupportsQueryableUsers && !userManager.Users.Any()) || options.EnforceAdmin)
+                    {
+                        user = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+
+                        await userManager.CreateAsync(user);
+                        await userInitAsync(user);
+                    }
+                }).Wait();
+            }
 
             return app;
         }
@@ -117,52 +108,6 @@ namespace Squidex.Config.Identity
             }
 
             return app;
-        }
-
-        private class RetrieveClaimsHandler : OAuthEvents
-        {
-            public override Task CreatingTicket(OAuthCreatingTicketContext context)
-            {
-                var displayNameClaim = context.Identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name);
-                if (displayNameClaim != null)
-                {
-                    context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, displayNameClaim.Value));
-                }
-
-                return base.CreatingTicket(context);
-            }
-        }
-
-        private sealed class GoogleHandler : RetrieveClaimsHandler
-        {
-            private static readonly HttpClient HttpClient = new HttpClient();
-
-            public override Task RedirectToAuthorizationEndpoint(OAuthRedirectToAuthorizationContext context)
-            {
-                context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
-
-                return TaskHelper.Done;
-            }
-
-            public override async Task CreatingTicket(OAuthCreatingTicketContext context)
-            {
-                if (!string.IsNullOrWhiteSpace(context.AccessToken))
-                {
-                    var apiRequestUri = new Uri($"https://www.googleapis.com/oauth2/v2/userinfo?access_token={context.AccessToken}");
-
-                    var jsonReponseString = await HttpClient.GetStringAsync(apiRequestUri);
-                    var jsonResponse = JToken.Parse(jsonReponseString);
-
-                    var pictureUrl = jsonResponse["picture"]?.Value<string>();
-
-                    if (!string.IsNullOrWhiteSpace(pictureUrl))
-                    {
-                        context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl));
-                    }
-                }
-
-                await base.CreatingTicket(context);
-            }
         }
     }
 }
