@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?98f7w9');
-  src:  url('fonts/icomoon.eot?98f7w9#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?98f7w9') format('truetype'),
-    url('fonts/icomoon.woff?98f7w9') format('woff'),
-    url('fonts/icomoon.svg?98f7w9#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?h28uzm');
+  src:  url('fonts/icomoon.eot?h28uzm#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?h28uzm') format('truetype'),
+    url('fonts/icomoon.woff?h28uzm') format('woff'),
+    url('fonts/icomoon.svg?h28uzm#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,83 +24,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-download:before {
-  content: "\e93e";
+.icon-brand2:before {
+  content: "\e93f";
+  color: #4285f4;
 }
-.icon-control-RichText:before {
-  content: "\e939";
-}
-.icon-bug:before {
-  content: "\e93d";
-}
-.icon-control-Markdown:before {
-  content: "\e938";
-}
-.icon-control-Date:before {
-  content: "\e936";
-}
-.icon-control-DateTime:before {
-  content: "\e937";
-}
-.icon-angle-right:before {
-  content: "\e931";
-}
-.icon-user-o:before {
-  content: "\e932";
-}
-.icon-caret-right:before {
-  content: "\e929";
-}
-.icon-caret-left:before {
-  content: "\e92a";
-}
-.icon-caret-up:before {
-  content: "\e92b";
-}
-.icon-caret-down:before {
-  content: "\e92c";
-}
-.icon-angle-up:before {
-  content: "\e903";
-}
-.icon-angle-down:before {
-  content: "\e900";
-}
-.icon-angle-left:before {
-  content: "\e901";
-}
-.icon-info:before {
-  content: "\e93c";
-}
-.icon-google:before {
-  content: "\e93b";
-}
-.icon-unlocked:before {
-  content: "\e933";
-}
-.icon-lock:before {
-  content: "\e934";
-}
-.icon-reset:before {
-  content: "\e92e";
-}
-.icon-pause:before {
-  content: "\e92f";
-}
-.icon-play:before {
-  content: "\e930";
-}
-.icon-settings2:before {
-  content: "\e92d";
-}
-.icon-bin2:before {
-  content: "\e902";
-}
-.icon-control-Stars:before {
-  content: "\e93a";
-}
-.icon-browser:before {
-  content: "\e935";
+.icon-github:before {
+  content: "\e941";
 }
 .icon-activity:before {
   content: "\e904";
@@ -240,4 +169,126 @@
 .icon-user:before {
   content: "\e928";
 }
-
+.icon-microsoft:before {
+  content: "\e940";
+}
+.icon-google:before {
+  content: "\e93b";
+}
+.icon-unlocked:before {
+  content: "\e933";
+}
+.icon-lock:before {
+  content: "\e934";
+}
+.icon-reset:before {
+  content: "\e92e";
+}
+.icon-pause:before {
+  content: "\e92f";
+}
+.icon-play:before {
+  content: "\e930";
+}
+.icon-settings2:before {
+  content: "\e92d";
+}
+.icon-bin2:before {
+  content: "\e902";
+}
+.icon-download:before {
+  content: "\e93e";
+}
+.icon-control-RichText:before {
+  content: "\e939";
+}
+.icon-control-Date:before {
+  content: "\e936";
+}
+.icon-control-DateTime:before {
+  content: "\e937";
+}
+.icon-angle-right:before {
+  content: "\e931";
+}
+.icon-user-o:before {
+  content: "\e932";
+}
+.icon-caret-right:before {
+  content: "\e929";
+}
+.icon-caret-left:before {
+  content: "\e92a";
+}
+.icon-caret-up:before {
+  content: "\e92b";
+}
+.icon-bug:before {
+  content: "\e93d";
+}
+.icon-control-Markdown:before {
+  content: "\e938";
+}
+.icon-control-Date:before {
+  content: "\e936";
+}
+.icon-control-DateTime:before {
+  content: "\e937";
+}
+.icon-angle-right:before {
+  content: "\e931";
+}
+.icon-user-o:before {
+  content: "\e932";
+}
+.icon-caret-right:before {
+  content: "\e929";
+}
+.icon-caret-left:before {
+  content: "\e92a";
+}
+.icon-caret-up:before {
+  content: "\e92b";
+}
+.icon-caret-down:before {
+  content: "\e92c";
+}
+.icon-angle-up:before {
+  content: "\e903";
+}
+.icon-angle-down:before {
+  content: "\e900";
+}
+.icon-angle-left:before {
+  content: "\e901";
+}
+.icon-info:before {
+  content: "\e93c";
+}
+.icon-unlocked:before {
+  content: "\e933";
+}
+.icon-lock:before {
+  content: "\e934";
+}
+.icon-reset:before {
+  content: "\e92e";
+}
+.icon-pause:before {
+  content: "\e92f";
+}
+.icon-play:before {
+  content: "\e930";
+}
+.icon-settings2:before {
+  content: "\e92d";
+}
+.icon-bin2:before {
+  content: "\e902";
+}
+.icon-control-Stars:before {
+  content: "\e93a";
+}
+.icon-browser:before {
+  content: "\e935";
+}

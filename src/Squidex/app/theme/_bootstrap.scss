@@ -1,6 +1,8 @@
 @import '_mixins';
 @import '_vars';
 
+@import './../../node_modules/bootstrap/scss/mixins/_buttons';
+
 body {
     background: $color-background;
 }
@@ -167,6 +169,18 @@ body {
 }
 
 .btn {
+    &-github {
+        @include button-variant($color-dark-foreground, $color-extern-github, $color-extern-github);
+    }
+
+    &-google {
+        @include button-variant($color-dark-foreground, $color-extern-google, $color-extern-google);
+    }
+
+    &-microsoft {
+        @include button-variant($color-dark-foreground, $color-extern-microsoft, $color-extern-microsoft);
+    }
+
     &-cancel {
         padding: .4rem;
         font-size: 1.1rem;

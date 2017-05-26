@@ -4,25 +4,106 @@
 @model Squidex.Controllers.UI.Account.LoginVM
 
 @{
-    ViewBag.Title = "Login";
+    var type = Model.IsLogin ? "Login" : "Signup";
+
+    ViewBag.Title = type;
 }
 
-<form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
-    <div>
-        <p>
-            @foreach (var provider in Model.ExternalProviders)
+<div class="login">
+    <img class="login-logo" src="~/images/logo-small.png" />
+
+    <div class="row">
+        <div class="col-6">
+            @if (Model.IsLogin)
             {
-                <button class="redirect-button" type="submit" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+                <a class="login-headline active" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
             }
-        </p>
+            else
+            {
+                <a class="login-headline" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+            }
+        </div>
+        <div class="col-6 login-headline">
+            @if (!Model.IsLogin)
+            {
+                <a class="login-headline active" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+            }
+            else
+            {
+                <a class="login-headline" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+            }
+        </div>
     </div>
-</form>
 
-<script>
-    var redirectButtons = document.getElementsByClassName("redirect-button");
+    <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
+        @foreach (var provider in Model.ExternalProviders)
+        {
+            var schema = provider.AuthenticationScheme.ToLowerInvariant();
 
-    if (redirectButtons.length === 1) {
-        debugger;
-        redirectButtons[0].click();
+            <div class="form-group">
+                <button class="btn btn-external btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                    <i class="icon-@schema"></i> @type with <strong>@provider.AuthenticationScheme</strong>
+                </button>
+            </div>
+        }
+    </form>
+
+    @if (Model.HasPasswordAndExternal)
+    {
+        <div class="login-separator">
+            <div class="login-separator-text">OR</div>
+        </div>
     }
-</script>
+
+    @if (@Model.HasPasswordAuth)
+    {
+        @if (Model.IsLogin)
+         {
+            @if (Model.IsFailed)
+            {
+                <div class="form-error">Email or password not correct.</div>
+            }
+
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                </div>
+
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
+                </div>
+
+                <button type="submit" class="btn btn-block btn-primary">@type</button>
+            </form>
+         }
+         else
+         {
+             <div class="login-password-signup text-center">Ask your administrator to create an account.</div>
+         }
+    }
+
+    @if (Model.IsLogin)
+    {
+        <p class="login-footer">
+            No account yet? <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Click here to signup</a>
+        </p>
+    }
+    else
+    {
+        <p class="login-footer">
+            Already registered? <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Click here to login</a>
+        </p>
+    }
+</div>
+
+@if (!Model.HasPasswordAuth && Model.ExternalProviders.Count() == 1)
+{
+    <script>
+        var redirectButtons = document.getElementsByClassName("redirect-button");
+
+        if (redirectButtons.length === 1) {
+            debugger;
+            redirectButtons[0].click();
+        }
+    </script>
+}

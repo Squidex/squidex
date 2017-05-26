@@ -51,6 +51,28 @@ namespace Squidex.Controllers.Api.Users
             return Ok(model);
         }
 
+        [HttpPost]
+        [Route("user-management")]
+        [ApiCosts(0)]
+        public async Task<IActionResult> Create([FromBody] CreateUserDto request)
+        {
+            var id = await userRepository.CreateAsync(request.Email, request.DisplayName, request.Password);
+
+            var model = new EntityCreatedDto { Id = id };
+
+            return Ok(model);
+        }
+
+        [HttpPut]
+        [Route("user-management/{id}")]
+        [ApiCosts(0)]
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateUserDto request)
+        {
+            await userRepository.UpdateAsync(id, request.Email, request.DisplayName, request.Password);
+
+            return NoContent();
+        }
+
         [HttpPut]
         [Route("user-management/{id}/lock/")]
         [ApiCosts(0)]

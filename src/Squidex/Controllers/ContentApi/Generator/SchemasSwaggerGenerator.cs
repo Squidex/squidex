@@ -34,6 +34,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
+        private readonly SwaggerOwinSettings swaggerSettings;
         private readonly SwaggerJsonSchemaGenerator schemaGenerator;
         private readonly SwaggerDocument document = new SwaggerDocument { Tags = new List<SwaggerTag>() };
         private readonly HttpContext context;
@@ -59,6 +60,8 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             schemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
+
+            this.swaggerSettings = swaggerSettings;
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity targetApp, IEnumerable<ISchemaEntity> schemas)
@@ -130,7 +133,8 @@ namespace Squidex.Controllers.ContentApi.Generator
         private async Task GenerateBasicSchemas()
         {
             var errorType = typeof(ErrorDto);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
+            var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], EnumHandling.String);
 
             errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
         }

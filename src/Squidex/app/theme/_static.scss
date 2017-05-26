@@ -1,6 +1,87 @@
 @import '_mixins';
 @import '_vars';
 
+noscript {
+    display: block;
+    color: $color-theme-error;
+    font-size: 30px;
+    font-weight: lighter;
+    margin-bottom: 20px;
+}
+
+.login {
+    & {
+        max-width: 20rem;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+    }
+
+    &-headline {
+        & {
+            color: $color-empty;
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: normal;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        &.active {
+            color: $color-text;
+            cursor: pointer;
+            pointer-events: none;
+        }
+    }
+
+    &-logo {
+        @include fixed(1rem, auto, auto, 1rem);
+    }
+
+    &-password-signup {
+        color: $color-empty;
+    }
+
+    &-footer {
+        font-size: .8rem;
+        font-weight: normal;
+        margin-top: 2rem;
+    }
+
+    &-separator {
+        & {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            margin-top: 1.5rem;
+            border-bottom: 1px solid $color-border;
+        }
+
+        &-text {
+            color: darken($color-border, 15%);
+            display: inline-block;
+            background: $color-background;
+            border: 0;
+            bottom: -.7rem;
+            position: relative;
+            padding: 0 1rem;
+        }
+    }
+
+    .icon-microsoft {
+        &::before {
+            color: $color-dark-foreground;
+        }
+    }
+
+    .btn-external {
+        text-align: left;
+    }
+
+    .form-group {
+        margin-bottom: .5rem;
+    }
+}
+
 .splash {
     &-h1,
     &-text {
@@ -19,12 +100,4 @@
         font-size: 30px;
         font-weight: lighter;
     }
-}
-
-noscript {
-    display: block;
-    color: $color-theme-error;
-    font-size: 30px;
-    font-weight: lighter;
-    margin-bottom: 20px;
 }

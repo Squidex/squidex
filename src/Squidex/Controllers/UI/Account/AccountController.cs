@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Core.Identity;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
@@ -126,14 +127,63 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
+        [Route("account/signup/")]
+        public IActionResult Signup(string returnUrl = null)
+        {
+            return LoginView(returnUrl, false, false);
+        }
+
+        [HttpGet]
         [Route("account/login/")]
         public IActionResult Login(string returnUrl = null)
         {
-            var providers = 
+            return LoginView(returnUrl, true, false);
+        }
+
+        [HttpPost]
+        [Route("account/login/")]
+        public async Task<IActionResult> Login(LoginModel model, string returnUrl = null)
+        {
+            if (!ModelState.IsValid)
+            {
+                return LoginView(returnUrl, true, true);
+            }
+
+            var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
+
+            if (!result.Succeeded)
+            {
+                return LoginView(returnUrl, true, true);
+            }
+            else if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return Redirect("~/../");
+            }
+        }
+
+        private IActionResult LoginView(string returnUrl, bool isLogin, bool isFailed)
+        {
+            var allowPasswordAuth = identityOptions.Value.AllowPasswordAuth;
+
+            var providers =
                 signInManager.GetExternalAuthenticationSchemes()
                     .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName)).ToList();
 
-            return View(new LoginVM { ExternalProviders = providers, ReturnUrl = returnUrl });
+            var vm = new LoginVM
+            {
+                ExternalProviders = providers,
+                IsLogin = isLogin,
+                IsFailed = isFailed,
+                HasPasswordAuth = allowPasswordAuth,
+                HasPasswordAndExternal = allowPasswordAuth && providers.Any(),
+                ReturnUrl = returnUrl
+            };
+
+            return View("Login", vm);
         }
 
         [HttpPost]
@@ -204,7 +254,7 @@ namespace Squidex.Controllers.UI.Account
             }
             else
             {
-                return Redirect("~/");
+                return Redirect("~/../");
             }
         }
 
@@ -248,6 +298,16 @@ namespace Squidex.Controllers.UI.Account
         private static IdentityUser CreateUser(ExternalLoginInfo externalLogin, string email)
         {
             var user = new IdentityUser { Email = email, UserName = email };
+
+            if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexPictureUrl))
+            {
+                user.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email)));
+            }
+
+            if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexDisplayName))
+            {
+                user.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, email));
+            }
 
             foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix)))
             {

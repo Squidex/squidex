@@ -22,9 +22,15 @@ namespace Squidex.Config.Identity
 
         public string GithubSecret { get; set; }
 
+        public string MicrosoftClient { get; set; }
+
+        public string MicrosoftSecret { get; set; }
+
         public bool EnforceAdmin { get; set; }
 
         public bool RequiresHttps { get; set; }
+
+        public bool AllowPasswordAuth { get; set; }
 
         public bool LockAutomatically { get; set; }
 
@@ -41,6 +47,11 @@ namespace Squidex.Config.Identity
         public bool IsGoogleAuthConfigured()
         {
             return !string.IsNullOrWhiteSpace(GoogleClient) && !string.IsNullOrWhiteSpace(GoogleSecret);
+        }
+
+        public bool IsMicrosoftAuthConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(MicrosoftClient) && !string.IsNullOrWhiteSpace(MicrosoftSecret);
         }
     }
 }

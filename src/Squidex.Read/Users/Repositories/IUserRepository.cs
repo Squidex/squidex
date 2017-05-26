@@ -17,6 +17,10 @@ namespace Squidex.Read.Users.Repositories
 
         Task<IUserEntity> FindUserByIdAsync(string id);
 
+        Task<string> CreateAsync(string email, string displayName, string password);
+
+        Task UpdateAsync(string id, string email, string displayName, string password);
+
         Task LockAsync(string id);
 
         Task UnlockAsync(string id);

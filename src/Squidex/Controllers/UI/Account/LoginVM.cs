@@ -14,6 +14,14 @@ namespace Squidex.Controllers.UI.Account
     {
         public string ReturnUrl { get; set; }
 
+        public bool IsLogin { get; set; }
+
+        public bool IsFailed { get; set; }
+
+        public bool HasPasswordAuth { get; set; }
+
+        public bool HasPasswordAndExternal { get; set; }
+
         public IEnumerable<ExternalProvider> ExternalProviders { get; set; }
     }
 }
