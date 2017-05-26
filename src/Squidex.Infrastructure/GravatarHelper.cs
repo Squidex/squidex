@@ -9,18 +9,41 @@
 using System.Security.Cryptography;
 using System.Text;
 
+// ReSharper disable ForCanBeConvertedToForeach
+
 namespace Squidex.Infrastructure
 {
     public static class GravatarHelper
     {
         public static string CreatePictureUrl(string email)
         {
+            var gravatarUrl = $"https://www.gravatar.com/avatar/{Hash(email)}";
+
+            return gravatarUrl;
+        }
+
+        public static string CreateProfileUrl(string email)
+        {
+            var gravatarUrl = $"https://www.gravatar.com/{Hash(email)}";
+
+            return gravatarUrl;
+        }
+
+        private static string Hash(string email)
+        {
             using (var md5 = MD5.Create())
             {
-                var gravatarHash = md5.ComputeHash(Encoding.UTF8.GetBytes(email.ToLowerInvariant().Trim()));
-                var gravatarUrl = $"https://www.gravatar.com/avatar/{gravatarHash}";
+                var normalizedEmail = email.ToLowerInvariant().Trim();
 
-                return gravatarUrl;
+                var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(normalizedEmail));
+                var hashBuilder = new StringBuilder();
+  
+                for (var i = 0; i < hashBytes.Length; i++)
+                {
+                    hashBuilder.Append(hashBytes[i].ToString("x2"));
+                }
+
+                return hashBuilder.ToString();
             }
         }
     }
