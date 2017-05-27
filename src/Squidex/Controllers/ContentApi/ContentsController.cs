@@ -59,7 +59,7 @@ namespace Squidex.Controllers.ContentApi
 
             await Task.WhenAll(taskForContents, taskForCount);
 
-            var model = new AssetsDto
+            var response = new AssetsDto
             {
                 Total = taskForCount.Result,
                 Items = taskForContents.Result.Take(200).Select(x =>
@@ -75,7 +75,7 @@ namespace Squidex.Controllers.ContentApi
                 }).ToArray()
             };
 
-            return Ok(model);
+            return Ok(response);
         }
 
         [HttpGet]
@@ -97,16 +97,16 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var model = SimpleMapper.Map(entity, new ContentDto());
+            var resposne = SimpleMapper.Map(entity, new ContentDto());
 
             if (entity.Data != null)
             {
-                model.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
+                resposne.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
             }
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
-            return Ok(model);
+            return Ok(resposne);
         }
 
         [HttpPost]

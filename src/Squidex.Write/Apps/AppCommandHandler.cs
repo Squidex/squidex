@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Repositories;
 using Squidex.Read.Apps.Services;
-using Squidex.Read.Users.Repositories;
+using Squidex.Read.Users;
 using Squidex.Write.Apps.Commands;
 
 // ReSharper disable InvertIf
@@ -25,25 +25,25 @@ namespace Squidex.Write.Apps
         private readonly IAggregateHandler handler;
         private readonly IAppRepository appRepository;
         private readonly IAppLimitsProvider appLimitsProvider;
-        private readonly IUserRepository userRepository;
+        private readonly IUserResolver userResolver;
         private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
             IAggregateHandler handler,
             IAppRepository appRepository,
             IAppLimitsProvider appLimitsProvider,
-            IUserRepository userRepository,
+            IUserResolver userResolver,
             ClientKeyGenerator keyGenerator)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
-            Guard.NotNull(userRepository, nameof(userRepository));
+            Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appLimitsProvider, nameof(appLimitsProvider));
 
             this.handler = handler;
             this.keyGenerator = keyGenerator;
-            this.userRepository = userRepository;
+            this.userResolver = userResolver;
             this.appRepository = appRepository;
             this.appLimitsProvider = appLimitsProvider;
         }
@@ -69,7 +69,7 @@ namespace Squidex.Write.Apps
 
         protected async Task On(AssignContributor command, CommandContext context)
         {
-            if (await userRepository.FindUserByIdAsync(command.ContributorId) == null)
+            if (await userResolver.FindById(command.ContributorId) == null)
             {
                 var error =
                     new ValidationError("Cannot find contributor the contributor",

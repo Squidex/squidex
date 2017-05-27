@@ -16,11 +16,11 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
+using Squidex.Read.Users;
 using StackExchange.Redis;
 
 namespace Squidex.Config.Identity
@@ -100,7 +100,7 @@ namespace Squidex.Config.Identity
                 {
                     options.UserInteraction.ErrorUrl = "/account/error/";
                 })
-                .AddAspNetIdentity<IdentityUser>()
+                .AddAspNetIdentity<IUser>()
                 .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources())
                 .AddSigningCredential(certificate);
@@ -110,7 +110,7 @@ namespace Squidex.Config.Identity
 
         public static IServiceCollection AddMyIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
+            services.AddIdentity<IUser, IRole>().AddDefaultTokenProviders();
 
             return services;
         }

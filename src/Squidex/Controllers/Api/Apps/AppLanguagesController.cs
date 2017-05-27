@@ -50,7 +50,7 @@ namespace Squidex.Controllers.Api.Apps
         [ProducesResponseType(typeof(LanguageDto[]), 200)]
         public IActionResult GetLanguages(string app)
         {
-            var model = App.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
+            var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
                 SimpleMapper.Map(x.Language, 
                     new AppLanguageDto
                     {
@@ -61,7 +61,7 @@ namespace Squidex.Controllers.Api.Apps
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>

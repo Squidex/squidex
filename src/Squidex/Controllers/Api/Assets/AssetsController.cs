@@ -102,13 +102,13 @@ namespace Squidex.Controllers.Api.Assets
 
             await Task.WhenAll(taskForAssets, taskForCount);
 
-            var model = new AssetsDto
+            var response = new AssetsDto
             {
                 Total = taskForCount.Result,
                 Items = taskForAssets.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
             };
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>
@@ -133,11 +133,11 @@ namespace Squidex.Controllers.Api.Assets
                 return NotFound();
             }
 
-            var model = SimpleMapper.Map(entity, new AssetDto());
+            var response = SimpleMapper.Map(entity, new AssetDto());
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>

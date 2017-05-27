@@ -9,12 +9,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.Users.Repositories;
+using Squidex.Read.Users;
 
 namespace Squidex.Controllers.Api.Users
 {
@@ -26,11 +27,11 @@ namespace Squidex.Controllers.Api.Users
     [SwaggerTag("Users")]
     public class UsersController : Controller
     {
-        private readonly IUserRepository userRepository;
+        private readonly UserManager<IUser> userManager;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(UserManager<IUser> userManager)
         {
-            this.userRepository = userRepository;
+            this.userManager = userManager;
         }
 
         /// <summary>
@@ -48,11 +49,11 @@ namespace Squidex.Controllers.Api.Users
         [ProducesResponseType(typeof(UserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
-            var entities = await userRepository.QueryByEmailAsync(query ?? string.Empty);
+            var entities = await userManager.QueryByEmailAsync(query ?? string.Empty);
 
-            var response = entities.Select(x => SimpleMapper.Map(x, new UserDto())).ToList();
+            var models = entities.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray();
 
-            return Ok(response);
+            return Ok(models);
         }
 
         /// <summary>
@@ -68,14 +69,14 @@ namespace Squidex.Controllers.Api.Users
         [ProducesResponseType(typeof(UserDto), 200)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var entity = await userRepository.FindUserByIdAsync(id);
+            var entity = await userManager.FindByIdAsync(id);
 
             if (entity == null)
             {
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new UserDto());
+            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
 
             return Ok(response);
         } 

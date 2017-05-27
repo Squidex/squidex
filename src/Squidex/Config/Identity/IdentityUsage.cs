@@ -10,10 +10,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Core.Identity;
+using Squidex.Read.Users;
 
 // ReSharper disable InvertIf
 
@@ -37,9 +37,10 @@ namespace Squidex.Config.Identity
 
         public static IApplicationBuilder UseAdminRole(this IApplicationBuilder app)
         {
-            var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IRole>>();
+            var roleFactory = app.ApplicationServices.GetRequiredService<IRoleFactory>();
 
-            roleManager.CreateAsync(new IdentityRole { Name = SquidexRoles.Administrator, NormalizedName = SquidexRoles.Administrator }).Wait();
+            roleManager.CreateAsync(roleFactory.Create(SquidexRoles.Administrator)).Wait();
 
             return app;
         }
@@ -48,7 +49,8 @@ namespace Squidex.Config.Identity
         {
             var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
 
-            var userManager = app.ApplicationServices.GetService<UserManager<IdentityUser>>();
+            var userManager = app.ApplicationServices.GetService<UserManager<IUser>>();
+            var userFactory = app.ApplicationServices.GetService<IUserFactory>();
 
             if (options.IsAdminConfigured())
             {
@@ -59,7 +61,7 @@ namespace Squidex.Config.Identity
                 {
                     var user = await userManager.FindByEmailAsync(adminPass);
 
-                    async Task userInitAsync(IdentityUser theUser)
+                    async Task userInitAsync(IUser theUser)
                     {
                         await userManager.RemovePasswordAsync(theUser);
                         await userManager.ChangePasswordAsync(theUser, null, adminEmail);
@@ -75,7 +77,7 @@ namespace Squidex.Config.Identity
                     }
                     else if ((userManager.SupportsQueryableUsers && !userManager.Users.Any()) || options.EnforceAdmin)
                     {
-                        user = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+                        user = userFactory.Create(adminEmail);
 
                         await userManager.CreateAsync(user);
                         await userInitAsync(user);

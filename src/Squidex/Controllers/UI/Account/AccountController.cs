@@ -14,7 +14,6 @@ using System.Text;
 using System.Threading.Tasks;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Microsoft.Extensions.Options;
@@ -24,6 +23,7 @@ using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Read.Users;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
@@ -34,16 +34,18 @@ namespace Squidex.Controllers.UI.Account
     [SwaggerIgnore]
     public sealed class AccountController : Controller
     {
-        private readonly SignInManager<IdentityUser> signInManager;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IUser> signInManager;
+        private readonly UserManager<IUser> userManager;
+        private readonly IUserFactory userFactory;
         private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
-            SignInManager<IdentityUser> signInManager, 
-            UserManager<IdentityUser> userManager,
+            SignInManager<IUser> signInManager, 
+            UserManager<IUser> userManager, 
+            IUserFactory userFactory,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
             ISemanticLog log,
@@ -52,6 +54,7 @@ namespace Squidex.Controllers.UI.Account
             this.log = log;
             this.urlOptions = urlOptions;
             this.userManager = userManager;
+            this.userFactory = userFactory;
             this.interactions = interactions;
             this.identityOptions = identityOptions;
             this.signInManager = signInManager;
@@ -258,12 +261,12 @@ namespace Squidex.Controllers.UI.Account
             }
         }
 
-        private Task<bool> AddLoginAsync(IdentityUser user, UserLoginInfo externalLogin)
+        private Task<bool> AddLoginAsync(IUser user, UserLoginInfo externalLogin)
         {
             return MakeIdentityOperation(() => userManager.AddLoginAsync(user, externalLogin));
         }
 
-        private Task<bool> AddUserAsync(IdentityUser user)
+        private Task<bool> AddUserAsync(IUser user)
         {
             return MakeIdentityOperation(() => userManager.CreateAsync(user));
         }
@@ -275,7 +278,7 @@ namespace Squidex.Controllers.UI.Account
             return result.Succeeded;
         }
 
-        private Task<bool> LockAsync(IdentityUser user, bool isFirst)
+        private Task<bool> LockAsync(IUser user, bool isFirst)
         {
             if (isFirst || !identityOptions.Value.LockAutomatically)
             {
@@ -285,7 +288,7 @@ namespace Squidex.Controllers.UI.Account
             return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
         }
 
-        private Task<bool> MakeAdminAsync(IdentityUser user, bool isFirst)
+        private Task<bool> MakeAdminAsync(IUser user, bool isFirst)
         {
             if (!isFirst)
             {
@@ -295,18 +298,18 @@ namespace Squidex.Controllers.UI.Account
             return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
         }
 
-        private static IdentityUser CreateUser(ExternalLoginInfo externalLogin, string email)
+        private IUser CreateUser(ExternalLoginInfo externalLogin, string email)
         {
-            var user = new IdentityUser { Email = email, UserName = email };
+            var user = userFactory.Create(email);
 
             if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexPictureUrl))
             {
-                user.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email)));
+                user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email));
             }
 
             if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexDisplayName))
             {
-                user.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, email));
+                user.SetClaim(SquidexClaimTypes.SquidexDisplayName, email);
             }
 
             foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix)))

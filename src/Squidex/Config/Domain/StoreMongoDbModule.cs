@@ -10,7 +10,6 @@ using Autofac;
 using Autofac.Core;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Core.Schemas;
@@ -33,7 +32,7 @@ using Squidex.Read.MongoDb.Schemas;
 using Squidex.Read.MongoDb.Users;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Read.Schemas.Services.Implementations;
-using Squidex.Read.Users.Repositories;
+using Squidex.Read.Users;
 
 namespace Squidex.Config.Domain
 {
@@ -85,30 +84,17 @@ namespace Squidex.Config.Domain
                 .Named<IMongoDatabase>(MongoContentDatabaseRegistration)
                 .SingleInstance();
 
-            builder.Register<IUserStore<IdentityUser>>(c =>
-                {
-                    var usersCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseRegistration).GetCollection<IdentityUser>("Identity_Users");
-
-                    IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
-                    IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
-
-                    return new UserStore<IdentityUser>(usersCollection);
-                })
+            builder.RegisterType<MongoUserStore>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IUserStore<IUser>>()
+                .As<IUserFactory>()
                 .SingleInstance();
 
-            builder.Register<IRoleStore<IdentityRole>>(c =>
-                {
-                    var rolesCollection = c.ResolveNamed<IMongoDatabase>(MongoDatabaseRegistration).GetCollection<IdentityRole>("Identity_Roles");
-
-                    IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
-
-                    return new RoleStore<IdentityRole>(rolesCollection);
-                })
+            builder.RegisterType<MongoRoleStore>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IRoleStore<IRole>>()
+                .As<IRoleFactory>()
                 .SingleInstance();
-
-            builder.RegisterType<MongoUserRepository>()
-                .As<IUserRepository>()
-                .InstancePerLifetimeScope();
 
             builder.RegisterType<MongoPersistedGrantStore>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))

@@ -55,9 +55,9 @@ namespace Squidex.Controllers.Api.Schemas
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
 
-            var model = schemas.Select(s => s.ToModel()).ToList();
+            var response = schemas.Select(s => s.ToModel()).ToList();
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>
@@ -83,11 +83,11 @@ namespace Squidex.Controllers.Api.Schemas
                 return NotFound();
             }
 
-            var model = entity.ToDetailsModel();
+            var response = entity.ToDetailsModel();
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
-            return Ok(model);
+            return Ok(response);
         }
 
         /// <summary>

@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
@@ -16,7 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Read.Users.Repositories;
+using Squidex.Read.Users;
 
 namespace Squidex.Controllers.Api.Users
 {
@@ -25,11 +26,13 @@ namespace Squidex.Controllers.Api.Users
     [SwaggerIgnore]
     public class UserManagementController : Controller
     {
-        private readonly IUserRepository userRepository;
+        private readonly UserManager<IUser> userManager;
+        private readonly IUserFactory userFactory;
 
-        public UserManagementController(IUserRepository userRepository)
+        public UserManagementController(UserManager<IUser> userManager, IUserFactory userFactory)
         {
-            this.userRepository = userRepository;
+            this.userManager = userManager;
+            this.userFactory = userFactory;
         }
 
         [HttpGet]
@@ -37,18 +40,18 @@ namespace Squidex.Controllers.Api.Users
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsers([FromQuery] string query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var taskForUsers = userRepository.QueryByEmailAsync(query, take, skip);
-            var taskForCount = userRepository.CountAsync(query);
+            var taskForUsers = userManager.QueryByEmailAsync(query, take, skip);
+            var taskForCount = userManager.CountAsync(query);
 
             await Task.WhenAll(taskForUsers, taskForCount);
 
-            var model = new UsersDto
+            var response = new UsersDto
             {
                 Total = taskForCount.Result,
-                Items = taskForUsers.Result.Select(x => SimpleMapper.Map(x, new UserDto())).ToArray()
+                Items = taskForUsers.Result.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray()
             };
 
-            return Ok(model);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -56,11 +59,11 @@ namespace Squidex.Controllers.Api.Users
         [ApiCosts(0)]
         public async Task<IActionResult> Create([FromBody] CreateUserDto request)
         {
-            var id = await userRepository.CreateAsync(request.Email, request.DisplayName, request.Password);
+            var id = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password);
 
-            var model = new EntityCreatedDto { Id = id };
+            var response = new EntityCreatedDto { Id = id };
 
-            return Ok(model);
+            return Ok(response);
         }
 
         [HttpPut]
@@ -68,7 +71,7 @@ namespace Squidex.Controllers.Api.Users
         [ApiCosts(0)]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateUserDto request)
         {
-            await userRepository.UpdateAsync(id, request.Email, request.DisplayName, request.Password);
+            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password);
 
             return NoContent();
         }
@@ -83,7 +86,7 @@ namespace Squidex.Controllers.Api.Users
                 throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
             }
 
-            await userRepository.LockAsync(id);
+            await userManager.LockAsync(id);
 
             return NoContent();
         }
@@ -98,7 +101,7 @@ namespace Squidex.Controllers.Api.Users
                 throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
             }
 
-            await userRepository.UnlockAsync(id);
+            await userManager.UnlockAsync(id);
 
             return NoContent();
         }
