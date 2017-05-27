@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Log
 
         public void Log(SemanticLogLevel logLevel, string message)
         {
-            processor.EnqueueMessage(new LogMessageEntry { Message = message, Level = logLevel });
+            processor.EnqueueMessage(new LogMessageEntry { Message = message, IsError = logLevel >= SemanticLogLevel.Error });
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             foreach (var storedEvent in events)
             {
-                var envelope = TryParseEvent(storedEvent);
+                var envelope = ParseOrNull(storedEvent);
 
                 if (envelope != null)
                 {
@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             }
         }
 
-        private Envelope<IEvent> TryParseEvent(StoredEvent storedEvent)
+        private Envelope<IEvent> ParseOrNull(StoredEvent storedEvent)
         {
             try
             {

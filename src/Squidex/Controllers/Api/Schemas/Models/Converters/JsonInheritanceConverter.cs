@@ -23,21 +23,21 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         private readonly string discriminator;
 
         [ThreadStatic]
-        private static bool isReading;
+        private static bool IsReading;
 
         [ThreadStatic]
-        private static bool isWriting;
+        private static bool IsWriting;
 
         public override bool CanWrite
         {
             get
             {
-                if (!isWriting)
+                if (!IsWriting)
                 {
                     return true;
                 }
 
-                return isWriting = false;
+                return IsWriting = false;
             }
         }
         
@@ -45,12 +45,12 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         {
             get
             {
-                if (!isReading)
+                if (!IsReading)
                 {
                     return true;
                 }
 
-                return isReading = false;
+                return IsReading = false;
             }
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            isWriting = true;
+            IsWriting = true;
             try
             {
                 var jsonObject = JObject.FromObject(value, serializer);
@@ -77,13 +77,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
             finally
             {
-                isWriting = false;
+                IsWriting = false;
             }
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            isReading = true;
+            IsReading = true;
             try
             {
                 var jsonObject = serializer.Deserialize<JObject>(reader);
@@ -106,7 +106,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
             finally
             {
-                isReading = false;
+                IsReading = false;
             }
         }
 

@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             foreach (var entry in messageQueue.GetConsumingEnumerable())
             {
-                console.WriteLine(entry.Level, entry.Message);
+                console.WriteLine(entry.IsError, entry.Message);
             }
         }
 

@@ -10,7 +10,7 @@ namespace Squidex.Infrastructure.Log.Internal
 {
     public struct LogMessageEntry
     {
-        public SemanticLogLevel Level;
+        public bool IsError;
 
         public string Message;
     }

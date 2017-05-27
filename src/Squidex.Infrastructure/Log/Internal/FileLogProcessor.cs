@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  FileLogChannel.cs
+//  FileLogProcessor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,9 +12,11 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+// ReSharper disable InvertIf
+
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class FileLogProcessor : IDisposable
+    public class FileLogProcessor : DisposableObjectBase
     {
         private const int MaxQueuedMessages = 1024;
         private const int Retries = 10;
@@ -27,6 +29,25 @@ namespace Squidex.Infrastructure.Log.Internal
             this.path = path;
 
             outputTask = Task.Factory.StartNew(ProcessLogQueue, this, TaskCreationOptions.LongRunning);
+        }
+
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                messageQueue.CompleteAdding();
+
+                try
+                {
+                    outputTask.Wait(1500);
+                }
+                catch (TaskCanceledException)
+                {
+                }
+                catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is TaskCanceledException)
+                {
+                }
+            }
         }
 
         public void Connect()
@@ -74,22 +95,6 @@ namespace Squidex.Infrastructure.Log.Internal
             var processor = (FileLogProcessor)state;
 
             return processor.ProcessLogQueue();
-        }
-
-        public void Dispose()
-        {
-            messageQueue.CompleteAdding();
-
-            try
-            {
-                outputTask.Wait(1500);
-            }
-            catch (TaskCanceledException)
-            {
-            }
-            catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is TaskCanceledException)
-            {
-            }
         }
     }
 }

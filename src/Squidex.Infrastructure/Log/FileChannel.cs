@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Log.Internal;
 
 namespace Squidex.Infrastructure.Log
 {
-    public sealed class FileChannel : ILogChannel, IExternalSystem
+    public sealed class FileChannel : DisposableObjectBase, ILogChannel, IExternalSystem
     {
         private readonly FileLogProcessor processor;
 
@@ -21,9 +21,17 @@ namespace Squidex.Infrastructure.Log
             processor = new FileLogProcessor(path);
         }
 
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                processor.Dispose();
+            }
+        }
+
         public void Log(SemanticLogLevel logLevel, string message)
         {
-            processor.EnqueueMessage(new LogMessageEntry { Message = message, Level = logLevel });
+            processor.EnqueueMessage(new LogMessageEntry { Message = message, IsError = logLevel >= SemanticLogLevel.Error });
         }
 
         public void Connect()

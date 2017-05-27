@@ -5,10 +5,11 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Infrastructure.Log.Internal
 {
     public interface IConsole
     {
-        void WriteLine(SemanticLogLevel level, string message);
+        void WriteLine(bool isError, string message);
     }
 }

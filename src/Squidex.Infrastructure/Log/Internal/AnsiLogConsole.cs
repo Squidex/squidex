@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.Log.Internal
             this.logToStdError = logToStdError;
         }
 
-        public void WriteLine(SemanticLogLevel level, string message)
+        public void WriteLine(bool isError, string message)
         {
-            if (level >= SemanticLogLevel.Error && logToStdError)
+            if (isError && logToStdError)
             {
                 Console.Error.WriteLine(message);
             }

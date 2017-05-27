@@ -10,12 +10,12 @@ namespace Squidex.Core.Identity
 {
     public static class SquidexRoles
     {
-        public const string Administrator = "ADMINISTRATOR";
+        public static readonly string Administrator = "ADMINISTRATOR";
 
-        public const string AppOwner = "APP-OWNER";
+        public static readonly string AppOwner = "APP-OWNER";
 
-        public const string AppEditor = "APP-EDITOR";
+        public static readonly string AppEditor = "APP-EDITOR";
 
-        public const string AppDeveloper = "APP-DEVELOPER";
+        public static readonly string AppDeveloper = "APP-DEVELOPER";
     }
 }
