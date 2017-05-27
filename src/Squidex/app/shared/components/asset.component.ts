@@ -189,7 +189,6 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                     this.notifyError(error);
                     this.resetRename();
                 });
-            this.resetRename();
         }
     }
 

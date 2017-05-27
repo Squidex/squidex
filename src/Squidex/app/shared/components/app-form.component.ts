@@ -30,7 +30,7 @@ export class AppFormComponent {
     @Output()
     public cancelled = new EventEmitter();
 
-    public creationError = '';
+    public createFormError = '';
     public createFormSubmitted = false;
     public createForm: FormGroup =
         this.formBuilder.group({
@@ -66,9 +66,10 @@ export class AppFormComponent {
 
             const request = new CreateAppDto(this.createForm.get('name')!.value);
 
-            const enable = () => {
+            const enable = (message?: string) => {
                 this.createForm.enable();
                 this.createFormSubmitted = false;
+                this.createFormError = message;
             };
 
             this.appsStore.createApp(request)
@@ -76,14 +77,13 @@ export class AppFormComponent {
                     this.reset();
                     this.created.emit(dto);
                 }, error => {
-                    enable();
-                    this.creationError = error.displayMessage;
+                    enable(error.displayMessage);
                 });
         }
     }
 
     private reset() {
-        this.creationError = '';
+        this.createFormError = '';
         this.createForm.enable();
         this.createFormSubmitted = false;
     }

@@ -63,7 +63,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
             const requestDto = this.userForm.value;
 
-            const enable = (message: string) => {
+            const enable = (message?: string) => {
                 this.userForm.enable();
                 this.userForm.controls['password'].reset();
                 this.userForm.controls['passwordConfirm'].reset();
@@ -88,8 +88,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                         this.notifyInfo('User created successfully.');
                         back();
                     }, error => {
-                        this.notifyError(error);
-                        enable(error.displayMessage);
+                        enable();
                     });
             } else {
                  this.userManagementService.putUser(this.userId, requestDto)
@@ -103,7 +102,6 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                         this.notifyInfo('User saved successfully.');
                         enable(null);
                     }, error => {
-                        this.notifyError(error);
                         enable(error.displayMessage);
                     });
             }

@@ -29,6 +29,12 @@
 
         <div class="panel-main">
             <div class="panel-content panel-content-blank">
+                <div *ngIf="userFormError">
+                    <div class="form-error">
+                        {{userFormError}}
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="email">Email</label>
 
