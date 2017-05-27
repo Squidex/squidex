@@ -42,7 +42,7 @@ export class SchemaFormComponent {
 
     public showImport = false;
 
-    public creationError = '';
+    public createFormError = '';
     public createFormSubmitted = false;
     public createForm: FormGroup =
         this.formBuilder.group({
@@ -97,13 +97,13 @@ export class SchemaFormComponent {
                     this.created.emit(this.createSchemaDto(dto.id, requestDto.properties || {}, schemaName, schemaVersion));
                 }, error => {
                     this.createForm.enable();
-                    this.creationError = error.displayMessage;
+                    this.createFormError = error.displayMessage;
                 });
         }
     }
 
     private reset() {
-        this.creationError = '';
+        this.createFormError = '';
         this.createForm.reset();
         this.createFormSubmitted = false;
     }

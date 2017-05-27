@@ -13,5 +13,4 @@ import { Component } from '@angular/core';
     templateUrl: './administration-area.component.html'
 })
 export class AdministrationAreaComponent {
-
 }
