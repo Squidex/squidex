@@ -6,10 +6,11 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
+    AuthService,
     ComponentBase,
     MessageBus,
     NotificationService,
@@ -25,14 +26,17 @@ import { UserCreated, UserUpdated } from './messages';
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ComponentBase implements OnInit {
+    public currentUserId: string;
     public userFormSubmitted = false;
     public userForm: FormGroup;
     public userId: string;
     public userFormError: string;
 
+    public isCurrentUser = false;
     public isNewMode = false;
 
     constructor(notifications: NotificationService,
+        private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
@@ -47,6 +51,8 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             .subscribe((user: UserDto) => {
                 this.populateForm(user);
             });
+
+        this.currentUserId = this.authService.user!.id;
     }
 
     public save(publish: boolean) {
@@ -107,51 +113,34 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     }
 
     private populateForm(user: UserDto) {
+        const input = user || {};
+
+        this.isNewMode = !user;
+        this.userId = input['id'];
         this.userFormError = '';
         this.userFormSubmitted = false;
+        this.userForm =
+            this.formBuilder.group({
+                email: [input['email'],
+                    [
+                        Validators.email,
+                        Validators.required,
+                        Validators.maxLength(100)
+                    ]],
+                displayName: [input['displayName'],
+                    [
+                        Validators.required,
+                        Validators.maxLength(100)
+                    ]]
+            });
 
         if (user) {
-            this.isNewMode = false;
-            this.userId = user.id;
-            this.userForm =
-                this.formBuilder.group({
-                    email: [user.email,
-                        [
-                            Validators.email,
-                            Validators.required,
-                            Validators.maxLength(100)
-                        ]],
-                    displayName: [user.displayName,
-                        [
-                            Validators.required,
-                            Validators.maxLength(100)
-                        ]],
-                    password: ['', []],
-                    passwordConfirm: ['', []]
-                });
+            this.userForm.addControl('password', new FormControl(''));
         } else {
-            this.isNewMode = true;
-            this.userForm =
-                this.formBuilder.group({
-                    displayName: ['',
-                        [
-                            Validators.required,
-                            Validators.maxLength(100)
-                        ]],
-                    email: ['',
-                        [
-                            Validators.email,
-                            Validators.required,
-                            Validators.maxLength(100)
-                        ]],
-                    password: ['', [
-                            Validators.required
-                        ]],
-                    passwordConfirm: ['', [
-                            Validators.required
-                        ]]
-                });
+            this.userForm.addControl('password', new FormControl(Validators.required));
         }
+
+        this.isCurrentUser = this.userId === this.currentUserId;
     }
 }
 

@@ -14,7 +14,7 @@
                     <input class="form-control" [formControl]="usersFilter" placeholder="Search for user" />
                 </form>
 
-                <button class="btn btn-success" [routerLink]="['new']">
+                <button class="btn btn-success" routerLink="new">
                     <i class="icon-plus"></i> New
                 </button>
             </div>
@@ -56,7 +56,7 @@
 
                 <tbody>
                     <ng-template ngFor let-user [ngForOf]="usersItems">
-                        <tr [routerLink]="[user.id]" routerLinkActive="active">
+                        <tr [routerLink]="user.id" routerLinkActive="active">
                             <td>
                                 <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
                             </td>

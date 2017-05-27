@@ -3,7 +3,7 @@
         <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{appName}}</span>
 
         <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
-            <a class="dropdown-item all-apps" [routerLink]="['/app']">
+            <a class="dropdown-item all-apps" routerLink="/app">
                 <span class="all-apps-text">All Apps</span> 
                 <span class="all-apps-pill tag tag-pill tag-default">{{apps.length || 0}}</span>
             </a>
