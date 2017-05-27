@@ -55,7 +55,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         this.currentUserId = this.authService.user!.id;
     }
 
-    public save(publish: boolean) {
+    public save() {
         this.userFormSubmitted = true;
 
         if (this.userForm.valid) {
