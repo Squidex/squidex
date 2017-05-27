@@ -75,6 +75,11 @@ export class SchemaEditFormComponent implements OnInit {
         if (this.editForm.valid) {
             this.editForm.disable();
 
+            const enable = () => {
+                this.editForm.enable();
+                this.editFormSubmitted = false;
+            };
+
             const requestDto = this.editForm.value;
 
             this.schemas.putSchema(this.appName, this.name, requestDto, this.version)
@@ -82,7 +87,7 @@ export class SchemaEditFormComponent implements OnInit {
                     this.reset();
                     this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
                 }, error => {
-                    this.editForm.enable();
+                    enable();
                     this.notifications.notify(Notification.error(error.displayMessage));
                 });
         }
@@ -91,5 +96,6 @@ export class SchemaEditFormComponent implements OnInit {
     private reset() {
         this.editFormSubmitted = false;
         this.editForm.reset();
+        this.editForm.enable();
     }
 }

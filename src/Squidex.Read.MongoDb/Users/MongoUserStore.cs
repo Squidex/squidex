@@ -31,6 +31,7 @@ namespace Squidex.Read.MongoDb.Users
         IUserLockoutStore<IUser>, 
         IUserAuthenticationTokenStore<IUser>,
         IUserFactory,
+        IUserResolver,
         IQueryableUserStore<IUser>
     {
         private readonly UserStore<WrappedIdentityUser> innerStore;
@@ -58,6 +59,11 @@ namespace Squidex.Read.MongoDb.Users
         public IUser Create(string email)
         {
             return new WrappedIdentityUser { Email = email, UserName = email };
+        }
+
+        public async Task<IUser> FindByIdAsync(string userId)
+        {
+            return await innerStore.FindByIdAsync(userId, CancellationToken.None);
         }
 
         public async Task<IUser> FindByIdAsync(string userId, CancellationToken cancellationToken)

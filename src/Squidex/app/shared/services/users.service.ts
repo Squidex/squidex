@@ -21,6 +21,32 @@ export class UsersDto {
     }
 }
 
+export class UserCreatedDto {
+    constructor(
+        public readonly id: string,
+        public readonly pictureUrl: string
+    ) {
+    }
+}
+
+export class CreateUserDto {
+    constructor(
+        public readonly email: string,
+        public readonly displayName: string,
+        public readonly password: string
+    ) {
+    }
+}
+
+export class UpdateUserDto {
+    constructor(
+        public readonly email: string,
+        public readonly displayName: string,
+        public readonly password: string
+    ) {
+    }
+}
+
 export class UserDto {
     constructor(
         public readonly id: string,
@@ -105,6 +131,38 @@ export class UserManagementService {
                     return new UsersDto(response.total, users);
                 })
                 .catchError('Failed to load users. Please reload.');
+    }
+
+    public getUser(id: string): Observable<UserDto> {
+        const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
+
+        return this.authService.authGet(url)
+                .map(response => response.json())
+                .map(response => {
+                    return new UserDto(
+                        response.id,
+                        response.email,
+                        response.displayName,
+                        response.pictureUrl,
+                        response.isLocked);
+                })
+                .catchError('Failed to load user. Please reload.');
+    }
+
+    public postUser(dto: CreateUserDto): Observable<UserDto> {
+        const url = this.apiUrl.buildUrl(`api/user-management/`);
+
+        return this.authService.authPost(url, dto)
+                .map(response => response.json())
+                .map(response => new UserCreatedDto(response.id, response.pictureUrl))
+                .catchError('Failed to create user. Please reload.');
+    }
+
+    public putUser(id: string, dto: UpdateUserDto): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
+
+        return this.authService.authPut(url, dto)
+                .catchError('Failed to update user. Please reload.');
     }
 
     public lockUser(id: string): Observable<any> {

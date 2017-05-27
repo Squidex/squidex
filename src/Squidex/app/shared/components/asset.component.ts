@@ -164,18 +164,17 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         if (this.renameForm.valid) {
             this.renameForm.disable();
 
-            const dto = new UpdateAssetDto(this.renameForm.controls['name'].value);
+            const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
             this.appNameOnce()
-                .switchMap(app => this.assetsService.putAsset(app, this.asset.id, dto, this.version))
+                .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.version))
                 .subscribe(_ => {
                     const me = `subject:${this.authService.user!.id}`;
 
                     const asset = new AssetDto(
                         this.asset.id,
                         this.asset.createdBy, me,
-                        this.asset.created, DateTime.now(),
-                        dto.fileName,
+                        this.asset.created, DateTime.now(), requestDto.fileName,
                         this.asset.fileSize,
                         this.asset.fileVersion,
                         this.asset.mimeType,

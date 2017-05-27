@@ -1,17 +1,21 @@
 ﻿// ==========================================================================
-//  IUserResolver.cs
+//  UserCreatedDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Read.Users
+namespace Squidex.Controllers.Api.Users.Models
 {
-    public interface IUserResolver
+    public class UserCreatedDto
     {
-        Task<IUser> FindByIdAsync(string id);
+        [Required]
+        public string Id { get; set; }
+
+        [Required]
+        public string PictureUrl { get; set; }
     }
 }

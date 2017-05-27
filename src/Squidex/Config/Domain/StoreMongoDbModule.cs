@@ -88,6 +88,7 @@ namespace Squidex.Config.Domain
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IUserStore<IUser>>()
                 .As<IUserFactory>()
+                .As<IUserResolver>()
                 .SingleInstance();
 
             builder.RegisterType<MongoRoleStore>()

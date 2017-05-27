@@ -50,7 +50,7 @@ namespace Squidex.Read.Users
             return result;
         }
 
-        public static async Task<string> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password)
+        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password)
         {
             var user = factory.Create(email);
 
@@ -64,7 +64,7 @@ namespace Squidex.Read.Users
                 await DoChecked(() => userManager.AddPasswordAsync(user, password), "Cannot create user.");
             }
 
-            return user.Id;
+            return user;
         }
 
         public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password)

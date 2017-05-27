@@ -13,6 +13,10 @@
                 <form class="form-inline" (ngSubmit)="search()">
                     <input class="form-control" [formControl]="usersFilter" placeholder="Search for user" />
                 </form>
+
+                <button class="btn btn-success" [routerLink]="['new']">
+                    <i class="icon-plus"></i> New
+                </button>
             </div>
             
             <h3 class="panel-title">Users</h3>
@@ -52,7 +56,7 @@
 
                 <tbody>
                     <ng-template ngFor let-user [ngForOf]="usersItems">
-                        <tr>
+                        <tr [routerLink]="[user.id]" routerLinkActive="active">
                             <td>
                                 <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
                             </td>
@@ -93,3 +97,5 @@
         </div>
     </div>
 </sqx-panel>
+
+<router-outlet></router-outlet>

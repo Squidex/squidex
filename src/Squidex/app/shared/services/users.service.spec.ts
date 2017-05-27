@@ -235,6 +235,34 @@ describe('UserManagementService', () => {
         authService.verifyAll();
     });
 
+    it('should make get request to get single user', () => {
+        authService.setup(x => x.authGet('http://service/p/api/users/123'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            id: '123',
+                            email: 'mail1@domain.com',
+                            displayName: 'User1',
+                            pictureUrl: 'path/to/image1',
+                            isLocked: true
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let user: UserDto | null = null;
+
+        userManagementService.getUser('123').subscribe(result => {
+            user = result;
+        }).unsubscribe();
+
+        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true));
+
+        authService.verifyAll();
+    });
+
     it('should make put request to lock user', () => {
         authService.setup(x => x.authPut('http://service/p/api/user-management/123/lock', It.isAny()))
             .returns(() => Observable.of(

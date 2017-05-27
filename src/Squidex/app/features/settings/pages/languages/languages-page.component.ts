@@ -77,10 +77,10 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public addLanguage() {
-        const request = new AddAppLanguageDto(this.addLanguageForm.get('language')!.value.iso2Code);
+        const requestDto = new AddAppLanguageDto(this.addLanguageForm.get('language')!.value.iso2Code);
 
         this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.postLanguages(app, request, this.version))
+            .switchMap(app => this.appLanguagesService.postLanguages(app, requestDto, this.version))
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.push(dto));
             }, error => {

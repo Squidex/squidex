@@ -87,7 +87,7 @@ namespace Squidex.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindById(contributorId)).Returns(Task.FromResult<IUser>(null));
+            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult<IUser>(null));
 
             await TestUpdate(app, async _ =>
             {
@@ -106,7 +106,7 @@ namespace Squidex.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindById(It.IsAny<string>())).Returns(Task.FromResult(new Mock<IUser>().Object));
+            userResolver.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Mock<IUser>().Object));
 
             await TestUpdate(app, async _ =>
             {
@@ -121,7 +121,7 @@ namespace Squidex.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindById(contributorId)).Returns(Task.FromResult<IUser>(null));
+            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult<IUser>(null));
 
             await TestUpdate(app, async _ =>
             {
@@ -138,7 +138,7 @@ namespace Squidex.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindById(contributorId)).Returns(Task.FromResult(new Mock<IUser>().Object));
+            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult(new Mock<IUser>().Object));
 
             await TestUpdate(app, async _ =>
             {

@@ -66,12 +66,17 @@ export class AppFormComponent {
 
             const request = new CreateAppDto(this.createForm.get('name')!.value);
 
+            const enable = () => {
+                this.createForm.enable();
+                this.createFormSubmitted = false;
+            };
+
             this.appsStore.createApp(request)
                 .subscribe(dto => {
                     this.reset();
                     this.created.emit(dto);
                 }, error => {
-                    this.createForm.enable();
+                    enable();
                     this.creationError = error.displayMessage;
                 });
         }

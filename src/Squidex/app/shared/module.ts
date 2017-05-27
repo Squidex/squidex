@@ -7,7 +7,6 @@
 
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { DndModule } from 'ng2-dnd';
-
 import { ProgressHttpModule } from 'angular-progress-http';
 
 import { SqxFrameworkModule } from 'framework';
@@ -39,6 +38,7 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
+    ResolveUserGuard,
     UsagesService,
     UserEmailPipe,
     UserEmailRefPipe,
@@ -110,6 +110,7 @@ export class SqxSharedModule {
                 ResolveContentGuard,
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
+                ResolveUserGuard,
                 SchemasService,
                 UsagesService,
                 UserManagementService,

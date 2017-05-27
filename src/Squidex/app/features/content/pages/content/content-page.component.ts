@@ -139,27 +139,29 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         if (this.contentForm.valid) {
             this.disable();
 
-            const data = this.contentForm.value;
+            const requestDto = this.contentForm.value;
+
+            const back = () => {
+                this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+            };
 
             if (this.isNewMode) {
                 this.appNameOnce()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, data, publish, this.version))
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, requestDto, publish, this.version))
                     .subscribe(created => {
-                        this.contentId = created.id;
-
                         this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
 
                         this.notifyInfo('Content created successfully.');
-                        this.finish();
+                        back();
                     }, error => {
                         this.notifyError(error);
                         this.enable();
                     });
             } else {
                 this.appNameOnce()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, data, this.version))
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, requestDto, this.version))
                     .subscribe(() => {
-                        this.messageBus.publish(new ContentUpdated(this.contentId!, data, this.version.value));
+                        this.messageBus.publish(new ContentUpdated(this.contentId!, requestDto, this.version.value));
 
                         this.notifyInfo('Content saved successfully.');
                         this.enable();
@@ -171,10 +173,6 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         } else {
             this.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
-    }
-
-    private finish() {
-        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 
     private enable() {

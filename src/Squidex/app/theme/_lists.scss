@@ -60,9 +60,18 @@
             }
 
             &.active {
-                background: $color-theme-blue;
-                border-color: $color-theme-blue;
-                color: $color-dark-foreground;
+                & {
+                    background: $color-theme-blue;
+                    border-color: $color-theme-blue;
+                    color: $color-dark-foreground;
+                }
+
+                .btn-link {
+                    &,
+                    &:hover {
+                        color: $color-dark-foreground;
+                    }
+                }
             }
         }
     }

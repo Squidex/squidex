@@ -54,14 +54,31 @@ namespace Squidex.Controllers.Api.Users
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route("user-management/{id}")]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            var entity = await userManager.FindByIdAsync(id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
+
+            return Ok(response);
+        }
+
         [HttpPost]
         [Route("user-management")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Create([FromBody] CreateUserDto request)
+        public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var id = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password);
+            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password);
 
-            var response = new EntityCreatedDto { Id = id };
+            var response = new UserCreatedDto { Id = user.Id, PictureUrl = user.PictureUrl() };
 
             return Ok(response);
         }
@@ -69,7 +86,7 @@ namespace Squidex.Controllers.Api.Users
         [HttpPut]
         [Route("user-management/{id}")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateUserDto request)
+        public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
             await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password);
 
@@ -79,7 +96,7 @@ namespace Squidex.Controllers.Api.Users
         [HttpPut]
         [Route("user-management/{id}/lock/")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Lock(string id)
+        public async Task<IActionResult> LockUser(string id)
         {
             if (IsSelf(id))
             {
@@ -94,7 +111,7 @@ namespace Squidex.Controllers.Api.Users
         [HttpPut]
         [Route("user-management/{id}/unlock/")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Unlock(string id)
+        public async Task<IActionResult> UnlockUser(string id)
         {
             if (IsSelf(id))
             {

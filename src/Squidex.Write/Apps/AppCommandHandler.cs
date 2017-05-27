@@ -69,7 +69,7 @@ namespace Squidex.Write.Apps
 
         protected async Task On(AssignContributor command, CommandContext context)
         {
-            if (await userResolver.FindById(command.ContributorId) == null)
+            if (await userResolver.FindByIdAsync(command.ContributorId) == null)
             {
                 var error =
                     new ValidationError("Cannot find contributor the contributor",

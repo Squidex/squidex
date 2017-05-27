@@ -125,12 +125,12 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public assignContributor() {
-        const newContributor = new AppContributorDto(this.addContributorForm.get('user')!.value.model.id, 'Editor');
+        const requestDto = new AppContributorDto(this.addContributorForm.get('user')!.value.model.id, 'Editor');
 
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
+            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
             .subscribe(() => {
-                this.updateContributors(this.appContributors.push(newContributor));
+                this.updateContributors(this.appContributors.push(requestDto));
             }, error => {
                 this.notifyError(error);
             });
@@ -139,12 +139,12 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public changePermission(contributor: AppContributorDto, permission: string) {
-        const newContributor = changePermission(contributor, permission);
+        const requestDto = changePermission(contributor, permission);
 
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, newContributor, this.version))
+            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
             .subscribe(() => {
-                this.updateContributors(this.appContributors.replace(contributor, newContributor));
+                this.updateContributors(this.appContributors.replace(contributor, requestDto));
             }, error => {
                 this.notifyError(error);
             });

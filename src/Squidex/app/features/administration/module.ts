@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    ResolveUserGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
@@ -16,6 +17,7 @@ import {
 import {
     AdministrationAreaComponent,
     EventConsumersPageComponent,
+    UserPageComponent,
     UsersPageComponent
 } from './declarations';
 
@@ -33,7 +35,20 @@ const routes: Routes = [
                     },
                     {
                         path: 'users',
-                        component: UsersPageComponent
+                        component: UsersPageComponent,
+                        children: [
+                            {
+                                path: 'new',
+                                component: UserPageComponent
+                            },
+                            {
+                                path: ':userId',
+                                component: UserPageComponent,
+                                resolve: {
+                                    user: ResolveUserGuard
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -50,6 +65,7 @@ const routes: Routes = [
     declarations: [
         AdministrationAreaComponent,
         EventConsumersPageComponent,
+        UserPageComponent,
         UsersPageComponent
     ]
 })

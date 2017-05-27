@@ -195,10 +195,10 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public saveField(field: FieldDto, newField: FieldDto) {
-        const request = new UpdateFieldDto(newField.properties);
+        const requestDto = new UpdateFieldDto(newField.properties);
 
         this.appNameOnce()
-            .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, request, this.schemaVersion)).retry(2)
+            .switchMap(app => this.schemasService.putField(app, this.schemaName, field.fieldId, requestDto, this.schemaVersion)).retry(2)
             .subscribe(() => {
                 this.updateField(field, new FieldDto(field.fieldId, field.name, newField.isHidden, field.isDisabled, field.partitioning, newField.properties));
             }, error => {
