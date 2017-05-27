@@ -52,6 +52,7 @@
 input,
 select {
     &.form-control {
+        @include placeholder-color($color-empty);
         padding-top: 0;
         padding-bottom: 0;
         height: calc(2.5rem - 2px);

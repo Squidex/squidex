@@ -35,7 +35,7 @@ noscript {
     }
 
     &-logo {
-        @include fixed(1rem, auto, auto, 1rem);
+        @include absolute(1rem, auto, auto, 1rem);
     }
 
     &-password-signup {

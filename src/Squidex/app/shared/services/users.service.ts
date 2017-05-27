@@ -150,7 +150,7 @@ export class UserManagementService {
     }
 
     public postUser(dto: CreateUserDto): Observable<UserDto> {
-        const url = this.apiUrl.buildUrl(`api/user-management/`);
+        const url = this.apiUrl.buildUrl('api/user-management');
 
         return this.authService.authPost(url, dto)
                 .map(response => response.json())

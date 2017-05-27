@@ -2,8 +2,6 @@
 @import '_vars';
 
 $color-footer: #f7f8fa;
-$color-google: #d34736;
-$color-google-dark: #af2c1a;
 
 .card-footer {
     background: $color-footer;
@@ -26,14 +24,6 @@ $color-google-dark: #af2c1a;
     font-size: 1.4rem;
 }
 
-.icon-google {
-    color: $color-google-dark;
-    font-size: 1.4rem;
-    font-weight: normal;
-    margin-right: .5rem;
-    vertical-align: middle;
-}
-
 .logo {
     height: 1.4rem;
     margin-top: 1rem;
@@ -50,22 +40,13 @@ $color-google-dark: #af2c1a;
     &-button {
         & {
             @include border-radius(1.5rem);
-            color: $color-dark-foreground;
             cursor: pointer;
+            border: 0;
             margin-top: 4rem;
             height: 3rem;
             padding-left: 1.4rem;
             padding-right: 1.4rem;
-            background: $color-google;
             text-transform: uppercase;
-        }
-
-        &:hover {
-            background: darken($color-google, 5%);
-        }
-
-        &:focus {
-            @include box-shadow-none;
         }
     }
 

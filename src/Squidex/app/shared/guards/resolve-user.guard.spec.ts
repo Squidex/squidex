@@ -15,6 +15,7 @@ import { RouterMockup } from './router-mockup';
 
 describe('ResolveUserGuard', () => {
     const route = {
+        params: {},
         parent: {
             params: {
                 userId: 'my-user'
@@ -31,7 +32,7 @@ describe('ResolveUserGuard', () => {
     it('should throw if route does not contain parameter', () => {
         const guard = new ResolveUserGuard(usersService.object, <any>new RouterMockup());
 
-        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and user name.');
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain user id.');
     });
 
     it('should navigate to 404 page if user is not found', (done) => {

@@ -12,8 +12,11 @@ import { It, IMock, Mock, Times } from 'typemoq';
 import {
     ApiUrlConfig,
     AuthService,
-    UserManagementService,
+    CreateUserDto,
+    UpdateUserDto,
+    UserCreatedDto,
     UserDto,
+    UserManagementService,
     UsersDto,
     UsersService
 } from './../';
@@ -236,7 +239,7 @@ describe('UserManagementService', () => {
     });
 
     it('should make get request to get single user', () => {
-        authService.setup(x => x.authGet('http://service/p/api/users/123'))
+        authService.setup(x => x.authGet('http://service/p/api/user-management/123'))
             .returns(() => Observable.of(
                 new Response(
                     new ResponseOptions({
@@ -259,6 +262,49 @@ describe('UserManagementService', () => {
         }).unsubscribe();
 
         expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true));
+
+        authService.verifyAll();
+    });
+
+    it('should make post request to create user', () => {
+        const dto = new CreateUserDto('mail@squidex.io', 'Squidex User', 'password');
+
+        authService.setup(x => x.authPost('http://service/p/api/user-management', It.isAny()))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            id: '123',
+                            pictureUrl: 'path/to/image1'
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let user: UserCreatedDto | null = null;
+
+        userManagementService.postUser(dto).subscribe(result => {
+            user = result;
+        }).unsubscribe();
+
+        expect(user).toEqual(new UserCreatedDto('123', 'path/to/image1'));
+
+        authService.verifyAll();
+    });
+
+    it('should make put request to update user', () => {
+        const dto = new UpdateUserDto('mail@squidex.io', 'Squidex User', 'password');
+
+        authService.setup(x => x.authPut('http://service/p/api/user-management/123', It.isAny()))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions()
+                )
+            ))
+            .verifiable(Times.once());
+
+        userManagementService.putUser('123', dto);
 
         authService.verifyAll();
     });
