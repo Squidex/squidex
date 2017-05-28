@@ -47,12 +47,12 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     }
 
     public ngOnInit() {
+        this.currentUserId = this.authService.user!.id;
+
         this.route.data.map(p => p['user'])
             .subscribe((user: UserDto) => {
                 this.populateForm(user);
             });
-
-        this.currentUserId = this.authService.user!.id;
     }
 
     public save() {
@@ -66,7 +66,6 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             const enable = (message?: string) => {
                 this.userForm.enable();
                 this.userForm.controls['password'].reset();
-                this.userForm.controls['passwordConfirm'].reset();
                 this.userFormSubmitted = false;
                 this.userFormError = message;
             };
@@ -88,7 +87,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                         this.notifyInfo('User created successfully.');
                         back();
                     }, error => {
-                        enable();
+                        enable(error.displayMessage);
                     });
             } else {
                  this.userManagementService.putUser(this.userId, requestDto)
@@ -100,13 +99,11 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 requestDto.displayName));
 
                         this.notifyInfo('User saved successfully.');
-                        enable(null);
+                        enable();
                     }, error => {
                         enable(error.displayMessage);
                     });
             }
-        } else {
-            this.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
