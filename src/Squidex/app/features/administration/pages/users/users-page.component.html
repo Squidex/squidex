@@ -68,10 +68,10 @@
                             </td>
                             <td class="col-right">
                                 <span *ngIf="user.id !== currentUserId">
-                                    <button class="btn btn-link" (click)="lock(user.id)" *ngIf="!user.isLocked" title="Lock User">
+                                    <button class="btn btn-link" (click)="lock(user.id); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
                                         <i class="icon icon-unlocked"></i>
                                     </button>
-                                    <button class="btn btn-link" (click)="unlock(user.id)" *ngIf="user.isLocked" title="Unlock User">
+                                    <button class="btn btn-link" (click)="unlock(user.id); $event.stopPropagation();" *ngIf="user.isLocked" title="Unlock User">
                                         <i class="icon icon-lock"></i>
                                     </button>
                                 </span>

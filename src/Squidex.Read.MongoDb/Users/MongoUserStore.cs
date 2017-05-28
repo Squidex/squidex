@@ -146,11 +146,6 @@ namespace Squidex.Read.MongoDb.Users
             return innerStore.SetPasswordHashAsync((WrappedIdentityUser)user, passwordHash, cancellationToken);
         }
 
-        public Task<bool> HasPasswordAsync(IUser user, CancellationToken cancellationToken)
-        {
-            return innerStore.HasPasswordAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
         public Task AddToRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
         {
             return innerStore.AddToRoleAsync((WrappedIdentityUser)user, roleName, cancellationToken);
@@ -324,6 +319,11 @@ namespace Squidex.Read.MongoDb.Users
         public Task<string> GetTokenAsync(IUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
             return innerStore.GetTokenAsync((WrappedIdentityUser)user, loginProvider, name, cancellationToken);
+        }
+
+        public Task<bool> HasPasswordAsync(IUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(!string.IsNullOrWhiteSpace(((WrappedIdentityUser)user).PasswordHash));
         }
     }
 }

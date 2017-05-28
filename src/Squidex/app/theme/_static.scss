@@ -9,7 +9,7 @@ noscript {
     margin-bottom: 20px;
 }
 
-.login {
+.profile {
     & {
         max-width: 20rem;
         margin: 0 auto;
@@ -38,8 +38,28 @@ noscript {
         @include absolute(1rem, auto, auto, 1rem);
     }
 
+    &-title {
+        margin-bottom: 2rem;
+    }
+
+    &-section {
+        margin-top: 3rem;
+    }
+
+    &-lg {
+        max-width: 40rem;
+    }
+
     &-password-signup {
         color: $color-empty;
+    }
+
+    &-picture-col {
+        max-width: 7rem;
+    }
+
+    &-picture {
+        max-width: 100%;
     }
 
     &-footer {
@@ -99,5 +119,16 @@ noscript {
     div {
         font-size: 30px;
         font-weight: lighter;
+    }
+}
+
+@media (max-width: 400px) {
+    .profile-picture-col {
+        min-width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .profile-picture {
+        height: 5rem;
     }
 }

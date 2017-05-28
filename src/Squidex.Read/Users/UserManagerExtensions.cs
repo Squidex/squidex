@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Squidex.Core.Identity;
 using Squidex.Infrastructure;
 
 // ReSharper disable ImplicitlyCapturedClosure
@@ -83,7 +82,7 @@ namespace Squidex.Read.Users
 
             if (!string.IsNullOrWhiteSpace(displayName))
             {
-                user.SetClaim(SquidexClaimTypes.SquidexDisplayName, displayName);
+                user.SetDisplayName(displayName);
             }
 
             await DoChecked(() => userManager.UpdateAsync(user), "Cannot update user.");

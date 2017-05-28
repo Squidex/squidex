@@ -9,6 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
+    ApiUrlConfig,
     AuthService,
     fadeAnimation,
     ModalView
@@ -32,8 +33,11 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
 
     public isAdmin = false;
 
+    public profileUrl = this.apiUrl.buildUrl('/identity-server/account/profile');
+
     constructor(
-        private readonly auth: AuthService
+        private readonly auth: AuthService,
+        private readonly apiUrl: ApiUrlConfig
     ) {
     }
 

@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,20 +60,6 @@ namespace Squidex.Controllers.UI.Account
             this.identityOptions = identityOptions;
             this.signInManager = signInManager;
         }
-        
-        [HttpGet]
-        [Route("account/forbidden")]
-        public IActionResult Forbidden()
-        {
-            return View("Error");
-        }
-        
-        [HttpGet]
-        [Route("account/accessdenied")]
-        public IActionResult AccessDenied()
-        {
-            return View("LockedOut");
-        }
 
         [HttpGet]
         [Route("client-callback-silent/")]
@@ -89,15 +76,22 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/logout-completed/")]
-        public IActionResult LogoutCompleted()
+        [Route("account/forbidden")]
+        public IActionResult Forbidden()
         {
-            return View();
+            throw new SecurityException("User is not allowed to login.");
+        }
+        
+        [HttpGet]
+        [Route("account/accessdenied")]
+        public IActionResult AccessDenied()
+        {
+            return View("LockedOut");
         }
 
         [HttpGet]
-        [Route("account/error/")]
-        public IActionResult Error()
+        [Route("account/logout-completed/")]
+        public IActionResult LogoutCompleted()
         {
             return View();
         }

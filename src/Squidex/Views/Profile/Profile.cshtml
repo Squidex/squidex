@@ -1,0 +1,155 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model Squidex.Controllers.UI.Profile.ProfileVM
+
+@{
+    ViewBag.Title = "Profile";
+}
+
+<div class="profile profile-lg">
+    <img class="profile-logo" src="~/images/logo-small.png" />
+    
+    <div>
+        <h4 class="profile-title">Welcome, @Model.DisplayName</h4>
+    </div>
+    
+    @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+    {
+        <div class="form-success">
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+    {
+        <div class="form-error">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="row">
+        <div class="col profile-picture-col">
+            <img class="profile-picture" src="@Model.PictureUrl" />
+        </div>
+        <div class="col">
+            <form class="profile-form" asp-controller="Profile" asp-action="Profile" method="post">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    
+                    @if (ViewContext.ViewData.ModelState["Email"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                    {
+                        <div class="errors-box">
+                            <span asp-validation-for="Email" class="errors"></span>
+                        </div>
+                    }
+
+                    <input type="email" ap class="form-control" asp-for="Email" name="email" id="email" />
+                </div>
+
+                <div class="form-group">
+                    <label for="displayName">Display Name</label>
+
+
+                    @if (ViewContext.ViewData.ModelState["DisplayName"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                    {
+                        <div class="errors-box">
+                            <span asp-validation-for="DisplayName" class="errors"></span>
+                        </div>
+                    }
+
+                    <input type="text" class="form-control" asp-for="DisplayName" name="displayName" id="displayName"/>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+    
+    @if (Model.HasPasswordAuth)
+    {
+        <h5 class="profile-section">Password</h5>
+
+        @if (Model.HasPassword)
+         {
+             <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
+                 <div class="form-group">
+                     <label for="oldPassword">Old Password</label>
+
+                     @if (ViewContext.ViewData.ModelState["OldPassword"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                     {
+                         <div class="errors-box">
+                             <span class="errors">@Html.ValidationMessage("OldPassword")</span>
+                         </div>
+                     }
+
+                     <input type="password" class="form-control" name="oldPassword" id="oldPassword"/>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="password">Password</label>
+
+                     @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                     {
+                         <div class="errors-box">
+                             <span class="errors">@Html.ValidationMessage("Password")</span>
+                         </div>
+                     }
+
+                     <input type="password" class="form-control" name="password" id="password"/>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="passwordConfirm">Confirm</label>
+
+                     @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                     {
+                         <div class="errors-box">
+                             <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
+                         </div>
+                     }
+
+                     <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm"/>
+                 </div>
+
+                 <div class="form-group">
+                     <button type="submit" class="btn btn-primary">Change Password</button>
+                 </div>
+             </form>
+         }
+         else
+         {
+             <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
+                 <div class="form-group">
+                     <label for="password">Password</label>
+
+                     @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                     {
+                         <div class="errors-box">
+                             <span class="errors">@Html.ValidationMessage("Password")</span>
+                         </div>
+                     }
+
+                     <input type="password" class="form-control" name="password" id="password"/>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="passwordConfirm">Confirm</label>
+
+                     @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                     {
+                         <div class="errors-box">
+                             <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
+                         </div>
+                     }
+
+                     <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm"/>
+                 </div>
+
+                 <div class="form-group">
+                     <button type="submit" class="btn btn-primary">Set Password</button>
+                 </div>
+             </form>
+         }
+    }
+</div>

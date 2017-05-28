@@ -36,7 +36,8 @@ namespace Squidex
         {
             "/client-callback-popup",
             "/client-callback-silent",
-            "/account"
+            "/account",
+            "/error"
         };
 
         private IConfigurationRoot Configuration { get; }
@@ -137,6 +138,10 @@ namespace Squidex
                 {
                     identityApp.UseDeveloperExceptionPage();
                 }
+                else
+                {
+                    identityApp.UseExceptionHandler("/error");
+                }
 
                 identityApp.UseMyIdentity();
                 identityApp.UseMyIdentityServer();
@@ -177,7 +182,6 @@ namespace Squidex
         {
             if (Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseWebpackProxy();
                 
                 app.Use((context, next) => 

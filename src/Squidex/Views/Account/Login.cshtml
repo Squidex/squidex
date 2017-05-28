@@ -9,29 +9,31 @@
     ViewBag.Title = type;
 }
 
-<div class="login">
-    <img class="login-logo" src="~/images/logo-small.png" />
-
-    <div class="row">
-        <div class="col-6">
-            @if (Model.IsLogin)
-            {
-                <a class="login-headline active" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
-            }
-            else
-            {
-                <a class="login-headline" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
-            }
-        </div>
-        <div class="col-6 login-headline">
-            @if (!Model.IsLogin)
-            {
-                <a class="login-headline active" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
-            }
-            else
-            {
-                <a class="login-headline" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
-            }
+<div class="profile">
+    <img class="profile-logo" src="~/images/logo-small.png" />
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                @if (Model.IsLogin)
+                {
+                    <a class="profile-headline active" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                }
+                else
+                {
+                    <a class="profile-headline" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                }
+            </div>
+            <div class="col-6 profile-headline">
+                @if (!Model.IsLogin)
+                {
+                    <a class="profile-headline active" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                }
+                else
+                {
+                    <a class="profile-headline" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                }
+            </div>
         </div>
     </div>
 
@@ -50,8 +52,8 @@
 
     @if (Model.HasPasswordAndExternal)
     {
-        <div class="login-separator">
-            <div class="login-separator-text">OR</div>
+        <div class="profile-separator">
+            <div class="profile-separator-text">OR</div>
         </div>
     }
 
@@ -66,11 +68,11 @@
 
             <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
                 <div class="form-group">
-                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" />
                 </div>
 
                 <div class="form-group">
-                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" />
                 </div>
 
                 <button type="submit" class="btn btn-block btn-primary">@type</button>
@@ -78,19 +80,19 @@
          }
          else
          {
-             <div class="login-password-signup text-center">Ask your administrator to create an account.</div>
+             <div class="profile-password-signup text-center">Ask your administrator to create an account.</div>
          }
     }
 
     @if (Model.IsLogin)
     {
-        <p class="login-footer">
+        <p class="profile-footer">
             No account yet? <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Click here to signup</a>
         </p>
     }
     else
     {
-        <p class="login-footer">
+        <p class="profile-footer">
             Already registered? <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Click here to login</a>
         </p>
     }
