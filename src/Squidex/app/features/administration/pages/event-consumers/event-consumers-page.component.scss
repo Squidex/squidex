@@ -7,15 +7,7 @@
     }
 
     &-icon {
-        & {
-            @include transition(color .3s ease);
-            cursor: pointer;
-            color: $color-theme-error;
-        }
-
-        &:hover {
-            color: darken($color-theme-error, 10%);
-        }
+        @include build-icon($color-theme-error);
     }
 }
 

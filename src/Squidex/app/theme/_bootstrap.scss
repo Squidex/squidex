@@ -3,10 +3,6 @@
 
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
-body {
-    background: $color-background;
-}
-
 .col-right {
     text-align: right;
 }
@@ -165,6 +161,20 @@ body {
         border-color: transparent;
         background: transparent;
         text-decoration: none;
+    }
+}
+
+.icon {
+    &-github {
+        color: $color-extern-github-icon;
+    }
+
+    &-google {
+        color: $color-extern-google-icon;
+    }
+
+    &-microsoft {
+        color: $color-extern-microsoft-icon;
     }
 }
 

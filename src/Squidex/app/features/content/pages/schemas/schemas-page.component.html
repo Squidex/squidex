@@ -10,9 +10,11 @@
             <i class="icon-close"></i>
         </a>
 
-        <div class="panel-row">            
+        <div class="panel-row">
+            <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+
             <div class="search-form">
-                <input class="form-control form-control-dark" [formControl]="schemasFilter" placeholder="Search for schemas" />
+                <input class="form-control form-control-dark" #findInput [formControl]="schemasFilter" placeholder="Search for schemas" />
 
                 <i class="icon-search"></i>
             </div>

@@ -9,16 +9,18 @@
                 </button>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="newButton.click()"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" [formControl]="contentsFilter" placeholder="Search for content" />
+                    <input class="form-control" #findInput [formControl]="contentsFilter" placeholder="Search for content" />
                 </form>
                 
                 <span *ngIf="languages.length > 1">
                     <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
                 </span>
 
-                <button class="btn btn-success" routerLink="new">
+                <button class="btn btn-success" #newButton routerLink="new">
                     <i class="icon-plus"></i> New
                 </button>
             </div>

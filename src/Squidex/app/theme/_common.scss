@@ -2,9 +2,15 @@
 @import '_vars';
 
 body {
-    background: $color-background;
-    padding-top: $size-navbar-height;
-    padding-left: 0;
+    & {
+        background: $color-background;
+        padding-top: $size-navbar-height;
+        padding-left: 0;
+    }
+
+    &.white {
+        background: $color-dark-foreground;
+    }
 }
 
 h1 {

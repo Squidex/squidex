@@ -87,14 +87,26 @@ noscript {
         }
     }
 
-    .icon-microsoft {
-        &::before {
-            color: $color-dark-foreground;
+    .btn-external {
+        & {
+            text-align: left;
+            text-transform: none;
+            line-height: 1.8rem;
+        }
+
+        &:hover,
+        &:focus {
+            .icon-external {
+                color: $color-dark-foreground;
+            }
         }
     }
 
-    .btn-external {
-        text-align: left;
+    .icon-external {
+        margin-right: .5rem;
+        font-size: 1.3rem;
+        font-weight: normal;
+        vertical-align: middle;
     }
 
     .form-group {

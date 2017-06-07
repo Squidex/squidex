@@ -5,7 +5,8 @@
 
 @{
     var type = Model.IsLogin ? "Login" : "Signup";
-
+    
+    ViewBag.Theme = "white";
     ViewBag.Title = type;
 }
 
@@ -44,7 +45,7 @@
 
             <div class="form-group">
                 <button class="btn btn-external btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
-                    <i class="icon-@schema"></i> @type with <strong>@provider.AuthenticationScheme</strong>
+                    <i class="icon-external icon-@schema"></i> @type with <strong>@provider.AuthenticationScheme</strong>
                 </button>
             </div>
         }

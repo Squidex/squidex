@@ -1,3 +1,15 @@
+@mixin build-icon($color) {
+    & {
+        @include transition(color .3s ease);
+        color: $color;
+    }
+
+    &:hover,
+    &:focus {
+        color: darken($color, 10%);
+    }
+}
+
 @mixin clearfix() {
     &::after {
         content: '';
