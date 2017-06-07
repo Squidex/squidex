@@ -1,16 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.language {
-    &-select {
-        width: 16rem;
-    }
-
-    &-name {
-        @include truncate;
-    }
-
-    &-default {
-        margin: 0;
-    }
+.language-select {
+    width: 16rem;
 }

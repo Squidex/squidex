@@ -1,16 +1,9 @@
 @import '_vars';
 @import '_mixins';
 
-.user {
-    &-name,
-    &-email {
-        @include truncate;
-    }
-
-    &-email {
-        font-style: italic;
-        font-size: .8rem;
-    }
+.user-email {
+    font-style: italic;
+    font-size: .8rem;
 }
 
 .contributors-limit {

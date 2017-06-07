@@ -63,10 +63,10 @@
                                 <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
                             </td>
                             <td>
-                                <span class="user-name">{{user.displayName}}</span>
+                                <span class="user-name table-cell">{{user.displayName}}</span>
                             </td>
                             <td>
-                                <span class="user-email">{{user.email}}</span>
+                                <span class="user-email table-cell">{{user.email}}</span>
                             </td>
                             <td class="col-right">
                                 <span *ngIf="user.id !== currentUserId">

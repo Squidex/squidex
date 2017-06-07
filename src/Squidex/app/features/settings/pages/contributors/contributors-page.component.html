@@ -33,10 +33,10 @@
                                 <img class="user-picture" [attr.title]="contributor.contributorId | userName" [attr.src]="contributor.contributorId | userPicture" />
                             </td>
                             <td>
-                                <span class="user-name">{{contributor.contributorId | userName}}</span>
+                                <span class="user-name table-cell">{{contributor.contributorId | userName}}</span>
                             </td>
                             <td>
-                                <span class="user-email">{{contributor.contributorId | userEmail}}</span>
+                                <span class="user-email table-cell">{{contributor.contributorId | userEmail}}</span>
                             </td>
                             <td>
                                 <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">

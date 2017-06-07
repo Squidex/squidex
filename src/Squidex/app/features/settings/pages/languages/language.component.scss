@@ -4,10 +4,6 @@
 $field-header: #e7ebef;
 
 .language {
-    &-name {
-        @include truncate;
-    }
-
     &-master {
         font-weight: bold;
     }

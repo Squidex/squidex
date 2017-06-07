@@ -18,6 +18,17 @@
         cursor: copy;
     }
 
+    &-button-input {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+    }
+
+    &-button {
+        margin: .5rem 0;
+    }
+
     &-or {
         font-size: .8rem;
     }
@@ -25,19 +36,6 @@
     &-info {
         color: darken($color-border, 30%);
     }
-
-    &-button {
-        margin: .5rem 0;
-    }
-}
-
-.btn-input {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
 }
 
 .row {

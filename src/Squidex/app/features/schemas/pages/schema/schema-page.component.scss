@@ -1,11 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.panel {
-    min-width: 48rem;
-    max-width: 48rem;
-}
-
 .btn-publishing {
     &.disabled,
     &:disabled {

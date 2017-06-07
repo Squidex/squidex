@@ -156,6 +156,10 @@
     }
 }
 
+.table-cell {
+    @include truncate;
+}
+
 .pagination {
     & {
         margin-top: 1rem;

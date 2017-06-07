@@ -1,10 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.field {
-    @include truncate;
-}
-
 .content {
     & {
         cursor: pointer;
