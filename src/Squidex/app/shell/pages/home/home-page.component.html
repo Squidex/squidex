@@ -1,24 +1,25 @@
 <div class="login-area">
     <div class="card">
         <div class="card-block text-center">
-            <img class="login-icon" src="/images/logo-half.png" />
+            <img class="login-icon login-element" src="/images/logo-half.png" />
+
+            <h4 class="login-title login-element">You're about to enter into the future of CMS</h4>
 
             <div>
-                <button class="btn btn-success btn-lg login-button" (click)="login()">
+                <button class="btn btn-success btn-lg login-button login-element" (click)="login()">
                     Login to Squidex
                 </button>
             </div>
-        </div>
-        <div class="card-footer text-muted" *ngIf="!isIE()">
-            <i class="icon-info"></i>
 
-            The login button will open a new popup. Once you are logged in successfull we will redirect you to the squidex management portal.
+            <div class="login-info login-element" *ngIf="!isIE()">
+                The login button will open a new popup. Once you are logged in successfull we will redirect you to the squidex management portal.
+            </div>
         </div>
 
         <div class="login-arms"></div>
     </div>
 
     <div class="proudly-made">
-        Proudly made by Qaisar Ahmad &amp; Sebastian Stehle, 2016-2017
+        Proudly made by<br /> Qaisar Ahmad &amp; Sebastian Stehle, 2016-2017
     </div>
 </div>
