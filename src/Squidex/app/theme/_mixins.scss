@@ -18,6 +18,13 @@
     }
 }
 
+@mixin hidden() {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+}
+
 @mixin flex-box {
     display: -webkit-box;
     display: -webkit-flex;

@@ -9,18 +9,20 @@
 }
 
 .app {
-    float: left;
-    width: 20rem;
-    margin: .625rem;
+    & {
+        margin: .625rem;
+    }
+
+    &-content {
+        width: 20rem;
+    }
+
+    &-title {
+        @include truncate;
+    }
 }
 
-.empty {
-    & {
-        text-align: center;
-    }
-
-    &-headline {
-        margin: 1.25rem;
-        margin-top: 6.25rem;
-    }
+.empty-headline {
+    margin: 1.25rem;
+    margin-top: 6.25rem;
 }

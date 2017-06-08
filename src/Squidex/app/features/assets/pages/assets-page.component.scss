@@ -19,10 +19,7 @@
     }
 
     &-button-input {
-        width: 0;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
+        @include hidden;
     }
 
     &-button {
@@ -36,6 +33,10 @@
     &-info {
         color: darken($color-border, 30%);
     }
+}
+
+.btn {
+    cursor: default;
 }
 
 .row {
