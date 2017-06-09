@@ -2,25 +2,32 @@
 @import '_vars';
 
 body {
+    // Default body with padding for fixed navbar and sidebar.
     & {
         background: $color-background;
         padding-top: $size-navbar-height;
         padding-left: 0;
     }
 
+    // White body for login and profile page.
     &.white {
         background: $color-dark-foreground;
     }
 }
 
+// User ref for history panel. Must be placed here, because element is created dynamically.
 .user-ref {
     color: $color-theme-blue-dark;
 }
 
+// Marker ref for history panel. Must be placed here, because element is created dynamically.
 .marker-ref {
     color: $color-theme-blue-dark;
 }
 
+//
+// Profile picture in circle
+//
 .user-picture {
     & {
         @include circle(2rem);
@@ -31,6 +38,9 @@ body {
     }
 }
 
+//
+// Green or red circle if element is published or unpublished
+//
 .item-published {
     & {
         @include circle(.5rem);
@@ -59,6 +69,9 @@ body {
     }
 }
 
+//
+// Landing page with loading spinner.
+//
 .landing-page {
     & {
         margin: 8rem auto;
@@ -75,14 +88,12 @@ body {
     }
 }
 
+// Hidden helper (fast *ngIf replacement)
 .hidden {
     display: none;
 }
 
+// Hidden helper (fast *ngIf replacement)
 .invisible {
     visibility: hidden;
-}
-
-.item-modified {
-    font-size: .8rem;
 }

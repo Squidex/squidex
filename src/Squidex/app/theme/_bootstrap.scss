@@ -3,6 +3,9 @@
 
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
+//
+// Override most common header sizes
+//
 h1 {
     font-size: 1.3rem;
 }
@@ -15,7 +18,11 @@ h3 {
     font-size: 1.05rem;
 }
 
+//
+// Fix navbar.
+// 
 .navbar {
+    // Use fixed height to reduce problems with dynamic elements.
     & {
         height: $size-navbar-height;
     }
@@ -24,19 +31,9 @@ h3 {
         line-height: 2.2rem;
     }
 
-    &-fixed-top {
-        @include fixed(0, 0, auto, 0);
-        z-index: 10000;
-    }
-
+    // Ensure that dropdown is always under nav bar.
     .dropdown-menu {
         top: 2.6rem;
-    }
-}
-
-.nav-pills {
-    .nav-link {
-        @include border-radius(0);
     }
 }
 
@@ -46,7 +43,11 @@ h3 {
     }
 }
 
+//
+// Restyle dropdown menu.
+//
 .dropdown-menu {
+    // White dropdown menu without border and shadow.
     & {
         @include box-shadow(0, 3px, 16px, .2px);
         border: 0;
@@ -54,6 +55,7 @@ h3 {
     }
 
     a {
+        // Special style for menu item to delete something.
         &.dropdown-item-delete {
             & {
                 color: $color-theme-error;
@@ -65,11 +67,11 @@ h3 {
 
             &:active {
                 background: $color-theme-error-dark;
-                border: 0;
             }
         }
 
         &.dropdown-item {
+            // Make the color white on active.
             &:active {
                 color: $color-dark-foreground;
             }
@@ -77,6 +79,9 @@ h3 {
     }
 }
 
+//
+// Dark vertical menu for dark panels.
+//
 .nav-dark {
     & {
         background: $color-dark2-background;
@@ -94,30 +99,32 @@ h3 {
         .nav-item {
             &:last-child {
                 .nav-link {
+                    // Keep border between two items, not after last item.
                     border: 0;
                 }
             }
         }
     }
 
-    &.nav-pills {
-        .nav-link {
-            & {
-                color: $color-dark2-foreground;
-            }
+    .nav-link {
+        & {
+            color: $color-dark2-foreground;
+        }
 
-            &:hover,
-            &.active {
-                color: $color-dark1-focus-foreground;
-            }
+        &:hover,
+        &.active {
+            color: $color-dark1-focus-foreground;
+        }
 
-            &.active {
-                background: $color-dark2-active-background;
-            }
+        &.active {
+            background: $color-dark2-active-background;
         }
     }
 }
 
+//
+// Tab control navigation.
+//
 .nav-field-tabs {
     & {
         @include absolute(auto, auto, 0, 1.25rem);
@@ -144,34 +151,9 @@ h3 {
     }
 }
 
-@mixin link-button($color) {
-    color: $color;
-    cursor: pointer;
-
-    &:focus {
-        outline-color: transparent;
-    }
-
-    &:disabled {
-        @include opacity(.4);
-    }
-
-    &:disabled,
-    &.disabled {
-        cursor: not-allowed;
-        border-color: transparent;
-    }
-
-    &:focus,
-    &:active,
-    &:hover {
-        color: darken($color, 8%);
-        border-color: transparent;
-        background: transparent;
-        text-decoration: none;
-    }
-}
-
+//
+// Corresponding icon colors for external login buttons.
+//
 .icon {
     &-github {
         color: $color-extern-github-icon;
@@ -186,7 +168,11 @@ h3 {
     }
 }
 
+//
+// Button improvements
+//
 .btn {
+    // Buttons for external logins.
     &-github {
         @include button-variant($color-dark-foreground, $color-extern-github, $color-extern-github);
     }
@@ -199,12 +185,7 @@ h3 {
         @include button-variant($color-dark-foreground, $color-extern-microsoft, $color-extern-microsoft);
     }
 
-    &-cancel {
-        padding: .4rem;
-        font-size: 1.1rem;
-        font-weight: normal;
-    }
-
+    // Special radio button.
     &-radio {
         & {
             color: $color-border-dark;
@@ -227,6 +208,10 @@ h3 {
             line-height: 1.5rem;
         }
 
+        .radio-input {
+            display: none;
+        }
+
         &.active {
             & {
                 @include box-shadow(0, 0, 10px, .5);
@@ -243,31 +228,31 @@ h3 {
         &:hover {
             color: $color-theme-blue;
         }
-
-        .radio-input {
-            display: none;
-        }
     }
 
+    // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-link {
         & {
-            @include link-button($color-theme-blue);
+            @include build-link-button($color-theme-blue);
         }
 
         &.btn-danger {
-            @include link-button($color-theme-error);
+            @include build-link-button($color-theme-error);
         }
 
         &.btn-success {
-            @include link-button($color-theme-green);
+            @include build-link-button($color-theme-green);
         }
 
         &.btn-decent {
-            @include link-button($color-subtext);
+            @include build-link-button($color-subtext);
         }
     }
 }
 
+//
+// Restyle modal dialogs.
+//
 .modal {
     &-content,
     &-header {
@@ -319,17 +304,23 @@ h3 {
     }
 }
 
+// 
+// Table Helpers
+// 
 .table {
+    // Use fixed width for columns.
     &-fixed {
         table-layout: fixed;
     }
 
+    // Vertical align cells.
     &-middle {
         td {
             vertical-align: middle;
         }
     }
 
+    // Remove all borders.
     &-borderless {
         td {
             border: 0;
