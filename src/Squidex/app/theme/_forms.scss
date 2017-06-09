@@ -1,6 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
+//
+// Support for Angular validation states.
+// 
 .ng-invalid {
     &.ng-dirty {
         & {
@@ -14,11 +17,16 @@
     }
 }
 
+//
+// Error tooltip.
+//
 .errors {
-    &-box {
+    // Container where the tooltip is placed.
+    &-container {
         position: relative;
     }
 
+    // Small triangle under the error tooltip with the border trick.
     &::after {
         @include absolute(auto, auto, -.7rem, .625rem);
         content: '';
@@ -29,6 +37,7 @@
         width: 0;
     }
 
+    // The tooltip rectangle itself.
     & {
         @include absolute(auto, auto, .4rem, 0);
         @include border-radius(2px);
@@ -44,50 +53,67 @@
     }
 }
 
+//
+// Align labels to the right.
+//
 .col-form-label,
 .col-form-checkbox-label {
     text-align: right;
 }
 
-.form-error,
-.form-success {
-    @include border-radius(4px);
-    color: $color-dark-foreground;
-    margin-top: .25rem;
-    margin-bottom: .8rem;
-    font-size: .9rem;
-    font-weight: normal;
-    padding: .5rem;
+//
+// Form alerts.
+//  
+.form-alert {
+    & {
+        @include border-radius(4px);
+        color: $color-dark-foreground;
+        margin-top: .25rem;
+        margin-bottom: .8rem;
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .5rem;
+    }
+
+    &-error {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green-dark;
+    }
 }
 
-.form-error {
-    background: $color-theme-error;
-}
-
-.form-success {
-    background: $color-theme-green-dark;
-}
-
+//
+// Form group error.
+//
 .form-group {
+    // Remove the margin after the last form group.
     &:last-child {
         margin-bottom: 0;
     }
 
+    // Remove the margin if the next element is hidden.
     &~.hidden {
         margin-bottom: 0;
     }
 }
 
+//
+// Custom search form.
+//
 .search-form {
     & {
         @include flex-grow(1);
         position: relative;
     }
 
+    // Keep some additional space for the search icon.
     .form-control {
         padding-right: 3rem;
     }
 
+    // Search icon that is placed within the form control.
     .icon-search {
         @include absolute(.625rem, 1rem, auto, auto);
         color: $color-dark2-focus-foreground;
@@ -96,6 +122,7 @@
     }
 }
 
+// Dark form control for the dark panel.
 .form-control-dark {
     & {
         @include transition(background-color .3s ease);

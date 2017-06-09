@@ -1,12 +1,6 @@
 @import '_mixins';
 @import '_vars';
 
-.panel-container {
-    @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
 @mixin panel-icon {
     color: $color-panel-icon;
     font-size: 1.2rem;
@@ -27,6 +21,18 @@
     }
 }
 
+//
+// Panel container to enforce horizontal stacking and scrolling.
+//
+.panel-container {
+    @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+//
+// Panel element.
+//
 .panel {
     & {
         @include flex-box;
@@ -36,6 +42,7 @@
         border-right: 1px solid $color-border;
     }
 
+    // First row of the panel with the header. Fixed height.
     &-header {
         & {
             background: $panel-light-background;
@@ -57,6 +64,7 @@
         }
     }
 
+    // Second row of the panel with the content.
     &-main {
         @include flex-box;
         @include flex-flow(row);
@@ -64,7 +72,9 @@
         overflow: hidden;
     }
 
+    // First column of the main row (second row) with the main content.
     &-content {
+        // Content area is gray by default to contain scrollable content, e.g. lists.
         & {
             @include flex-grow(1);
             border-top: 1px solid $color-border;
@@ -73,11 +83,13 @@
             overflow-y: auto;
         }
 
+        // White content area, e.g. for history panel.
         &-blank {
             background: $panel-light-background;
             border: 0;
         }
 
+        // Scrolling must be enabled optionally to prevent bugs.
         &-scroll {
             overflow-y: scroll;
         }
@@ -93,6 +105,7 @@
         }
     }
 
+    // Second column of the main row (second row) with additional links.
     &-sidebar {
         & {
             background: $panel-light-background;
@@ -122,6 +135,7 @@
         }
     }
 
+    // Panel title.
     &-title {
         @include truncate;
         line-height: 2rem;
@@ -130,14 +144,12 @@
         padding-right: 2rem;
     }
 
-    &-row {
-        margin-top: 1rem;
-    }
-
+    // Keep some space on the right side for the close icon.
     &-title-row {
         padding-right: $panel-sidebar - $panel-padding;
     }
 
+    // Close button to close the panel.
     &-close {
         @include absolute($panel-padding - .2rem, $panel-padding - .8rem, auto, auto);
         @include panel-icon;
@@ -146,6 +158,9 @@
     }
 }
 
+//
+// Dark panel.
+//
 .panel-dark {
     & {
         @include box-shadow(2px, 0, 1px, .3);
@@ -175,7 +190,9 @@
     }
 }
 
-
+//
+// Fixed main sidebar.
+//
 .sidebar {
     & {
         @include fixed($size-navbar-height, auto, 0, 0);

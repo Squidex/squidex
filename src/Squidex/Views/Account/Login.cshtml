@@ -64,7 +64,7 @@
          {
             @if (Model.IsFailed)
             {
-                <div class="form-error">Email or password not correct.</div>
+                <div class="form-alert form-alert-error">Email or password not correct.</div>
             }
 
             <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">

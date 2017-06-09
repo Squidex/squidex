@@ -17,14 +17,14 @@
 
     @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
     {
-        <div class="form-success">
+        <div class="form-alert form-alert-success">
             @ViewBag.SuccessMessage
         </div>
     }
 
     @if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
     {
-        <div class="form-error">
+        <div class="form-alert form-alert-error">
             @ViewBag.ErrorMessage
         </div>
     }
@@ -40,7 +40,7 @@
                     
                     @if (ViewContext.ViewData.ModelState["Email"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                     {
-                        <div class="errors-box">
+                        <div class="errors-container">
                             <span asp-validation-for="Email" class="errors"></span>
                         </div>
                     }
@@ -54,7 +54,7 @@
 
                     @if (ViewContext.ViewData.ModelState["DisplayName"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                     {
-                        <div class="errors-box">
+                        <div class="errors-container">
                             <span asp-validation-for="DisplayName" class="errors"></span>
                         </div>
                     }
@@ -79,7 +79,7 @@
 
                      @if (ViewContext.ViewData.ModelState["OldPassword"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                      {
-                         <div class="errors-box">
+                         <div class="errors-container">
                              <span class="errors">@Html.ValidationMessage("OldPassword")</span>
                          </div>
                      }
@@ -92,7 +92,7 @@
 
                      @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                      {
-                         <div class="errors-box">
+                         <div class="errors-container">
                              <span class="errors">@Html.ValidationMessage("Password")</span>
                          </div>
                      }
@@ -105,7 +105,7 @@
 
                      @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                      {
-                         <div class="errors-box">
+                         <div class="errors-container">
                              <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
                          </div>
                      }
@@ -126,7 +126,7 @@
 
                      @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                      {
-                         <div class="errors-box">
+                         <div class="errors-container">
                              <span class="errors">@Html.ValidationMessage("Password")</span>
                          </div>
                      }
@@ -139,7 +139,7 @@
 
                      @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                      {
-                         <div class="errors-box">
+                         <div class="errors-container">
                              <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
                          </div>
                      }

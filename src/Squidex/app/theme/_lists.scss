@@ -1,6 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
+//
+// Custom list that can either be used with a table or divs.
+//
 .table-items {
     & {
         margin-bottom: -.25rem;
@@ -8,20 +11,24 @@
 
     th,
     td {
+        // Unified padding for all table cells.
         & {
             padding: 1rem;
         }
 
+        // Additional padding for the first column.
         &:first-child {
             padding-left: 1.25rem;
         }
 
+        // Additional padding for the last. column.
         &:last-child {
             padding-right: 1.25rem;
         }
     }
 
     thead {
+        // Small font size for the table header, content is more important!
         th {
             color: $color-table-header;
             font-size: .8rem;
@@ -29,12 +36,16 @@
             border: 0;
             padding-top: 0;
 
+            // Auto truncate all header elements.
             & > span {
                 @include truncate;
             }
         }
     }
 
+    //
+    // Use the list style with a table.
+    //
     tbody {
         td {
             margin: 0;
@@ -43,6 +54,7 @@
         }
 
         tr {
+            // Each row is white and a has a border.
             & {
                 @include transition(all .2s ease);
                 background: $color-table;
@@ -51,14 +63,16 @@
                 margin-bottom: .5rem;
             }
 
+            // Transitioned hover effect.
             &:hover {
-                background: darken($color-table, 1%);
+                background: darken($color-table, 2%);
             }
 
             &:focus {
                 outline: none;
             }
 
+            // Blue background and white text when active.
             &.active {
                 & {
                     background: $color-theme-blue;
@@ -69,6 +83,7 @@
                 .btn-link {
                     &,
                     &:hover {
+                        // Enforce white color for links.
                         color: $color-dark-foreground;
                     }
                 }
@@ -76,6 +91,9 @@
         }
     }
 
+    //
+    // Use the list style with divs.
+    //
     &-row {
         & {
             padding: 1rem 1.25rem;
@@ -85,6 +103,7 @@
             margin-bottom: .25rem;
         }
 
+        // Summary row for expandable rows.
         &-summary {
             padding: 1rem 1.25rem;
             position: relative;
@@ -99,11 +118,13 @@
             color: $color-empty;
         }
 
+        // Detail row for expandable rows.
         &-details {
             & {
                 position: relative;
             }
 
+            // Caret that is placed next to the expand button.
             &::before {
                 @include caret-top;
                 @include absolute(-.5rem, 5.5rem, auto, auto);
@@ -123,6 +144,7 @@
         }
     }
 
+    // Footer that typically contains an add-item-form.
     &-footer {
         padding: 1rem 1.25rem;
         background: $color-table-footer;
@@ -131,6 +153,7 @@
         margin-top: .8rem;
     }
 
+    // Edit or expand button.
     &-edit-button {
         & {
             color: $color-theme-blue;
@@ -150,16 +173,23 @@
         }
     }
 
+    // Spacer item between two normal items, because table rows cannot have margins.
     .spacer {
         border: 0;
         height: .3rem;
     }
 }
 
+//
+// Table cell with truncated content.
+//
 .table-cell {
     @include truncate;
 }
 
+//
+// Lightweight pagination controls.
+//
 .pagination {
     & {
         margin-top: 1rem;

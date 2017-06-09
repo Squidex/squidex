@@ -1,6 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
+//
+// Noscript element with warning, when javascript is disabled.
+//
 noscript {
     display: block;
     color: $color-theme-error;
@@ -9,6 +12,9 @@ noscript {
     margin-bottom: 20px;
 }
 
+//
+// Profile element
+//
 .profile {
     & {
         max-width: 20rem;
@@ -16,6 +22,7 @@ noscript {
         padding: 1rem 2rem;
     }
 
+    // Lightweight, table like headline.
     &-headline {
         & {
             color: $color-empty;
@@ -34,16 +41,9 @@ noscript {
         }
     }
 
+    // Fixed logo on the top left corner of the screen.
     &-logo {
         @include absolute(1rem, auto, auto, 1rem);
-    }
-
-    &-title {
-        margin-bottom: 2rem;
-    }
-
-    &-section {
-        margin-top: 3rem;
     }
 
     &-lg {
@@ -68,6 +68,9 @@ noscript {
         margin-top: 2rem;
     }
 
+    //
+    // Separator element to split two sections.
+    //
     &-separator {
         & {
             text-align: center;
@@ -87,6 +90,7 @@ noscript {
         }
     }
 
+    // External button and icon.
     .external {
         &-button {
             text-align: left;
@@ -104,6 +108,9 @@ noscript {
     }
 }
 
+//
+// Splash text for loader.
+//
 .splash {
     &-h1,
     &-text {
@@ -111,6 +118,9 @@ noscript {
     }
 }
 
+//
+// Loader element.
+//
 .loading {
     & {
         text-align: center;
