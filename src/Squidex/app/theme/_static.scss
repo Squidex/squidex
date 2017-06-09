@@ -11,7 +11,7 @@ noscript {
 
 .profile {
     & {
-        max-width: 20rem;
+        width: 20rem;
         margin: 0 auto;
         padding: 1rem 2rem;
     }
@@ -87,30 +87,24 @@ noscript {
         }
     }
 
-    .btn-external {
-        & {
+    .form-group {
+        margin-bottom: .5rem;
+    }
+
+    .external {
+        &-button {
             text-align: left;
             text-transform: none;
             line-height: 1.8rem;
         }
 
-        &:hover,
-        &:focus {
-            .icon-external {
-                color: $color-dark-foreground;
-            }
+        &-icon {
+            display: inline-block;
+            font-size: 1.3rem;
+            font-weight: normal;
+            vertical-align: middle;
+            width: 1.6rem;
         }
-    }
-
-    .icon-external {
-        margin-right: .5rem;
-        font-size: 1.3rem;
-        font-weight: normal;
-        vertical-align: middle;
-    }
-
-    .form-group {
-        margin-bottom: .5rem;
     }
 }
 
