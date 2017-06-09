@@ -62,9 +62,9 @@
                         <input class="form-check-input" type="checkbox" formControlName="isMaster"> Is Master
                     </label>
 
-                    <div class="form-hint">
+                    <small class="form-text text-muted">
                         Master language is the last fallback language, when no value for a content and a language is available.
-                    </div>
+                    </small>
                 </div>
 
                 <div class="form-check offset-3 col col-9" *ngIf="!isMaster">
@@ -72,9 +72,9 @@
                         <input class="form-check-input" type="checkbox" formControlName="isOptional"> Is Optional
                     </label>
 
-                    <div class="form-hint">
+                    <small class="form-text text-muted">
                         Values for optional languages must not be specified, even if the field is set to required.
-                    </div>
+                    </small>
                 </div>
             </div>
         </form>

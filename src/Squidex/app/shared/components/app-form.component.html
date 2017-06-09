@@ -12,13 +12,13 @@
 
 		<input type="text" class="form-control" id="app-name" formControlName="name" autocomplete="off" sqxLowerCaseInput />
         
-        <span class="form-hint">
+        <small class="form-text text-muted">
             The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{appName | async}}</b>/.
-        </span>
+        </small>
           
-        <span class="form-hint">
+        <small class="form-text text-muted">
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
-        </span>
+        </small>
 	</div>
 
     <div class="form-group clearfix">

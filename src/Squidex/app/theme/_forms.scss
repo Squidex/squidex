@@ -49,23 +49,6 @@
     text-align: right;
 }
 
-input,
-select {
-    &.form-control {
-        @include placeholder-color($color-empty);
-        padding-top: 0;
-        padding-bottom: 0;
-        height: calc(2.5rem - 2px);
-    }
-}
-
-.form-hint {
-    font-size: .8rem;
-    margin-top: .1rem;
-    margin-bottom: 0;
-    color: lighten($color-text, 30%);
-}
-
 .form-error,
 .form-success {
     @include border-radius(4px);

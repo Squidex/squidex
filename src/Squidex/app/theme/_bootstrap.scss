@@ -3,8 +3,16 @@
 
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
-.col-right {
-    text-align: right;
+h1 {
+    font-size: 1.3rem;
+}
+
+h2 {
+    font-size: 1.1rem;
+}
+
+h3 {
+    font-size: 1.05rem;
 }
 
 .navbar {

@@ -11,7 +11,7 @@ noscript {
 
 .profile {
     & {
-        width: 20rem;
+        max-width: 20rem;
         margin: 0 auto;
         padding: 1rem 2rem;
     }
@@ -85,10 +85,6 @@ noscript {
             position: relative;
             padding: 0 1rem;
         }
-    }
-
-    .form-group {
-        margin-bottom: .5rem;
     }
 
     .external {

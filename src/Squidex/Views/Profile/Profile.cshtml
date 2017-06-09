@@ -4,16 +4,17 @@
 @model Squidex.Controllers.UI.Profile.ProfileVM
 
 @{
+    ViewBag.Theme = "white";
     ViewBag.Title = "Profile";
 }
 
 <div class="profile profile-lg">
     <img class="profile-logo" src="~/images/logo-small.png" />
     
-    <div>
-        <h4 class="profile-title">Welcome, @Model.DisplayName</h4>
-    </div>
-    
+    <h1>Edit Profile</h1>
+
+    <h2>Personal Information</h2>
+
     @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
     {
         <div class="form-success">
@@ -68,7 +69,7 @@
     
     @if (Model.HasPasswordAuth)
     {
-        <h5 class="profile-section">Password</h5>
+        <h2>Password</h2>
 
         @if (Model.HasPassword)
          {

@@ -68,7 +68,7 @@
                             <td>
                                 <span class="user-email table-cell">{{user.email}}</span>
                             </td>
-                            <td class="col-right">
+                            <td class="text-right">
                                 <span *ngIf="user.id !== currentUserId">
                                     <button class="btn btn-link" (click)="lock(user.id); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
                                         <i class="icon icon-unlocked"></i>
