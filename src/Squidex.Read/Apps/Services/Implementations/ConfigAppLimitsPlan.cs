@@ -10,7 +10,11 @@ namespace Squidex.Read.Apps.Services.Implementations
 {
     public sealed class ConfigAppLimitsPlan : IAppLimitsPlan
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
+
+        public string Costs { get; set; }
 
         public long MaxApiCalls { get; set; }
 

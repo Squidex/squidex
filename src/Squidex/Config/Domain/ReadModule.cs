@@ -46,8 +46,13 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<ConfigAppLimitsProvider>()
-                .As<IAppLimitsProvider>()
+            builder.RegisterType<ConfigAppPlansProvider>()
+                .As<IAppPlansProvider>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<NoopAppPlanBillingManager>()
+                .As<IAppPlanBillingManager>()
                 .AsSelf()
                 .SingleInstance();
 

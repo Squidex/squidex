@@ -105,6 +105,35 @@
         }
     }
 
+    // Error or alert on top of the panel content.
+    &-alert {
+        & {
+            padding: .5 * $panel-padding $panel-padding;
+            margin: -$panel-padding;
+            margin-bottom: $panel-padding;
+            font-size: .9rem;
+            font-weight: normal;
+            color: $color-dark-foreground;
+        }
+
+        a {
+            color: $color-dark-foreground;
+        }
+
+        a,
+        a:hover {
+            text-decoration: underline;
+        }
+
+        &-success {
+            background: $color-theme-green-dark;
+        }
+
+        &-danger {
+            background: $color-theme-error-dark;
+        }
+    }
+
     // Second column of the main row (second row) with additional links.
     &-sidebar {
         & {

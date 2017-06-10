@@ -97,6 +97,15 @@ namespace Squidex.Read.MongoDb.Apps
             });
         }
 
+        protected Task On(AppPlanChanged @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.PlanOwner = @event.Actor.Identifier;
+                a.PlanId = @event.PlanId;
+            });
+        }
+
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, a =>

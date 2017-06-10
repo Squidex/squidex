@@ -34,7 +34,11 @@ namespace Squidex.Read.MongoDb.Apps
 
         [BsonIgnoreIfDefault]
         [BsonElement]
-        public int PlanId { get; set; }
+        public string PlanId { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement]
+        public string PlanOwner { get; set; }
 
         [BsonRequired]
         [BsonElement]

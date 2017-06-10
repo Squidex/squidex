@@ -30,7 +30,8 @@ namespace Squidex.Write.Apps
     {
         private readonly Mock<ClientKeyGenerator> keyGenerator = new Mock<ClientKeyGenerator>();
         private readonly Mock<IAppRepository> appRepository = new Mock<IAppRepository>();
-        private readonly Mock<IAppLimitsProvider> appLimitsProvider = new Mock<IAppLimitsProvider>();
+        private readonly Mock<IAppPlansProvider> appLimitsProvider = new Mock<IAppPlansProvider>();
+        private readonly Mock<IAppPlanBillingManager> appPlansBillingManager = new Mock<IAppPlanBillingManager>();
         private readonly Mock<IUserResolver> userResolver = new Mock<IUserResolver>();
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
@@ -43,7 +44,7 @@ namespace Squidex.Write.Apps
         {
             app = new AppDomainObject(AppId, -1);
 
-            sut = new AppCommandHandler(Handler, appRepository.Object, appLimitsProvider.Object, userResolver.Object, keyGenerator.Object);
+            sut = new AppCommandHandler(Handler, appRepository.Object, appLimitsProvider.Object, appPlansBillingManager.Object, userResolver.Object, keyGenerator.Object);
         }
 
         [Fact]
@@ -98,7 +99,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_throw_exception_if_reached_max_contributor_size()
         {
-            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
+            appLimitsProvider.Setup(x => x.GetPlan("free")).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
 
             CreateApp()
                 .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "1" }))
@@ -132,7 +133,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_should_assign_if_user_found()
         {
-            appLimitsProvider.Setup(x => x.GetPlan(0)).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
+            appLimitsProvider.Setup(x => x.GetPlan("free")).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
 
             CreateApp();
 

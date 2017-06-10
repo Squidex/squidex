@@ -1,25 +1,21 @@
 ﻿// ==========================================================================
-//  IAppLimitsPlan.cs
+//  ChangePlanDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps.Services
+using System.ComponentModel.DataAnnotations;
+
+namespace Squidex.Controllers.Api.Plans.Models
 {
-    public interface IAppLimitsPlan
+    public class ChangePlanDto
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        string Costs { get; }
-
-        long MaxApiCalls { get; }
-
-        long MaxAssetSize { get; }
-
-        int MaxContributors { get; }
+        /// <summary>
+        /// The new plan id.
+        /// </summary>
+        [Required]
+        public string PlanId { get; set; }
     }
 }

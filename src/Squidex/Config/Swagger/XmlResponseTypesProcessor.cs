@@ -15,7 +15,6 @@ using NJsonSchema.Infrastructure;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
-using NSwag.SwaggerGeneration.WebApi;
 using Squidex.Controllers.Api;
 
 // ReSharper disable UseObjectOrCollectionInitializer
@@ -25,13 +24,6 @@ namespace Squidex.Config.Swagger
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
         private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Description>.*)", RegexOptions.Compiled);
-
-        private readonly WebApiToSwaggerGeneratorSettings settings;
-
-        public XmlResponseTypesProcessor(WebApiToSwaggerGeneratorSettings settings)
-        {
-            this.settings = settings;
-        }
 
         public async Task<bool> ProcessAsync(OperationProcessorContext context)
         {
@@ -59,7 +51,7 @@ namespace Squidex.Config.Swagger
                     hasOkResponse = true;
                 }
             }
-            
+
             await AddInternalErrorResponseAsync(context, operation);
 
             if (!hasOkResponse)
@@ -70,20 +62,19 @@ namespace Squidex.Config.Swagger
             return true;
         }
 
-        private async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
+        private static async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
         {
             if (operation.Responses.ContainsKey("500"))
             {
-                return;    
+                return;
             }
 
             var errorType = typeof(ErrorDto);
-            var errorContract = settings.ActualContractResolver.ResolveContract(errorType);
-            var errorScheme = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], EnumHandling.String);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
 
             var response = new SwaggerResponse { Description = "Operation failed." };
 
-            response.Schema = await context.SwaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorScheme.IsNullable, null);
+            response.Schema = await context.SwaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
 
             operation.Responses.Add("500", response);
         }

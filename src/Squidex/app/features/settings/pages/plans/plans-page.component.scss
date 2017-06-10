@@ -1,0 +1,35 @@
+@import '_vars';
+@import '_mixins';
+
+.panel-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.plan {
+    & {
+        min-width: 13rem;
+        max-width: 20rem;
+        margin: .5rem;
+    }
+
+    &-header {
+        border-bottom: 1px solid $color-border;
+    }
+
+    &-price {
+        color: $color-theme-blue;
+    }
+
+    &-selected {
+        pointer-events: none;
+    }
+
+    &-fact {
+        line-height: 2rem;
+    }
+}
+
+.billing-portal-link {
+    padding: 2rem .5rem 0;
+}

@@ -30,15 +30,17 @@ namespace Squidex.Write.Apps
         private readonly AppClients clients = new AppClients();
         private LanguagesConfig languagesConfig = LanguagesConfig.Empty;
         private string name;
+        private string planId;
+        private RefToken planOwner;
 
         public string Name
         {
             get { return name; }
         }
 
-        public int PlanId
+        public string PlanId
         {
-            get { return 0; }
+            get { return planId; }
         }
 
         public int ContributorCount
@@ -99,6 +101,13 @@ namespace Squidex.Write.Apps
         protected void On(AppLanguageUpdated @event)
         {
             languagesConfig = languagesConfig.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback);
+        }
+
+        protected void On(AppPlanChanged @event)
+        {
+            planId = @event.PlanId;
+
+            planOwner = string.IsNullOrWhiteSpace(planId) ? null : @event.Actor;
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -210,6 +219,17 @@ namespace Squidex.Write.Apps
             return this;
         }
 
+        public AppDomainObject ChangePlan(ChangePlan command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            ThrowIfOtherUser(command);;
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
+
+            return this;
+        }
+
         private void RaiseEvent(AppEvent @event)
         {
             if (@event.AppId == null)
@@ -228,6 +248,14 @@ namespace Squidex.Write.Apps
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
             return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
+        }
+
+        private void ThrowIfOtherUser(ChangePlan command)
+        {
+            if (!string.IsNullOrWhiteSpace(command.PlanId) && planOwner != null && !planOwner.Equals(command.Actor))
+            {
+                throw new DomainException("Plan can only be changed from current user.");
+            }
         }
 
         private void ThrowIfNotCreated()

@@ -6,13 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Read.Apps.Services.Implementations
 {
-    public sealed class ConfigAppLimitsProvider : IAppLimitsProvider
+    public sealed class ConfigAppPlansProvider : IAppPlansProvider
     {
         private static readonly ConfigAppLimitsPlan Infinite = new ConfigAppLimitsPlan
         {
@@ -22,18 +23,18 @@ namespace Squidex.Read.Apps.Services.Implementations
             MaxContributors = -1
         };
 
-        private readonly List<ConfigAppLimitsPlan> config;
+        private readonly Dictionary<string, ConfigAppLimitsPlan> config;
 
-        public ConfigAppLimitsProvider(IEnumerable<ConfigAppLimitsPlan> config)
+        public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
             Guard.NotNull(config, nameof(config));
 
-            this.config = config.Select(c => c.Clone()).OrderBy(x => x.MaxApiCalls).ToList();
+            this.config = config.Select(c => c.Clone()).OrderBy(x => x.MaxApiCalls).ToDictionary(c => c.Id, StringComparer.OrdinalIgnoreCase);
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()
         {
-            return config;
+            return config.Values;
         }
 
         public IAppLimitsPlan GetPlanForApp(IAppEntity app)
@@ -43,14 +44,14 @@ namespace Squidex.Read.Apps.Services.Implementations
             return GetPlan(app.PlanId);
         }
 
-        public IAppLimitsPlan GetPlan(int planId)
+        public IAppLimitsPlan GetPlan(string planId)
         {
-            if (planId >= 0 && planId < config.Count)
-            {
-                return config[planId];
-            }
+            return config.GetOrDefault(planId ?? string.Empty) ?? config.Values.First() ?? Infinite;
+        }
 
-            return config.FirstOrDefault() ?? Infinite;
+        public bool IsConfiguredPlan(string planId)
+        {
+            return planId != null && config.ContainsKey(planId);
         }
     }
 }

@@ -102,6 +102,7 @@ namespace Squidex.Read.Apps.Services.Implementations
             if (@event.Payload is AppClientAttached ||
                 @event.Payload is AppClientRenamed ||
                 @event.Payload is AppClientRevoked ||
+                @event.Payload is AppPlanChanged ||
                 @event.Payload is AppContributorAssigned ||
                 @event.Payload is AppContributorRemoved ||
                 @event.Payload is AppCreated ||

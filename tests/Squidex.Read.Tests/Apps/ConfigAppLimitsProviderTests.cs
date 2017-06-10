@@ -20,6 +20,7 @@ namespace Squidex.Read.Apps
         {
             new ConfigAppLimitsPlan
             {
+                Id = "basic",
                 Name = "Basic",
                 MaxApiCalls = 150000,
                 MaxAssetSize = 1024 * 1024 * 2,
@@ -27,6 +28,7 @@ namespace Squidex.Read.Apps
             },
             new ConfigAppLimitsPlan
             {
+                Id = "free",
                 Name = "Free",
                 MaxApiCalls = 50000,
                 MaxAssetSize = 1024 * 1024 * 10,
@@ -37,7 +39,7 @@ namespace Squidex.Read.Apps
         [Fact]
         public void Should_return_plans()
         {
-            var sut = new ConfigAppLimitsProvider(Plans);
+            var sut = new ConfigAppPlansProvider(Plans);
 
             Plans.OrderBy(x => x.MaxApiCalls).ShouldBeEquivalentTo(sut.GetAvailablePlans());
         }
@@ -45,9 +47,9 @@ namespace Squidex.Read.Apps
         [Fact]
         public void Should_return_infinite_if_nothing_configured()
         {
-            var sut = new ConfigAppLimitsProvider(Enumerable.Empty<ConfigAppLimitsPlan>());
+            var sut = new ConfigAppPlansProvider(Enumerable.Empty<ConfigAppLimitsPlan>());
 
-            var plan = sut.GetPlanForApp(CreateApp(0));
+            var plan = sut.GetPlanForApp(CreateApp("my-plan"));
 
             plan.ShouldBeEquivalentTo(new ConfigAppLimitsPlan
             {
@@ -61,12 +63,13 @@ namespace Squidex.Read.Apps
         [Fact]
         public void Should_return_fitting_app_plan()
         {
-            var sut = new ConfigAppLimitsProvider(Plans);
+            var sut = new ConfigAppPlansProvider(Plans);
 
-            var plan = sut.GetPlanForApp(CreateApp(1));
+            var plan = sut.GetPlanForApp(CreateApp("basic"));
 
             plan.ShouldBeEquivalentTo(new ConfigAppLimitsPlan
             {
+                Id = "basic",
                 Name = "Basic",
                 MaxApiCalls = 150000,
                 MaxAssetSize = 1024 * 1024 * 2,
@@ -77,12 +80,13 @@ namespace Squidex.Read.Apps
         [Fact]
         public void Should_smallest_plan_if_none_fits()
         {
-            var sut = new ConfigAppLimitsProvider(Plans);
+            var sut = new ConfigAppPlansProvider(Plans);
 
-            var plan = sut.GetPlanForApp(CreateApp(4));
+            var plan = sut.GetPlanForApp(CreateApp("Enterprise"));
 
             plan.ShouldBeEquivalentTo(new ConfigAppLimitsPlan
             {
+                Id = "free",
                 Name = "Free",
                 MaxApiCalls = 50000,
                 MaxAssetSize = 1024 * 1024 * 10,
@@ -90,7 +94,7 @@ namespace Squidex.Read.Apps
             });
         }
 
-        private static IAppEntity CreateApp(int plan)
+        private static IAppEntity CreateApp(string plan)
         {
             var app = new Mock<IAppEntity>();
 

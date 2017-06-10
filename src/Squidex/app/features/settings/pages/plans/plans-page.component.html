@@ -1,0 +1,71 @@
+<sqx-title message="{app} | Plans | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<sqx-panel panelWidth="60rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <div class="float-right">
+                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+            </div>
+            
+            <h3 class="panel-title">Update Plan</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink>
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content">
+            <div *ngIf="plans">
+                <div class="panel-alert panel-alert-danger" *ngIf="!plans.hasConfigured || !planOwned">
+                    <div *ngIf="!plans.hasConfigured">
+                        You have not configured your account yet. Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> to add payment options.
+                    </div>
+                    <div *ngIf="!planOwned">
+                        You have not created the subscription. Therefore you cannot change the plan.
+                    </div>
+                </div>
+
+                <div class="clearfix">
+                    <div class="card plan float-left" *ngFor="let plan of plans.plans">
+                        <div class="card-block plan-header text-center">
+                            <h4 class="card-title">{{plan.name}}</h4>
+                            <h5 class="plan-price">{{plan.costs}}</h5>
+
+                            <small class="text-muted">Per Month</small>
+                        </div>
+                        <div class="card-block">
+                            <div class="plan-fact">
+                                {{formatCalls(plan.maxApiCalls)}} API Calls
+                            </div>
+                            <div class="plan-fact">
+                                {{formatSize(plan.maxAssetSize)}} Storage
+                            </div>
+                            <div class="plan-fact">
+                                {{plan.maxContributors}} Contributors
+                            </div>
+                        </div>
+                        <div class="card-block">
+                            <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
+                                &#10003; Selected
+                            </button>
+                            
+                            <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled ||  !plans.hasConfigured || !planOwned" (click)="changePlan(plan.id)">
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="plans.hasPortal" class="billing-portal-link">
+                    Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> for payment history and subscription overview.
+                </div>
+            </div>
+        </div>
+    </div>
+</sqx-panel>

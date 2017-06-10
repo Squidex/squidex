@@ -87,7 +87,7 @@ namespace Squidex.Config.Swagger
             settings.DocumentProcessors.Add(new XmlTagProcessor());
 
             settings.OperationProcessors.Add(new XmlTagProcessor());
-            settings.OperationProcessors.Add(new XmlResponseTypesProcessor(settings));
+            settings.OperationProcessors.Add(new XmlResponseTypesProcessor());
 
             return settings;
         }

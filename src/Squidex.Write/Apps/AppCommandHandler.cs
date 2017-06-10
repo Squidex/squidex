@@ -24,14 +24,16 @@ namespace Squidex.Write.Apps
     {
         private readonly IAggregateHandler handler;
         private readonly IAppRepository appRepository;
-        private readonly IAppLimitsProvider appLimitsProvider;
+        private readonly IAppPlansProvider appPlansProvider;
+        private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
         private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
             IAggregateHandler handler,
             IAppRepository appRepository,
-            IAppLimitsProvider appLimitsProvider,
+            IAppPlansProvider appPlansProvider,
+            IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver,
             ClientKeyGenerator keyGenerator)
         {
@@ -39,13 +41,15 @@ namespace Squidex.Write.Apps
             Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(appLimitsProvider, nameof(appLimitsProvider));
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.handler = handler;
             this.keyGenerator = keyGenerator;
             this.userResolver = userResolver;
             this.appRepository = appRepository;
-            this.appLimitsProvider = appLimitsProvider;
+            this.appPlansProvider = appPlansProvider;
+            this.appPlansBillingManager = appPlansBillingManager;
         }
 
         protected async Task On(CreateApp command, CommandContext context)
@@ -81,7 +85,7 @@ namespace Squidex.Write.Apps
             await handler.UpdateAsync<AppDomainObject>(context, a =>
             {
                 var oldContributors = a.ContributorCount;
-                var maxContributors = appLimitsProvider.GetPlan(a.PlanId).MaxContributors;
+                var maxContributors = appPlansProvider.GetPlan(a.PlanId).MaxContributors;
 
                 a.AssignContributor(command);
 
@@ -91,6 +95,25 @@ namespace Squidex.Write.Apps
 
                     throw new ValidationException("Cannot assign contributor to app", error);
                 }
+            });
+        }
+
+        protected Task On(ChangePlan command, CommandContext context)
+        {
+            if (!appPlansProvider.IsConfiguredPlan(command.PlanId))
+            {
+                var error =
+                    new ValidationError($"The plan '{command.PlanId}' does not exists",
+                        nameof(CreateApp.Name));
+
+                throw new ValidationException("Cannot change plan", error);
+            }
+
+            return handler.UpdateAsync<AppDomainObject>(context, async a =>
+            {
+                a.ChangePlan(command);
+
+                await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, a.Id, a.Name, command.PlanId);
             });
         }
 

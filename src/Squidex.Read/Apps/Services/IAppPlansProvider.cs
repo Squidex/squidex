@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppLimitsProvider.cs
+//  IAppPlansProvider.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,12 +10,14 @@ using System.Collections.Generic;
 
 namespace Squidex.Read.Apps.Services
 {
-    public interface IAppLimitsProvider
+    public interface IAppPlansProvider
     {
         IEnumerable<IAppLimitsPlan> GetAvailablePlans();
 
+        bool IsConfiguredPlan(string planId);
+
         IAppLimitsPlan GetPlanForApp(IAppEntity entity);
 
-        IAppLimitsPlan GetPlan(int planId);
+        IAppLimitsPlan GetPlan(string planId);
     }
 }

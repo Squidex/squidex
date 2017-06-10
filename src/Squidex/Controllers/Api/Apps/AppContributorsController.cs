@@ -29,12 +29,12 @@ namespace Squidex.Controllers.Api.Apps
     [SwaggerTag("Apps")]
     public class AppContributorsController : ControllerBase
     {
-        private readonly IAppLimitsProvider appLimitsProvider;
+        private readonly IAppPlansProvider appPlansProvider;
 
-        public AppContributorsController(ICommandBus commandBus, IAppLimitsProvider appLimitsProvider) 
+        public AppContributorsController(ICommandBus commandBus, IAppPlansProvider appPlansProvider) 
             : base(commandBus)
         {
-            this.appLimitsProvider = appLimitsProvider;
+            this.appPlansProvider = appPlansProvider;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Squidex.Controllers.Api.Apps
         {
             var contributors = App.Contributors.Select(x => SimpleMapper.Map(x, new ContributorDto())).ToArray();
 
-            var response = new ContributorsDto { Contributors = contributors, MaxContributors = appLimitsProvider.GetPlanForApp(App).MaxContributors };
+            var response = new ContributorsDto { Contributors = contributors, MaxContributors = appPlansProvider.GetPlanForApp(App).MaxContributors };
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 

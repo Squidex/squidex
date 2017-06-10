@@ -26,6 +26,7 @@ export * from './services/event-consumers.service';
 export * from './services/help.service';
 export * from './services/history.service';
 export * from './services/languages.service';
+export * from './services/plans.service';
 export * from './services/schemas.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';

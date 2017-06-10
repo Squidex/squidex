@@ -1,25 +1,15 @@
 ﻿// ==========================================================================
-//  IAppLimitsPlan.cs
+//  ChangePlanCommand.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Write.Apps.Commands
 {
-    public interface IAppLimitsPlan
+    public sealed class ChangePlan : AppAggregateCommand
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        string Costs { get; }
-
-        long MaxApiCalls { get; }
-
-        long MaxAssetSize { get; }
-
-        int MaxContributors { get; }
+        public string PlanId { get; set; }
     }
 }

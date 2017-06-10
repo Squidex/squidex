@@ -38,21 +38,21 @@ namespace Squidex.Controllers.Api.Assets
     {
         private readonly IAssetRepository assetRepository;
         private readonly IAssetStatsRepository assetStatsRepository;
-        private readonly IAppLimitsProvider appLimitProvider;
+        private readonly IAppPlansProvider appPlanProvider;
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
             ICommandBus commandBus, 
             IAssetRepository assetRepository,
             IAssetStatsRepository assetStatsRepository,
-            IAppLimitsProvider appLimitProvider,
+            IAppPlansProvider appPlanProvider,
             IOptions<AssetConfig> assetsConfig) 
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
             this.assetRepository = assetRepository;
             this.assetStatsRepository = assetStatsRepository;
-            this.appLimitProvider = appLimitProvider;
+            this.appPlanProvider = appPlanProvider;
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Squidex.Controllers.Api.Assets
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            var plan = appLimitProvider.GetPlanForApp(App);
+            var plan = appPlanProvider.GetPlanForApp(App);
 
             var currentSize = await assetStatsRepository.GetTotalSizeAsync(App.Id);
 

@@ -15,7 +15,9 @@ namespace Squidex.Read.Apps
     {
         string Name { get; }
 
-        int PlanId { get; }
+        string PlanId { get; }
+
+        string PlanOwner { get; }
 
         LanguagesConfig LanguagesConfig { get; }
 

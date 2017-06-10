@@ -26,13 +26,13 @@ namespace Squidex.Pipeline
     public sealed class AppApiFilter : IAsyncAuthorizationFilter
     {
         private readonly IAppProvider appProvider;
-        private readonly IAppLimitsProvider appLimitProvider;
+        private readonly IAppPlansProvider appPlanProvider;
         private readonly IUsageTracker usageTracker;
 
-        public AppApiFilter(IAppProvider appProvider, IAppLimitsProvider appLimitProvider, IUsageTracker usageTracker)
+        public AppApiFilter(IAppProvider appProvider, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
         {
             this.appProvider = appProvider;
-            this.appLimitProvider = appLimitProvider;
+            this.appPlanProvider = appPlanProvider;
 
             this.usageTracker = usageTracker;
         }
@@ -63,7 +63,7 @@ namespace Squidex.Pipeline
                     return;
                 }
 
-                var plan = appLimitProvider.GetPlanForApp(app);
+                var plan = appPlanProvider.GetPlanForApp(app);
 
                 var usage = await usageTracker.GetMonthlyCalls(app.Id.ToString(), DateTime.Today);
 

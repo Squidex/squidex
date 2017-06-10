@@ -1,25 +1,18 @@
 ﻿// ==========================================================================
-//  IAppLimitsPlan.cs
+//  AppPlanChanged.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps.Services
+using Squidex.Infrastructure;
+
+namespace Squidex.Events.Apps
 {
-    public interface IAppLimitsPlan
+    [TypeName("AppPlanChanged")]
+    public sealed class AppPlanChanged : AppEvent
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        string Costs { get; }
-
-        long MaxApiCalls { get; }
-
-        long MaxAssetSize { get; }
-
-        int MaxContributors { get; }
+        public string PlanId { get; set; }
     }
 }

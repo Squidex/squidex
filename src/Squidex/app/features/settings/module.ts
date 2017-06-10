@@ -22,6 +22,7 @@ import {
     ContributorsPageComponent,
     LanguageComponent,
     LanguagesPageComponent,
+    PlansPageComponent,
     SettingsAreaComponent
 } from './declarations';
 
@@ -32,6 +33,10 @@ const routes: Routes = [
         children: [
             {
                 path: ''
+            },
+            {
+                path: 'plans',
+                component: PlansPageComponent
             },
             {
                 path: 'clients',
@@ -110,6 +115,7 @@ const routes: Routes = [
         ContributorsPageComponent,
         LanguageComponent,
         LanguagesPageComponent,
+        PlansPageComponent,
         SettingsAreaComponent
     ]
 })

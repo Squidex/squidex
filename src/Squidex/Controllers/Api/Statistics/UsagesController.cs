@@ -30,19 +30,19 @@ namespace Squidex.Controllers.Api.Statistics
     public class UsagesController : ControllerBase
     {
         private readonly IUsageTracker usageTracker;
-        private readonly IAppLimitsProvider appLimitProvider;
+        private readonly IAppPlansProvider appPlanProvider;
         private readonly IAssetStatsRepository assetStatsRepository;
 
         public UsagesController(
             ICommandBus commandBus, 
             IUsageTracker usageTracker,
-            IAppLimitsProvider appLimitProvider, 
+            IAppPlansProvider appPlanProvider, 
             IAssetStatsRepository assetStatsRepository)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;
 
-            this.appLimitProvider = appLimitProvider;
+            this.appPlanProvider = appPlanProvider;
             this.assetStatsRepository = assetStatsRepository;
         }
 
@@ -62,7 +62,7 @@ namespace Squidex.Controllers.Api.Statistics
         {
             var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
 
-            var plan = appLimitProvider.GetPlanForApp(App);
+            var plan = appPlanProvider.GetPlanForApp(App);
 
             return Ok(new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls });
         }
@@ -117,7 +117,7 @@ namespace Squidex.Controllers.Api.Statistics
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(App.Id);
 
-            var plan = appLimitProvider.GetPlanForApp(App);
+            var plan = appPlanProvider.GetPlanForApp(App);
 
             return Ok(new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize });
         }
