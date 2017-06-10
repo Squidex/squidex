@@ -58,12 +58,15 @@ namespace Squidex.Controllers.Api.Plans
 
             var planId = appPlansProvider.GetPlanForApp(App).Id;
 
+            var hasPortal = appPlansBillingManager.HasPortal;
+            var hasConfigured = await appPlansBillingManager.HasPaymentOptionsAsync(userId);
+
             var response = new AppPlansDto
             {
                 Plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList(),
                 PlanOwner = App.PlanOwner,
-                HasPortal = appPlansBillingManager.HasPortal,
-                HasConfigured = await appPlansBillingManager.HasPaymentOptionsAsync(userId),
+                HasPortal = hasPortal,
+                HasConfigured = hasConfigured,
                 CurrentPlanId = planId
             };
 
