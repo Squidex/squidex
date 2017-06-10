@@ -44,20 +44,36 @@ namespace Squidex.Read.Apps
             Plans.OrderBy(x => x.MaxApiCalls).ShouldBeEquivalentTo(sut.GetAvailablePlans());
         }
 
-        [Fact]
-        public void Should_return_infinite_if_nothing_configured()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("my-plan")]
+        public void Should_return_infinite_if_nothing_configured(string planId)
         {
             var sut = new ConfigAppPlansProvider(Enumerable.Empty<ConfigAppLimitsPlan>());
 
-            var plan = sut.GetPlanForApp(CreateApp("my-plan"));
+            var plan = sut.GetPlanForApp(CreateApp(planId));
 
             plan.ShouldBeEquivalentTo(new ConfigAppLimitsPlan
             {
+                Id = "infinite",
                 Name = "Infinite",
                 MaxApiCalls = -1,
                 MaxAssetSize = -1,
                 MaxContributors = -1
             });
+        }
+
+        [Fact]
+        public void Should_check_plan_exists()
+        {
+            var sut = new ConfigAppPlansProvider(Plans);
+
+            Assert.True(sut.IsConfiguredPlan("basic"));
+            Assert.True(sut.IsConfiguredPlan("free"));
+
+            Assert.False(sut.IsConfiguredPlan("infinite"));
+            Assert.False(sut.IsConfiguredPlan("invalid"));
+            Assert.False(sut.IsConfiguredPlan(null));
         }
 
         [Fact]

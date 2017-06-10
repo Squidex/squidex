@@ -17,6 +17,7 @@ namespace Squidex.Read.Apps.Services.Implementations
     {
         private static readonly ConfigAppLimitsPlan Infinite = new ConfigAppLimitsPlan
         {
+            Id = "infinite",
             Name = "Infinite",
             MaxApiCalls = -1,
             MaxAssetSize = -1,
@@ -46,7 +47,7 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public IAppLimitsPlan GetPlan(string planId)
         {
-            return config.GetOrDefault(planId ?? string.Empty) ?? config.Values.First() ?? Infinite;
+            return config.GetOrDefault(planId ?? string.Empty) ?? config.Values.FirstOrDefault() ?? Infinite;
         }
 
         public bool IsConfiguredPlan(string planId)

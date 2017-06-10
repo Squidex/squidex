@@ -21,7 +21,7 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public string FreePlanId
         {
-            get { return "free"; }
+            get { return "infinite"; }
         }
 
         public Task ChangePlanAsync(string userId, Guid appId, string appName, string planId)
