@@ -99,7 +99,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_throw_exception_if_reached_max_contributor_size()
         {
-            appLimitsProvider.Setup(x => x.GetPlan("free")).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
+            appLimitsProvider.Setup(x => x.GetPlan(null)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
 
             CreateApp()
                 .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "1" }))
@@ -133,7 +133,7 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AssignContributor_should_assign_if_user_found()
         {
-            appLimitsProvider.Setup(x => x.GetPlan("free")).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
+            appLimitsProvider.Setup(x => x.GetPlan(null)).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
 
             CreateApp();
 
@@ -180,6 +180,40 @@ namespace Squidex.Write.Apps
             keyGenerator.VerifyAll();
 
             context.Result<EntityCreatedResult<AppClient>>().IdOrValue.ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
+        }
+
+        [Fact]
+        public async Task ChangePlan_should_throw_if_plan_not_found()
+        {
+            appLimitsProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(false);
+
+            CreateApp()
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
+
+            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task ChangePlan_should_update_domain_object()
+        {
+            appLimitsProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+
+            CreateApp()
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
+
+            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Once());
         }
 
         [Fact]

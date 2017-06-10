@@ -221,9 +221,10 @@ namespace Squidex.Write.Apps
 
         public AppDomainObject ChangePlan(ChangePlan command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.Valid(command, nameof(command), () => "Cannot change plan");
 
-            ThrowIfOtherUser(command);;
+            ThrowIfNotCreated();
+            ThrowIfOtherUser(command);
 
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
 
@@ -254,7 +255,12 @@ namespace Squidex.Write.Apps
         {
             if (!string.IsNullOrWhiteSpace(command.PlanId) && planOwner != null && !planOwner.Equals(command.Actor))
             {
-                throw new DomainException("Plan can only be changed from current user.");
+                throw new ValidationException("Plan can only be changed from current user.");
+            }
+
+            if (string.Equals(command.PlanId, planId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ValidationException("App has already this plan.");
             }
         }
 

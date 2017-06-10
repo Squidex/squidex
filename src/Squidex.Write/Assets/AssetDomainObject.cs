@@ -31,11 +31,6 @@ namespace Squidex.Write.Assets
             get { return isDeleted; }
         }
 
-        public string FileName
-        {
-            get { return fileName; }
-        }
-
         public long FileVersion
         {
             get { return fileVersion; }

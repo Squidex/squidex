@@ -101,24 +101,27 @@ namespace Squidex.Write.TestHelpers
 
             if (!handler.IsUpdated && shouldUpdate)
             {
-                throw new InvalidOperationException("Create not called");
+                throw new InvalidOperationException("Update not called");
             }
         }
 
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
-            command.Actor = User;
+            if (command.Actor == null)
+            {
+                command.Actor = User;
+            }
 
             var appCommand = command as AppCommand;
 
-            if (appCommand != null)
+            if (appCommand != null && appCommand.AppId == null)
             {
                 appCommand.AppId = AppNamedId;
             }
 
             var schemaCommand = command as SchemaCommand;
 
-            if (schemaCommand != null)
+            if (schemaCommand != null && schemaCommand.SchemaId == null)
             {
                 schemaCommand.SchemaId = SchemaNamedId;
             }

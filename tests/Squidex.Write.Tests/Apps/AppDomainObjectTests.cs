@@ -28,6 +28,7 @@ namespace Squidex.Write.Apps
         private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
+        private readonly string planId = "premium";
 
         public AppDomainObjectTests()
         {
@@ -70,6 +71,62 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
+        public void ChangePlan_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
+            });
+        }
+
+        [Fact]
+        public void ChangePlan_should_throw_exception_if_command_is_not_valid()
+        {
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.ChangePlan(CreateCommand(new ChangePlan()));
+            });
+        }
+
+        [Fact]
+        public void ChangePlan_should_throw_exception_if_plan_configured_from_other_user()
+        {
+            CreateApp();
+
+            sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = "other-plan", Actor = new RefToken("User", "other") }));
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
+            });
+        }
+
+        [Fact]
+        public void ChangePlan_should_throw_exception_if_same_plan()
+        {
+            CreateApp();
+            sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
+            });
+        }
+
+        [Fact]
+        public void ChangePlan_should_create_events()
+        {
+            CreateApp();
+
+            sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPlanChanged { PlanId = planId })
+                );
+        }
+
+        [Fact]
         public void AssignContributor_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
@@ -102,6 +159,7 @@ namespace Squidex.Write.Apps
         public void AssignContributor_should_throw_exception_if_user_already_contributor()
         {
             CreateApp();
+
             sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
 
             Assert.Throws<ValidationException>(() =>

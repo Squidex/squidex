@@ -6,10 +6,21 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Squidex.Infrastructure;
+
 namespace Squidex.Write.Apps.Commands
 {
-    public sealed class ChangePlan : AppAggregateCommand
+    public sealed class ChangePlan : AppAggregateCommand, IValidatable
     {
         public string PlanId { get; set; }
+
+        public void Validate(IList<ValidationError> errors)
+        {
+            if (string.IsNullOrWhiteSpace(PlanId))
+            {
+                errors.Add(new ValidationError("PlanId is not defined", nameof(PlanId)));
+            }
+        }
     }
 }
