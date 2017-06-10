@@ -1,6 +1,5 @@
 FROM microsoft/aspnetcore-build:1.1.2
 
-
 # Install runtime dependencies
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates bzip2 libfontconfig \
