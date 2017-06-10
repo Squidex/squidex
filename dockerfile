@@ -1,4 +1,7 @@
-FROM microsoft/aspnetcore-build:1.1.2
+#
+# Stage 1, Prebuild
+#
+FROM microsoft/aspnetcore-build:1.1.2 as builder
 
 # Install runtime dependencies
 RUN apt-get update \
@@ -49,3 +52,16 @@ RUN dotnet restore \
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Release
+
+#
+# Stage 2, Build runtime
+#
+FROM microsoft/aspnetcore:1.1.2
+
+# Default AspNet Core Workdir
+WORKDIR /app
+
+# Copy from Build Stage
+COPY --from=builder /out/ .
+
+ENTRYPOINT ["dotnet", "Squidex.dll"]
