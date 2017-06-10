@@ -46,7 +46,12 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
                 {
                     display: true
                 }
-            ]
+            ],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
         },
         maintainAspectRatio: false
     };
@@ -84,7 +89,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
             });
 
         this.appName()
-            .switchMap(app => this.usagesService.getStorageUsages(app, DateTime.today().addDays(-30), DateTime.today()))
+            .switchMap(app => this.usagesService.getStorageUsages(app, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartStorageCount = {
                     labels: createLabels(dtos),
@@ -118,7 +123,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
             });
 
         this.appName()
-            .switchMap(app => this.usagesService.getCallsUsages(app, DateTime.today().addDays(-30), DateTime.today()))
+            .switchMap(app => this.usagesService.getCallsUsages(app, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartCallsCount = {
                     labels: createLabels(dtos),
@@ -184,10 +189,8 @@ function createLabels(dtos: { date: DateTime }[]): string[] {
     const labels: string[] = [];
 
     for (let dto of dtos) {
-        if (dto.date.weekDay === 1 || dto.date.weekDay === 4) {
+        if (true || dto.date.weekDay === 1 || dto.date.weekDay === 4) {
             labels.push(dto.date.toStringFormat('M-DD'));
-        } else {
-            labels.push('');
         }
     }
 
