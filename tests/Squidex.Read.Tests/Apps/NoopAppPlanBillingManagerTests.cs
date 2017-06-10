@@ -24,12 +24,6 @@ namespace Squidex.Read.Apps
         }
 
         [Fact]
-        public void Should_provide_free_plan()
-        {
-            Assert.Equal("infinite", sut.FreePlanId);
-        }
-
-        [Fact]
         public async Task Should_do_nothing_when_changing_plan()
         {
             await sut.ChangePlanAsync(null, Guid.Empty, null, null);

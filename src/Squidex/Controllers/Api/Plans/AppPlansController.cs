@@ -56,13 +56,15 @@ namespace Squidex.Controllers.Api.Plans
         {
             var userId = User.FindFirst(OpenIdClaims.Subject).Value;
 
+            var planId = appPlansProvider.GetPlanForApp(App).Id;
+
             var response = new AppPlansDto
             {
                 Plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList(),
                 PlanOwner = App.PlanOwner,
                 HasPortal = appPlansBillingManager.HasPortal,
                 HasConfigured = await appPlansBillingManager.HasPaymentOptionsAsync(userId),
-                CurrentPlanId = !string.IsNullOrWhiteSpace(App.PlanId) ? App.PlanId : appPlansBillingManager.FreePlanId
+                CurrentPlanId = planId
             };
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
