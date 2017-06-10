@@ -31,6 +31,10 @@
                     </div>
                 </div>
 
+                <div class="text-muted text-center empty" *ngIf="plans.plans.length === 0">
+                    No plan configured, this app has unlimited usage.
+                </div>
+
                 <div class="clearfix">
                     <div class="card plan float-left" *ngFor="let plan of plans.plans">
                         <div class="card-block plan-header text-center">
