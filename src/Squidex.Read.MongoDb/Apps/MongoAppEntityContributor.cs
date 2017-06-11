@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MongoAppContributorEntity.cs
+//  MongoAppEntityContributor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,7 +12,7 @@ using Squidex.Read.Apps;
 
 namespace Squidex.Read.MongoDb.Apps
 {
-    public sealed class MongoAppContributorEntity : IAppContributorEntity
+    public sealed class MongoAppEntityContributor : IAppContributorEntity
     {
         [BsonRequired]
         [BsonElement]

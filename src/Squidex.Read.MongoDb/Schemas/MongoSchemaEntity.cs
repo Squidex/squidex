@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
@@ -52,6 +53,15 @@ namespace Squidex.Read.MongoDb.Schemas
         [BsonRequired]
         [BsonElement]
         public bool IsDeleted { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public List<MongoSchemaEntityWebhook> Webhooks { get; set; } = new List<MongoSchemaEntityWebhook>();
+
+        IEnumerable<ISchemaWebhookEntity> ISchemaEntity.Webhooks
+        {
+            get { return Webhooks; }
+        }
 
         Schema ISchemaEntity.Schema
         {

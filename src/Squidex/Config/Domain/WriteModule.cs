@@ -51,10 +51,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<ClientKeyGenerator>()
-                .AsSelf()
-                .SingleInstance();
-
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();

@@ -46,15 +46,15 @@ namespace Squidex.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public List<MongoAppLanguage> Languages { get; set; } = new List<MongoAppLanguage>(); 
+        public List<MongoAppEntityLanguage> Languages { get; set; } = new List<MongoAppEntityLanguage>(); 
 
         [BsonRequired]
         [BsonElement]
-        public Dictionary<string, MongoAppClientEntity> Clients { get; set; } = new Dictionary<string, MongoAppClientEntity>();
+        public Dictionary<string, MongoAppEntityClient> Clients { get; set; } = new Dictionary<string, MongoAppEntityClient>();
 
         [BsonRequired]
         [BsonElement]
-        public Dictionary<string, MongoAppContributorEntity> Contributors { get; set; } = new Dictionary<string, MongoAppContributorEntity>();
+        public Dictionary<string, MongoAppEntityContributor> Contributors { get; set; } = new Dictionary<string, MongoAppEntityContributor>();
 
         public PartitionResolver PartitionResolver
         {
@@ -101,12 +101,12 @@ namespace Squidex.Read.MongoDb.Apps
             return languagesConfig;
         }
 
-        private static MongoAppLanguage FromLanguageConfig(LanguageConfig l)
+        private static MongoAppEntityLanguage FromLanguageConfig(LanguageConfig l)
         {
-            return new MongoAppLanguage { Iso2Code = l.Language, IsOptional = l.IsOptional, Fallback = l.Fallback.Select(x => x.Iso2Code).ToList() };
+            return new MongoAppEntityLanguage { Iso2Code = l.Language, IsOptional = l.IsOptional, Fallback = l.Fallback.Select(x => x.Iso2Code).ToList() };
         }
 
-        private static LanguageConfig ToLanguageConfig(MongoAppLanguage l)
+        private static LanguageConfig ToLanguageConfig(MongoAppEntityLanguage l)
         {
             return new LanguageConfig(l.Iso2Code, l.IsOptional, l.Fallback?.Select<string, Language>(f => f));
         }

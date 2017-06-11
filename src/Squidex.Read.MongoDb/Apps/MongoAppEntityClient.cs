@@ -1,28 +1,33 @@
 ﻿// ==========================================================================
-//  MongoAppLanguage.cs
+//  MongoAppEntityClient.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Read.Apps;
 
 namespace Squidex.Read.MongoDb.Apps
 {
-    public sealed class MongoAppLanguage
+    public sealed class MongoAppEntityClient : IAppClientEntity
     {
         [BsonRequired]
         [BsonElement]
-        public string Iso2Code { get; set; }
+        public string Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public bool IsOptional { get; set; }
+        public string Secret { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public List<string> Fallback { get; set; }
+        public string Name { get; set; }
+
+        string IAppClientEntity.Name
+        {
+            get { return !string.IsNullOrWhiteSpace(Name) ? Name : Id; }
+        }
     }
 }

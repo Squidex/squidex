@@ -53,7 +53,7 @@ namespace Squidex.Read.MongoDb.Apps
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id] = SimpleMapper.Map(@event, new MongoAppClientEntity());
+                a.Clients[@event.Id] = SimpleMapper.Map(@event, new MongoAppEntityClient());
             });
         }
 

@@ -1,33 +1,35 @@
 ﻿// ==========================================================================
-//  MongoAppClientEntity.cs
+//  MongoSchemaWebhookEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Read.Apps;
+using Squidex.Read.Schemas;
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Read.MongoDb.Schemas
 {
-    public sealed class MongoAppClientEntity : IAppClientEntity
+    public class MongoSchemaWebhookEntity : ISchemaWebhookEntity
     {
-        [BsonRequired]
+        [BsonId]
         [BsonElement]
-        public string Id { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string Secret { get; set; }
+        public Uri Url { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string Name { get; set; }
+        public string SecurityToken { get; set; }
 
-        string IAppClientEntity.Name
-        {
-            get { return !string.IsNullOrWhiteSpace(Name) ? Name : Id; }
-        }
+        [BsonRequired]
+        [BsonElement]
+        public Guid SchemaId { get; set; }
     }
 }

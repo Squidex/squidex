@@ -73,6 +73,10 @@ namespace Squidex.Config.Domain
                 .As<IHistoryEventsCreator>()
                 .SingleInstance();
 
+            builder.RegisterType<WebhookInvoker>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<EdmModelBuilder>()
                 .AsSelf()
                 .SingleInstance();

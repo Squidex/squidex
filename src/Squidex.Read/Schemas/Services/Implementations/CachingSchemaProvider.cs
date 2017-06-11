@@ -34,7 +34,7 @@ namespace Squidex.Read.Schemas.Services.Implementations
 
         public string EventsFilter
         {
-            get { return "*"; }
+            get { return string.Empty; }
         }
 
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
@@ -124,6 +124,14 @@ namespace Squidex.Read.Schemas.Services.Implementations
             else if (@event.Payload is SchemaUpdated schemaUpdatedEvent)
             {
                 Remove(schemaUpdatedEvent.AppId, schemaUpdatedEvent.SchemaId);
+            }
+            else if (@event.Payload is WebhookAdded webhookAddedEvent)
+            {
+                Remove(webhookAddedEvent.AppId, webhookAddedEvent.SchemaId);
+            }
+            else if (@event.Payload is WebhookDeleted webhookDeletedEvent)
+            {
+                Remove(webhookDeletedEvent.AppId, webhookDeletedEvent.SchemaId);
             }
 
             return TaskHelper.Done;

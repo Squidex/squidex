@@ -34,7 +34,7 @@ namespace Squidex.Read.Apps.Services.Implementations
 
         public string EventsFilter
         {
-            get { return "*"; }
+            get { return string.Empty; }
         }
 
         public CachingAppProvider(IMemoryCache cache, IAppRepository repository)

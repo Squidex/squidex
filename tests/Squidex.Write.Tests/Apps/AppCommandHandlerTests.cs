@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Moq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;

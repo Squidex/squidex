@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_given_name()
         {
-            var sut = new CompoundEventConsumer("consumer-name");
+            var sut = new CompoundEventConsumer("consumer-name", consumer1.Object);
 
             Assert.Equal("consumer-name", sut.Name);
         }
@@ -33,25 +33,33 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_first_inner_name()
         {
-            const string name = "my-inner-consumer";
-
-            consumer1.Setup(x => x.Name).Returns(name);
+            consumer1.Setup(x => x.Name).Returns("my-inner-consumer");
 
             var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
 
-            Assert.Equal(name, sut.Name);
+            Assert.Equal("my-inner-consumer", sut.Name);
         }
 
         [Fact]
-        public void Should_return_first_inner_filter()
+        public void Should_return_compound_filter()
         {
-            const string filter = "my-inner-filter";
+            consumer1.Setup(x => x.EventsFilter).Returns("filter1");
+            consumer2.Setup(x => x.EventsFilter).Returns("filter2");
 
-            consumer1.Setup(x => x.EventsFilter).Returns(filter);
+            var sut = new CompoundEventConsumer("my", consumer1.Object, consumer2.Object);
 
-            var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
+            Assert.Equal("(filter1)|(filter2)", sut.EventsFilter);
+        }
 
-            Assert.Equal(filter, sut.EventsFilter);
+        [Fact]
+        public void Should_ignore_empty_filters()
+        {
+            consumer1.Setup(x => x.EventsFilter).Returns("filter1");
+            consumer2.Setup(x => x.EventsFilter).Returns("");
+
+            var sut = new CompoundEventConsumer("my", consumer1.Object, consumer2.Object);
+
+            Assert.Equal("(filter1)", sut.EventsFilter);
         }
 
         [Fact]
