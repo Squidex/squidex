@@ -97,16 +97,16 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var resposne = SimpleMapper.Map(entity, new ContentDto());
+            var response = SimpleMapper.Map(entity, new ContentDto());
 
             if (entity.Data != null)
             {
-                resposne.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
+                response.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
             }
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
-            return Ok(resposne);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -120,8 +120,6 @@ namespace Squidex.Controllers.ContentApi
 
             var result = context.Result<EntityCreatedResult<ContentData>>();
             var response = ContentDto.Create(command, result);
-
-            Response.Headers["ETag"] = new StringValues(response.Version.ToString());
 
             return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
         }

@@ -28,7 +28,6 @@ namespace Squidex.Write.Apps
 {
     public class AppCommandHandlerTests : HandlerTestBase<AppDomainObject>
     {
-        private readonly Mock<ClientKeyGenerator> keyGenerator = new Mock<ClientKeyGenerator>();
         private readonly Mock<IAppRepository> appRepository = new Mock<IAppRepository>();
         private readonly Mock<IAppPlansProvider> appPlansProvider = new Mock<IAppPlansProvider>();
         private readonly Mock<IAppPlanBillingManager> appPlansBillingManager = new Mock<IAppPlanBillingManager>();
@@ -37,14 +36,13 @@ namespace Squidex.Write.Apps
         private readonly AppDomainObject app;
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
-        private readonly string clientSecret = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
 
         public AppCommandHandlerTests()
         {
             app = new AppDomainObject(AppId, -1);
 
-            sut = new AppCommandHandler(Handler, appRepository.Object, appPlansProvider.Object, appPlansBillingManager.Object, userResolver.Object, keyGenerator.Object);
+            sut = new AppCommandHandler(Handler, appRepository.Object, appPlansProvider.Object, appPlansBillingManager.Object, userResolver.Object);
         }
 
         [Fact]
@@ -164,22 +162,14 @@ namespace Squidex.Write.Apps
         [Fact]
         public async Task AttachClient_should_update_domain_object()
         {
-            keyGenerator.Setup(x => x.GenerateKey())
-                .Returns(clientSecret)
-                .Verifiable();
-
             CreateApp();
-
+            
             var context = CreateContextForCommand(new AttachClient { Id = clientName });
 
             await TestUpdate(app, async _ =>
             {
                 await sut.HandleAsync(context);
             });
-
-            keyGenerator.VerifyAll();
-
-            context.Result<EntityCreatedResult<AppClient>>().IdOrValue.ShouldBeEquivalentTo(new AppClient(clientName, clientSecret));
         }
 
         [Fact]
@@ -188,7 +178,7 @@ namespace Squidex.Write.Apps
             appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(false);
 
             CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }));
 
             var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
 
@@ -199,28 +189,10 @@ namespace Squidex.Write.Apps
         }
 
         [Fact]
-        public async Task ChangePlan_should_update_domain_object()
-        {
-            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
-
-            CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
-
-            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
-
-            await TestUpdate(app, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-
-            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Once());
-        }
-
-        [Fact]
         public async Task RenameClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }));
 
             var context = CreateContextForCommand(new RenameClient { Id = clientName, Name = "New Name" });
 
@@ -234,7 +206,7 @@ namespace Squidex.Write.Apps
         public async Task RevokeClient_should_update_domain_object()
         {
             CreateApp()
-                .AttachClient(CreateCommand(new AttachClient { Id = clientName }), clientSecret);
+                .AttachClient(CreateCommand(new AttachClient { Id = clientName }));
 
             var context = CreateContextForCommand(new RevokeClient { Id = clientName });
 
@@ -242,6 +214,23 @@ namespace Squidex.Write.Apps
             {
                 await sut.HandleAsync(context);
             });
+        }
+
+        [Fact]
+        public async Task ChangePlan_should_update_domain_object()
+        {
+            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+
+            CreateApp();
+
+            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Once());
         }
 
         [Fact]

@@ -153,13 +153,13 @@ namespace Squidex.Write.Apps
             return this;
         }
 
-        public AppDomainObject AttachClient(AttachClient command, string secret)
+        public AppDomainObject AttachClient(AttachClient command)
         {
             Guard.Valid(command, nameof(command), () => "Cannot attach client");
 
             ThrowIfNotCreated();
 
-            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached { Secret = secret }));
+            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached()));
 
             return this;
         }

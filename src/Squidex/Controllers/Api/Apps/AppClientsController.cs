@@ -15,7 +15,6 @@ using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Write.Apps;
 using Squidex.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Apps
@@ -77,10 +76,11 @@ namespace Squidex.Controllers.Api.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
-            var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new AttachClient()));
+            var command = SimpleMapper.Map(request, new AttachClient());
 
-            var result = context.Result<EntityCreatedResult<AppClient>>().IdOrValue;
-            var response = SimpleMapper.Map(result, new ClientDto());
+            await CommandBus.PublishAsync(command);
+            
+            var response = SimpleMapper.Map(command, new ClientDto { Name = command .Id });
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);
         }

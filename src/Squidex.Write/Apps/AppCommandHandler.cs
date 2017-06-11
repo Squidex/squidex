@@ -27,25 +27,21 @@ namespace Squidex.Write.Apps
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
-        private readonly ClientKeyGenerator keyGenerator;
 
         public AppCommandHandler(
             IAggregateHandler handler,
             IAppRepository appRepository,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver,
-            ClientKeyGenerator keyGenerator)
+            IUserResolver userResolver)
         {
             Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(keyGenerator, nameof(keyGenerator));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
             Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.handler = handler;
-            this.keyGenerator = keyGenerator;
             this.userResolver = userResolver;
             this.appRepository = appRepository;
             this.appPlansProvider = appPlansProvider;
@@ -119,12 +115,7 @@ namespace Squidex.Write.Apps
 
         protected Task On(AttachClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
-            {
-                a.AttachClient(command, keyGenerator.GenerateKey());
-
-                context.Succeed(EntityCreatedResult.Create(a.Clients[command.Id], a.Version));
-            });
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.AttachClient(command));
         }
 
         protected Task On(RemoveContributor command, CommandContext context)

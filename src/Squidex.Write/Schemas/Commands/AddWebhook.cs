@@ -1,27 +1,30 @@
 ﻿// ==========================================================================
-//  AttachClient.cs
+//  AddWebhook.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Apps.Commands
+namespace Squidex.Write.Schemas.Commands
 {
-    public sealed class AttachClient : AppAggregateCommand, IValidatable
+    public sealed class AddWebhook : SchemaAggregateCommand, IValidatable
     {
-        public string Id { get; set; }
+        public Guid Id { get; } = Guid.NewGuid();
 
-        public string Secret { get; } = RandomHash.New();
+        public Uri Url { get; set; }
+
+        public string SecurityToken { get; } = RandomHash.New();
 
         public void Validate(IList<ValidationError> errors)
         {
-            if (!Id.IsSlug())
+            if (Url == null || !Url.IsAbsoluteUri)
             {
-                errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
+                errors.Add(new ValidationError("Url must be specified and absolute", nameof(Url)));
             }
         }
     }
