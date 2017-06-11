@@ -186,14 +186,6 @@ function formatCalls(count: number): string {
 }
 
 function createLabels(dtos: { date: DateTime }[]): string[] {
-    const labels: string[] = [];
-
-    for (let dto of dtos) {
-        if (true || dto.date.weekDay === 1 || dto.date.weekDay === 4) {
-            labels.push(dto.date.toStringFormat('M-DD'));
-        }
-    }
-
-    return labels;
+    return dtos.map(d => d.date.toStringFormat('M-DD'));
 }
 
