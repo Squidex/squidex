@@ -14,6 +14,6 @@ namespace Squidex.Read.Schemas.Repositories
 {
     public interface ISchemaWebhookRepository
     {
-        Task<IReadOnlyList<ISchemaWebhookEntity>> QueryBySchemaAsync(Guid schemaId);
+        Task<IReadOnlyList<ISchemaWebhookEntity>> QueryByAppAsync(Guid appId);
     }
 }

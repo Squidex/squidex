@@ -98,16 +98,6 @@ namespace Squidex.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
-        protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, e => e.Webhooks.Add(SimpleMapper.Map(@event, new MongoSchemaEntityWebhook())));
-        }
-
-        protected Task On(WebhookDeleted @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, e => e.Webhooks.RemoveAll(w => w.Id == @event.Id));
-        }
-
         protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);

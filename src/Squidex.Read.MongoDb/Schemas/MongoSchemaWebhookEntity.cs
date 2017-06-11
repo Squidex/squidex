@@ -30,6 +30,10 @@ namespace Squidex.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
+        public Guid AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public Guid SchemaId { get; set; }
     }
 }

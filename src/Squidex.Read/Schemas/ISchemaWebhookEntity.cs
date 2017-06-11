@@ -14,6 +14,8 @@ namespace Squidex.Read.Schemas
     {
         Guid Id { get; }
 
+        Guid SchemaId { get; }
+
         Uri Url { get; }
 
         string SecurityToken { get; }

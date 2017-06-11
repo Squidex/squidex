@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using Squidex.Core.Schemas;
-using System.Collections.Generic;
 
 namespace Squidex.Read.Schemas
 {
@@ -20,7 +19,5 @@ namespace Squidex.Read.Schemas
         bool IsDeleted { get; }
 
         Schema Schema { get; }
-
-        IEnumerable<ISchemaWebhookEntity> Webhooks { get; }
     }
 }

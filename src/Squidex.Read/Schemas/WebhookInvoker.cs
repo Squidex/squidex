@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,13 +61,15 @@ namespace Squidex.Read.Schemas
         {
             if (@event.Payload is ContentEvent contentEvent)
             {
-                var hooks = await webhookRepository.QueryBySchemaAsync(contentEvent.SchemaId.Id);
+                var hooks = await webhookRepository.QueryByAppAsync(contentEvent.AppId.Id);
 
-                if (hooks.Count > 0)
+                var schemaHooks = hooks.Where(x => x.SchemaId == contentEvent.SchemaId.Id).ToList();
+
+                if (schemaHooks.Count > 0)
                 {
                     var payload = CreatePayload(@event);
 
-                    foreach (var hook in hooks)
+                    foreach (var hook in schemaHooks)
                     {
                         DispatchEventAsync(payload, hook).Forget();
                     }

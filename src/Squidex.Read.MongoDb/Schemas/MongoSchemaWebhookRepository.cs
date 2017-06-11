@@ -64,9 +64,9 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             await EnsureWebooksLoadedAsync();
 
-            var webhook = SimpleMapper.Map(@event, new MongoSchemaWebhookEntity { SchemaId = @event.SchemaId.Id });
+            var webhook = SimpleMapper.Map(@event, new MongoSchemaWebhookEntity { AppId = @event.AppId.Id, SchemaId = @event.SchemaId.Id });
 
-            inMemoryWebhooks.GetOrAddNew(webhook.SchemaId).Add(webhook);
+            inMemoryWebhooks.GetOrAddNew(webhook.AppId).Add(webhook);
 
             await Collection.InsertOneAsync(webhook);
         }
@@ -75,7 +75,7 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             await EnsureWebooksLoadedAsync();
 
-            inMemoryWebhooks.GetOrDefault(@event.SchemaId.Id)?.RemoveAll(w => w.Id == @event.Id);
+            inMemoryWebhooks.GetOrDefault(@event.AppId.Id)?.RemoveAll(w => w.Id == @event.Id);
 
             await Collection.DeleteManyAsync(x => x.Id == @event.Id);
         }
@@ -84,16 +84,16 @@ namespace Squidex.Read.MongoDb.Schemas
         {
             await EnsureWebooksLoadedAsync();
 
-            inMemoryWebhooks.Remove(@event.SchemaId.Id);
+            inMemoryWebhooks.GetOrDefault(@event.AppId.Id)?.RemoveAll(w => w.SchemaId == @event.SchemaId.Id);
 
             await Collection.DeleteManyAsync(x => x.SchemaId == @event.SchemaId.Id);
         }
 
-        public async Task<IReadOnlyList<ISchemaWebhookEntity>> QueryBySchemaAsync(Guid schemaId)
+        public async Task<IReadOnlyList<ISchemaWebhookEntity>> QueryByAppAsync(Guid appId)
         {
             await EnsureWebooksLoadedAsync();
 
-            return inMemoryWebhooks.GetOrDefault(schemaId)?.OfType<ISchemaWebhookEntity>()?.ToList() ?? EmptyWebhooks;
+            return inMemoryWebhooks.GetOrDefault(appId)?.OfType<ISchemaWebhookEntity>()?.ToList() ?? EmptyWebhooks;
         }
 
         private async Task EnsureWebooksLoadedAsync()
@@ -108,7 +108,7 @@ namespace Squidex.Read.MongoDb.Schemas
                     {
                         var webhooks = await Collection.Find(new BsonDocument()).ToListAsync();
 
-                        inMemoryWebhooks = webhooks.GroupBy(x => x.SchemaId).ToDictionary(x => x.Key, x => x.ToList());
+                        inMemoryWebhooks = webhooks.GroupBy(x => x.AppId).ToDictionary(x => x.Key, x => x.ToList());
                     }
                 }
                 finally

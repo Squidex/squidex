@@ -11,6 +11,7 @@ using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
 using Squidex.Read.Apps.Services.Implementations;
@@ -74,6 +75,7 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<WebhookInvoker>()
+                .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
 

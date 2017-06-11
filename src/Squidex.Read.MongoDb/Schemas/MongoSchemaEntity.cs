@@ -54,15 +54,6 @@ namespace Squidex.Read.MongoDb.Schemas
         [BsonElement]
         public bool IsDeleted { get; set; }
 
-        [BsonRequired]
-        [BsonElement]
-        public List<MongoSchemaEntityWebhook> Webhooks { get; set; } = new List<MongoSchemaEntityWebhook>();
-
-        IEnumerable<ISchemaWebhookEntity> ISchemaEntity.Webhooks
-        {
-            get { return Webhooks; }
-        }
-
         Schema ISchemaEntity.Schema
         {
             get { return schema.Value; }
