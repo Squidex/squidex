@@ -47,7 +47,7 @@
         <tr>
             <td>Client Id:</td>
             <td>
-                <input readonly class="form-control" #inputId [attr.value]="clientId" #inputName />
+                <input readonly class="form-control" [attr.value]="clientId" #inputName />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
@@ -58,7 +58,7 @@
         <tr>
             <td>Client Secret:</td>
             <td>
-                <input readonly class="form-control" name="inputSecret" [attr.value]="clientSecret" #inputSecret />
+                <input readonly class="form-control" [attr.value]="clientSecret" #inputSecret />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">

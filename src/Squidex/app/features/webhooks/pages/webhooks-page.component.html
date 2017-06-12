@@ -1,0 +1,98 @@
+<sqx-title message="{app} | Webhooks" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<sqx-panel panelWidth="46rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <div class="float-right">
+                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+            </div>
+
+            <h3 class="panel-title">Webhooks</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink isLazyLoaded="true">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-scroll">
+            <div class="table-items-row table-items-row-empty" *ngIf="webhooks && webhooks.length === 0">
+                No Webhook created yet.
+            </div>
+
+            <div *ngIf="webhooks">
+                <div *ngFor="let webhook of webhooks">
+                    <div class="table-items-row">
+                        <table class="table table-middle table-sm table-borderless table-fixed">
+                            <colgroup>
+                                <col style="width: 160px; text-align: right;" />
+                                <col style="width: 100%" />
+                                <col style="width: 40px" />
+                            </colgroup>
+
+                            <tr>
+                                <td colspan="2">
+                                    <h3 class="client-name">
+                                        Schema: {{webhook.schema.name}}
+                                    </h3>
+                                </td>
+                                <td class="client-delete">
+                                    <button type="button" class="btn btn-link btn-danger" (click)="deleteWebhook(webhook)">
+                                        <i class="icon-bin2"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Url:</td>
+                                <td>
+                                    <input readonly class="form-control" [attr.value]="webhook.webhook.url" #inputUrl />
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputUrl">
+                                        <i class="icon-copy"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Token:</td>
+                                <td>
+                                    <input readonly class="form-control" [attr.value]="webhook.webhook.securityToken" #inputToken />
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputToken">
+                                        <i class="icon-copy"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-items-footer">
+                    <form class="form-inline" [formGroup]="addWebhookForm" (ngSubmit)="addWebhook()">
+                        <div class="form-group mr-1">
+                            <select class="form-control schemas-control" formControlName="schemaId">
+                                <option *ngFor="let schema of schemas" [ngValue]="schema.id">{{schema.name}}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mr-1">
+                            <sqx-control-errors for="url" [submitted]="addWebhookFormSubmitted"></sqx-control-errors>
+
+                            <input type="text" class="form-control" formControlName="url" placeholder="Enter webhook url" autocomplete="off" />
+                        </div>
+                        
+
+                        <button type="submit" class="btn btn-success" [disabled]="!hasUrl">Add Webhook</button>
+                        <button type="reset" class="btn btn-link" (click)="resetWebhookForm()" [disabled]="addWebhookFormSubmitted">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</sqx-panel>

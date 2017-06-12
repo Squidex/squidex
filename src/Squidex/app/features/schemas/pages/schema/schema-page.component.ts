@@ -82,7 +82,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         });
 
     public get hasName() {
-        return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
+        return this.addFieldForm.get('name').value && this.addFieldForm.get('name').value.length > 0;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,

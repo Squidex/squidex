@@ -65,7 +65,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
             const enable = (message?: string) => {
                 this.userForm.enable();
-                this.userForm.controls['password'].reset();
+                this.userForm.get('password').reset();
                 this.userFormSubmitted = false;
                 this.userFormError = message;
             };

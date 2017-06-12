@@ -49,7 +49,8 @@ import {
     UserPictureRefPipe,
     UserManagementService,
     UsersProviderService,
-    UsersService
+    UsersService,
+    WebhooksService
 } from './declarations';
 
 @NgModule({
@@ -117,7 +118,8 @@ export class SqxSharedModule {
                 UsagesService,
                 UserManagementService,
                 UsersProviderService,
-                UsersService
+                UsersService,
+                WebhooksService
             ]
         };
     }

@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
             if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, "*", StringComparison.OrdinalIgnoreCase))
             {
-                if (streamFilter.StartsWith("^"))
+                if (streamFilter.Contains("^"))
                 {
                     filters.Add(Filter.Regex(x => x.EventStream, streamFilter));
                 }

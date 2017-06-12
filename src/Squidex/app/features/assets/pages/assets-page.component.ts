@@ -17,7 +17,6 @@ import {
     AssetDto,
     AssetsService,
     AssetUpdated,
-    fadeAnimation,
     ImmutableArray,
     MessageBus,
     NotificationService,
@@ -27,10 +26,7 @@ import {
 @Component({
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
-    templateUrl: './assets-page.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './assets-page.component.html'
 })
 export class AssetsPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;

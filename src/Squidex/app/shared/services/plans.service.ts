@@ -36,7 +36,6 @@ export class PlanDto {
     }
 }
 
-
 export class ChangePlanDto {
     constructor(
         public readonly planId: string

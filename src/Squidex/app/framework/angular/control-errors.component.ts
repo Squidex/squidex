@@ -101,6 +101,6 @@ export class ControlErrorsComponent implements OnChanges {
             this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
         }
 
-        this.control = this.formGroupDirective.form.controls[this.for];
+        this.control = this.formGroupDirective.form.get(this.for);
     }
 }

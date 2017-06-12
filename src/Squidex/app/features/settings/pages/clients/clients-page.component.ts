@@ -44,7 +44,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         });
 
     public get hasName() {
-        return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
+        return this.addClientForm.get('name').value && this.addClientForm.get('name').value.length > 0;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,

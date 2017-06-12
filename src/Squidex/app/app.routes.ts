@@ -64,6 +64,10 @@ export const routes: Routes = [
                         loadChildren: './features/assets/module#SqxFeatureAssetsModule'
                     },
                     {
+                        path: 'webhooks',
+                        loadChildren: './features/webhooks/module#SqxFeatureWebhooksModule'
+                    },
+                    {
                         path: 'settings',
                         loadChildren: './features/settings/module#SqxFeatureSettingsModule'
                     }

@@ -82,7 +82,7 @@ namespace Squidex.Read.Schemas
             return new JObject(
                 new JProperty("type", @event.Payload.GetType().Name),
                 new JProperty("meta", JObject.FromObject(@event.Headers, webhookSerializer)),
-                new JProperty("data", JObject.FromObject(@event.Headers, webhookSerializer)));
+                new JProperty("data", JObject.FromObject(@event.Payload, webhookSerializer)));
         }
 
         private async Task DispatchEventAsync(JObject payload, ISchemaWebhookEntity webhook)
