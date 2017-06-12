@@ -63,8 +63,8 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Get a schema by name.
         /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to retrieve.</param>
-        /// <param name="app">The name of the app to get the schema from.</param>
         /// <returns>
         /// 200 => Schema found.
         /// 404 => Schema or app not found.
@@ -93,8 +93,8 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Create a new schema.
         /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="request">The schema object that needs to be added to the app.</param>
-        /// <param name="app">The name of the app to create the schema to.</param>
         /// <returns>
         /// 201 => Schema created.  
         /// 400 => Schema name or properties are not valid.
@@ -119,7 +119,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Update a schema.
         /// </summary>
-        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
@@ -143,7 +143,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Publish a schema.
         /// </summary>
-        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to publish.</param>
         /// <returns>
         /// 204 => Schema has been published.
@@ -165,7 +165,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Unpublish a schema.
         /// </summary>
-        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to unpublish.</param>
         /// <returns>
         /// 204 => Schema has been unpublished.
@@ -187,7 +187,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <summary>
         /// Delete a schema.
         /// </summary>
-        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to delete.</param>
         /// <returns>
         /// 204 => Schema has been deleted.

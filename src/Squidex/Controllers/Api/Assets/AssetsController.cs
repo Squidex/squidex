@@ -58,16 +58,19 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Get assets.
         /// </summary>
-        /// <param name="app">The app where the assets belong to.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
         /// <param name="skip">The number of assets to skip.</param>
-        /// <param name="take">The number of assets to take.</param>
+        /// <param name="take">The number of assets to take (Default: 20).</param>
         /// <param name="query">The query to limit the files by name.</param>
         /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
         /// </returns>
+        /// <remarks>
+        /// Get all assets for the app. Mime types can be comma-separated, e.g. application/json,text/html.
+        /// </remarks>
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
@@ -112,10 +115,10 @@ namespace Squidex.Controllers.Api.Assets
         }
 
         /// <summary>
-        /// Get a asset by id.
+        /// Get an asset by id.
         /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset to retrieve.</param>
-        /// <param name="app">The name of the app to get the asset from.</param>
         /// <returns>
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
@@ -143,13 +146,16 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Upload a new asset.
         /// </summary>
-        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 201 => Asset created.
         /// 404 => App not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
+        /// <remarks>
+        /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and must be defined correctly.
+        /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
@@ -170,7 +176,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Replace asset content.
         /// </summary>
-        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
@@ -199,7 +205,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Updates the asset.
         /// </summary>
-        /// <param name="app">The app where the asset is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
@@ -223,7 +229,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <summary>
         /// Delete an asset.
         /// </summary>
-        /// <param name="app">The app where the schema is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset to delete.</param>
         /// <returns>
         /// 204 => Asset has been deleted.

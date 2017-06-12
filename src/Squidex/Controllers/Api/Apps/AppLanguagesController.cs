@@ -93,20 +93,20 @@ namespace Squidex.Controllers.Api.Apps
         /// Updates an app language.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="language">The language to delete from the app.</param>
-        /// <param name="model">The language properties.</param>
+        /// <param name="language">The language to update.</param>
+        /// <param name="request">The language object.</param>
         /// <returns>
         /// 204 => Language updated.
-        /// 400 => Language is an invalid language.
+        /// 400 => Language object is invalid.
         /// 404 => App not found.
         /// </returns>
         [MustBeAppOwner]
         [HttpPut]
         [Route("apps/{app}/languages/{language}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto model)
+        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(model, new UpdateLanguage { Language = language }));
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateLanguage { Language = language }));
           
             return NoContent();
         }
@@ -118,7 +118,6 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="language">The language to delete from the app.</param>
         /// <returns>
         /// 204 => Language deleted.
-        /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
         [MustBeAppOwner]

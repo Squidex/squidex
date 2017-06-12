@@ -41,9 +41,9 @@ namespace Squidex.Controllers.Api.Webhooks
         /// <summary>
         /// Get webhooks.
         /// </summary>
-        /// <param name="app">The name of the app to get the schema for.</param>
+        /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => Schemas returned.
+        /// 200 => Webhooks returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -64,9 +64,9 @@ namespace Squidex.Controllers.Api.Webhooks
         /// <summary>
         /// Create a new webhook.
         /// </summary>
-        /// <param name="request">The webhook object that needs to be added to the app.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="app">The name of the app to create the webhook for.</param>
+        /// <param name="request">The webhook object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Webhook created.  
         /// 400 => Webhook name or properties are not valid.
@@ -94,7 +94,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// <summary>
         /// Delete a webhook.
         /// </summary>
-        /// <param name="app">The app where the webhook is a part of.</param>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the webhook to delete.</param>
         /// <returns>
