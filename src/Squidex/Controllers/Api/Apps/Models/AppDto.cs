@@ -30,17 +30,17 @@ namespace Squidex.Controllers.Api.Apps.Models
         public long Version { get; set; }
 
         /// <summary>
-        /// The name of the app.
+        /// The id of the app.
         /// </summary>
         public Guid Id { get; set; }
         
         /// <summary>
-        /// The date and time when the app has been created.
+        /// The timestamp when the app has been created.
         /// </summary>
         public Instant Created { get; set; }
-        
+
         /// <summary>
-        /// The date and time when the app has been modified last.
+        /// The timestamp when the app has been modified last.
         /// </summary>
         public Instant LastModified { get; set; }
 

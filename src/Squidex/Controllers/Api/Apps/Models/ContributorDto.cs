@@ -16,7 +16,7 @@ namespace Squidex.Controllers.Api.Apps.Models
     public sealed class ContributorDto
     {
         /// <summary>
-        /// The id of the user that contributes to the app (GUID).
+        /// The id of the user that contributes to the app.
         /// </summary>
         [Required]
         public string ContributorId { get; set; }

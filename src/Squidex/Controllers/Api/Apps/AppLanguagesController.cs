@@ -70,7 +70,7 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The language to add to the app.</param>
         /// <returns>
-        /// 201 => App language created.
+        /// 201 => Language created.
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
@@ -96,7 +96,7 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="language">The language to delete from the app.</param>
         /// <param name="model">The language properties.</param>
         /// <returns>
-        /// 204 => App language updated.
+        /// 204 => Language updated.
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
@@ -117,7 +117,7 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="language">The language to delete from the app.</param>
         /// <returns>
-        /// 204 => App language deleted.
+        /// 204 => Language deleted.
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>

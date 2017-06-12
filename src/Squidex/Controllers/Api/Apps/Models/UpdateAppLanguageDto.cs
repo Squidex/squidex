@@ -14,7 +14,7 @@ namespace Squidex.Controllers.Api.Apps.Models
     public class UpdateAppLanguageDto
     {
         /// <summary>
-        /// Set the value to true to make the language to the master language.
+        /// Set the value to true to make the language the master.
         /// </summary>
         public bool? IsMaster { get; set; }
 

@@ -42,7 +42,7 @@ namespace Squidex.Controllers.Api.Apps
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
-        /// Gets all configured client keys for the app with the specified name.
+        /// Gets all configured clients for the app with the specified name.
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/clients/")]
@@ -63,12 +63,12 @@ namespace Squidex.Controllers.Api.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => Client key generated.
+        /// 201 => Client generated.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
-        /// Create a new key for the app with the specified name.
-        /// The client secret is auto generated on the server and returned. The client is valid for one year.
+        /// Create a new client for the app with the specified name.
+        /// The client secret is auto generated on the server and returned. The client does not exire, the access token is valid for 30 days.
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/clients/")]
@@ -95,6 +95,9 @@ namespace Squidex.Controllers.Api.Apps
         /// 204 => Client updated.
         /// 404 => App not found or client not found.
         /// </returns>
+        /// <remarks>
+        /// Only the display name can be changed, create a new client if necessary.
+        /// </remarks>
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
         [ApiCosts(1)]
@@ -114,6 +117,9 @@ namespace Squidex.Controllers.Api.Apps
         /// 204 => Client revoked.
         /// 404 => App not found or client not found.
         /// </returns>
+        /// <remarks>
+        /// The application that uses this client credentials cannot access the API after it has been revoked.
+        /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/clients/{clientId}/")]
         [ApiCosts(1)]
