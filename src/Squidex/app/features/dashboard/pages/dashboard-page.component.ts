@@ -167,7 +167,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     }
 }
 
-function formatCalls(count: number): string {
+function formatCalls(count: number): string | null {
     if (count > 1000) {
         count = count / 1000;
 
@@ -179,7 +179,7 @@ function formatCalls(count: number): string {
 
         return count + 'k';
     } else if (count < 0) {
-        return undefined;
+        return null;
     } else {
         return count.toString();
     }

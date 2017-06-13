@@ -36,7 +36,7 @@ export class NumberValidationComponent implements OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.hideDefaultValue =
-            this.editForm.get('isRequired')!.valueChanges
+            this.editForm.controls['isRequired'].valueChanges
                 .startWith(this.properties.isRequired)
                 .map(x => !!x);
     }

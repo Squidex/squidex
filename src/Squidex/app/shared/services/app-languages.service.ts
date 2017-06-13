@@ -79,7 +79,7 @@ export class AppLanguagesService {
                         response.englishName,
                         response.isMaster === true,
                         response.isOptional === true,
-                        response.fallback);
+                        response.fallback || []);
                 })
                 .catchError('Failed to add language. Please reload.');
     }

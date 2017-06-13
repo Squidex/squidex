@@ -26,7 +26,7 @@ namespace Squidex.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public string SecurityToken { get; set; }
+        public string SharedSecret { get; set; }
 
         [BsonRequired]
         [BsonElement]

@@ -30,7 +30,7 @@ export class AppFormComponent {
     @Output()
     public cancelled = new EventEmitter();
 
-    public createFormError = '';
+    public createFormError? = '';
     public createFormSubmitted = false;
     public createForm: FormGroup =
         this.formBuilder.group({
@@ -43,7 +43,7 @@ export class AppFormComponent {
         });
 
     public appName =
-        this.createForm.get('name')!.valueChanges.map(n => n || FALLBACK_NAME)
+        this.createForm.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);
 
     constructor(
@@ -64,7 +64,7 @@ export class AppFormComponent {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const request = new CreateAppDto(this.createForm.get('name')!.value);
+            const request = new CreateAppDto(this.createForm.controls['name'].value);
 
             const enable = (message?: string) => {
                 this.createForm.enable();

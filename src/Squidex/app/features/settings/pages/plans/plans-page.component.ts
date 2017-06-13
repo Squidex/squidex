@@ -87,7 +87,7 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
         return FileHelper.fileSize(count);
     }
 
-    public formatCalls(count: number): string {
+    public formatCalls(count: number): string | null {
         if (count > 1000) {
             count = count / 1000;
 
@@ -99,7 +99,7 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
 
             return count + 'k';
         } else if (count < 0) {
-            return undefined;
+            return null;
         } else {
             return count.toString();
         }

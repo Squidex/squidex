@@ -30,9 +30,9 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public Uri Url { get; set; }
 
         /// <summary>
-        /// The security token that is added as request header.
+        /// The shared secret that is used to calculate the signature.
         /// </summary>
         [Required]
-        public string SecurityToken { get; set; }
+        public string SharedSecret { get; set; }
     }
 }

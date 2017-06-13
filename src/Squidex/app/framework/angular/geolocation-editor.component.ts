@@ -108,8 +108,8 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public updateValueByInput() {
-        if (this.geolocationForm.get('latitude').value !== null &&
-            this.geolocationForm.get('longitude').value !== null &&
+        if (this.geolocationForm.controls['latitude'].value !== null &&
+            this.geolocationForm.controls['longitude'].value !== null &&
             this.geolocationForm.valid) {
             this.value = this.geolocationForm.value;
         } else {

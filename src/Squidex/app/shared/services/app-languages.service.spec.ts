@@ -61,7 +61,7 @@ describe('AppLanguagesService', () => {
         expect(languages).toEqual(
             [
                 new AppLanguageDto('de', 'German', true, true, ['de', 'en']),
-                new AppLanguageDto('en', 'English', false, false, undefined)
+                new AppLanguageDto('en', 'English', false, false, [])
             ]);
 
         authService.verifyAll();
@@ -90,7 +90,7 @@ describe('AppLanguagesService', () => {
         });
 
         expect(language).toEqual(
-            new AppLanguageDto('de', 'German', false, false, undefined));
+            new AppLanguageDto('de', 'German', false, false, []));
 
         authService.verifyAll();
     });

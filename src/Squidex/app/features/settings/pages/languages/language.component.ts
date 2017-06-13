@@ -66,10 +66,10 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
 
     public ngOnInit() {
         this.isMasterSubscription =
-            this.editForm.get('isMaster').valueChanges
+            this.editForm.controls['isMaster'].valueChanges
                 .subscribe(v => {
                     this.isMaster = v;
-                    this.editForm.get('isOptional').setValue(false);
+                    this.editForm.controls['isOptional'].setValue(false);
                 });
 
         this.resetForm();
@@ -92,7 +92,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public addLanguage() {
-        this.addFallbackLanguage(this.addLanguageForm.get('language')!.value);
+        this.addFallbackLanguage(this.addLanguageForm.controls['language'].value);
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {
@@ -115,8 +115,8 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                 new AppLanguageDto(
                     this.language.iso2Code,
                     this.language.englishName,
-                    this.editForm.get('isMaster')!.value,
-                    this.editForm.get('isOptional')!.value,
+                    this.editForm.controls['isMaster'].value,
+                    this.editForm.controls['isOptional'].value,
                     this.fallbackLanguages.map(l => l.iso2Code));
 
             this.saving.emit(newLanguage);

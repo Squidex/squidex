@@ -49,7 +49,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         });
 
     public get hasUrl() {
-        return this.addWebhookForm.get('url').value && this.addWebhookForm.get('url').value.length > 0;
+        return this.addWebhookForm.controls['url'].value && this.addWebhookForm.controls['url'].value.length > 0;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
@@ -98,8 +98,8 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             this.addWebhookFormSubmitted = true;
             this.addWebhookForm.disable();
 
-            const requestDto = new CreateWebhookDto(this.addWebhookForm.get('url')!.value);
-            const schemaId = this.addWebhookForm.get('schemaId')!.value;
+            const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value);
+            const schemaId = this.addWebhookForm.controls['schemaId'].value;
             const schema = this.schemas.find(s => s.id === schemaId);
 
             this.appNameOnce()

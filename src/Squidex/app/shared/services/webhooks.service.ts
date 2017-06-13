@@ -17,7 +17,7 @@ export class WebhookDto {
     constructor(
         public readonly id: string,
         public readonly schemaId: string,
-        public readonly securityToken: string,
+        public readonly sharedSecret: string,
         public readonly url: string
     ) {
     }
@@ -50,7 +50,7 @@ export class WebhooksService {
                         return new WebhookDto(
                             item.id,
                             item.schemaId,
-                            item.securityToken,
+                            item.sharedSecret,
                             item.url);
                     });
                 })
@@ -66,7 +66,7 @@ export class WebhooksService {
                     return new WebhookDto(
                         response.id,
                         response.schemaId,
-                        response.securityToken,
+                        response.sharedSecret,
                         response.url);
                 })
                 .catchError('Failed to create webhook. Please reload.');

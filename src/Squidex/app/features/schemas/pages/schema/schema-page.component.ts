@@ -82,7 +82,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         });
 
     public get hasName() {
-        return this.addFieldForm.get('name').value && this.addFieldForm.get('name').value.length > 0;
+        return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
@@ -227,10 +227,10 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         if (this.addFieldForm.valid) {
             this.addFieldForm.disable();
 
-            const properties = createProperties(this.addFieldForm.get('type')!.value);
-            const partitioning = this.addFieldForm.get('isLocalizable')!.value ? 'language' : 'invariant';
+            const properties = createProperties(this.addFieldForm.controls['type'].value);
+            const partitioning = this.addFieldForm.controls['isLocalizable'].value ? 'language' : 'invariant';
 
-            const requestDto = new AddFieldDto(this.addFieldForm.get('name')!.value, partitioning, properties);
+            const requestDto = new AddFieldDto(this.addFieldForm.controls['name'].value, partitioning, properties);
 
             const reset = () => {
                 this.addFieldForm.reset({ type: 'String' });

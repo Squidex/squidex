@@ -30,7 +30,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     public userFormSubmitted = false;
     public userForm: FormGroup;
     public userId: string;
-    public userFormError: string;
+    public userFormError? = '';
 
     public isCurrentUser = false;
     public isNewMode = false;
@@ -65,7 +65,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
             const enable = (message?: string) => {
                 this.userForm.enable();
-                this.userForm.get('password').reset();
+                this.userForm.controls['password'].reset();
                 this.userFormSubmitted = false;
                 this.userFormError = message;
             };
@@ -82,7 +82,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 created.id,
                                 requestDto.email,
                                 requestDto.displayName,
-                                created.pictureUrl));
+                                created.pictureUrl!));
 
                         this.notifyInfo('User created successfully.');
                         back();

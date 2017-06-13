@@ -179,17 +179,13 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentForm.markAsPristine();
 
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-            const fieldForm = this.contentForm.get(field.name);
-
-            fieldForm.enable();
+            this.contentForm.controls[field.name].enable();
         }
     }
 
     private disable() {
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-            const fieldForm = this.contentForm.get(field.name);
-
-            fieldForm.disable();
+            this.contentForm.controls[field.name].disable();
         }
     }
 
@@ -256,10 +252,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
              if (field.partitioning === 'language') {
                 for (let language of this.languages) {
-                    fieldForm.get(language.iso2Code).setValue(fieldValue[language.iso2Code]);
+                    fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                 }
             } else {
-                fieldForm.get('iv').setValue(fieldValue['iv']);
+                fieldForm.controls['iv'].setValue(fieldValue['iv']);
             }
         }
     }

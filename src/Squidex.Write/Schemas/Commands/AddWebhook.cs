@@ -18,7 +18,7 @@ namespace Squidex.Write.Schemas.Commands
 
         public Uri Url { get; set; }
 
-        public string SecurityToken { get; } = RandomHash.New();
+        public string SharedSecret { get; } = RandomHash.New();
 
         public void Validate(IList<ValidationError> errors)
         {

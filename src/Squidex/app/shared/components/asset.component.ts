@@ -164,7 +164,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         if (this.renameForm.valid) {
             this.renameForm.disable();
 
-            const requestDto = new UpdateAssetDto(this.renameForm.get('name').value);
+            const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
             this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.version))
@@ -194,7 +194,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     private resetRename() {
         this.renameForm.enable();
-        this.renameForm.get('name').setValue(this.asset.fileName);
+        this.renameForm.controls['name'].setValue(this.asset.fileName);
         this.renameFormSubmitted = false;
         this.renameDialog.hide();
     }

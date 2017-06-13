@@ -56,7 +56,7 @@ export class SchemaFormComponent {
         });
 
     public schemaName =
-        this.createForm.get('name')!.valueChanges.map(n => n || FALLBACK_NAME)
+        this.createForm.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);
 
     constructor(
@@ -85,9 +85,9 @@ export class SchemaFormComponent {
             this.createForm.disable();
 
             const schemaVersion = new Version();
-            const schemaName = this.createForm.get('name')!.value;
+            const schemaName = this.createForm.controls['name'].value;
 
-            const requestDto = Object.assign(this.createForm.get('import')!.value || {}, {});
+            const requestDto = Object.assign(this.createForm.controls['import'].value || {}, {});
 
             requestDto.name = schemaName;
 

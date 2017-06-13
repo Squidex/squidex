@@ -282,7 +282,7 @@ describe('UserManagementService', () => {
             ))
             .verifiable(Times.once());
 
-        let user: UserCreatedDto | null = null;
+        let user: UserDto | null = null;
 
         userManagementService.postUser(dto).subscribe(result => {
             user = result;

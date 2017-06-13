@@ -36,12 +36,12 @@ describe('WebhooksService', () => {
                         body: [{
                             id: 'id1',
                             schemaId: 'schemaId1',
-                            securityToken: 'token1',
+                            sharedSecret: 'token1',
                             url: 'http://squidex.io/1'
                         }, {
                             id: 'id2',
                             schemaId: 'schemaId2',
-                            securityToken: 'token2',
+                            sharedSecret: 'token2',
                             url: 'http://squidex.io/2'
                         }]
                     })
@@ -73,7 +73,7 @@ describe('WebhooksService', () => {
                         body: {
                             id: 'id1',
                             schemaId: 'schemaId1',
-                            securityToken: 'token1',
+                            sharedSecret: 'token1',
                             url: 'http://squidex.io/1'
                         }
                     })

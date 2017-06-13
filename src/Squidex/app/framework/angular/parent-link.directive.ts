@@ -35,7 +35,7 @@ export class ParentLinkDirective implements OnInit, OnDestroy {
         this.urlSubscription =
             this.route.url.subscribe(() => {
                 this.url = this.isLazyLoaded ?
-                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent.parent }).toString() :
+                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent!.parent }).toString() :
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent }).toString();
 
                 this.renderer.setElementAttribute(this.element.nativeElement, 'href', this.url);

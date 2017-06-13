@@ -48,12 +48,12 @@ export class DateTimeValidationComponent implements OnInit {
             ]));
 
         this.hideDefaultValues =
-            this.editForm.get('isRequired')!.valueChanges
+            this.editForm.controls['isRequired'].valueChanges
                 .startWith(this.properties.isRequired)
                 .map(x => !!x);
 
         this.hideDefaultValue =
-            this.editForm.get('calculatedDefaultValue')!.valueChanges
+            this.editForm.controls['calculatedDefaultValue'].valueChanges
                 .startWith(this.properties.calculatedDefaultValue)
                 .map(x => !!x);
     }

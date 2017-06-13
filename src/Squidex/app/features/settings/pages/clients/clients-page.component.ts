@@ -44,7 +44,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         });
 
     public get hasName() {
-        return this.addClientForm.get('name').value && this.addClientForm.get('name').value.length > 0;
+        return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
     }
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
@@ -102,7 +102,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             this.addClientFormSubmitted = true;
             this.addClientForm.disable();
 
-            const requestDto = new CreateAppClientDto(this.addClientForm.get('name')!.value);
+            const requestDto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
 
             this.appNameOnce()
                 .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))

@@ -59,12 +59,12 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Token:</td>
+                                <td>Secret:</td>
                                 <td>
-                                    <input readonly class="form-control" [attr.value]="webhook.webhook.securityToken" #inputToken />
+                                    <input readonly class="form-control" [attr.value]="webhook.webhook.sharedSecret" #inputSecret />
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputToken">
+                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
                                         <i class="icon-copy"></i>
                                     </button>
                                 </td>

@@ -12,12 +12,12 @@ namespace Squidex.Read.Schemas
 {
     public interface ISchemaWebhookEntity
     {
-        Guid Id { get; }
-
         Guid SchemaId { get; }
+
+        Guid Id { get; }
 
         Uri Url { get; }
 
-        string SecurityToken { get; }
+        string SharedSecret { get; }
     }
 }

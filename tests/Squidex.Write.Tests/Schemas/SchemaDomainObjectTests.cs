@@ -709,7 +709,7 @@ namespace Squidex.Write.Schemas
             
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = command.Id, Url = command.Url, SecurityToken = command.SecurityToken })
+                    CreateEvent(new WebhookAdded { Id = command.Id, Url = command.Url, SharedSecret = command.SharedSecret })
                 );
         }
 
@@ -757,7 +757,7 @@ namespace Squidex.Write.Schemas
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = createCommand.Id, Url = createCommand.Url, SecurityToken = createCommand.SecurityToken }),
+                    CreateEvent(new WebhookAdded { Id = createCommand.Id, Url = createCommand.Url, SharedSecret = createCommand.SharedSecret }),
                     CreateEvent(new WebhookDeleted { Id = createCommand.Id })
                 );
         }

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NodaTime;
 using Squidex.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
@@ -71,7 +72,7 @@ namespace Squidex.Read.Schemas
 
                     foreach (var hook in schemaHooks)
                     {
-                        DispatchEventAsync(payload, hook).Forget();
+                        DispatchEventAsync(payload, hook, @event.Headers.Timestamp()).Forget();
                     }
                 }
             }
@@ -85,7 +86,7 @@ namespace Squidex.Read.Schemas
                 new JProperty("data", JObject.FromObject(@event.Payload, webhookSerializer)));
         }
 
-        private async Task DispatchEventAsync(JObject payload, ISchemaWebhookEntity webhook)
+        private async Task DispatchEventAsync(JObject payload, ISchemaWebhookEntity webhook, Instant instant)
         {
             try
             {
@@ -93,6 +94,10 @@ namespace Squidex.Read.Schemas
                     .WriteProperty("Action", "SendToHook")
                     .WriteProperty("Status", "Invoked")))
                 {
+                    var signature = $"{instant.ToUnixTimeSeconds()}{webhook.SharedSecret}".Sha256Base64();
+
+                    payload["Signature"] = signature;
+
                     using (var client = new HttpClient())
                     {
                         client.Timeout = Timeout;
@@ -102,7 +107,7 @@ namespace Squidex.Read.Schemas
                             Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json")
                         };
 
-                        message.Headers.TryAddWithoutValidation("X-SecurityToken", webhook.SecurityToken);
+                        message.Headers.TryAddWithoutValidation("X-Signature", signature);
                         message.Headers.Add("User-Agent", "Squidex");
 
                         var response = await client.SendAsync(message);

@@ -18,6 +18,6 @@ namespace Squidex.Events.Schemas
 
         public Uri Url { get; set; }
 
-        public string SecurityToken { get; set; }
+        public string SharedSecret { get; set; }
     }
 }
