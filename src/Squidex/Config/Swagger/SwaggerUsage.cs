@@ -17,7 +17,7 @@ namespace Squidex.Config.Swagger
     {
         public static void UseMySwagger(this IApplicationBuilder app)
         {
-            var settings = app.ApplicationServices.GetService<SwaggerOwinSettings>();
+            var settings = app.ApplicationServices.GetService<SwaggerSettings>();
 
             app.UseSwagger(typeof(SwaggerUsage).GetTypeInfo().Assembly, settings);
         }

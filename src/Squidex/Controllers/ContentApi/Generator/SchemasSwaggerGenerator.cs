@@ -36,6 +36,7 @@ namespace Squidex.Controllers.ContentApi.Generator
     {
         private readonly SwaggerJsonSchemaGenerator schemaGenerator;
         private readonly SwaggerDocument document = new SwaggerDocument { Tags = new List<SwaggerTag>() };
+        private readonly SwaggerSettings swaggerSettings;
         private readonly HttpContext context;
         private readonly JsonSchemaResolver schemaResolver;
         private readonly SwaggerGenerator swaggerGenerator;
@@ -46,16 +47,17 @@ namespace Squidex.Controllers.ContentApi.Generator
         private string appBasePath;
         private IAppEntity app;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerOwinSettings swaggerSettings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
         {
             this.context = context.HttpContext;
 
             this.urlOptions = urlOptions.Value;
 
-            schemaGenerator = new SwaggerJsonSchemaGenerator(swaggerSettings);
-            schemaResolver = new SwaggerSchemaResolver(document, swaggerSettings);
+            schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
+            schemaResolver = new SwaggerSchemaResolver(document, settings);
 
-            swaggerGenerator = new SwaggerGenerator(schemaGenerator, swaggerSettings, schemaResolver);
+            swaggerSettings = settings;
+            swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
 
             schemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
@@ -130,7 +132,8 @@ namespace Squidex.Controllers.ContentApi.Generator
         private async Task GenerateBasicSchemas()
         {
             var errorType = typeof(ErrorDto);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, new Attribute[0], EnumHandling.String);
+            var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], EnumHandling.String);
 
             errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
         }

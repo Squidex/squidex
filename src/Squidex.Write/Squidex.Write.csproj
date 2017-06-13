@@ -14,6 +14,6 @@
     <ProjectReference Include="..\Squidex.Read\Squidex.Read.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NodaTime" Version="2.0.2" />
+    <PackageReference Include="NodaTime" Version="2.0.3" />
   </ItemGroup>
 </Project>

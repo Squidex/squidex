@@ -24,12 +24,12 @@ namespace Squidex.Config.Swagger
     {
         public static void AddMySwaggerSettings(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(SwaggerOwinSettings), s =>
+            services.AddSingleton(typeof(SwaggerSettings), s =>
             {
                 var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
 
                 var settings =
-                    new SwaggerOwinSettings { Title = "Squidex API Specification", IsAspNetCore = false }
+                    new SwaggerSettings { Title = "Squidex API Specification", IsAspNetCore = false }
                         .ConfigurePaths(urlOptions)
                         .ConfigureSchemaSettings()
                         .ConfigureIdentity(urlOptions);
@@ -40,7 +40,7 @@ namespace Squidex.Config.Swagger
             services.AddTransient<SchemasSwaggerGenerator>();
         }
 
-        private static SwaggerOwinSettings ConfigureIdentity(this SwaggerOwinSettings settings, MyUrlsOptions urlOptions)
+        private static SwaggerSettings ConfigureIdentity(this SwaggerSettings settings, MyUrlsOptions urlOptions)
         {
             settings.DocumentProcessors.Add(
                 new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
@@ -50,7 +50,7 @@ namespace Squidex.Config.Swagger
             return settings;
         }
 
-        private static SwaggerOwinSettings ConfigurePaths(this SwaggerOwinSettings settings, MyUrlsOptions urlOptions)
+        private static SwaggerSettings ConfigurePaths(this SwaggerSettings settings, MyUrlsOptions urlOptions)
         {
             settings.SwaggerRoute = $"{Constants.ApiPrefix}/swagger/v1/swagger.json";
 
@@ -68,7 +68,7 @@ namespace Squidex.Config.Swagger
             return settings;
         }
 
-        private static SwaggerOwinSettings ConfigureSchemaSettings(this SwaggerOwinSettings settings)
+        private static SwaggerSettings ConfigureSchemaSettings(this SwaggerSettings settings)
         {
             settings.DefaultEnumHandling = EnumHandling.String;
             settings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
@@ -87,7 +87,7 @@ namespace Squidex.Config.Swagger
             settings.DocumentProcessors.Add(new XmlTagProcessor());
 
             settings.OperationProcessors.Add(new XmlTagProcessor());
-            settings.OperationProcessors.Add(new XmlResponseTypesProcessor());
+            settings.OperationProcessors.Add(new XmlResponseTypesProcessor(settings));
 
             return settings;
         }
