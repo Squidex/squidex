@@ -9,7 +9,6 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NSwag;
@@ -79,7 +78,7 @@ namespace Squidex.Config.Swagger
 
             var errorType = typeof(ErrorDto);
             var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], EnumHandling.String);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], swaggerSettings.DefaultEnumHandling);
 
             var response = new SwaggerResponse { Description = "Operation failed." };
 

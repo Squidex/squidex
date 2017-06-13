@@ -133,7 +133,7 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             var errorType = typeof(ErrorDto);
             var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], EnumHandling.String);
+            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], swaggerSettings.DefaultEnumHandling);
 
             errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
         }
