@@ -36,15 +36,15 @@ describe('AppLanguagesService', () => {
                     new ResponseOptions({
                         body: [
                             {
-                                iso2Code: 'de',
-                                englishName: 'German',
+                                iso2Code: 'en',
+                                englishName: 'English',
                                 isMaster: true,
                                 isOptional: true,
                                 fallback: ['de', 'en']
                             },
                             {
-                                iso2Code: 'en',
-                                englishName: 'English'
+                                iso2Code: 'it',
+                                englishName: 'Italian'
                             }
                         ]
                     })
@@ -60,8 +60,8 @@ describe('AppLanguagesService', () => {
 
         expect(languages).toEqual(
             [
-                new AppLanguageDto('de', 'German', true, true, ['de', 'en']),
-                new AppLanguageDto('en', 'English', false, false, [])
+                new AppLanguageDto('en', 'English', true, true,  ['de', 'en']),
+                new AppLanguageDto('it', 'Italian', false, false, [])
             ]);
 
         authService.verifyAll();

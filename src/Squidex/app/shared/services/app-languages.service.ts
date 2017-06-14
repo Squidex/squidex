@@ -62,7 +62,7 @@ export class AppLanguagesService {
                             item.englishName,
                             item.isMaster === true,
                             item.isOptional === true,
-                            item.fallback);
+                            item.fallback || []);
                     });
                 })
                 .catchError('Failed to load languages. Please reload.');
