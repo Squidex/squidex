@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 
 namespace Squidex.Controllers.UI.Error
 {
+    [SwaggerIgnore]
     public class ErrorController : Controller
     {
         [Route("error")]

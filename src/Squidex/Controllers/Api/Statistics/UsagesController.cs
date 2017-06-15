@@ -102,7 +102,7 @@ namespace Squidex.Controllers.Api.Statistics
         }
 
         /// <summary>
-        /// Get current size of all assets for today.
+        /// Get total asset size.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
