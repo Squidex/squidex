@@ -19,6 +19,52 @@
     float: left;
 }
 
+.github {
+    &-button {
+        & {
+            @include fixed(50%, -103px, auto, auto);
+            @include border-radius-left(3px);
+            @include transition(transform .3s ease);
+            background: lighten($color-extern-github, 10%);
+            border: 0;
+            cursor: pointer;
+            color: $color-dark-foreground;
+            margin-top: -60px;
+            padding-left: 65px;
+            font-size: .9rem;
+            font-weight: bold;
+            height: 44px;
+            line-height: 40px;
+            width: 147px;
+        }
+
+        &:hover {
+            & {
+                @include translate(-103px, 0);
+                text-decoration: none;
+            }
+
+            .github-icon {
+                background: $color-extern-github;
+            }
+        }
+    }
+
+    &-icon {
+        @include absolute(0, auto, auto, 0);
+        @include border-radius-left(3px);
+        @include transition(background .4s ease);
+        background: lighten($color-extern-github, 10%);
+        display: inline-block;
+        line-height: 44px;
+        font-size: 1.5rem;
+        font-weight: normal;
+        width: 44px;
+        text-align: center;
+        color: $color-dark-foreground;
+    }
+}
+
 .notification {
     &-container {
         @include fixed(auto, .625rem, .625rem, auto);
