@@ -50,9 +50,16 @@
     }
 
     &-text {
+        color: $color-empty;
         font-weight: normal;
         font-size: .9rem;
+    }
+
+    &-more {
         color: $color-empty;
+        font-weight: normal;
+        font-size: .8rem;
+        margin-top: .4rem;
     }
 
     &-title {
