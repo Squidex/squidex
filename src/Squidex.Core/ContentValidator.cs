@@ -109,7 +109,7 @@ namespace Squidex.Core
 
             foreach (var partitionValues in fieldData)
             {
-                if (!partition.TryGetItem(partitionValues.Key, out var partitionItem))
+                if (!partition.TryGetItem(partitionValues.Key, out var _))
                 {
                     errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
                 }

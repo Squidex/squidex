@@ -18,7 +18,20 @@ export class WebhookDto {
         public readonly id: string,
         public readonly schemaId: string,
         public readonly sharedSecret: string,
-        public readonly url: string
+        public readonly url: string,
+        public readonly totalSucceeded: number,
+        public readonly totalFailed: number,
+        public readonly totalTimedout: number,
+        public readonly averageRequestTimeMs: number,
+        public readonly lastDumps: string[]
+    ) {
+    }
+}
+
+export class WebhookCreatedDto {
+    constructor(
+        public readonly id: string,
+        public readonly sharedSecret: string
     ) {
     }
 }
@@ -51,23 +64,26 @@ export class WebhooksService {
                             item.id,
                             item.schemaId,
                             item.sharedSecret,
-                            item.url);
+                            item.url,
+                            item.totalSucceeded,
+                            item.totalFailed,
+                            item.totalTimedout,
+                            item.averageRequestTimeMs,
+                            item.lastDumps);
                     });
                 })
                 .catchError('Failed to load webhooks. Please reload.');
     }
 
-    public postWebhook(appName: string, schemaName: string, dto: CreateWebhookDto, version?: Version): Observable<WebhookDto> {
+    public postWebhook(appName: string, schemaName: string, dto: CreateWebhookDto, version?: Version): Observable<WebhookCreatedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/webhooks`);
 
         return this.authService.authPost(url, dto, version)
                 .map(response => response.json())
                 .map(response => {
-                    return new WebhookDto(
+                    return new WebhookCreatedDto(
                         response.id,
-                        response.schemaId,
-                        response.sharedSecret,
-                        response.url);
+                        response.sharedSecret);
                 })
                 .catchError('Failed to create webhook. Please reload.');
     }

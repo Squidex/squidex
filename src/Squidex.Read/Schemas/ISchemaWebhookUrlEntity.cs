@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ISchemaWebhookEntity.cs
+//  ISchemaWebhookUrlEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,22 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 
 namespace Squidex.Read.Schemas
 {
-    public interface ISchemaWebhookEntity : ISchemaWebhookUrlEntity
+    public interface ISchemaWebhookUrlEntity
     {
-        Guid SchemaId { get; }
+        Guid Id { get; }
 
-        long TotalSucceeded { get; }
+        Uri Url { get; }
 
-        long TotalFailed { get; }
-
-        long TotalTimedout { get; }
-
-        long TotalRequestTime { get; }
-
-        IEnumerable<string> LastDumps { get; }
+        string SharedSecret { get; }
     }
 }

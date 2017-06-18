@@ -21,7 +21,7 @@ import {
     WebhooksService
 } from 'shared';
 
-interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; };
+interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; showDetails: boolean; };
 
 @Component({
     selector: 'sqx-webhooks-page',
@@ -68,7 +68,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app =>
                 this.schemasService.getSchemas(app)
-                    .withLatestFrom(this.webhooksService.getWebhooks(app),
+                    .combineLatest(this.webhooksService.getWebhooks(app),
                         (s, w) => { return { webhooks: w, schemas: s }; }))
             .subscribe(dtos => {
                 this.schemas = dtos.schemas;
@@ -76,7 +76,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                 this.webhooks =
                     ImmutableArray.of(
                         dtos.webhooks.map(w => {
-                            return { webhook: w, schema: dtos.schemas.find(s => s.id === w.schemaId) };
+                            return { webhook: w, schema: dtos.schemas.find(s => s.id === w.schemaId), showDetails: false };
                         }).filter(w => !!w.schema));
 
                 if (showInfo) {
@@ -86,7 +86,6 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                 this.notifyError(error);
             });
     }
-
     public resetWebhookForm() {
         this.addWebhookFormSubmitted = false;
         this.addWebhookForm.enable();
@@ -105,13 +104,19 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             this.appNameOnce()
                 .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
                 .subscribe(dto => {
-                    this.webhooks = this.webhooks.push({ schema, webhook: dto });
+                    const webhook = new WebhookDto(dto.id, schemaId, dto.sharedSecret, requestDto.url, 0, 0, 0, 0, []);
+
+                    this.webhooks = this.webhooks.push({ schema, webhook, showDetails: false });
                     this.resetWebhookForm();
                 }, error => {
                     this.notifyError(error);
                     this.resetWebhookForm();
                 });
         }
+    }
+
+    public toggleDetails(webhook: WebhookWithSchema) {
+        this.webhooks = this.webhooks.replace(webhook, { webhook: webhook.webhook, schema: webhook.schema, showDetails: !webhook.showDetails });
     }
 
     public deleteWebhook(webhook: WebhookWithSchema) {

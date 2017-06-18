@@ -13,31 +13,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Repositories; 
 
+// ReSharper disable SwitchStatementMissingSomeCases
+
 namespace Squidex.Read.MongoDb.Schemas
 {
-    public class MongoSchemaWebhookRepository : MongoRepositoryBase<MongoSchemaWebhookEntity>, ISchemaWebhookRepository, IEventConsumer
+    public partial class MongoSchemaWebhookRepository : MongoRepositoryBase<MongoSchemaWebhookEntity>, ISchemaWebhookRepository, IEventConsumer
     {
-        private static readonly List<ISchemaWebhookEntity> EmptyWebhooks = new List<ISchemaWebhookEntity>();
-        private Dictionary<Guid, List<MongoSchemaWebhookEntity>> inMemoryWebhooks;
+        private const int MaxDumps = 10;
+        private static readonly List<ShortInfo> EmptyWebhooks = new List<ShortInfo>();
+        private Dictionary<Guid, Dictionary<Guid, List<ShortInfo>>> inMemoryWebhooks;
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
 
-        public string Name
+        public sealed class ShortInfo : ISchemaWebhookUrlEntity
         {
-            get { return GetType().Name; }
-        }
+            public Guid Id { get; set; }
 
-        public string EventsFilter
-        {
-            get { return "^schema-"; }
+            public Uri Url { get; set; }
+
+            public string SharedSecret { get; set; }
         }
 
         public MongoSchemaWebhookRepository(IMongoDatabase database)
@@ -55,45 +55,47 @@ namespace Squidex.Read.MongoDb.Schemas
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.SchemaId));
         }
 
-        public Task On(Envelope<IEvent> @event)
-        {
-            return this.DispatchActionAsync(@event.Payload, @event.Headers);
-        }
-
-        protected async Task On(WebhookAdded @event, EnvelopeHeaders headers)
-        {
-            await EnsureWebooksLoadedAsync();
-
-            var webhook = SimpleMapper.Map(@event, new MongoSchemaWebhookEntity { AppId = @event.AppId.Id, SchemaId = @event.SchemaId.Id });
-
-            inMemoryWebhooks.GetOrAddNew(webhook.AppId).Add(webhook);
-
-            await Collection.InsertOneAsync(webhook);
-        }
-
-        protected async Task On(WebhookDeleted @event, EnvelopeHeaders headers)
-        {
-            await EnsureWebooksLoadedAsync();
-
-            inMemoryWebhooks.GetOrDefault(@event.AppId.Id)?.RemoveAll(w => w.Id == @event.Id);
-
-            await Collection.DeleteManyAsync(x => x.Id == @event.Id);
-        }
-
-        protected async Task On(SchemaDeleted @event, EnvelopeHeaders headers)
-        {
-            await EnsureWebooksLoadedAsync();
-
-            inMemoryWebhooks.GetOrDefault(@event.AppId.Id)?.RemoveAll(w => w.SchemaId == @event.SchemaId.Id);
-
-            await Collection.DeleteManyAsync(x => x.SchemaId == @event.SchemaId.Id);
-        }
-
         public async Task<IReadOnlyList<ISchemaWebhookEntity>> QueryByAppAsync(Guid appId)
         {
+            return await Collection.Find(x => x.AppId == appId).ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<ISchemaWebhookUrlEntity>> QueryUrlsBySchemaAsync(Guid appId, Guid schemaId)
+        {
             await EnsureWebooksLoadedAsync();
 
-            return inMemoryWebhooks.GetOrDefault(appId)?.OfType<ISchemaWebhookEntity>()?.ToList() ?? EmptyWebhooks;
+            return inMemoryWebhooks.GetOrDefault(appId)?.GetOrDefault(schemaId)?.ToList() ?? EmptyWebhooks;
+        }
+
+        public async Task AddInvokationAsync(Guid webhookId, string dump, WebhookResult result, TimeSpan elapsed)
+        {
+            var webhookEntity = await Collection.Find(x => x.Id == webhookId).FirstOrDefaultAsync();
+
+            if (webhookEntity != null)
+            {
+                switch (result)
+                {
+                    case WebhookResult.Success:
+                        webhookEntity.TotalSucceeded++;
+                        break;
+                    case WebhookResult.Fail:
+                        webhookEntity.TotalFailed++;
+                        break;
+                    case WebhookResult.Timeout:
+                        webhookEntity.TotalTimedout++;
+                        break;
+                }
+
+                webhookEntity.TotalRequestTime += (long)elapsed.TotalMilliseconds;
+                webhookEntity.LastDumps.Insert(0, dump);
+
+                while (webhookEntity.LastDumps.Count > MaxDumps)
+                {
+                    webhookEntity.LastDumps.RemoveAt(webhookEntity.LastDumps.Count - 1);
+                }
+
+                await Collection.ReplaceOneAsync(x => x.Id == webhookId, webhookEntity);
+            }
         }
 
         private async Task EnsureWebooksLoadedAsync()
@@ -106,9 +108,18 @@ namespace Squidex.Read.MongoDb.Schemas
 
                     if (inMemoryWebhooks == null)
                     {
+                        var result = new Dictionary<Guid, Dictionary<Guid, List<ShortInfo>>>();
+
                         var webhooks = await Collection.Find(new BsonDocument()).ToListAsync();
 
-                        inMemoryWebhooks = webhooks.GroupBy(x => x.AppId).ToDictionary(x => x.Key, x => x.ToList());
+                        foreach (var webhook in webhooks)
+                        {
+                            var list = result.GetOrAddNew(webhook.AppId).GetOrAddNew(webhook.SchemaId);
+
+                            list.Add(SimpleMapper.Map(webhook, new ShortInfo()));
+                        }
+
+                        inMemoryWebhooks = result;
                     }
                 }
                 finally

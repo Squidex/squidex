@@ -192,13 +192,13 @@ namespace Squidex.Infrastructure
             }
             catch (OverflowException)
             {
-                string message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}' because it is either too small or large.";
+                var message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}' because it is either too small or large.";
 
                 throw new InvalidCastException(message);
             }
             catch (InvalidCastException)
             {
-                string message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
+                var message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
 
                 throw new InvalidCastException(message);
             }
@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure
             }
             catch (Exception ex)
             {
-                string message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
+                var message = $"The property has type '{valueType}' and cannot be casted to '{requestedType}'.";
 
                 throw new InvalidCastException(message, ex);
             }

@@ -56,7 +56,13 @@ namespace Squidex.Controllers.Api.Webhooks
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 
-            var response = webhooks.Select(w => SimpleMapper.Map(w, new WebhookDto()));
+            var response = webhooks.Select(w =>
+            {
+                var count = w.TotalTimedout + w.TotalSucceeded + w.TotalFailed;
+                var average = count == 0 ? 0 : w.TotalRequestTime / count;
+
+                return SimpleMapper.Map(w, new WebhookDto { AverageRequestTimeMs = average, LastDumps = w.LastDumps.ToList() });
+            });
 
             return Ok(response);
         }
@@ -78,7 +84,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/webhooks/")]
-        [ProducesResponseType(typeof(WebhookDto), 201)]
+        [ProducesResponseType(typeof(WebhookCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ApiCosts(1)]
@@ -88,7 +94,7 @@ namespace Squidex.Controllers.Api.Webhooks
 
             await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction(nameof(GetWebhooks), new { app }, SimpleMapper.Map(command, new WebhookDto()));
+            return CreatedAtAction(nameof(GetWebhooks), new { app }, SimpleMapper.Map(command, new WebhookCreatedDto()));
         }
 
         /// <summary>

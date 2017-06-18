@@ -69,7 +69,7 @@ namespace Squidex.Read.Schemas
         {
             if (@event.Payload is SchemaEvent schemaEvent)
             {
-                string channel = $"schemas.{schemaEvent.SchemaId.Name}";
+                var channel = $"schemas.{schemaEvent.SchemaId.Name}";
 
                 var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaEvent.SchemaId.Name);
 

@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public T Result<T>()
         {
-            return result != null ? (T)result.Item1 : default(T);
+            return (T)result?.Item1;
         }
     }
 }
