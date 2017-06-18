@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, string value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value);
 
             return this;
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, double value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value);
 
             return this;
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, long value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value);
 
             return this;
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, bool value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value);
 
             return this;
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, DateTime value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
 
             return this;
@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, DateTimeOffset value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
 
             return this;
@@ -126,7 +126,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteProperty(string property, TimeSpan value)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteValue(value);
 
             return this;
@@ -146,7 +146,7 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter IObjectWriter.WriteArray(string property, Action<IArrayWriter> arrayWriter)
         {
-            jsonWriter.WritePropertyName(property);
+            jsonWriter.WritePropertyName(property.ToCamelCase());
             jsonWriter.WriteStartArray();
 
             arrayWriter?.Invoke(this);
