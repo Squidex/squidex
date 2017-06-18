@@ -43,7 +43,7 @@ describe('WebhooksService', () => {
                             totalFailed: 2,
                             totalTimedout: 3,
                             averageRequestTimeMs: 4,
-                            dumps: ['dump1']
+                            lastDumps: ['dump1']
                         }, {
                             id: 'id2',
                             schemaId: 'schemaId2',
@@ -53,7 +53,7 @@ describe('WebhooksService', () => {
                             totalFailed: 6,
                             totalTimedout: 7,
                             averageRequestTimeMs: 8,
-                            dumps: ['dump2']
+                            lastDumps: ['dump2']
                         }]
                     })
                 )
