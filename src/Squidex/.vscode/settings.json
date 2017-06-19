@@ -1,7 +1,4 @@
 {
-     // Controls if the editor shows reference information for the modes that support it
-    "editor.referenceInfos": false,
-
     // When opening a file, `editor.tabSize` and `editor.insertSpaces` will be detected based on the file contents.
     "editor.detectIndentation": false,
 
@@ -12,8 +9,10 @@
     "files.exclude": {
         "_test-output": true,
         "**/node_modules": true,
+        "**/Assets": true,
         "**/artifacts": true,
         "**/build": true,
+        "**/logs": true,
         "**/out": true,
         "**/obj": true,
         "**/bin": true,
