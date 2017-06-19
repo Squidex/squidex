@@ -56,13 +56,14 @@ describe('PanelService', () => {
             numPublished++;
         });
 
-        panelService.push(element1, <any>renderer);
-        panelService.push(element2, <any>renderer);
-        panelService.push(element3, <any>renderer);
+        panelService.push(element1);
+        panelService.push(element2);
+        panelService.push(element3);
 
         styles = [];
 
-        panelService.pop(element3, <any>renderer);
+        panelService.pop(element3);
+        panelService.render(<any>renderer);
 
         expect(styles).toEqual([
             { element: element1, property: 'top', value: '0px' },

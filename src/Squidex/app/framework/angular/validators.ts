@@ -49,6 +49,34 @@ export module ValidatorsEx {
         };
     }
 
+    export function matchOther(otherControlName: string, message: string) {
+        let otherControl: AbstractControl = null;
+
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.parent) {
+                return {};
+            }
+
+            if (otherControl === null) {
+                otherControl = control.parent.get(otherControlName) || undefined;
+
+                if (!otherControl) {
+                    throw new Error('matchOtherValidator(): other control is not found in parent group');
+                }
+
+                otherControl.valueChanges.subscribe(() => {
+                    control.updateValueAndValidity({ onlySelf: true });
+                });
+            }
+
+            if (otherControl && otherControl.value !== control.value) {
+                return { matchOther: { message } };
+            }
+
+            return {};
+        };
+    }
+
     export function validDateTime() {
         return (control: AbstractControl): { [key: string]: any } => {
             const v: string = control.value;

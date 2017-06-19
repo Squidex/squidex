@@ -18,6 +18,7 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     maxvalue: '{field} must be smaller than {maxValue}.',
     minlength: '{field} must have more than {requiredLength} characters.',
     maxlength: '{field} cannot have more than {requiredLength} characters.',
+    matchOther: '{message}',
     validdatetime: '{field} is not a valid date time',
     validnumber: '{field} is not a valid number.',
     validvalues: '{field} is not a valid value.'

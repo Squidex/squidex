@@ -15,7 +15,8 @@ import {
     MessageBus,
     NotificationService,
     UserDto,
-    UserManagementService
+    UserManagementService,
+    ValidatorsEx
 } from 'shared';
 
 import { UserCreated, UserUpdated } from './messages';
@@ -66,6 +67,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             const enable = (message?: string) => {
                 this.userForm.enable();
                 this.userForm.controls['password'].reset();
+                this.userForm.controls['passwordConfirm'].reset();
                 this.userFormSubmitted = false;
                 this.userFormError = message;
             };
@@ -75,7 +77,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             };
 
             if (this.isNewMode) {
-                 this.userManagementService.postUser(requestDto)
+                this.userManagementService.postUser(requestDto)
                     .subscribe(created => {
                         this.messageBus.publish(
                             new UserCreated(
@@ -90,7 +92,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                         enable(error.displayMessage);
                     });
             } else {
-                 this.userManagementService.putUser(this.userId, requestDto)
+                this.userManagementService.putUser(this.userId, requestDto)
                     .subscribe(() => {
                         this.messageBus.publish(
                             new UserUpdated(
@@ -132,8 +134,10 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         if (user) {
             this.userForm.addControl('password', new FormControl(''));
         } else {
-            this.userForm.addControl('password', new FormControl(Validators.required));
+            this.userForm.addControl('password', new FormControl('', Validators.required));
         }
+
+        this.userForm.addControl('passwordConfirm', new FormControl('', ValidatorsEx.matchOther('password', 'Passwords must be the same.')));
 
         this.isCurrentUser = this.userId === this.currentUserId;
     }

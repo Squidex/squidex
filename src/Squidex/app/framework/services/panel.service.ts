@@ -21,17 +21,15 @@ export class PanelService {
         return this.changed$;
     }
 
-    public push(element: any, renderer: Renderer) {
+    public push(element: any) {
         this.elements.push(element);
-        this.update(renderer);
     }
 
-    public pop(element: any, renderer: Renderer) {
+    public pop(element: any) {
         this.elements.splice(-1, 1);
-        this.update(renderer);
     }
 
-    private update(renderer: Renderer) {
+    public render(renderer: Renderer) {
         let currentPosition = 0;
         let currentLayer = this.elements.length * 10;
 

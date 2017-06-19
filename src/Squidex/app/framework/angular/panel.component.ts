@@ -40,10 +40,13 @@ export class PanelComponent implements OnDestroy, AfterViewInit {
     }
 
     public ngOnDestroy() {
-        this.panels.pop(this.panel.nativeElement, this.renderer);
+        this.panels.pop(this.panel.nativeElement);
+        this.panels.render(this.renderer);
     }
-
     public ngAfterViewInit() {
-        this.panels.push(this.panel.nativeElement, this.renderer);
+        this.panels.render(this.renderer);
+    }
+    public ngOnInit() {
+        this.panels.push(this.panel.nativeElement);
     }
 }
