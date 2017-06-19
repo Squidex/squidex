@@ -137,7 +137,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             this.userForm.addControl('password', new FormControl('', Validators.required));
         }
 
-        this.userForm.addControl('passwordConfirm', new FormControl('', ValidatorsEx.matchOther('password', 'Passwords must be the same.')));
+        this.userForm.addControl('passwordConfirm', new FormControl('', ValidatorsEx.match('password', 'Passwords must be the same.')));
 
         this.isCurrentUser = this.userId === this.currentUserId;
     }

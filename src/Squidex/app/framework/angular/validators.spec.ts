@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ValidatorsEx } from './../';
 
@@ -16,12 +16,12 @@ describe('ValidatorsEx.between', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return empty value when value is valid', () => {
+    it('should return null when value is valid', () => {
         const input = new FormControl(4);
 
         const error = <any>ValidatorsEx.between(1, 5)(input);
 
-        expect(error).toEqual({});
+        expect(error).toBeNull();
     });
 
     it('should return error when not a number', () => {
@@ -56,12 +56,12 @@ describe('ValidatorsEx.validValues', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return empty value if value is in allowed values', () => {
+    it('should return null if value is in allowed values', () => {
         const input = new FormControl(10);
 
         const error = ValidatorsEx.validValues([10, 20, 30])(input);
 
-        expect(error).toEqual({});
+        expect(error).toBeNull();
     });
 
     it('should return error if value is not in allowed values', () => {
@@ -73,6 +73,66 @@ describe('ValidatorsEx.validValues', () => {
     });
 });
 
+describe('ValidatorsEx.match', () => {
+    it('should revalidate if other control changes', () => {
+        const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
+
+        const form = new FormGroup({
+            password: new FormControl('1'),
+            passwordConfirm: new FormControl('2', validator)
+        });
+
+        form.controls['passwordConfirm'].setValue('1');
+
+        expect(form.valid).toBeTruthy();
+
+        form.controls['password'].setValue('2');
+
+        expect(form.controls['password'].valid).toBeTruthy();
+        expect(form.controls['passwordConfirm'].valid).toBeFalsy();
+    });
+
+    it('should return error if not the same value', () => {
+        const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
+
+        const form = new FormGroup({
+            password: new FormControl('1'),
+            passwordConfirm: new FormControl('2', validator)
+        });
+
+        expect(validator(form.controls['passwordConfirm'])).toEqual({ match: { message: 'Passwords are not the same.' }});
+    });
+
+    it('should return empty object if values are the same', () => {
+        const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
+
+        const form = new FormGroup({
+            password: new FormControl('1'),
+            passwordConfirm: new FormControl('1', validator)
+        });
+
+        expect(validator(form.controls['passwordConfirm'])).toBeNull();
+    });
+
+    it('should throw error if other object is not found', () => {
+        const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
+
+        const form = new FormGroup({
+            passwordConfirm: new FormControl('2', validator)
+        });
+
+        expect(() => validator(form.controls['passwordConfirm'])).toThrow();
+    });
+
+    it('should return empty object if control has no parent', () => {
+        const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
+
+        const control = new FormControl('2', validator);
+
+        expect(validator(control)).toBeNull();
+    });
+});
+
 describe('ValidatorsEx.pattern', () => {
     it('should return null validator if pattern not defined', () => {
         const validator = ValidatorsEx.pattern(undefined!, undefined);
@@ -80,28 +140,28 @@ describe('ValidatorsEx.pattern', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return empty value  when value is valid pattern', () => {
+    it('should return null when value is valid pattern', () => {
         const input = new FormControl('1234');
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
-        expect(error).toEqual({});
+        expect(error).toBeNull();
     });
 
-    it('should return empty value when value is null string', () => {
+    it('should return null when value is null string', () => {
         const input = new FormControl(null);
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
-        expect(error).toEqual({});
+        expect(error).toBeNull();
     });
 
-    it('should return empty value when value is empty string', () => {
+    it('should return null when value is empty string', () => {
         const input = new FormControl('');
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
-        expect(error).toEqual({});
+        expect(error).toBeNull();
     });
 
     it('should return error with message if value does not match pattern string', () => {

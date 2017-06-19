@@ -34,7 +34,7 @@ export module ValidatorsEx {
             const n: string = control.value;
 
             if (n == null || n.length === 0) {
-                return {};
+                return null;
             }
 
             if (!regex.test(n)) {
@@ -45,23 +45,23 @@ export module ValidatorsEx {
                 }
             }
 
-            return {};
+            return null;
         };
     }
 
-    export function matchOther(otherControlName: string, message: string) {
+    export function match(otherControlName: string, message: string) {
         let otherControl: AbstractControl = null;
 
         return (control: AbstractControl): { [key: string]: any } => {
             if (!control.parent) {
-                return {};
+                return null;
             }
 
             if (otherControl === null) {
                 otherControl = control.parent.get(otherControlName) || undefined;
 
                 if (!otherControl) {
-                    throw new Error('matchOtherValidator(): other control is not found in parent group');
+                    throw new Error('matchValidator(): other control is not found in parent group');
                 }
 
                 otherControl.valueChanges.subscribe(() => {
@@ -70,10 +70,10 @@ export module ValidatorsEx {
             }
 
             if (otherControl && otherControl.value !== control.value) {
-                return { matchOther: { message } };
+                return { match: { message } };
             }
 
-            return {};
+            return null;
         };
     }
 
@@ -89,7 +89,7 @@ export module ValidatorsEx {
                 }
             }
 
-            return {};
+            return null;
         };
     }
 
@@ -109,7 +109,7 @@ export module ValidatorsEx {
                 return { maxvalue: { maxValue, actualValue: n } };
             }
 
-            return {};
+            return null;
         };
     }
 
@@ -125,7 +125,7 @@ export module ValidatorsEx {
                 return { validvalues: false };
             }
 
-            return {};
+            return null;
         };
     }
 }

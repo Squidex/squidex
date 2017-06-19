@@ -79,6 +79,6 @@ describe('PanelService', () => {
             { element: element2, property: 'z-index', value: '10' }
         ]);
 
-        expect(numPublished).toBe(4);
+        expect(numPublished).toBe(1);
     });
 });
