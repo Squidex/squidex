@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
+    <EmbeddedResource Include="Controllers\Api\Users\Assets\Avatar.png" />
     <EmbeddedResource Remove="Assets\**" />
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />

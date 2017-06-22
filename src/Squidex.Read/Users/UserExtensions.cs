@@ -6,9 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using Squidex.Core.Identity;
 using Squidex.Infrastructure;
+
+// ReSharper disable InvertIf
 
 namespace Squidex.Read.Users
 {
@@ -37,6 +40,25 @@ namespace Squidex.Read.Users
         public static string DisplayName(this IUser user)
         {
             return user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexDisplayName)?.Value;
+        }
+
+        public static string PictureNormalizedUrl(this IUser user)
+        {
+            var url = user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value;
+
+            if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute) && url.Contains("gravatar"))
+            {
+                if (url.Contains("?"))
+                {
+                    url += "&d=404";
+                }
+                else
+                {
+                    url += "?d=404";
+                }
+            }
+
+            return url;
         }
     }
 }

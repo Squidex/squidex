@@ -6,7 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +20,31 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Users;
 
+// ReSharper disable InvertIf
+
 namespace Squidex.Controllers.Api.Users
 {
     /// <summary>
     /// Readonly API to retrieve information about squidex users.
     /// </summary>
-    [Authorize]
     [ApiExceptionFilter]
     [SwaggerTag("Users")]
     public class UsersController : Controller
     {
+        private static readonly byte[] AvatarBytes;
         private readonly UserManager<IUser> userManager;
+
+        static UsersController()
+        {
+            var assembly = typeof(UsersController).GetTypeInfo().Assembly;
+
+            using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Controllers.Api.Users.Assets.Avatar.png"))
+            {
+                AvatarBytes = new byte[avatarStream.Length];
+
+                avatarStream.Read(AvatarBytes, 0, AvatarBytes.Length);
+            }
+        }
 
         public UsersController(UserManager<IUser> userManager)
         {
@@ -44,6 +61,7 @@ namespace Squidex.Controllers.Api.Users
         /// <returns>
         /// 200 => Users returned.
         /// </returns>
+        [Authorize]
         [HttpGet]
         [Route("users")]
         [ProducesResponseType(typeof(UserDto[]), 200)]
@@ -64,6 +82,7 @@ namespace Squidex.Controllers.Api.Users
         /// 200 => User found.
         /// 404 => User not found.
         /// </returns>
+        [Authorize]
         [HttpGet]
         [Route("users/{id}/")]
         [ProducesResponseType(typeof(UserDto), 200)]
@@ -79,6 +98,44 @@ namespace Squidex.Controllers.Api.Users
             var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
 
             return Ok(response);
-        } 
+        }
+
+        /// <summary>
+        /// Get user picture by id.
+        /// </summary>
+        /// <param name="id">The id of the user (GUID).</param>
+        /// <returns>
+        /// 200 => User found and image or fallback returned.
+        /// 404 => User not found.
+        /// </returns>
+        [HttpGet]
+        [Route("users/{id}/picture")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetUserPicture(string id)
+        {
+            var entity = await userManager.FindByIdAsync(id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            using (var client = new HttpClient())
+            {
+                var url = entity.PictureNormalizedUrl();
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    var response = await client.GetAsync(url);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return new FileStreamResult(await response.Content.ReadAsStreamAsync(), response.Content.Headers.ContentType.ToString());
+                    }
+                }
+            }
+
+            return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");
+        }
     }
 }

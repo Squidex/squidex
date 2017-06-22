@@ -60,7 +60,7 @@
                     <ng-template ngFor let-user [ngForOf]="usersItems">
                         <tr [routerLink]="user.id" routerLinkActive="active">
                             <td>
-                                <img class="user-picture" [attr.title]="user.name" [attr.src]="user.pictureUrl" />
+                                <img class="user-picture" [attr.title]="user.name" [attr.src]="user | userDtoPicture" />
                             </td>
                             <td>
                                 <span class="user-name table-cell">{{user.displayName}}</span>
