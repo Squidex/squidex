@@ -27,9 +27,19 @@ namespace Squidex.Read.Users
             user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl);
         }
 
+        public static void SetPictureUrlToStore(this IUser user)
+        {
+            user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, "store");
+        }
+
         public static void SetPictureUrlFromGravatar(this IUser user, string email)
         {
             user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email));
+        }
+
+        public static bool IsPictureUrlStored(this IUser user)
+        {
+            return string.Equals(user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value, "store", StringComparison.OrdinalIgnoreCase);
         }
 
         public static string PictureUrl(this IUser user)

@@ -41,9 +41,9 @@ noscript {
         }
     }
 
-    // Fixed logo on the top left corner of the screen.
+    // Fix logo on the top right corner of the screen.
     &-logo {
-        @include absolute(1rem, auto, auto, 1rem);
+        @include absolute(1rem, 1rem, auto, auto);
     }
 
     &-lg {
@@ -54,12 +54,24 @@ noscript {
         color: $color-empty;
     }
 
+    &-section {
+        margin-top: 2rem;
+    }
+
     &-picture-col {
         max-width: 7rem;
     }
 
     &-picture {
-        max-width: 100%;
+        @include circle(6rem);
+    }
+
+    &-picture-input {
+        @include hidden;
+    }
+
+    &-picture-form {
+        margin-top: 1.6rem;
     }
 
     &-footer {
@@ -131,16 +143,5 @@ noscript {
     div {
         font-size: 30px;
         font-weight: lighter;
-    }
-}
-
-@media (max-width: 400px) {
-    .profile-picture-col {
-        min-width: 100%;
-        margin-bottom: 1rem;
-    }
-
-    .profile-picture {
-        height: 5rem;
     }
 }

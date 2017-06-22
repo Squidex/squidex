@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Assets
         {
             sut.Connect();
 
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(Guid.NewGuid(), 1, "suffix", new MemoryStream()));
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(Guid.NewGuid().ToString(), 1, "suffix", new MemoryStream()));
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Assets
         {
             sut.Connect();
 
-            var assetId = Guid.NewGuid();
+            var assetId = Guid.NewGuid().ToString();
             var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
 
             await sut.UploadAsync(assetId, 1, "suffix", assetData);

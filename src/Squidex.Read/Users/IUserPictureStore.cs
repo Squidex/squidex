@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAssetStorage.cs
+//  IUserPictureStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,12 +9,12 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Read.Users
 {
-    public interface IAssetStore
+    public interface IUserPictureStore
     {
-        Task DownloadAsync(string id, long version, string suffix, Stream stream);
+        Task UploadAsync(string userId, Stream stream);
 
-        Task UploadAsync(string id, long version, string suffix, Stream stream);
+        Task<Stream> DownloadAsync(string userId);
     }
 }

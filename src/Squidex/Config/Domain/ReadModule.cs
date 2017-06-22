@@ -21,6 +21,7 @@ using Squidex.Read.History;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Read.Schemas.Services.Implementations;
+using Squidex.Read.Users;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -60,6 +61,10 @@ namespace Squidex.Config.Domain
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
                 .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<AssetUserPictureStore>()
+                .As<IUserPictureStore>()
                 .SingleInstance();
 
             builder.RegisterType<AppHistoryEventsCreator>()

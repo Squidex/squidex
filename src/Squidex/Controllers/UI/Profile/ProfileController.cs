@@ -7,14 +7,19 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
+using Squidex.Config;
 using Squidex.Config.Identity;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Read.Users;
 
@@ -25,12 +30,20 @@ namespace Squidex.Controllers.UI.Profile
     public class ProfileController : Controller
     {
         private readonly UserManager<IUser> userManager;
+        private readonly IUserPictureStore userPictureStore;
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IOptions<MyIdentityOptions> identityOptions;
 
-        public ProfileController(UserManager<IUser> userManager, IOptions<MyIdentityOptions> identityOptions)
+        public ProfileController(
+            UserManager<IUser> userManager,
+            IUserPictureStore userPictureStore,
+            IAssetThumbnailGenerator assetThumbnailGenerator, 
+            IOptions<MyIdentityOptions> identityOptions)
         {
-            this.userManager = userManager;
             this.identityOptions = identityOptions;
+            this.userManager = userManager;
+            this.userPictureStore = userPictureStore;
+            this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
         [HttpGet]
@@ -73,6 +86,37 @@ namespace Squidex.Controllers.UI.Profile
                 "Password changed successfully.");
         }
 
+        [HttpPost]
+        [Route("/account/picture")]
+        public Task<IActionResult> UploadPicture(List<IFormFile> file)
+        {
+            return MakeChangeAsync(async user =>
+            {
+                if (file.Count != 1)
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
+                }
+
+                var thumbnailStream = new MemoryStream();
+                try
+                {
+                    await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
+
+                    thumbnailStream.Position = 0;
+                }
+                catch
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
+                }
+
+                await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+
+                user.SetPictureUrlToStore();
+
+                return await userManager.UpdateAsync(user);
+            }, "Password set successfully.");
+        }
+
         private async Task<IActionResult> MakeChangeAsync(Func<IUser, Task<IdentityResult>> action, string successMessage, ChangeProfileModel model = null)
         {
             var user = await userManager.GetUserAsync(User);
@@ -105,9 +149,9 @@ namespace Squidex.Controllers.UI.Profile
         {
             var result = new ProfileVM
             {
+                Id = user.Id,
                 Email = user.Email,
                 DisplayName = user.DisplayName(),
-                PictureUrl = user.PictureUrl(),
                 HasPassword = await userManager.HasPasswordAsync(user),
                 HasPasswordAuth = identityOptions.Value.AllowPasswordAuth
             };

@@ -52,15 +52,17 @@ namespace Squidex.Controllers.Api.Assets
                 return NotFound();
             }
 
+            var assetId = asset.Id.ToString();
+
             return new FileCallbackResult(asset.MimeType, asset.FileName, async bodyStream =>
             {
                 if (asset.IsImage && (width.HasValue || height.HasValue))
                 {
-                    var suffix = $"{width}_{height}_{mode}";
+                    var assetSuffix = $"{width}_{height}_{mode}";
 
                     try
                     {
-                        await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, suffix, bodyStream);
+                        await assetStorage.DownloadAsync(assetId, asset.FileVersion, assetSuffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -68,13 +70,13 @@ namespace Squidex.Controllers.Api.Assets
                         {
                             using (var destinationStream = GetTempStream())
                             {
-                                await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, null, sourceStream);
+                                await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, sourceStream);
                                 sourceStream.Position = 0;
 
                                 await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
                                 destinationStream.Position = 0;
 
-                                await assetStorage.UploadAsync(asset.Id, asset.FileVersion, suffix, destinationStream);
+                                await assetStorage.UploadAsync(assetId, asset.FileVersion, assetSuffix, destinationStream);
                                 destinationStream.Position = 0;
 
                                 await destinationStream.CopyToAsync(bodyStream);
@@ -84,7 +86,7 @@ namespace Squidex.Controllers.Api.Assets
                     }
                 }
 
-                await assetStorage.DownloadAsync(asset.Id, asset.FileVersion, null, bodyStream);
+                await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
             });
         }
 

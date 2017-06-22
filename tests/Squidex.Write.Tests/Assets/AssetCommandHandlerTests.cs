@@ -120,7 +120,7 @@ namespace Squidex.Write.Assets
         private void SetupStore(long version)
         {
             assetStore
-                .Setup(x => x.UploadAsync(assetId, version, null, stream)).Returns(TaskHelper.Done)
+                .Setup(x => x.UploadAsync(assetId.ToString(), version, null, stream)).Returns(TaskHelper.Done)
                 .Verifiable();
         }
     }

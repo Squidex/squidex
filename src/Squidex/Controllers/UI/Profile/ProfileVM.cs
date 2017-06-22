@@ -10,11 +10,11 @@ namespace Squidex.Controllers.UI.Profile
 {
     public sealed class ProfileVM
     {
+        public string Id { get; set; }
+
         public string Email { get; set; }
 
         public string DisplayName { get; set; }
-
-        public string PictureUrl { get; set; }
 
         public bool HasPassword { get; set; }
 

@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.GoogleCloud
             }
         }
 
-        public async Task DownloadAsync(Guid id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
         {
             var objectName = GetObjectName(id, version, suffix);
 
@@ -60,15 +60,17 @@ namespace Squidex.Infrastructure.GoogleCloud
             }
         }
 
-        public async Task UploadAsync(Guid id, long version, string suffix, Stream stream)
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
         {
             var objectName = GetObjectName(id, version, suffix);
 
             await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream);
         }
 
-        private string GetObjectName(Guid id, long version, string suffix)
+        private string GetObjectName(string id, long version, string suffix)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
             if (storageClient == null)
             {
                 throw new InvalidOperationException("No connection established yet.");

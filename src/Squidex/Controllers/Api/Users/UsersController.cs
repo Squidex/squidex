@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Users;
@@ -33,6 +34,7 @@ namespace Squidex.Controllers.Api.Users
     {
         private static readonly byte[] AvatarBytes;
         private readonly UserManager<IUser> userManager;
+        private readonly IUserPictureStore userPictureStore;
 
         static UsersController()
         {
@@ -46,9 +48,10 @@ namespace Squidex.Controllers.Api.Users
             }
         }
 
-        public UsersController(UserManager<IUser> userManager)
+        public UsersController(UserManager<IUser> userManager, IUserPictureStore userPictureStore)
         {
             this.userManager = userManager;
+            this.userPictureStore = userPictureStore;
         }
 
         /// <summary>
@@ -118,6 +121,18 @@ namespace Squidex.Controllers.Api.Users
             if (entity == null)
             {
                 return NotFound();
+            }
+
+            try
+            {
+                if (entity.IsPictureUrlStored())
+                {
+                    return new FileStreamResult(await userPictureStore.DownloadAsync(entity.Id), "image/png");
+                }
+            }
+            catch
+            {
+                return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");
             }
 
             using (var client = new HttpClient())
