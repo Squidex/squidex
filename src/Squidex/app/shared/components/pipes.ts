@@ -140,6 +140,21 @@ export class UserDtoPicture implements PipeTransform {
 }
 
 @Pipe({
+    name: 'userIdPicture',
+    pure: false
+})
+export class UserIdPicturePipe implements PipeTransform {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
+    public transform(userId: string): string | null {
+        return this.apiUrl.buildUrl(`api/users/${userId}/picture`);
+    }
+}
+
+@Pipe({
     name: 'userPicture',
     pure: false
 })

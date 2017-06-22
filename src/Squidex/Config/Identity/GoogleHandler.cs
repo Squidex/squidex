@@ -36,6 +36,16 @@ namespace Squidex.Config.Identity
 
             var pictureUrl = context.User?.Value<string>("picture");
 
+            if (string.IsNullOrWhiteSpace(pictureUrl))
+            {
+                pictureUrl = context.User?["image"]?.Value<string>("url");
+
+                if (pictureUrl != null && pictureUrl.EndsWith("?sz=50"))
+                {
+                    pictureUrl = pictureUrl.Substring(0, pictureUrl.Length - 6);
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(pictureUrl))
             {
                 context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl));

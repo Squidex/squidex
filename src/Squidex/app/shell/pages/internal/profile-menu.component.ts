@@ -29,7 +29,7 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
     public modalMenu = new ModalView(false, true);
 
     public profileDisplayName = '';
-    public profilePictureUrl = '';
+    public profileId = '';
 
     public isAdmin = false;
 
@@ -52,7 +52,7 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
                     const user = this.auth.user;
 
                     if (user) {
-                        this.profilePictureUrl = user.pictureUrl;
+                        this.profileId = user.id;
                         this.profileDisplayName = user.displayName;
 
                         this.isAdmin = user.isAdmin;
