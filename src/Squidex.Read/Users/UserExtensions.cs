@@ -17,7 +17,7 @@ namespace Squidex.Read.Users
 {
     public static class UserExtensions
     {
-        public static void SetDisplayName(this IUser user, string displayName)
+        public static void UpdateDisplayName(this IUser user, string displayName)
         {
             user.SetClaim(SquidexClaimTypes.SquidexDisplayName, displayName);
         }

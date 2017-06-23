@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Users;

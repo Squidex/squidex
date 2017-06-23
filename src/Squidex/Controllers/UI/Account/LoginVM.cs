@@ -22,6 +22,6 @@ namespace Squidex.Controllers.UI.Account
 
         public bool HasPasswordAndExternal { get; set; }
 
-        public IEnumerable<ExternalProvider> ExternalProviders { get; set; }
+        public IReadOnlyList<ExternalProvider> ExternalProviders { get; set; }
     }
 }

@@ -6,6 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Squidex.Read.Users;
+
 namespace Squidex.Controllers.UI.Profile
 {
     public sealed class ProfileVM
@@ -19,5 +22,9 @@ namespace Squidex.Controllers.UI.Profile
         public bool HasPassword { get; set; }
 
         public bool HasPasswordAuth { get; set; }
+
+        public IReadOnlyList<ExternalLogin> ExternalLogins { get; set; }
+
+        public IReadOnlyList<ExternalProvider> ExternalProviders { get; set; }
     }
 }

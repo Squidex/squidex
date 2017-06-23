@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
-using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
@@ -29,18 +28,24 @@ namespace Squidex.Controllers.UI.Profile
     [SwaggerIgnore]
     public class ProfileController : Controller
     {
+        private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;
         private readonly IUserPictureStore userPictureStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IOptions<MyIdentityOptions> identityOptions;
+        private readonly IOptions<IdentityCookieOptions> identityCookieOptions;
 
         public ProfileController(
+            SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserPictureStore userPictureStore,
             IAssetThumbnailGenerator assetThumbnailGenerator, 
-            IOptions<MyIdentityOptions> identityOptions)
+            IOptions<MyIdentityOptions> identityOptions,
+            IOptions<IdentityCookieOptions> identityCookieOptions)
         {
+            this.signInManager = signInManager;
             this.identityOptions = identityOptions;
+            this.identityCookieOptions = identityCookieOptions;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -64,14 +69,39 @@ namespace Squidex.Controllers.UI.Profile
             return MakeChangeAsync(async user =>
             {
                 user.UpdateEmail(model.Email);
-                user.SetDisplayName(model.DisplayName);
+                user.UpdateDisplayName(model.DisplayName);
 
                 return await userManager.UpdateAsync(user);
             }, "Account updated successfully. Please logout and login again to see the changes.");
         }
 
         [HttpPost]
-        [Route("/account/setpassword")]
+        [Route("account/add-login/")]
+        public async Task<IActionResult> AddLogin(string provider)
+        {
+            await HttpContext.Authentication.SignOutAsync(identityCookieOptions.Value.ExternalCookieAuthenticationScheme);
+
+            var properties =
+                signInManager.ConfigureExternalAuthenticationProperties(provider,
+                    Url.Action(nameof(AddLoginCallback)), userManager.GetUserId(User));
+
+            return Challenge(properties, provider);
+        }
+
+        [HttpGet]
+        [Route("account/add-login-callback/")]
+        public Task<IActionResult> AddLoginCallback(string remoteError = null)
+        {
+            return MakeChangeAsync(async user =>
+            {
+                var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(userManager.GetUserId(User));
+
+                return await userManager.AddLoginAsync(user, externalLogin);
+            }, "Login added successfully.");
+        }
+
+        [HttpPost]
+        [Route("/account/set-password")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password), 
@@ -79,7 +109,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/changepassword")]
+        [Route("/account/change-password")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password), 
@@ -87,7 +117,15 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/picture")]
+        [Route("/account/remove-login")]
+        public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
+        {
+            return MakeChangeAsync(user => userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey), 
+                "Login provider removed successfully.");
+        }
+
+        [HttpPost]
+        [Route("/account/upload-picture")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync(async user =>
@@ -132,6 +170,8 @@ namespace Squidex.Controllers.UI.Profile
 
                 if (result.Succeeded)
                 {
+                    await signInManager.SignInAsync(user, true);
+
                     return RedirectToAction(nameof(Profile), new { successMessage });
                 }
 
@@ -147,10 +187,16 @@ namespace Squidex.Controllers.UI.Profile
 
         private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null)
         {
+            var providers =
+                signInManager.GetExternalAuthenticationSchemes()
+                    .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName)).ToList();
+
             var result = new ProfileVM
             {
                 Id = user.Id,
                 Email = user.Email,
+                ExternalLogins = user.Logins,
+                ExternalProviders = providers,
                 DisplayName = user.DisplayName(),
                 HasPassword = await userManager.HasPasswordAsync(user),
                 HasPasswordAuth = identityOptions.Value.AllowPasswordAuth

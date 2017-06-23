@@ -44,7 +44,7 @@ namespace Squidex.Controllers.UI.Account
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
-            SignInManager<IUser> signInManager, 
+            SignInManager<IUser> signInManager,
             UserManager<IUser> userManager, 
             IUserFactory userFactory,
             IOptions<MyIdentityOptions> identityOptions,
@@ -86,7 +86,7 @@ namespace Squidex.Controllers.UI.Account
         [Route("account/accessdenied")]
         public IActionResult AccessDenied()
         {
-            return View("LockedOut");
+            return View("AccessDenied");
         }
 
         [HttpGet]
@@ -189,16 +189,16 @@ namespace Squidex.Controllers.UI.Account
         {
             var properties = 
                 signInManager.ConfigureExternalAuthenticationProperties(provider,
-                    Url.Action(nameof(Callback), new { ReturnUrl = returnUrl }));
+                    Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
 
             return Challenge(properties, provider);
         }
 
         [HttpGet]
-        [Route("account/callback/")]
-        public async Task<IActionResult> Callback(string returnUrl = null, string remoteError = null)
+        [Route("account/external-callback/")]
+        public async Task<IActionResult> ExternalCallback(string returnUrl = null, string remoteError = null)
         {
-            var externalLogin = await signInManager.GetExternalLoginInfoAsync();
+            var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
             if (externalLogin == null)
             {

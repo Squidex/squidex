@@ -175,14 +175,35 @@ h3 {
     // Buttons for external logins.
     &-github {
         @include button-variant($color-dark-foreground, $color-extern-github, $color-extern-github);
+
+        &:hover,
+        &:focus {
+            .icon-github {
+                color: darken($color-extern-github-icon, 5%);
+            }
+        }
     }
 
     &-google {
         @include button-variant($color-dark-foreground, $color-extern-google, $color-extern-google);
+
+        &:hover,
+        &:focus {
+            .icon-google {
+                color: darken($color-extern-google-icon, 5%);
+            }
+        }
     }
 
     &-microsoft {
         @include button-variant($color-dark-foreground, $color-extern-microsoft, $color-extern-microsoft);
+
+        &:hover,
+        &:focus {
+            .icon-microsoft {
+                color: darken($color-extern-microsoft-icon, 5%);
+            }
+        }
     }
 
     // Special radio button.
@@ -324,6 +345,18 @@ h3 {
     &-borderless {
         td {
             border: 0;
+        }
+    }
+
+    &-lesspadding {
+        td {
+            &:first-child {
+                padding-left: 0;
+            }
+
+            &:last-child {
+                padding-right: 0;
+            }
         }
     }
 }

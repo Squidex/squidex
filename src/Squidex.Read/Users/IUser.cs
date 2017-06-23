@@ -23,6 +23,8 @@ namespace Squidex.Read.Users
 
         IReadOnlyList<Claim> Claims { get; }
 
+        IReadOnlyList<ExternalLogin> Logins { get; }
+
         void UpdateEmail(string email);
 
         void AddClaim(Claim claim);

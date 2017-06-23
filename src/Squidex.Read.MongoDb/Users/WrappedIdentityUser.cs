@@ -27,6 +27,11 @@ namespace Squidex.Read.MongoDb.Users
             get { return Claims.Select(x => new Claim(x.Type, x.Value)).ToList(); }
         }
 
+        IReadOnlyList<ExternalLogin> IUser.Logins
+        {
+            get { return Logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToList(); }
+        }
+
         public void UpdateEmail(string email)
         {
             Email = UserName = email;
