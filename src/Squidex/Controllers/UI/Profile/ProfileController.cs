@@ -57,26 +57,11 @@ namespace Squidex.Controllers.UI.Profile
         {
             var user = await userManager.GetUserAsync(User);
 
-            ViewBag.SuccessMessage = successMessage;
-
-            return View(await GetProfileVM(user));
+            return View(await GetProfileVM(user, successMessage: successMessage));
         }
 
         [HttpPost]
-        [Route("/account/profile")]
-        public Task<IActionResult> Profile(ChangeProfileModel model)
-        {
-            return MakeChangeAsync(async user =>
-            {
-                user.UpdateEmail(model.Email);
-                user.UpdateDisplayName(model.DisplayName);
-
-                return await userManager.UpdateAsync(user);
-            }, "Account updated successfully. Please logout and login again to see the changes.");
-        }
-
-        [HttpPost]
-        [Route("account/add-login/")]
+        [Route("/account/profile/login-add/")]
         public async Task<IActionResult> AddLogin(string provider)
         {
             await HttpContext.Authentication.SignOutAsync(identityCookieOptions.Value.ExternalCookieAuthenticationScheme);
@@ -89,7 +74,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpGet]
-        [Route("account/add-login-callback/")]
+        [Route("/account/profile/login-add-callback/")]
         public Task<IActionResult> AddLoginCallback(string remoteError = null)
         {
             return MakeChangeAsync(async user =>
@@ -101,7 +86,23 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/set-password")]
+        [Route("/account/profile/update")]
+        public Task<IActionResult> Profile(ChangeProfileModel model)
+        {
+            return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName),
+                "Account updated successfully.");
+        }
+
+        [HttpPost]
+        [Route("/account/profile/login-remove")]
+        public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
+        {
+            return MakeChangeAsync(user => userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey),
+                "Login provider removed successfully.");
+        }
+
+        [HttpPost]
+        [Route("/account/profile/password-set")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password), 
@@ -109,7 +110,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/change-password")]
+        [Route("/account/profile/password-change")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password), 
@@ -117,15 +118,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/remove-login")]
-        public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
-        {
-            return MakeChangeAsync(user => userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey), 
-                "Login provider removed successfully.");
-        }
-
-        [HttpPost]
-        [Route("/account/upload-picture")]
+        [Route("/account/profile/upload-picture")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync(async user =>
@@ -152,7 +145,7 @@ namespace Squidex.Controllers.UI.Profile
                 user.SetPictureUrlToStore();
 
                 return await userManager.UpdateAsync(user);
-            }, "Password set successfully.");
+            }, "Picture uploaded successfully.");
         }
 
         private async Task<IActionResult> MakeChangeAsync(Func<IUser, Task<IdentityResult>> action, string successMessage, ChangeProfileModel model = null)
@@ -164,6 +157,7 @@ namespace Squidex.Controllers.UI.Profile
                 return View("Profile", await GetProfileVM(user, model));
             }
 
+            string errorMessage;
             try
             {
                 var result = await action(user);
@@ -175,17 +169,17 @@ namespace Squidex.Controllers.UI.Profile
                     return RedirectToAction(nameof(Profile), new { successMessage });
                 }
 
-                ViewBag.ErrorMessage = string.Join(". ", result.Errors.Select(x => x.Description));
+                errorMessage = string.Join(". ", result.Errors.Select(x => x.Description));
             }
             catch
             {
-                ViewBag.ErrorMessage = "An unexpected exception occurred.";
+                errorMessage = "An unexpected exception occurred.";
             }
 
-            return View("Profile", await GetProfileVM(user, model));
+            return View("Profile", await GetProfileVM(user, model, errorMessage));
         }
 
-        private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null)
+        private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)
         {
             var providers =
                 signInManager.GetExternalAuthenticationSchemes()
@@ -195,11 +189,13 @@ namespace Squidex.Controllers.UI.Profile
             {
                 Id = user.Id,
                 Email = user.Email,
+                ErrorMessage = errorMessage,
                 ExternalLogins = user.Logins,
                 ExternalProviders = providers,
                 DisplayName = user.DisplayName(),
                 HasPassword = await userManager.HasPasswordAsync(user),
-                HasPasswordAuth = identityOptions.Value.AllowPasswordAuth
+                HasPasswordAuth = identityOptions.Value.AllowPasswordAuth,
+                SuccessMessage = successMessage
             };
 
             if (model != null)

@@ -15,17 +15,17 @@
 
     <h2>Personal Information</h2>
 
-    @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
     {
         <div class="form-alert form-alert-success" id="success">
-            @ViewBag.SuccessMessage
+            @Model.SuccessMessage
         </div>
     }
 
-    @if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
         <div class="form-alert form-alert-error">
-            @ViewBag.ErrorMessage
+            @Model.ErrorMessage
         </div>
     }
     
@@ -74,56 +74,59 @@
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
     
-    <div class="profile-section">
-        <h2>Logins</h2>
-        
-        <table class="table table-fixed table-lesspadding">
-            <colgroup>
-                <col style="width: 100px;" />
-                <col style="width: 100%;" />
-                <col style="width: 100px;" />
-            </colgroup>
-            @foreach (var login in Model.ExternalLogins)
-            {
-                <tr>
-                    <td>
-                        <span>@login.LoginProvider</span>
-                    </td>
-                    <td>
-                        <span class="truncate">@login.ProviderDisplayName</span>
-                    </td>
-                    <td class="text-right">
-                        @if (Model.ExternalLogins.Count > 1 || Model.HasPassword)
-                        {
-                            <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
-                                <input type="hidden" value="@login.LoginProvider" name="LoginProvider" />
-                                <input type="hidden" value="@login.ProviderKey" name="ProviderKey" />
+    @if (Model.ExternalProviders.Any())
+    {
+        <div class="profile-section">
+            <h2>Logins</h2>
 
-                                <button type="submit" class="btn btn-link btn-danger btn-sm">
-                                    Remove
-                                </button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </table>
-        
-        <form asp-controller="Profile" asp-action="AddLogin" method="post">
-            @foreach (var provider in Model.ExternalProviders)
-            {
-                var schema = provider.AuthenticationScheme.ToLowerInvariant();
+            <table class="table table-fixed table-lesspadding">
+                <colgroup>
+                    <col style="width: 100px;"/>
+                    <col style="width: 100%;"/>
+                    <col style="width: 100px;"/>
+                </colgroup>
+                @foreach (var login in Model.ExternalLogins)
+                {
+                    <tr>
+                        <td>
+                            <span>@login.LoginProvider</span>
+                        </td>
+                        <td>
+                            <span class="truncate">@login.ProviderDisplayName</span>
+                        </td>
+                        <td class="text-right">
+                            @if (Model.ExternalLogins.Count > 1 || Model.HasPassword)
+                            {
+                                <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
+                                    <input type="hidden" value="@login.LoginProvider" name="LoginProvider"/>
+                                    <input type="hidden" value="@login.ProviderKey" name="ProviderKey"/>
 
-                <button class="btn external-button-small btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
-                    <i class="icon-@schema external-icon"></i>
-                </button>
-            }
-        </form>
-    </div>
+                                    <button type="submit" class="btn btn-link btn-danger btn-sm">
+                                        Remove
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+
+            <form asp-controller="Profile" asp-action="AddLogin" method="post">
+                @foreach (var provider in Model.ExternalProviders.Where(x => !Model.ExternalLogins.Any(y => x.AuthenticationScheme == y.LoginProvider)))
+                {
+                    var schema = provider.AuthenticationScheme.ToLowerInvariant();
+
+                    <button class="btn external-button-small btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                        <i class="icon-@schema external-icon"></i>
+                    </button>
+                }
+            </form>
+        </div>
+    }
     
-    <div class="profile-section">
-        @if (Model.HasPasswordAuth)
-        {
+    @if (Model.HasPasswordAuth)
+    {
+        <div class="profile-section">
             <h2>Password</h2>
 
             @if (Model.HasPassword)
@@ -207,8 +210,8 @@
                     </div>
                 </form>
             }
-        }
-    </div>
+        </div>
+    }
 </div>
 
 <script>

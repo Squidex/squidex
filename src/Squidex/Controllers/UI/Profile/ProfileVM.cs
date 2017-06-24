@@ -19,6 +19,10 @@ namespace Squidex.Controllers.UI.Profile
 
         public string DisplayName { get; set; }
 
+        public string ErrorMessage { get; set; }
+
+        public string SuccessMessage { get; set; }
+
         public bool HasPassword { get; set; }
 
         public bool HasPasswordAuth { get; set; }

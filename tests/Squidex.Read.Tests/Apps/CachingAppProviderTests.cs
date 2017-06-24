@@ -50,6 +50,24 @@ namespace Squidex.Read.Apps
         }
 
         [Fact]
+        public void Should_return_empty_for_events_filter()
+        {
+            Assert.Equal(string.Empty, sut.EventsFilter);
+        }
+
+        [Fact]
+        public void Should_return_empty_for_name()
+        {
+            Assert.Equal(typeof(CachingAppProvider).Name, sut.Name);
+        }
+        
+        [Fact]
+        public void Should_do_nothing_when_clearing()
+        {
+            Assert.NotNull(sut.ClearAsync());
+        }
+
+        [Fact]
         public async Task Should_also_retrieve_app_by_name_if_retrieved_by_id_before()
         {
             repository.Setup(x => x.FindAppAsync(appId.Id)).Returns(Task.FromResult(appV1));
