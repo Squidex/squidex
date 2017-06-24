@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?5o132k');
-  src:  url('fonts/icomoon.eot?5o132k#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?5o132k') format('truetype'),
-    url('fonts/icomoon.woff?5o132k') format('woff'),
-    url('fonts/icomoon.svg?5o132k#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?b0qz8m');
+  src:  url('fonts/icomoon.eot?b0qz8m#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?b0qz8m') format('truetype'),
+    url('fonts/icomoon.woff?b0qz8m') format('woff'),
+    url('fonts/icomoon.svg?b0qz8m#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,51 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-grid:before {
+  content: "\f00a";
+}
+.icon-list:before {
+  content: "\f0c9";
+}
+.icon-bug:before {
+  content: "\e93d";
+}
+.icon-control-Markdown:before {
+  content: "\e938";
+}
+.icon-control-Date:before {
+  content: "\e936";
+}
+.icon-control-DateTime:before {
+  content: "\e937";
+}
+.icon-angle-right:before {
+  content: "\e931";
+}
+.icon-user-o:before {
+  content: "\e932";
+}
+.icon-caret-right:before {
+  content: "\e929";
+}
+.icon-caret-left:before {
+  content: "\e92a";
+}
+.icon-caret-up:before {
+  content: "\e92b";
+}
+.icon-caret-down:before {
+  content: "\e92c";
+}
+.icon-angle-up:before {
+  content: "\e903";
+}
+.icon-angle-down:before {
+  content: "\e900";
+}
+.icon-angle-left:before {
+  content: "\e901";
+}
 .icon-elapsed:before {
   content: "\e943";
 }
@@ -209,45 +254,6 @@
 }
 .icon-control-RichText:before {
   content: "\e939";
-}
-.icon-bug:before {
-  content: "\e93d";
-}
-.icon-control-Markdown:before {
-  content: "\e938";
-}
-.icon-control-Date:before {
-  content: "\e936";
-}
-.icon-control-DateTime:before {
-  content: "\e937";
-}
-.icon-angle-right:before {
-  content: "\e931";
-}
-.icon-user-o:before {
-  content: "\e932";
-}
-.icon-caret-right:before {
-  content: "\e929";
-}
-.icon-caret-left:before {
-  content: "\e92a";
-}
-.icon-caret-up:before {
-  content: "\e92b";
-}
-.icon-caret-down:before {
-  content: "\e92c";
-}
-.icon-angle-up:before {
-  content: "\e903";
-}
-.icon-angle-down:before {
-  content: "\e900";
-}
-.icon-angle-left:before {
-  content: "\e901";
 }
 .icon-info:before {
   content: "\e93c";
