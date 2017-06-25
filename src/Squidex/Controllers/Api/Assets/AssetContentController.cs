@@ -20,9 +20,12 @@ using Squidex.Read.Assets.Repositories;
 
 namespace Squidex.Controllers.Api.Assets
 {
+    /// <summary>
+    /// Uploads and retrieves assets.
+    /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerIgnore]
+    [SwaggerTag("Assets")]
     public class AssetContentController : ControllerBase
     {
         private readonly IAssetStore assetStorage;
@@ -41,8 +44,22 @@ namespace Squidex.Controllers.Api.Assets
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
+        /// <summary>
+        /// Get the asset content.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <param name="version">The optional version of the asset.</param>
+        /// <param name="width">The target width of the asset, if it is an image.</param>
+        /// <param name="height">The target height of the asset, if it is an image.</param>
+        /// <param name="mode">The resize mode when the width and height is defined.</param>
+        /// <returns>
+        /// 200 => Asset found and content or (resize) image returned.
+        /// 404 => Asset or app not found.
+        /// </returns>
         [HttpGet]
         [Route("assets/{id}/")]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int version = -1, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {
             var asset = await assetRepository.FindAssetAsync(id);
