@@ -37,10 +37,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
                 propertyNames[1] = field.Id.ToString();
             }
 
-            if (char.IsLower(propertyNames[0][0]))
-            {
-                propertyNames[0] = char.ToUpperInvariant(propertyNames[0][0]) + propertyNames[0].Substring(1);
-            }
+            propertyNames[0] = "do";
 
             var propertyName = string.Join(".", propertyNames);
 
