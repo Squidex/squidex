@@ -31,6 +31,22 @@ namespace Squidex.Read.MongoDb.Contents
         private readonly ISchemaProvider schemas;
         private readonly EdmModelBuilder modelBuilder;
 
+        protected static FilterDefinitionBuilder<MongoContentEntity> Filter
+        {
+            get
+            {
+                return Builders<MongoContentEntity>.Filter;
+            }
+        }
+
+        protected static UpdateDefinitionBuilder<MongoContentEntity> Update
+        {
+            get
+            {
+                return Builders<MongoContentEntity>.Update;
+            }
+        }
+
         protected static IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
         {
             get
@@ -54,7 +70,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             List<IContentEntity> result = null;
 
-            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
@@ -63,7 +79,12 @@ namespace Squidex.Read.MongoDb.Contents
 
                     var parser = model.ParseQuery(odataQuery);
 
-                    cursor = collection.Find(parser, schemaEntity.Schema, nonPublished).Take(parser).Skip(parser).Sort(parser, schemaEntity.Schema);
+                    cursor = 
+                        collection
+                            .Find(parser, schemaEntity.Id, schemaEntity.Schema, nonPublished)
+                            .Take(parser)
+                            .Skip(parser)
+                            .Sort(parser, schemaEntity.Schema);
                 }
                 catch (NotSupportedException)
                 {
@@ -95,7 +116,7 @@ namespace Squidex.Read.MongoDb.Contents
         {
             var result = 0L;
 
-            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
@@ -104,7 +125,7 @@ namespace Squidex.Read.MongoDb.Contents
 
                     var parser = model.ParseQuery(odataQuery);
 
-                    cursor = collection.Find(parser, schemaEntity.Schema, nonPublished);
+                    cursor = collection.Find(parser, schemaEntity.Id, schemaEntity.Schema, nonPublished);
                 }
                 catch (NotSupportedException)
                 {
@@ -125,11 +146,11 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id, IAppEntity appEntity)
         {
             MongoContentEntity result = null;
 
-            await ForSchemaAsync(schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
                 result = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
@@ -139,9 +160,9 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        private async Task ForSchemaAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
+        private async Task ForSchemaAsync(Guid appId, Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
         {
-            var collection = GetCollection(schemaId);
+            var collection = GetCollection(appId);
 
             var schemaEntity = await schemas.FindSchemaByIdAsync(schemaId, true);
 

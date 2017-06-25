@@ -28,7 +28,7 @@ namespace Squidex.Read.Users
             return Task.FromResult<IReadOnlyList<IUser>>(users);
         }
 
-        public static Task<long> CountAsync(this UserManager<IUser> userManager, string email = null)
+        public static Task<long> CountByEmailAsync(this UserManager<IUser> userManager, string email = null)
         {
             var count = QueryUsers(userManager, email).LongCount();
 

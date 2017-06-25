@@ -100,15 +100,15 @@ namespace Squidex.Controllers.Api.Assets
                 }
             }
 
-            var taskForAssets = assetRepository.QueryAsync(AppId, mimeTypeList, idsList, query, take, skip);
-            var taskForCount  = assetRepository.CountAsync(AppId, mimeTypeList, idsList, query);
+            var taskForItems = assetRepository.QueryAsync(AppId, mimeTypeList, idsList, query, take, skip);
+            var taskForCount = assetRepository.CountAsync(AppId, mimeTypeList, idsList, query);
 
-            await Task.WhenAll(taskForAssets, taskForCount);
+            await Task.WhenAll(taskForItems, taskForCount);
 
             var response = new AssetsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForAssets.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
+                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
             };
 
             return Ok(response);

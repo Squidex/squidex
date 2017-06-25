@@ -40,15 +40,15 @@ namespace Squidex.Controllers.Api.Users
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsers([FromQuery] string query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var taskForUsers = userManager.QueryByEmailAsync(query, take, skip);
-            var taskForCount = userManager.CountAsync(query);
+            var taskForItems = userManager.QueryByEmailAsync(query, take, skip);
+            var taskForCount = userManager.CountByEmailAsync(query);
 
-            await Task.WhenAll(taskForUsers, taskForCount);
+            await Task.WhenAll(taskForItems, taskForCount);
 
             var response = new UsersDto
             {
                 Total = taskForCount.Result,
-                Items = taskForUsers.Result.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray()
+                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray()
             };
 
             return Ok(response);

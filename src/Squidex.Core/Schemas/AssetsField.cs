@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
@@ -15,8 +16,9 @@ using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class AssetsField : Field<AssetsFieldProperties>
+    public sealed class AssetsField : Field<AssetsFieldProperties>, IReferenceField
     {
+        private static readonly Guid[] EmptyIds = new Guid[0];
         private readonly IAssetTester assetTester;
 
         public AssetsField(long id, string name, Partitioning partitioning, IAssetTester assetTester)
@@ -33,6 +35,34 @@ namespace Squidex.Core.Schemas
         protected override IEnumerable<IValidator> CreateValidators()
         {
             yield return new AssetsValidator(assetTester, Properties.IsRequired);
+        }
+
+        public IEnumerable<Guid> GetReferencedIds(JToken value)
+        {
+            Guid[] assetIds;
+            try
+            {
+                assetIds = value?.ToObject<Guid[]>() ?? EmptyIds;
+            }
+            catch
+            {
+                assetIds = EmptyIds;
+            }
+
+            return assetIds;
+        }
+
+        public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            var oldAssetIds = GetReferencedIds(value).ToArray();
+            var newAssetIds = oldAssetIds.Where(x => !deletedReferencedIds.Contains(x)).ToList();
+
+            return newAssetIds.Count != oldAssetIds.Length ? JToken.FromObject(newAssetIds) : value;
         }
 
         public override object ConvertValue(JToken value)

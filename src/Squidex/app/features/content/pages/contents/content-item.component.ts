@@ -100,9 +100,9 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
                 value = value ? '✔' : '-';
             }else if (properties.fieldType === 'Assets') {
                 try {
-                    value = `${value.length} Assets`;
+                    value = `${value.length} Asset(s)`;
                 } catch (ex) {
-                    value = '0 Assets';
+                    value = '0 Asset(s)';
                 }
             }  else if (properties.fieldType === 'DateTime') {
                 try {

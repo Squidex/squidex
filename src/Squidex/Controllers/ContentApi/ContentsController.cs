@@ -54,15 +54,15 @@ namespace Squidex.Controllers.ContentApi
             
             var query = Request.QueryString.ToString();
 
-            var taskForContents = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App);
-            var taskForCount    = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App);
+            var taskForItems = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App);
+            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App);
 
-            await Task.WhenAll(taskForContents, taskForCount);
+            await Task.WhenAll(taskForItems, taskForCount);
 
             var response = new AssetsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForContents.Result.Take(200).Select(x =>
+                Items = taskForItems.Result.Take(200).Select(x =>
                 {
                     var itemModel = SimpleMapper.Map(x, new ContentDto());
 
@@ -90,7 +90,7 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var entity = await contentRepository.FindContentAsync(schemaEntity.Id, id);
+            var entity = await contentRepository.FindContentAsync(schemaEntity.Id, id, App);
 
             if (entity == null)
             {

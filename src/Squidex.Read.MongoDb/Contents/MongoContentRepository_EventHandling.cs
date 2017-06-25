@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Events.Assets;
 using Squidex.Events.Contents;
 using Squidex.Events.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
@@ -24,14 +25,6 @@ namespace Squidex.Read.MongoDb.Contents
 {
     public partial class MongoContentRepository
     {
-        private static UpdateDefinitionBuilder<MongoContentEntity> Update
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Update;
-            }
-        }
-
         public string Name
         {
             get { return GetType().Name; }
@@ -39,7 +32,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         public string EventsFilter
         {
-            get { return "^(content-)|(schema-)"; }
+            get { return "^(content-)|(schema-)|(asset-)"; }
         }
 
         public async Task ClearAsync()
@@ -68,8 +61,9 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(@event.SchemaId.Id, async collection =>
+            return ForAppIdAsync(@event.AppId.Id, async collection =>
             {
+                await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.ReferencedIds));
                 await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
                 await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.Text));
             });
@@ -77,10 +71,12 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
+            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.CreateAsync(@event, headers, x =>
                 {
+                    x.SchemaId = @event.SchemaId.Id;
+
                     SimpleMapper.Map(@event, x);
 
                     x.SetData(schemaEntity.Schema, @event.Data);
@@ -90,7 +86,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.SchemaId.Id, (collection, schemaEntity) =>
+            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schemaEntity) =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
@@ -101,7 +97,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentPublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            return ForAppIdAsync(@event.AppId.Id, collection =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
@@ -112,7 +108,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            return ForAppIdAsync(@event.AppId.Id, collection =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
@@ -121,32 +117,42 @@ namespace Squidex.Read.MongoDb.Contents
             });
         }
 
+        protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
+        {
+            return ForAppIdAsync(@event.AppId.Id, collection =>
+            {
+                return collection.UpdateManyAsync(
+                    Filter.And(
+                        Filter.AnyEq(x => x.ReferencedIds, @event.AssetId),
+                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.AssetId)),
+                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.AssetId));
+            });
+        }
+
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
+            return ForAppIdAsync(@event.SchemaId.Id, async collection =>
             {
-                return collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
+                await collection.UpdateManyAsync(
+                    Filter.And(
+                        Filter.AnyEq(x => x.ReferencedIds, @event.ContentId),
+                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.ContentId)),
+                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.ContentId));
+
+                await collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
             });
         }
-
-        protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
+        
+        private Task ForAppIdAsync(Guid appId, Func<IMongoCollection<MongoContentEntity>, Task> action)
         {
-            return ForSchemaIdAsync(@event.SchemaId.Id, collection =>
-            {
-                return collection.UpdateManyAsync(new BsonDocument(), Update.Unset(new StringFieldDefinition<MongoContentEntity>($"Data.{@event.FieldId}")));
-            });
-        }
-
-        private Task ForSchemaIdAsync(Guid schemaId, Func<IMongoCollection<MongoContentEntity>, Task> action)
-        {
-            var collection = GetCollection(schemaId);
+            var collection = GetCollection(appId);
 
             return action(collection);
         }
 
-        private IMongoCollection<MongoContentEntity> GetCollection(Guid schemaId)
+        private IMongoCollection<MongoContentEntity> GetCollection(Guid appId)
         {
-            var name = $"{Prefix}{schemaId}";
+            var name = $"{Prefix}{appId}";
 
             return database.GetCollection<MongoContentEntity>(name);
         }

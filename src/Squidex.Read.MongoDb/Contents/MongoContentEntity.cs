@@ -7,12 +7,14 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
+using Squidex.Core;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -49,6 +51,10 @@ namespace Squidex.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement]
+        public Guid SchemaId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public RefToken CreatedBy { get; set; }
 
         [BsonRequired]
@@ -58,6 +64,14 @@ namespace Squidex.Read.MongoDb.Contents
         [BsonRequired]
         [BsonElement]
         public BsonDocument Data { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public List<Guid> ReferencedIds { get; set; } = new List<Guid>();
+
+        [BsonRequired]
+        [BsonElement]
+        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
         ContentData IContentEntity.Data
         {
@@ -73,7 +87,9 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 var jsonString = Data.ToJson(Settings);
 
-                contentData = JsonConvert.DeserializeObject<ContentData>(jsonString).ToNameModel(schema, true);
+                contentData = JsonConvert.DeserializeObject<ContentData>(jsonString);
+                contentData = contentData.ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted));
+                contentData = contentData.ToNameModel(schema, true);
             }
             else
             {
@@ -83,9 +99,11 @@ namespace Squidex.Read.MongoDb.Contents
 
         public void SetData(Schema schema, ContentData newContentData)
         {
+            newContentData = newContentData?.ToIdModel(schema, true);
+
             if (newContentData != null)
             {
-                var jsonString = JsonConvert.SerializeObject(newContentData.ToIdModel(schema, true));
+                var jsonString = JsonConvert.SerializeObject(newContentData);
 
                 Data = BsonDocument.Parse(jsonString);
             }
@@ -93,6 +111,8 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 Data = null;
             }
+
+            ReferencedIds = newContentData?.GetReferencedIds(schema).ToList() ?? new List<Guid>();
 
             Text = ExtractText(newContentData);
         }
@@ -103,6 +123,7 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 return string.Empty;
             }
+
             var stringBuilder = new StringBuilder();
 
             foreach (var text in data.Values.SelectMany(x => x.Values).Where(x => x != null).OfType<JValue>())

@@ -59,16 +59,19 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             return cursor;
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Schema schema, bool nonPublished)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Guid schemaId, Schema schema, bool nonPublished)
         {
-            var filter = BuildQuery(query, schema, nonPublished);
+            var filter = BuildQuery(query, schemaId, schema, nonPublished);
 
             return cursor.Find(filter);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Schema schema, bool nonPublished)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Schema schema, bool nonPublished)
         {
-            var filters = new List<FilterDefinition<MongoContentEntity>>();
+            var filters = new List<FilterDefinition<MongoContentEntity>>
+            {
+                Filter.Eq(x => x.SchemaId, schemaId)
+            };
 
             if (!nonPublished)
             {
