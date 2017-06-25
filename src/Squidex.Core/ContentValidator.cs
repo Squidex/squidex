@@ -38,7 +38,7 @@ namespace Squidex.Core
             this.partitionResolver = partitionResolver;
         }
 
-        public async Task ValidatePartialAsync(ContentData data)
+        public async Task ValidatePartialAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -77,7 +77,7 @@ namespace Squidex.Core
             }
         }
 
-        public async Task ValidateAsync(ContentData data)
+        public async Task ValidateAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -91,7 +91,7 @@ namespace Squidex.Core
             }
         }
 
-        private void ValidateUnknownFields(ContentData data)
+        private void ValidateUnknownFields(NamedContentData data)
         {
             foreach (var fieldData in data)
             {

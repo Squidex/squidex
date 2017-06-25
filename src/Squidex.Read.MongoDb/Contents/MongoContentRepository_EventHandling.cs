@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Events.Assets;
 using Squidex.Events.Contents;
@@ -65,7 +64,7 @@ namespace Squidex.Read.MongoDb.Contents
             {
                 await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.ReferencedIds));
                 await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
-                await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.Text));
+                await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.DataText));
             });
         }
 

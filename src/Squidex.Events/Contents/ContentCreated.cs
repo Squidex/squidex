@@ -14,6 +14,6 @@ namespace Squidex.Events.Contents
     [TypeName("ContentCreatedEvent")]
     public class ContentCreated : ContentEvent
     {
-        public ContentData Data { get; set; }
+        public NamedContentData Data { get; set; }
     }
 }

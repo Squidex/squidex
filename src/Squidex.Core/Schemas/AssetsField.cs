@@ -54,7 +54,7 @@ namespace Squidex.Core.Schemas
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
         {
-            if (value == null)
+            if (value == null || value.Type == JTokenType.Null)
             {
                 return null;
             }

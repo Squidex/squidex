@@ -14,7 +14,7 @@ namespace Squidex.Write.Contents.Commands
 {
     public abstract class ContentDataCommand : ContentCommand, IValidatable
     {
-        public ContentData Data { get; set; }
+        public NamedContentData Data { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {

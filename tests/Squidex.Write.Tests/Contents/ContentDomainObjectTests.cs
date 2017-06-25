@@ -23,13 +23,13 @@ namespace Squidex.Write.Contents
     public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>
     {
         private readonly ContentDomainObject sut;
-        private readonly ContentData data =
-            new ContentData()
+        private readonly NamedContentData data =
+            new NamedContentData()
                 .AddField("field1",
                     new ContentFieldData()
                         .AddValue("iv", 1));
-        private readonly ContentData otherData =
-            new ContentData()
+        private readonly NamedContentData otherData =
+            new NamedContentData()
                 .AddField("field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));

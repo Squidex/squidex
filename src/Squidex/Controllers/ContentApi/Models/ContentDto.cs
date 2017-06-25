@@ -61,7 +61,7 @@ namespace Squidex.Controllers.ContentApi.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto Create(CreateContent command, EntityCreatedResult<ContentData> result)
+        public static ContentDto Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 

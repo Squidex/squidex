@@ -6,7 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Moq;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -21,6 +24,8 @@ namespace Squidex.Core.Contents
                 .AddOrUpdateField(new NumberField(1, "field1", Partitioning.Language))
                 .AddOrUpdateField(new NumberField(2, "field2", Partitioning.Invariant))
                 .AddOrUpdateField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
+                .AddOrUpdateField(new AssetsField(5, "assets1", Partitioning.Invariant, new Mock<IAssetTester>().Object))
+                .AddOrUpdateField(new AssetsField(6, "assets2", Partitioning.Invariant, new Mock<IAssetTester>().Object))
                 .AddOrUpdateField(new JsonField(4, "json", Partitioning.Language));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
@@ -28,7 +33,7 @@ namespace Squidex.Core.Contents
         public void Should_convert_to_id_model()
         {
             var input =
-               new ContentData()
+               new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
@@ -43,12 +48,12 @@ namespace Squidex.Core.Contents
             var actual = input.ToIdModel(schema, false);
 
             var expected =
-                new ContentData()
-                    .AddField("1",
+                new IdContentData()
+                    .AddField(1,
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField("2",
+                    .AddField(2,
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -59,7 +64,7 @@ namespace Squidex.Core.Contents
         public void Should_convert_to_encoded_id_model()
         {
             var input =
-               new ContentData()
+               new NamedContentData()
                     .AddField("json",
                         new ContentFieldData()
                             .AddValue("en", new JObject())
@@ -69,8 +74,8 @@ namespace Squidex.Core.Contents
             var actual = input.ToIdModel(schema, true);
 
             var expected =
-                new ContentData()
-                    .AddField("4",
+                new IdContentData()
+                    .AddField(4,
                         new ContentFieldData()
                             .AddValue("en", "e30=")
                             .AddValue("de", null)
@@ -80,25 +85,25 @@ namespace Squidex.Core.Contents
         }
 
         [Fact]
-        public void Should_convert_from_id_model()
+        public void Should_convert_to_name_model()
         {
             var input =
-               new ContentData()
-                    .AddField("1",
+               new IdContentData()
+                    .AddField(1,
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField("2",
+                    .AddField(2,
                         new ContentFieldData()
                             .AddValue("iv", 3))
-                    .AddField("99",
+                    .AddField(99,
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
             var actual = input.ToNameModel(schema, false);
 
             var expected =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
@@ -111,11 +116,11 @@ namespace Squidex.Core.Contents
         }
 
         [Fact]
-        public void Should_convert_from_encoded_id_model()
+        public void Should_convert_to_encoded_name_model()
         {
             var input =
-               new ContentData()
-                    .AddField("4",
+               new IdContentData()
+                    .AddField(4,
                         new ContentFieldData()
                             .AddValue("en", "e30=")
                             .AddValue("de", null)
@@ -129,15 +134,8 @@ namespace Squidex.Core.Contents
         [Fact]
         public void Should_cleanup_old_fields()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field1",
-                        new ContentFieldData()
-                            .AddValue("en", "en_string")
-                            .AddValue("de", "de_string"));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field0",
                         new ContentFieldData()
                             .AddValue("en", "en_string"))
@@ -148,21 +146,21 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"));
+
             Assert.Equal(expected, actual);
         }
 
         [Fact]
         public void Should_cleanup_old_languages()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field1",
-                        new ContentFieldData()
-                            .AddValue("en", "en_string")
-                            .AddValue("de", "de_string"));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
@@ -171,20 +169,21 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "en_string")
+                            .AddValue("de", "de_string"));
+
             Assert.Equal(expected, actual);
         }
         
         [Fact]
         public void Should_provide_invariant_from_master_language()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("iv", 3));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("de", 2)
@@ -192,40 +191,40 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 3));
+
             Assert.Equal(expected, actual);
         }
 
         [Fact]
         public void Should_provide_master_language_from_invariant()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field1",
-                        new ContentFieldData()
-                            .AddValue("en", 3));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", 3));
+
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void Should_remove_null_values_when_cleaning()
+        public void Should_remove_null_values_from_name_model_when_cleaning()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("en", 2));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1", null)
                     .AddField("field2",
                         new ContentFieldData()
@@ -234,20 +233,42 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToCleaned();
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("en", 2));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_remove_null_values_from_id_model_when_cleaning()
+        {
+            var input =
+                new IdContentData()
+                    .AddField(1, null)
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("en", 2)
+                            .AddValue("it", null));
+
+            var actual = input.ToCleaned();
+
+            var expected =
+                new IdContentData()
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("en", 2));
+
             Assert.Equal(expected, actual);
         }
 
         [Fact]
         public void Should_provide_invariant_from_first_language()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("iv", 2));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("de", 2)
@@ -255,20 +276,20 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
             Assert.Equal(expected, actual);
         }
 
         [Fact]
         public void Should_not_include_hidden_field()
         {
-            var expected =
-                new ContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("iv", 5));
-
             var input =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", 5))
@@ -278,6 +299,12 @@ namespace Squidex.Core.Contents
 
             var actual = input.ToApiModel(schema, languagesConfig);
 
+            var expected =
+                new NamedContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 5));
+
             Assert.Equal(expected, actual);
         }
 
@@ -285,7 +312,7 @@ namespace Squidex.Core.Contents
         public void Should_return_original_when_no_language_preferences_defined()
         {
             var data =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1));
@@ -297,7 +324,7 @@ namespace Squidex.Core.Contents
         public void Should_return_flat_list_when_single_languages_specified()
         {
             var data =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("de", 1)
@@ -333,7 +360,7 @@ namespace Squidex.Core.Contents
         public void Should_return_flat_list_when_languages_specified()
         {
             var data =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("de", 1)
@@ -362,10 +389,10 @@ namespace Squidex.Core.Contents
         }
 
         [Fact]
-        public void Should_merge_two_data()
+        public void Should_merge_two_name_models()
         {
             var lhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1))
@@ -374,7 +401,7 @@ namespace Squidex.Core.Contents
                             .AddValue("de", 2));
 
             var rhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("en", 3))
@@ -383,7 +410,7 @@ namespace Squidex.Core.Contents
                             .AddValue("iv", 4));
 
             var expected =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1))
@@ -401,10 +428,49 @@ namespace Squidex.Core.Contents
         }
 
         [Fact]
+        public void Should_merge_two_id_models()
+        {
+            var lhs =
+                new IdContentData()
+                    .AddField(1,
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("de", 2));
+
+            var rhs =
+                new IdContentData()
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("en", 3))
+                    .AddField(3,
+                        new ContentFieldData()
+                            .AddValue("iv", 4));
+
+            var expected =
+                new IdContentData()
+                    .AddField(1,
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("de", 2)
+                            .AddValue("en", 3))
+                    .AddField(3,
+                        new ContentFieldData()
+                            .AddValue("iv", 4));
+
+            var actual = lhs.MergeInto(rhs);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void Should_be_equal_when_data_have_same_structure()
         {
             var lhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
@@ -413,7 +479,7 @@ namespace Squidex.Core.Contents
                             .AddValue("iv", 2));
 
             var rhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
@@ -430,7 +496,7 @@ namespace Squidex.Core.Contents
         public void Should_not_be_equal_when_data_have_not_same_structure()
         {
             var lhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
@@ -439,7 +505,7 @@ namespace Squidex.Core.Contents
                             .AddValue("iv", 2));
 
             var rhs =
-                new ContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", 2))
@@ -450,6 +516,43 @@ namespace Squidex.Core.Contents
             Assert.False(lhs.Equals(rhs));
             Assert.False(lhs.Equals((object)rhs));
             Assert.NotEqual(lhs.GetHashCode(), rhs.GetHashCode());
+        }
+
+        [Fact]
+        public void Should_remove_ids()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var input =
+                new NamedContentData()
+                    .AddField("assets1",
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
+
+            var ids = input.GetReferencedIds(schema).ToArray();
+
+            Assert.Equal(new[] { id1, id2 }, ids);
+        }
+
+        [Fact]
+        public void Should_cleanup_deleted_ids()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var input =
+                new IdContentData()
+                    .AddField(5,
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
+
+            var actual = input.ToCleanedReferences(schema, new HashSet<Guid>(new[] { id2 }));
+
+            var cleanedValue = (JArray)actual[5]["iv"];
+
+            Assert.Equal(1, cleanedValue.Count);
+            Assert.Equal(id1.ToString(), cleanedValue[0]);
         }
     }
 }

@@ -74,10 +74,12 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         this.oldAssets = ImmutableArray.empty<AssetDto>();
 
         if (value && value.length > 0) {
+            const assetIds: string[] = value;
+
             this.appNameOnce()
                 .switchMap(app => this.assetsService.getAssets(app, 10000, 0, undefined, undefined, value))
                 .subscribe(dtos => {
-                    this.oldAssets = ImmutableArray.of(dtos.items);
+                    this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)));
                 });
         }
     }
@@ -100,14 +102,16 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         }
     }
 
-    public onAssetLoaded(file: File, asset: AssetDto) {
-        this.newAssets = this.newAssets.remove(file);
-        this.oldAssets = this.oldAssets.pushFront(asset);
+    public onAssetDropped(asset: AssetDto) {
+        if (asset) {
+            this.oldAssets = this.oldAssets.pushFront(asset);
 
-        this.updateValue();
+            this.updateValue();
+        }
     }
 
-    public onAssetDropped(asset: AssetDto) {
+    public onAssetLoaded(file: File, asset: AssetDto) {
+        this.newAssets = this.newAssets.remove(file);
         this.oldAssets = this.oldAssets.pushFront(asset);
 
         this.updateValue();

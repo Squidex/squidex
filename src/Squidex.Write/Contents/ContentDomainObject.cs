@@ -23,7 +23,7 @@ namespace Squidex.Write.Contents
         private bool isDeleted;
         private bool isCreated;
         private bool isPublished;
-        private ContentData data;
+        private NamedContentData data;
 
         public bool IsDeleted
         {

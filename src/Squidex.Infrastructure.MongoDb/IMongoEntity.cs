@@ -1,19 +1,22 @@
 ﻿// ==========================================================================
-//  IContentEntity.cs
+//  IMongoEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Contents;
+using System;
+using NodaTime;
 
-namespace Squidex.Read.Contents
+namespace Squidex.Infrastructure.MongoDb
 {
-    public interface IContentEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IMongoEntity
     {
-        bool IsPublished { get; }
-
-        NamedContentData Data { get; }
+        Guid Id { get; set; }
+        
+        Instant Created { get; set; }
+        
+        Instant LastModified { get; set; }
     }
 }

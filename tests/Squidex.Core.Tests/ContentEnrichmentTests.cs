@@ -43,7 +43,7 @@ namespace Squidex.Core
                         new GeolocationFieldProperties()));
 
             var data =
-                new ContentData()
+                new NamedContentData()
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", "de-string"))

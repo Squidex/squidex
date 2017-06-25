@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Core
 {
-    public sealed class ContentEnricher
+    public sealed class ContentEnricher<T>
     {
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
@@ -29,13 +29,14 @@ namespace Squidex.Core
             this.partitionResolver = partitionResolver;
         }
 
-        public void Enrich(ContentData data)
+        public void Enrich(ContentData<T> data)
         {
             Guard.NotNull(data, nameof(data));
 
-            foreach (var field in schema.FieldsByName.Values)
+            foreach (var field in schema.Fields)
             {
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
+                var fieldKey = data.GetKey(field);
+                var fieldData = data.GetOrCreate(fieldKey, k => new ContentFieldData());
                 var fieldPartition = partitionResolver(field.Paritioning);
 
                 foreach (var partitionItem in fieldPartition)
@@ -45,7 +46,7 @@ namespace Squidex.Core
 
                 if (fieldData.Count > 0)
                 {
-                    data.AddField(field.Name, fieldData);
+                    data[fieldKey] = fieldData;
                 }
             }
         }

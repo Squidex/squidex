@@ -34,7 +34,7 @@ namespace Squidex.Write.Contents
         private readonly Mock<IAppProvider> appProvider = new Mock<IAppProvider>();
         private readonly Mock<ISchemaEntity> schemaEntity = new Mock<ISchemaEntity>();
         private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
-        private readonly ContentData data = new ContentData().AddField("my-field", new ContentFieldData().SetValue(1));
+        private readonly NamedContentData data = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(1));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
 
@@ -60,7 +60,7 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Create_should_throw_exception_if_data_is_not_valid()
         {
-            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = new ContentData() });
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = new NamedContentData() });
 
             await TestCreate(content, async _ =>
             {
@@ -78,7 +78,7 @@ namespace Squidex.Write.Contents
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(data, context.Result<EntityCreatedResult<ContentData>>().IdOrValue);
+            Assert.Equal(data, context.Result<EntityCreatedResult<NamedContentData>>().IdOrValue);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = new ContentData() });
+            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = new NamedContentData() });
 
             await TestUpdate(content, async _ =>
             {
@@ -112,7 +112,7 @@ namespace Squidex.Write.Contents
         {
             CreateContent();
 
-            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = new ContentData() });
+            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = new NamedContentData() });
 
             await TestUpdate(content, async _ =>
             {
@@ -123,7 +123,7 @@ namespace Squidex.Write.Contents
         [Fact]
         public async Task Patch_should_update_domain_object()
         {
-            var otherContent = new ContentData().AddField("my-field", new ContentFieldData().SetValue(3));
+            var otherContent = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
 
             CreateContent();
 

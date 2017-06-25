@@ -14,7 +14,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
-using Squidex.Core;
+using NodaTime;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -27,53 +27,66 @@ using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Squidex.Read.MongoDb.Contents
 {
-    public sealed class MongoContentEntity : MongoEntity, IContentEntity
+    public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {
         private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private const int MaxLength = 1024 * 1024;
-        private ContentData contentData;
+        private NamedContentData contentData;
+
+        [BsonId]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("ct")]
+        public Instant Created { get; set; }
+
+        [BsonRequired]
+        [BsonElement("mt")]
+        public Instant LastModified { get; set; }
+
+        [BsonRequired]
+        [BsonElement("pu")]
         public bool IsPublished { get; set; }
 
         [BsonRequired]
-        [BsonElement]
-        public string Text { get; set; }
+        [BsonElement("dt")]
+        public string DataText { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("vs")]
         public long Version { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("ai")]
         public Guid AppId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("si")]
         public Guid SchemaId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("cb")]
         public RefToken CreatedBy { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("mb")]
         public RefToken LastModifiedBy { get; set; }
 
         [BsonRequired]
-        [BsonElement]
-        public BsonDocument Data { get; set; }
+        [BsonElement("do")]
+        public BsonDocument DataObject { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("rf")]
         public List<Guid> ReferencedIds { get; set; } = new List<Guid>();
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("rd")]
         public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
-        ContentData IContentEntity.Data
+        NamedContentData IContentEntity.Data
         {
             get
             {
@@ -83,13 +96,14 @@ namespace Squidex.Read.MongoDb.Contents
 
         public void ParseData(Schema schema)
         {
-            if (Data != null)
+            if (DataObject != null)
             {
-                var jsonString = Data.ToJson(Settings);
+                var jsonString = DataObject.ToJson(Settings);
 
-                contentData = JsonConvert.DeserializeObject<ContentData>(jsonString);
-                contentData = contentData.ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted));
-                contentData = contentData.ToNameModel(schema, true);
+                contentData = 
+                    JsonConvert.DeserializeObject<IdContentData>(jsonString)
+                        .ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted))
+                        .ToNameModel(schema, true);
             }
             else
             {
@@ -97,27 +111,27 @@ namespace Squidex.Read.MongoDb.Contents
             }
         }
 
-        public void SetData(Schema schema, ContentData newContentData)
+        public void SetData(Schema schema, NamedContentData newContentData)
         {
-            newContentData = newContentData?.ToIdModel(schema, true);
-
             if (newContentData != null)
             {
-                var jsonString = JsonConvert.SerializeObject(newContentData);
+                var idModel = newContentData.ToIdModel(schema, true);
 
-                Data = BsonDocument.Parse(jsonString);
+                var jsonString = JsonConvert.SerializeObject(idModel);
+
+                DataObject = BsonDocument.Parse(jsonString);
+                DataText = ExtractText(idModel);
+
+                ReferencedIds = idModel.GetReferencedIds(schema).ToList();
             }
             else
             {
-                Data = null;
+                DataObject = null;
+                DataText = string.Empty;
             }
-
-            ReferencedIds = newContentData?.GetReferencedIds(schema).ToList() ?? new List<Guid>();
-
-            Text = ExtractText(newContentData);
         }
 
-        private static string ExtractText(ContentData data)
+        private static string ExtractText(IdContentData data)
         {
             if (data == null)
             {

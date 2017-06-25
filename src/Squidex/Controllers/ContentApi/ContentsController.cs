@@ -112,13 +112,13 @@ namespace Squidex.Controllers.ContentApi
         [HttpPost]
         [Route("content/{app}/{name}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent([FromBody] ContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent([FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<ContentData>>();
+            var result = context.Result<EntityCreatedResult<NamedContentData>>();
             var response = ContentDto.Create(command, result);
 
             return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
@@ -127,7 +127,7 @@ namespace Squidex.Controllers.ContentApi
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(Guid id, [FromBody] ContentData request)
+        public async Task<IActionResult> PutContent(Guid id, [FromBody] NamedContentData request)
         {
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
@@ -139,7 +139,7 @@ namespace Squidex.Controllers.ContentApi
         [HttpPatch]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(Guid id, [FromBody] ContentData request)
+        public async Task<IActionResult> PatchContent(Guid id, [FromBody] NamedContentData request)
         {
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
