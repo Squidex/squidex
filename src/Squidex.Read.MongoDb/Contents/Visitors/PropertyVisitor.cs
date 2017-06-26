@@ -37,9 +37,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
                 propertyNames[1] = field.Id.ToString();
             }
 
-            propertyNames[0] = "do";
-
-            var propertyName = string.Join(".", propertyNames);
+            var propertyName = $"do.{string.Join(".", propertyNames.Skip(1))}";
 
             return new StringFieldDefinition<MongoContentEntity, object>(propertyName);
         }
