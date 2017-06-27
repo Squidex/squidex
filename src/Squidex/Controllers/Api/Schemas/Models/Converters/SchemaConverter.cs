@@ -49,6 +49,10 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             {
                 typeof(AssetsFieldProperties),
                 p => Convert((AssetsFieldProperties)p)
+            },
+            {
+                typeof(ReferencesFieldProperties),
+                p => Convert((ReferencesFieldProperties)p)
             }
         };
 
@@ -146,6 +150,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
         private static FieldPropertiesDto Convert(AssetsFieldProperties source)
         {
             var result = SimpleMapper.Map(source, new AssetsFieldPropertiesDto());
+
+            return result;
+        }
+
+        private static FieldPropertiesDto Convert(ReferencesFieldProperties source)
+        {
+            var result = SimpleMapper.Map(source, new ReferencesFieldPropertiesDto());
 
             return result;
         }

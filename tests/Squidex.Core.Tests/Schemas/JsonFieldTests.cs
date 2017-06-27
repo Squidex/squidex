@@ -39,7 +39,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new JsonField(1, "my-json", Partitioning.Invariant);
 
-            await sut.ValidateAsync(CreateValue(new JValue(1)), false, errors);
+            await sut.ValidateAsync(CreateValue(new JValue(1)), errors);
 
             Assert.Empty(errors);
         }
@@ -49,7 +49,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new JsonField(1, "my-json", Partitioning.Invariant, new JsonFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), false, errors);
+            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });

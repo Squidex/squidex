@@ -18,6 +18,8 @@ namespace Squidex.Read.Assets.Repositories
 
         Task<long> CountAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null);
 
+        Task<bool> ExistsAsync(Guid appId, Guid assetId);
+
         Task<IAssetEntity> FindAssetAsync(Guid id);
     }
 }

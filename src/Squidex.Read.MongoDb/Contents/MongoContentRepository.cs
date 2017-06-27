@@ -112,6 +112,18 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
+        public async Task<bool> ExistsAsync(Guid appId, Guid schemaId, Guid contentId)
+        {
+            var result = false;
+
+            await ForAppIdAsync(appId, async collection =>
+            {
+                result = await collection.Find(x => x.Id == contentId && x.SchemaId == schemaId).CountAsync() == 1;
+            });
+
+            return result;
+        }
+
         public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity)
         {
             var result = 0L;

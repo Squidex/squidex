@@ -21,6 +21,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
     [KnownType(typeof(GeolocationFieldPropertiesDto))]
     [KnownType(typeof(JsonFieldPropertiesDto))]
     [KnownType(typeof(NumberFieldPropertiesDto))]
+    [KnownType(typeof(ReferencesFieldPropertiesDto))]
     [KnownType(typeof(StringFieldPropertiesDto))]
     public abstract class FieldPropertiesDto
     {

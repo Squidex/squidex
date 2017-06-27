@@ -38,7 +38,7 @@ namespace Squidex.Core
             errors.Add(new ValidationError(message.Replace("<FIELD>", displayName), fieldName));
         }
 
-        public static async Task ValidateAsync(this Field field, JToken value, bool isOptional, Action<string> addError)
+        public static async Task ValidateAsync(this Field field, JToken value, ValidationContext context, Action<string> addError)
         {
             Guard.NotNull(value, nameof(value));
 
@@ -48,7 +48,7 @@ namespace Squidex.Core
 
                 foreach (var validator in field.Validators)
                 {
-                    await validator.ValidateAsync(typedValue, isOptional, addError);
+                    await validator.ValidateAsync(typedValue, context, addError);
                 }
             }
             catch

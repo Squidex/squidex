@@ -21,9 +21,9 @@ namespace Squidex.Core.Schemas.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object value, bool isOptional, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
-            if (isOptional || (value != null && !(value is string)))
+            if (context.IsOptional || (value != null && !(value is string)))
             {
                 return TaskHelper.Done;
             }

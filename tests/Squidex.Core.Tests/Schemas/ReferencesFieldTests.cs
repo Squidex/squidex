@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetFieldTests.cs
+//  ReferenceFieldTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -17,43 +17,44 @@ using Xunit;
 
 namespace Squidex.Core.Schemas
 {
-    public class AssetsFieldTests
+    public class ReferencesFieldTests
     {
         private readonly List<string> errors = new List<string>();
-        private static readonly ValidationContext InvalidAssetContext = new ValidationContext((x, y) => TaskHelper.False, x => TaskHelper.False);
+        private readonly Guid schemaId = Guid.NewGuid();
+        private static readonly ValidationContext InvalidSchemaContext = new ValidationContext((x, y) => TaskHelper.False, x => TaskHelper.False);
 
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
-            Assert.Equal("my-asset", sut.Name);
+            Assert.Equal("my-refs", sut.Name);
         }
 
         [Fact]
         public void Should_clone_object()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             Assert.NotEqual(sut, sut.Enable());
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_assets_are_valid()
+        public async Task Should_not_add_error_if_references_are_valid()
         {
-            var assetId = Guid.NewGuid();
+            var referenceId = Guid.NewGuid();
+            
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
-
-            await sut.ValidateAsync(CreateValue(assetId), errors);
+            await sut.ValidateAsync(CreateValue(referenceId), errors, InvalidSchemaContext);
 
             Assert.Empty(errors);
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_assets_are_null_and_valid()
+        public async Task Should_not_add_error_if_references_are_null_and_valid()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -61,9 +62,9 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_null()
+        public async Task Should_add_errors_if_references_are_required_and_null()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { IsRequired = true });
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -72,9 +73,9 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_empty()
+        public async Task Should_add_errors_if_references_are_required_and_empty()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { IsRequired = true });
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(), errors);
 
@@ -85,7 +86,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             await sut.ValidateAsync("invalid", errors);
 
@@ -94,16 +95,16 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
-        public async Task Should_add_errors_if_asset_are_not_valid()
+        public async Task Should_add_errors_if_reference_are_not_valid()
         {
-            var assetId = Guid.NewGuid();
-            
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var referenceId = Guid.NewGuid();
 
-            await sut.ValidateAsync(CreateValue(assetId), errors, InvalidAssetContext);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
+
+            await sut.ValidateAsync(CreateValue(referenceId), errors, InvalidSchemaContext);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> contains invalid asset '{assetId}'" });
+                new[] { $"<FIELD> contains invalid reference '{referenceId}'" });
         }
 
         [Fact]
@@ -112,37 +113,37 @@ namespace Squidex.Core.Schemas
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
 
             var result = sut.GetReferencedIds(CreateValue(id1, id2)).ToArray();
 
-            Assert.Equal(new[] { id1, id2 }, result);
+            Assert.Equal(new[] { id1, id2, schemaId }, result);
         }
 
         [Fact]
-        public void Should_empty_list_for_referenced_ids_when_null()
+        public void Should_return_list_with_schema_idempty_list_for_referenced_ids_when_null()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
 
             var result = sut.GetReferencedIds(null).ToArray();
 
-            Assert.Empty(result);
+            Assert.Equal(new[] { schemaId }, result);
         }
 
         [Fact]
-        public void Should_empty_list_for_referenced_ids_when_other_type()
+        public void Should_return_list_with_schema_id_for_referenced_ids_when_other_type()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
 
             var result = sut.GetReferencedIds("invalid").ToArray();
 
-            Assert.Empty(result);
+            Assert.Equal(new[] { schemaId }, result);
         }
 
         [Fact]
         public void Should_return_null_when_removing_references_from_null_array()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             var result = sut.RemoveDeletedReferences(null, null);
 
@@ -152,7 +153,7 @@ namespace Squidex.Core.Schemas
         [Fact]
         public void Should_return_null_when_removing_references_from_null_json_array()
         {
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             var result = sut.RemoveDeletedReferences(JValue.CreateNull(), null);
 
@@ -165,11 +166,24 @@ namespace Squidex.Core.Schemas
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             var result = sut.RemoveDeletedReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { id2 }));
 
             Assert.Equal(CreateValue(id1), result);
+        }
+
+        [Fact]
+        public void Should_remove_all_references_when_schema_is_removed()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
+
+            var result = sut.RemoveDeletedReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { schemaId }));
+
+            Assert.Equal(CreateValue(), result);
         }
 
         [Fact]
@@ -178,7 +192,7 @@ namespace Squidex.Core.Schemas
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             var token = CreateValue(id1, id2);
             var result = sut.RemoveDeletedReferences(token, new HashSet<Guid>(new[] { Guid.NewGuid() }));

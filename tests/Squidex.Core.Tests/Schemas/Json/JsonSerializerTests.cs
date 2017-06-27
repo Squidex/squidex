@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Immutable;
 using FluentAssertions;
-using Moq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -27,7 +27,7 @@ namespace Squidex.Core.Schemas.Json
             serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
             
-            sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry, new Mock<IAssetTester>().Object), serializerSettings);
+            sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry), serializerSettings);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Squidex.Core.Schemas.Json
                     .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
                     .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                        new AssetsFieldProperties()))
                     .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
                         new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
                     .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,
@@ -51,7 +51,9 @@ namespace Squidex.Core.Schemas.Json
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
                     .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
-                    .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
+                    .AddOrUpdateField(new ReferencesField(9, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
+                    .AddOrUpdateField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
                     .Publish();
 

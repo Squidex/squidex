@@ -41,10 +41,9 @@ namespace Squidex.Core.Schemas
             }
         }
 
-        public FieldRegistry(TypeNameRegistry typeNameRegistry, IAssetTester assetTester)
+        public FieldRegistry(TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
-            Guard.NotNull(assetTester, nameof(assetTester));
 
             this.typeNameRegistry = typeNameRegistry;
 
@@ -70,7 +69,11 @@ namespace Squidex.Core.Schemas
 
             Add<AssetsFieldProperties>(
                 (id, name, partitioning, properties) => 
-                    new AssetsField(id, name, partitioning, (AssetsFieldProperties)properties, assetTester));
+                    new AssetsField(id, name, partitioning, (AssetsFieldProperties)properties));
+
+            Add<ReferencesFieldProperties>(
+                (id, name, partitioning, properties) =>
+                    new ReferencesField(id, name, partitioning, (ReferencesFieldProperties)properties));
 
             Add<GeolocationFieldProperties>(
                 (id, name, partitioning, properties) => 

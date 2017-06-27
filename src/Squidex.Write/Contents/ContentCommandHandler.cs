@@ -10,11 +10,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Core;
+using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Read.Apps.Services;
+using Squidex.Read.Assets.Repositories;
+using Squidex.Read.Contents.Repositories;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
 
@@ -24,21 +27,29 @@ namespace Squidex.Write.Contents
     {
         private readonly IAggregateHandler handler;
         private readonly IAppProvider appProvider;
+        private readonly IAssetRepository assetRepository;
+        private readonly IContentRepository contentRepository;
         private readonly ISchemaProvider schemas;
 
         public ContentCommandHandler(
             IAggregateHandler handler,
             IAppProvider appProvider, 
-            ISchemaProvider schemas)
+            IAssetRepository assetRepository, 
+            ISchemaProvider schemas, 
+            IContentRepository contentRepository)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.handler = handler;
             this.schemas = schemas;
-
             this.appProvider = appProvider;
+            this.assetRepository = assetRepository;
+            this.contentRepository = contentRepository;
         }
 
         protected async Task On(CreateContent command, CommandContext context)
@@ -99,7 +110,11 @@ namespace Squidex.Write.Contents
             var schemaObject = taskForSchema.Result.Schema;
             var schemaErrors = new List<ValidationError>();
 
-            await command.Data.ValidateAsync(schemaObject, taskForApp.Result.PartitionResolver, schemaErrors);
+            var appId = command.AppId.Id;
+
+            var validationContext = new ValidationContext((x, y) => contentRepository.ExistsAsync(appId, x, y), x => assetRepository.ExistsAsync(appId, x));
+
+            await command.Data.ValidateAsync(validationContext, schemaObject, taskForApp.Result.PartitionResolver, schemaErrors);
 
             if (schemaErrors.Count > 0)
             {

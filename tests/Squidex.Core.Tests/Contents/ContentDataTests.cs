@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
@@ -24,8 +23,8 @@ namespace Squidex.Core.Contents
                 .AddOrUpdateField(new NumberField(1, "field1", Partitioning.Language))
                 .AddOrUpdateField(new NumberField(2, "field2", Partitioning.Invariant))
                 .AddOrUpdateField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
-                .AddOrUpdateField(new AssetsField(5, "assets1", Partitioning.Invariant, new Mock<IAssetTester>().Object))
-                .AddOrUpdateField(new AssetsField(6, "assets2", Partitioning.Invariant, new Mock<IAssetTester>().Object))
+                .AddOrUpdateField(new AssetsField(5, "assets1", Partitioning.Invariant))
+                .AddOrUpdateField(new AssetsField(6, "assets2", Partitioning.Invariant))
                 .AddOrUpdateField(new JsonField(4, "json", Partitioning.Language));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 

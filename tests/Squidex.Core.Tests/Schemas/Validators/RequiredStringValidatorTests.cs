@@ -26,7 +26,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredStringValidator();
 
-            await sut.ValidateAsync(value, false, errors.Add);
+            await sut.ValidateAsync(value, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -36,7 +36,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredStringValidator();
 
-            await sut.ValidateAsync(string.Empty, true, errors.Add);
+            await sut.ValidateOptionalAsync(string.Empty, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -46,7 +46,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredStringValidator();
 
-            await sut.ValidateAsync(true, false, errors.Add);
+            await sut.ValidateAsync(true, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -56,7 +56,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredStringValidator(true);
 
-            await sut.ValidateAsync(string.Empty, false, errors.Add);
+            await sut.ValidateAsync(string.Empty, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -67,7 +67,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RequiredStringValidator();
 
-            await sut.ValidateAsync(null, false, errors.Add);
+            await sut.ValidateAsync(null, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });

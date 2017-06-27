@@ -16,6 +16,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Read.Apps;
 using Squidex.Read.Apps.Services;
+using Squidex.Read.Assets.Repositories;
+using Squidex.Read.Contents.Repositories;
 using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
@@ -47,7 +49,7 @@ namespace Squidex.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandHandler(Handler, appProvider.Object, schemaProvider.Object);
+            sut = new ContentCommandHandler(Handler, appProvider.Object, new Mock<IAssetRepository>().Object, schemaProvider.Object, new Mock<IContentRepository>().Object);
 
             appEntity.Setup(x => x.LanguagesConfig).Returns(languagesConfig);
             appEntity.Setup(x => x.PartitionResolver).Returns(languagesConfig.ToResolver());

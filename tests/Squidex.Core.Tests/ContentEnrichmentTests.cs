@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Moq;
+using System;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Core.Contents;
@@ -34,12 +34,14 @@ namespace Squidex.Core
                     .AddOrUpdateField(new NumberField(3, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties { DefaultValue = 123 }))
                     .AddOrUpdateField(new AssetsField(4, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                        new AssetsFieldProperties()))
                     .AddOrUpdateField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties { DefaultValue = true }))
                     .AddOrUpdateField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { DefaultValue = now }))
-                    .AddOrUpdateField(new GeolocationField(7, "my-geolocation", Partitioning.Invariant,
+                    .AddOrUpdateField(new ReferencesField(7, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
+                    .AddOrUpdateField(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()));
 
             var data =

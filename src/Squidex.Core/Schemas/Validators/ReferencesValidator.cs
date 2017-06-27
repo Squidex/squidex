@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetsValidator.cs
+//  ReferencesValidator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,20 +12,22 @@ using System.Threading.Tasks;
 
 namespace Squidex.Core.Schemas.Validators
 {
-    public sealed class AssetsValidator : IValidator
+    public sealed class ReferencesValidator : IValidator
     {
         private readonly bool isRequired;
+        private readonly Guid schemaId;
 
-        public AssetsValidator(bool isRequired)
+        public ReferencesValidator(bool isRequired, Guid schemaId)
         {
             this.isRequired = isRequired;
+            this.schemaId = schemaId;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
-            var assets = value as AssetsValue;
+            var references = value as ReferencesValue;
 
-            if (assets == null || assets.AssetIds.Count == 0)
+            if (references == null || references.ContentIds.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {
@@ -35,19 +37,19 @@ namespace Squidex.Core.Schemas.Validators
                 return;
             }
 
-            var assetTasks = assets.AssetIds.Select(x => CheckAssetAsync(context, x)).ToArray();
+            var referenceTasks = references.ContentIds.Select(x => CheckReferenceAsync(context, x)).ToArray();
 
-            await Task.WhenAll(assetTasks);
+            await Task.WhenAll(referenceTasks);
 
-            foreach (var notFoundId in assetTasks.Where(x => !x.Result.IsFound).Select(x => x.Result.AssetId))
+            foreach (var notFoundId in referenceTasks.Where(x => !x.Result.IsFound).Select(x => x.Result.ReferenceId))
             {
-                addError($"<FIELD> contains invalid asset '{notFoundId}'");
+                addError($"<FIELD> contains invalid reference '{notFoundId}'");
             }
         }
 
-        private static async Task<(Guid AssetId, bool IsFound)> CheckAssetAsync(ValidationContext context, Guid id)
+        private async Task<(Guid ReferenceId, bool IsFound)> CheckReferenceAsync(ValidationContext context, Guid id)
         {
-            var isFound = await context.IsValidAssetIdAsync(id);
+            var isFound = await context.IsValidContentIdAsync(schemaId, id);
 
             return (id, isFound);
         }

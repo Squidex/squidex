@@ -28,7 +28,7 @@ namespace Squidex.Core.Schemas.Validators
             this.max = max;
         }
 
-        public Task ValidateAsync(object value, bool isOptional, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
             if (value == null)
             {

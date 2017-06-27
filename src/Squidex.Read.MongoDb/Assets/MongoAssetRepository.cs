@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Assets;
@@ -20,7 +19,7 @@ using Squidex.Read.Assets.Repositories;
 
 namespace Squidex.Read.MongoDb.Assets
 {
-    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IAssetTester, IEventConsumer
+    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
     {
         public MongoAssetRepository(IMongoDatabase database) 
             : base(database)
@@ -37,9 +36,9 @@ namespace Squidex.Read.MongoDb.Assets
             return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId).Ascending(x => x.IsDeleted).Descending(x => x.LastModified).Ascending(x => x.FileName).Ascending(x => x.MimeType));
         }
 
-        public async Task<bool> IsValidAsync(Guid assetId)
+        public async Task<bool> ExistsAsync(Guid appId, Guid assetId)
         {
-            return await Collection.Find(x => x.Id == assetId).CountAsync() == 1;
+            return await Collection.Find(x => x.Id == assetId && x.AppId == appId).CountAsync() == 1;
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)

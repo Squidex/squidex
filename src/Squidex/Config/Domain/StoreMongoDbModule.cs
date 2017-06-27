@@ -12,7 +12,6 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
@@ -139,7 +138,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoAssetRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAssetRepository>()
-                .As<IAssetTester>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()

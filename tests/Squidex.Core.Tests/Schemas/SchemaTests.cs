@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Moq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure;
@@ -319,7 +318,7 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
                     .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties(), new Mock<IAssetTester>().Object))
+                        new AssetsFieldProperties()))
                     .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
                         new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
                     .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,

@@ -28,7 +28,7 @@ namespace Squidex.Write.Schemas
         private readonly Mock<ISchemaProvider> schemaProvider = new Mock<ISchemaProvider>();
         private readonly SchemaCommandHandler sut;
         private readonly SchemaDomainObject schema;
-        private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry(), new Mock<IAssetTester>().Object);
+        private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly string fieldName = "age";
 
         public SchemaCommandHandlerTests()

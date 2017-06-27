@@ -40,7 +40,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Label = "<FIELD>" });
 
-            await sut.ValidateAsync(CreateValue(null), false, errors);
+            await sut.ValidateAsync(CreateValue(null), errors);
 
             Assert.Empty(errors);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), false, errors);
+            await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -61,7 +61,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { MinLength = 10 });
 
-            await sut.ValidateAsync(CreateValue("123"), false, errors);
+            await sut.ValidateAsync(CreateValue("123"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must have more than '10' characters" });
@@ -72,7 +72,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { MaxLength = 5 });
 
-            await sut.ValidateAsync(CreateValue("12345678"), false, errors);
+            await sut.ValidateAsync(CreateValue("12345678"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must have less than '5' characters" });
@@ -83,7 +83,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
 
-            await sut.ValidateAsync(CreateValue("Bar"), false, errors);
+            await sut.ValidateAsync(CreateValue("Bar"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not an allowed value" });
@@ -94,7 +94,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}" });
 
-            await sut.ValidateAsync(CreateValue("abc"), false, errors);
+            await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not valid" });
@@ -105,7 +105,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message" });
 
-            await sut.ValidateAsync(CreateValue("abc"), false, errors);
+            await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "Custom Error Message" });

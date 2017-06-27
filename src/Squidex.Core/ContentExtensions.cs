@@ -25,9 +25,9 @@ namespace Squidex.Core
             enricher.Enrich(data);
         }
 
-        public static async Task ValidateAsync(this NamedContentData data, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
+        public static async Task ValidateAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
         {
-            var validator = new ContentValidator(schema, partitionResolver);
+            var validator = new ContentValidator(schema, partitionResolver, context);
 
             await validator.ValidateAsync(data);
 
@@ -37,9 +37,9 @@ namespace Squidex.Core
             }
         }
 
-        public static async Task ValidatePartialAsync(this NamedContentData data, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
+        public static async Task ValidatePartialAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
         {
-            var validator = new ContentValidator(schema, partitionResolver);
+            var validator = new ContentValidator(schema, partitionResolver, context);
 
             await validator.ValidatePartialAsync(data);
 

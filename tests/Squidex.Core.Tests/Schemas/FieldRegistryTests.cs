@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using Moq;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Xunit;
@@ -17,7 +16,7 @@ namespace Squidex.Core.Schemas
 {
     public class FieldRegistryTests
     {
-        private readonly FieldRegistry sut = new FieldRegistry(new TypeNameRegistry(), new Mock<IAssetTester>().Object);
+        private readonly FieldRegistry sut = new FieldRegistry(new TypeNameRegistry());
 
         private sealed class InvalidProperties : FieldProperties
         {

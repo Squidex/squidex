@@ -18,21 +18,21 @@ namespace Squidex.Core.Schemas.Validators
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_not_error_if_value_null()
+        public async Task Should_not_add_error_if_value_null()
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(null, false, errors.Add);
+            await sut.ValidateAsync(null, errors);
 
             Assert.Equal(0, errors.Count);
         }
 
         [Fact]
-        public async Task Should_not_error_if_value_is_allowed()
+        public async Task Should_not_add_error_if_value_is_allowed()
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(100, false, errors.Add);
+            await sut.ValidateAsync(100, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new AllowedValuesValidator<int>(100, 200);
 
-            await sut.ValidateAsync(50, false, errors.Add);
+            await sut.ValidateAsync(50, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not an allowed value" });

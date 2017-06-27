@@ -12,6 +12,7 @@ using FluentAssertions;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Core
@@ -20,6 +21,7 @@ namespace Squidex.Core
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
         private readonly List<ValidationError> errors = new List<ValidationError>();
+        private readonly ValidationContext context = new ValidationContext((x, y) => TaskHelper.True, x => TaskHelper.True);
         private Schema schema = Schema.Create("my-name", new SchemaProperties());
 
         [Fact]
@@ -30,7 +32,7 @@ namespace Squidex.Core
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -50,7 +52,7 @@ namespace Squidex.Core
                         new ContentFieldData()
                             .SetValue(1000));
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -71,7 +73,7 @@ namespace Squidex.Core
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -89,7 +91,7 @@ namespace Squidex.Core
             var data =
                 new NamedContentData();
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -107,7 +109,7 @@ namespace Squidex.Core
             var data =
                 new NamedContentData();
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -128,7 +130,7 @@ namespace Squidex.Core
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -151,7 +153,7 @@ namespace Squidex.Core
                         new ContentFieldData()
                             .AddValue("es", "value"));
 
-            await data.ValidateAsync(schema, optionalConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, optionalConfig.ToResolver(), errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -168,7 +170,7 @@ namespace Squidex.Core
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidateAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -186,7 +188,7 @@ namespace Squidex.Core
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -206,7 +208,7 @@ namespace Squidex.Core
                         new ContentFieldData()
                             .SetValue(1000));
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -227,7 +229,7 @@ namespace Squidex.Core
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -245,7 +247,7 @@ namespace Squidex.Core
             var data =
                 new NamedContentData();
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -258,7 +260,7 @@ namespace Squidex.Core
             var data =
                 new NamedContentData();
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -275,7 +277,7 @@ namespace Squidex.Core
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -296,7 +298,7 @@ namespace Squidex.Core
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidatePartialAsync(schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

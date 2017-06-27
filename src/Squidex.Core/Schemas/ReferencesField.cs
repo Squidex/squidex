@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetsField.cs
+//  ReferencesField.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -16,38 +16,41 @@ using Squidex.Core.Schemas.Validators;
 
 namespace Squidex.Core.Schemas
 {
-    public sealed class AssetsField : Field<AssetsFieldProperties>, IReferenceField
+    public sealed class ReferencesField : Field<ReferencesFieldProperties>, IReferenceField
     {
         private static readonly Guid[] EmptyIds = new Guid[0];
 
-        public AssetsField(long id, string name, Partitioning partitioning)
-            : this(id, name, partitioning, new AssetsFieldProperties())
+        public ReferencesField(long id, string name, Partitioning partitioning)
+            : this(id, name, partitioning, new ReferencesFieldProperties())
         {
         }
 
-        public AssetsField(long id, string name, Partitioning partitioning, AssetsFieldProperties properties)
+        public ReferencesField(long id, string name, Partitioning partitioning, ReferencesFieldProperties properties)
             : base(id, name, partitioning, properties)
         {
         }
 
         protected override IEnumerable<IValidator> CreateValidators()
         {
-            yield return new AssetsValidator(Properties.IsRequired);
+            if (Properties.SchemaId != Guid.Empty)
+            {
+                yield return new ReferencesValidator(Properties.IsRequired, Properties.SchemaId);
+            }
         }
 
         public IEnumerable<Guid> GetReferencedIds(JToken value)
         {
-            Guid[] assetIds;
+            Guid[] referenceIds;
             try
             {
-                assetIds = value?.ToObject<Guid[]>() ?? EmptyIds;
+                referenceIds = value?.ToObject<Guid[]>() ?? EmptyIds;
             }
             catch
             {
-                assetIds = EmptyIds;
+                referenceIds = EmptyIds;
             }
 
-            return assetIds;
+            return referenceIds.Union(new [] { Properties.SchemaId });
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
@@ -57,20 +60,25 @@ namespace Squidex.Core.Schemas
                 return null;
             }
 
-            var oldAssetIds = GetReferencedIds(value).ToArray();
-            var newAssetIds = oldAssetIds.Where(x => !deletedReferencedIds.Contains(x)).ToList();
+            if (deletedReferencedIds.Contains(Properties.SchemaId))
+            {
+                return new JArray();
+            }
 
-            return newAssetIds.Count != oldAssetIds.Length ? JToken.FromObject(newAssetIds) : value;
+            var oldReferenceIds = GetReferencedIds(value).TakeWhile(x => x != Properties.SchemaId).ToArray();
+            var newReferenceIds = oldReferenceIds.Where(x => !deletedReferencedIds.Contains(x)).ToList();
+
+            return newReferenceIds.Count != oldReferenceIds.Length ? JToken.FromObject(newReferenceIds) : value;
         }
 
         public override object ConvertValue(JToken value)
         {
-            return new AssetsValue(value.ToObject<Guid[]>());
+            return new ReferencesValue(value.ToObject<Guid[]>());
         }
 
         protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
-            var itemSchema = schemaResolver("AssetItem", new JsonSchema4 { Type = JsonObjectType.String });
+            var itemSchema = schemaResolver("ReferenceItem", new JsonSchema4 { Type = JsonObjectType.String });
 
             jsonProperty.Type = JsonObjectType.Array;
             jsonProperty.Item = itemSchema;

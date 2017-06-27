@@ -19,11 +19,11 @@ namespace Squidex.Core.Schemas.Validators
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_not_error_if_value_is_null()
+        public async Task Should_not_add_error_if_value_is_null()
         {
             var sut = new RangeValidator<int>(100, 200);
 
-            await sut.ValidateAsync(null, false, errors.Add);
+            await sut.ValidateAsync(null, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -37,7 +37,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(min, max);
 
-            await sut.ValidateAsync(1500, false, errors.Add);
+            await sut.ValidateAsync(1500, errors);
 
             Assert.Equal(0, errors.Count);
         }
@@ -55,7 +55,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(2000, null);
 
-            await sut.ValidateAsync(1500, false, errors.Add);
+            await sut.ValidateAsync(1500, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be greater than '2000'" });
@@ -66,7 +66,7 @@ namespace Squidex.Core.Schemas.Validators
         {
             var sut = new RangeValidator<int>(null, 1000);
 
-            await sut.ValidateAsync(1500, false, errors.Add);
+            await sut.ValidateAsync(1500, errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be less than '1000'" });

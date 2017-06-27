@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAssetTester.cs
+//  ReferencesValue.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,12 +7,19 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Squidex.Core.Schemas
 {
-    public interface IAssetTester
+    public sealed class ReferencesValue
     {
-        Task<bool> IsValidAsync(Guid assetId);
+        private readonly List<Guid> EmptyReferencedIds = new List<Guid>();
+
+        public IReadOnlyList<Guid> ContentIds { get; }
+
+        public ReferencesValue(IReadOnlyList<Guid> assetIds)
+        {
+            ContentIds = assetIds ?? EmptyReferencedIds;
+        }
     }
 }

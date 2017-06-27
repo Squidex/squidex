@@ -21,6 +21,7 @@ namespace Squidex.Core
     {
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
+        private readonly ValidationContext context;
         private readonly List<ValidationError> errors = new List<ValidationError>();
 
         public IReadOnlyList<ValidationError> Errors
@@ -28,13 +29,13 @@ namespace Squidex.Core
             get { return errors; }
         }
 
-        public ContentValidator(Schema schema, PartitionResolver partitionResolver)
+        public ContentValidator(Schema schema, PartitionResolver partitionResolver, ValidationContext context)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
+            
             this.schema = schema;
-
+            this.context = context;
             this.partitionResolver = partitionResolver;
         }
 
@@ -64,15 +65,13 @@ namespace Squidex.Core
 
             foreach (var partitionValues in fieldData)
             {
-                if (!partition.TryGetItem(partitionValues.Key, out var partitionItem))
+                if (partition.TryGetItem(partitionValues.Key, out var item))
                 {
-                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
+                    await field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item));
                 }
                 else
                 {
-                    var item = partitionItem;
-
-                    await field.ValidateAsync(partitionValues.Value, item.IsOptional, m => errors.AddError(m, field, item));
+                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
                 }
             }
         }
@@ -115,11 +114,11 @@ namespace Squidex.Core
                 }
             }
 
-            foreach (var partitionItem in partition)
+            foreach (var item in partition)
             {
-                var value = fieldData.GetOrCreate(partitionItem.Key, k => JValue.CreateNull());
+                var value = fieldData.GetOrCreate(item.Key, k => JValue.CreateNull());
 
-                await field.ValidateAsync(value, partitionItem.IsOptional, m => errors.AddError(m, field, partitionItem));
+                await field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item));
             }
         }
     }

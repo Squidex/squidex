@@ -40,7 +40,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
-            await sut.ValidateAsync(CreateValue(null), false, errors);
+            await sut.ValidateAsync(CreateValue(null), errors);
 
             Assert.Empty(errors);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), false, errors);
+            await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is required" });
@@ -61,7 +61,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { MinValue = 10 });
 
-            await sut.ValidateAsync(CreateValue(5), false, errors);
+            await sut.ValidateAsync(CreateValue(5), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be greater than '10'" });
@@ -72,7 +72,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { MaxValue = 10 });
 
-            await sut.ValidateAsync(CreateValue(20), false, errors);
+            await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> must be less than '10'" });
@@ -83,7 +83,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
 
-            await sut.ValidateAsync(CreateValue(20), false, errors);
+            await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not an allowed value" });
@@ -94,7 +94,7 @@ namespace Squidex.Core.Schemas
         {
             var sut = new NumberField(1, "my-number", Partitioning.Invariant);
 
-            await sut.ValidateAsync(CreateValue("Invalid"), false, errors);
+            await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "<FIELD> is not a valid value" });
