@@ -28,9 +28,9 @@ RUN set -x  \
 RUN phantomjs --version
 
 COPY src/Squidex/package.json /tmp/package.json
-RUN cd /tmp \
-&& npm install \
-&& npm rebuild node-sass
+
+# Install Node Packages 
+RUN cd /tmp && npm install
 
 COPY . .
 
