@@ -1,8 +1,6 @@
 @import '_mixins';
 @import '_vars';
 
-$form-color: #fff;
-
 :host(.ng-invalid) {
     &.ng-dirty {
         .form-control {
@@ -15,12 +13,6 @@ $form-color: #fff;
                 border-color: $color-theme-error-dark;
             }
         }
-    }
-}
-
-.form-control {
-    &[readonly] {
-        background: $form-color;
     }
 }
 

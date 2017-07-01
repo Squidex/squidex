@@ -56,7 +56,7 @@
             
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
-                    <div class="form-group mr-3">
+                    <div class="form-group mr-1">
                         <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user"></sqx-autocomplete>
                     </div>
 

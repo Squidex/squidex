@@ -20,6 +20,10 @@
     margin-right: 1rem;
 }
 
+.types-group {
+    width: 10rem;
+}
+
 .schema {
     &-edit {
         color: $color-border-dark;
@@ -30,6 +34,10 @@
         background: transparent;
         vertical-align: baseline;
     }
+}
+
+.field-icon {
+    color: $color-border-dark;
 }
 
 .form-check {

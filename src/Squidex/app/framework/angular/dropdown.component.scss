@@ -1,0 +1,74 @@
+@import '_mixins';
+@import '_vars';
+
+$color-input-border: rgba(0, 0, 0, .15);
+$color-input-disabled: #eef1f4;
+
+.form-control {
+    & {
+        width: 100%;
+    }
+
+    &[readonly] {
+        background: $color-input-background;
+    }
+
+    &:disabled {
+        background: $color-input-disabled;
+    }
+}
+
+.selection {
+    & {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .item {
+        @include absolute(0, 1rem, 0, 0);
+        pointer-events: none;
+    }
+
+    .icon-caret-down {
+        @include absolute(30%, .4rem, auto, auto);
+        font-size: .9rem;
+        font-weight: normal;
+    }
+}
+
+.items {
+    &-container {
+        position: relative;
+    }
+
+    & {
+        @include absolute(2px, auto, auto, 0);
+        @include border-radius(.25em);
+        @include box-shadow;
+        max-height: 12rem;
+        border: 1px solid $color-input-border;
+        background: $color-dark-foreground;
+        padding: .3rem 0;
+        overflow-y: auto;
+        z-index: 10000;
+    }
+}
+
+.item {
+    & {
+        padding: .5rem .75rem;
+    }
+
+    &.selectable {
+        & {
+            cursor: pointer;
+        }
+
+        &.active,
+        &:hover {
+            color: $color-dark-foreground;
+            border: 0;
+            background: $color-theme-blue;
+        }
+    }
+}

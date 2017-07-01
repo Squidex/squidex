@@ -24,6 +24,7 @@ export class AutocompleteItem {
 }
 
 const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
 const NOOP = () => { /* NOOP */ };
@@ -59,7 +60,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public writeValue(value: any) {
         if (!value) {
-            this.queryInput.setValue('');
+            this.resetValue();
         } else {
             let item: AutocompleteItem | null = null;
 
@@ -101,25 +102,21 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public ngOnInit() {
         this.subscription =
             this.queryInput.valueChanges
-                .map(q => <string>q)
-                .map(q => q ? q.trim() : q)
+                .map(query => <string>query)
+                .map(query => query ? query.trim() : query)
                 .distinctUntilChanged()
                 .debounceTime(200)
-                .do(q => {
-                    if (!q) {
+                .do(query => {
+                    if (!query) {
                         this.reset();
                     }
                 })
-                .filter(q => !!q && !!this.source)
-                .switchMap(q => this.source.find(q)).catch(_ => Observable.of([]))
-                .subscribe(r => {
+                .filter(query => !!query && !!this.source)
+                .switchMap(query => this.source.find(query)).catch(_ => Observable.of([]))
+                .subscribe(items => {
                     this.reset();
-                    this.items = r || [];
+                    this.items = items || [];
                 });
-    }
-
-    public markTouched() {
-        this.touchedCallback();
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -130,6 +127,10 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             case KEY_DOWN:
                 this.down();
                 return false;
+            case KEY_ESCAPE:
+                this.resetValue();
+                this.reset();
+                return false;
             case KEY_ENTER:
                 if (this.items.length > 0) {
                     this.chooseItem();
@@ -139,21 +140,9 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
     }
 
-    private reset() {
-        this.items = [];
-        this.itemSelection = -1;
-    }
-
     public blur() {
         this.reset();
-    }
-
-    public up() {
-        this.selectIndex(this.itemSelection - 1);
-    }
-
-    public down() {
-        this.selectIndex(this.itemSelection + 1);
+        this.touchedCallback();
     }
 
     public chooseItem(selection: AutocompleteItem | null = null) {
@@ -175,7 +164,19 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
     }
 
-    public selectIndex(selection: number) {
+    private up() {
+        this.selectIndex(this.itemSelection - 1);
+    }
+
+    private down() {
+        this.selectIndex(this.itemSelection + 1);
+    }
+
+    private resetValue() {
+        this.queryInput.setValue('');
+    }
+
+    private selectIndex(selection: number) {
         if (selection < 0) {
             selection = 0;
         }
@@ -185,5 +186,10 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
 
         this.itemSelection = selection;
+    }
+
+    private reset() {
+        this.items = [];
+        this.itemSelection = -1;
     }
 }

@@ -18,18 +18,21 @@ $color-input-border: rgba(0, 0, 0, .15);
         background: $color-dark-foreground;
         padding: .3rem 0;
         overflow-y: auto;
+        z-index: 10000;
     }
 }
 
 .item {
     & {
         padding: .3rem .8rem;
+        border: 0;
         background: transparent;
         cursor: pointer;
     }
 
     &.active {
         color: $color-dark-foreground;
+        border: 0;
         background: $color-theme-blue;
     }
 

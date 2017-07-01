@@ -54,10 +54,12 @@
             <div class="table-items-footer">
                 <form [formGroup]="addFieldForm" (ngSubmit)="addField()">
                     <div class="form-inline">
-                        <div class="form-group mr-1">
-                            <select class="form-control" formControlName="type">
-                                <option *ngFor="let type of fieldTypes" [ngValue]="type">{{type}}</option>
-                            </select>
+                        <div class="form-group types-group mr-1">
+                            <sqx-dropdown formControlName="type" [items]="fieldTypes">
+                                <ng-template let-type="$implicit">
+                                    <i class="field-icon icon-type-{{type}}"></i> <span>{{type}}</span>
+                                </ng-template>
+                            </sqx-dropdown>
                         </div>
 
                         <div class="form-group mr-1">
