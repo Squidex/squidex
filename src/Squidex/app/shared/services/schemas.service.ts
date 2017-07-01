@@ -41,6 +41,9 @@ export function createProperties(fieldType: string, values: Object | null = null
         case 'Json':
             properties = new JsonFieldPropertiesDto(null, null, null, false, false);
             break;
+        case 'References':
+            properties = new ReferencesFieldPropertiesDto(null, null, null, false, false);
+            break;
         case 'Assets':
             properties = new AssetsFieldPropertiesDto(null, null, null, false, false);
             break;
@@ -172,6 +175,16 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
         public readonly editor: string
     ) {
         super('Geolocation', label, hints, placeholder, isRequired, isListField);
+    }
+}
+
+export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
+        isRequired: boolean,
+        isListField: boolean,
+        public readonly schemaId?: string
+    ) {
+        super('References', label, hints, placeholder, isRequired, isListField);
     }
 }
 

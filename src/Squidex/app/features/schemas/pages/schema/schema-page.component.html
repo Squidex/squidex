@@ -42,7 +42,7 @@
     <div class="panel-main">
         <div class="panel-content panel-content-scroll" dnd-sortable-container [sortableData]="schemaFields.mutableValues">
             <div *ngFor="let field of schemaFields; let i = index" dnd-sortable [sortableIndex]="i" (sorted)="sortFields($event)">
-                <sqx-field [field]="field"
+                <sqx-field [field]="field" [schemas]="schemas"
                     (disabling)="disableField(field)"
                     (deleting)="deleteField(field)"
                     (enabling)="enableField(field)"

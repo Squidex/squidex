@@ -146,6 +146,9 @@
                     <div *ngSwitchCase="'Assets'">
                         <sqx-assets-validation [editForm]="editForm" [properties]="field.properties"></sqx-assets-validation>
                     </div>
+                    <div *ngSwitchCase="'References'">
+                        <sqx-references-validation [editForm]="editForm" [properties]="field.properties"></sqx-references-validation>
+                    </div>
                 </div>
             </div>
 
@@ -171,6 +174,9 @@
                     </div>
                     <div *ngSwitchCase="'Assets'">
                         <sqx-assets-ui [editForm]="editForm" [properties]="field.properties"></sqx-assets-ui>
+                    </div>
+                    <div *ngSwitchCase="'References'">
+                        <sqx-references-ui [editForm]="editForm" [properties]="field.properties" [schemas]="schemas"></sqx-references-ui>
                     </div>
                 </div>
             </div>

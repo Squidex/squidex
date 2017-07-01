@@ -22,6 +22,7 @@ import {
     ModalView,
     NotificationService,
     SchemaDetailsDto,
+    SchemaDto,
     SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
@@ -47,6 +48,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         'Geolocation',
         'Json',
         'Number',
+        'References',
         'String'
     ];
 
@@ -56,6 +58,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public schemaVersion = new Version('');
     public schemaProperties: SchemaPropertiesDto;
     public schemaInformation: any;
+    public schemas: SchemaDto[];
 
     public confirmDeleteDialog = new ModalView();
 
@@ -107,6 +110,18 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
                 this.isPublished = schema.isPublished;
 
                 this.export();
+            });
+
+        this.load();
+    }
+
+    private load() {
+        this.appNameOnce()
+            .switchMap(app => this.schemasService.getSchemas(app))
+            .subscribe(dtos => {
+                this.schemas = dtos;
+            }, error => {
+                this.notifyError(error);
             });
     }
 

@@ -12,7 +12,8 @@ import {
     createProperties,
     fadeAnimation,
     FieldDto,
-    ModalView
+    ModalView,
+    SchemaDto
 } from 'shared';
 
 @Component({
@@ -28,6 +29,9 @@ export class FieldComponent implements OnInit {
 
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public schemas: SchemaDto[];
 
     @Output()
     public hiding = new EventEmitter<FieldDto>();

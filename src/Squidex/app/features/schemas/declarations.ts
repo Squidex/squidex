@@ -17,6 +17,8 @@ export * from './pages/schema/types/json-ui.component';
 export * from './pages/schema/types/json-validation.component';
 export * from './pages/schema/types/number-ui.component';
 export * from './pages/schema/types/number-validation.component';
+export * from './pages/schema/types/references-ui.component';
+export * from './pages/schema/types/references-validation.component';
 export * from './pages/schema/types/string-ui.component';
 export * from './pages/schema/types/string-validation.component';
 export * from './pages/schema/field.component';
