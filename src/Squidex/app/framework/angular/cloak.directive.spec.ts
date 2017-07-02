@@ -12,16 +12,20 @@ describe('CloakDirective', () => {
         let called = false;
 
         const element = {
-            nativeElement: {
-                classList: {
-                    remove: () => {
-                        called = true;
-                    }
-                }
+            nativeElement: {}
+        };
+
+        const renderer = {
+            setElementClass: (target: any, className: string, isAdd: boolean) => {
+                called = true;
+
+                expect(target).toBe(element.nativeElement);
+                expect(className).toBe('sqx-cloak');
+                expect(isAdd).toBeFalsy();
             }
         };
 
-        new CloakDirective(element).ngOnInit();
+        new CloakDirective(<any>element, <any>renderer).ngOnInit();
 
         expect(called).toBeTruthy();
     });
