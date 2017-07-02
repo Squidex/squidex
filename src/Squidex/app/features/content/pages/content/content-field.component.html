@@ -92,6 +92,9 @@
                     <div *ngSwitchCase="'Assets'">
                         <sqx-assets-editor [formControlName]="partition"></sqx-assets-editor>
                     </div>
+                    <div *ngSwitchCase="'References'">
+                        <sqx-references-editor [formControlName]="partition" [languageCode]="partition" [schemaId]="field.properties.schemaId"></sqx-references-editor>
+                    </div>
                 </div>
             </div>
         </div>

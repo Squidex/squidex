@@ -49,6 +49,9 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
     @Input()
     public schema: SchemaDto;
 
+    @Input()
+    public isReadOnly = false;
+
     @Input('sqxContent')
     public content: ContentDto;
 

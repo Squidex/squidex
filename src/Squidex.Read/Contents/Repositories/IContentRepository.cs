@@ -15,9 +15,9 @@ namespace Squidex.Read.Contents.Repositories
 {
     public interface IContentRepository
     {
-        Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity);
+        Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity);
 
-        Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity);
+        Task<long> CountAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity);
 
         Task<bool> ExistsAsync(Guid appId, Guid schemaId, Guid contentId);
 

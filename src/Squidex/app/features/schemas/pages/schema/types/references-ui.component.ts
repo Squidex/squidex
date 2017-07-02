@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { ReferencesFieldPropertiesDto, SchemaDto } from 'shared';
+import { ReferencesFieldPropertiesDto } from 'shared';
 
 @Component({
     selector: 'sqx-references-ui',
@@ -22,7 +22,4 @@ export class ReferencesUIComponent {
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
-
-    @Input()
-    public schems: SchemaDto[];
 }

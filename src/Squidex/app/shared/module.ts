@@ -20,7 +20,6 @@ import {
     AppsService,
     AppMustExistGuard,
     AssetComponent,
-    AssetsEditorComponent,
     AssetsService,
     AuthService,
     ContentsService,
@@ -64,7 +63,6 @@ import {
     declarations: [
         AppFormComponent,
         AssetComponent,
-        AssetsEditorComponent,
         HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent,
@@ -80,7 +78,6 @@ import {
     exports: [
         AppFormComponent,
         AssetComponent,
-        AssetsEditorComponent,
         HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent,

@@ -1,0 +1,31 @@
+<div class="references-container" [class.disabled]="isDisabled">
+    <div class="drop-area-container" *ngIf="schema && !isDisabled">
+        <div class="drop-area" dnd-droppable (onDropSuccess)="onContentDropped($event.dragData.content)" [allowDrop]="canDrop()" [routerLink]="['references', schemaId, languageCode]">
+            Drop content here to add them.
+        </div>
+    </div>
+
+    <div class="invalid" *ngIf="isInvalidSchema">
+        Schema not found or not configured yet.
+    </div>
+
+    <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="contentItems && contentItems.length > 0">
+        <colgroup>
+            <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
+            <col style="width: 180px" />
+            <col style="width: 50px" />
+            <col style="width: 80px" />
+        </colgroup>
+
+        <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
+            <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
+                <tr [sqxContent]="content" isReadOnly="true" dnd-sortable [sortableIndex]="i" (sorted)="onContentsSorted($event)"
+                    [language]="languageSelected"
+                    [fields]="contentFields"
+                    [schema]="schema"
+                    (deleting)="onContentRemoving(content)"></tr>
+                <tr class="spacer"></tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>

@@ -20,6 +20,7 @@ import {
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
+    allDataFromRoute,
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
@@ -73,6 +74,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     }
 
     public ngOnInit() {
+        const routeData = allDataFromRoute(this.route);
+
+        this.languages = routeData['appLanguages'];
+
         this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
                 .subscribe(message => {
@@ -81,15 +86,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     }
                 });
 
-        this.route.parent!.data.map(p => p['appLanguages'])
-            .subscribe((languages: AppLanguageDto[]) => {
-                this.languages = languages;
-            });
-
-        this.route.parent!.data.map(p => p['schema'])
-            .subscribe((schema: SchemaDetailsDto) => {
-                this.setupForm(schema);
-            });
+        this.setupForm(routeData['schema']);
 
         this.route.data.map(p => p['content'])
             .subscribe((content: ContentDto) => {

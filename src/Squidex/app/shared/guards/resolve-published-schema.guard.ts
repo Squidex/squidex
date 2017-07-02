@@ -8,6 +8,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
+import { allParameters } from 'framework';
+
 import { SchemaDetailsDto, SchemasService } from './../services/schemas.service';
 
 @Injectable()
@@ -19,11 +21,18 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<SchemaDetailsDto> {
-        const appName = this.findParameter(route, 'appName');
-        const schemaName = this.findParameter(route, 'schemaName');
+        const params = allParameters(route);
 
-        if (!appName || !schemaName) {
-            throw 'Route must contain app and schema name.';
+        const appName = params['appName'];
+
+        if (!appName) {
+            throw 'Route must contain app name.';
+        }
+
+        const schemaName = params['schemaName'];
+
+        if (!schemaName) {
+            throw 'Route must contain schema name.';
         }
 
         const result =
@@ -41,22 +50,6 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
 
                     return null;
                 });
-
-        return result;
-    }
-
-    private findParameter(route: ActivatedRouteSnapshot, name: string): string | null {
-        let result: string | null = null;
-
-        while (route) {
-            result = route.params[name];
-
-            if (result || !route.parent) {
-                break;
-            }
-
-            route = route.parent;
-        }
 
         return result;
     }

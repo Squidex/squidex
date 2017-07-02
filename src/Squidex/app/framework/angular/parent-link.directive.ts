@@ -28,7 +28,9 @@ export class ParentLinkDirective implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.urlSubscription.unsubscribe();
+        if (this.urlSubscription) {
+            this.urlSubscription.unsubscribe();
+        }
     }
 
     public ngOnInit() {

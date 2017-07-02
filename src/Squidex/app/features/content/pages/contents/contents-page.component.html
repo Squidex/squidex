@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" value1="{{appName() | async}}" value2="{{schema.name}}"></sqx-title>
 
-<sqx-panel panelWidth="60rem">
+<sqx-panel [panelWidth]="isReadOnly ? '40rem' : '60rem'">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -10,17 +10,17 @@
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
                 <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
                     <input class="form-control" #findInput [formControl]="contentsFilter" placeholder="Search for content" />
                 </form>
                 
-                <span *ngIf="languages.length > 1">
+                <span *ngIf="!isReadOnly && languages.length > 1">
                     <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
                 </span>
 
-                <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+                <button *ngIf="!isReadOnly" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
                     <i class="icon-plus"></i> New
                 </button>
             </div>
@@ -38,9 +38,9 @@
             <table class="table table-items table-fixed" *ngIf="contentItems">
                 <colgroup>
                     <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
-                    <col style="width: 190px" />
-                    <col style="width: 80px" />
-                    <col style="width: 80px" />
+                    <col style="width: 180px" />
+                    <col style="width: 50px" />
+                    <col style="width: 80px" *ngIf="!isReadOnly" />
                 </colgroup>
 
                 <thead>
@@ -54,15 +54,15 @@
                         <th>
                             By
                         </th>
-                        <th>
+                        <th *ngIf="!isReadOnly">
                             Options
                         </th>
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody *ngIf="!isReadOnly">
                     <ng-template ngFor let-content [ngForOf]="contentItems">
-                        <tr [routerLink]="[content.id]" routerLinkActive="active" class="content" 
+                        <tr [routerLink]="[content.id]" routerLinkActive="active" class="content"
                             [sqxContent]="content" 
                             [language]="languageSelected"
                             [fields]="contentFields"
@@ -70,6 +70,16 @@
                             (unpublishing)="unpublishContent(content)"
                             (publishing)="publishContent(content)"
                             (deleting)="deleteContent(content)"></tr>
+                        <tr class="spacer"></tr>
+                    </ng-template>
+                </tbody>
+
+                <tbody *ngIf="isReadOnly">
+                    <ng-template ngFor let-content [ngForOf]="contentItems">
+                        <tr [sqxContent]="content" isReadOnly="true" dnd-draggable [dragData]="dropData(content)"
+                            [language]="languageSelected"
+                            [fields]="contentFields"
+                            [schema]="schema"></tr>
                         <tr class="spacer"></tr>
                     </ng-template>
                 </tbody>

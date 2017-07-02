@@ -48,7 +48,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<ContentsDto> {
         let fullQuery = query ? query.trim() : '';
 
         if (fullQuery.length > 0) {
@@ -67,6 +67,10 @@ export class ContentsService {
 
         if (skip > 0) {
             fullQuery += `&$skip=${skip}`;
+        }
+
+        if (ids && ids.length > 0) {
+            fullQuery += `&ids=${ids.join(',')}`;
         }
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?nonPublished=true&hidden=true${fullQuery}`);

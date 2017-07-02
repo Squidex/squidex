@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Controllers.Api.Schemas.Models.Converters;
 using Squidex.Core.Schemas;
 using Squidex.Pipeline;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Repositories;
 using Squidex.Write.Schemas.Commands;
 
@@ -50,7 +52,7 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemaDto[]), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
             var schemas = await schemaRepository.QueryAllAsync(AppId);
@@ -73,10 +75,19 @@ namespace Squidex.Controllers.Api.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {
-            var entity = await schemaRepository.FindSchemaAsync(AppId, name);
+            ISchemaEntity entity;
+
+            if (Guid.TryParse(name, out var id))
+            {
+                entity = await schemaRepository.FindSchemaAsync(id);
+            }
+            else
+            {
+                entity = await schemaRepository.FindSchemaAsync(AppId, name);
+            }
 
             if (entity == null)
             {

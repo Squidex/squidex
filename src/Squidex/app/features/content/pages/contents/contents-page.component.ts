@@ -17,6 +17,7 @@ import {
 } from './../messages';
 
 import {
+    allDataFromRoute,
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
@@ -52,6 +53,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public languages: AppLanguageDto[] = [];
     public languageSelected: AppLanguageDto;
+    public languageParameter: string;
+
+    public isReadOnly = false;
 
     public columnWidth: number;
 
@@ -70,6 +74,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public ngOnInit() {
+        const routeData = allDataFromRoute(this.route);
+
+        this.languages = routeData['appLanguages'];
+
         this.contentCreatedSubscription =
             this.messageBus.of(ContentCreated)
                 .subscribe(message => {
@@ -83,18 +91,20 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                     this.updateContents(message.id, undefined, message.data, message.version);
                 });
 
-        this.route.data.map(p => p['appLanguages'])
-            .subscribe((languages: AppLanguageDto[]) => {
-                this.languages = languages;
+        this.route.params.map(p => <string> p['language'])
+            .subscribe(language => {
+                this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
             });
 
-        this.route.data.map(p => p['schema'])
+        this.route.data.map(p => p['schemaOverride'] || p['schema'])
             .subscribe(schema => {
                 this.schema = schema;
 
                 this.reset();
                 this.load();
             });
+
+        this.isReadOnly = routeData['isReadOnly'];
     }
 
     public search() {
@@ -173,6 +183,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 }, error => {
                     this.notifyError(error);
                 });
+    }
+
+    public dropData(content: ContentDto) {
+        return { content, schemaId: this.schema.id };
     }
 
     public goNext() {

@@ -7,6 +7,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
@@ -19,10 +20,12 @@ import {
 } from 'shared';
 
 import {
+    AssetsEditorComponent,
     ContentFieldComponent,
     ContentPageComponent,
     ContentItemComponent,
     ContentsPageComponent,
+    ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
 
@@ -49,6 +52,16 @@ const routes: Routes = [
                             {
                                 path: 'assets',
                                 loadChildren: './../assets/module#SqxFeatureAssetsModule'
+                            },
+                            {
+                                path: 'references/:schemaName/:language',
+                                component: ContentsPageComponent,
+                                data: {
+                                    isReadOnly: true
+                                },
+                                resolve: {
+                                    schemaOverride: ResolvePublishedSchemaGuard
+                                }
                             }
                         ]
                     },
@@ -68,6 +81,16 @@ const routes: Routes = [
                                 }
                             },
                             {
+                                path: 'references/:schemaName/:language',
+                                component: ContentsPageComponent,
+                                data: {
+                                    isReadOnly: true
+                                },
+                                resolve: {
+                                    schema: ResolvePublishedSchemaGuard
+                                }
+                            },
+                            {
                                 path: 'assets',
                                 loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
@@ -82,13 +105,16 @@ const routes: Routes = [
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
+        DndModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
+        AssetsEditorComponent,
         ContentFieldComponent,
         ContentItemComponent,
         ContentPageComponent,
         ContentsPageComponent,
+        ReferencesEditorComponent,
         SchemasPageComponent
     ]
 })

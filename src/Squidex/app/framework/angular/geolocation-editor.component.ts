@@ -73,6 +73,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         if (isDisabled) {
             if (this.map) {
                 this.map.zoomControl.disable();
+
                 this.map._handlers.forEach((handler: any) => {
                     handler.disable();
                 });
@@ -86,6 +87,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         } else {
             if (this.map) {
                 this.map.zoomControl.enable();
+
                 this.map._handlers.forEach((handler: any) => {
                     handler.enable();
                 });
@@ -129,7 +131,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }).addTo(this.map);
 
             this.map.on('click', (event: any) => {
-                if (!this.marker) {
+                if (!this.marker && !this.isDisabled) {
                     const latlng = event.latlng.wrap();
 
                     this.value = { latitude: latlng.lat, longitude: latlng.lng };
@@ -142,6 +144,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
             if (this.isDisabled) {
                 this.map.zoomControl.disable();
+
                 this.map._handlers.forEach((handler: any) => {
                     handler.disable();
                 });

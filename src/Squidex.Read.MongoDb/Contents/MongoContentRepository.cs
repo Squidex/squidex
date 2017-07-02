@@ -66,7 +66,7 @@ namespace Squidex.Read.MongoDb.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
         {
             List<IContentEntity> result = null;
 
@@ -81,7 +81,7 @@ namespace Squidex.Read.MongoDb.Contents
 
                     cursor = 
                         collection
-                            .Find(parser, schemaEntity.Id, schemaEntity.Schema, nonPublished)
+                            .Find(parser, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished)
                             .Take(parser)
                             .Skip(parser)
                             .Sort(parser, schemaEntity.Schema);
@@ -112,19 +112,7 @@ namespace Squidex.Read.MongoDb.Contents
             return result;
         }
 
-        public async Task<bool> ExistsAsync(Guid appId, Guid schemaId, Guid contentId)
-        {
-            var result = false;
-
-            await ForAppIdAsync(appId, async collection =>
-            {
-                result = await collection.Find(x => x.Id == contentId && x.SchemaId == schemaId).CountAsync() == 1;
-            });
-
-            return result;
-        }
-
-        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, string odataQuery, IAppEntity appEntity)
+        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
         {
             var result = 0L;
 
@@ -137,7 +125,7 @@ namespace Squidex.Read.MongoDb.Contents
 
                     var parser = model.ParseQuery(odataQuery);
 
-                    cursor = collection.Find(parser, schemaEntity.Id, schemaEntity.Schema, nonPublished);
+                    cursor = collection.Find(parser, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished);
                 }
                 catch (NotSupportedException)
                 {
@@ -153,6 +141,18 @@ namespace Squidex.Read.MongoDb.Contents
                 }
 
                 result = await cursor.CountAsync();
+            });
+
+            return result;
+        }
+
+        public async Task<bool> ExistsAsync(Guid appId, Guid schemaId, Guid contentId)
+        {
+            var result = false;
+
+            await ForAppIdAsync(appId, async collection =>
+            {
+                result = await collection.Find(x => x.Id == contentId && x.SchemaId == schemaId).CountAsync() == 1;
             });
 
             return result;

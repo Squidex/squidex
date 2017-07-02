@@ -5,10 +5,10 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ReferencesFieldPropertiesDto } from 'shared';
+import { ReferencesFieldPropertiesDto, SchemaDto } from 'shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -16,10 +16,20 @@ import { ReferencesFieldPropertiesDto } from 'shared';
     templateUrl: 'references-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesValidationComponent {
+export class ReferencesValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
+
+    @Input()
+    public schemas: SchemaDto[];
+
+    public ngOnInit() {
+        this.editForm.setControl('schemaId',
+            new FormControl(this.properties.schemaId, [
+                Validators.required
+            ]));
+    }
 }

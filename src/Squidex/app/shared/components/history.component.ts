@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import { AppComponentBase } from './app.component-base';
 
 import {
+    allParametersFromRoute,
     AppsStoreService,
     HistoryChannelUpdated,
     HistoryEventDto,
@@ -30,18 +31,21 @@ const REPLACEMENT_TEMP = '$TEMP$';
 })
 export class HistoryComponent extends AppComponentBase {
     public get channel(): string {
-        let result = this.route.snapshot.data['channel'];
-        let params = this.route.parent!.snapshot.params;
+        let channelPath = this.route.snapshot.data['channel'];
 
-        for (let key in params) {
-            if (params.hasOwnProperty(key)) {
-                 const value = params[key];
+        if (channelPath) {
+            let params = allParametersFromRoute(this.route);
 
-                 result = result.replace('{' + key + '}', value);
+            for (let key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const value = params[key];
+
+                    channelPath = channelPath.replace('{' + key + '}', value);
+                }
             }
         }
 
-        return result;
+        return channelPath;
     }
 
     public events: Observable<HistoryEventDto[]> =

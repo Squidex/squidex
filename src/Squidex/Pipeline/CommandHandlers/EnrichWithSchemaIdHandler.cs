@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write;
 using Squidex.Write.Schemas;
@@ -41,7 +42,16 @@ namespace Squidex.Pipeline.CommandHandlers
                 {
                     var schemaName = routeValues["name"].ToString();
 
-                    var schema = await schemas.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
+                    ISchemaEntity schema;
+
+                    if (Guid.TryParse(schemaName, out var id))
+                    {
+                        schema = await schemas.FindSchemaByIdAsync(id);
+                    }
+                    else
+                    {
+                        schema = await schemas.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
+                    }
 
                     if (schema == null)
                     {

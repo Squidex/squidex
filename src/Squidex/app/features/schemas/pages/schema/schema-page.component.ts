@@ -16,6 +16,7 @@ import {
     createProperties,
     fadeAnimation,
     FieldDto,
+    fieldTypes,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
@@ -41,16 +42,7 @@ import { SchemaDeleted, SchemaUpdated } from './../messages';
     ]
 })
 export class SchemaPageComponent extends AppComponentBase implements OnInit {
-    public fieldTypes: string[] = [
-        'Assets',
-        'Boolean',
-        'DateTime',
-        'Geolocation',
-        'Json',
-        'Number',
-        'References',
-        'String'
-    ];
+    public fieldTypes = fieldTypes;
 
     public schemaExport: any;
     public schemaName: string;

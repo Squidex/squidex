@@ -17,8 +17,6 @@ import {
     SqxSharedModule
 } from 'shared';
 
-import { SortedDirective } from './utils/sorted.directive';
-
 import {
     FieldComponent,
     AssetsUIComponent,
@@ -104,7 +102,6 @@ const routes: Routes = [
         SchemaFormComponent,
         SchemaPageComponent,
         SchemasPageComponent,
-        SortedDirective,
         StringUIComponent,
         StringValidationComponent
     ]

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, ElementRef, Input, OnChanges, OnInit, Renderer } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, Renderer, SimpleChanges } from '@angular/core';
 
 const ProgressBar = require('progressbar.js');
 
@@ -59,8 +59,8 @@ export class ProgressBarComponent implements OnChanges, OnInit {
         this.updateValue();
     }
 
-    public ngOnChanges() {
-        if (this.progressBar) {
+    public ngOnChanges(changes: SimpleChanges) {
+        if (this.progressBar && changes.value) {
             this.updateValue();
         }
     }

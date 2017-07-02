@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, Input, OnDestroy, OnInit, OnChanges, TemplateRef, ViewContainerRef, EmbeddedViewRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 
 @Directive({
     selector: '[sqxTemplateWrapper]'
@@ -34,10 +34,13 @@ export class TemplateWrapper implements OnInit, OnDestroy, OnChanges {
         });
     }
 
-    public ngOnChanges() {
+    public ngOnChanges(changes: SimpleChanges) {
         if (this.view) {
-            this.view.context.$implicit = this.item;
-            this.view.context.index = this.index;
+            if (changes.item) {
+                this.view.context.$implicit = this.item;
+            } else if (changes.index) {
+                this.view.context.index = this.index;
+            }
         }
     }
 

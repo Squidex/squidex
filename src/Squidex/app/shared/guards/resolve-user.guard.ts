@@ -8,6 +8,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
+import { allParameters } from 'framework';
+
 import { UserDto, UserManagementService } from './../services/users.service';
 
 @Injectable()
@@ -19,7 +21,9 @@ export class ResolveUserGuard implements Resolve<UserDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<UserDto> {
-        const userId = this.findParameter(route, 'userId');
+        const params = allParameters(route);
+
+        const userId = params['userId'];
 
         if (!userId) {
             throw 'Route must contain user id.';
@@ -40,22 +44,6 @@ export class ResolveUserGuard implements Resolve<UserDto> {
 
                     return null;
                 });
-
-        return result;
-    }
-
-    private findParameter(route: ActivatedRouteSnapshot, name: string): string | null {
-        let result: string | null = null;
-
-        while (route) {
-            result = route.params[name];
-
-            if (result || !route.parent) {
-                break;
-            }
-
-            route = route.parent;
-        }
 
         return result;
     }

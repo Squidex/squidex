@@ -1,5 +1,14 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
+        <label for="field-placeholder" class="col col-3 col-form-label">Schema</label>
+
+        <div class="col col-6">
+           <select class="form-control" formControlName="schemaId">
+                <option *ngFor="let schema of schemas" [ngValue]="schema.id">{{schema.name}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
         <label class="col col-3 col-form-checkbox-label" for="field-required">Required</label>
 
         <div class="col col-6">
@@ -7,3 +16,4 @@
         </div>
     </div>
 </div>
+

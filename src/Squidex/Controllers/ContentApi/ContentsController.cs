@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Read.Contents.Repositories;
+using Squidex.Read.Schemas;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
 
@@ -43,19 +45,27 @@ namespace Squidex.Controllers.ContentApi
         [HttpGet]
         [Route("content/{app}/{name}")]
         [ApiCosts(2)]
-        public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false)
+        public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false, [FromQuery] string ids = null)
         {
-            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await FindSchemaAsync(name);
 
-            if (schemaEntity == null)
+            var idsList = new HashSet<Guid>();
+
+            if (!string.IsNullOrWhiteSpace(ids))
             {
-                return NotFound();
+                foreach (var id in ids.Split(','))
+                {
+                    if (Guid.TryParse(id, out var guid))
+                    {
+                        idsList.Add(guid);
+                    }
+                }
             }
-            
+
             var query = Request.QueryString.ToString();
 
-            var taskForItems = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, query, App);
-            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, query, App);
+            var taskForItems = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, idsList, query, App);
+            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, idsList, query, App);
 
             await Task.WhenAll(taskForItems, taskForCount);
 
@@ -83,7 +93,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
         {
-            var schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
+            var schemaEntity = await FindSchemaAsync(name);
 
             if (schemaEntity == null)
             {
@@ -182,6 +192,22 @@ namespace Squidex.Controllers.ContentApi
             await CommandBus.PublishAsync(command);
 
             return NoContent();
+        }
+
+        private async Task<ISchemaEntity> FindSchemaAsync(string name)
+        {
+            ISchemaEntity schemaEntity;
+
+            if (Guid.TryParse(name, out var schemaId))
+            {
+                schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
+            }
+            else
+            {
+                schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
+            }
+
+            return schemaEntity;
         }
     }
 }

@@ -59,14 +59,14 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             return cursor;
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Guid schemaId, Schema schema, bool nonPublished)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, bool nonPublished)
         {
-            var filter = BuildQuery(query, schemaId, schema, nonPublished);
+            var filter = BuildQuery(query, ids, schemaId, schema, nonPublished);
 
             return cursor.Find(filter);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Schema schema, bool nonPublished)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, bool nonPublished)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -76,6 +76,11 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
             if (!nonPublished)
             {
                 filters.Add(Filter.Eq(x => x.IsPublished, true));
+            }
+
+            if (ids != null && ids.Count > 0)
+            {
+                Filter.In(x => x.Id, ids);
             }
 
             var filter = FilterBuilder.Build(query, schema);

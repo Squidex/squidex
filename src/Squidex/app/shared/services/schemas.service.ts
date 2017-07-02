@@ -19,6 +19,17 @@ import {
 
 import { AuthService } from './auth.service';
 
+export const fieldTypes: string[] = [
+    'Assets',
+    'Boolean',
+    'DateTime',
+    'Geolocation',
+    'Json',
+    'Number',
+    'References',
+    'String'
+];
+
 export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
     let properties: FieldPropertiesDto;
 

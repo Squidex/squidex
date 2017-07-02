@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+.disabled {
+    pointer-events: none;
+}
+
 .assets {
     &-container {
         & {
@@ -27,6 +31,10 @@
         color: darken($color-border, 30%);
     }
 
+    &:hover {
+        text-decoration: underline;
+    }
+
     &-container {
         padding-bottom: 1rem;
     }
@@ -37,6 +45,7 @@
         border-color: darken($color-border, 10%);
         cursor: copy;
         color: darken($color-border, 40%);
+        text-decoration: none;
     }
 }
 

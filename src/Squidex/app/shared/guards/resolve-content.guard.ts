@@ -8,6 +8,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
+import { allParameters } from 'framework';
+
 import { ContentDto, ContentsService } from './../services/contents.service';
 
 @Injectable()
@@ -19,12 +21,24 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<ContentDto> {
-        const appName = this.findParameter(route, 'appName');
-        const schemaName = this.findParameter(route, 'schemaName');
-        const contentId = this.findParameter(route, 'contentId');
+        const params = allParameters(route);
 
-        if (!appName || !schemaName || !contentId) {
-            throw 'Route must contain app and schema name and id.';
+        const appName = params['appName'];
+
+        if (!appName) {
+            throw 'Route must contain app name.';
+        }
+
+        const schemaName = params['schemaName'];
+
+        if (!schemaName) {
+            throw 'Route must contain schema name.';
+        }
+
+        const contentId = params['contentId'];
+
+        if (!contentId) {
+            throw 'Route must contain content id.';
         }
 
         const result =
@@ -42,22 +56,6 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
 
                     return null;
                 });
-
-        return result;
-    }
-
-    private findParameter(route: ActivatedRouteSnapshot, name: string): string | null {
-        let result: string | null = null;
-
-        while (route) {
-            result = route.params[name];
-
-            if (result || !route.parent) {
-                break;
-            }
-
-            route = route.parent;
-        }
 
         return result;
     }

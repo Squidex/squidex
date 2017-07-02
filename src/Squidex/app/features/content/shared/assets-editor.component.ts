@@ -8,12 +8,11 @@
 // tslint:disable:prefer-for-of
 
 import { Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-import { AppComponentBase } from './app.component-base';
-
 import {
+    AppComponentBase,
     AppsStoreService,
     AssetDto,
     AssetsService,
@@ -21,7 +20,7 @@ import {
     ImmutableArray,
     MessageBus,
     NotificationService
-} from './../declarations-base';
+} from 'shared';
 
 const NOOP = () => { /* NOOP */ };
 
@@ -37,12 +36,11 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
+    private changeCallback: (value: any) => void = NOOP;
+    private touchedCallback: () => void = NOOP;
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
-
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
 
     public isDisabled = false;
 
@@ -102,6 +100,14 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         }
     }
 
+    public canDrop() {
+        const component = this;
+
+        return (dragData: any) => {
+            return dragData instanceof AssetDto && !component.oldAssets.find(a => a.id === dragData.id);
+        };
+    }
+
     public onAssetDropped(asset: AssetDto) {
         if (asset) {
             this.oldAssets = this.oldAssets.pushFront(asset);
@@ -110,15 +116,17 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         }
     }
 
+    public onAssetRemoving(asset: AssetDto) {
+        if (asset) {
+            this.oldAssets = this.oldAssets.remove(asset);
+
+            this.updateValue();
+        }
+    }
+
     public onAssetLoaded(file: File, asset: AssetDto) {
         this.newAssets = this.newAssets.remove(file);
         this.oldAssets = this.oldAssets.pushFront(asset);
-
-        this.updateValue();
-    }
-
-    public onAssetRemoving(asset: AssetDto) {
-        this.oldAssets = this.oldAssets.remove(asset);
 
         this.updateValue();
     }

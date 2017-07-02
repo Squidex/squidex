@@ -8,6 +8,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
+import { allParameters } from 'framework';
+
 import { AppLanguageDto, AppLanguagesService } from './../services/app-languages.service';
 
 @Injectable()
@@ -19,7 +21,9 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<AppLanguageDto[]> {
-        const appName = this.findParameter(route, 'appName');
+        const params = allParameters(route);
+
+        const appName = params['appName'];
 
         if (!appName) {
             throw 'Route must contain app name.';
@@ -40,22 +44,6 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
 
                     return null;
                 });
-
-        return result;
-    }
-
-    private findParameter(route: ActivatedRouteSnapshot, name: string): string | null {
-        let result: string | null = null;
-
-        while (route) {
-            result = route.params[name];
-
-            if (result || !route.parent) {
-                break;
-            }
-
-            route = route.parent;
-        }
 
         return result;
     }

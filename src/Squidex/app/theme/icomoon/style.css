@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?b0qz8m');
-  src:  url('fonts/icomoon.eot?b0qz8m#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?b0qz8m') format('truetype'),
-    url('fonts/icomoon.woff?b0qz8m') format('woff'),
-    url('fonts/icomoon.svg?b0qz8m#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?3aocbn');
+  src:  url('fonts/icomoon.eot?3aocbn#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?3aocbn') format('truetype'),
+    url('fonts/icomoon.woff?3aocbn') format('woff'),
+    url('fonts/icomoon.svg?3aocbn#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,51 +24,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-grid:before {
-  content: "\f00a";
-}
-.icon-list:before {
-  content: "\f0c9";
-}
-.icon-bug:before {
-  content: "\e93d";
-}
-.icon-control-Markdown:before {
-  content: "\e938";
-}
-.icon-control-Date:before {
-  content: "\e936";
-}
-.icon-control-DateTime:before {
-  content: "\e937";
-}
-.icon-angle-right:before {
-  content: "\e931";
-}
-.icon-user-o:before {
-  content: "\e932";
-}
-.icon-caret-right:before {
-  content: "\e929";
-}
-.icon-caret-left:before {
-  content: "\e92a";
-}
-.icon-caret-up:before {
-  content: "\e92b";
-}
-.icon-caret-down:before {
-  content: "\e92c";
-}
-.icon-angle-up:before {
-  content: "\e903";
-}
-.icon-angle-down:before {
-  content: "\e900";
-}
-.icon-angle-left:before {
-  content: "\e901";
-}
 .icon-elapsed:before {
   content: "\e943";
 }
@@ -136,6 +91,9 @@
   content: "\e908";
 }
 .icon-content:before {
+  content: "\e909";
+}
+.icon-type-References:before {
   content: "\e909";
 }
 .icon-control-Checkbox:before {
@@ -254,6 +212,45 @@
 }
 .icon-control-RichText:before {
   content: "\e939";
+}
+.icon-bug:before {
+  content: "\e93d";
+}
+.icon-control-Markdown:before {
+  content: "\e938";
+}
+.icon-control-Date:before {
+  content: "\e936";
+}
+.icon-control-DateTime:before {
+  content: "\e937";
+}
+.icon-angle-right:before {
+  content: "\e931";
+}
+.icon-user-o:before {
+  content: "\e932";
+}
+.icon-caret-right:before {
+  content: "\e929";
+}
+.icon-caret-left:before {
+  content: "\e92a";
+}
+.icon-caret-up:before {
+  content: "\e92b";
+}
+.icon-caret-down:before {
+  content: "\e92c";
+}
+.icon-angle-up:before {
+  content: "\e903";
+}
+.icon-angle-down:before {
+  content: "\e900";
+}
+.icon-angle-left:before {
+  content: "\e901";
 }
 .icon-info:before {
   content: "\e93c";
