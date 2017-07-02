@@ -27,13 +27,6 @@ export class TemplateWrapper implements OnInit, OnDestroy, OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
-        if (this.view) {
-            this.view.context.$implicit = this.item;
-            this.view.context.index = this.index;
-        }
-    }
-
     public ngOnInit() {
         this.view = this.viewContainer.createEmbeddedView(this.templateRef, {
             '\$implicit': this.item,
@@ -41,7 +34,16 @@ export class TemplateWrapper implements OnInit, OnDestroy, OnChanges {
         });
     }
 
+    public ngOnChanges() {
+        if (this.view) {
+            this.view.context.$implicit = this.item;
+            this.view.context.index = this.index;
+        }
+    }
+
     public ngOnDestroy() {
-        this.view.destroy();
+        if (this.view) {
+            this.view.destroy();
+        }
     }
 }

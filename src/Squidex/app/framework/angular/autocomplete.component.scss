@@ -1,28 +1,6 @@
 @import '_mixins';
 @import '_vars';
 
-$color-input-border: rgba(0, 0, 0, .15);
-
 .control-dropdown {
-    & {
-        width: 18rem;
-    }
-
-    &-item {
-        &-image {
-            @include circle(2.5rem);
-            float: left;
-        }
-
-        &-title,
-        &-description {
-            @include truncate;
-            margin-left: 3rem;
-        }
-
-        &-description {
-            font-size: .8rem;
-            font-style: italic;
-        }
-    }
+    width: 18rem;
 }

@@ -57,7 +57,14 @@
             <div class="table-items-footer">
                 <form class="form-inline" [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
                     <div class="form-group mr-1">
-                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user"></sqx-autocomplete>
+                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="email">
+                            <ng-template let-user="$implicit">
+                                <img class="user-picture autocomplete-user-picture" [attr.src]="user | userDtoPicture" />
+
+                                <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
+                                <span class="user-email autocomplete-user-email">{{user.email}}</span>
+                            </ng-template>
+                        </sqx-autocomplete>
                     </div>
 
                     <button type="submit" class="btn btn-success" [disabled]="!canAddContributor">Add Contributor</button>

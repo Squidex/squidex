@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, ContentChild, forwardRef, Input, TemplateRef } from '@angular/core';
+import { AfterContentInit, Component, ContentChildren, forwardRef, Input, QueryList, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const KEY_ENTER = 13;
@@ -26,25 +26,38 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './dropdown.component.html',
     providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR]
 })
-export class DropdownComponent implements ControlValueAccessor {
+export class DropdownComponent implements AfterContentInit, ControlValueAccessor {
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
     @Input()
     public items: any[] = [];
 
-    @ContentChild(TemplateRef)
-    public itemTemplate: TemplateRef<any>;
+    @ContentChildren(TemplateRef)
+    public templates: QueryList<any>;
 
     public dropdown = new ModalView();
 
     public selectedItem: any;
     public selectedIndex = -1;
+    public selectionTemplate: TemplateRef<any>;
+
+    public itemTemplate: TemplateRef<any>;
 
     public isDisabled = false;
 
-    private get safeItems(): any[] {
-        return this.items || [];
+    public ngAfterContentInit() {
+        if (this.templates.length === 1) {
+            this.itemTemplate = this.selectionTemplate = this.templates.first;
+        } else {
+            this.templates.forEach(template => {
+                if (template.name === 'selection') {
+                    this.selectionTemplate = template;
+                } else {
+                    this.itemTemplate = template;
+                }
+            });
+        }
     }
 
     public writeValue(value: any) {

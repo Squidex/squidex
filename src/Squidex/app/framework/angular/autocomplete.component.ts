@@ -5,22 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ContentChild, forwardRef, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
 export interface AutocompleteSource {
-    find(query: string): Observable<AutocompleteItem[]>;
-}
-
-export class AutocompleteItem {
-    constructor(
-        public readonly title: string,
-        public readonly description: string,
-        public readonly image: string,
-        public readonly model: any
-    ) {
-    }
+    find(query: string): Observable<any[]>;
 }
 
 const KEY_ENTER = 13;
@@ -51,10 +41,17 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public inputName = 'autocompletion';
 
     @Input()
+    public displayProperty = '';
+
+    @Input()
     public placeholder = '';
 
-    public items: AutocompleteItem[] = [];
-    public itemSelection = -1;
+    @ContentChild(TemplateRef)
+    public itemTemplate: TemplateRef<any>;
+
+    public items: any[] = [];
+
+    public selectedIndex = -1;
 
     public queryInput = new FormControl();
 
@@ -62,13 +59,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         if (!value) {
             this.resetValue();
         } else {
-            let item: AutocompleteItem | null = null;
-
-            if (value instanceof AutocompleteItem) {
-                item = value;
-            } else {
-                item = this.items.find(i => i.model === value);
-            }
+            let item = this.items.find(i => i === value);
 
             if (item) {
                 this.queryInput.setValue(value.title || '');
@@ -133,7 +124,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 return false;
             case KEY_ENTER:
                 if (this.items.length > 0) {
-                    this.chooseItem();
+                    this.selectItem();
                     return false;
                 }
                 break;
@@ -145,9 +136,9 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.touchedCallback();
     }
 
-    public chooseItem(selection: AutocompleteItem | null = null) {
+    public selectItem(selection: any | null = null) {
         if (!selection) {
-            selection = this.items[this.itemSelection];
+            selection = this.items[this.selectedIndex];
         }
 
         if (!selection && this.items.length === 1) {
@@ -156,7 +147,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
         if (selection) {
             try {
-                this.queryInput.setValue(selection.title);
+                if (this.displayProperty && this.displayProperty.length > 0) {
+                    this.queryInput.setValue(selection[this.displayProperty], { emitEvent: false });
+                } else {
+                    this.queryInput.setValue(selection.toString(), { emitEvent: false });
+                }
                 this.changeCallback(selection);
             } finally {
                 this.reset();
@@ -165,11 +160,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     private up() {
-        this.selectIndex(this.itemSelection - 1);
+        this.selectIndex(this.selectedIndex - 1);
     }
 
     private down() {
-        this.selectIndex(this.itemSelection + 1);
+        this.selectIndex(this.selectedIndex + 1);
     }
 
     private resetValue() {
@@ -185,11 +180,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             selection = this.items.length - 1;
         }
 
-        this.itemSelection = selection;
+        this.selectedIndex = selection;
     }
 
     private reset() {
         this.items = [];
-        this.itemSelection = -1;
+        this.selectedIndex = -1;
     }
 }
