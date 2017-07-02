@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { AppComponentBase } from './app.component-base';
 
 import {
-    allParametersFromRoute,
+    allParams,
     AppsStoreService,
     HistoryChannelUpdated,
     HistoryEventDto,
@@ -34,7 +34,7 @@ export class HistoryComponent extends AppComponentBase {
         let channelPath = this.route.snapshot.data['channel'];
 
         if (channelPath) {
-            let params = allParametersFromRoute(this.route);
+            let params = allParams(this.route);
 
             for (let key in params) {
                 if (params.hasOwnProperty(key)) {

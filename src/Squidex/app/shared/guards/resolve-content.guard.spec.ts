@@ -36,10 +36,22 @@ describe('ResolveContentGuard', () => {
         appsStore = Mock.ofType(ContentsService);
     });
 
-    it('should throw if route does not contain parameter', () => {
+    it('should throw if route does not contain app name', () => {
         const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
 
-        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name and id.');
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app name.');
+    });
+
+    it('should throw if route does not contain schema name', () => {
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
+
+        expect(() => guard.resolve(<any>{ params: { appName: 'my-app' } }, <any>{})).toThrow('Route must contain schema name.');
+    });
+
+    it('should throw if route does not contain content id', () => {
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
+
+        expect(() => guard.resolve(<any>{ params: { appName: 'my-app', schemaName: 'my-schema' } }, <any>{})).toThrow('Route must contain content id.');
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {

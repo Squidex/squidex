@@ -85,7 +85,7 @@ export module ValidatorsEx {
                 try {
                     DateTime.parseISO_UTC(v);
                 } catch (e) {
-                    return { validdateTime: false };
+                    return { validdatetime: false };
                 }
             }
 

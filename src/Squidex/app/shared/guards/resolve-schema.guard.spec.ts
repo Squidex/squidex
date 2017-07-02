@@ -31,10 +31,16 @@ describe('ResolveSchemaGuard', () => {
         schemasService = Mock.ofType(SchemasService);
     });
 
-    it('should throw if route does not contain parameter', () => {
+    it('should throw if route does not contain app name', () => {
         const guard = new ResolveSchemaGuard(schemasService.object, <any>new RouterMockup());
 
-        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app and schema name.');
+        expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app name.');
+    });
+
+    it('should throw if route does not contain schema name', () => {
+        const guard = new ResolveSchemaGuard(schemasService.object, <any>new RouterMockup());
+
+        expect(() => guard.resolve(<any>{ params: { appName: 'my-app' } }, <any>{})).toThrow('Route must contain schema name.');
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {

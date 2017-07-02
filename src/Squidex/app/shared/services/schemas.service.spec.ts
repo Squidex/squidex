@@ -191,6 +191,16 @@ describe('SchemasService', () => {
                                     properties: {
                                         fieldType: 'Assets'
                                     }
+                                },
+                                {
+                                    fieldId: 8,
+                                    name: 'field8',
+                                    isHidden: true,
+                                    isDisabled: true,
+                                    partitioning: 'language',
+                                    properties: {
+                                        fieldType: 'References'
+                                    }
                                 }
                             ]
                         }
@@ -217,7 +227,8 @@ describe('SchemasService', () => {
                     new FieldDto(4, 'field4', true, true, 'language', createProperties('DateTime')),
                     new FieldDto(5, 'field5', true, true, 'language', createProperties('Json')),
                     new FieldDto(6, 'field6', true, true, 'language', createProperties('Geolocation')),
-                    new FieldDto(7, 'field7', true, true, 'language', createProperties('Assets'))
+                    new FieldDto(7, 'field7', true, true, 'language', createProperties('Assets')),
+                    new FieldDto(8, 'field8', true, true, 'language', createProperties('References'))
                 ]));
 
         authService.verifyAll();

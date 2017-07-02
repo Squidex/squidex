@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
-import { allParameters } from 'framework';
+import { allParams } from 'framework';
 
 import { SchemaDetailsDto, SchemasService } from './../services/schemas.service';
 
@@ -21,7 +21,7 @@ export class ResolveSchemaGuard implements Resolve<SchemaDetailsDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<SchemaDetailsDto> {
-        const params = allParameters(route);
+        const params = allParams(route);
 
         const appName = params['appName'];
 

@@ -110,6 +110,29 @@ describe('ContentsService', () => {
         authService.verifyAll();
     });
 
+    it('should append ids to get request  with ids', () => {
+        authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$top=17&$skip=13&ids=id1,id2'))
+            .returns(() => Observable.of(
+                new Response(
+                    new ResponseOptions({
+                        body: {
+                            total: 10,
+                            items: []
+                        }
+                    })
+                )
+            ))
+            .verifiable(Times.once());
+
+        let contents: ContentsDto | null = null;
+
+        contentsService.getContents('my-app', 'my-schema', 17, 13, null, ['id1', 'id2']).subscribe(result => {
+            contents = result;
+        }).unsubscribe();
+
+        authService.verifyAll();
+    });
+
     it('should append query to get request as plain query string', () => {
         authService.setup(x => x.authGet('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$filter=my-filter&$top=17&$skip=13'))
             .returns(() => Observable.of(

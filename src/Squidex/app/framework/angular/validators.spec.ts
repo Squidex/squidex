@@ -7,6 +7,7 @@
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { DateTime } from './../utils/date-time';
 import { ValidatorsEx } from './../';
 
 describe('ValidatorsEx.between', () => {
@@ -46,6 +47,32 @@ describe('ValidatorsEx.between', () => {
         const error = <any>ValidatorsEx.between(1, 5)(input);
 
         expect(error.maxvalue).toBeDefined();
+    });
+});
+
+describe('ValidatorsEx.validDateTime', () => {
+    it('should return null validator if valid is not defined', () => {
+        const input = new FormControl(null);
+
+        const error = <any>ValidatorsEx.validDateTime()(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return null if date time is valid', () => {
+        const input = new FormControl(DateTime.now().toISOString());
+
+        const error = ValidatorsEx.validDateTime()(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return error if value is invalid date', () => {
+        const input = new FormControl('invalid');
+
+        const error = <any>ValidatorsEx.validDateTime()(input);
+
+        expect(error.validdatetime).toBeDefined();
     });
 });
 

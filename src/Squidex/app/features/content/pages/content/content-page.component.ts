@@ -20,7 +20,7 @@ import {
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
-    allDataFromRoute,
+    allData,
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
@@ -74,7 +74,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     }
 
     public ngOnInit() {
-        const routeData = allDataFromRoute(this.route);
+        const routeData = allData(this.route);
 
         this.languages = routeData['appLanguages'];
 

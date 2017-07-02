@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
-import { allParameters } from 'framework';
+import { allParams } from 'framework';
 
 import { UserDto, UserManagementService } from './../services/users.service';
 
@@ -21,7 +21,7 @@ export class ResolveUserGuard implements Resolve<UserDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<UserDto> {
-        const params = allParameters(route);
+        const params = allParams(route);
 
         const userId = params['userId'];
 

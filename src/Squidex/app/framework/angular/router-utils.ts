@@ -7,41 +7,36 @@
 
 import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params } from '@angular/router';
 
-export function allDataFromRoute(route: ActivatedRoute): Data {
-    return allData(route.snapshot);
-}
+export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
+    let snapshot: ActivatedRouteSnapshot = value['snapshot'] || value;
 
-export function allData(route: ActivatedRouteSnapshot): Data {
     let result: { [key: string]: any } = { };
 
-    while (route) {
-        for (let key in route.data) {
-            if (route.data.hasOwnProperty(key) && !result[key]) {
-                result[key] = route.data[key];
+    while (snapshot) {
+        for (let key in snapshot.data) {
+            if (snapshot.data.hasOwnProperty(key) && !result[key]) {
+                result[key] = snapshot.data[key];
             }
         }
 
-        route = route.parent;
+        snapshot = snapshot.parent;
     }
 
     return result;
 }
+export function allParams(value: ActivatedRouteSnapshot | ActivatedRoute): Params {
+    let snapshot: ActivatedRouteSnapshot = value['snapshot'] || value;
 
-export function allParametersFromRoute(route: ActivatedRoute): Params {
-    return allParameters(route.snapshot);
-}
-
-export function allParameters(route: ActivatedRouteSnapshot): Params {
     let result: { [key: string]: any } = { };
 
-    while (route) {
-        for (let key of route.paramMap.keys) {
-            if (!result[key]) {
-                result[key] = route.paramMap.get(key);
+    while (snapshot) {
+        for (let key in snapshot.params) {
+            if (snapshot.params.hasOwnProperty(key) && !result[key]) {
+                result[key] = snapshot.params[key];
             }
         }
 
-        route = route.parent;
+        snapshot = snapshot.parent;
     }
 
     return result;

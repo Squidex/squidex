@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
-import { allParameters } from 'framework';
+import { allParams } from 'framework';
 
 import { AppLanguageDto, AppLanguagesService } from './../services/app-languages.service';
 
@@ -21,7 +21,7 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<AppLanguageDto[]> {
-        const params = allParameters(route);
+        const params = allParams(route);
 
         const appName = params['appName'];
 

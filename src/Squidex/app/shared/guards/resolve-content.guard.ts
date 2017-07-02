@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 
-import { allParameters } from 'framework';
+import { allParams } from 'framework';
 
 import { ContentDto, ContentsService } from './../services/contents.service';
 
@@ -21,7 +21,7 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
     }
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<ContentDto> {
-        const params = allParameters(route);
+        const params = allParams(route);
 
         const appName = params['appName'];
 

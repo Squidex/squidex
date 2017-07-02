@@ -17,7 +17,7 @@ import {
 } from './../messages';
 
 import {
-    allDataFromRoute,
+    allData,
     AppComponentBase,
     AppLanguageDto,
     AppsStoreService,
@@ -74,7 +74,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public ngOnInit() {
-        const routeData = allDataFromRoute(this.route);
+        const routeData = allData(this.route);
 
         this.languages = routeData['appLanguages'];
 
