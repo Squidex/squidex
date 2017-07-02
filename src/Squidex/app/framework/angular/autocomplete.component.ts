@@ -141,7 +141,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     public blur() {
-        // this.reset();
+        this.reset();
         this.touchedCallback();
     }
 
