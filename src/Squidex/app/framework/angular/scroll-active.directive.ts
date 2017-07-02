@@ -5,12 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnChanges } from '@angular/core';
 
 @Directive({
     selector: '[sqxScrollActive]'
 })
-export class ScrollActiveDirective implements OnChanges {
+export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     @Input('sqxScrollActive')
     public isActive = false;
 
@@ -22,7 +22,15 @@ export class ScrollActiveDirective implements OnChanges {
     ) {
     }
 
+    public ngAfterViewInit() {
+        this.check();
+    }
+
     public ngOnChanges() {
+        this.check();
+    }
+
+    private check() {
         if (this.isActive && this.container) {
             this.scrollInView(this.container, this.element.nativeElement);
         }

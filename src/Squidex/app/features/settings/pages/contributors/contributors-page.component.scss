@@ -1,2 +1,15 @@
 @import '_vars';
 @import '_mixins';
+
+.autocomplete-user {
+    &-picture {
+        float: left;
+        margin-top: .4rem;
+    }
+
+    &-name,
+    &-email {
+        @include truncate;
+        margin-left: 3rem;
+    }
+}

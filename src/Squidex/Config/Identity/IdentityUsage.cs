@@ -59,7 +59,7 @@ namespace Squidex.Config.Identity
 
                 Task.Run(async () =>
                 {
-                    var user = await userManager.FindByEmailAsync(adminPass);
+                    var user = await userManager.FindByEmailAsync(adminEmail);
 
                     async Task userInitAsync(IUser theUser)
                     {

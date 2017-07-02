@@ -15,7 +15,6 @@ import {
     AppContributorsService,
     AppsStoreService,
     AuthService,
-    AutocompleteItem,
     AutocompleteSource,
     HistoryChannelUpdated,
     ImmutableArray,
@@ -32,19 +31,14 @@ export class UsersDataSource implements AutocompleteSource {
     ) {
     }
 
-    public find(query: string): Observable<AutocompleteItem[]> {
+    public find(query: string): Observable<any[]> {
         return this.usersService.getUsers(query)
             .map(users => {
-                const results: AutocompleteItem[] = [];
+                const results: any[] = [];
 
                 for (let user of users) {
                     if (!this.component.appContributors || !this.component.appContributors.find(t => t.contributorId === user.id)) {
-                        results.push(
-                            new AutocompleteItem(
-                                user.displayName,
-                                user.email,
-                                user.pictureUrl!,
-                                user));
+                        results.push(user);
                     }
                 }
                 return results;

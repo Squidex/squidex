@@ -5,25 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ContentChild, forwardRef, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
 export interface AutocompleteSource {
-    find(query: string): Observable<AutocompleteItem[]>;
-}
-
-export class AutocompleteItem {
-    constructor(
-        public readonly title: string,
-        public readonly description: string,
-        public readonly image: string,
-        public readonly model: any
-    ) {
-    }
+    find(query: string): Observable<any[]>;
 }
 
 const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
 const NOOP = () => { /* NOOP */ };
@@ -50,24 +41,25 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public inputName = 'autocompletion';
 
     @Input()
+    public displayProperty = '';
+
+    @Input()
     public placeholder = '';
 
-    public items: AutocompleteItem[] = [];
-    public itemSelection = -1;
+    @ContentChild(TemplateRef)
+    public itemTemplate: TemplateRef<any>;
+
+    public items: any[] = [];
+
+    public selectedIndex = -1;
 
     public queryInput = new FormControl();
 
     public writeValue(value: any) {
         if (!value) {
-            this.queryInput.setValue('');
+            this.resetValue();
         } else {
-            let item: AutocompleteItem | null = null;
-
-            if (value instanceof AutocompleteItem) {
-                item = value;
-            } else {
-                item = this.items.find(i => i.model === value);
-            }
+            let item = this.items.find(i => i === value);
 
             if (item) {
                 this.queryInput.setValue(value.title || '');
@@ -101,25 +93,21 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public ngOnInit() {
         this.subscription =
             this.queryInput.valueChanges
-                .map(q => <string>q)
-                .map(q => q ? q.trim() : q)
+                .map(query => <string>query)
+                .map(query => query ? query.trim() : query)
                 .distinctUntilChanged()
                 .debounceTime(200)
-                .do(q => {
-                    if (!q) {
+                .do(query => {
+                    if (!query) {
                         this.reset();
                     }
                 })
-                .filter(q => !!q && !!this.source)
-                .switchMap(q => this.source.find(q)).catch(_ => Observable.of([]))
-                .subscribe(r => {
+                .filter(query => !!query && !!this.source)
+                .switchMap(query => this.source.find(query)).catch(_ => Observable.of([]))
+                .subscribe(items => {
                     this.reset();
-                    this.items = r || [];
+                    this.items = items || [];
                 });
-    }
-
-    public markTouched() {
-        this.touchedCallback();
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -130,35 +118,27 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             case KEY_DOWN:
                 this.down();
                 return false;
+            case KEY_ESCAPE:
+                this.resetValue();
+                this.reset();
+                return false;
             case KEY_ENTER:
                 if (this.items.length > 0) {
-                    this.chooseItem();
+                    this.selectItem();
                     return false;
                 }
                 break;
         }
     }
 
-    private reset() {
-        this.items = [];
-        this.itemSelection = -1;
-    }
-
     public blur() {
         this.reset();
+        this.touchedCallback();
     }
 
-    public up() {
-        this.selectIndex(this.itemSelection - 1);
-    }
-
-    public down() {
-        this.selectIndex(this.itemSelection + 1);
-    }
-
-    public chooseItem(selection: AutocompleteItem | null = null) {
+    public selectItem(selection: any | null = null) {
         if (!selection) {
-            selection = this.items[this.itemSelection];
+            selection = this.items[this.selectedIndex];
         }
 
         if (!selection && this.items.length === 1) {
@@ -167,7 +147,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
         if (selection) {
             try {
-                this.queryInput.setValue(selection.title);
+                if (this.displayProperty && this.displayProperty.length > 0) {
+                    this.queryInput.setValue(selection[this.displayProperty], { emitEvent: false });
+                } else {
+                    this.queryInput.setValue(selection.toString(), { emitEvent: false });
+                }
                 this.changeCallback(selection);
             } finally {
                 this.reset();
@@ -175,7 +159,19 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
     }
 
-    public selectIndex(selection: number) {
+    private up() {
+        this.selectIndex(this.selectedIndex - 1);
+    }
+
+    private down() {
+        this.selectIndex(this.selectedIndex + 1);
+    }
+
+    private resetValue() {
+        this.queryInput.setValue('');
+    }
+
+    private selectIndex(selection: number) {
         if (selection < 0) {
             selection = 0;
         }
@@ -184,6 +180,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             selection = this.items.length - 1;
         }
 
-        this.itemSelection = selection;
+        this.selectedIndex = selection;
+    }
+
+    private reset() {
+        this.items = [];
+        this.selectedIndex = -1;
     }
 }

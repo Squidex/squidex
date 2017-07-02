@@ -18,10 +18,10 @@
                 </div>
 
                <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-link btn-decent btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async">
+                    <button type="button" class="btn btn-link btn-decent btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #optionsButton>
                         <i class="icon-dots"></i>
                     </button>
-                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [@fade]>
+                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
                         <a class="dropdown-item dropdown-item-delete" (click)="confirmDeleteDialog.show()">
                             Delete
                         </a>
@@ -54,10 +54,12 @@
             <div class="table-items-footer">
                 <form [formGroup]="addFieldForm" (ngSubmit)="addField()">
                     <div class="form-inline">
-                        <div class="form-group mr-1">
-                            <select class="form-control" formControlName="type">
-                                <option *ngFor="let type of fieldTypes" [ngValue]="type">{{type}}</option>
-                            </select>
+                        <div class="form-group types-group mr-1">
+                            <sqx-dropdown formControlName="type" [items]="fieldTypes">
+                                <ng-template let-type="$implicit">
+                                    <i class="field-icon icon-type-{{type}}"></i> <span>{{type}}</span>
+                                </ng-template>
+                            </sqx-dropdown>
                         </div>
 
                         <div class="form-group mr-1">
