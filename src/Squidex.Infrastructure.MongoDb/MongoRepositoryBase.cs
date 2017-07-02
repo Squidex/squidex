@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected static ProjectionDefinitionBuilder<TEntity> Projection
+        protected static ProjectionDefinitionBuilder<TEntity> Project
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected static IndexKeysDefinitionBuilder<TEntity> IndexKeys
+        protected static IndexKeysDefinitionBuilder<TEntity> Index
         {
             get
             {

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Squidex.Core.Schemas.Validators
@@ -37,21 +36,12 @@ namespace Squidex.Core.Schemas.Validators
                 return;
             }
 
-            var referenceTasks = references.ContentIds.Select(x => CheckReferenceAsync(context, x)).ToArray();
-
-            await Task.WhenAll(referenceTasks);
-
-            foreach (var notFoundId in referenceTasks.Where(x => !x.Result.IsFound).Select(x => x.Result.ReferenceId))
+            var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);
+            
+            foreach (var invalidId in invalidIds)
             {
-                addError($"<FIELD> contains invalid reference '{notFoundId}'");
+                addError($"<FIELD> contains invalid reference '{invalidId}'");
             }
-        }
-
-        private async Task<(Guid ReferenceId, bool IsFound)> CheckReferenceAsync(ValidationContext context, Guid id)
-        {
-            var isFound = await context.IsValidContentIdAsync(schemaId, id);
-
-            return (id, isFound);
         }
     }
 }

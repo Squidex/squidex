@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Core;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
@@ -47,7 +48,15 @@ namespace Squidex.Read.MongoDb.Contents
             }
         }
 
-        protected static IndexKeysDefinitionBuilder<MongoContentEntity> IndexKeys
+        protected static ProjectionDefinitionBuilder<MongoContentEntity> Projection
+        {
+            get
+            {
+                return Builders<MongoContentEntity>.Projection;
+            }
+        }
+
+        protected static IndexKeysDefinitionBuilder<MongoContentEntity> Index
         {
             get
             {
@@ -68,7 +77,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
         {
-            List<IContentEntity> result = null;
+            var contentEntities = (List<IContentEntity>)null;
 
             await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
@@ -106,15 +115,15 @@ namespace Squidex.Read.MongoDb.Contents
                     entity.ParseData(schemaEntity.Schema);
                 }
 
-                result = entities.OfType<IContentEntity>().ToList();
+                contentEntities = entities.OfType<IContentEntity>().ToList();
             });
 
-            return result;
+            return contentEntities;
         }
 
         public async Task<long> CountAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
         {
-            var result = 0L;
+            var contentsCount = 0L;
 
             await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
@@ -140,36 +149,40 @@ namespace Squidex.Read.MongoDb.Contents
                     throw new ValidationException("Failed to parse query: " + ex.Message, ex);
                 }
 
-                result = await cursor.CountAsync();
+                contentsCount = await cursor.CountAsync();
             });
 
-            return result;
+            return contentsCount;
         }
 
-        public async Task<bool> ExistsAsync(Guid appId, Guid schemaId, Guid contentId)
+        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds)
         {
-            var result = false;
+            var contentEntities = (List<BsonDocument>)null;
 
             await ForAppIdAsync(appId, async collection =>
             {
-                result = await collection.Find(x => x.Id == contentId && x.SchemaId == schemaId).CountAsync() == 1;
+                contentEntities =
+                    await collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Projection.Include(x => x.Id))
+                        .ToListAsync();
             });
 
-            return result;
+            return contentIds.Except(contentEntities.Select(x => x["Id"].AsGuid)).ToList();
         }
 
         public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id, IAppEntity appEntity)
         {
-            MongoContentEntity result = null;
+            var contentEntity = (MongoContentEntity)null;
 
             await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
             {
-                result = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+                contentEntity = 
+                    await collection.Find(x => x.Id == id)
+                        .FirstOrDefaultAsync();
 
-                result?.ParseData(schemaEntity.Schema);
+                contentEntity?.ParseData(schemaEntity.Schema);
             });
 
-            return result;
+            return contentEntity;
         }
 
         private async Task ForSchemaAsync(Guid appId, Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)

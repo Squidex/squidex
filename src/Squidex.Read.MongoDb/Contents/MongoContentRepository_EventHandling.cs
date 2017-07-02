@@ -62,9 +62,9 @@ namespace Squidex.Read.MongoDb.Contents
         {
             return ForAppIdAsync(@event.AppId.Id, async collection =>
             {
-                await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.ReferencedIds));
-                await collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.IsPublished));
-                await collection.Indexes.CreateOneAsync(IndexKeys.Text(x => x.DataText));
+                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
+                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsPublished));
+                await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
             });
         }
 

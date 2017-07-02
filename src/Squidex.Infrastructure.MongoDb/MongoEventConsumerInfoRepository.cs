@@ -61,22 +61,31 @@ namespace Squidex.Infrastructure.MongoDb
 
         public Task StartAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Unset(x => x.IsStopped));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
+                Update.Unset(x => x.IsStopped));
         }
 
         public Task StopAsync(string consumerName, string error = null)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsStopped, true).Set(x => x.Error, error));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
+                Update.Set(x => x.IsStopped, true).Set(x => x.Error, error));
         }
 
         public Task ResetAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsResetting, true));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
+                Update.Set(x => x.IsResetting, true));
         }
 
         public Task SetLastHandledEventNumberAsync(string consumerName, long eventNumber)
         {
-            return Collection.ReplaceOneAsync(x => x.Name == consumerName, new MongoEventConsumerInfo { Name = consumerName, LastHandledEventNumber = eventNumber });
+            return Collection.ReplaceOneAsync(x => x.Name == consumerName, 
+                CreateEntity(consumerName, eventNumber));
+        }
+
+        private static MongoEventConsumerInfo CreateEntity(string consumerName, long eventNumber)
+        {
+            return new MongoEventConsumerInfo { Name = consumerName, LastHandledEventNumber = eventNumber };
         }
     }
 }

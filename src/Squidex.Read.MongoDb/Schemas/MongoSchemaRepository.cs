@@ -44,38 +44,40 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
-            var entities = await Collection.Find(s => s.AppId == appId && !s.IsDeleted).ToListAsync();
+            var schemaEntities = 
+                await Collection.Find(s => s.AppId == appId && !s.IsDeleted)
+                    .ToListAsync();
 
-            entities.ForEach(x => x.DeserializeSchema(serializer));
+            schemaEntities.ForEach(x => x.DeserializeSchema(serializer));
 
-            return entities.OfType<ISchemaEntity>().ToList();
+            return schemaEntities.OfType<ISchemaEntity>().ToList();
         }
 
         public async Task<ISchemaEntity> FindSchemaAsync(Guid appId, string name)
         {
-            var entity = 
+            var schemaEntity = 
                 await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
-            entity?.DeserializeSchema(serializer);
+            schemaEntity?.DeserializeSchema(serializer);
 
-            return entity;
+            return schemaEntity;
         }
 
         public async Task<ISchemaEntity> FindSchemaAsync(Guid schemaId)
         {
-            var entity = 
+            var schemaEntity = 
                 await Collection.Find(s => s.Id == schemaId)
                     .FirstOrDefaultAsync();
 
-            entity?.DeserializeSchema(serializer);
+            schemaEntity?.DeserializeSchema(serializer);
 
-            return entity;
+            return schemaEntity;
         }
     }
 }

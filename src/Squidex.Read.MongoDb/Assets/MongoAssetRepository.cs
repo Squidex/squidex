@@ -17,6 +17,8 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Read.Assets;
 using Squidex.Read.Assets.Repositories;
 
+// ReSharper disable ClassNeverInstantiated.Local
+
 namespace Squidex.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
@@ -33,40 +35,47 @@ namespace Squidex.Read.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId).Ascending(x => x.IsDeleted).Descending(x => x.LastModified).Ascending(x => x.FileName).Ascending(x => x.MimeType));
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Ascending(x => x.IsDeleted).Descending(x => x.LastModified).Ascending(x => x.FileName).Ascending(x => x.MimeType));
         }
 
-        public async Task<bool> ExistsAsync(Guid appId, Guid assetId)
+        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, IList<Guid> assetIds)
         {
-            return await Collection.Find(x => x.Id == assetId && x.AppId == appId).CountAsync() == 1;
+            var assetEntities =
+                await Collection.Find(x => assetIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Project.Include(x => x.Id))
+                    .ToListAsync();
+
+            return assetIds.Except(assetEntities.Select(x => x["Id"].AsGuid)).ToList();
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
         {
             var filter = CreateFilter(appId, mimeTypes, ids, query);
 
-            var assets =
-                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.LastModified).ToListAsync();
+            var assetEntities =
+                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.LastModified)
+                    .ToListAsync();
 
-            return assets.OfType<IAssetEntity>().ToList();
+            return assetEntities.OfType<IAssetEntity>().ToList();
         }
 
         public async Task<long> CountAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null)
         {
             var filter = CreateFilter(appId, mimeTypes, ids, query);
 
-            var count =
-                await Collection.Find(filter).CountAsync();
+            var assetsCount =
+                await Collection.Find(filter)
+                    .CountAsync();
 
-            return count;
+            return assetsCount;
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
-            var entity =
-                await Collection.Find(s => s.Id == id).FirstOrDefaultAsync();
+            var assetEntity =
+                await Collection.Find(s => s.Id == id)
+                    .FirstOrDefaultAsync();
 
-            return entity;
+            return assetEntity;
         }
 
         private static FilterDefinition<MongoAssetEntity> CreateFilter(Guid appId, ICollection<string> mimeTypes, ICollection<Guid> ids, string query)

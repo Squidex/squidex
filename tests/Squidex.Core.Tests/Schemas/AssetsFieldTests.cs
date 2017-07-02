@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Core.Schemas
@@ -20,7 +19,6 @@ namespace Squidex.Core.Schemas
     public class AssetsFieldTests
     {
         private readonly List<string> errors = new List<string>();
-        private static readonly ValidationContext InvalidAssetContext = new ValidationContext((x, y) => TaskHelper.False, x => TaskHelper.False);
 
         [Fact]
         public void Should_instantiate_field()
@@ -100,7 +98,7 @@ namespace Squidex.Core.Schemas
             
             var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
 
-            await sut.ValidateAsync(CreateValue(assetId), errors, InvalidAssetContext);
+            await sut.ValidateAsync(CreateValue(assetId), errors, ValidationTestExtensions.InvalidContext(assetId));
 
             errors.ShouldBeEquivalentTo(
                 new[] { $"<FIELD> contains invalid asset '{assetId}'" });

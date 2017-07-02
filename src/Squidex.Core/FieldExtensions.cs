@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Core.Schemas;
@@ -18,17 +18,17 @@ namespace Squidex.Core
 {
     public static class FieldExtensions
     {
-        public static void AddError(this ICollection<ValidationError> errors, string message, Field field, IFieldPartitionItem partitionItem = null)
+        public static void AddError(this ConcurrentBag<ValidationError> errors, string message, Field field, IFieldPartitionItem partitionItem = null)
         {
             AddError(errors, message, !string.IsNullOrWhiteSpace(field.RawProperties.Label) ? field.RawProperties.Label : field.Name, field.Name, partitionItem);
         }
 
-        public static void AddError(this ICollection<ValidationError> errors, string message, string fieldName, IFieldPartitionItem partitionItem = null)
+        public static void AddError(this ConcurrentBag<ValidationError> errors, string message, string fieldName, IFieldPartitionItem partitionItem = null)
         {
             AddError(errors, message, fieldName, fieldName, partitionItem);
         }
 
-        public static void AddError(this ICollection<ValidationError> errors, string message, string displayName, string fieldName, IFieldPartitionItem partitionItem = null)
+        public static void AddError(this ConcurrentBag<ValidationError> errors, string message, string displayName, string fieldName, IFieldPartitionItem partitionItem = null)
         {
             if (partitionItem != null && partitionItem != InvariantPartitioning.Instance.Master)
             {

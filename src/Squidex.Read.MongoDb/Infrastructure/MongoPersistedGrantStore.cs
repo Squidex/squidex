@@ -40,8 +40,8 @@ namespace Squidex.Read.MongoDb.Infrastructure
         protected override Task SetupCollectionAsync(IMongoCollection<PersistedGrant> collection)
         {
             return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.ClientId)),
-                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.SubjectId)));
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ClientId)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SubjectId)));
         }
 
         public Task StoreAsync(PersistedGrant grant)

@@ -64,7 +64,7 @@ namespace Squidex.Config.Identity
                     async Task userInitAsync(IUser theUser)
                     {
                         await userManager.RemovePasswordAsync(theUser);
-                        await userManager.ChangePasswordAsync(theUser, null, adminEmail);
+                        await userManager.ChangePasswordAsync(theUser, null, adminPass);
                         await userManager.AddToRoleAsync(theUser, SquidexRoles.Administrator);
                     }
 

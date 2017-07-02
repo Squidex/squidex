@@ -52,12 +52,12 @@ namespace Squidex.Read.MongoDb.Schemas
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaWebhookEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.SchemaId));
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaId));
         }
 
         public async Task<IReadOnlyList<ISchemaWebhookEntity>> QueryByAppAsync(Guid appId)
         {
-            return await Collection.Find(x => x.AppId == appId).ToListAsync();
+            return await Collection.Find(Filter.Eq(x => x.AppId, appId)).ToListAsync();
         }
 
         public async Task<IReadOnlyList<ISchemaWebhookUrlEntity>> QueryUrlsBySchemaAsync(Guid appId, Guid schemaId)
@@ -69,7 +69,9 @@ namespace Squidex.Read.MongoDb.Schemas
 
         public async Task AddInvokationAsync(Guid webhookId, string dump, WebhookResult result, TimeSpan elapsed)
         {
-            var webhookEntity = await Collection.Find(x => x.Id == webhookId).FirstOrDefaultAsync();
+            var webhookEntity = 
+                await Collection.Find(x => x.Id == webhookId)
+                    .FirstOrDefaultAsync();
 
             if (webhookEntity != null)
             {

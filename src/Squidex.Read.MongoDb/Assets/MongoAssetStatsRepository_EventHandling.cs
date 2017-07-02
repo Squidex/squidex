@@ -53,26 +53,30 @@ namespace Squidex.Read.MongoDb.Assets
         {
             var id = $"{appId}_{date:yyyy-MM-dd}";
 
-            var entity = await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var assetStatsEntity = 
+                await Collection.Find(x => x.Id == id)
+                    .FirstOrDefaultAsync();
 
-            if (entity == null)
+            if (assetStatsEntity == null)
             {
-                var last = await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date).FirstOrDefaultAsync();
+                var lastEntity = 
+                    await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date)
+                        .FirstOrDefaultAsync();
 
-                entity = new MongoAssetStatsEntity
+                assetStatsEntity = new MongoAssetStatsEntity
                 {
                     Id = id,
                     Date = date,
                     AppId = appId,
-                    TotalSize = last?.TotalSize ?? 0,
-                    TotalCount = last?.TotalCount ?? 0
+                    TotalSize = lastEntity?.TotalSize ?? 0,
+                    TotalCount = lastEntity?.TotalCount ?? 0
                 };
             }
 
-            entity.TotalSize += size;
-            entity.TotalCount += count;
+            assetStatsEntity.TotalSize += size;
+            assetStatsEntity.TotalCount += count;
 
-            await Collection.ReplaceOneAsync(x => x.Id == id, entity, Upsert);
+            await Collection.ReplaceOneAsync(x => x.Id == id, assetStatsEntity, Upsert);
         }
     }
 }

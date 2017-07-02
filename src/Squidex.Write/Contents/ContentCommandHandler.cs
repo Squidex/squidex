@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Core;
 using Squidex.Core.Schemas;
@@ -20,6 +21,8 @@ using Squidex.Read.Assets.Repositories;
 using Squidex.Read.Contents.Repositories;
 using Squidex.Read.Schemas.Services;
 using Squidex.Write.Contents.Commands;
+
+// ReSharper disable ConvertToLambdaExpression
 
 namespace Squidex.Write.Contents
 {
@@ -112,7 +115,16 @@ namespace Squidex.Write.Contents
 
             var appId = command.AppId.Id;
 
-            var validationContext = new ValidationContext((x, y) => contentRepository.ExistsAsync(appId, x, y), x => assetRepository.ExistsAsync(appId, x));
+            var validationContext = 
+                new ValidationContext(
+                    (contentIds, schemaId) =>
+                    {
+                        return contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
+                    },
+                    assetIds =>
+                    {
+                        return assetRepository.QueryNotFoundAsync(appId, assetIds.ToList());
+                    });
 
             await command.Data.ValidateAsync(validationContext, schemaObject, taskForApp.Result.PartitionResolver, schemaErrors);
 

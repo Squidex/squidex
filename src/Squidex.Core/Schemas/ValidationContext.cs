@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -14,22 +15,22 @@ namespace Squidex.Core.Schemas
 {
     public sealed class ValidationContext
     {
-        private readonly Func<Guid, Guid, Task<bool>> checkContent;
-        private readonly Func<Guid, Task<bool>> checkAsset;
+        private readonly Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent;
+        private readonly Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset;
 
         public bool IsOptional { get; }
 
         public ValidationContext(
-            Func<Guid, Guid, Task<bool>> checkContent,
-            Func<Guid, Task<bool>> checkAsset)
+            Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent,
+            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset)
             : this(checkContent, checkAsset, false)
         {
             
         }
 
         private ValidationContext(
-            Func<Guid, Guid, Task<bool>> checkContent, 
-            Func<Guid, Task<bool>> checkAsset, 
+            Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent, 
+            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset, 
             bool isOptional)
         {
             Guard.NotNull(checkAsset, nameof(checkAsset));
@@ -46,14 +47,14 @@ namespace Squidex.Core.Schemas
             return isOptional == IsOptional ? this : new ValidationContext(checkContent, checkAsset, isOptional);
         }
 
-        public async Task<bool> IsValidContentIdAsync(Guid schemaId, Guid contentId)
+        public Task<IReadOnlyList<Guid>> GetInvalidContentIdsAsync(IEnumerable<Guid> contentIds, Guid schemaId)
         {
-            return contentId != Guid.Empty && schemaId != Guid.Empty && await checkContent(schemaId, contentId);
+            return checkContent(contentIds, schemaId);
         }
 
-        public async Task<bool> IsValidAssetIdAsync(Guid assetId)
+        public Task<IReadOnlyList<Guid>> GetInvalidAssetIdsAsync(IEnumerable<Guid> assetId)
         {
-            return assetId != Guid.Empty && await checkAsset(assetId);
+            return checkAsset(assetId);
         }
     }
 }

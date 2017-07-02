@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -22,9 +23,9 @@ namespace Squidex.Core
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
-        private readonly List<ValidationError> errors = new List<ValidationError>();
+        private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
-        public IReadOnlyList<ValidationError> Errors
+        public IReadOnlyCollection<ValidationError> Errors
         {
             get { return errors; }
         }
@@ -39,9 +40,11 @@ namespace Squidex.Core
             this.partitionResolver = partitionResolver;
         }
 
-        public async Task ValidatePartialAsync(NamedContentData data)
+        public Task ValidatePartialAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
+
+            var tasks = new List<Task>();
 
             foreach (var fieldData in data)
             {
@@ -53,41 +56,51 @@ namespace Squidex.Core
                 }
                 else
                 {
-                    await ValidateFieldPartialAsync(field, fieldData.Value);
+                    tasks.Add(ValidateFieldPartialAsync(field, fieldData.Value));
                 }
             }
+
+            return Task.WhenAll(tasks);
         }
 
-        private async Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
+        private Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
         {
             var partitioning = field.Paritioning;
             var partition = partitionResolver(partitioning);
+
+            var tasks = new List<Task>();
 
             foreach (var partitionValues in fieldData)
             {
                 if (partition.TryGetItem(partitionValues.Key, out var item))
                 {
-                    await field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item));
+                    tasks.Add(field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
                 }
                 else
                 {
                     errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
                 }
             }
+
+            return Task.WhenAll(tasks);
         }
 
-        public async Task ValidateAsync(NamedContentData data)
+        public Task ValidateAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
             ValidateUnknownFields(data);
 
+            var tasks = new List<Task>();
+
             foreach (var field in schema.FieldsByName.Values)
             {
                 var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
 
-                await ValidateFieldAsync(field, fieldData);
+                tasks.Add(ValidateFieldAsync(field, fieldData));
             }
+
+            return Task.WhenAll(tasks);
         }
 
         private void ValidateUnknownFields(NamedContentData data)
@@ -101,10 +114,12 @@ namespace Squidex.Core
             }
         }
 
-        private async Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
+        private Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
         {
             var partitioning = field.Paritioning;
             var partition = partitionResolver(partitioning);
+
+            var tasks = new List<Task>();
 
             foreach (var partitionValues in fieldData)
             {
@@ -118,8 +133,10 @@ namespace Squidex.Core
             {
                 var value = fieldData.GetOrCreate(item.Key, k => JValue.CreateNull());
 
-                await field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item));
+                tasks.Add(field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
             }
+
+            return Task.WhenAll(tasks);
         }
     }
 }

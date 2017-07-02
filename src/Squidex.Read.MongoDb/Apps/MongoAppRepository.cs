@@ -31,7 +31,7 @@ namespace Squidex.Read.MongoDb.Apps
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Name));
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
         protected override MongoCollectionSettings CollectionSettings()
@@ -41,26 +41,29 @@ namespace Squidex.Read.MongoDb.Apps
 
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId)
         {
-            var entities =
-                await Collection.Find(s => s.Contributors.ContainsKey(subjectId)).ToListAsync();
+            var appEntities =
+                await Collection.Find(s => s.Contributors.ContainsKey(subjectId))
+                    .ToListAsync();
 
-            return entities;
+            return appEntities;
         }
 
         public async Task<IAppEntity> FindAppAsync(Guid id)
         {
-            var entity =
-                await Collection.Find(s => s.Id == id).FirstOrDefaultAsync();
+            var appEntity =
+                await Collection.Find(s => s.Id == id)
+                    .FirstOrDefaultAsync();
 
-            return entity;
+            return appEntity;
         }
 
         public async Task<IAppEntity> FindAppAsync(string name)
         {
-            var entity =
-                await Collection.Find(s => s.Name == name).FirstOrDefaultAsync();
+            var appEntity =
+                await Collection.Find(s => s.Name == name)
+                    .FirstOrDefaultAsync();
 
-            return entity;
+            return appEntity;
         }
     }
 }

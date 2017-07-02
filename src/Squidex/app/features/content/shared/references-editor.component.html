@@ -1,7 +1,7 @@
 <div class="references-container" [class.disabled]="isDisabled">
     <div class="drop-area-container" *ngIf="schema && !isDisabled">
         <div class="drop-area" dnd-droppable (onDropSuccess)="onContentDropped($event.dragData.content)" [allowDrop]="canDrop()" [routerLink]="['references', schemaId, languageCode]">
-            Drop content here to add them.
+            Drop content here to add a reference.
         </div>
     </div>
 

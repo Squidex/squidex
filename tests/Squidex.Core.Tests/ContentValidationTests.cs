@@ -12,7 +12,6 @@ using FluentAssertions;
 using Squidex.Core.Contents;
 using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Core
@@ -21,7 +20,7 @@ namespace Squidex.Core
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
         private readonly List<ValidationError> errors = new List<ValidationError>();
-        private readonly ValidationContext context = new ValidationContext((x, y) => TaskHelper.True, x => TaskHelper.True);
+        private readonly ValidationContext context = ValidationTestExtensions.ValidContext;
         private Schema schema = Schema.Create("my-name", new SchemaProperties());
 
         [Fact]

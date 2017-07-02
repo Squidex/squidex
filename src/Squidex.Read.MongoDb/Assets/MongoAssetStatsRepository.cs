@@ -34,16 +34,19 @@ namespace Squidex.Read.MongoDb.Assets
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetStatsEntity> collection)
         {
             return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId).Ascending(x => x.Date)),
-                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.AppId).Descending(x => x.Date)));
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Ascending(x => x.Date)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Date)));
         }
 
         public async Task<IReadOnlyList<IAssetStatsEntity>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
         {
-            var originalSizes = await Collection.Find(x => x.AppId == appId && x.Date >= fromDate && x.Date <= toDate).SortBy(x => x.Date).ToListAsync();
+            var originalSizesEntities = 
+                await Collection.Find(x => x.AppId == appId && x.Date >= fromDate && x.Date <= toDate).SortBy(x => x.Date)
+                    .ToListAsync();
+
             var enrichedSizes = new List<MongoAssetStatsEntity>();
 
-            var sizesDictionary = originalSizes.ToDictionary(x => x.Date);
+            var sizesDictionary = originalSizesEntities.ToDictionary(x => x.Date);
 
             var previousSize = long.MinValue;
             var previousCount = long.MinValue;
@@ -61,10 +64,12 @@ namespace Squidex.Read.MongoDb.Assets
                 {
                     if (previousSize < 0)
                     {
-                        var firstBeforeRange = await Collection.Find(x => x.AppId == appId && x.Date < fromDate).SortByDescending(x => x.Date).FirstOrDefaultAsync();
+                        var firstBeforeRangeEntity = 
+                            await Collection.Find(x => x.AppId == appId && x.Date < fromDate).SortByDescending(x => x.Date)
+                                .FirstOrDefaultAsync();
 
-                        previousSize = firstBeforeRange?.TotalSize ?? 0L;
-                        previousCount = firstBeforeRange?.TotalCount ?? 0L;
+                        previousSize = firstBeforeRangeEntity?.TotalSize ?? 0L;
+                        previousCount = firstBeforeRangeEntity?.TotalCount ?? 0L;
                     }
 
                     size = new MongoAssetStatsEntity
@@ -83,9 +88,11 @@ namespace Squidex.Read.MongoDb.Assets
 
         public async Task<long> GetTotalSizeAsync(Guid appId)
         {
-            var entity = await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date).FirstOrDefaultAsync();
+            var totalSizeEntity = 
+                await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date)
+                    .FirstOrDefaultAsync();
 
-            return entity?.TotalSize ?? 0;
+            return totalSizeEntity?.TotalSize ?? 0;
         }
     }
 }

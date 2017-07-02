@@ -57,10 +57,10 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             var indexNames =
                 await Task.WhenAll(
-                    collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
-                    collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }),
-                    collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
-                    collection.Indexes.CreateOneAsync(IndexKeys.Descending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }));
+                    collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
+                    collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }),
+                    collection.Indexes.CreateOneAsync(Index.Descending(x => x.EventsOffset), new CreateIndexOptions { Unique = true }),
+                    collection.Indexes.CreateOneAsync(Index.Descending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true }));
 
             eventsOffsetIndex = indexNames[0];
         }
@@ -201,7 +201,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             var document =
                 await Collection.Find(x => x.EventsOffset <= startEventNumber)
-                    .Project<BsonDocument>(Projection
+                    .Project<BsonDocument>(Project
                         .Include(x => x.EventsOffset))
                     .SortByDescending(x => x.EventsOffset).Limit(1)
                     .FirstOrDefaultAsync();
@@ -218,7 +218,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             var document =
                 await Collection.Find(new BsonDocument())
-                    .Project<BsonDocument>(Projection
+                    .Project<BsonDocument>(Project
                         .Include(x => x.EventsOffset)
                         .Include(x => x.EventsCount))
                     .SortByDescending(x => x.EventsOffset).Limit(1)
@@ -236,7 +236,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             var document =
                 await Collection.Find(x => x.EventStream == streamName)
-                    .Project<BsonDocument>(Projection
+                    .Project<BsonDocument>(Project
                         .Include(x => x.EventStreamOffset)
                         .Include(x => x.EventsCount))
                     .SortByDescending(x => x.EventsOffset).Limit(1)

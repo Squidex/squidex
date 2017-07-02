@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Squidex.Core.Schemas.Validators
@@ -35,21 +34,12 @@ namespace Squidex.Core.Schemas.Validators
                 return;
             }
 
-            var assetTasks = assets.AssetIds.Select(x => CheckAssetAsync(context, x)).ToArray();
+            var invalidIds = await context.GetInvalidAssetIdsAsync(assets.AssetIds);
 
-            await Task.WhenAll(assetTasks);
-
-            foreach (var notFoundId in assetTasks.Where(x => !x.Result.IsFound).Select(x => x.Result.AssetId))
+            foreach (var invalidId in invalidIds)
             {
-                addError($"<FIELD> contains invalid asset '{notFoundId}'");
+                addError($"<FIELD> contains invalid asset '{invalidId}'");
             }
-        }
-
-        private static async Task<(Guid AssetId, bool IsFound)> CheckAssetAsync(ValidationContext context, Guid id)
-        {
-            var isFound = await context.IsValidAssetIdAsync(id);
-
-            return (id, isFound);
         }
     }
 }

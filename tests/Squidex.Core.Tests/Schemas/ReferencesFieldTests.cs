@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Core.Schemas
@@ -21,7 +20,6 @@ namespace Squidex.Core.Schemas
     {
         private readonly List<string> errors = new List<string>();
         private readonly Guid schemaId = Guid.NewGuid();
-        private static readonly ValidationContext InvalidSchemaContext = new ValidationContext((x, y) => TaskHelper.False, x => TaskHelper.False);
 
         [Fact]
         public void Should_instantiate_field()
@@ -46,7 +44,7 @@ namespace Squidex.Core.Schemas
             
             var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
-            await sut.ValidateAsync(CreateValue(referenceId), errors, InvalidSchemaContext);
+            await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.ValidContext);
 
             Assert.Empty(errors);
         }
@@ -101,7 +99,7 @@ namespace Squidex.Core.Schemas
 
             var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId });
 
-            await sut.ValidateAsync(CreateValue(referenceId), errors, InvalidSchemaContext);
+            await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.InvalidContext(referenceId));
 
             errors.ShouldBeEquivalentTo(
                 new[] { $"<FIELD> contains invalid reference '{referenceId}'" });

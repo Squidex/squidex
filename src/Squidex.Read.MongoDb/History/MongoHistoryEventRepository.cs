@@ -60,21 +60,22 @@ namespace Squidex.Read.MongoDb.History
         {
             return Task.WhenAll(
                 collection.Indexes.CreateOneAsync(
-                    IndexKeys
+                    Index
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.Channel)
                         .Descending(x => x.Created)
                         .Descending(x => x.SessionEventIndex)),
-                collection.Indexes.CreateOneAsync(IndexKeys.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
         }
 
         public async Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
         {
-            var entities =
+            var historyEventEntities =
                 await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
-                    .SortByDescending(x => x.Created).ThenByDescending(x => x.SessionEventIndex).Limit(count).ToListAsync();
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.SessionEventIndex).Limit(count)
+                    .ToListAsync();
 
-            return entities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
+            return historyEventEntities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
         }
 
         public async Task On(Envelope<IEvent> @event)
