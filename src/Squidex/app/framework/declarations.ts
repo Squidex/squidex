@@ -24,6 +24,7 @@ export * from './angular/indeterminate-value.directive';
 export * from './angular/json-editor.component';
 export * from './angular/lowercase-input.directive';
 export * from './angular/markdown-editor.component';
+export * from './angular/modal-target.directive';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
 export * from './angular/name.pipe';

@@ -1,11 +1,11 @@
 <span>
     <div class="selection">
-        <input type="text" class="form-control" [disabled]="isDisabled" (click)="open()" readonly (keydown)="onKeyDown($event)"
+        <input type="text" class="form-control" [disabled]="isDisabled" (click)="open()" readonly (keydown)="onKeyDown($event)" #input
             autocomplete="off" 
             autocorrect="off"
             autocapitalize="off">
         
-        <div class="item" *ngIf="selectedItem">
+        <div class="control-dropdown-item" *ngIf="selectedItem">
             <ng-template [sqxTemplateWrapper]="itemTemplate" [item]="selectedItem"></ng-template>
         </div>
 
@@ -13,8 +13,8 @@
     </div>
 
     <div class="items-container">
-        <div class="items" #container *sqxModalView="modalView">
-            <div *ngFor="let item of items; let i = index;" class="item selectable" [class.active]="i === selectedIndex" (mousedown)="selectIndexAndClose(i)" [sqxScrollActive]="i === selectedIndex" [container]="container">
+        <div class="control-dropdown" #container *sqxModalView="dropdown" [sqxModalTarget]="input">
+            <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === selectedIndex" (mousedown)="selectIndexAndClose(i)" [sqxScrollActive]="i === selectedIndex" [container]="container">
                 <ng-template [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
             </div>
         </div>

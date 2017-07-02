@@ -36,7 +36,7 @@ export class DropdownComponent implements ControlValueAccessor {
     @ContentChild(TemplateRef)
     public itemTemplate: TemplateRef<any>;
 
-    public modalView = new ModalView();
+    public dropdown = new ModalView();
 
     public selectedItem: any;
     public selectedIndex = -1;
@@ -79,7 +79,7 @@ export class DropdownComponent implements ControlValueAccessor {
     }
 
     public open() {
-        this.modalView.show();
+        this.dropdown.show();
         this.touchedCallback();
     }
 
@@ -89,7 +89,7 @@ export class DropdownComponent implements ControlValueAccessor {
     }
 
     private close() {
-        this.modalView.hide();
+        this.dropdown.hide();
     }
 
     private up() {

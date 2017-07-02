@@ -1,18 +1,16 @@
 <span>
-    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="onKeyDown($event)" [attr.placeholder]="placeholder"
+    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="onKeyDown($event)" [attr.placeholder]="placeholder" #input
         [formControl]="queryInput"
         autocomplete="off" 
         autocorrect="off"
         autocapitalize="off">
 
-    <div class="items-container" *ngIf="items.length > 0">
-        <div class="items" #container>
-            <div *ngFor="let item of items; let i = index;" class="item" [class.active]="i === itemSelection" (mousedown)="chooseItem(item)" (mouseover)="selectIndex(i)" [sqxScrollActive]="i === itemSelection" [container]="container">
-                <img class="item-image" [attr.src]="item.image" />
+    <div *ngIf="items.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container>
+        <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === itemSelection" (mousedown)="chooseItem(item)" (mouseover)="selectIndex(i)" [sqxScrollActive]="i === itemSelection" [container]="container">
+            <img class="control-dropdown-item-image" [attr.src]="item.image" />
 
-                <span class="item-title">{{item.title}}</span>
-                <span class="item-description">{{item.description}}</span>
-            </div>
+            <span class="control-dropdown-item-title">{{item.title}}</span>
+            <span class="control-dropdown-item-description">{{item.description}}</span>
         </div>
     </div>
 </span>
