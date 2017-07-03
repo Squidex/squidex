@@ -332,7 +332,9 @@ namespace Squidex.Core.Schemas
                     .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
                     .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
-                        new GeolocationFieldProperties()));
+                        new GeolocationFieldProperties()))
+                    .AddOrUpdateField(new ReferencesField(10, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties()));
 
             return schema;
         }

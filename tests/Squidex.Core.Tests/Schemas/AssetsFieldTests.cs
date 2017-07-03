@@ -92,6 +92,28 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public async Task Should_add_errors_if_value_has_not_enough_items()
+        {
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { MinItems = 3 });
+
+            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> must have at least 3 asset(s)" });
+        }
+
+        [Fact]
+        public async Task Should_add_errors_if_value_has_too_much_items()
+        {
+            var sut = new AssetsField(1, "my-asset", Partitioning.Invariant, new AssetsFieldProperties { MaxItems = 1 });
+
+            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> must have not more than 1 asset(s)" });
+        }
+
+        [Fact]
         public async Task Should_add_errors_if_asset_are_not_valid()
         {
             var assetId = Guid.NewGuid();

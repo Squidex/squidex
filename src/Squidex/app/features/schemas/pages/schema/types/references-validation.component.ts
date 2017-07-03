@@ -27,6 +27,12 @@ export class ReferencesValidationComponent implements OnInit {
     public schemas: SchemaDto[];
 
     public ngOnInit() {
+        this.editForm.setControl('maxItems',
+            new FormControl(this.properties.maxItems));
+
+        this.editForm.setControl('minItems',
+            new FormControl(this.properties.minItems));
+
         this.editForm.setControl('schemaId',
             new FormControl(this.properties.schemaId, [
                 Validators.required

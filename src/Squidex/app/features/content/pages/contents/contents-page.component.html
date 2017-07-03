@@ -25,7 +25,13 @@
                 </button>
             </div>
 
-            <h3 class="panel-title">Contents</h3>
+            <h3 class="panel-title" *ngIf="!isReadOnly">
+                Contents
+            </h3>
+
+            <h3 class="panel-title" *ngIf="isReadOnly">
+                References
+            </h3>
         </div>
 
         <a class="panel-close" sqxParentLink>
@@ -39,7 +45,7 @@
                 <colgroup>
                     <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
                     <col style="width: 180px" />
-                    <col style="width: 50px" />
+                    <col style="width: 70px" />
                     <col style="width: 80px" *ngIf="!isReadOnly" />
                 </colgroup>
 
@@ -62,10 +68,9 @@
 
                 <tbody *ngIf="!isReadOnly">
                     <ng-template ngFor let-content [ngForOf]="contentItems">
-                        <tr [routerLink]="[content.id]" routerLinkActive="active" class="content"
-                            [sqxContent]="content" 
+                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                             [language]="languageSelected"
-                            [fields]="contentFields"
+                            [schemaFields]="contentFields"
                             [schema]="schema"
                             (unpublishing)="unpublishContent(content)"
                             (publishing)="publishContent(content)"
@@ -76,10 +81,11 @@
 
                 <tbody *ngIf="isReadOnly">
                     <ng-template ngFor let-content [ngForOf]="contentItems">
-                        <tr [sqxContent]="content" isReadOnly="true" dnd-draggable [dragData]="dropData(content)"
+                        <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
                             [language]="languageSelected"
-                            [fields]="contentFields"
-                            [schema]="schema"></tr>
+                            [schemaFields]="contentFields"
+                            [schema]="schema" 
+                            isReadOnly="true"></tr>
                         <tr class="spacer"></tr>
                     </ng-template>
                 </tbody>

@@ -34,7 +34,7 @@ namespace Squidex.Core.Schemas
         {
             if (Properties.SchemaId != Guid.Empty)
             {
-                yield return new ReferencesValidator(Properties.IsRequired, Properties.SchemaId);
+                yield return new ReferencesValidator(Properties.IsRequired, Properties.SchemaId, Properties.MinItems, Properties.MaxItems);
             }
         }
 

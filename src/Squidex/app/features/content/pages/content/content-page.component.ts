@@ -6,7 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -28,10 +28,7 @@ import {
     ModalView,
     MessageBus,
     NotificationService,
-    NumberFieldPropertiesDto,
     SchemaDetailsDto,
-    StringFieldPropertiesDto,
-    ValidatorsEx,
     Version
 } from 'shared';
 
@@ -192,34 +189,14 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         const controls: { [key: string]: AbstractControl } = {};
 
         for (const field of schema.fields) {
-            const validators: ValidatorFn[] = [];
-
-            if (field.properties.isRequired) {
-                validators.push(Validators.required);
-            }
-            if (field.properties instanceof NumberFieldPropertiesDto) {
-                validators.push(ValidatorsEx.between(field.properties.minValue, field.properties.maxValue));
-            }
-            if (field.properties instanceof StringFieldPropertiesDto) {
-                if (field.properties.minLength) {
-                    validators.push(Validators.minLength(field.properties.minLength));
-                }
-                if (field.properties.maxLength) {
-                    validators.push(Validators.maxLength(field.properties.maxLength));
-                }
-                if (field.properties.pattern) {
-                    validators.push(ValidatorsEx.pattern(field.properties.pattern, field.properties.patternMessage));
-                }
-            }
-
             const group = new FormGroup({});
 
             if (field.partitioning === 'language') {
                 for (let language of this.languages) {
-                    group.addControl(language.iso2Code, new FormControl(undefined, validators));
+                    group.addControl(language.iso2Code, new FormControl(undefined, field.createValidators()));
                 }
             } else {
-                group.addControl('iv', new FormControl(undefined, validators));
+                group.addControl('iv', new FormControl(undefined, field.createValidators()));
             }
 
             controls[field.name] = group;

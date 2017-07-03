@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import { AssetsFieldPropertiesDto } from 'shared';
 
@@ -16,10 +16,18 @@ import { AssetsFieldPropertiesDto } from 'shared';
     templateUrl: 'assets-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetsValidationComponent {
+export class AssetsValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
     @Input()
     public properties: AssetsFieldPropertiesDto;
+
+    public ngOnInit() {
+        this.editForm.setControl('maxItems',
+            new FormControl(this.properties.maxItems));
+
+        this.editForm.setControl('minItems',
+            new FormControl(this.properties.minItems));
+    }
 }

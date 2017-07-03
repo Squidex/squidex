@@ -19,11 +19,13 @@
 
         <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
             <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
-                <tr [sqxContent]="content" isReadOnly="true" dnd-sortable [sortableIndex]="i" (sorted)="onContentsSorted($event)"
+                <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sorted)="onContentsSorted($event)"
                     [language]="languageSelected"
-                    [fields]="contentFields"
+                    [schemaFields]="contentFields"
                     [schema]="schema"
-                    (deleting)="onContentRemoving(content)"></tr>
+                    (deleting)="onContentRemoving(content)"
+                    isReadOnly="true" 
+                    isReference="true"></tr>
                 <tr class="spacer"></tr>
             </ng-template>
         </tbody>

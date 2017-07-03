@@ -12,7 +12,6 @@ import {
     AppLanguageDto,
     AppsStoreService,
     ContentDto,
-    DateTime,
     fadeAnimation,
     FieldDto,
     ModalView,
@@ -41,16 +40,19 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
     public deleting = new EventEmitter<ContentDto>();
 
     @Input()
-    public fields: FieldDto[];
+    public language: AppLanguageDto;
 
     @Input()
-    public language: AppLanguageDto;
+    public schemaFields: FieldDto[];
 
     @Input()
     public schema: SchemaDto;
 
     @Input()
     public isReadOnly = false;
+
+    @Input()
+    public isReference = false;
 
     @Input('sqxContent')
     public content: ContentDto;
@@ -72,57 +74,25 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
     private updateValues() {
         this.values = [];
 
-        for (let field of this.fields) {
-            this.values.push(this.getValue(field));
+        if (this.schemaFields) {
+            for (let field of this.schemaFields) {
+                this.values.push(this.getValue(field));
+            }
         }
     }
 
     private getValue(field: FieldDto): any {
         const contentField = this.content.data[field.name];
 
-        if (!contentField) {
+        if (contentField) {
+            if (field.partitioning === 'language') {
+                return field.formatValue(contentField[this.language.iso2Code]);
+            } else {
+                return field.formatValue(contentField['iv']);
+            }
+        } else {
             return '';
         }
-
-        const properties = field.properties;
-
-        let value: any;
-
-        if (field.partitioning === 'language') {
-            value = contentField[this.language.iso2Code];
-        } else {
-            value = contentField['iv'];
-        }
-
-        if (value) {
-            if (properties.fieldType === 'Json') {
-                value = '<Json />';
-            } else if (properties.fieldType === 'Geolocation') {
-                value = `${value.longitude}, ${value.latitude}`;
-            } else if (properties.fieldType === 'Boolean') {
-                value = value ? '✔' : '-';
-            }else if (properties.fieldType === 'Assets') {
-                try {
-                    value = `${value.length} Asset(s)`;
-                } catch (ex) {
-                    value = '0 Asset(s)';
-                }
-            }  else if (properties.fieldType === 'DateTime') {
-                try {
-                    const parsed = DateTime.parseISO_UTC(value);
-
-                    if (properties['editor'] === 'Date') {
-                        value = parsed.toStringFormat('YYYY-MM-DD');
-                    } else {
-                        value = parsed.toStringFormat('YYYY-MM-DD hh:mm:ss');
-                    }
-                } catch (ex) {
-                    value = value;
-                }
-            }
-        }
-
-        return value;
     }
 }
 

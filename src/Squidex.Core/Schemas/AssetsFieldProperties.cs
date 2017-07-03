@@ -15,6 +15,31 @@ namespace Squidex.Core.Schemas
     [TypeName("AssetsField")]
     public sealed class AssetsFieldProperties : FieldProperties
     {
+        private int? minItems;
+        private int? maxItems;
+
+        public int? MinItems
+        {
+            get { return minItems; }
+            set
+            {
+                ThrowIfFrozen();
+
+                minItems = value;
+            }
+        }
+
+        public int? MaxItems
+        {
+            get { return maxItems; }
+            set
+            {
+                ThrowIfFrozen();
+
+                maxItems = value;
+            }
+        }
+
         public override JToken GetDefaultValue()
         {
             return new JArray();
@@ -22,7 +47,10 @@ namespace Squidex.Core.Schemas
 
         protected override IEnumerable<ValidationError> ValidateCore()
         {
-            yield break;
+            if (MaxItems.HasValue && MinItems.HasValue && MinItems.Value >= MaxItems.Value)
+            {
+                yield return new ValidationError("Max items must be greater than min items", nameof(MinItems), nameof(MaxItems));
+            }
         }
     }
 }

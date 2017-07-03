@@ -15,11 +15,15 @@ namespace Squidex.Core.Schemas.Validators
     {
         private readonly bool isRequired;
         private readonly Guid schemaId;
+        private readonly int? minItems;
+        private readonly int? maxItems;
 
-        public ReferencesValidator(bool isRequired, Guid schemaId)
+        public ReferencesValidator(bool isRequired, Guid schemaId, int? minItems = null, int? maxItems = null)
         {
             this.isRequired = isRequired;
             this.schemaId = schemaId;
+            this.minItems = minItems;
+            this.maxItems = maxItems;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
@@ -34,6 +38,16 @@ namespace Squidex.Core.Schemas.Validators
                 }
 
                 return;
+            }
+
+            if (minItems.HasValue && references.ContentIds.Count < minItems.Value)
+            {
+                addError($"<FIELD> must have at least {minItems} reference(s)");
+            }
+
+            if (maxItems.HasValue && references.ContentIds.Count > maxItems.Value)
+            {
+                addError($"<FIELD> must have not more than {maxItems} reference(s)");
             }
 
             var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);

@@ -32,7 +32,7 @@ namespace Squidex.Core.Schemas
 
         protected override IEnumerable<IValidator> CreateValidators()
         {
-            yield return new AssetsValidator(Properties.IsRequired);
+            yield return new AssetsValidator(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
         }
 
         public IEnumerable<Guid> GetReferencedIds(JToken value)

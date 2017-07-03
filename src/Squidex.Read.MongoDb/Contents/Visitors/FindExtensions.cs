@@ -80,7 +80,7 @@ namespace Squidex.Read.MongoDb.Contents.Visitors
 
             if (ids != null && ids.Count > 0)
             {
-                Filter.In(x => x.Id, ids);
+                filters.Add(Filter.In(x => x.Id, ids));
             }
 
             var filter = FilterBuilder.Build(query, schema);

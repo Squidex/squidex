@@ -6,6 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
@@ -14,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     EntityCreatedDto,
+    ValidatorsEx,
     Version
 } from 'framework';
 
@@ -110,6 +112,14 @@ export class FieldDto {
         public readonly properties: FieldPropertiesDto
     ) {
     }
+
+    public formatValue(value: any): string {
+        return this.properties.formatValue(value);
+    }
+
+    public createValidators(): ValidatorFn[] {
+        return this.properties.createValidators();
+    }
 }
 
 export abstract class FieldPropertiesDto {
@@ -122,6 +132,10 @@ export abstract class FieldPropertiesDto {
         public readonly isListField: boolean
     ) {
     }
+
+    public abstract formatValue(value: any): string;
+
+    public abstract createValidators(): ValidatorFn[];
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -138,6 +152,40 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super('String', label, hints, placeholder, isRequired, isListField);
     }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        return value;
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        if (this.minLength) {
+            validators.push(Validators.minLength(this.minLength));
+        }
+
+        if (this.maxLength) {
+            validators.push(Validators.maxLength(this.maxLength));
+        }
+
+        if (this.pattern && this.pattern.length > 0) {
+            validators.push(ValidatorsEx.pattern(this.pattern, this.patternMessage));
+        }
+
+        if (this.allowedValues && this.allowedValues.length > 0) {
+            validators.push(ValidatorsEx.validValues(this.allowedValues));
+        }
+
+        return validators;
+    }
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
@@ -151,6 +199,36 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         public readonly allowedValues?: number[]
     ) {
         super('Number', label, hints, placeholder, isRequired, isListField);
+    }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        return value;
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        if (this.minValue) {
+            validators.push(Validators.min(this.minValue));
+        }
+
+        if (this.maxValue) {
+            validators.push(Validators.max(this.maxValue));
+        }
+
+        if (this.allowedValues && this.allowedValues.length > 0) {
+            validators.push(ValidatorsEx.validValues(this.allowedValues));
+        }
+
+        return validators;
     }
 }
 
@@ -166,6 +244,34 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super('DateTime', label, hints, placeholder, isRequired, isListField);
     }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        try {
+            const parsed = DateTime.parseISO_UTC(value);
+
+            if (this.editor === 'Date') {
+                return parsed.toStringFormat('YYYY-MM-DD');
+            } else {
+                return parsed.toStringFormat('YYYY-MM-DD HH:mm:ss');
+            }
+        } catch (ex) {
+            return value;
+        }
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        return validators;
+    }
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
@@ -177,6 +283,24 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super('Boolean', label, hints, placeholder, isRequired, isListField);
     }
+
+    public formatValue(value: any): string {
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        return value ? '✔' : '-';
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        return validators;
+    }
 }
 
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
@@ -187,24 +311,106 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     ) {
         super('Geolocation', label, hints, placeholder, isRequired, isListField);
     }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        return `${value.longitude}, ${value.latitude}`;
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        return validators;
+    }
 }
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
+        public readonly minItems?: number,
+        public readonly maxItems?: number,
         public readonly schemaId?: string
     ) {
         super('References', label, hints, placeholder, isRequired, isListField);
+    }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        if (value.length) {
+            return `${value.length} Reference(s)`;
+        } else {
+            return '0 References';
+        }
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        if (this.minItems) {
+            validators.push(Validators.minLength(this.minItems));
+        }
+
+        if (this.maxItems) {
+            validators.push(Validators.maxLength(this.maxItems));
+        }
+
+        return validators;
     }
 }
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
-        isListField: boolean
+        isListField: boolean,
+        public readonly minItems?: number,
+        public readonly maxItems?: number
     ) {
         super('Assets', label, hints, placeholder, isRequired, isListField);
+    }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        if (value.length) {
+            return `${value.length} Asset(s)`;
+        } else {
+            return '0 Assets';
+        }
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        if (this.minItems) {
+            validators.push(Validators.minLength(this.minItems));
+        }
+
+        if (this.maxItems) {
+            validators.push(Validators.maxLength(this.maxItems));
+        }
+
+        return validators;
     }
 }
 
@@ -214,6 +420,24 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
         isListField: boolean
     ) {
         super('Json', label, hints, placeholder, isRequired, isListField);
+    }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        return '<Json />';
+    }
+
+    public createValidators(): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired) {
+            validators.push(Validators.required);
+        }
+
+        return validators;
     }
 }
 

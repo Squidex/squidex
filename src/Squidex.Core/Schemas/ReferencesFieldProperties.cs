@@ -16,7 +16,31 @@ namespace Squidex.Core.Schemas
     [TypeName("References")]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
+        private int? minItems;
+        private int? maxItems;
         private Guid schemaId;
+
+        public int? MinItems
+        {
+            get { return minItems; }
+            set
+            {
+                ThrowIfFrozen();
+
+                minItems = value;
+            }
+        }
+
+        public int? MaxItems
+        {
+            get { return maxItems; }
+            set
+            {
+                ThrowIfFrozen();
+
+                maxItems = value;
+            }
+        }
 
         public Guid SchemaId
         {
@@ -36,7 +60,10 @@ namespace Squidex.Core.Schemas
 
         protected override IEnumerable<ValidationError> ValidateCore()
         {
-            yield break;
+            if (MaxItems.HasValue && MinItems.HasValue && MinItems.Value >= MaxItems.Value)
+            {
+                yield return new ValidationError("Max items must be greater than min items", nameof(MinItems), nameof(MaxItems));
+            }
         }
     }
 }

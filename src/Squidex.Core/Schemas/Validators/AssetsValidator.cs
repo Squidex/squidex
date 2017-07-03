@@ -14,10 +14,14 @@ namespace Squidex.Core.Schemas.Validators
     public sealed class AssetsValidator : IValidator
     {
         private readonly bool isRequired;
+        private readonly int? minItems;
+        private readonly int? maxItems;
 
-        public AssetsValidator(bool isRequired)
+        public AssetsValidator(bool isRequired, int? minItems = null, int? maxItems = null)
         {
             this.isRequired = isRequired;
+            this.minItems = minItems;
+            this.maxItems = maxItems;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
@@ -32,6 +36,16 @@ namespace Squidex.Core.Schemas.Validators
                 }
 
                 return;
+            }
+
+            if (minItems.HasValue && assets.AssetIds.Count < minItems.Value)
+            {
+                addError($"<FIELD> must have at least {minItems} asset(s)");
+            }
+
+            if (maxItems.HasValue && assets.AssetIds.Count > maxItems.Value)
+            {
+                addError($"<FIELD> must have not more than {maxItems} asset(s)");
             }
 
             var invalidIds = await context.GetInvalidAssetIdsAsync(assets.AssetIds);

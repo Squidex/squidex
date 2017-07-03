@@ -17,6 +17,16 @@ namespace Squidex.Controllers.Api.Schemas.Models
     public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The minimum allowed items for the field value.
+        /// </summary>
+        public int? MinItems { get; set; }
+
+        /// <summary>
+        /// The maximum allowed items for the field value.
+        /// </summary>
+        public int? MaxItems { get; set; }
+
+        /// <summary>
         /// The id of the referenced schema.
         /// </summary>
         public Guid SchemaId { get; set; }

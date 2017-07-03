@@ -7,7 +7,7 @@
     }
 
     &-label {
-        @include absolute(0, -2rem, auto, auto);
+        @include absolute(0, -.2rem, auto, auto);
     }
 }
 

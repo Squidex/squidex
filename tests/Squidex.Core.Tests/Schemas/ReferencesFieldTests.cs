@@ -93,6 +93,28 @@ namespace Squidex.Core.Schemas
         }
 
         [Fact]
+        public async Task Should_add_errors_if_value_has_not_enough_items()
+        {
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId, MinItems = 3 });
+
+            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> must have at least 3 reference(s)" });
+        }
+
+        [Fact]
+        public async Task Should_add_errors_if_value_has_too_much_items()
+        {
+            var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant, new ReferencesFieldProperties { SchemaId = schemaId, MaxItems = 1 });
+
+            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> must have not more than 1 reference(s)" });
+        }
+
+        [Fact]
         public async Task Should_add_errors_if_reference_are_not_valid()
         {
             var referenceId = Guid.NewGuid();
