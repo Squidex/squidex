@@ -119,7 +119,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public assignContributor() {
-        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.model.id, 'Editor');
+        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
 
         this.appNameOnce()
             .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
