@@ -102,5 +102,6 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
         this.renderer.setElementStyle(modalRef, 'left', left + 'px');
         this.renderer.setElementStyle(modalRef, 'right', 'auto');
         this.renderer.setElementStyle(modalRef, 'bottom', 'auto');
+        this.renderer.setElementStyle(modalRef, 'margin', '0');
     }
 }
