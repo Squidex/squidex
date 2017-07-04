@@ -130,7 +130,7 @@ namespace Squidex.Read.MongoDb.Contents
 
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
-            return ForAppIdAsync(@event.SchemaId.Id, async collection =>
+            return ForAppIdAsync(@event.AppId.Id, async collection =>
             {
                 await collection.UpdateManyAsync(
                     Filter.And(
