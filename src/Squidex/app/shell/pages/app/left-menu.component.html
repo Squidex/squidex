@@ -5,12 +5,12 @@
                 <i class="nav-icon icon-schemas"></i> <div class="nav-text">Schemas</div>
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="permission">
             <a class="nav-link" routerLink="content" routerLinkActive="active">
                 <i class="nav-icon icon-content"></i> <div class="nav-text">Content</div>
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="permission">
             <a class="nav-link" routerLink="assets" routerLinkActive="active">
                 <i class="nav-icon icon-media"></i> <div class="nav-text">Assets</div>
             </a>
