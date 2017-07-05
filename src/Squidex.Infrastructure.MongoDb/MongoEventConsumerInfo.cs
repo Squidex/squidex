@@ -32,6 +32,6 @@ namespace Squidex.Infrastructure.MongoDb
 
         [BsonElement]
         [BsonRequired]
-        public long LastHandledEventNumber { get; set; }
+        public string Position { get; set; }
     }
 }

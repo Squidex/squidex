@@ -65,12 +65,12 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_set_and_get_event_number()
         {
-            const int eventNumber = 123;
+            const string eventNumber = "123";
 
-            sut.SetEventNumber(eventNumber);
+            sut.SetEventPosition(eventNumber);
 
-            Assert.Equal(eventNumber, sut.Headers.EventNumber());
-            Assert.Equal(eventNumber, sut.Headers["EventNumber"].ToInt32(culture));
+            Assert.Equal(eventNumber, sut.Headers.EventPosition());
+            Assert.Equal(eventNumber, sut.Headers["EventNumber"].ToString());
         }
 
         [Fact]

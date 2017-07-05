@@ -27,13 +27,15 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private sealed class MyEventConsumerInfo : IEventConsumerInfo
         {
-            public long LastHandledEventNumber { get; set; }
-
             public bool IsStopped { get; set; }
+
             public bool IsResetting { get; set; }
 
             public string Name { get; set; }
+
             public string Error { get; set; }
+
+            public string Position { get; set; }
         }
 
         private sealed class MyEventStore : IEventStore
@@ -45,7 +47,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 this.storedEvents = storedEvents;
             }
 
-            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, long lastReceivedEventNumber = -1)
+            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
             {
                 foreach (var @event in storedEvents)
                 {
@@ -53,12 +55,12 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
             }
 
-            public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, long lastReceivedEventNumber = -1)
+            public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, string position = null)
             {
                 throw new NotSupportedException();
             }
 
-            public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, IEnumerable<EventData> events)
+            public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
             {
                 throw new NotSupportedException();
             }
@@ -83,9 +85,9 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var events = new[]
             {
-                new StoredEvent(3, 3, eventData1),
-                new StoredEvent(4, 4, eventData2),
-                new StoredEvent(5, 5, eventData3)
+                new StoredEvent("3", 3, eventData1),
+                new StoredEvent("4", 4, eventData2),
+                new StoredEvent("5", 5, eventData3)
             };
 
             consumerName = eventConsumer.Object.GetType().Name;
@@ -116,7 +118,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_subscribe_to_consumer_and_handle_events()
         {
-            consumerInfo.LastHandledEventNumber = 2L;
+            consumerInfo.Position = "2";
 
             sut.Subscribe(eventConsumer.Object);
             sut.Next();
@@ -130,7 +132,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_abort_if_handling_failed()
         {
-            consumerInfo.LastHandledEventNumber = 2L;
+            consumerInfo.Position = "2";
 
             eventConsumer.Setup(x => x.On(envelope1)).Returns(TaskHelper.True);
             eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
@@ -149,7 +151,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_abort_if_serialization_failed()
         {
-            consumerInfo.LastHandledEventNumber = 2L;
+            consumerInfo.Position = "2";
 
             formatter.Setup(x => x.Parse(eventData2)).Throws(new InvalidOperationException());
 
@@ -168,7 +170,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         public void Should_reset_if_requested()
         {
             consumerInfo.IsResetting = true;
-            consumerInfo.LastHandledEventNumber = 2L;
+            consumerInfo.Position = "2";
 
             sut.Subscribe(eventConsumer.Object);
             sut.Next();

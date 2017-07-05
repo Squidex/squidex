@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==========================================================================
+//  Program.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +18,8 @@ namespace Benchmarks
     {
         private static readonly List<IBenchmark> Benchmarks = new List<IBenchmark>
         {
-            new AppendToEventStore()
+            new AppendToEventStore(),
+            new AppendToEventStoreParallel()
         };
 
         public static void Main(string[] args)

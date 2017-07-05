@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             inputEvent.SetAggregateId(Guid.NewGuid());
             inputEvent.SetCommitId(commitId);
             inputEvent.SetEventId(Guid.NewGuid());
-            inputEvent.SetEventNumber(1);
+            inputEvent.SetEventPosition("1");
             inputEvent.SetEventStreamNumber(1);
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 

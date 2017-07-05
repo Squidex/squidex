@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 try
                 {
-                    await Collection.InsertOneAsync(new MongoEventConsumerInfo { Name = consumerName, LastHandledEventNumber = -1 });
+                    await Collection.InsertOneAsync(new MongoEventConsumerInfo { Name = consumerName, Position = null });
                 }
                 catch (MongoWriteException ex)
                 {
@@ -61,31 +61,27 @@ namespace Squidex.Infrastructure.MongoDb
 
         public Task StartAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
-                Update.Unset(x => x.IsStopped));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Unset(x => x.IsStopped));
         }
 
         public Task StopAsync(string consumerName, string error = null)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
-                Update.Set(x => x.IsStopped, true).Set(x => x.Error, error));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsStopped, true).Set(x => x.Error, error));
         }
 
         public Task ResetAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, 
-                Update.Set(x => x.IsResetting, true));
+            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsResetting, true));
         }
 
-        public Task SetLastHandledEventNumberAsync(string consumerName, long eventNumber)
+        public Task SetLastHandledEventNumberAsync(string consumerName, string position)
         {
-            return Collection.ReplaceOneAsync(x => x.Name == consumerName, 
-                CreateEntity(consumerName, eventNumber));
+            return Collection.ReplaceOneAsync(x => x.Name == consumerName, CreateEntity(consumerName, position));
         }
 
-        private static MongoEventConsumerInfo CreateEntity(string consumerName, long eventNumber)
+        private static MongoEventConsumerInfo CreateEntity(string consumerName, string position)
         {
-            return new MongoEventConsumerInfo { Name = consumerName, LastHandledEventNumber = eventNumber };
+            return new MongoEventConsumerInfo { Name = consumerName, Position = position };
         }
     }
 }

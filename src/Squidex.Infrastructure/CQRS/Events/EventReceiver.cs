@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
+// ReSharper disable ConvertToLambdaExpression
 // ReSharper disable MethodSupportsCancellation
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
@@ -97,21 +98,23 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     var status = await eventConsumerInfoRepository.FindAsync(consumerName);
 
-                    var lastHandledEventNumber = status.LastHandledEventNumber;
+                    var position = status.Position;
 
                     if (status.IsResetting)
                     {
                         await ResetAsync(eventConsumer, consumerName);
 
-                        lastHandledEventNumber = -1;
+                        position = null;
                     }
                     else if (status.IsStopped)
                     {
                         return;
                     }
 
-                    await eventStore.GetEventsAsync(se => HandleEventAsync(eventConsumer, se, consumerName), ct, 
-                        eventConsumer.EventsFilter, lastHandledEventNumber);
+                    await eventStore.GetEventsAsync(se =>
+                    {
+                        return HandleEventAsync(eventConsumer, se, consumerName);
+                    }, ct, eventConsumer.EventsFilter, position);
                 }
                 catch (Exception ex)
                 {
@@ -133,8 +136,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return;
             }
 
-            await DispatchConsumer(@event, eventConsumer);
-            await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventNumber);
+            await DispatchConsumer(@event, eventConsumer, consumerName);
+
+            await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventPosition);
         }
 
         private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName)
@@ -149,7 +153,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 await eventConsumer.ClearAsync();
-                await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, -1);
+                await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, null);
 
                 log.LogInformation(w => w
                     .WriteProperty("action", "EventConsumerReset")
@@ -169,7 +173,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer)
+        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer, string consumerName)
         {
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;
@@ -181,7 +185,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("state", "Started")
                     .WriteProperty("eventId", eventId)
                     .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+                    .WriteProperty("eventConsumer", consumerName));
 
                 await eventConsumer.On(@event);
 
@@ -191,7 +195,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("state", "Completed")
                     .WriteProperty("eventId", eventId)
                     .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+                    .WriteProperty("eventConsumer", consumerName));
             }
             catch (Exception ex)
             {
@@ -201,7 +205,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("state", "Started")
                     .WriteProperty("eventId", eventId)
                     .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+                    .WriteProperty("eventConsumer", consumerName));
 
                 throw;
             }
@@ -213,7 +217,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             {
                 var @event = formatter.Parse(storedEvent.Data);
 
-                @event.SetEventNumber(storedEvent.EventNumber);
+                @event.SetEventPosition(storedEvent.EventPosition);
                 @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
@@ -228,7 +232,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("action", "ParseEvent")
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventId", storedEvent.Data.EventId.ToString())
-                    .WriteProperty("eventNumber", storedEvent.EventNumber));
+                    .WriteProperty("eventPosition", storedEvent.EventPosition));
 
                 throw;
             }

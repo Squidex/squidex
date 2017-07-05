@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppendToEventStore.cs
+//  AppendToEventStoreParallel.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Benchmarks.Utils;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
@@ -15,19 +16,19 @@ using Squidex.Infrastructure.MongoDb.EventStore;
 
 namespace Benchmarks.Tests
 {
-    public sealed class AppendToEventStore : IBenchmark
+    public sealed class AppendToEventStoreParallel : IBenchmark
     {
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
 
         public string Id
         {
-            get { return "appendToEventStore"; }
+            get { return "appendToEventStoreParallel"; }
         }
 
         public string Name
         {
-            get { return "Append Events to EventStore"; }
+            get { return "Append Events to EventStore Parallel"; }
         }
 
         public void Initialize()
@@ -47,7 +48,7 @@ namespace Benchmarks.Tests
 
             var eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
 
-            for (var streamId = 0; streamId < eventStreams; streamId++)
+            Parallel.For(0, eventStreams, streamId =>
             {
                 var eventOffset = -1;
                 var streamName = streamId.ToString();
@@ -58,7 +59,7 @@ namespace Benchmarks.Tests
 
                     eventOffset++;
                 }
-            }
+            });
 
             return numCommits * eventStreams;
         }

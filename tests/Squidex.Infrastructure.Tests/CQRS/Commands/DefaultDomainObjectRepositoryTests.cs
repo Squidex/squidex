@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(Observable.Empty<StoredEvent>());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(Observable.Empty<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
         }
@@ -90,11 +90,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, 0, eventData1),
-                new StoredEvent(1, 1, eventData2)
+                new StoredEvent("0", 0, eventData1),
+                new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -115,11 +115,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var events = new[]
             {
-                new StoredEvent(0, 0, eventData1),
-                new StoredEvent(1, 1, eventData2)
+                new StoredEvent("0", 0, eventData1),
+                new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName, -1)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(events.ToObservable());
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
             eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, It.Is<IEnumerable<EventData>>(e => e.Count() == 2)))
+            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, It.Is<ICollection<EventData>>(e => e.Count() == 2)))
                 .Returns(TaskHelper.Done)
                 .Verifiable();
 

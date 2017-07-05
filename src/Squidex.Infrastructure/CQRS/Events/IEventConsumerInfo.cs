@@ -10,8 +10,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventConsumerInfo
     {
-        long LastHandledEventNumber { get; }
-
         bool IsStopped { get; }
 
         bool IsResetting { get; }
@@ -19,5 +17,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         string Name { get; }
 
         string Error { get; }
+
+        string Position { get; }
     }
 }

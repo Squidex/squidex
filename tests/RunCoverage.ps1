@@ -50,6 +50,6 @@ New-Item -ItemType directory -Path $reportsFolder
 -output:"$workingFolder\$reportsFolder\Read.xml" `
 -oldStyle
 
-&"$userProfile\.nuget\packages\ReportGenerator\2.5.8\tools\ReportGenerator.exe" `
+&"$userProfile\.nuget\packages\ReportGenerator\2.5.9\tools\ReportGenerator.exe" `
 -reports:"$workingFolder\$reportsFolder\*.xml" `
 -targetdir:"$workingFolder\$reportsFolder\Output"

@@ -10,18 +10,13 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class StoredEvent
     {
-        private readonly long eventNumber;
-        private readonly long eventStreamNumber;
+        private readonly string eventPosition;
+        private readonly int eventStreamNumber;
         private readonly EventData data;
 
-        public long EventNumber
+        public string EventPosition
         {
-            get { return eventNumber; }
-        }
-
-        public long EventStreamNumber
-        {
-            get { return eventStreamNumber; }
+            get { return eventPosition; }
         }
 
         public EventData Data
@@ -29,12 +24,18 @@ namespace Squidex.Infrastructure.CQRS.Events
             get { return data; }
         }
 
-        public StoredEvent(long eventNumber, long eventStreamNumber, EventData data)
+        public int EventStreamNumber
         {
+            get { return eventStreamNumber; }
+        }
+
+        public StoredEvent(string eventPosition, int eventStreamNumber, EventData data)
+        {
+            Guard.NotNullOrEmpty(eventPosition, nameof(eventPosition));
             Guard.NotNull(data, nameof(data));
 
             this.data = data;
-            this.eventNumber = eventNumber;
+            this.eventPosition = eventPosition;
             this.eventStreamNumber = eventStreamNumber;
         }
     }
