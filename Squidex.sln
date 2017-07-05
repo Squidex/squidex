@@ -1,40 +1,44 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "squidex_infrastructure", "squidex_infrastructure", "{8CF53B92-5EB1-461D-98F8-70DA9B603FBF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "squidex_domain", "squidex_domain", "{4C6B06C2-6D77-4E0E-AE32-D7050236433A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Core", "src\Squidex.Core\Squidex.Core.csproj", "{47F3C27E-698B-4EDF-A7E8-D7F4232AFBB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Core", "src\Squidex.Core\Squidex.Core.csproj", "{47F3C27E-698B-4EDF-A7E8-D7F4232AFBB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure", "src\Squidex.Infrastructure\Squidex.Infrastructure.csproj", "{BD1C30A8-8FFA-4A92-A9BD-B67B1CDDD84C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure", "src\Squidex.Infrastructure\Squidex.Infrastructure.csproj", "{BD1C30A8-8FFA-4A92-A9BD-B67B1CDDD84C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Events", "src\Squidex.Events\Squidex.Events.csproj", "{25F66C64-058A-4D44-BC0C-F12A054F9A91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Events", "src\Squidex.Events\Squidex.Events.csproj", "{25F66C64-058A-4D44-BC0C-F12A054F9A91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Write", "src\Squidex.Write\Squidex.Write.csproj", "{A85201C6-6AF8-4B63-8365-08F741050438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Write", "src\Squidex.Write\Squidex.Write.csproj", "{A85201C6-6AF8-4B63-8365-08F741050438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Read", "src\Squidex.Read\Squidex.Read.csproj", "{A92B4734-2587-4F6F-97A3-741BE48709A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read", "src\Squidex.Read\Squidex.Read.csproj", "{A92B4734-2587-4F6F-97A3-741BE48709A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Read.MongoDb", "src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read.MongoDb", "src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Write.Tests", "tests\Squidex.Write.Tests\Squidex.Write.Tests.csproj", "{9A3DEA7E-1681-4D48-AC5C-1F0DE421A203}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Write.Tests", "tests\Squidex.Write.Tests\Squidex.Write.Tests.csproj", "{9A3DEA7E-1681-4D48-AC5C-1F0DE421A203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.Tests", "tests\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj", "{7FD0A92B-7862-4BB1-932B-B52A9CACB56B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Tests", "tests\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj", "{7FD0A92B-7862-4BB1-932B-B52A9CACB56B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Core.Tests", "tests\Squidex.Core.Tests\Squidex.Core.Tests.csproj", "{FD0AFD44-7A93-4F9E-B5ED-72582392E435}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Core.Tests", "tests\Squidex.Core.Tests\Squidex.Core.Tests.csproj", "{FD0AFD44-7A93-4F9E-B5ED-72582392E435}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.MongoDb", "src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj", "{6A811927-3C37-430A-90F4-503E37123956}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.MongoDb", "src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj", "{6A811927-3C37-430A-90F4-503E37123956}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Read.Tests", "tests\Squidex.Read.Tests\Squidex.Read.Tests.csproj", "{8B074219-F69A-4E41-83C6-12EE1E647779}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read.Tests", "tests\Squidex.Read.Tests\Squidex.Read.Tests.csproj", "{8B074219-F69A-4E41-83C6-12EE1E647779}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.Redis", "src\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj", "{D7166C56-178A-4457-B56A-C615C7450DEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Redis", "src\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj", "{D7166C56-178A-4457-B56A-C615C7450DEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.RabbitMq", "src\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj", "{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.RabbitMq", "src\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj", "{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Infrastructure.GoogleCloud", "src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj", "{945871B1-77B8-43FB-B53C-27CF385AB756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.GoogleCloud", "src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj", "{945871B1-77B8-43FB-B53C-27CF385AB756}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B56EBCEC-9C50-46A7-848C-65502DE69C5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "tests\Benchmarks\Benchmarks.csproj", "{D48A03DF-BCD3-4667-8747-2F251347E2B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -174,6 +178,18 @@ Global
 		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x64.Build.0 = Release|Any CPU
 		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x86.ActiveCfg = Release|Any CPU
 		{945871B1-77B8-43FB-B53C-27CF385AB756}.Release|x86.Build.0 = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|x64.Build.0 = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Debug|x86.Build.0 = Debug|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|x64.ActiveCfg = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|x64.Build.0 = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|x86.ActiveCfg = Release|Any CPU
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -193,5 +209,6 @@ Global
 		{D7166C56-178A-4457-B56A-C615C7450DEE} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{C1E5BBB6-6B6A-4DE5-B19D-0538304DE343} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{945871B1-77B8-43FB-B53C-27CF385AB756} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+		{D48A03DF-BCD3-4667-8747-2F251347E2B6} = {B56EBCEC-9C50-46A7-848C-65502DE69C5C}
 	EndGlobalSection
 EndGlobal
