@@ -33,14 +33,14 @@ describe('EventConsumersService', () => {
                         body: [
                             {
                                 name: 'event-consumer1',
-                                lastHandledEventNumber: 13,
+                                position: '13',
                                 isStopped: true,
                                 isResetting: true,
                                 error: 'an error 1'
                             },
                             {
                                 name: 'event-consumer2',
-                                lastHandledEventNumber: 29,
+                                position: '29',
                                 isStopped: true,
                                 isResetting: true,
                                 error: 'an error 2'
@@ -58,8 +58,8 @@ describe('EventConsumersService', () => {
         }).unsubscribe();
 
         expect(eventConsumers).toEqual([
-            new EventConsumerDto('event-consumer1', 13, true, true, 'an error 1'),
-            new EventConsumerDto('event-consumer2', 29, true, true, 'an error 2')
+            new EventConsumerDto('event-consumer1', true, true, 'an error 1', '13'),
+            new EventConsumerDto('event-consumer2', true, true, 'an error 2', '29')
         ]);
 
         authService.verifyAll();

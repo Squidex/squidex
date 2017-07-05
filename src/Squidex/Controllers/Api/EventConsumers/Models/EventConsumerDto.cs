@@ -10,8 +10,6 @@ namespace Squidex.Controllers.Api.EventConsumers.Models
 {
     public sealed class EventConsumerDto
     {
-        public long LastHandledEventNumber { get; set; }
-
         public bool IsStopped { get; set; }
 
         public bool IsResetting { get; set; }
@@ -19,5 +17,7 @@ namespace Squidex.Controllers.Api.EventConsumers.Models
         public string Name { get; set; }
 
         public string Error { get; set; }
+
+        public string Position { get; set; }
     }
 }

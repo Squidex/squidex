@@ -58,7 +58,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
                 this.eventConsumers =
                     this.eventConsumers.replaceAll(
                         e => e.name === name,
-                        e => new EventConsumerDto(name, e.lastHandledEventNumber, false, e.isResetting, e.error));
+                        e => new EventConsumerDto(name, false, e.isResetting, e.error, e.position));
             }, error => {
                 this.notifyError(error);
             });
@@ -70,7 +70,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
                 this.eventConsumers =
                     this.eventConsumers.replaceAll(
                         e => e.name === name,
-                        e => new EventConsumerDto(name, e.lastHandledEventNumber, true, e.isResetting, e.error));
+                        e => new EventConsumerDto(name, true, e.isResetting, e.error, e.position));
             }, error => {
                 this.notifyError(error);
             });
@@ -82,7 +82,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
                 this.eventConsumers =
                     this.eventConsumers.replaceAll(
                         e => e.name === name,
-                        e => new EventConsumerDto(name, e.lastHandledEventNumber, e.isStopped, true, e.error));
+                        e => new EventConsumerDto(name, e.isStopped, true, e.error, e.position));
             }, error => {
                 this.notifyError(error);
             });

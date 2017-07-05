@@ -15,8 +15,8 @@
         <div class="panel-content panel-content-scroll">
             <table class="table table-items table-fixed">
                 <colgroup>
-                    <col style="width: 100%" />
-                    <col style="width: 160px" />
+                    <col style="width: 50%" />
+                    <col style="width: 50%" />
                     <col style="width: 160px" />
                 </colgroup>
 
@@ -26,7 +26,7 @@
                             Name
                         </th>
                         <th class="text-right">
-                            Event Number
+                            Position
                         </th>
                         <th class="text-right">
                             Actions
@@ -45,7 +45,7 @@
                                 </span>
                             </td>
                             <td class="text-right">
-                                <span>{{eventConsumer.lastHandledEventNumber}}</span>
+                                <span>{{eventConsumer.position}}</span>
                             </td>
                             <td class="text-right">
                                 <button class="btn btn-link" (click)="reset(eventConsumer.name)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">

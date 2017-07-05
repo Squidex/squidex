@@ -16,10 +16,10 @@ import { AuthService } from './auth.service';
 export class EventConsumerDto {
     constructor(
         public readonly name: string,
-        public readonly lastHandledEventNumber: number,
         public readonly isStopped: boolean,
         public readonly isResetting: boolean,
-        public readonly error: string
+        public readonly error: string,
+        public readonly position: string
     ) {
     }
 }
@@ -43,10 +43,10 @@ export class EventConsumersService {
                     return items.map(item => {
                         return new EventConsumerDto(
                             item.name,
-                            item.lastHandledEventNumber,
                             item.isStopped,
                             item.isResetting,
-                            item.error);
+                            item.error,
+                            item.position);
                     });
                 })
                 .catchError('Failed to load event consumers. Please reload.');
