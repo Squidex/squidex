@@ -15,6 +15,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 
+// ReSharper disable RedundantAssignment
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable TooWideLocalVariableScope
@@ -89,39 +90,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 }
             }
 
-            var filters = new List<FilterDefinition<MongoEventCommit>>();
-
-            if (isEndOfCommit)
-            {
-                filters.Add(Filter.Gt(x => x.Timestamp, tokenTimestamp));
-            }
-            else
-            {
-                filters.Add(Filter.Gte(x => x.Timestamp, tokenTimestamp));
-            }
-
-            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, "*", StringComparison.OrdinalIgnoreCase))
-            {
-                if (streamFilter.Contains("^"))
-                {
-                    filters.Add(Filter.Regex(x => x.EventStream, streamFilter));
-                }
-                else
-                {
-                    filters.Add(Filter.Eq(x => x.EventStream, streamFilter));
-                }
-            }
-
-            FilterDefinition<MongoEventCommit> filter = new BsonDocument();
-
-            if (filters.Count > 1)
-            {
-                filter = Filter.And(filters);
-            }
-            else if (filters.Count == 1)
-            {
-                filter = filters[0];
-            }
+            var filter = CreateFilter(streamFilter, isEndOfCommit, tokenTimestamp);
 
             await Collection.Find(filter).SortBy(x => x.Timestamp).ForEachAsync(async commit =>
             {
@@ -216,6 +185,45 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             }
 
             return -1;
+        }
+
+        private static FilterDefinition<MongoEventCommit> CreateFilter(string streamFilter, bool isEndOfCommit, BsonTimestamp tokenTimestamp)
+        {
+            var filters = new List<FilterDefinition<MongoEventCommit>>();
+
+            if (isEndOfCommit)
+            {
+                filters.Add(Filter.Gt(x => x.Timestamp, tokenTimestamp));
+            }
+            else
+            {
+                filters.Add(Filter.Gte(x => x.Timestamp, tokenTimestamp));
+            }
+
+            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, "*", StringComparison.OrdinalIgnoreCase))
+            {
+                if (streamFilter.Contains("^"))
+                {
+                    filters.Add(Filter.Regex(x => x.EventStream, streamFilter));
+                }
+                else
+                {
+                    filters.Add(Filter.Eq(x => x.EventStream, streamFilter));
+                }
+            }
+
+            FilterDefinition<MongoEventCommit> filter = new BsonDocument();
+
+            if (filters.Count > 1)
+            {
+                filter = Filter.And(filters);
+            }
+            else if (filters.Count == 1)
+            {
+                filter = filters[0];
+            }
+
+            return filter;
         }
 
         private static string CreateToken(BsonTimestamp timestamp, int commitOffset, int commitSize)
