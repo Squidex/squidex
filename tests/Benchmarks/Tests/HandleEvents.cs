@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
@@ -82,7 +83,7 @@ namespace Benchmarks.Tests
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private const int NumEvents = 1000;
+        private const int NumEvents = 5000;
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
         private IEventStore eventStore;
@@ -143,7 +144,7 @@ namespace Benchmarks.Tests
 
             if (eventConsumer.EventNumbers.Count != NumEvents)
             {
-                throw new InvalidOperationException($"Only {eventConsumer.EventNumbers.Count} have been handled");
+                throw new InvalidOperationException($"{eventConsumer.EventNumbers.Count} Events have been handled");
             }
 
             for (var i = 0; i < eventConsumer.EventNumbers.Count; i++)

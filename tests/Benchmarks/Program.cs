@@ -25,7 +25,7 @@ namespace Benchmarks
 
         public static void Main(string[] args)
         {
-            var id = args.Length > 0 ? args[0] : "handleEvents";
+            var id = args.Length > 0 ? args[0] : string.Empty;
 
             var benchmark = Benchmarks.Find(x => x.Id == id);
 
