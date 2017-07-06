@@ -19,6 +19,7 @@ namespace Benchmarks.Tests
     {
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
+        private IEventStore eventStore;
 
         public string Id
         {
@@ -38,14 +39,14 @@ namespace Benchmarks.Tests
         public void RunInitialize()
         {
             mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
+
+            eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
         }
 
         public long Run()
         {
             const long numCommits = 200;
             const long eventStreams = 10;
-
-            var eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
 
             for (var streamId = 0; streamId < eventStreams; streamId++)
             {

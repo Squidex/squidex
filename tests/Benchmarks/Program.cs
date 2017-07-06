@@ -19,12 +19,13 @@ namespace Benchmarks
         private static readonly List<IBenchmark> Benchmarks = new List<IBenchmark>
         {
             new AppendToEventStore(),
-            new AppendToEventStoreParallel()
+            new AppendToEventStoreParallel(),
+            new HandleEvents()
         };
 
         public static void Main(string[] args)
         {
-            var id = args.Length > 0 ? args[0] : string.Empty;
+            var id = args.Length > 0 ? args[0] : "handleEvents";
 
             var benchmark = Benchmarks.Find(x => x.Id == id);
 
@@ -70,10 +71,10 @@ namespace Benchmarks
                         }
                     }
 
-                    var totalElapsed = TimeSpan.FromMilliseconds(elapsed);
-                    var totalPerSecond = Math.Round(count / totalElapsed.TotalSeconds, 2);
+                    var averageElapsed = TimeSpan.FromMilliseconds(elapsed / numRuns);
+                    var averageSeconds = Math.Round(count / (numRuns * averageElapsed.TotalSeconds), 2);
 
-                    Console.WriteLine($"{benchmark.Name} completed after {totalElapsed}, {totalPerSecond} items/s");
+                    Console.WriteLine($"{benchmark.Name} completed after {averageElapsed}, {averageSeconds} items/s");
                 }
                 catch (Exception e)
                 {

@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+// ReSharper disable InvertIf
+
 namespace Squidex.Infrastructure
 {
     public sealed class TypeNameRegistry
@@ -17,7 +19,7 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<Type, string> namesByType = new Dictionary<Type, string>();
         private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
-        public void Map(Type type)
+        public TypeNameRegistry Map(Type type)
         {
             Guard.NotNull(type, nameof(type));
 
@@ -27,9 +29,11 @@ namespace Squidex.Infrastructure
             {
                 Map(type, typeNameAttribute.TypeName);
             }
+
+            return this;
         }
 
-        public void Map(Type type, string name)
+        public TypeNameRegistry Map(Type type, string name)
         {
             Guard.NotNull(type, nameof(type));
             Guard.NotNull(name, nameof(name));
@@ -64,9 +68,11 @@ namespace Squidex.Infrastructure
                     }
                 }
             }
+
+            return this;
         }
 
-        public void Map(Assembly assembly)
+        public TypeNameRegistry Map(Assembly assembly)
         {
             foreach (var type in assembly.GetTypes())
             {
@@ -77,6 +83,8 @@ namespace Squidex.Infrastructure
                     Map(type, typeNameAttribute.TypeName);
                 }
             }
+
+            return this;
         }
 
         public string GetName<T>()
