@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
+// ReSharper disable ExpressionIsAlwaysNull
 // ReSharper disable ConvertToLambdaExpression
 // ReSharper disable MethodSupportsCancellation
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
@@ -102,9 +103,9 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                     if (status.IsResetting)
                     {
-                        await ResetAsync(eventConsumer, consumerName);
-
                         position = null;
+
+                        await ResetAsync(eventConsumer, consumerName, position);
                     }
                     else if (status.IsStopped)
                     {
@@ -138,10 +139,10 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await DispatchConsumer(@event, eventConsumer, consumerName);
 
-            await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, storedEvent.EventPosition);
+            await eventConsumerInfoRepository.SetPositionAsync(consumerName, storedEvent.EventPosition, false);
         }
 
-        private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName)
+        private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName, string position)
         {
             var actionId = Guid.NewGuid().ToString();
             try
@@ -153,7 +154,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
 
                 await eventConsumer.ClearAsync();
-                await eventConsumerInfoRepository.SetLastHandledEventNumberAsync(consumerName, null);
+                await eventConsumerInfoRepository.SetPositionAsync(consumerName, position, true);
 
                 log.LogInformation(w => w
                     .WriteProperty("action", "EventConsumerReset")

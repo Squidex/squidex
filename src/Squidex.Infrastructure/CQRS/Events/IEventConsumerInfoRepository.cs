@@ -25,6 +25,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         Task ResetAsync(string consumerName);
 
-        Task SetLastHandledEventNumberAsync(string consumerName, string position);
+        Task SetPositionAsync(string consumerName, string position, bool reset);
     }
 }

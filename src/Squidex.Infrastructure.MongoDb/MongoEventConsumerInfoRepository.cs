@@ -13,6 +13,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 
+// ReSharper disable ConvertIfStatementToReturnStatement
+// ReSharper disable RedundantIfElseBlock
+
 namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class MongoEventConsumerInfoRepository : MongoRepositoryBase<MongoEventConsumerInfo>, IEventConsumerInfoRepository
@@ -74,9 +77,16 @@ namespace Squidex.Infrastructure.MongoDb
             return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsResetting, true));
         }
 
-        public Task SetLastHandledEventNumberAsync(string consumerName, string position)
+        public Task SetPositionAsync(string consumerName, string position, bool reset)
         {
-            return Collection.ReplaceOneAsync(x => x.Name == consumerName, CreateEntity(consumerName, position));
+            if (reset)
+            {
+                return Collection.ReplaceOneAsync(x => x.Name == consumerName, CreateEntity(consumerName, position));
+            }
+            else
+            {
+                return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.Position, position));
+            }
         }
 
         private static MongoEventConsumerInfo CreateEntity(string consumerName, string position)
