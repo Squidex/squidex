@@ -24,7 +24,6 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private const int Retries = 500;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private readonly IEventNotifier notifier;
 
