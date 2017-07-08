@@ -8,10 +8,8 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Squidex.Core\Squidex.Core.csproj" />
-    <ProjectReference Include="..\Squidex.Events\Squidex.Events.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
-    <ProjectReference Include="..\Squidex.Read\Squidex.Read.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NodaTime" Version="2.0.3" />

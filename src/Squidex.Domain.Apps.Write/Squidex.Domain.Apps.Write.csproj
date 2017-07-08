@@ -8,16 +8,13 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Squidex.Core\Squidex.Core.csproj" />
-    <ProjectReference Include="..\Squidex.Events\Squidex.Events.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.2" />
     <PackageReference Include="NodaTime" Version="2.0.3" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.7.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
 </Project>

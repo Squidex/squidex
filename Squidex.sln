@@ -8,27 +8,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "squidex_infrastructure", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "squidex_domain", "squidex_domain", "{4C6B06C2-6D77-4E0E-AE32-D7050236433A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Core", "src\Squidex.Core\Squidex.Core.csproj", "{47F3C27E-698B-4EDF-A7E8-D7F4232AFBB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core", "src\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj", "{47F3C27E-698B-4EDF-A7E8-D7F4232AFBB0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure", "src\Squidex.Infrastructure\Squidex.Infrastructure.csproj", "{BD1C30A8-8FFA-4A92-A9BD-B67B1CDDD84C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Events", "src\Squidex.Events\Squidex.Events.csproj", "{25F66C64-058A-4D44-BC0C-F12A054F9A91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Events", "src\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj", "{25F66C64-058A-4D44-BC0C-F12A054F9A91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Write", "src\Squidex.Write\Squidex.Write.csproj", "{A85201C6-6AF8-4B63-8365-08F741050438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Write", "src\Squidex.Domain.Apps.Write\Squidex.Domain.Apps.Write.csproj", "{A85201C6-6AF8-4B63-8365-08F741050438}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read", "src\Squidex.Read\Squidex.Read.csproj", "{A92B4734-2587-4F6F-97A3-741BE48709A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Read", "src\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj", "{A92B4734-2587-4F6F-97A3-741BE48709A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read.MongoDb", "src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Read.MongoDb", "src\Squidex.Domain.Apps.Read.MongoDb\Squidex.Domain.Apps.Read.MongoDb.csproj", "{28F8E9E2-FE24-41F7-A888-9FC244A9E2DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Write.Tests", "tests\Squidex.Write.Tests\Squidex.Write.Tests.csproj", "{9A3DEA7E-1681-4D48-AC5C-1F0DE421A203}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Write.Tests", "tests\Squidex.Domain.Apps.Write.Tests\Squidex.Domain.Apps.Write.Tests.csproj", "{9A3DEA7E-1681-4D48-AC5C-1F0DE421A203}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Tests", "tests\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj", "{7FD0A92B-7862-4BB1-932B-B52A9CACB56B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Core.Tests", "tests\Squidex.Core.Tests\Squidex.Core.Tests.csproj", "{FD0AFD44-7A93-4F9E-B5ED-72582392E435}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Tests", "tests\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj", "{FD0AFD44-7A93-4F9E-B5ED-72582392E435}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.MongoDb", "src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj", "{6A811927-3C37-430A-90F4-503E37123956}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Read.Tests", "tests\Squidex.Read.Tests\Squidex.Read.Tests.csproj", "{8B074219-F69A-4E41-83C6-12EE1E647779}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Read.Tests", "tests\Squidex.Domain.Apps.Read.Tests\Squidex.Domain.Apps.Read.Tests.csproj", "{8B074219-F69A-4E41-83C6-12EE1E647779}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Redis", "src\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj", "{D7166C56-178A-4457-B56A-C615C7450DEE}"
 EndProject

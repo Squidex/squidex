@@ -3,18 +3,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <RootNamespace>Squidex.Read</RootNamespace>
+    <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Squidex.Core\Squidex.Core.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Squidex.Read\Squidex.Read.csproj" />
-    <ProjectReference Include="..\..\src\Squidex.Read.MongoDb\Squidex.Read.MongoDb.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
     <PackageReference Include="Moq" Version="4.7.63" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
