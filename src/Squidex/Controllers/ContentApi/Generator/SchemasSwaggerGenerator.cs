@@ -6,21 +6,17 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
-using NJsonSchema.Generation;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
-using Squidex.Controllers.Api;
 using Squidex.Core.Identity;
-using Squidex.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Read.Apps;
@@ -34,108 +30,36 @@ namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
-        private readonly SwaggerJsonSchemaGenerator schemaGenerator;
-        private readonly SwaggerDocument document = new SwaggerDocument { Tags = new List<SwaggerTag>() };
-        private readonly SwaggerSettings swaggerSettings;
         private readonly HttpContext context;
-        private readonly JsonSchemaResolver schemaResolver;
-        private readonly SwaggerGenerator swaggerGenerator;
+        private readonly SwaggerSettings settings;
         private readonly MyUrlsOptions urlOptions;
-        private readonly string schemaQueryDescription;
-        private readonly string schemaBodyDescription;
-        private JsonSchema4 errorDtoSchema;
-        private string appBasePath;
-        private IAppEntity app;
+        private SwaggerJsonSchemaGenerator schemaGenerator;
+        private JsonSchemaResolver schemaResolver;
+        private SwaggerGenerator swaggerGenerator;
+        private SwaggerDocument document;
 
         public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
         {
             this.context = context.HttpContext;
-
+            this.settings = settings;
             this.urlOptions = urlOptions.Value;
+        }
+
+        public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        {
+            document = SwaggerHelper.CreateApiDocument(context, urlOptions, app.Name);
 
             schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
             schemaResolver = new SwaggerSchemaResolver(document, settings);
 
-            swaggerSettings = settings;
             swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
 
-            schemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
-            schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
-        }
-
-        public async Task<SwaggerDocument> Generate(IAppEntity targetApp, IEnumerable<ISchemaEntity> schemas)
-        {
-            app = targetApp;
-
-            await GenerateBasicSchemas();
-
-            GenerateBasePath();
-            GenerateTitle();
-            GenerateRequestInfo();
-            GenerateContentTypes();
-            GenerateSchemes();
-            GenerateSchemasOperations(schemas);
-            GenerateSecurityDefinitions();
+            GenerateSchemasOperations(schemas, app);
             GenerateSecurityRequirements();
-            GenerateDefaultErrors();
-            GeneratePing();
+
+            await GenerateDefaultErrorsAsync();
 
             return document;
-        }
-
-        private void GenerateBasePath()
-        {
-            appBasePath = $"/content/{app.Name}";
-        }
-
-        private void GenerateSchemes()
-        {
-            document.Schemes.Add(context.Request.Scheme == "http" ? SwaggerSchema.Http : SwaggerSchema.Https);
-        }
-
-        private void GenerateTitle()
-        {
-            document.Host = context.Request.Host.Value ?? string.Empty;
-            document.BasePath = "/api";
-        }
-
-        private void GenerateRequestInfo()
-        {
-            document.Info = new SwaggerInfo
-            {
-                ExtensionData = new Dictionary<string, object>
-                {
-                    ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
-                },
-                Title = $"Suidex API for {app.Name} App"
-            };
-        }
-
-        private void GenerateContentTypes()
-        {
-            document.Consumes = new List<string>
-            {
-                "application/json"
-            };
-
-            document.Produces = new List<string>
-            {
-                "application/json"
-            };
-        }
-
-        private void GenerateSecurityDefinitions()
-        {
-            document.SecurityDefinitions.Add("OAuth2", SwaggerHelper.CreateOAuthSchema(urlOptions));
-        }
-
-        private async Task GenerateBasicSchemas()
-        {
-            var errorType = typeof(ErrorDto);
-            var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], swaggerSettings.DefaultEnumHandling);
-
-            errorDtoSchema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
         }
 
         private void GenerateSecurityRequirements()
@@ -154,258 +78,26 @@ namespace Squidex.Controllers.ContentApi.Generator
             }
         }
 
-        private void GenerateDefaultErrors()
+        private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
         {
-            foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
-            {
-                operation.Responses.Add("500", new SwaggerResponse { Description = "Operation failed with internal server error.", Schema = errorDtoSchema });
-            }
-        }
+            var appBasePath = $"/content/{app.Name}";
 
-        private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas)
-        {
             foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
             {
-                GenerateSchemaOperations(schema);
+                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
             }
         }
 
-        private void GenerateSchemaOperations(Schema schema)
+        private async Task GenerateDefaultErrorsAsync()
         {
-            var schemaIdentifier = schema.Name.ToPascalCase();
-            var schemaName = !string.IsNullOrWhiteSpace(schema.Properties.Label) ? schema.Properties.Label.Trim() : schema.Name;
+            const string errorDescription = "Operation failed with internal server error.";
 
-            document.Tags.Add(
-                new SwaggerTag
-                {
-                    Name = schemaName,
-                    Description = $"API to managed {schemaName} contents."
-                });
+            var errorDtoSchema = await swaggerGenerator.GetErrorDtoSchemaAsync();
 
-            var dataSchema = AppendSchema($"{schemaIdentifier}Dto", schema.BuildJsonSchema(app.PartitionResolver, AppendSchema));
-
-            var schemaOperations = new List<SwaggerOperations>
+            foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
             {
-                GenerateSchemaQueryOperation(schema, schemaName, schemaIdentifier, dataSchema),
-                GenerateSchemaCreateOperation(schema, schemaName, schemaIdentifier, dataSchema),
-                GenerateSchemaGetOperation(schema, schemaName, schemaIdentifier, dataSchema),
-                GenerateSchemaUpdateOperation(schema, schemaName, schemaIdentifier, dataSchema),
-                GenerateSchemaPatchOperation(schema, schemaName, schemaIdentifier, dataSchema),
-                GenerateSchemaPublishOperation(schema, schemaName, schemaIdentifier),
-                GenerateSchemaUnpublishOperation(schema, schemaName, schemaIdentifier),
-                GenerateSchemaDeleteOperation(schema, schemaName, schemaIdentifier)
-            };
-
-            foreach (var operation in schemaOperations.SelectMany(x => x.Values).Distinct())
-            {
-                operation.Tags = new List<string> { schemaName };
+                operation.Responses.Add("500", new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
             }
-        }
-
-        private void GeneratePing()
-        {
-            var swaggerOperation = AddOperation(SwaggerOperationMethod.Get, null, $"ping/{app.Name}", operation =>
-            {
-                operation.OperationId = "MakePingTest";
-
-                operation.Description = "Make a simple request, e.g. to test credentials.";
-
-                operation.Summary = "Make Test";
-
-            });
-
-            foreach (var operation in swaggerOperation.Values)
-            {
-                operation.Tags = new List<string> { "PingTest" };
-            }
-        }
-
-        private SwaggerOperations GenerateSchemaQueryOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            return AddOperation(SwaggerOperationMethod.Get, null, $"{appBasePath}/{schema.Name}", operation =>
-            {
-                operation.OperationId = $"Query{schemaIdentifier}Contents";
-
-                operation.Summary = $"Queries {schemaName} contents.";
-
-                operation.Description = schemaQueryDescription;
-
-                operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take.");
-                operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
-                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
-                operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
-                operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
-
-                var responseSchema = CreateContentsSchema(schemaName, schema.Name, dataSchema);
-
-                operation.AddResponse("200", $"{schemaName} content retrieved.", responseSchema);
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaGetOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
-            {
-                operation.OperationId = $"Get{schemaIdentifier}Content";
-
-                operation.Summary = $"Get a {schemaName} content.";
-
-                var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
-
-                operation.AddResponse("200", $"{schemaName} content found.", responseSchema);
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaCreateOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            return AddOperation(SwaggerOperationMethod.Post, null, $"{appBasePath}/{schema.Name}", operation =>
-            {
-                operation.OperationId = $"Create{schemaIdentifier}Content";
-
-                operation.Summary = $"Create a {schemaName} content.";
-
-                var responseSchema = CreateContentSchema(schemaName, schemaIdentifier, dataSchema);
-
-                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-                operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
-                operation.AddResponse("201", $"{schemaName} created.", responseSchema);
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaUpdateOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
-            {
-                operation.OperationId = $"Update{schemaIdentifier}Content";
-
-                operation.Summary = $"Update a {schemaName} content.";
-
-                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-                operation.AddResponse("204", $"{schemaName} element updated.");
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaPatchOperation(Schema schema, string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appBasePath}/{schema.Name}/{{id}}", operation =>
-            {
-                operation.OperationId = $"Path{schemaIdentifier}Content";
-
-                operation.Summary = $"Patchs a {schemaName} content.";
-
-                operation.AddBodyParameter(dataSchema, "data", schemaBodyDescription);
-                operation.AddResponse("204", $"{schemaName} element updated.");
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaPublishOperation(Schema schema, string schemaName, string schemaIdentifier)
-        {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/publish", operation =>
-            {
-                operation.OperationId = $"Publish{schemaIdentifier}Content";
-
-                operation.Summary = $"Publish a {schemaName} content.";
-
-                operation.AddResponse("204", $"{schemaName} element published.");
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaUnpublishOperation(Schema schema, string schemaName, string schemaIdentifier)
-        {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/unpublish", operation =>
-            {
-                operation.OperationId = $"Unpublish{schemaIdentifier}Content";
-
-                operation.Summary = $"Unpublish a {schemaName} content.";
-
-                operation.AddResponse("204", $"{schemaName} element unpublished.");
-            });
-        }
-
-        private SwaggerOperations GenerateSchemaDeleteOperation(Schema schema, string schemaName, string schemaIdentifier)
-        {
-            return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appBasePath}/{schema.Name}/{{id}}/", operation =>
-            {
-                operation.OperationId = $"Delete{schemaIdentifier}Content";
-
-                operation.Summary = $"Delete a {schemaName} content.";
-
-                operation.AddResponse("204", $"{schemaName} content deleted.");
-            });
-        }
-
-        private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
-        {
-            var operations = document.Paths.GetOrAdd(path, k => new SwaggerOperations());
-            var operation = new SwaggerOperation();
-
-            updater(operation);
-
-            operations[method] = operation;
-
-            if (entityName != null)
-            {
-                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} content (GUID).");
-
-                operation.AddResponse("404", $"App, schema or {entityName} content not found.");
-            }
-
-            return operations;
-        }
-
-        private JsonSchema4 CreateContentsSchema(string schemaName, string id, JsonSchema4 dataSchema)
-        {
-            var contentSchema = CreateContentSchema(schemaName, id, dataSchema);
-
-            var schema = new JsonSchema4
-            {
-                Properties =
-                {
-                    ["total"] = new JsonProperty
-                    {
-                        Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} contents."
-                    },
-                    ["items"] = new JsonProperty
-                    {
-                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The {schemaName} contents."
-                    }
-                },
-                Type = JsonObjectType.Object
-            };
-
-            return schema;
-        }
-
-        private JsonSchema4 CreateContentSchema(string schemaName, string schemaIdentifier, JsonSchema4 dataSchema)
-        {
-            var dataProperty = new JsonProperty { Description = schemaBodyDescription, Type = JsonObjectType.Object, IsRequired = true, SchemaReference = dataSchema };
-
-            var schema = new JsonSchema4
-            {
-                Properties =
-                {
-                    ["id"] = CreateProperty($"The id of the {schemaName} content."),
-                    ["data"] = dataProperty,
-                    ["version"] = CreateProperty($"The version of the {schemaName}", JsonObjectType.Number),
-                    ["created"] = CreateProperty($"The date and time when the {schemaName} content has been created.", "date-time"),
-                    ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content."),
-                    ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content has been modified last.", "date-time"),
-                    ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.")
-                },
-                Type = JsonObjectType.Object
-            };
-
-            return AppendSchema($"{schemaIdentifier}ContentDto", schema);
-        }
-
-        private static JsonProperty CreateProperty(string description, JsonObjectType type)
-        {
-            return new JsonProperty { Description = description, IsRequired = true, Type = type };
-        }
-
-        private static JsonProperty CreateProperty(string description, string format = null)
-        {
-            return new JsonProperty { Description = description, Format = format, IsRequired = true, Type = JsonObjectType.String };
         }
 
         private JsonSchema4 AppendSchema(string name, JsonSchema4 schema)

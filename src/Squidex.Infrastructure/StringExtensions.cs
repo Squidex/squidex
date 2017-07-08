@@ -36,5 +36,10 @@ namespace Squidex.Infrastructure
         {
             return string.Concat(value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(c => char.ToUpper(c[0]) + c.Substring(1)));
         }
+
+        public static string WithFallback(this string value, string fallback)
+        {
+            return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
+        }
     }
 }

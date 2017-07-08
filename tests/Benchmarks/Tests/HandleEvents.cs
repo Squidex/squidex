@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;

@@ -6,34 +6,70 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using NJsonSchema;
 using NSwag;
 using Squidex.Config;
 using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using NSwag.SwaggerGeneration;
+using Squidex.Controllers.Api;
 using Squidex.Core.Identity;
 
 namespace Squidex.Pipeline.Swagger
 {
     public static class SwaggerHelper
     {
-        private static readonly ConcurrentDictionary<string, string> Docs = new ConcurrentDictionary<string, string>();
-
         public static string LoadDocs(string name)
         {
-            return Docs.GetOrAdd(name, x =>
+            var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
+
+            using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {
-                var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
+                var streamReader = new StreamReader(resourceStream);
 
-                using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
+                return streamReader.ReadToEnd();
+            }
+        }
+
+        public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
+        {
+            var document = new SwaggerDocument
+            {
+                Tags = new List<SwaggerTag>(),
+                Schemes = new List<SwaggerSchema>
                 {
-                    var streamReader = new StreamReader(resourceStream);
+                    context.Request.Scheme == "http" ? SwaggerSchema.Http : SwaggerSchema.Https
+                },
+                Consumes = new List<string>
+                {
+                    "application/json"
+                },
+                Produces = new List<string>
+                {
+                    "application/json"
+                },
+                Info = new SwaggerInfo
+                {
+                    ExtensionData = new Dictionary<string, object>
+                    {
+                        ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
+                    },
+                    Title = $"Suidex API for {appName} App"
+                },
+                BasePath = "/api"
+            };
 
-                    return streamReader.ReadToEnd();
-                }
-            });
+            if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))
+            {
+                document.Host = context.Request.Host.Value;
+            }
+
+            document.SecurityDefinitions.Add("OAuth2", CreateOAuthSchema(urlOptions));
+
+            return document;
         }
 
         public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
@@ -60,6 +96,13 @@ namespace Squidex.Pipeline.Swagger
                 };
 
             return result;
+        }
+
+        public static async Task<JsonSchema4> GetErrorDtoSchemaAsync(this SwaggerGenerator swaggerGenerator)
+        {
+            var errorType = typeof(ErrorDto);
+
+            return await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, false, null);
         }
 
         public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)
@@ -89,7 +132,7 @@ namespace Squidex.Pipeline.Swagger
             operation.Parameters.Add(parameter);
         }
 
-        public static void AddBodyParameter(this SwaggerOperation operation, JsonSchema4 schema, string name, string description)
+        public static void AddBodyParameter(this SwaggerOperation operation, string name, JsonSchema4 schema, string description)
         {
             var parameter = new SwaggerParameter { Schema = schema, Name = name, Kind = SwaggerParameterKind.Body };
 

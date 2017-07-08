@@ -6,16 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NSwag;
-using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Controllers.Api;
+using Squidex.Pipeline.Swagger;
 
 // ReSharper disable UseObjectOrCollectionInitializer
 
@@ -24,13 +21,6 @@ namespace Squidex.Config.Swagger
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
         private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Description>.*)", RegexOptions.Compiled);
-
-        private readonly SwaggerSettings swaggerSettings;
-
-        public XmlResponseTypesProcessor(SwaggerSettings swaggerSettings)
-        {
-            this.swaggerSettings = swaggerSettings;
-        }
 
         public async Task<bool> ProcessAsync(OperationProcessorContext context)
         {
@@ -69,22 +59,14 @@ namespace Squidex.Config.Swagger
             return true;
         }
 
-        private async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
+        private static async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
         {
             if (operation.Responses.ContainsKey("500"))
             {
                 return;
             }
 
-            var errorType = typeof(ErrorDto);
-            var errorContract = swaggerSettings.ActualContractResolver.ResolveContract(errorType);
-            var errorSchema = JsonObjectTypeDescription.FromType(errorType, errorContract, new Attribute[0], swaggerSettings.DefaultEnumHandling);
-
-            var response = new SwaggerResponse { Description = "Operation failed." };
-
-            response.Schema = await context.SwaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, errorSchema.IsNullable, null);
-
-            operation.Responses.Add("500", response);
+            operation.AddResponse("500", "Operation failed", await context.SwaggerGenerator.GetErrorDtoSchemaAsync());
         }
 
         private static void RemoveOkResponse(SwaggerOperation operation)

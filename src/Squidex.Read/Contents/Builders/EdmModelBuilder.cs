@@ -57,6 +57,7 @@ namespace Squidex.Read.Contents.Builders
 
             var entityType = new EdmEntityType("Squidex", schema.Name);
             entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
+            entityType.AddStructuralProperty("version", EdmPrimitiveTypeKind.Int32);
             entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
