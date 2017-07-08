@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Controllers.Api.Statistics.Models
 {
     public class CurrentCallsDto

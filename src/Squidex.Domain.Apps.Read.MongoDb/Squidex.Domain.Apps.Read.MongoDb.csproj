@@ -24,9 +24,4 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="Microsoft.OData.Core" Version="6.15.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>C:\Users\mail2\.nuget\packages\system.reflection.metadata\1.4.1\lib\netstandard1.1\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

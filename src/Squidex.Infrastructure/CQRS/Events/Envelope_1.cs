@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class Envelope<TPayload> where TPayload : class
