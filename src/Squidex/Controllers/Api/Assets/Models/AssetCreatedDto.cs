@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetDto.cs
+//  AssetCreatedDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,8 +8,8 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Controllers.Api.Assets.Models
 {

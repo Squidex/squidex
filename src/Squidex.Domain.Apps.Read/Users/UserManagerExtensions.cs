@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Read.Users
         {
             var result = userManager.Users;
 
-            if (email != null && !string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(email))
             {
                 var upperEmail = email.ToUpperInvariant();
 

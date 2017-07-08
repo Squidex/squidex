@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
-using System.Linq;
 
 // ReSharper disable ConvertToConstant.Local
 

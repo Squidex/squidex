@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  StringExtensionsTests.cs
+//  StringExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

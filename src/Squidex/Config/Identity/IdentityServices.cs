@@ -1,5 +1,4 @@
-﻿
-// ==========================================================================
+﻿// ==========================================================================
 //  IdentityServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
@@ -19,8 +18,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Identity;
-using Squidex.Infrastructure;
 using Squidex.Domain.Apps.Read.Users;
+using Squidex.Infrastructure;
 using StackExchange.Redis;
 
 namespace Squidex.Config.Identity

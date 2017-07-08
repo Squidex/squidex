@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
 using System.Collections.Immutable;
 using System.Linq;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core
 {

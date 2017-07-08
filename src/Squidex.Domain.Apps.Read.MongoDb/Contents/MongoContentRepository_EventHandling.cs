@@ -12,10 +12,10 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
 // ReSharper disable UnusedParameterGlobal
 // ReSharper disable ConvertToLambdaExpression

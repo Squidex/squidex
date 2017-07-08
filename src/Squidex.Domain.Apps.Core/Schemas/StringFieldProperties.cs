@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure;
 
 // ReSharper disable ObjectCreationAsStatement
 

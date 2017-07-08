@@ -17,11 +17,13 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Contents;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
+// ReSharper disable CollectionNeverUpdated.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 

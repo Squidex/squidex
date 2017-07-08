@@ -8,13 +8,13 @@
 
 using System.Collections.Generic;
 using System.IO;
-using NJsonSchema;
-using NSwag;
-using Squidex.Config;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using NJsonSchema;
+using NSwag;
 using NSwag.SwaggerGeneration;
+using Squidex.Config;
 using Squidex.Controllers.Api;
 using Squidex.Domain.Apps.Core.Identity;
 

@@ -14,9 +14,9 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Infrastructure;
 
 namespace Squidex.Config.Identity
 {

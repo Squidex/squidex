@@ -12,12 +12,12 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Domain.Apps.Write.Apps.Commands;
 
 // ReSharper disable InvertIf
 

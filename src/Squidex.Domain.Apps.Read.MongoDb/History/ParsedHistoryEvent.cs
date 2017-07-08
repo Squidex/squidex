@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using NodaTime;
-using Squidex.Infrastructure;
 using Squidex.Domain.Apps.Read.History;
+using Squidex.Infrastructure;
 
 // ReSharper disable LoopCanBeConvertedToQuery
 

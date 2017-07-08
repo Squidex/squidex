@@ -16,14 +16,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Domain.Apps.Write.Assets.Commands;
 
 namespace Squidex.Controllers.Api.Assets
 {

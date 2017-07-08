@@ -12,11 +12,6 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.MongoDb.UsageTracker;
-using Squidex.Infrastructure.UsageTracking;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
@@ -32,6 +27,11 @@ using Squidex.Domain.Apps.Read.MongoDb.Users;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Apps.Read.Users;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.MongoDb.UsageTracker;
+using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Config.Domain
 {

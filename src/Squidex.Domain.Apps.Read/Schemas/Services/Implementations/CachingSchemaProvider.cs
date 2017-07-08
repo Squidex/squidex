@@ -10,12 +10,12 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Domain.Apps.Read.Utils;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf

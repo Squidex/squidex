@@ -5,7 +5,6 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-
 namespace Squidex.Controllers.UI
 {
     public class ExternalProvider

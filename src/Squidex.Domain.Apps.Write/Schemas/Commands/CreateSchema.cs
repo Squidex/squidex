@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Write.Schemas.Commands.CreateSchemaField>;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands

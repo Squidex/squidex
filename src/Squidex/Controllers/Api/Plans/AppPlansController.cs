@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Plans.Models;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Plans
 {

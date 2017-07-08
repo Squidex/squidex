@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ReferenceFieldPropertiesTests.cs
+//  ReferencesFieldPropertiesTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

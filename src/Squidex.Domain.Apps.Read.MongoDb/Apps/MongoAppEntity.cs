@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Apps;
 
 // ReSharper disable InvertIf
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global

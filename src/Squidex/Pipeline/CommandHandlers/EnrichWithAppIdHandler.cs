@@ -9,10 +9,10 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Write;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Write;
 
 // ReSharper disable InvertIf
 

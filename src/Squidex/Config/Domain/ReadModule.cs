@@ -11,7 +11,6 @@ using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -22,6 +21,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Apps.Read.Users;
+using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CollectionExtensions.cs
+//  MongoCollectionExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

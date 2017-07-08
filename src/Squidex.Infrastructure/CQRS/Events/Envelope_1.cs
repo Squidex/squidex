@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
-//  Envelope.cs
+//  Envelope_1.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class Envelope<TPayload> where TPayload : class

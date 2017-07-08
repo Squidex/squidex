@@ -9,12 +9,12 @@
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Pipeline.CommandHandlers;
 using Squidex.Domain.Apps.Write.Apps;
 using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Pipeline.CommandHandlers;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 

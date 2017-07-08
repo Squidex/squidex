@@ -8,7 +8,6 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Events.Schemas.SchemaCreatedField>;
 
 namespace Squidex.Domain.Apps.Events.Schemas

@@ -16,12 +16,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
 
 namespace Squidex.Domain.Apps.Read.Schemas
 {

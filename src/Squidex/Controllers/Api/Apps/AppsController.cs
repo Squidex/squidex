@@ -13,12 +13,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Apps.Repositories;
-using Squidex.Domain.Apps.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Apps
 {

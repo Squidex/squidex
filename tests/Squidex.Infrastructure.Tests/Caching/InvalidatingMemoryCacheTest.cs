@@ -101,9 +101,7 @@ namespace Squidex.Infrastructure.Caching
 
             cache.Setup(x => x.TryGetValue("a-key", out currentOut)).Returns(true);
 
-            object result;
-
-            var exists = sut.TryGetValue("a-key", out result);
+            var exists = sut.TryGetValue("a-key", out object result);
 
             Assert.Equal(123, result);
             Assert.True(exists);

@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using Microsoft.OData.Core;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.Builders;
@@ -22,6 +20,8 @@ using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {

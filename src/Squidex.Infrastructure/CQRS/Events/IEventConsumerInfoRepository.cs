@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IEventCatchConsumerControlStore.cs
+//  IEventConsumerInfoRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

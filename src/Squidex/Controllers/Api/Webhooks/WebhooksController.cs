@@ -13,11 +13,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Webhooks.Models;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Domain.Apps.Write.Schemas.Commands;
 
 namespace Squidex.Controllers.Api.Webhooks
 {    

@@ -15,13 +15,13 @@ using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Reflection;
-using Squidex.Pipeline;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Controllers.ContentApi
 {

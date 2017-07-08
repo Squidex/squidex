@@ -9,10 +9,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Controllers.Api.Schemas.Models;
-using Squidex.Pipeline;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.Schemas
 {

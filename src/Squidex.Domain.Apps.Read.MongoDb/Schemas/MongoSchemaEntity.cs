@@ -11,9 +11,9 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {

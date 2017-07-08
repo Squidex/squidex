@@ -8,12 +8,12 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Read.Schemas.Services;
-using Squidex.Domain.Apps.Write.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {

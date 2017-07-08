@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  GeolocationFieldPropertiesDto.cs
+//  GeolocationPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {

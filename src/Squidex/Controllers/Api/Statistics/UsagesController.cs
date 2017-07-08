@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Statistics.Models;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
 
 namespace Squidex.Controllers.Api.Statistics
 {

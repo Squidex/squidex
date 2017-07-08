@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Write.Assets.Commands;
 
 namespace Squidex.Domain.Apps.Write.Assets
 {

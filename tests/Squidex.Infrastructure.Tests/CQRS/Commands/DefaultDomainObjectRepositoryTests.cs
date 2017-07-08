@@ -7,14 +7,13 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Infrastructure.CQRS.Events;
-using Xunit;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.Tasks;
+using Xunit;
 
 // ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable

@@ -9,13 +9,13 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Commands;
+using Moq;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
-using Xunit;
-using Moq;
+using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
+using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 

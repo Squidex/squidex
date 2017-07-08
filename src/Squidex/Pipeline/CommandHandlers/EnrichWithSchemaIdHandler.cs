@@ -9,12 +9,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write;
 using Squidex.Domain.Apps.Write.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 
 // ReSharper disable InvertIf
 

@@ -12,10 +12,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Moq;
 using Squidex.Domain.Apps.Events.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local

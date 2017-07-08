@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppHistoryEventsCreator.cs
+//  SchemaHistoryEventsCreator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,9 +9,9 @@
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Domain.Apps.Read.History;
 
 // ReSharper disable InvertIf
 

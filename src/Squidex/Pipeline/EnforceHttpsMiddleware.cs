@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SingleUrlsMiddleware.cs
+//  EnforceHttpsMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

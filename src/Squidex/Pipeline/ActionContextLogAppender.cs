@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  HttpLogAppender.cs
+//  ActionContextLogAppender.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

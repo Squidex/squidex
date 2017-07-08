@@ -11,11 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Read.Assets;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Assets;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {

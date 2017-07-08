@@ -8,11 +8,11 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {

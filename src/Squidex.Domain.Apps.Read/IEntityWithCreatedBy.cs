@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ITrackCreatedByEntity.cs
+//  IEntityWithCreatedBy.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

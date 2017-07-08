@@ -6,8 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Moq;
 using System;
+using Moq;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands

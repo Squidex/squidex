@@ -13,11 +13,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.History.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.History
 {

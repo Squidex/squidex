@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppFilterAttribute.cs
+//  AppApiFilter.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -14,10 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Identity;
-using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.UsageTracking;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.UsageTracking;
 
 // ReSharper disable SwitchStatementMissingSomeCases
 

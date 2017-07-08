@@ -9,11 +9,11 @@
 using System;
 using System.IO;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Domain.Apps.Write.Assets.Commands;
-using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RequiredValidatorTests.cs
+//  RequiredStringValidatorTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

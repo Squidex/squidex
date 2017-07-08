@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MinMaxValidatorTests.cs
+//  RangeValidatorTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

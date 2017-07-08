@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
-using Squidex.Pipeline;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.Apps
 {

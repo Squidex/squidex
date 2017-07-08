@@ -12,15 +12,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Dispatching;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable ConvertToLambdaExpression
 

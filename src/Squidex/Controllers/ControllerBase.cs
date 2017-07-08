@@ -8,9 +8,9 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Controllers
 {

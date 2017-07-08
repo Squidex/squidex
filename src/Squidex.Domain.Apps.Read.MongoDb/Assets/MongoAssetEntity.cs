@@ -1,8 +1,16 @@
-﻿using System;
+﻿// ==========================================================================
+//  MongoAssetEntity.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Domain.Apps.Read.Assets;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {

@@ -5,7 +5,6 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-
 namespace Squidex.Domain.Apps.Read
 {
     public interface IEntityWithVersion

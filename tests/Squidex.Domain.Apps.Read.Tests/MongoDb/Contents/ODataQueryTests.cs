@@ -16,12 +16,12 @@ using MongoDB.Driver;
 using Moq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Builders;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 // ReSharper disable SpecifyACultureInStringConversionExplicitly

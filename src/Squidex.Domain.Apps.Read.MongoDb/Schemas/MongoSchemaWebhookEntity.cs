@@ -12,6 +12,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Read.Schemas;
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public class MongoSchemaWebhookEntity : ISchemaWebhookEntity

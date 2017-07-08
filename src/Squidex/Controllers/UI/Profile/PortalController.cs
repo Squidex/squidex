@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Infrastructure.Security;
 using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Controllers.UI.Profile 
 {

@@ -17,10 +17,10 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Domain.Apps.Core.Identity;
-using Squidex.Infrastructure;
-using Squidex.Pipeline.Swagger;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Pipeline.Swagger;
 
 // ReSharper disable InvertIf
 // ReSharper disable SuggestBaseTypeForParameter

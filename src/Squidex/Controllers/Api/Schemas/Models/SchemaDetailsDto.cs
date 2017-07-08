@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {

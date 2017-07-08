@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IHistoryEventCreator.cs
+//  IHistoryEventsCreator.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

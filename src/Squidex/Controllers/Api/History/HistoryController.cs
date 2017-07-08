@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.History.Models;
+using Squidex.Domain.Apps.Read.History.Repositories;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.History.Repositories;
 
 namespace Squidex.Controllers.Api.History
 {

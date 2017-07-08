@@ -12,8 +12,6 @@ using Moq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
@@ -22,6 +20,8 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local

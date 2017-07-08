@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ApiWeightAttribute.cs
+//  ApiCostsAttribute.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

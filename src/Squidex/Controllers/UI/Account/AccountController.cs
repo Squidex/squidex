@@ -16,15 +16,15 @@ using System.Threading.Tasks;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Microsoft.Extensions.Options;
+using NSwag.Annotations;
 using Squidex.Config;
 using Squidex.Config.Identity;
 using Squidex.Domain.Apps.Core.Identity;
+using Squidex.Domain.Apps.Read.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Read.Users;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock

@@ -6,10 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
-using System;
 
 // ReSharper disable InvertIf
 

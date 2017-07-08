@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
-using Xunit;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Moq;
 using Squidex.Infrastructure.Log;
+using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {

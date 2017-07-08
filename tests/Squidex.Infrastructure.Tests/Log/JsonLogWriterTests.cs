@@ -6,8 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Squidex.Infrastructure.Log
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Log
             var value = DateTimeOffset.UtcNow;
             var result = sut.WriteProperty("property", value).ToString();
 
-            Assert.Equal($"{{\"property\":\"{value.ToString("o")}\"}}", result);
+            Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Log
             var value = DateTime.UtcNow;
             var result = sut.WriteProperty("property", value).ToString();
 
-            Assert.Equal($"{{\"property\":\"{value.ToString("o")}\"}}", result);
+            Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace Squidex.Infrastructure.Log
             var value = DateTimeOffset.UtcNow;
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
-            Assert.Equal($"{{\"property\":[\"{value.ToString("o")}\"]}}", result);
+            Assert.Equal($"{{\"property\":[\"{value:o}\"]}}", result);
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure.Log
             var value = DateTime.UtcNow;
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
-            Assert.Equal($"{{\"property\":[\"{value.ToString("o")}\"]}}", result);
+            Assert.Equal($"{{\"property\":[\"{value:o}\"]}}", result);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_pretty_json()
         {
-            IObjectWriter prettySut = new JsonLogWriter(Formatting.Indented, false);
+            IObjectWriter prettySut = new JsonLogWriter(Formatting.Indented);
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
             

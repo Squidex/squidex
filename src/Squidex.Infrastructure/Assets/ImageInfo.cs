@@ -3,9 +3,8 @@
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
-//  All rights reserved.d
+//  All rights reserved.
 // ==========================================================================
-
 namespace Squidex.Infrastructure.Assets
 {
     public sealed class ImageInfo

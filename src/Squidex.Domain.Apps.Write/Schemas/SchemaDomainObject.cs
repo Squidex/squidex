@@ -7,16 +7,16 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Domain.Apps.Write.Schemas.Commands;
-using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {

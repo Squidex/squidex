@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Infrastructure.Reflection;
 
 // ReSharper disable InvertIf
 

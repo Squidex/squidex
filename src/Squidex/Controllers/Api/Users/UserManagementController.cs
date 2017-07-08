@@ -13,11 +13,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
+using Squidex.Domain.Apps.Read.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Domain.Apps.Read.Users;
 
 namespace Squidex.Controllers.Api.Users
 {
