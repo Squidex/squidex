@@ -16,7 +16,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.Contents.Builders
+namespace Squidex.Domain.Apps.Read.Contents.Edm
 {
     public sealed class EdmModelBuilder : CachingProviderBase
     {

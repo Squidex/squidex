@@ -15,7 +15,7 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;

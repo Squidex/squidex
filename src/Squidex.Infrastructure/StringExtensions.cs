@@ -27,9 +27,9 @@ namespace Squidex.Infrastructure
             return value != null && PropertyNameRegex.IsMatch(value);
         }
 
-        public static string ToCamelCase(this string value)
+        public static string WithFallback(this string value, string fallback)
         {
-            return char.ToLower(value[0]) + value.Substring(1);
+            return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
         }
 
         public static string ToPascalCase(this string value)
@@ -37,9 +37,11 @@ namespace Squidex.Infrastructure
             return string.Concat(value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(c => char.ToUpper(c[0]) + c.Substring(1)));
         }
 
-        public static string WithFallback(this string value, string fallback)
+        public static string ToCamelCase(this string value)
         {
-            return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
+            value = value.ToPascalCase();
+
+            return char.ToLower(value[0]) + value.Substring(1);
         }
     }
 }
