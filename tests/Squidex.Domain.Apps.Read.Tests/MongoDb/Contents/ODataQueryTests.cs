@@ -17,7 +17,7 @@ using Moq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;

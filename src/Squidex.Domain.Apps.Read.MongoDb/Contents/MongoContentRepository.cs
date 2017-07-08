@@ -15,7 +15,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
