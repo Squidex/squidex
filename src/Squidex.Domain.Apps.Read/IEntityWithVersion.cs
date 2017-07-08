@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read
+namespace Squidex.Domain.Apps.Read
 {
     public interface IEntityWithVersion
     {

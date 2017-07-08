@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     public sealed class SchemaCreatedField
     {

@@ -14,19 +14,19 @@ using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Moq;
-using Squidex.Core;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Apps;
-using Squidex.Read.Contents.Builders;
-using Squidex.Read.MongoDb.Contents.Visitors;
-using Squidex.Read.Schemas;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
+using Squidex.Domain.Apps.Read.Schemas;
 using Xunit;
 
 // ReSharper disable SpecifyACultureInStringConversionExplicitly
 
-namespace Squidex.Read.MongoDb.Contents
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public class ODataQueryTests
     {

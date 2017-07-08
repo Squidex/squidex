@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntityLanguage
     {

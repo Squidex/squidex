@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppClientEntity
     {

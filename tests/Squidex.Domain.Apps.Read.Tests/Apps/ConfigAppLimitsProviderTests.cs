@@ -9,10 +9,10 @@
 using System.Linq;
 using FluentAssertions;
 using Moq;
-using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Xunit;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public class ConfigAppLimitsProviderTests
     {

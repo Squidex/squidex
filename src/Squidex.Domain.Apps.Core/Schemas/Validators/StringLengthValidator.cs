@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public class StringLengthValidator : IValidator
     {

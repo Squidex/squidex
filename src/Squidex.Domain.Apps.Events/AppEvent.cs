@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events
+namespace Squidex.Domain.Apps.Events
 {
     public abstract class AppEvent : SquidexEvent
     {

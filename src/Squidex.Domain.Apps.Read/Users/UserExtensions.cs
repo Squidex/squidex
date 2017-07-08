@@ -8,12 +8,12 @@
 
 using System;
 using System.Linq;
-using Squidex.Core.Identity;
+using Squidex.Domain.Apps.Core.Identity;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public static class UserExtensions
     {

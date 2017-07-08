@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("WebhookAddedEvent")]
     public sealed class WebhookAdded : SchemaEvent

@@ -8,17 +8,17 @@
 
 using System;
 using FluentAssertions;
-using Squidex.Core.Contents;
-using Squidex.Events.Contents;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Write.Contents.Commands;
-using Squidex.Write.TestHelpers;
+using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Contents
+namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>
     {

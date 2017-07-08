@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure.Assets;
 
-namespace Squidex.Write.Assets.Commands
+namespace Squidex.Domain.Apps.Write.Assets.Commands
 {
     public class UpdateAsset : AssetAggregateCommand
     {

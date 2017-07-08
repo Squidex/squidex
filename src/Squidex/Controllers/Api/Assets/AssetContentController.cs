@@ -14,7 +14,7 @@ using NSwag.Annotations;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
-using Squidex.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 
 #pragma warning disable 1573
 

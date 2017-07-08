@@ -9,7 +9,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Infrastructure;
 
-namespace Squidex.Read.Utils
+namespace Squidex.Domain.Apps.Read.Utils
 {
     public abstract class CachingProviderBase
     {

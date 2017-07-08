@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps
 {
     [TypeName("AppLanguageRemovedEvent")]
     public sealed class AppLanguageRemoved : AppEvent

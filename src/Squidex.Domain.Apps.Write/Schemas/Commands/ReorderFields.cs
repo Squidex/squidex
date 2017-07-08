@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
     public class ReorderFields : SchemaAggregateCommand, IValidatable
     {

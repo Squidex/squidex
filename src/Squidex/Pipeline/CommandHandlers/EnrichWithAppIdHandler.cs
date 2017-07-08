@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Write;
+using Squidex.Domain.Apps.Write;
 
 // ReSharper disable InvertIf
 

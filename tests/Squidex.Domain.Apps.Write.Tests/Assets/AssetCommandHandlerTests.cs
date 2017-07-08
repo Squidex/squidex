@@ -11,15 +11,15 @@ using System.IO;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Write.Assets.Commands;
-using Squidex.Write.TestHelpers;
+using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 using Moq;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Assets
+namespace Squidex.Domain.Apps.Write.Assets
 {
     public class AssetCommandHandlerTests : HandlerTestBase<AssetDomainObject>
     {

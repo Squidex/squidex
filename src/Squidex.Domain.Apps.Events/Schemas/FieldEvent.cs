@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     public abstract class FieldEvent : SchemaEvent
     {

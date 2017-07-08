@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
-using Squidex.Core.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {

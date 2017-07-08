@@ -11,11 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
-using Squidex.Core;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
-using Squidex.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.Contents.Builders;
 
 // ReSharper disable InvertIf
 

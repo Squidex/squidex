@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Assets.Commands
+namespace Squidex.Domain.Apps.Write.Assets.Commands
 {
     public sealed class RenameAsset : AssetAggregateCommand, IValidatable
     {

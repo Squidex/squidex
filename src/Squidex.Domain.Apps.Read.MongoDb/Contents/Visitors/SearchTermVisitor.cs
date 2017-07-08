@@ -11,7 +11,7 @@ using Microsoft.OData.Core.UriParser.Semantic;
 using Microsoft.OData.Core.UriParser.TreeNodeKinds;
 using Microsoft.OData.Core.UriParser.Visitors;
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public class SearchTermVisitor : QueryNodeVisitor<string>
     {

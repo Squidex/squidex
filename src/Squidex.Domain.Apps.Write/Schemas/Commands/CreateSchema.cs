@@ -8,13 +8,13 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 
-using SchemaFields = System.Collections.Generic.List<Squidex.Write.Schemas.Commands.CreateSchemaField>;
+using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Write.Schemas.Commands.CreateSchemaField>;
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
     public class CreateSchema : AppCommand, IValidatable, IAggregateCommand
     {

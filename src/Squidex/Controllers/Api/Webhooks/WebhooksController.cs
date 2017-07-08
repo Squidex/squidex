@@ -16,8 +16,8 @@ using Squidex.Controllers.Api.Webhooks.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 
 namespace Squidex.Controllers.Api.Webhooks
 {    

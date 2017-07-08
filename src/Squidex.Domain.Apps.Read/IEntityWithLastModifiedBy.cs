@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Read
+namespace Squidex.Domain.Apps.Read
 {
     public interface IEntityWithLastModifiedBy
     {

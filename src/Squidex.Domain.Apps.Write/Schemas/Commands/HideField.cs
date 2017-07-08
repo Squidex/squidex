@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
     public class HideField : FieldCommand
     {

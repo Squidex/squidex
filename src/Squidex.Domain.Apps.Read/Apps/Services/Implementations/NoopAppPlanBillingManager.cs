@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Read.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
     public sealed class NoopAppPlanBillingManager : IAppPlanBillingManager
     {

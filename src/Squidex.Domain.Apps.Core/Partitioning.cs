@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public delegate IFieldPartitioning PartitionResolver(Partitioning key);
 

@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("SchemaFieldsReorderedEvent")]
     public class SchemaFieldsReordered : SchemaEvent

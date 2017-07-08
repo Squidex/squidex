@@ -2,9 +2,9 @@
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Assets;
+using Squidex.Domain.Apps.Read.Assets;
 
-namespace Squidex.Read.MongoDb.Assets
+namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public sealed class MongoAssetEntity : MongoEntity, IAssetEntity
     {

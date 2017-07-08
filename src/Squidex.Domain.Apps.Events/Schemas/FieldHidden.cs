@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("FieldHiddenEvent")]
     public class FieldHidden : FieldEvent

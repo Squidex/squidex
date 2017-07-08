@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Write.Assets.Commands
+namespace Squidex.Domain.Apps.Write.Assets.Commands
 {
     public sealed class DeleteAsset : AssetAggregateCommand
     {

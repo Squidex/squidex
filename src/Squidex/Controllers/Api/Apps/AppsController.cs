@@ -17,8 +17,8 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Repositories;
-using Squidex.Write.Apps.Commands;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Apps
 {

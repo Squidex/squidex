@@ -10,14 +10,14 @@ using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
-using Squidex.Core;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Read.Apps;
-using Squidex.Read.Schemas;
-using Squidex.Read.Utils;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Utils;
 
-namespace Squidex.Read.Contents.Builders
+namespace Squidex.Domain.Apps.Read.Contents.Builders
 {
     public sealed class EdmModelBuilder : CachingProviderBase
     {

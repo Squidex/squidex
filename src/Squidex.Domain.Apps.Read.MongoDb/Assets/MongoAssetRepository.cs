@@ -14,12 +14,12 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Assets;
-using Squidex.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Assets;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 
 // ReSharper disable ClassNeverInstantiated.Local
 
-namespace Squidex.Read.MongoDb.Assets
+namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
     {

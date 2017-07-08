@@ -20,11 +20,11 @@ using NSwag.Annotations;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Config.Identity;
-using Squidex.Core.Identity;
+using Squidex.Domain.Apps.Core.Identity;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock

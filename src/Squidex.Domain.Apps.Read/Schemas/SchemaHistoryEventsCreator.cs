@@ -7,15 +7,15 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Events;
-using Squidex.Events.Schemas;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Read.History;
+using Squidex.Domain.Apps.Read.History;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public sealed class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
     {

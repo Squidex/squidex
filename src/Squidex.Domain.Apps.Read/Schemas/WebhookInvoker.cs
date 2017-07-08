@@ -15,15 +15,15 @@ using System.Threading.Tasks.Dataflow;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
-using Squidex.Events.Contents;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public sealed class WebhookInvoker : DisposableObjectBase, IEventConsumer
     {

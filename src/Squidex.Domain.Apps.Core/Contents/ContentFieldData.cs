@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class ContentFieldData : Dictionary<string, JToken>, IEquatable<ContentFieldData>
     {

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Read.History
+namespace Squidex.Domain.Apps.Read.History
 {
     public interface IHistoryEventsCreator
     {

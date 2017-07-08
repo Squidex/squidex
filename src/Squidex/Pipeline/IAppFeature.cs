@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Pipeline
 {

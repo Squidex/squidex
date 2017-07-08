@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Core;
+using Squidex.Domain.Apps.Core;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppEntity : IEntity, IEntityWithVersion
     {

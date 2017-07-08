@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Write.Assets.Commands
+namespace Squidex.Domain.Apps.Write.Assets.Commands
 {
     public abstract class AssetAggregateCommand : AppCommand, IAggregateCommand
     {

@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public interface ISchemaWebhookEntity : ISchemaWebhookUrlEntity
     {

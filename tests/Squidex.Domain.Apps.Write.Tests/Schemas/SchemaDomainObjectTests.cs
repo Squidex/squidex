@@ -9,17 +9,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Squidex.Core.Schemas;
-using Squidex.Events.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Write.Schemas.Commands;
-using Squidex.Write.TestHelpers;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject>
     {

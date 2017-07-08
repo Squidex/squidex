@@ -12,7 +12,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Read.MongoDb.History
+namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     public sealed class MongoHistoryEventEntity : MongoEntity, IAppRefEntity, IEntityWithCreatedBy
     {

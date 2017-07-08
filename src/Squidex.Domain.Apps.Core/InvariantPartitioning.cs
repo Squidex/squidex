@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public sealed class InvariantPartitioning : IFieldPartitioning
     {

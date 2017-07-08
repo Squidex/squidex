@@ -11,7 +11,7 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Write.TestHelpers
+namespace Squidex.Domain.Apps.Write.TestHelpers
 {
     public static class AssertHelper
     {

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IReferenceField
     {

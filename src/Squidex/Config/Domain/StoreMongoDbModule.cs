@@ -17,21 +17,21 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.UsageTracker;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Read.Apps.Repositories;
-using Squidex.Read.Apps.Services.Implementations;
-using Squidex.Read.Assets.Repositories;
-using Squidex.Read.Contents.Repositories;
-using Squidex.Read.History.Repositories;
-using Squidex.Read.MongoDb.Apps;
-using Squidex.Read.MongoDb.Assets;
-using Squidex.Read.MongoDb.Contents;
-using Squidex.Read.MongoDb.History;
-using Squidex.Read.MongoDb.Infrastructure;
-using Squidex.Read.MongoDb.Schemas;
-using Squidex.Read.MongoDb.Users;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.Schemas.Services.Implementations;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.Repositories;
+using Squidex.Domain.Apps.Read.History.Repositories;
+using Squidex.Domain.Apps.Read.MongoDb.Apps;
+using Squidex.Domain.Apps.Read.MongoDb.Assets;
+using Squidex.Domain.Apps.Read.MongoDb.Contents;
+using Squidex.Domain.Apps.Read.MongoDb.History;
+using Squidex.Domain.Apps.Read.MongoDb.Infrastructure;
+using Squidex.Domain.Apps.Read.MongoDb.Schemas;
+using Squidex.Domain.Apps.Read.MongoDb.Users;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Users;
 
 namespace Squidex.Config.Domain
 {

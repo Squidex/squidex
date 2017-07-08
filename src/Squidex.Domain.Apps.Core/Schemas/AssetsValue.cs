@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class AssetsValue
     {

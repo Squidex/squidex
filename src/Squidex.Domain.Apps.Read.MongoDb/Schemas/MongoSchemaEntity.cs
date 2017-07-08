@@ -9,13 +9,13 @@
 using System;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
-using Squidex.Core.Schemas;
-using Squidex.Core.Schemas.Json;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas;
 
-namespace Squidex.Read.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntity
     {

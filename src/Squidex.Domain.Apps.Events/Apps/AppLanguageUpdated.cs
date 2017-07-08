@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps
 {
     [TypeName("AppLanguageUpdated")]
     public sealed class AppLanguageUpdated : AppEvent

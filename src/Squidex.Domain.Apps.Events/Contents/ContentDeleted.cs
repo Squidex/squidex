@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentDeletedEvent")]
     public class ContentDeleted : ContentEvent

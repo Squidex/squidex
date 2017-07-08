@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class NamedElementPropertiesBase
     {

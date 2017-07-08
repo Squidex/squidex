@@ -12,10 +12,10 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Schemas.Services;
-using Squidex.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 
-namespace Squidex.Write.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaCommandHandler : ICommandHandler
     {

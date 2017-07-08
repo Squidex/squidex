@@ -10,7 +10,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
-using Squidex.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Controllers
 {

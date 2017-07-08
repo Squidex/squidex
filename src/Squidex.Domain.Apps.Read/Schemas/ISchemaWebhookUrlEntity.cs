@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public interface ISchemaWebhookUrlEntity
     {

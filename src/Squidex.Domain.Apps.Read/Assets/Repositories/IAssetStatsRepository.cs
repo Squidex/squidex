@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Read.Assets.Repositories
+namespace Squidex.Domain.Apps.Read.Assets.Repositories
 {
     public interface IAssetStatsRepository
     {

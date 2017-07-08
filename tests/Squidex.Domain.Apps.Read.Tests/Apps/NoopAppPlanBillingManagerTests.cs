@@ -8,10 +8,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Xunit;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public class NoopAppPlanBillingManagerTests
     {

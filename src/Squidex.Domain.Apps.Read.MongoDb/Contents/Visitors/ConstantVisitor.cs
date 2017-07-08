@@ -17,7 +17,7 @@ using NodaTime.Text;
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable InvertIf
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public sealed class ConstantVisitor : QueryNodeVisitor<object>
     {

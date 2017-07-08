@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public class RequiredValidator : IValidator
     {

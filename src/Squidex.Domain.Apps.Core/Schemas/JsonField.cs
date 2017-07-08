@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
-using Squidex.Core.Schemas.Validators;
+using Squidex.Domain.Apps.Core.Schemas.Validators;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class JsonField : Field<JsonFieldProperties>
     {

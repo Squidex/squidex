@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public interface IUser
     {

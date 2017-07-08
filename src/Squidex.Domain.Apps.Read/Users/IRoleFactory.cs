@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public interface IRoleFactory
     {

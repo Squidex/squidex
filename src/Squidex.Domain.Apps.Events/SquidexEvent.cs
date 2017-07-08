@@ -9,7 +9,7 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Events
+namespace Squidex.Domain.Apps.Events
 {
     public abstract class SquidexEvent : IEvent
     {

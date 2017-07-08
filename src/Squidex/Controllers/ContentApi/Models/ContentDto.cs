@@ -9,10 +9,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
-using Squidex.Core.Contents;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Write.Contents.Commands;
+using Squidex.Domain.Apps.Write.Contents.Commands;
 
 namespace Squidex.Controllers.ContentApi.Models
 {

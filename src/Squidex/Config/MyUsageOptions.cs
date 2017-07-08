@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Read.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 
 namespace Squidex.Config
 {

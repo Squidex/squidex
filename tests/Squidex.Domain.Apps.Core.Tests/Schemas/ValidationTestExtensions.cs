@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Squidex.Core.Schemas.Validators;
+using Squidex.Domain.Apps.Core.Schemas.Validators;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class ValidationTestExtensions
     {

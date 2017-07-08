@@ -9,18 +9,18 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Events;
-using Squidex.Events.Apps;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Apps.Repositories;
-using Squidex.Read.Utils;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Utils;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Read.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
     public class CachingAppProvider : CachingProviderBase, IAppProvider, IEventConsumer
     {

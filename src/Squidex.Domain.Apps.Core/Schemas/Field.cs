@@ -12,14 +12,14 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
-using Squidex.Core.Schemas.Validators;
+using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class Field : CloneableBase
     {

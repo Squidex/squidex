@@ -6,14 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Events;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable SuspiciousTypeConversion.Global
 
-namespace Squidex.Read.MongoDb.Utils
+namespace Squidex.Domain.Apps.Read.MongoDb.Utils
 {
     public static class EntityMapper
     {

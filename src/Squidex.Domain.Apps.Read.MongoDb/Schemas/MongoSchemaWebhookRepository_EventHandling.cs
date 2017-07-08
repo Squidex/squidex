@@ -8,13 +8,13 @@
 
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Read.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaWebhookRepository
     {

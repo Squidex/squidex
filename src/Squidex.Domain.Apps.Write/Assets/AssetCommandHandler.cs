@@ -12,9 +12,9 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Write.Assets.Commands;
+using Squidex.Domain.Apps.Write.Assets.Commands;
 
-namespace Squidex.Write.Assets
+namespace Squidex.Domain.Apps.Write.Assets
 {
     public class AssetCommandHandler : ICommandHandler
     {

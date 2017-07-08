@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure.Security;
-using Squidex.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Apps.Services;
 
 namespace Squidex.Controllers.UI.Profile 
 {

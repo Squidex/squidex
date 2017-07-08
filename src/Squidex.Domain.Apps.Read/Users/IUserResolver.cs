@@ -8,7 +8,7 @@
 
 using System.Threading.Tasks;
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public interface IUserResolver
     {

@@ -16,11 +16,11 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Controllers.Api.Schemas.Models.Converters;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Pipeline;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 
 namespace Squidex.Controllers.Api.Schemas
 {

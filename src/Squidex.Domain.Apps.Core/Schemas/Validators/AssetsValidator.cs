@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public sealed class AssetsValidator : IValidator
     {

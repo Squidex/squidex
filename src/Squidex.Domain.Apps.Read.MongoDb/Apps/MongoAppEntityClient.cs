@@ -7,9 +7,9 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps;
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntityClient : IAppClientEntity
     {

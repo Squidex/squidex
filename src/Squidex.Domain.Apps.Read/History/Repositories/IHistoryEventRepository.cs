@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Read.History.Repositories
+namespace Squidex.Domain.Apps.Read.History.Repositories
 {
     public interface IHistoryEventRepository
     {

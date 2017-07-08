@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Contents;
+using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Read.Contents
+namespace Squidex.Domain.Apps.Read.Contents
 {
     public interface IContentEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {

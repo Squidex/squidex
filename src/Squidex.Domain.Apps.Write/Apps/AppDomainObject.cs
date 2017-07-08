@@ -8,20 +8,20 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Core;
-using Squidex.Core.Apps;
-using Squidex.Events;
-using Squidex.Events.Apps;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Write.Apps.Commands;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Write.Apps
+namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppDomainObject : DomainObjectBase
     {

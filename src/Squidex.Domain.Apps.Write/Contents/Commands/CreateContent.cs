@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Write.Contents.Commands
+namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
     public class CreateContent : ContentDataCommand
     {

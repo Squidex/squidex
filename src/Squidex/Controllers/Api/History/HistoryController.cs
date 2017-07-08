@@ -14,7 +14,7 @@ using Squidex.Controllers.Api.History.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.History.Repositories;
+using Squidex.Domain.Apps.Read.History.Repositories;
 
 namespace Squidex.Controllers.Api.History
 {

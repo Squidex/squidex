@@ -9,7 +9,7 @@
 using System;
 using NodaTime;
 
-namespace Squidex.Read
+namespace Squidex.Domain.Apps.Read
 {
     public interface IEntity
     {

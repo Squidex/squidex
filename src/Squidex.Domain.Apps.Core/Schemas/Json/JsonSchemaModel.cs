@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Squidex.Core.Schemas.Json
+namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
     {

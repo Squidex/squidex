@@ -11,14 +11,14 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Apps.Repositories;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Users;
-using Squidex.Write.Apps.Commands;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Write.Apps
+namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppCommandHandler : ICommandHandler
     {

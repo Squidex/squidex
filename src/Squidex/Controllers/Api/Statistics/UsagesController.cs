@@ -15,8 +15,8 @@ using Squidex.Controllers.Api.Statistics.Models;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 
 namespace Squidex.Controllers.Api.Statistics
 {

@@ -10,15 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Core;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps;
 
 // ReSharper disable InvertIf
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity
     {

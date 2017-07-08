@@ -9,12 +9,12 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Read.MongoDb.Utils
+namespace Squidex.Domain.Apps.Read.MongoDb.Utils
 {
     public static class MongoCollectionExtensions
     {

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public class RangeValidatorTests
     {

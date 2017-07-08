@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Read.History
+namespace Squidex.Domain.Apps.Read.History
 {
     public sealed class HistoryEventToStore
     {

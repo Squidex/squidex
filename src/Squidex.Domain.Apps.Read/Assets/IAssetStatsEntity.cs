@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Read.Assets
+namespace Squidex.Domain.Apps.Read.Assets
 {
     public interface IAssetStatsEntity
     {

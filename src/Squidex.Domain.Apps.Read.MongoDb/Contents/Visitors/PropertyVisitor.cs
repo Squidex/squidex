@@ -12,12 +12,12 @@ using System.Linq;
 using Microsoft.OData.Core.UriParser.Semantic;
 using Microsoft.OData.Core.UriParser.Visitors;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
 // ReSharper disable InvertIf
 // ReSharper disable RedundantIfElseBlock
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public sealed class PropertyVisitor : QueryNodeVisitor<ImmutableList<string>>
     {

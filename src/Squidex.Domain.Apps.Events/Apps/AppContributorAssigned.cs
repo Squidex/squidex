@@ -6,10 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps
 {
     [TypeName("AppContributorAssignedEvent")]
     public class AppContributorAssigned : AppEvent

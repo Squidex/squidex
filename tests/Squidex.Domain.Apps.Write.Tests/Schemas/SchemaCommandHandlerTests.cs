@@ -10,18 +10,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Services;
-using Squidex.Write.Schemas.Commands;
-using Squidex.Write.TestHelpers;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaCommandHandlerTests : HandlerTestBase<SchemaDomainObject>
     {

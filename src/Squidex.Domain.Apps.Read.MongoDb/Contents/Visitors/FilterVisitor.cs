@@ -13,13 +13,13 @@ using Microsoft.OData.Core.UriParser.TreeNodeKinds;
 using Microsoft.OData.Core.UriParser.Visitors;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
 // ReSharper disable InvertIf
 // ReSharper disable SwitchStatementMissingSomeCases
 // ReSharper disable ConvertIfStatementToSwitchStatement
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public class FilterVisitor : QueryNodeVisitor<FilterDefinition<MongoContentEntity>>
     {

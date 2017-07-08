@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppContributorEntity
     {

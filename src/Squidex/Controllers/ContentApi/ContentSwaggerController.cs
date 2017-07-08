@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Generator;
 using Squidex.Pipeline;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
 
 // ReSharper disable UseObjectOrCollectionInitializer
 

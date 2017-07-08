@@ -8,14 +8,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Events;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
 #pragma warning disable IDE0019
 
-namespace Squidex.Write.TestHelpers
+namespace Squidex.Domain.Apps.Write.TestHelpers
 {
     public abstract class HandlerTestBase<T> where T : DomainObjectBase
     {

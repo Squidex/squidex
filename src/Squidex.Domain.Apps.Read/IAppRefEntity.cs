@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Read
+namespace Squidex.Domain.Apps.Read
 {
     public interface IAppRefEntity : IEntity
     {

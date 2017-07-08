@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Apps
+namespace Squidex.Domain.Apps.Write.Apps
 {
     public sealed class AppClient
     {

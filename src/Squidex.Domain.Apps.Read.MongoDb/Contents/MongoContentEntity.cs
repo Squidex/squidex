@@ -15,17 +15,17 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
 using NodaTime;
-using Squidex.Core.Contents;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
-namespace Squidex.Read.MongoDb.Contents
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {

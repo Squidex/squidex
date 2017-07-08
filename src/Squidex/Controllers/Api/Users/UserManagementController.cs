@@ -17,7 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
 namespace Squidex.Controllers.Api.Users
 {

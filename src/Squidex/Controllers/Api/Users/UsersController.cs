@@ -18,7 +18,7 @@ using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
 // ReSharper disable InvertIf
 

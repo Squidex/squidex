@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Core.Contents;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Contents.Commands
+namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
     public abstract class ContentDataCommand : ContentCommand, IValidatable
     {

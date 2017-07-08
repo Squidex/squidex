@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Core.Schemas.Validators
+namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public sealed class AllowedValuesValidator<T> : IValidator
     {

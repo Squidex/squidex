@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Write.Assets.Commands;
+using Squidex.Domain.Apps.Write.Assets.Commands;
 
 namespace Squidex.Controllers.Api.Assets.Models
 {

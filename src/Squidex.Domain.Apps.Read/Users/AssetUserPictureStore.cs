@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public sealed class AssetUserPictureStore : IUserPictureStore
     {

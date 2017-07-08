@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.Apps;
-using Squidex.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
     {

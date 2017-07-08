@@ -8,7 +8,7 @@
 
 using System;
 using NJsonSchema.Annotations;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Controllers.Api.Schemas.Models

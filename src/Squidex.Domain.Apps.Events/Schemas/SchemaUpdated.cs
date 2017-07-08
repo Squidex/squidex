@@ -6,10 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("SchemaUpdatedEvent")]
     public class SchemaUpdated : SchemaEvent

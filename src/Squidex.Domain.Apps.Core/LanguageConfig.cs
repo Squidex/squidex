@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public sealed class LanguageConfig : IFieldPartitionItem
     {

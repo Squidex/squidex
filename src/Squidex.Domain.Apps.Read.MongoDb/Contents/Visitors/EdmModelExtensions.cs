@@ -11,7 +11,7 @@ using System.Linq;
 using Microsoft.OData.Core.UriParser;
 using Microsoft.OData.Edm;
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public static class EdmModelExtensions
     {

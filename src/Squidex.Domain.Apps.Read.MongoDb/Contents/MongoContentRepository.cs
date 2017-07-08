@@ -15,15 +15,15 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Read.Apps;
-using Squidex.Read.Contents;
-using Squidex.Read.Contents.Builders;
-using Squidex.Read.Contents.Repositories;
-using Squidex.Read.MongoDb.Contents.Visitors;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.Contents.Repositories;
+using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Services;
 
-namespace Squidex.Read.MongoDb.Contents
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IEventConsumer
     {

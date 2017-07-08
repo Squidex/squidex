@@ -8,16 +8,16 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Core.Schemas;
-using Squidex.Events;
-using Squidex.Events.Schemas;
-using Squidex.Events.Schemas.Utils;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.MongoDb.Utils;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
-namespace Squidex.Read.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
     {

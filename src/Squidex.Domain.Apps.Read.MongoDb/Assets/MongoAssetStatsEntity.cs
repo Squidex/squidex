@@ -9,9 +9,9 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Read.Assets;
+using Squidex.Domain.Apps.Read.Assets;
 
-namespace Squidex.Read.MongoDb.Assets
+namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public sealed class MongoAssetStatsEntity : IAssetStatsEntity
     {

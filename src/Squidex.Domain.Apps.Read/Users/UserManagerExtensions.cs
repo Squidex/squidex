@@ -17,7 +17,7 @@ using Squidex.Infrastructure;
 // ReSharper disable InvertIf
 // ReSharper disable ReturnTypeCanBeEnumerable.Local
 
-namespace Squidex.Read.Users
+namespace Squidex.Domain.Apps.Read.Users
 {
     public static class UserManagerExtensions
     {

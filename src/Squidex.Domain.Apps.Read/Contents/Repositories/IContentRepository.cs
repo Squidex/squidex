@@ -9,9 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps;
 
-namespace Squidex.Read.Contents.Repositories
+namespace Squidex.Domain.Apps.Read.Contents.Repositories
 {
     public interface IContentRepository
     {

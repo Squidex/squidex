@@ -12,16 +12,16 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Read.Apps;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Apps.Services.Implementations;
-using Squidex.Read.Contents;
-using Squidex.Read.Contents.Builders;
-using Squidex.Read.History;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Services;
-using Squidex.Read.Schemas.Services.Implementations;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents.Builders;
+using Squidex.Domain.Apps.Read.History;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Users;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 

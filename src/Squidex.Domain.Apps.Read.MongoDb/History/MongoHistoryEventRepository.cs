@@ -12,14 +12,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Read.History;
-using Squidex.Read.History.Repositories;
-using Squidex.Read.MongoDb.Utils;
+using Squidex.Domain.Apps.Read.History;
+using Squidex.Domain.Apps.Read.History.Repositories;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
-namespace Squidex.Read.MongoDb.History
+namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     public class MongoHistoryEventRepository : MongoRepositoryBase<MongoHistoryEventEntity>, IHistoryEventRepository, IEventConsumer
     {

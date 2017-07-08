@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public class FieldRegistryTests
     {

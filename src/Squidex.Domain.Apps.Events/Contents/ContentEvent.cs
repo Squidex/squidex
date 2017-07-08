@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents
 {
     public abstract class ContentEvent : SchemaEvent
     {

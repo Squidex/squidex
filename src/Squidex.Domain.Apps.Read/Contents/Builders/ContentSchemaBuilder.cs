@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using NJsonSchema;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Read.Contents.Builders
+namespace Squidex.Domain.Apps.Read.Contents.Builders
 {
     public sealed class ContentSchemaBuilder
     {

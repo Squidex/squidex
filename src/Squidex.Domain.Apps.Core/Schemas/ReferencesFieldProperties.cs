@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("References")]
     public sealed class ReferencesFieldProperties : FieldProperties

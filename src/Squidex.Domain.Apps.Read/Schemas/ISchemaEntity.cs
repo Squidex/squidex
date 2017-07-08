@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public interface ISchemaEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {

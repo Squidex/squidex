@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Apps.Commands
+namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
     public class RemoveContributor : AppAggregateCommand, IValidatable
     {

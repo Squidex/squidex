@@ -10,21 +10,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Core;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Assets.Repositories;
-using Squidex.Read.Contents.Repositories;
-using Squidex.Read.Schemas.Services;
-using Squidex.Write.Contents.Commands;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Contents.Commands;
 
 // ReSharper disable ConvertToLambdaExpression
 
-namespace Squidex.Write.Contents
+namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentCommandHandler : ICommandHandler
     {

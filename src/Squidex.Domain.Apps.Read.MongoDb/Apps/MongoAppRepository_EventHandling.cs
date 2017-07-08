@@ -7,14 +7,14 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Events.Apps;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.MongoDb.Utils;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
-namespace Squidex.Read.MongoDb.Apps
+namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository
     {

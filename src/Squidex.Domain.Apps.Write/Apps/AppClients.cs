@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Write.Apps
+namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppClients
     {

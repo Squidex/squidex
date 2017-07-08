@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public sealed class LanguagesConfig : IFieldPartitioning
     {

@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Read.Schemas.Services
+namespace Squidex.Domain.Apps.Read.Schemas.Services
 {
     public interface ISchemaProvider
     {

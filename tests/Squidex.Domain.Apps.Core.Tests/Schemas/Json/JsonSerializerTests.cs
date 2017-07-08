@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
-namespace Squidex.Core.Schemas.Json
+namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public class JsonSerializerTests
     {

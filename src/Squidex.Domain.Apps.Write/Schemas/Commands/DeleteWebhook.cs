@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
     public class DeleteWebhook : SchemaAggregateCommand
     {

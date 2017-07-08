@@ -9,11 +9,11 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events.Assets;
+using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 
-namespace Squidex.Read.MongoDb.Assets
+namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public partial class MongoAssetStatsRepository
     {

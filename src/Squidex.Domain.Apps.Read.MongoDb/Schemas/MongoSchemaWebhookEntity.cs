@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas;
 
-namespace Squidex.Read.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public class MongoSchemaWebhookEntity : ISchemaWebhookEntity
     {

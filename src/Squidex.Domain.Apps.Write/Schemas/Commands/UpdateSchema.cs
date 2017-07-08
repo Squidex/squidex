@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Schemas.Commands
+namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
     public class UpdateSchema : SchemaAggregateCommand, IValidatable
     {

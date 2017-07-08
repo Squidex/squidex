@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using MongoDB.Driver;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
-namespace Squidex.Read.MongoDb.Users
+namespace Squidex.Domain.Apps.Read.MongoDb.Users
 {
     public sealed class MongoRoleStore : 
         IRoleStore<IRole>, 

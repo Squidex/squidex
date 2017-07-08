@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Core.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write.Apps.Commands
+namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
     public class AssignContributor : AppAggregateCommand, IValidatable
     {

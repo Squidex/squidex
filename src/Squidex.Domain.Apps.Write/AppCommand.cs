@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Write
+namespace Squidex.Domain.Apps.Write
 {
     public abstract class AppCommand : SquidexCommand
     {

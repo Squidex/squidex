@@ -20,7 +20,7 @@ using NSwag.Annotations;
 using Squidex.Config.Identity;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
 namespace Squidex.Controllers.UI.Profile
 {

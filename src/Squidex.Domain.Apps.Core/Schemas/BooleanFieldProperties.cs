@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("BooleanField")]
     public sealed class BooleanFieldProperties : FieldProperties

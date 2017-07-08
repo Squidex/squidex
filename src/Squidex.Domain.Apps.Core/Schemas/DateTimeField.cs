@@ -14,14 +14,14 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
-using Squidex.Core.Schemas.Validators;
+using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable ConvertIfStatementToSwitchStatement
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("DateTimeField")]
     public sealed class DateTimeField : Field<DateTimeFieldProperties>

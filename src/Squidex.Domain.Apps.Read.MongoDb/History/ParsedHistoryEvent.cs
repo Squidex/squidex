@@ -10,11 +10,11 @@ using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Infrastructure;
-using Squidex.Read.History;
+using Squidex.Domain.Apps.Read.History;
 
 // ReSharper disable LoopCanBeConvertedToQuery
 
-namespace Squidex.Read.MongoDb.History
+namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     internal sealed class ParsedHistoryEvent : IHistoryEventEntity
     {

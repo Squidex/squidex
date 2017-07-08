@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Core.Identity
+namespace Squidex.Domain.Apps.Core.Identity
 {
     public static class SquidexClaimTypes
     {

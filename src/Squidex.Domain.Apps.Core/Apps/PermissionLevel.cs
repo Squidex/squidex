@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Core.Apps
+namespace Squidex.Domain.Apps.Core.Apps
 {
     public enum PermissionLevel
     {

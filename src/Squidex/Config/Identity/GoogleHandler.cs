@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Squidex.Core.Identity;
+using Squidex.Domain.Apps.Core.Identity;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf

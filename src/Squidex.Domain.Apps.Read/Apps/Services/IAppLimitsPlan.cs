@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Domain.Apps.Read.Apps.Services
 {
     public interface IAppLimitsPlan
     {

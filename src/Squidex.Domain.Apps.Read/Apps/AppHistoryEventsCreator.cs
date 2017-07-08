@@ -7,15 +7,15 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Events.Apps;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
-using Squidex.Read.History;
+using Squidex.Domain.Apps.Read.History;
 
 // ReSharper disable UnusedParameter.Global
 
-namespace Squidex.Read.Apps
+namespace Squidex.Domain.Apps.Read.Apps
 {
     public class AppHistoryEventsCreator : HistoryEventsCreatorBase
     {

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class FieldRegistry
     {

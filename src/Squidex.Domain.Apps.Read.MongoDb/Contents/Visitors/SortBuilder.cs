@@ -10,13 +10,13 @@ using System.Collections.Generic;
 using Microsoft.OData.Core.UriParser;
 using Microsoft.OData.Core.UriParser.Semantic;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public static class SortBuilder
     {

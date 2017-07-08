@@ -17,12 +17,12 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Repositories; 
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Repositories; 
 
 // ReSharper disable SwitchStatementMissingSomeCases
 
-namespace Squidex.Read.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaWebhookRepository : MongoRepositoryBase<MongoSchemaWebhookEntity>, ISchemaWebhookRepository, IEventConsumer
     {

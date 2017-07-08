@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets
 {
     [TypeName("AssetRenamedEvent")]
     public class AssetRenamed : AssetEvent

@@ -13,7 +13,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable ConvertIfStatementToReturnStatement
 
-namespace Squidex.Read.History
+namespace Squidex.Domain.Apps.Read.History
 {
     public abstract class HistoryEventsCreatorBase : IHistoryEventsCreator
     {

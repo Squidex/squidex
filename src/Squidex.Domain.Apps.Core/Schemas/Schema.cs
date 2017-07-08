@@ -17,7 +17,7 @@ using Squidex.Infrastructure;
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class Schema : CloneableBase
     {

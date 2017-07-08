@@ -11,7 +11,7 @@ using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("NumberField")]
     public sealed class NumberFieldProperties : FieldProperties

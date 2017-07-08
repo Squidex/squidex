@@ -6,10 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Core.Contents;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentUpdatedEvent")]
     public class ContentUpdated : ContentEvent

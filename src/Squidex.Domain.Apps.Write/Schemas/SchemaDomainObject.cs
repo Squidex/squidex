@@ -7,18 +7,18 @@
 // ==========================================================================
 
 using System;
-using Squidex.Core.Schemas;
-using Squidex.Events.Schemas;
-using Squidex.Events.Schemas.Utils;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 using System.Collections.Generic;
 
-namespace Squidex.Write.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaDomainObject : DomainObjectBase
     {

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Read.Apps.Repositories
+namespace Squidex.Domain.Apps.Read.Apps.Repositories
 {
     public interface IAppRepository
     {

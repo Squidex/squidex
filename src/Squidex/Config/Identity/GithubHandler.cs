@@ -9,7 +9,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Squidex.Core.Identity;
+using Squidex.Domain.Apps.Core.Identity;
 
 namespace Squidex.Config.Identity
 {

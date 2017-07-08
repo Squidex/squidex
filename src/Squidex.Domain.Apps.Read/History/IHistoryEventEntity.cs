@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Read.History
+namespace Squidex.Domain.Apps.Read.History
 {
     public interface IHistoryEventEntity : IEntity
     {

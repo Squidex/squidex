@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Read.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
     public sealed class ConfigAppPlansProvider : IAppPlansProvider
     {

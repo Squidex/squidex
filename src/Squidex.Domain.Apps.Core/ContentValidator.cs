@@ -10,13 +10,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Squidex.Core.Contents;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 #pragma warning disable 168
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public sealed class ContentValidator
     {

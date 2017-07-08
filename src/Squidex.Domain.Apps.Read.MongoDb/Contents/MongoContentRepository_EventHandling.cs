@@ -9,18 +9,18 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Events.Assets;
-using Squidex.Events.Contents;
-using Squidex.Events.Schemas;
+using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Read.MongoDb.Utils;
+using Squidex.Domain.Apps.Read.MongoDb.Utils;
 
 // ReSharper disable UnusedParameterGlobal
 // ReSharper disable ConvertToLambdaExpression
 
-namespace Squidex.Read.MongoDb.Contents
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public partial class MongoContentRepository
     {

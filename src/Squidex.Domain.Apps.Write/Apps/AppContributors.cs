@@ -9,12 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Squidex.Core.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Write.Apps
+namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppContributors
     {

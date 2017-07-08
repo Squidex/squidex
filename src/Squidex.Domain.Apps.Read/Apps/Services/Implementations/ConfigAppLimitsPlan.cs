@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Read.Apps.Services.Implementations
+namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
     public sealed class ConfigAppLimitsPlan : IAppLimitsPlan
     {

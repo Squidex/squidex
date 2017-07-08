@@ -8,11 +8,11 @@
 
 using Microsoft.OData.Core.UriParser;
 using MongoDB.Driver;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 
 // ReSharper disable ConvertIfStatementToReturnStatement
 
-namespace Squidex.Read.MongoDb.Contents.Visitors
+namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public static class FilterBuilder
     {

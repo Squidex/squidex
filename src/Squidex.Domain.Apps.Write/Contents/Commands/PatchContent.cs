@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Write.Contents.Commands
+namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
     public class PatchContent : ContentDataCommand
     {

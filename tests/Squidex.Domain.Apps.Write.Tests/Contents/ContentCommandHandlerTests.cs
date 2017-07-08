@@ -9,24 +9,24 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
-using Squidex.Core;
-using Squidex.Core.Contents;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Read.Apps;
-using Squidex.Read.Apps.Services;
-using Squidex.Read.Assets.Repositories;
-using Squidex.Read.Contents.Repositories;
-using Squidex.Read.Schemas;
-using Squidex.Read.Schemas.Services;
-using Squidex.Write.Contents.Commands;
-using Squidex.Write.TestHelpers;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.Repositories;
+using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Domain.Apps.Write.TestHelpers;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 
-namespace Squidex.Write.Contents
+namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentCommandHandlerTests : HandlerTestBase<ContentDomainObject>
     {

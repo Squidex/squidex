@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Read.Apps.Services
+namespace Squidex.Domain.Apps.Read.Apps.Services
 {
     public interface IAppProvider
     {

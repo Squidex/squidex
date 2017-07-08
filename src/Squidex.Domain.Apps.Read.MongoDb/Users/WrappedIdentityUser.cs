@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity.MongoDB;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 
-namespace Squidex.Read.MongoDb.Users
+namespace Squidex.Domain.Apps.Read.MongoDb.Users
 {
     public sealed class WrappedIdentityUser : IdentityUser, IUser
     {

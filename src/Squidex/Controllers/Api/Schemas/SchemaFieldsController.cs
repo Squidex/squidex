@@ -12,7 +12,7 @@ using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Pipeline;
-using Squidex.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Write.Schemas.Commands;
 
 namespace Squidex.Controllers.Api.Schemas
 {

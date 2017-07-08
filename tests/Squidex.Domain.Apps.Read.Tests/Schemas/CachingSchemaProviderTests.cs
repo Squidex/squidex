@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Moq;
-using Squidex.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Read.Schemas.Repositories;
-using Squidex.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Xunit;
 
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable UnusedParameter.Local
 
-namespace Squidex.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public class CachingSchemaProviderTests
     {

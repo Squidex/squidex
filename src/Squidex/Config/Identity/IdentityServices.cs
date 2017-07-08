@@ -18,9 +18,9 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Core.Identity;
+using Squidex.Domain.Apps.Core.Identity;
 using Squidex.Infrastructure;
-using Squidex.Read.Users;
+using Squidex.Domain.Apps.Read.Users;
 using StackExchange.Redis;
 
 namespace Squidex.Config.Identity

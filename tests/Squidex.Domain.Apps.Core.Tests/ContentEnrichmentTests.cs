@@ -9,12 +9,12 @@
 using System;
 using NodaTime;
 using NodaTime.Text;
-using Squidex.Core.Contents;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public class ContentEnrichmentTests
     {

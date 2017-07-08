@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets
 {
     public abstract class AssetEvent : AppEvent
     {

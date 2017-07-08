@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable InvertIf
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("DateTime")]
     public sealed class DateTimeFieldProperties : FieldProperties

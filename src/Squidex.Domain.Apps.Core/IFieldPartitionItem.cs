@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public interface IFieldPartitionItem
     {

@@ -16,10 +16,10 @@ using NSwag.Annotations;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Controllers.Api.Apps.Models;
-using Squidex.Core;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
-using Squidex.Write.Apps.Commands;
+using Squidex.Domain.Apps.Write.Apps.Commands;
 
 namespace Squidex.Controllers.Api.Apps
 {

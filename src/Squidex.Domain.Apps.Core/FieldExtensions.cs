@@ -10,11 +10,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Squidex.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public static class FieldExtensions
     {

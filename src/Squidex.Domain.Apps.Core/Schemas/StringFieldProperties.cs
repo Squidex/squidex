@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 // ReSharper disable ObjectCreationAsStatement
 
-namespace Squidex.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("StringField")]
     public sealed class StringFieldProperties : FieldProperties

@@ -14,7 +14,7 @@ using Xunit;
 // ReSharper disable RedundantCast
 // ReSharper disable UseCollectionCountProperty
 
-namespace Squidex.Core
+namespace Squidex.Domain.Apps.Core
 {
     public sealed class InvariantPartitionTests
     {

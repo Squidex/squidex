@@ -8,7 +8,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentPublishedEvent")]
     public class ContentPublished : ContentEvent

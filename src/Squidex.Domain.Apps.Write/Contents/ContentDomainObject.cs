@@ -7,16 +7,16 @@
 // ==========================================================================
 
 using System;
-using Squidex.Core.Contents;
-using Squidex.Events.Contents;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Write.Contents.Commands;
+using Squidex.Domain.Apps.Write.Contents.Commands;
 
-namespace Squidex.Write.Contents
+namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentDomainObject : DomainObjectBase
     {
