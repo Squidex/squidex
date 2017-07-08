@@ -79,8 +79,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract object ConvertValue(JToken value);
 
-        public abstract IGraph
-
         public Field Hide()
         {
             return Clone<Field>(clone => clone.isHidden = true);

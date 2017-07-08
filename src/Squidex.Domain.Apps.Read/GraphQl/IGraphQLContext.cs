@@ -1,22 +1,25 @@
 ﻿// ==========================================================================
-//  IGraphQLResolver.cs
+//  SchemaGraphType.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Schemas;
+using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Read.GraphQl
 {
-    public interface IGraphQLResolver
+    public interface IGraphQLContext
     {
         IGraphType GetSchemaListType(Schema schema);
 
-        IGraphType GetSchemaListType(Guid schemaId);
+        IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IGraphType GetAssetListType();
+        (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
     }
 }
