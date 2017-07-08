@@ -42,9 +42,9 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                var upperEmail = email.ToUpperInvariant();
+                var normalizedEmail = userManager.NormalizeKey(email);
 
-                result = result.Where(x => x.NormalizedEmail.Contains(upperEmail));
+                result = result.Where(x => x.NormalizedEmail.Contains(normalizedEmail));
             }
 
             return result;
