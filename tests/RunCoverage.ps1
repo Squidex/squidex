@@ -26,7 +26,7 @@ New-Item -ItemType directory -Path $reportsFolder
 &"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
 -register:user `
 -target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Core.Tests\Squidex.Core.Tests.csproj" `
+-targetargs:"test $workingFolder\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
 -filter:"+[Squidex*]*" `
 -skipautoprops `
 -output:"$workingFolder\$reportsFolder\Core.xml" `
@@ -35,7 +35,16 @@ New-Item -ItemType directory -Path $reportsFolder
 &"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
 -register:user `
 -target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Write.Tests\Squidex.Write.Tests.csproj" `
+-targetargs:"test $workingFolder\Squidex.Domain.Apps.Read.Tests\Squidex.Domain.Apps.Read.Tests.csproj" `
+-filter:"+[Squidex*]*" `
+-skipautoprops `
+-output:"$workingFolder\$reportsFolder\Read.xml" `
+-oldStyle
+
+&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+-register:user `
+-target:"C:\Program Files\dotnet\dotnet.exe" `
+-targetargs:"test $workingFolder\Squidex.Domain.Apps.Write.Tests\Squidex.Domain.Apps.Write.Tests.csproj" `
 -filter:"+[Squidex*]*" `
 -skipautoprops `
 -output:"$workingFolder\$reportsFolder\Write.xml" `
@@ -44,10 +53,10 @@ New-Item -ItemType directory -Path $reportsFolder
 &"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
 -register:user `
 -target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Read.Tests\Squidex.Read.Tests.csproj" `
+-targetargs:"test $workingFolder\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
 -filter:"+[Squidex*]*" `
 -skipautoprops `
--output:"$workingFolder\$reportsFolder\Read.xml" `
+-output:"$workingFolder\$reportsFolder\Users.xml" `
 -oldStyle
 
 &"$userProfile\.nuget\packages\ReportGenerator\2.5.9\tools\ReportGenerator.exe" `

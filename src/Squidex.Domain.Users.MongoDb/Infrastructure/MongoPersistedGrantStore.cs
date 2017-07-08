@@ -14,7 +14,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Read.MongoDb.Infrastructure
+namespace Squidex.Domain.Users.MongoDb.Infrastructure
 {
     public class MongoPersistedGrantStore : MongoRepositoryBase<PersistedGrant>, IPersistedGrantStore
     {

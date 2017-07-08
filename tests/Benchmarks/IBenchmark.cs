@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
 namespace Benchmarks
 {
     public interface IBenchmark

@@ -13,11 +13,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
+using Squidex.Shared.Users;
 
 namespace Squidex.Controllers.Api.Users
 {
@@ -48,7 +49,7 @@ namespace Squidex.Controllers.Api.Users
             var response = new UsersDto
             {
                 Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray()
+                Items = taskForItems.Result.Select(Map).ToArray()
             };
 
             return Ok(response);
@@ -66,7 +67,7 @@ namespace Squidex.Controllers.Api.Users
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
+            var response = Map(entity);
 
             return Ok(response);
         }
@@ -121,6 +122,11 @@ namespace Squidex.Controllers.Api.Users
             await userManager.UnlockAsync(id);
 
             return NoContent();
+        }
+
+        private static UserDto Map(IUser user)
+        {
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), PictureUrl = user.PictureUrl() });
         }
 
         private bool IsSelf(string id)

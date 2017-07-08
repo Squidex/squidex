@@ -9,7 +9,8 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
+using Squidex.Shared.Users;
 
 namespace Squidex.Controllers.UI
 {

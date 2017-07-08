@@ -20,7 +20,7 @@ using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.CQRS.Events;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local

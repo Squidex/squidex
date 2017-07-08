@@ -16,9 +16,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Users.Models;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using Squidex.Shared.Users;
 
 // ReSharper disable InvertIf
 
@@ -144,7 +145,9 @@ namespace Squidex.Controllers.Api.Users
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return new FileStreamResult(await response.Content.ReadAsStreamAsync(), response.Content.Headers.ContentType.ToString());
+                        var contentType = response.Content.Headers.ContentType.ToString();
+
+                        return new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
                     }
                 }
             }

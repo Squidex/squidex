@@ -15,9 +15,6 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IdentityServer4" Version="1.5.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.MongoDB" Version="1.0.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>

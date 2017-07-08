@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<OutputType>Exe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <RootNamespace>Squidex.Domain.Apps.Write</RootNamespace>
+    <RootNamespace>Squidex.Domain.Users</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Write\Squidex.Domain.Apps.Write.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.3" />

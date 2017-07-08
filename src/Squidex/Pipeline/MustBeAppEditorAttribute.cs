@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authorization;
-using Squidex.Domain.Apps.Core.Identity;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {

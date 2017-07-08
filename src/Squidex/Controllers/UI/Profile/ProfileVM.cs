@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Shared.Users;
 
 namespace Squidex.Controllers.UI.Profile
 {

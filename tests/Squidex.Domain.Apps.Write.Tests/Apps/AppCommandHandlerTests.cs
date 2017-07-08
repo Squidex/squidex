@@ -13,11 +13,11 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
-using Squidex.Domain.Apps.Read.Users;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Shared.Users;
 using Xunit;
 
 // ReSharper disable ImplicitlyCapturedClosure

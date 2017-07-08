@@ -16,7 +16,7 @@ using NSwag;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Controllers.Api;
-using Squidex.Domain.Apps.Core.Identity;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline.Swagger
 {

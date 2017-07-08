@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Read.Users
+namespace Squidex.Domain.Users
 {
     public class AssetUserPictureStoreTests
     {

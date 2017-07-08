@@ -12,8 +12,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Identity;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
+using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 
 // ReSharper disable InvertIf
 

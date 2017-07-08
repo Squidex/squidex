@@ -9,12 +9,12 @@
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Users;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Shared.Users;
 
 // ReSharper disable InvertIf
 

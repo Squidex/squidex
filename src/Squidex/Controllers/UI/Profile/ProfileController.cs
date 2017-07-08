@@ -18,9 +18,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Config.Identity;
-using Squidex.Domain.Apps.Read.Users;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared.Users;
 
 namespace Squidex.Controllers.UI.Profile
 {
