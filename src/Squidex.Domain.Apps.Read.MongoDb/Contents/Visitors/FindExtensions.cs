@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.OData.Core.UriParser;
+using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;

@@ -8,8 +8,8 @@
 
 using System;
 using System.Linq;
-using Microsoft.OData.Core.UriParser;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
     {
         public static ODataUriParser ParseQuery(this IEdmModel model, string query)
         {
-            var path = model.EntityContainer.EntitySets().First().Path.Path.Last().Split('.').Last();
+            var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
 
             if (query.StartsWith("?"))
             {

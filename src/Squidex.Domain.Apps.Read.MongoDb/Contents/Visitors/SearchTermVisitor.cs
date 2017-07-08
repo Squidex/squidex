@@ -7,9 +7,7 @@
 // ==========================================================================
 
 using System;
-using Microsoft.OData.Core.UriParser.Semantic;
-using Microsoft.OData.Core.UriParser.TreeNodeKinds;
-using Microsoft.OData.Core.UriParser.Visitors;
+using Microsoft.OData.UriParser;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {

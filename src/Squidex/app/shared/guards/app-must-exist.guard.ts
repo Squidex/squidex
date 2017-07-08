@@ -29,8 +29,10 @@ export class AppMustExistGuard implements CanActivate {
                     }
 
                     return hasApp;
-                }).catch(() => {
+                }, () => {
                     this.router.navigate(['/404']);
+
+                    return false;
                 });
 
         return result;

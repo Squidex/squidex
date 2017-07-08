@@ -87,17 +87,17 @@ describe('ResolveContentGuard', () => {
     });
 
     it('should return content if loading succeeded', (done) => {
-        const schema = {};
+        const content: any = {};
 
         appsStore.setup(x => x.getContent('my-app', 'my-schema', '123'))
-            .returns(() => Observable.of(schema));
+            .returns(() => Observable.of(content));
         const router = new RouterMockup();
 
         const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .then(result => {
-                expect(result).toBe(schema);
+                expect(result).toBe(content);
 
                 done();
             });

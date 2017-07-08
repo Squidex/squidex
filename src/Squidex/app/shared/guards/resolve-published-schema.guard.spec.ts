@@ -76,7 +76,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     });
 
     it('should navigate to 404 page if schema not published', (done) => {
-        const schema = { isPublished: false };
+        const schema: any = { isPublished: false };
 
         schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));
@@ -94,7 +94,7 @@ describe('ResolvePublishedSchemaGuard', () => {
     });
 
     it('should return schema if loading succeeded', (done) => {
-        const schema = { isPublished: true };
+        const schema: any = { isPublished: true };
 
         schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));

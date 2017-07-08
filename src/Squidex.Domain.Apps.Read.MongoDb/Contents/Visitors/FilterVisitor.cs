@@ -8,9 +8,7 @@
 
 using System;
 using System.Linq;
-using Microsoft.OData.Core.UriParser.Semantic;
-using Microsoft.OData.Core.UriParser.TreeNodeKinds;
-using Microsoft.OData.Core.UriParser.Visitors;
+using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;

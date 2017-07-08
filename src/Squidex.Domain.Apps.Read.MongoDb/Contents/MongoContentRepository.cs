@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OData.Core;
+using Microsoft.OData;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Apps;
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 }
                 catch (ODataException ex)
                 {
-                    throw new ValidationException("Failed to parse query: " + ex.Message, ex);
+                    throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
                 }
 
                 var entities = await cursor.ToListAsync();
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 }
                 catch (ODataException ex)
                 {
-                    throw new ValidationException("Failed to parse query: " + ex.Message, ex);
+                    throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
                 }
 
                 contentsCount = await cursor.CountAsync();

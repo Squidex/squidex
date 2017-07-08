@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
-using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;

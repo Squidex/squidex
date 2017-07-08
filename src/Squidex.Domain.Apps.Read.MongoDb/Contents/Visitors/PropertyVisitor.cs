@@ -9,8 +9,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.OData.Core.UriParser.Semantic;
-using Microsoft.OData.Core.UriParser.Visitors;
+using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 

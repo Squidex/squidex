@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.OData.Edm;
-using Microsoft.OData.Edm.Library;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;

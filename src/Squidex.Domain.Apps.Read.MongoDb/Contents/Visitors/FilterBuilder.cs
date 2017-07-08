@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.OData.Core.UriParser;
+using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 

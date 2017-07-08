@@ -68,7 +68,7 @@ describe('ResolveUserGuard', () => {
     });
 
     it('should return user if loading succeeded', (done) => {
-        const user = {};
+        const user: any = {};
 
         usersService.setup(x => x.getUser('my-user'))
             .returns(() => Observable.of(user));

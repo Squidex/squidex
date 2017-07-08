@@ -76,7 +76,7 @@ describe('ResolveSchemaGuard', () => {
     });
 
     it('should return schema if loading succeeded', (done) => {
-        const schema = {};
+        const schema: any = {};
 
         schemasService.setup(x => x.getSchema('my-app', 'my-schema'))
             .returns(() => Observable.of(schema));

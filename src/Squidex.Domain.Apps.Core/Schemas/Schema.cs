@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.OData.Edm.Library;
+using Microsoft.OData.Edm;
 using NJsonSchema;
 using Squidex.Infrastructure;
 

@@ -9,7 +9,6 @@
 using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
-using Microsoft.OData.Edm.Library;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
