@@ -42,6 +42,12 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public void Should_throw_when_creating_directory_failed()
+        {
+            Assert.Throws<ConfigurationException>(() => new FolderAssetStore(CreateInvalidPath(), new Mock<ISemanticLog>().Object).Connect());
+        }
+
+        [Fact]
         public Task Should_throw_exception_if_asset_not_found()
         {
             sut.Connect();
@@ -64,6 +70,13 @@ namespace Squidex.Infrastructure.Assets
             await sut.DownloadAsync(assetId, 1, "suffix", readData);
 
             Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        private static string CreateInvalidPath()
+        {
+            var windir = Environment.GetEnvironmentVariable("windir");
+
+            return !string.IsNullOrWhiteSpace(windir) ? "Z://invalid" : "/proc/invalid";
         }
     }
 }

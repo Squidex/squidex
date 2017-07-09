@@ -46,9 +46,10 @@ RUN cp -a /tmp/node_modules /src/Squidex/ \
 # Test Backend
 RUN dotnet restore \
  && dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
- && dotnet test tests/Squidex.Core.Tests/Squidex.Core.Tests.csproj \ 
- && dotnet test tests/Squidex.Read.Tests/Squidex.Read.Tests.csproj \
- && dotnet test tests/Squidex.Write.Tests/Squidex.Write.Tests.csproj
+ && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
+ && dotnet test tests/Squidex.Domain.Apps.Read.Tests/Squidex.Domain.Apps.Read.Tests.csproj \
+ && dotnet test tests/Squidex.Domain.Apps.Write.Tests/Squidex.Domain.Apps.Write.Tests.csproj \
+ && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Release
