@@ -56,6 +56,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.MongoD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.Tests", "tests\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj", "{42184546-E3CB-4D4F-9495-43979B9C63B9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "C:\Users\mail2\Downloads\graphql-dotnet\src\GraphQL\GraphQL.csproj", "{A1290A2F-E935-4666-95F0-E015293F5AF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -266,6 +268,18 @@ Global
 		{42184546-E3CB-4D4F-9495-43979B9C63B9}.Release|x64.Build.0 = Release|Any CPU
 		{42184546-E3CB-4D4F-9495-43979B9C63B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{42184546-E3CB-4D4F-9495-43979B9C63B9}.Release|x86.Build.0 = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|x64.Build.0 = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Debug|x86.Build.0 = Debug|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|x64.Build.0 = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1290A2F-E935-4666-95F0-E015293F5AF6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

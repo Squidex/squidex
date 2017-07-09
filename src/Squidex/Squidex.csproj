@@ -38,6 +38,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Read.MongoDb\Squidex.Domain.Apps.Read.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Write\Squidex.Domain.Apps.Write.csproj" />
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
+    <ProjectReference Include="C:\Users\mail2\Downloads\graphql-dotnet\src\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

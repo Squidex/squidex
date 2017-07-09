@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
         {
             AddField(new FieldType
             {
-                Name = $"find{schemaEntity.Name.ToPascalCase()}",
+                Name = $"find{schemaEntity.Name.ToPascalCase()}Content",
                 Arguments = new QueryArguments
                 {
                     new QueryArgument(typeof(StringGraphType))
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
         {
             AddField(new FieldType
             {
-                Name = $"query{schemaEntity.Name.ToPascalCase()}",
+                Name = $"query{schemaEntity.Name.ToPascalCase()}Contents",
                 Arguments = new QueryArguments
                 {
                     new QueryArgument(typeof(IntGraphType))

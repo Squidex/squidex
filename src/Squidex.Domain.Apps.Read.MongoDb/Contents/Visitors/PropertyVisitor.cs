@@ -46,9 +46,21 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             return nodeIn.Source.Accept(this);
         }
 
+        public override ImmutableList<string> Visit(SingleComplexNode nodeIn)
+        {
+            if (nodeIn.Source is SingleComplexNode)
+            {
+                return nodeIn.Source.Accept(this).Add(nodeIn.Property.Name);
+            }
+            else
+            {
+                return ImmutableList.Create(nodeIn.Property.Name);
+            }
+        }
+
         public override ImmutableList<string> Visit(SingleValuePropertyAccessNode nodeIn)
         {
-            if (nodeIn.Source is SingleValuePropertyAccessNode)
+            if (nodeIn.Source is SingleComplexNode)
             {
                 return nodeIn.Source.Accept(this).Add(nodeIn.Property.Name);
             }
