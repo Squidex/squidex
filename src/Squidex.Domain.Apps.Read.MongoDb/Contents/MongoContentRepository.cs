@@ -75,16 +75,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
         {
             var contentEntities = (List<IContentEntity>)null;
 
-            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, appEntity);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, app);
 
                     var parser = model.ParseQuery(odataQuery);
 
@@ -121,16 +121,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return contentEntities;
         }
 
-        public async Task<long> CountAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
+        public async Task<long> CountAsync(IAppEntity app, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
         {
             var contentsCount = 0L;
 
-            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
             {
                 IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, appEntity);
+                    var model = modelBuilder.BuildEdmModel(schemaEntity, app);
 
                     var parser = model.ParseQuery(odataQuery);
 
@@ -169,11 +169,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity appEntity, Guid schemaId, Guid id)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, Guid schemaId, Guid id)
         {
             var contentEntity = (MongoContentEntity)null;
 
-            await ForSchemaAsync(appEntity.Id, schemaId, async (collection, schemaEntity) =>
+            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
             {
                 contentEntity = 
                     await collection.Find(x => x.Id == id)

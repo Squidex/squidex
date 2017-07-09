@@ -67,28 +67,28 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return TaskHelper.Done;
         }
 
-        public async Task<object> QueryAsync(IAppEntity appEntity, GraphQLQuery query)
+        public async Task<object> QueryAsync(IAppEntity app, GraphQLQuery query)
         {
-            Guard.NotNull(appEntity, nameof(appEntity));
+            Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var modelContext = await GetModelAsync(appEntity);
-            var queryContext = new QueryContext(appEntity, contentRepository, assetRepository);
+            var modelContext = await GetModelAsync(app);
+            var queryContext = new QueryContext(app, contentRepository, assetRepository);
 
             return await modelContext.ExecuteAsync(queryContext, query);
         }
 
-        private async Task<GraphQLModel> GetModelAsync(IAppEntity appEntity)
+        private async Task<GraphQLModel> GetModelAsync(IAppEntity app)
         {
-            var cacheKey = CreateCacheKey(appEntity.Id);
+            var cacheKey = CreateCacheKey(app.Id);
 
             var modelContext = Cache.Get<GraphQLModel>(cacheKey);
 
             if (modelContext == null)
             {
-                var schemas = await schemaRepository.QueryAllAsync(appEntity.Id);
+                var schemas = await schemaRepository.QueryAllAsync(app.Id);
 
-                modelContext = new GraphQLModel(appEntity, schemas.Where(x => x.IsPublished));
+                modelContext = new GraphQLModel(app, schemas.Where(x => x.IsPublished));
 
                 Cache.Set(cacheKey, modelContext);
             }

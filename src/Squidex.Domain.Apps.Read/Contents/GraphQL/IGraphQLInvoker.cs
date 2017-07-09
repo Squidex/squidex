@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public interface IGraphQLInvoker
     {
-        Task<object> QueryAsync(IAppEntity appEntity, GraphQLQuery query);
+        Task<object> QueryAsync(IAppEntity app, GraphQLQuery query);
     }
 }

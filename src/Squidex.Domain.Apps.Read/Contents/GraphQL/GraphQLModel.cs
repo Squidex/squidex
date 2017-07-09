@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IGraphType assetType = new AssetGraphType();
         private readonly GraphQLSchema graphQLSchema;
 
-        public GraphQLModel(IAppEntity appEntity, IEnumerable<ISchemaEntity> schemas)
+        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
-            partitionResolver = appEntity.PartitionResolver;
+            partitionResolver = app.PartitionResolver;
 
             var defaultResolver =
                 new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName));
@@ -58,10 +58,10 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 (new DateGraphType(), defaultResolver);
 
             var jsonInfos =
-                (new ObjectGraphType(), defaultResolver);
+                (new JsonScalarType(), defaultResolver);
 
             var geolocationInfos =
-                (new ObjectGraphType(), defaultResolver);
+                (new GeolocationScalarType(), defaultResolver);
 
             fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
             {

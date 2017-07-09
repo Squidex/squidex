@@ -28,18 +28,18 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly ConcurrentDictionary<Guid, IAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IAssetEntity>();
         private readonly IContentRepository contentRepository;
         private readonly IAssetRepository assetRepository;
-        private readonly IAppEntity appEntity;
+        private readonly IAppEntity app;
 
-        public QueryContext(IAppEntity appEntity, IContentRepository contentRepository, IAssetRepository assetRepository)
+        public QueryContext(IAppEntity app, IContentRepository contentRepository, IAssetRepository assetRepository)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(appEntity, nameof(appEntity));
+            Guard.NotNull(app, nameof(app));
 
             this.contentRepository = contentRepository;
             this.assetRepository = assetRepository;
 
-            this.appEntity = appEntity;
+            this.app = app;
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (content == null)
             {
-                content = await contentRepository.FindContentAsync(appEntity, schemaId, id);
+                content = await contentRepository.FindContentAsync(app, schemaId, id);
 
                 if (content != null)
                 {
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAssetsAsync(string query, int skip = 0, int take = 10)
         {
-            var assets = await assetRepository.QueryAsync(appEntity.Id, null, null, query, take, skip);
+            var assets = await assetRepository.QueryAsync(app.Id, null, null, query, take, skip);
 
             foreach (var asset in assets)
             {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
         {
-            var contents = await contentRepository.QueryAsync(appEntity, schemaId, false, null, query);
+            var contents = await contentRepository.QueryAsync(app, schemaId, false, null, query);
 
             foreach (var content in contents)
             {
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 Task.Run(async () =>
                 {
-                    var assets = await assetRepository.QueryAsync(appEntity.Id, null, notLoadedAssets, string.Empty, int.MaxValue).ConfigureAwait(false);
+                    var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, string.Empty, int.MaxValue).ConfigureAwait(false);
 
                     foreach (var asset in assets)
                     {
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 Task.Run(async () =>
                 {
-                    var contents = await contentRepository.QueryAsync(appEntity, schemaId, false, notLoadedContents, string.Empty).ConfigureAwait(false);
+                    var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, string.Empty).ConfigureAwait(false);
 
                     foreach (var content in contents)
                     {
