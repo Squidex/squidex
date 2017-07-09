@@ -42,12 +42,6 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public void Should_throw_when_creating_directory_failed()
-        {
-            Assert.Throws<ConfigurationException>(() => new FolderAssetStore("Z:\\Foo", new Mock<ISemanticLog>().Object).Connect());
-        }
-
-        [Fact]
         public Task Should_throw_exception_if_asset_not_found()
         {
             sut.Connect();
