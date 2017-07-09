@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             Name = $"{schema.Name.ToPascalCase()}DataDto";
 
-            foreach (var field in schema.Fields)
+            foreach (var field in schema.Fields.Where(x => !x.IsHidden))
             {
                 var fieldInfo = graphQLContext.GetGraphType(field);
 
