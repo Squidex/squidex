@@ -15,12 +15,12 @@ namespace Squidex.Domain.Apps.Read.Contents.Repositories
 {
     public interface IContentRepository
     {
-        Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity);
+        Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery);
 
         Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds);
 
-        Task<long> CountAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity);
+        Task<long> CountAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery);
 
-        Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id, IAppEntity appEntity);
+        Task<IContentEntity> FindContentAsync(IAppEntity appEntity, Guid schemaId, Guid id);
     }
 }

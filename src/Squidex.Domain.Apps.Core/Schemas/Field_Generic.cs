@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         private T properties;
 
-        protected T Properties
+        public T Properties
         {
             get { return properties; }
         }

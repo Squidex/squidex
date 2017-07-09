@@ -1,0 +1,12 @@
+@import '_vars';
+@import '_mixins';
+
+.nav-link {
+    position: relative;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
+}
+
+.icon-angle-right {
+    @include absolute(14px, 2rem, auto, auto);
+}

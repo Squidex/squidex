@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.Edm;
+using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
@@ -87,6 +88,11 @@ namespace Squidex.Config.Domain
             builder.RegisterType<EdmModelBuilder>()
                 .AsSelf()
                 .SingleInstance();
+
+            builder.RegisterType<CachingGraphQLInvoker>()
+                .As<IGraphQLInvoker>()
+                .AsSelf()
+                .InstancePerDependency();
         }
     }
 }

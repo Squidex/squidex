@@ -54,7 +54,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.MongoDb", "src\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj", "{27CF800D-890F-4882-BF05-44EC3233537D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Domain.Users.Tests", "tests\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj", "{42184546-E3CB-4D4F-9495-43979B9C63B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.Tests", "tests\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj", "{42184546-E3CB-4D4F-9495-43979B9C63B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

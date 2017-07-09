@@ -25,5 +25,10 @@
                 <i class="nav-icon icon-settings"></i> <div class="nav-text">Settings</div>
             </a>
         </li>
+        <li class="nav-item" *ngIf="permission !== 'Editor'">
+            <a class="nav-link" routerLink="api" routerLinkActive="active">
+                <i class="nav-icon icon-earth"></i> <div class="nav-text">API</div>
+            </a>
+        </li>
     </ul>
 </div>

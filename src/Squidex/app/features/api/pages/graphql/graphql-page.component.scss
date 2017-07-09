@@ -1,0 +1,12 @@
+@import '_vars';
+@import '_mixins';
+
+@import '~graphiql/graphiql';
+
+.graphiql-container {
+    @include absolute(0, 0, 0, 0);
+}
+
+.graphiql-container > * {
+    box-sizing: content-box;
+}

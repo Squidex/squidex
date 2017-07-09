@@ -15,8 +15,10 @@ using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -33,13 +35,38 @@ namespace Squidex.Controllers.ContentApi
     {
         private readonly ISchemaProvider schemas;
         private readonly IContentRepository contentRepository;
+        private readonly IGraphQLInvoker graphQL;
 
-        public ContentsController(ICommandBus commandBus, ISchemaProvider schemas, IContentRepository contentRepository) 
+        public ContentsController(
+            ICommandBus commandBus, 
+            ISchemaProvider schemas,
+            IContentRepository contentRepository,
+            IGraphQLInvoker graphQL) 
             : base(commandBus)
         {
+            this.graphQL = graphQL;
             this.schemas = schemas;
-
             this.contentRepository = contentRepository;
+        }
+
+        [HttpGet]
+        [Route("content/{app}/graphql")]
+        [ApiCosts(2)]
+        public async Task<IActionResult> GetGraphQL([FromQuery] GraphQLQuery query)
+        {
+            var result = await graphQL.QueryAsync(App, query);
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("content/{app}/graphql")]
+        [ApiCosts(2)]
+        public async Task<IActionResult> PostGraphQL([FromBody] GraphQLQuery query)
+        {
+            var result = await graphQL.QueryAsync(App, query);
+
+            return Ok(result);
         }
 
         [HttpGet]
@@ -64,8 +91,8 @@ namespace Squidex.Controllers.ContentApi
 
             var query = Request.QueryString.ToString();
 
-            var taskForItems = contentRepository.QueryAsync(schemaEntity.Id, nonPublished, idsList, query, App);
-            var taskForCount = contentRepository.CountAsync(schemaEntity.Id, nonPublished, idsList, query, App);
+            var taskForItems = contentRepository.QueryAsync(App, schemaEntity.Id, nonPublished, idsList, query);
+            var taskForCount = contentRepository.CountAsync(App, schemaEntity.Id, nonPublished, idsList, query);
 
             await Task.WhenAll(taskForItems, taskForCount);
 
@@ -100,7 +127,7 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            var entity = await contentRepository.FindContentAsync(schemaEntity.Id, id, App);
+            var entity = await contentRepository.FindContentAsync(App, schemaEntity.Id, id);
 
             if (entity == null)
             {

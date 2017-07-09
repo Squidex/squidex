@@ -5,16 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, Renderer, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { slideRightAnimation } from './animations';
 
-import { PanelService } from './../services/panel.service';
+import { PanelContainerDirective } from './panel-container.directive';
 
 @Component({
     selector: 'sqx-panel',
     template: `
-        <div [style.width]="panelWidth" #panel>
+        <div [style.width]="panelWidth" [attr.expand]="expand" #panel>
             <div class="panel panel-{{theme}}" [@slideRight]>
                 <ng-content></ng-content>
             </div>
@@ -23,30 +23,33 @@ import { PanelService } from './../services/panel.service';
         slideRightAnimation
     ]
 })
-export class PanelComponent implements OnDestroy, AfterViewInit {
+export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     @Input()
     public theme = 'light';
 
     @Input()
     public panelWidth = '10rem';
 
+    @Input()
+    public expand = false;
+
     @ViewChild('panel')
     public panel: ElementRef;
 
     constructor(
-        private readonly renderer: Renderer,
-        private readonly panels: PanelService
+        private readonly container: PanelContainerDirective
     ) {
     }
 
     public ngOnDestroy() {
-        this.panels.pop(this.panel.nativeElement);
-        this.panels.render(this.renderer);
+        this.container.pop();
     }
-    public ngAfterViewInit() {
-        this.panels.render(this.renderer);
-    }
+
     public ngOnInit() {
-        this.panels.push(this.panel.nativeElement);
+        this.container.push(this);
+    }
+
+    public ngAfterViewInit() {
+        this.container.invalidate();
     }
 }

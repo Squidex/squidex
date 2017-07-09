@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.History.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Apps;
@@ -170,6 +171,7 @@ namespace Squidex.Config.Domain
             builder.Register(c =>
                 new CompoundEventConsumer(
                     c.Resolve<MongoSchemaRepository>(), 
+                    c.Resolve<CachingGraphQLInvoker>(),
                     c.Resolve<CachingSchemaProvider>()))
                 .As<IEventConsumer>()
                 .AsSelf()

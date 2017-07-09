@@ -1,13 +1,13 @@
 @import '_bootstrap-vars.scss';
 
 // Bootstrap
-@import './../../node_modules/bootstrap/scss/bootstrap.scss';
+@import '~bootstrap/scss/bootstrap.scss';
 
 // Pikaday
-@import './../../node_modules/pikaday/css/pikaday.css';
+@import '~pikaday/css/pikaday.css';
 
 // Drag and Drop
-@import './../../node_modules/ng2-dnd/bundles/style.css';
+@import '~ng2-dnd/bundles/style.css';
 
 // Bootstrap Overrides
 @import '_bootstrap.scss';

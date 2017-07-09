@@ -70,6 +70,10 @@ export const routes: Routes = [
                     {
                         path: 'settings',
                         loadChildren: './features/settings/module#SqxFeatureSettingsModule'
+                    },
+                    {
+                        path: 'api',
+                        loadChildren: './features/api/module#SqxFeatureApiModule'
                     }
                 ]
             }

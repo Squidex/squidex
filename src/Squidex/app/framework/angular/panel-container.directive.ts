@@ -5,50 +5,84 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { AfterViewInit, Directive, ElementRef, HostListener, OnDestroy, Renderer } from '@angular/core';
 
-import { PanelService } from './../services/panel.service';
+import { PanelComponent } from './panel.component';
 
 @Directive({
     selector: '.panel-container'
 })
-export class PanelContainerDirective implements OnInit, OnDestroy {
-    private subscription: Subscription;
-    private panelsSize: number | null = null;
+export class PanelContainerDirective implements AfterViewInit, OnDestroy {
+    private readonly panels: PanelComponent[] = [];
+    private isInit = false;
 
     constructor(
         private readonly element: ElementRef,
-        private readonly panels: PanelService
+        private readonly renderer: Renderer
     ) {
     }
 
     @HostListener('window:resize')
     public onResize() {
-        this.resize();
+        this.invalidate();
+    }
+
+    public ngAfterViewInit() {
+        this.invalidate(true);
     }
 
     public ngOnDestroy() {
-        this.subscription.unsubscribe();
+        this.isInit = true;
     }
 
-    public ngOnInit() {
-        this.subscription =
-            this.panels.changed.subscribe(width => {
-                this.panelsSize = width;
+    public push(panel: PanelComponent) {
+        this.panels.push(panel);
 
-                this.resize();
-            });
+        this.invalidate();
     }
 
-    private resize() {
-        if (!this.panelsSize) {
+    public pop() {
+        this.panels.splice(-1, 1);
+
+        this.invalidate();
+    }
+
+    public invalidate(force = false) {
+        this.isInit = this.isInit || force;
+
+        if (!this.isInit) {
             return;
         }
 
-        const currentWidth = this.element.nativeElement.getBoundingClientRect().width;
+        const containerWidth = this.element.nativeElement.getBoundingClientRect().width;
 
-        const diff = this.panelsSize - currentWidth;
+        let currentPosition = 0;
+        let currentLayer = this.panels.length * 10;
+
+        const last = this.panels[this.panels.length - 1];
+
+        for (let panel of this.panels) {
+            const panelRoot = panel.panel.nativeElement;
+
+            let width = panelRoot.getBoundingClientRect().width;
+
+            if (panel.expand && panel === last) {
+                width = containerWidth - currentPosition;
+
+                panel.panelWidth = width + 'px';
+            }
+
+            this.renderer.setElementStyle(panelRoot, 'top', '0px');
+            this.renderer.setElementStyle(panelRoot, 'left', currentPosition + 'px');
+            this.renderer.setElementStyle(panelRoot, 'bottom', '0px');
+            this.renderer.setElementStyle(panelRoot, 'position', 'absolute');
+            this.renderer.setElementStyle(panelRoot, 'z-index', currentLayer.toString());
+
+            currentPosition += width;
+            currentLayer -= 10;
+        }
+
+        const diff = currentPosition - containerWidth;
 
         if (diff > 0) {
             this.element.nativeElement.scrollLeft = diff;

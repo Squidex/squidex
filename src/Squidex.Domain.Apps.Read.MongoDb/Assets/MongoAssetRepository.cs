@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
                 await Collection.Find(x => assetIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Project.Include(x => x.Id))
                     .ToListAsync();
 
-            return assetIds.Except(assetEntities.Select(x => x["Id"].AsGuid)).ToList();
+            return assetIds.Except(assetEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)

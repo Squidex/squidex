@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
         {
             var contentEntities = (List<IContentEntity>)null;
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return contentEntities;
         }
 
-        public async Task<long> CountAsync(Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery, IAppEntity appEntity)
+        public async Task<long> CountAsync(IAppEntity appEntity, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
         {
             var contentsCount = 0L;
 
@@ -166,10 +166,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                         .ToListAsync();
             });
 
-            return contentIds.Except(contentEntities.Select(x => x["Id"].AsGuid)).ToList();
+            return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id, IAppEntity appEntity)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity appEntity, Guid schemaId, Guid id)
         {
             var contentEntity = (MongoContentEntity)null;
 

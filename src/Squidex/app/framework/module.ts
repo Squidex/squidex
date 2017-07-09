@@ -43,7 +43,6 @@ import {
     NotificationService,
     PanelContainerDirective,
     PanelComponent,
-    PanelService,
     ParentLinkDirective,
     PopupLinkDirective,
     ProgressBarComponent,
@@ -177,7 +176,6 @@ export class SqxFrameworkModule {
                 LocalStoreService,
                 MessageBus,
                 NotificationService,
-                PanelService,
                 ResourceLoaderService,
                 ShortcutService,
                 TitleService

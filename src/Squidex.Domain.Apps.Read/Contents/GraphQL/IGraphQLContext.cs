@@ -6,19 +6,21 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
-namespace Squidex.Domain.Apps.Read.GraphQl
+namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public interface IGraphQLContext
     {
-        IGraphType GetSchemaListType(Schema schema);
-
         IFieldPartitioning ResolvePartition(Partitioning key);
+
+        IGraphType GetAssetType();
+
+        IGraphType GetSchemaType(Guid schemaId);
 
         (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
     }
