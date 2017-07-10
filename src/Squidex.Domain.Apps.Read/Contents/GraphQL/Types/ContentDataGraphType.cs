@@ -19,10 +19,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
     {
-        private static readonly IFieldResolver FieldResolver = 
-            new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(c.FieldName));
-
-        public ContentDataGraphType(Schema schema, IGraphQLContext graphQLContext)
+        public ContentDataGraphType(Schema schema, IGraphQLContext context)
         {
             var schemaName = schema.Properties.Label.WithFallback(schema.Name);
 
@@ -30,7 +27,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             foreach (var field in schema.Fields.Where(x => !x.IsHidden))
             {
-                var fieldInfo = graphQLContext.GetGraphType(field);
+                var fieldInfo = context.GetGraphType(field);
 
                 if (fieldInfo.ResolveType != null)
                 {
@@ -40,7 +37,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
                     };
 
-                    var partition = graphQLContext.ResolvePartition(field.Paritioning);
+                    var partition = context.ResolvePartition(field.Paritioning);
 
                     foreach (var partitionItem in partition)
                     {
@@ -55,10 +52,13 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     fieldGraphType.Description = $"The structure of the {fieldName} of a {schemaName} content type.";
 
+                    var fieldResolver =
+                        new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
+
                     AddField(new FieldType
                     {
-                        Name = field.Name,
-                        Resolver = FieldResolver,
+                        Name = field.Name.ToCamelCase(),
+                        Resolver = fieldResolver,
                         ResolvedType = fieldGraphType
                     });
                 }

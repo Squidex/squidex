@@ -16,9 +16,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
-    public sealed class ContentQueryType : ObjectGraphType
+    public sealed class ContentQueryGraphType : ObjectGraphType
     {
-        public ContentQueryType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemaEntities)
+        public ContentQueryGraphType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemaEntities)
         {
             AddAssetFind(graphQLContext);
             AddAssetsQuery(graphQLContext);
@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
             foreach (var schemaEntity in schemaEntities)
             {
                 var schemaName = schemaEntity.Schema.Properties.Label.WithFallback(schemaEntity.Schema.Name);
-                var schemaType = new ContentGraphType(schemaEntity.Schema, graphQLContext);
+                var schemaType = graphQLContext.GetSchemaType(schemaEntity.Id);
 
-                AddContentFind(schemaEntity, schemaName, schemaType);
+                AddContentFind(schemaEntity, schemaType, schemaName);
                 AddContentQuery(schemaEntity, schemaType, schemaName);
             }
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentFind(ISchemaEntity schemaEntity, string schemaName, IGraphType schemaType)
+        private void AddContentFind(ISchemaEntity schemaEntity, IGraphType schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     var argTop = c.GetArgument("top", 20);
                     var argSkip = c.GetArgument("skip", 0);
-                    var argQuery = c.GetArgument("query", string.Empty);
+                    var argQuery = c.GetArgument("search", string.Empty);
 
                     return context.QueryAssetsAsync(argQuery, argSkip, argTop);
                 }),

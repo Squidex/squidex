@@ -16,11 +16,20 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
     {
-        public ContentGraphType(Schema schema, IGraphQLContext graphQLContext)
+        private readonly Schema schema;
+        private readonly IGraphQLContext context;
+
+        public ContentGraphType(Schema schema, IGraphQLContext context)
         {
-            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
+            this.schema = schema;
+            this.context = context;
 
             Name = $"{schema.Name.ToPascalCase()}Dto";
+        }
+
+        public void Initialize()
+        {
+            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
 
             AddField(new FieldType
             {
@@ -69,12 +78,12 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = new NonNullGraphType(new StringGraphType()),
                 Description = $"The user that has updated the {schemaName} content last."
             });
-            
+
             AddField(new FieldType
             {
                 Name = "data",
                 Resolver = Resolver(x => x.Data),
-                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema, graphQLContext)),
+                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema, context)),
                 Description = $"The data of the {schemaName} content."
             });
 

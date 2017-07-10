@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
     public sealed class GraphQLModel : IGraphQLContext
     {
         private readonly Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>> fieldInfos;
-        private readonly Dictionary<Guid, IGraphType> schemaTypes = new Dictionary<Guid, IGraphType>();
+        private readonly Dictionary<Guid, ContentGraphType> schemaTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly Dictionary<Guid, ISchemaEntity> schemas;
         private readonly PartitionResolver partitionResolver;
         private readonly IGraphType assetType = new AssetGraphType();
@@ -45,97 +45,93 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             IGraphType assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
-            var stringInfos = 
-                (new StringGraphType(), defaultResolver);
-
-            var booleanInfos =
-                (new BooleanGraphType(), defaultResolver);
-
-            var numberInfos =
-                (new FloatGraphType(), defaultResolver);
-
-            var dateTimeInfos =
-                (new DateGraphType(), defaultResolver);
-
-            var jsonInfos =
-                (new JsonScalarType(), defaultResolver);
-
-            var geolocationInfos =
-                (new GeolocationScalarType(), defaultResolver);
-
             fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
             {
                 {
                     typeof(StringField),
-                    field => stringInfos
+                    field => ResolveDefault("String")
                 },
                 {
                     typeof(BooleanField),
-                    field => booleanInfos
+                    field => ResolveDefault("Boolean")
                 },
                 {
                     typeof(NumberField),
-                    field => numberInfos
+                    field => ResolveDefault("Float")
                 },
                 {
                     typeof(DateTimeField),
-                    field => dateTimeInfos
+                    field => ResolveDefault("Date")
                 },
                 {
                     typeof(JsonField),
-                    field => jsonInfos
+                    field => ResolveDefault("Json")
                 },
                 {
                     typeof(GeolocationField),
-                    field => geolocationInfos
+                    field => ResolveDefault("Geolocation")
                 },
                 {
                     typeof(AssetsField),
-                    field =>
-                    {
-                        var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
-                        {
-                            var context = (QueryContext)c.UserContext;
-                            var contentIds = c.Source.GetOrDefault(c.FieldName);
-
-                            return context.GetReferencedAssets(contentIds);
-                        });
-
-                        return (assetListType, resolver);
-                    }
+                    field => { return ResolveAssets(assetListType); }
                 },
                 {
                     typeof(ReferencesField),
-                    field =>
-                    {
-                        var schemaId = ((ReferencesField)field).Properties.SchemaId;
-                        var schemaType = GetSchemaType(schemaId);
-
-                        if (schemaType == null)
-                        {
-                            return (null, null);
-                        }
-
-                        var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
-                        {
-                            var context = (QueryContext)c.UserContext;
-                            var contentIds = c.Source.GetOrDefault(c.FieldName);
-
-                            return context.GetReferencedContents(schemaId, contentIds);
-                        });
-
-                        var schemaFieldType = new ListGraphType(new NonNullGraphType(GetSchemaType(schemaId)));
-
-                        return (schemaFieldType, resolver);
-                    }
+                    field => { return ResolveReferences(field); }
                 }
             };
 
             this.schemas = schemas.ToDictionary(x => x.Id);
             
-            graphQLSchema = new GraphQLSchema { Query = new ContentQueryType(this, this.schemas.Values) };
+            graphQLSchema = new GraphQLSchema { Query = new ContentQueryGraphType(this, this.schemas.Values) };
+
+            foreach (var schemaType in schemaTypes.Values)
+            {
+                schemaType.Initialize();
+            }
         }
-        
+
+        private (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(string name)
+        {
+            return (new NoopGraphType(name), new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+        }
+
+        private static ValueTuple<IGraphType, IFieldResolver> ResolveAssets(IGraphType assetListType)
+        {
+            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+                var contentIds = c.Source.GetOrDefault(c.FieldName);
+
+                return context.GetReferencedAssets(contentIds);
+            });
+
+            return (assetListType, resolver);
+        }
+
+        private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(Field field)
+        {
+            var schemaId = ((ReferencesField)field).Properties.SchemaId;
+            var schemaType = GetSchemaType(schemaId);
+
+            if (schemaType == null)
+            {
+                return (null, null);
+            }
+
+            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+                var contentIds = c.Source.GetOrDefault(c.FieldName);
+
+                return context.GetReferencedContents(schemaId, contentIds);
+            });
+
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(GetSchemaType(schemaId)));
+
+            return (schemaFieldType, resolver);
+        }
+
         public async Task<object> ExecuteAsync(QueryContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));

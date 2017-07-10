@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 Task.Run(async () =>
                 {
-                    var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, string.Empty, int.MaxValue).ConfigureAwait(false);
+                    var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
 
                     foreach (var asset in assets)
                     {
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 Task.Run(async () =>
                 {
-                    var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, string.Empty).ConfigureAwait(false);
+                    var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, null).ConfigureAwait(false);
 
                     foreach (var content in contents)
                     {
