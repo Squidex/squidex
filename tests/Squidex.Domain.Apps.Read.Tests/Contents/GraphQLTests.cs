@@ -52,7 +52,9 @@ namespace Squidex.Domain.Apps.Read.Contents
                     new DateTimeFieldProperties()))
                 .AddOrUpdateField(new ReferencesField(7, "my-references", Partitioning.Invariant,
                     new ReferencesFieldProperties { SchemaId = schemaId }))
-                .AddOrUpdateField(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
+                .AddOrUpdateField(new ReferencesField(9, "my-invalid", Partitioning.Invariant,
+                    new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
+                .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
                     new GeolocationFieldProperties()));
 
         private readonly Mock<ISchemaRepository> schemaRepository = new Mock<ISchemaRepository>();

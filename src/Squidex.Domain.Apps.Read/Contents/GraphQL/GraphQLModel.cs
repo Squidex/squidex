@@ -172,12 +172,9 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public IGraphType GetSchemaType(Guid schemaId)
         {
-            return schemaTypes.GetOrAdd(schemaId, k =>
-            {
-                var schemaEntity = schemas.GetOrDefault(k);
+            var schemaEntity = schemas.GetOrDefault(schemaId);
 
-                return schemaEntity != null ? new ContentGraphType(schemaEntity.Schema, this) : null;
-            });
+            return schemaEntity != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schemaEntity.Schema, this)) : null;
         }
     }
 }
