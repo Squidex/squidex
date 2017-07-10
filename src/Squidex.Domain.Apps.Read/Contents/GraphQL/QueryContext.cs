@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (asset == null)
             {
-                asset = await assetRepository.FindAssetAsync(id);
+                asset = await assetRepository.FindAssetAsync(id).ConfigureAwait(false);
 
                 if (asset != null)
                 {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (content == null)
             {
-                content = await contentRepository.FindContentAsync(app, schemaId, id);
+                content = await contentRepository.FindContentAsync(app, schemaId, id).ConfigureAwait(false);
 
                 if (content != null)
                 {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
         {
-            var contents = await contentRepository.QueryAsync(app, schemaId, false, null, query);
+            var contents = await contentRepository.QueryAsync(app, schemaId, false, null, query).ConfigureAwait(false);
 
             foreach (var content in contents)
             {
@@ -100,14 +100,14 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return contents;
         }
 
-        public List<IAssetEntity> GetReferencedAssets(JToken value)
+        public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(JToken value)
         {
             var ids = ParseIds(value);
 
-            return GetReferencedAssets(ids);
+            return GetReferencedAssetsAsync(ids);
         }
 
-        public List<IAssetEntity> GetReferencedAssets(ICollection<Guid> ids)
+        public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -115,28 +115,25 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedAssets.Count > 0)
             {
-                Task.Run(async () =>
-                {
-                    var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
+                var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
 
-                    foreach (var asset in assets)
-                    {
-                        cachedAssets[asset.Id] = asset;
-                    }
-                }).Wait();
+                foreach (var asset in assets)
+                {
+                    cachedAssets[asset.Id] = asset;
+                }
             }
 
             return ids.Select(id => cachedAssets.GetOrDefault(id)).Where(x => x != null).ToList();
         }
 
-        public List<IContentEntity> GetReferencedContents(Guid schemaId, JToken value)
+        public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, JToken value)
         {
             var ids =  ParseIds(value);
 
-            return GetReferencedContents(schemaId, ids);
+            return GetReferencedContentsAsync(schemaId, ids);
         }
 
-        public List<IContentEntity> GetReferencedContents(Guid schemaId, ICollection<Guid> ids)
+        public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, ICollection<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -144,15 +141,12 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedContents.Count > 0)
             {
-                Task.Run(async () =>
-                {
-                    var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, null).ConfigureAwait(false);
+                var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, null).ConfigureAwait(false);
 
-                    foreach (var content in contents)
-                    {
-                        cachedContents[content.Id] = content;
-                    }
-                }).Wait();
+                foreach (var content in contents)
+                {
+                    cachedContents[content.Id] = content;
+                }
             }
 
             return ids.Select(id => cachedContents.GetOrDefault(id)).Where(x => x != null).ToList();

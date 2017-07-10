@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 var context = (QueryContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);
 
-                return context.GetReferencedAssets(contentIds);
+                return context.GetReferencedAssetsAsync(contentIds);
             });
 
             return (assetListType, resolver);
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 var context = (QueryContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);
 
-                return context.GetReferencedContents(schemaId, contentIds);
+                return context.GetReferencedContentsAsync(schemaId, contentIds);
             });
 
             var schemaFieldType = new ListGraphType(new NonNullGraphType(GetSchemaType(schemaId)));
