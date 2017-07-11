@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
         protected override MongoCollectionSettings CollectionSettings()
         {
-            return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
+            return new MongoCollectionSettings { ReadPreference = ReadPreference.Primary, WriteConcern = WriteConcern.WMajority };
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
