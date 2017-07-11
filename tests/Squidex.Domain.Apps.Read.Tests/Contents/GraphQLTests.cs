@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     fileSize
                     fileVersion
                     isImage
-                    pixelWidth,
+                    pixelWidth
                     pixelHeight
                   }
                 }";
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     fileSize
                     fileVersion
                     isImage
-                    pixelWidth,
+                    pixelWidth
                     pixelHeight
                   }}
                 }}";
