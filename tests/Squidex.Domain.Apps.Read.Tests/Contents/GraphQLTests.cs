@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_make_assets_request()
+        public async Task Should_return_multiple_assets_when_querying_assets()
         {
             const string query = @"
                 query {
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_make_asset_request()
+        public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = Guid.NewGuid();
             var assetEntity = CreateAsset(Guid.NewGuid());
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_make_contents_request()
+        public async Task Should_return_multiple_contens_when_querying_contents()
         {
             const string query = @"
                 query {
@@ -310,8 +310,8 @@ namespace Squidex.Domain.Apps.Read.Contents
             contentRepository.VerifyAll();
         }
 
-        [Fact]
-        public async Task Should_make_content_request()
+        [Fact]]
+        public async Task Should_return_single_content_when_finding_content()
         {
             var contentId = Guid.NewGuid();
             var contentEntity = CreateContent(contentId, Guid.Empty, Guid.Empty);
@@ -410,7 +410,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_make_content_request_and_resolve_references()
+        public async Task Should_also_fetch_referenced_contents_when_field_is_included_in_query()
         {
             var contentRefId = Guid.NewGuid();
             var contentRefEntity = CreateContent(contentRefId, Guid.Empty, Guid.Empty);
@@ -474,7 +474,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_make_content_request_and_resolve_assets()
+        public async Task Should_also_fetch_referenced_assets_when_field_is_included_in_query()
         {
             var assetRefId = Guid.NewGuid();
             var assetRefEntity = CreateAsset(assetRefId);
