@@ -108,7 +108,16 @@ namespace Squidex
             app.TestExternalSystems();
 
             app.UseMyCors();
-            app.UseMyForwardingRules();
+
+            bool isAzure = Configuration.GetValue<bool>("runningAsAzureWebApp");
+            if (isAzure)
+            {
+                app.UseMyAzureLoadBalancerForwardingRules();
+            }
+            else
+            {
+                app.UseMyForwardingRules();
+            }
             app.UseMyTracking();
 
             MapAndUseIdentity(app);
