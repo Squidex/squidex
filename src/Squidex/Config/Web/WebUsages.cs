@@ -36,6 +36,32 @@ namespace Squidex.Config.Web
             app.UseMiddleware<EnforceHttpsMiddleware>();
         }
 
+        public static void UseMyAzureLoadBalancerForwardingRules(this IApplicationBuilder app)
+        {
+            var forwardingOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+                ForwardLimit = null,
+                RequireHeaderSymmetry = false
+            };
+            forwardingOptions.KnownNetworks.Clear();
+            forwardingOptions.KnownProxies.Clear();
+            app.UseForwardedHeaders(forwardingOptions);
+
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine();
+                if (context.Request.Headers.ContainsKey("X-ARR-SSL") ||
+                    (context.Request.Headers.ContainsKey("X-Forwarded-Proto")
+                     && context.Request.Headers["X-Forwarded-Proto"] == "https"))
+                {
+                    context.Request.Scheme = "https";
+                }
+
+                    await next();
+            });
+        }
+
         public static void UseMyCachedStaticFiles(this IApplicationBuilder app)
         {
             app.UseStaticFiles(new StaticFileOptions
