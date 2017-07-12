@@ -31,7 +31,8 @@ namespace Squidex.Domain.Users
 
         public static Task<long> CountByEmailAsync(this UserManager<IUser> userManager, string email = null)
         {
-            var count = QueryUsers(userManager, email).LongCount();
+            var allUsers = QueryUsers(userManager, email).ToList();
+            var count = allUsers.LongCount();
 
             return Task.FromResult(count);
         }
