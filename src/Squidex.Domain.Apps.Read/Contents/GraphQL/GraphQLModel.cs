@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
 
+// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable InvertIf
 // ReSharper disable ParameterHidesMember
 
@@ -39,10 +40,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
             partitionResolver = app.PartitionResolver;
-
-            var defaultResolver =
-                new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName));
-
+            
             IGraphType assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
             fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
@@ -73,11 +71,11 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 },
                 {
                     typeof(AssetsField),
-                    field => { return ResolveAssets(assetListType); }
+                    field => ResolveAssets(assetListType)
                 },
                 {
                     typeof(ReferencesField),
-                    field => { return ResolveReferences(field); }
+                    field => ResolveReferences(field)
                 }
             };
 
@@ -91,7 +89,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             }
         }
 
-        private (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(string name)
+        private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(string name)
         {
             return (new NoopGraphType(name), new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
