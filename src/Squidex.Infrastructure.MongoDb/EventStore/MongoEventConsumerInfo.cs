@@ -10,7 +10,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb.EventStore
 {
     public sealed class MongoEventConsumerInfo : IEventConsumerInfo
     {

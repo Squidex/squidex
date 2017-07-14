@@ -19,8 +19,9 @@ namespace Benchmarks
         private static readonly List<IBenchmark> Benchmarks = new List<IBenchmark>
         {
             new AppendToEventStore(),
-            new AppendToEventStoreParallel(),
-            new HandleEvents()
+            new AppendToEventStoreWithManyWriters(),
+            new HandleEvents(),
+            new HandleEventsWithManyWriters()
         };
 
         public static void Main(string[] args)
@@ -49,6 +50,8 @@ namespace Benchmarks
                     var elapsed = 0d;
                     var count = 0L;
 
+                    Console.WriteLine($"{benchmark.Name}: Initialized");
+
                     benchmark.Initialize();
 
                     for (var run = 0; run < numRuns; run++)
@@ -64,6 +67,8 @@ namespace Benchmarks
                             watch.Stop();
 
                             elapsed += watch.ElapsedMilliseconds;
+
+                            Console.WriteLine($"{benchmark.Name}: Run {run + 1} finished");
                         }
                         finally
                         {
@@ -74,7 +79,7 @@ namespace Benchmarks
                     var averageElapsed = TimeSpan.FromMilliseconds(elapsed / numRuns);
                     var averageSeconds = Math.Round(count / (numRuns * averageElapsed.TotalSeconds), 2);
 
-                    Console.WriteLine($"{benchmark.Name} completed after {averageElapsed}, {averageSeconds} items/s");
+                    Console.WriteLine($"{benchmark.Name}: Completed after {averageElapsed}, {averageSeconds} items/s");
                 }
                 catch (Exception e)
                 {

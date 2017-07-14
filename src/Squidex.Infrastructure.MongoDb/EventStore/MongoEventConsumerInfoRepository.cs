@@ -16,10 +16,16 @@ using Squidex.Infrastructure.CQRS.Events;
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable RedundantIfElseBlock
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb.EventStore
 {
     public sealed class MongoEventConsumerInfoRepository : MongoRepositoryBase<MongoEventConsumerInfo>, IEventConsumerInfoRepository
     {
+        private static readonly FieldDefinition<MongoEventConsumerInfo, string> NameField = Fields.Build(x => x.Name);
+        private static readonly FieldDefinition<MongoEventConsumerInfo, string> ErrorField = Fields.Build(x => x.Error);
+        private static readonly FieldDefinition<MongoEventConsumerInfo, string> PositionField = Fields.Build(x => x.Position);
+        private static readonly FieldDefinition<MongoEventConsumerInfo, bool> IsStoppedField = Fields.Build(x => x.IsStopped);
+        private static readonly FieldDefinition<MongoEventConsumerInfo, bool> IsResettingField = Fields.Build(x => x.IsResetting);
+
         public MongoEventConsumerInfoRepository(IMongoDatabase database) 
             : base(database)
         {
@@ -39,18 +45,18 @@ namespace Squidex.Infrastructure.MongoDb
 
         public async Task<IEventConsumerInfo> FindAsync(string consumerName)
         {
-            var entity = await Collection.Find(x => x.Name == consumerName).FirstOrDefaultAsync();
+            var entity = await Collection.Find(Filter.Eq(NameField, consumerName)).FirstOrDefaultAsync();
 
             return entity;
         }
 
         public async Task CreateAsync(string consumerName)
         {
-            if (await Collection.CountAsync(x => x.Name == consumerName) == 0)
+            if (await Collection.CountAsync(Filter.Eq(NameField, consumerName)) == 0)
             {
                 try
                 {
-                    await Collection.InsertOneAsync(new MongoEventConsumerInfo { Name = consumerName, Position = null });
+                    await Collection.InsertOneAsync(CreateEntity(consumerName, null));
                 }
                 catch (MongoWriteException ex)
                 {
@@ -64,28 +70,36 @@ namespace Squidex.Infrastructure.MongoDb
 
         public Task StartAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Unset(x => x.IsStopped));
+            var filter = Filter.Eq(NameField, consumerName);
+
+            return Collection.UpdateOneAsync(filter, Update.Unset(IsStoppedField));
         }
 
         public Task StopAsync(string consumerName, string error = null)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsStopped, true).Set(x => x.Error, error));
+            var filter = Filter.Eq(NameField, consumerName);
+
+            return Collection.UpdateOneAsync(filter, Update.Set(IsStoppedField, true).Set(ErrorField, error));
         }
 
         public Task ResetAsync(string consumerName)
         {
-            return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.IsResetting, true));
+            var filter = Filter.Eq(NameField, consumerName);
+
+            return Collection.UpdateOneAsync(filter, Update.Set(IsResettingField, true));
         }
 
         public Task SetPositionAsync(string consumerName, string position, bool reset)
         {
+            var filter = Filter.Eq(NameField, consumerName);
+
             if (reset)
             {
-                return Collection.ReplaceOneAsync(x => x.Name == consumerName, CreateEntity(consumerName, position));
+                return Collection.ReplaceOneAsync(filter, CreateEntity(consumerName, position));
             }
             else
             {
-                return Collection.UpdateOneAsync(x => x.Name == consumerName, Update.Set(x => x.Position, position));
+                return Collection.UpdateOneAsync(filter, Update.Set(PositionField, position));
             }
         }
 

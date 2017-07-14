@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             contentRepository.VerifyAll();
         }
 
-        [Fact]]
+        [Fact]
         public async Task Should_return_single_content_when_finding_content()
         {
             var contentId = Guid.NewGuid();

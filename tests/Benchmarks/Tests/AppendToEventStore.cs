@@ -12,6 +12,7 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb.EventStore;
+using Squidex.Infrastructure.Tasks;
 
 namespace Benchmarks.Tests
 {
@@ -28,7 +29,7 @@ namespace Benchmarks.Tests
 
         public string Name
         {
-            get { return "Append Events to EventStore"; }
+            get { return "Append events"; }
         }
 
         public void Initialize()
@@ -41,14 +42,15 @@ namespace Benchmarks.Tests
             mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
 
             eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
+            eventStore.GetEventsAsync(x => TaskHelper.Done).Wait();
         }
 
         public long Run()
         {
-            const long numCommits = 200;
-            const long eventStreams = 10;
+            const long numCommits = 100;
+            const long numStreams = 20;
 
-            for (var streamId = 0; streamId < eventStreams; streamId++)
+            for (var streamId = 0; streamId < numStreams; streamId++)
             {
                 var eventOffset = -1;
                 var streamName = streamId.ToString();
@@ -56,12 +58,11 @@ namespace Benchmarks.Tests
                 for (var commitId = 0; commitId < numCommits; commitId++)
                 {
                     eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset, new[] { Helper.CreateEventData() }).Wait();
-
                     eventOffset++;
                 }
             }
 
-            return numCommits * eventStreams;
+            return numCommits * numStreams;
         }
 
         public void RunCleanup()

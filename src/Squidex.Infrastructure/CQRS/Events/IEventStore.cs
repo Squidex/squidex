@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, string position = null);
 
-        Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null);
+        Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken = default(CancellationToken), string streamFilter = null, string position = null);
 
         Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events);
     }

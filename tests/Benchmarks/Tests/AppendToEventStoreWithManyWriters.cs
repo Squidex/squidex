@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppendToEventStoreParallel.cs
+//  AppendToEventStoreWithManyWriters.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,10 +13,11 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb.EventStore;
+using Squidex.Infrastructure.Tasks;
 
 namespace Benchmarks.Tests
 {
-    public sealed class AppendToEventStoreParallel : IBenchmark
+    public sealed class AppendToEventStoreWithManyWriters : IBenchmark
     {
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
@@ -29,7 +30,7 @@ namespace Benchmarks.Tests
 
         public string Name
         {
-            get { return "Append Events to EventStore Parallel"; }
+            get { return "Append events parallel"; }
         }
 
         public void Initialize()
@@ -42,14 +43,15 @@ namespace Benchmarks.Tests
             mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
 
             eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
+            eventStore.GetEventsAsync(x => TaskHelper.Done).Wait();
         }
 
         public long Run()
         {
             const long numCommits = 200;
-            const long eventStreams = 10;
+            const long numStreams = 100;
 
-            Parallel.For(0, eventStreams, streamId =>
+            Parallel.For(0, numStreams, streamId =>
             {
                 var eventOffset = -1;
                 var streamName = streamId.ToString();
@@ -57,12 +59,11 @@ namespace Benchmarks.Tests
                 for (var commitId = 0; commitId < numCommits; commitId++)
                 {
                     eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset, new[] { Helper.CreateEventData() }).Wait();
-
                     eventOffset++;
                 }
             });
-
-            return numCommits * eventStreams;
+            
+            return numCommits * numStreams;
         }
 
         public void RunCleanup()

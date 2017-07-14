@@ -18,72 +18,25 @@ namespace Squidex.Infrastructure.MongoDb
     public abstract class MongoRepositoryBase<TEntity> : IExternalSystem
     {
         private const string CollectionFormat = "{0}Set";
+
+        protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
+        protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
+        protected static readonly FieldDefinitionBuilder<TEntity> Fields = FieldDefinitionBuilder<TEntity>.Instance;
+        protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
+        protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
+        protected static readonly ProjectionDefinitionBuilder<TEntity> Project = Builders<TEntity>.Projection;
+
         private Lazy<IMongoCollection<TEntity>> mongoCollection;
         private readonly IMongoDatabase mongoDatabase;
-        private readonly string typeName;
-
-        protected string TypeName
-        {
-            get
-            {
-                return typeName;
-            }
-        }
-
-        protected static ProjectionDefinitionBuilder<TEntity> Project
-        {
-            get
-            {
-                return Builders<TEntity>.Projection;
-            }
-        }
-
-        protected static SortDefinitionBuilder<TEntity> Sort
-        {
-            get
-            {
-                return Builders<TEntity>.Sort;
-            }
-        }
-
-        protected static UpdateDefinitionBuilder<TEntity> Update
-        {
-            get
-            {
-                return Builders<TEntity>.Update;
-            }
-        }
-
-        protected static FilterDefinitionBuilder<TEntity> Filter
-        {
-            get
-            {
-                return Builders<TEntity>.Filter;
-            }
-        }
-
-        protected static IndexKeysDefinitionBuilder<TEntity> Index
-        {
-            get
-            {
-                return Builders<TEntity>.IndexKeys;
-            }
-        }
 
         protected IMongoCollection<TEntity> Collection
         {
-            get
-            {
-                return mongoCollection.Value;
-            }
+            get { return mongoCollection.Value; }
         }
 
         protected IMongoDatabase Database
         {
-            get
-            {
-                return mongoDatabase;
-            }
+            get { return mongoDatabase; }
         }
 
         static MongoRepositoryBase()
@@ -98,8 +51,6 @@ namespace Squidex.Infrastructure.MongoDb
 
             mongoDatabase = database;
             mongoCollection = CreateCollection();
-
-            typeName = GetType().Name;
         }
 
         protected virtual MongoCollectionSettings CollectionSettings()

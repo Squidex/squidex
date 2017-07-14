@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  HandleEvents.cs
+//  HandleEventsWithManyWriters.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Benchmarks.Tests.TestData;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -21,12 +22,13 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Benchmarks.Tests
 {
-    public sealed class HandleEvents : IBenchmark
+    public sealed class HandleEventsWithManyWriters : IBenchmark
     {
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private const int NumEvents = 5000;
+        private const int NumCommits = 200;
+        private const int NumStreams = 10;
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
         private IEventStore eventStore;
@@ -37,15 +39,15 @@ namespace Benchmarks.Tests
 
         public string Id
         {
-            get { return "handleEvents"; }
+            get { return "handleEventsParallel"; }
         }
 
         public string Name
         {
-            get { return "Handle Events"; }
+            get { return "Handle events parallel"; }
         }
 
-        public HandleEvents()
+        public HandleEventsWithManyWriters()
         {
             serializerSettings.Converters.Add(new PropertiesBagConverter());
 
@@ -64,7 +66,7 @@ namespace Benchmarks.Tests
             var log = new SemanticLog(new ILogChannel[0], new ILogAppender[0], () => new JsonLogWriter(Formatting.Indented, true));
 
             eventConsumerInfos = new MongoEventConsumerInfoRepository(mongoDatabase);
-            eventConsumer = new MyEventConsumer(NumEvents);
+            eventConsumer = new MyEventConsumer(NumStreams * NumCommits);
             eventNotifier = new DefaultEventNotifier(new InMemoryPubSub());
 
             eventStore = new MongoEventStore(mongoDatabase, eventNotifier);
@@ -76,18 +78,23 @@ namespace Benchmarks.Tests
 
         public long Run()
         {
-            var streamName = Guid.NewGuid().ToString();
-
-            for (var eventId = 0; eventId < NumEvents; eventId++)
+            Parallel.For(0, NumStreams, streamId =>
             {
-                var eventData = formatter.ToEventData(new Envelope<IEvent>(new MyEvent { EventNumber = eventId + 1 }), Guid.NewGuid());
+                var eventOffset = -1;
+                var streamName = streamId.ToString();
 
-                eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventId - 1, new [] { eventData }).Wait();
-            }
+                for (var commitId = 0; commitId < NumCommits; commitId++)
+                {
+                    var eventData = formatter.ToEventData(new Envelope<IEvent>(new MyEvent()), Guid.NewGuid());
+
+                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset - 1, new[] { eventData }).Wait();
+                    eventOffset++;
+                }
+            });
 
             eventConsumer.WaitAndVerify();
 
-            return NumEvents;
+            return NumStreams * NumCommits;
         }
 
         public void RunCleanup()
