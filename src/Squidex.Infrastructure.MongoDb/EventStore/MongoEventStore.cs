@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             return new PollingSubscription(this, notifier, streamFilter, position);
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, string position)
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)
         {
             var result = await Observable.Create<StoredEvent>((observer, ct) =>
             {
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     observer.OnNext(storedEvent);
 
                     return TaskHelper.Done;
-                }, ct, streamName, position);
+                }, ct, streamName);
             }).ToList();
 
             return result.ToList();
@@ -251,7 +251,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 filters.Add(Filter.Gte(TimestampField, streamPosition.Timestamp));
             }
 
-            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, "*", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, ".*", StringComparison.OrdinalIgnoreCase))
             {
                 if (streamFilter.Contains("^"))
                 {

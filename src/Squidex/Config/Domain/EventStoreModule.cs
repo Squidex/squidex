@@ -9,11 +9,13 @@
 using System;
 using Autofac;
 using Autofac.Core;
+using EventStore.ClientAPI;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb.EventStore;
+using EventStoreStore = Squidex.Infrastructure.EventStore.EventStore;
 
 namespace Squidex.Config.Domain
 {
@@ -77,9 +79,34 @@ namespace Squidex.Config.Domain
                     .As<IEventStore>()
                     .SingleInstance();
             }
+            else if (string.Equals(eventStoreType, "EventStore", StringComparison.OrdinalIgnoreCase))
+            {
+                var configuration = Configuration.GetValue<string>("eventStore:eventStore:configuration");
+
+                if (string.IsNullOrWhiteSpace(configuration))
+                {
+                    throw new ConfigurationException("Configure EventStore EventStore configuration with 'eventStore:eventStore:configuration'.");
+                }
+
+                var projectionHost = Configuration.GetValue<string>("eventStore:eventStore:projectionHost");
+
+                if (string.IsNullOrWhiteSpace(projectionHost))
+                {
+                    throw new ConfigurationException("Configure EventStore EventStore projection host with 'eventStore:eventStore:projectionHost'.");
+                }
+
+                var prefix = Configuration.GetValue<string>("eventStore:eventStore:prefix");
+
+                var connection = EventStoreConnection.Create(configuration);
+
+                builder.Register(c => new EventStoreStore(connection, prefix, projectionHost))
+                    .As<IExternalSystem>()
+                    .As<IEventStore>()
+                    .SingleInstance();
+            }
             else
             {
-                throw new ConfigurationException($"Unsupported value '{eventStoreType}' for 'eventStore:type', supported: MongoDb.");
+                throw new ConfigurationException($"Unsupported value '{eventStoreType}' for 'eventStore:type', supported: MongoDb, EventStore.");
             }
         }
     }

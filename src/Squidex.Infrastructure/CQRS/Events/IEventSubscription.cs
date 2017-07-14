@@ -13,6 +13,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventSubscription : IDisposable
     {
-        IEventSubscription Subscribe(Func<StoredEvent, Task> handler);
+        Task SubscribeAsync(Func<StoredEvent, Task> handler);
     }
 }

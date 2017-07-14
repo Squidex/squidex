@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
 
         public string EventsFilter
         {
-            get { return "*"; }
+            get { return ".*"; }
         }
 
         public MongoHistoryEventRepository(IMongoDatabase database, IEnumerable<IHistoryEventsCreator> creators) 

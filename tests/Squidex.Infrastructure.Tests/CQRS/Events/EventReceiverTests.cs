@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 this.storedEvents = storedEvents;
             }
 
-            public IEventSubscription Subscribe(Func<StoredEvent, Task> handler)
+            public Task SubscribeAsync(Func<StoredEvent, Task> handler)
             {
                 foreach (var storedEvent in storedEvents)
                 {
@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     handler(storedEvent).Wait();
                 }
 
-                return this;
+                return TaskHelper.Done;
             }
 
             public void Dispose()
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return new MyEventSubscription(storedEvents);
             }
 
-            public Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, string position = null)
+            public Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)
             {
                 throw new NotSupportedException();
             }

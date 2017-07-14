@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
@@ -37,7 +38,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             }
         }
 
-        public IEventSubscription Subscribe(Func<StoredEvent, Task> handler)
+        public Task SubscribeAsync(Func<StoredEvent, Task> handler)
         {
             Guard.NotNull(handler, nameof(handler));
 
@@ -53,7 +54,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
             eventNotifier.Subscribe(timer.Wakeup);
 
-            return this;
+            return TaskHelper.Done;
         }
     }
 }

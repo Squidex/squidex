@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     
                     if (currentSubscription == null)
                     {
-                        Subscribe(eventConsumer, position);
+                        await SubscribeAsync(eventConsumer, position);
                     }
                 }
                 catch (Exception ex)
@@ -135,13 +135,13 @@ namespace Squidex.Infrastructure.CQRS.Events
             });
         }
 
-        private void Subscribe(IEventConsumer eventConsumer, string position)
+        private async Task SubscribeAsync(IEventConsumer eventConsumer, string position)
         {
             var consumerName = eventConsumer.Name;
 
             var subscription = eventStore.CreateSubscription(eventConsumer.EventsFilter, position);
 
-            subscription.Subscribe(async storedEvent =>
+            await subscription.SubscribeAsync(async storedEvent =>
             {
                 try
                 {

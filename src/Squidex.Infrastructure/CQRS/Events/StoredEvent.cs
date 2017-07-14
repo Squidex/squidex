@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     public sealed class StoredEvent
     {
         private readonly string eventPosition;
-        private readonly int eventStreamNumber;
+        private readonly long eventStreamNumber;
         private readonly EventData data;
 
         public string EventPosition
@@ -19,17 +19,17 @@ namespace Squidex.Infrastructure.CQRS.Events
             get { return eventPosition; }
         }
 
+        public long EventStreamNumber
+        {
+            get { return eventStreamNumber; }
+        }
+
         public EventData Data
         {
             get { return data; }
         }
 
-        public int EventStreamNumber
-        {
-            get { return eventStreamNumber; }
-        }
-
-        public StoredEvent(string eventPosition, int eventStreamNumber, EventData data)
+        public StoredEvent(string eventPosition, long eventStreamNumber, EventData data)
         {
             Guard.NotNullOrEmpty(eventPosition, nameof(eventPosition));
             Guard.NotNull(data, nameof(data));
