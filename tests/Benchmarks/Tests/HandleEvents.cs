@@ -8,6 +8,7 @@
 
 using System;
 using Benchmarks.Tests.TestData;
+using Benchmarks.Utils;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
@@ -15,7 +16,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb.EventStore;
-using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
@@ -68,9 +68,9 @@ namespace Benchmarks.Tests
             eventNotifier = new DefaultEventNotifier(new InMemoryPubSub());
 
             eventStore = new MongoEventStore(mongoDatabase, eventNotifier);
-            eventStore.GetEventsAsync(x => TaskHelper.Done).Wait();
+            eventStore.Warmup();
 
-            eventReceiver = new EventReceiver(formatter, eventStore, eventNotifier, eventConsumerInfos, log);
+            eventReceiver = new EventReceiver(formatter, eventStore, eventConsumerInfos, log);
             eventReceiver.Subscribe(eventConsumer);
         }
 

@@ -11,10 +11,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
-// ReSharper disable ExpressionIsAlwaysNull
-// ReSharper disable ConvertToLambdaExpression
-// ReSharper disable MethodSupportsCancellation
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.CQRS.Events
@@ -23,28 +19,25 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
-        private readonly IEventNotifier eventNotifier;
         private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
         private readonly ISemanticLog log;
+        private IEventSubscription currentSubscription;
         private CompletionTimer timer;
 
         public EventReceiver(
             EventDataFormatter formatter,
             IEventStore eventStore,
-            IEventNotifier eventNotifier,
             IEventConsumerInfoRepository eventConsumerInfoRepository,
             ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventNotifier, nameof(eventNotifier));
             Guard.NotNull(eventConsumerInfoRepository, nameof(eventConsumerInfoRepository));
 
             this.log = log;
             this.formatter = formatter;
             this.eventStore = eventStore;
-            this.eventNotifier = eventNotifier;
             this.eventConsumerInfoRepository = eventConsumerInfoRepository;
         }
 
@@ -52,6 +45,17 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             if (disposing)
             {
+                try
+                {
+                    currentSubscription?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    log.LogWarning(ex, w => w
+                        .WriteProperty("action", "DisposeEventReceiver")
+                        .WriteProperty("state", "Failed"));
+                }
+
                 try
                 {
                     timer?.Dispose();
@@ -65,14 +69,14 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Next()
+        public void Refresh()
         {
             ThrowIfDisposed();
 
-            timer?.Trigger();
+            timer?.Wakeup();
         }
 
-        public void Subscribe(IEventConsumer eventConsumer, int delay = 5000)
+        public void Subscribe(IEventConsumer eventConsumer)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
@@ -86,7 +90,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             var consumerName = eventConsumer.Name;
             var consumerStarted = false;
 
-            timer = new CompletionTimer(delay, async ct =>
+            timer = new CompletionTimer(5000, async ct =>
             {
                 if (!consumerStarted)
                 {
@@ -101,48 +105,62 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                     var position = status.Position;
 
-                    if (status.IsResetting)
+                    if (status.IsResetting || status.IsStopped)
                     {
+                        currentSubscription?.Dispose();
+                        currentSubscription = null;
+
                         position = null;
 
-                        await ResetAsync(eventConsumer, consumerName, position);
+                        await ResetAsync(eventConsumer);
                     }
                     else if (status.IsStopped)
                     {
+                        currentSubscription?.Dispose();
+                        currentSubscription = null;
+
                         return;
                     }
-
-                    await eventStore.GetEventsAsync(se =>
+                    
+                    if (currentSubscription == null)
                     {
-                        return HandleEventAsync(eventConsumer, se, consumerName);
-                    }, ct, eventConsumer.EventsFilter, position);
+                        Subscribe(eventConsumer, position);
+                    }
                 }
                 catch (Exception ex)
                 {
                     log.LogFatal(ex, w => w.WriteProperty("action", "EventHandlingFailed"));
 
+                }
+            });
+        }
+
+        private void Subscribe(IEventConsumer eventConsumer, string position)
+        {
+            var consumerName = eventConsumer.Name;
+
+            var subscription = eventStore.CreateSubscription(eventConsumer.EventsFilter, position);
+
+            subscription.Subscribe(async storedEvent =>
+            {
+                try
+                {
+                    await DispatchConsumer(ParseEvent(storedEvent), eventConsumer, eventConsumer.Name);
+
+                    await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, storedEvent.EventPosition, false);
+                }
+                catch (Exception ex)
+                {
                     await eventConsumerInfoRepository.StopAsync(consumerName, ex.ToString());
+
+                    subscription.Dispose();
                 }
             });
 
-            eventNotifier.Subscribe(timer.Trigger);
+            currentSubscription = subscription;
         }
 
-        private async Task HandleEventAsync(IEventConsumer eventConsumer, StoredEvent storedEvent, string consumerName)
-        {
-            var @event = ParseEvent(storedEvent);
-
-            if (@event == null)
-            {
-                return;
-            }
-
-            await DispatchConsumer(@event, eventConsumer, consumerName);
-
-            await eventConsumerInfoRepository.SetPositionAsync(consumerName, storedEvent.EventPosition, false);
-        }
-
-        private async Task ResetAsync(IEventConsumer eventConsumer, string consumerName, string position)
+        private async Task ResetAsync(IEventConsumer eventConsumer)
         {
             var actionId = Guid.NewGuid().ToString();
             try
@@ -151,16 +169,16 @@ namespace Squidex.Infrastructure.CQRS.Events
                     .WriteProperty("action", "EventConsumerReset")
                     .WriteProperty("actionId", actionId)
                     .WriteProperty("state", "Started")
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+                    .WriteProperty("eventConsumer", eventConsumer.Name));
 
                 await eventConsumer.ClearAsync();
-                await eventConsumerInfoRepository.SetPositionAsync(consumerName, position, true);
+                await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, null, true);
 
                 log.LogInformation(w => w
                     .WriteProperty("action", "EventConsumerReset")
                     .WriteProperty("actionId", actionId)
                     .WriteProperty("state", "Completed")
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
+                    .WriteProperty("eventConsumer", eventConsumer.Name));
             }
             catch (Exception ex)
             {
@@ -222,10 +240,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                 @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
                 return @event;
-            }
-            catch (TypeNameNotFoundException)
-            {
-                return null;
             }
             catch (Exception ex)
             {

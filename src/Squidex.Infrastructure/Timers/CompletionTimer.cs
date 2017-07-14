@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.Timers
             }
         }
 
-        public void Trigger()
+        public void Wakeup()
         {
             ThrowIfDisposed();
 

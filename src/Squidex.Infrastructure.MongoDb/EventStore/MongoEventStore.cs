@@ -19,13 +19,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable PossibleInvalidOperationException
-// ReSharper disable EmptyGeneralCatchClause
-// ReSharper disable AccessToModifiedClosure
-// ReSharper disable RedundantAssignment
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable TooWideLocalVariableScope
 
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
@@ -72,17 +67,24 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStreamOffset).Ascending(x => x.EventStream), new CreateIndexOptions { Unique = true });
         }
 
-        public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, string position = null)
+        public IEventSubscription CreateSubscription(string streamFilter = null, string position = null)
         {
-            return Observable.Create<StoredEvent>((observer, ct) =>
+            return new PollingSubscription(this, notifier, streamFilter, position);
+        }
+
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, string position)
+        {
+            var result = await Observable.Create<StoredEvent>((observer, ct) =>
             {
                 return GetEventsAsync(storedEvent =>
                 {
                     observer.OnNext(storedEvent);
 
                     return TaskHelper.Done;
-                }, ct, streamFilter, position);
-            });
+                }, ct, streamName, position);
+            }).ToList();
+
+            return result.ToList();
         }
 
         public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
@@ -90,8 +92,6 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             Guard.NotNull(callback, nameof(callback));
 
             StreamPosition lastPosition = position;
-
-            var wasEndOfCommit = lastPosition.IsEndOfCommit;
 
             var filter = CreateFilter(streamFilter, lastPosition);
 
@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 {
                     eventStreamOffset++;
 
-                    if (commitOffset > lastPosition.CommitOffset || wasEndOfCommit)
+                    if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
                     {
                         var eventData = new EventData { EventId = e.EventId, Metadata = e.Metadata, Payload = e.Payload, Type = e.Type };
                         var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
                 pendingCommits.Enqueue((document, cts));
 
-                timer.Trigger();
+                timer.Wakeup();
 
                 await cts.Task;
             }
@@ -263,18 +263,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                 }
             }
 
-            FilterDefinition<MongoEventCommit> filter = new BsonDocument();
-
-            if (filters.Count > 1)
-            {
-                filter = Filter.And(filters);
-            }
-            else if (filters.Count == 1)
-            {
-                filter = filters[0];
-            }
-
-            return filter;
+            return Filter.And(filters);
         }
     }
 }

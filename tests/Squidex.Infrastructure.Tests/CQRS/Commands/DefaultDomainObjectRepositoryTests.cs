@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(Observable.Empty<StoredEvent>());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(new List<StoredEvent>()));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
         }
@@ -87,13 +87,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var events = new[]
+            var events = new List<StoredEvent>
             {
                 new StoredEvent("0", 0, eventData1),
                 new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
@@ -112,13 +112,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var events = new[]
+            var events = new List<StoredEvent>
             {
                 new StoredEvent("0", 0, eventData1),
                 new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(events.ToObservable());
+            eventStore.Setup(x => x.GetEventsAsync(streamName, null)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
 
             eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
             eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));

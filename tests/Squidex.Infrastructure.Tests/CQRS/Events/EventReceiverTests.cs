@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using Squidex.Infrastructure.Log;
@@ -28,14 +27,41 @@ namespace Squidex.Infrastructure.CQRS.Events
         private sealed class MyEventConsumerInfo : IEventConsumerInfo
         {
             public bool IsStopped { get; set; }
-
             public bool IsResetting { get; set; }
-
             public string Name { get; set; }
-
             public string Error { get; set; }
-
             public string Position { get; set; }
+        }
+
+        private sealed class MyEventSubscription : IEventSubscription
+        {
+            private readonly IEnumerable<StoredEvent> storedEvents;
+            private bool isDisposed;
+
+            public MyEventSubscription(IEnumerable<StoredEvent> storedEvents)
+            {
+                this.storedEvents = storedEvents;
+            }
+
+            public IEventSubscription Subscribe(Func<StoredEvent, Task> handler)
+            {
+                foreach (var storedEvent in storedEvents)
+                {
+                    if (isDisposed)
+                    {
+                        break;
+                    }
+
+                    handler(storedEvent).Wait();
+                }
+
+                return this;
+            }
+
+            public void Dispose()
+            {
+                isDisposed = true;
+            }
         }
 
         private sealed class MyEventStore : IEventStore
@@ -47,15 +73,12 @@ namespace Squidex.Infrastructure.CQRS.Events
                 this.storedEvents = storedEvents;
             }
 
-            public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
+            public IEventSubscription CreateSubscription(string streamFilter = null, string position = null)
             {
-                foreach (var @event in storedEvents)
-                {
-                    await callback(@event);
-                }
+                return new MyEventSubscription(storedEvents);
             }
 
-            public IObservable<StoredEvent> GetEventsAsync(string streamFilter = null, string position = null)
+            public Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, string position = null)
             {
                 throw new NotSupportedException();
             }
@@ -101,7 +124,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
             formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
 
-            sut = new EventReceiver(formatter.Object, eventStore, eventNotifier.Object, eventConsumerInfoRepository.Object, log.Object);
+            sut = new EventReceiver(formatter.Object, eventStore, eventConsumerInfoRepository.Object, log.Object);
         }
 
         [Fact]
@@ -109,7 +132,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             sut.Subscribe(eventConsumer.Object);
             sut.Subscribe(eventConsumer.Object);
-            sut.Next();
+            sut.Refresh();
             sut.Dispose();
 
             eventConsumerInfoRepository.Verify(x => x.CreateAsync(consumerName), Times.Once());
@@ -121,7 +144,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             consumerInfo.Position = "2";
 
             sut.Subscribe(eventConsumer.Object);
-            sut.Next();
+            sut.Refresh();
             sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
@@ -138,7 +161,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer.Object);
-            sut.Next();
+            sut.Refresh();
             sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
@@ -156,7 +179,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             formatter.Setup(x => x.Parse(eventData2)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer.Object);
-            sut.Next();
+            sut.Refresh();
             sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());
@@ -173,7 +196,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             consumerInfo.Position = "2";
 
             sut.Subscribe(eventConsumer.Object);
-            sut.Next();
+            sut.Refresh();
             sut.Dispose();
 
             eventConsumer.Verify(x => x.On(envelope1), Times.Once());

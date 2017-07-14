@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             ThrowIfDisposed();
 
-            timer.Trigger();
+            timer.Wakeup();
         }
 
         private async Task TrackAsync()

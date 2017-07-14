@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             var streamName = nameResolver.GetStreamName(typeof(TDomainObject), id);
 
-            var events = await eventStore.GetEventsAsync(streamName).ToList();
+            var events = await eventStore.GetEventsAsync(streamName);
 
             if (events.Count == 0)
             {
