@@ -118,6 +118,7 @@ namespace Squidex.Infrastructure.EventStore
         {
             var sb = new StringBuilder();
 
+            sb.Append("by-");
             sb.Append(prefix.Trim(' ', '-'));
             sb.Append("-");
 
