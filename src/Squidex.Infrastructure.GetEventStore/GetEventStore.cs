@@ -71,9 +71,9 @@ namespace Squidex.Infrastructure.GetEventStore
 
                     foreach (var resolved in currentSlice.Events)
                     {
-                        var eventData = Formatter.Read(resolved.Event);
+                        var storedEvent = Formatter.Read(resolved);
 
-                        result.Add(new StoredEvent(resolved.OriginalPosition.ToString(), resolved.Event.EventNumber, eventData));
+                        result.Add(storedEvent);
                     }
                 }
             }

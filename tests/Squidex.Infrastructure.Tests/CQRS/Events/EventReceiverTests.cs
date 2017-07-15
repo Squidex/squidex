@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 this.storedEvents = storedEvents;
             }
 
-            public Task SubscribeAsync(Func<StoredEvent, Task> handler)
+            public Task SubscribeAsync(Func<StoredEvent, Task> onNext, Func<Exception, Task> onError)
             {
                 foreach (var storedEvent in storedEvents)
                 {
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                         break;
                     }
 
-                    handler(storedEvent).Wait();
+                    onNext(storedEvent).Wait();
                 }
 
                 return TaskHelper.Done;

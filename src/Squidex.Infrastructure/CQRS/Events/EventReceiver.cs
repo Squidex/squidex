@@ -130,7 +130,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                 catch (Exception ex)
                 {
                     log.LogFatal(ex, w => w.WriteProperty("action", "EventHandlingFailed"));
-
                 }
             });
         }
@@ -140,6 +139,13 @@ namespace Squidex.Infrastructure.CQRS.Events
             var consumerName = eventConsumer.Name;
 
             var subscription = eventStore.CreateSubscription(eventConsumer.EventsFilter, position);
+
+            async Task StopSubscriptionAsync(Exception exception)
+            {
+                await eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString());
+
+                subscription.Dispose();
+            }
 
             await subscription.SubscribeAsync(async storedEvent =>
             {
@@ -151,11 +157,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
                 catch (Exception ex)
                 {
-                    await eventConsumerInfoRepository.StopAsync(consumerName, ex.ToString());
-
-                    subscription.Dispose();
+                    await StopSubscriptionAsync(ex);
                 }
-            });
+            }, StopSubscriptionAsync);
 
             currentSubscription = subscription;
         }

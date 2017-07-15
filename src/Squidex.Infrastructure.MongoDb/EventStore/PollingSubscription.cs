@@ -38,9 +38,9 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             }
         }
 
-        public Task SubscribeAsync(Func<StoredEvent, Task> handler)
+        public Task SubscribeAsync(Func<StoredEvent, Task> onNext, Func<Exception, Task> onError = null)
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(onNext, nameof(onNext));
 
             if (timer == null)
             {
@@ -49,7 +49,14 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 
             timer = new CompletionTimer(5000, async ct =>
             {
-                await eventStore.GetEventsAsync(handler, ct, streamFilter, position);
+                try
+                {
+                    await eventStore.GetEventsAsync(onNext, ct, streamFilter, position);
+                }
+                catch (Exception ex)
+                {
+                    onError?.Invoke(ex);
+                }
             });
 
             eventNotifier.Subscribe(timer.Wakeup);

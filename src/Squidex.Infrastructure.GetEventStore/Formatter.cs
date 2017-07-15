@@ -8,6 +8,7 @@
 
 using System.Text;
 using EventStore.ClientAPI;
+using Squidex.Infrastructure.CQRS.Events;
 using EventData = Squidex.Infrastructure.CQRS.Events.EventData;
 using EventStoreData = EventStore.ClientAPI.EventData;
 
@@ -15,12 +16,16 @@ namespace Squidex.Infrastructure.GetEventStore
 {
     public static class Formatter
     {
-        public static EventData Read(RecordedEvent eventData)
+        public static StoredEvent Read(ResolvedEvent resolvedEvent)
         {
-            var body = Encoding.UTF8.GetString(eventData.Data);
-            var meta = Encoding.UTF8.GetString(eventData.Metadata);
+            var @event = resolvedEvent.Event;
 
-            return new EventData { Type = eventData.EventType, EventId = eventData.EventId, Payload = body, Metadata = meta };
+            var body = Encoding.UTF8.GetString(@event.Data);
+            var meta = Encoding.UTF8.GetString(@event.Metadata);
+
+            var eventData = new EventData { Type = @event.EventType, EventId = @event.EventId, Payload = body, Metadata = meta };
+
+            return new StoredEvent(resolvedEvent.OriginalEventNumber.ToString(), resolvedEvent.Event.EventNumber, eventData);
         }
 
         public static EventStoreData Write(EventData eventData)

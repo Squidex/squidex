@@ -6,12 +6,22 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Xunit;
 
 namespace Squidex.Infrastructure
 {
     public class StringExtensionsTests
     {
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void Should_provide_fallback_if_invalid(string value)
+        {
+            Assert.Equal("fallback", value.WithFallback("fallback"));
+        }
+
         [Theory]
         [InlineData("my", "My")]
         [InlineData("myProperty ", "MyProperty")]
@@ -35,12 +45,55 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void Should_provide_fallback_if_invalid(string value)
+        [InlineData("Hello World", '-', "hello-world")]
+        [InlineData("Hello/World", '-', "hello-world")]
+        [InlineData("Hello World", '_', "hello_world")]
+        [InlineData("Hello/World", '_', "hello_world")]
+        [InlineData("Hello World ", '_', "hello_world")]
+        [InlineData("Hello World-", '_', "hello_world")]
+        [InlineData("Hello/World_", '_', "hello_world")]
+        public void Should_replace_special_characters_with_sepator_when_simplifying(string input, char separator, string output)
         {
-            Assert.Equal("fallback", value.WithFallback("fallback"));
+            Assert.Equal(output, input.Simplify(separator: separator));
+        }
+
+        [Theory]
+        [InlineData("ö", "oe")]
+        [InlineData("ü", "ue")]
+        [InlineData("ä", "ae")]
+        public void Should_replace_multi_char_diacritics_when_simplifying(string input, string output)
+        {
+            Assert.Equal(output, input.Simplify());
+        }
+
+        [Theory]
+        [InlineData("ö", "o")]
+        [InlineData("ü", "u")]
+        [InlineData("ä", "a")]
+        public void Should_not_replace_multi_char_diacritics_when_simplifying(string input, string output)
+        {
+            Assert.Equal(output, input.Simplify(singleCharDiactric: true));
+        }
+
+        [Theory]
+        [InlineData("Físh", "fish")]
+        [InlineData("źish", "zish")]
+        [InlineData("żish", "zish")]
+        [InlineData("fórm", "form")]
+        [InlineData("fòrm", "form")]
+        [InlineData("fårt", "fart")]
+        public void Should_replace_single_char_diacritics_when_simplifying(string input, string output)
+        {
+            Assert.Equal(output, input.Simplify());
+        }
+
+        [Theory]
+        [InlineData("Hello my&World ", '_', "hello_my&world")]
+        [InlineData("Hello my&World-", '_', "hello_my&world")]
+        [InlineData("Hello my/World_", '_', "hello_my/world")]
+        public void Should_keep_characters_when_simplifying(string input, char separator, string output)
+        {
+            Assert.Equal(output, input.Simplify(new HashSet<char> { '&', '/' }, false, separator));
         }
 
         [Fact]
