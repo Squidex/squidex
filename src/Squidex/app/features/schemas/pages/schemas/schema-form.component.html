@@ -10,7 +10,7 @@
         
         <sqx-control-errors for="name" [submitted]="createFormSubmitted"></sqx-control-errors>
 
-		<input type="text" class="form-control" id="schema-name" formControlName="name" autocomplete="off" sqxFocusOnInit sqxLowerCaseInput />
+		<input type="text" class="form-control" id="schema-name" formControlName="name" autocomplete="off" sqxLowerCaseInput />
         
         <small class="form-text text-muted">
             The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appName}}/<b>{{schemaName | async}}</b>/.

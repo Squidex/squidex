@@ -97,7 +97,7 @@
     </div>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="confirmDeleteDialog" [@fade]>
+<div class="modal" *sqxModalView="confirmDeleteDialog;onRoot:true" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -121,7 +121,7 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="editSchemaDialog" [@fade]>
+<div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -140,7 +140,7 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="exportSchemaDialog" [@fade]>
+<div class="modal" *sqxModalView="exportSchemaDialog;onRoot:true" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">

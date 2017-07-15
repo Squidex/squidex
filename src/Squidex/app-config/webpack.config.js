@@ -52,10 +52,16 @@ module.exports = {
                     loader: 'tslint-loader' 
                 }],
                 exclude: /node_modules/
-            },{
+            }, {
                 test: /\.ts$/,
                 use: [{
                     loader: 'awesome-typescript-loader' 
+                }],
+                include: /node_modules/
+            }, {
+                test: /\.js\.flow$/,
+                use: [{
+                    loader: 'ignore-loader'
                 }],
                 include: /node_modules/
             }, {

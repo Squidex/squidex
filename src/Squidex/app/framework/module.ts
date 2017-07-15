@@ -48,6 +48,8 @@ import {
     ProgressBarComponent,
     ResourceLoaderService,
     RichEditorComponent,
+    RootViewDirective,
+    RootViewService,
     ScrollActiveDirective,
     ShortcutComponent,
     ShortcutService,
@@ -103,6 +105,7 @@ import {
         PopupLinkDirective,
         ProgressBarComponent,
         RichEditorComponent,
+        RootViewDirective,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
@@ -147,6 +150,7 @@ import {
         PopupLinkDirective,
         ProgressBarComponent,
         RichEditorComponent,
+        RootViewDirective,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
@@ -177,6 +181,7 @@ export class SqxFrameworkModule {
                 MessageBus,
                 NotificationService,
                 ResourceLoaderService,
+                RootViewService,
                 ShortcutService,
                 TitleService
             ]

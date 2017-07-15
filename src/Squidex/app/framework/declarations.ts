@@ -34,6 +34,7 @@ export * from './angular/parent-link.directive';
 export * from './angular/popup-link.directive';
 export * from './angular/progress-bar.component';
 export * from './angular/rich-editor.component';
+export * from './angular/root-view.directive';
 export * from './angular/router-utils';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
@@ -53,6 +54,7 @@ export * from './services/local-store.service';
 export * from './services/message-bus';
 export * from './services/notification.service';
 export * from './services/resource-loader.service';
+export * from './services/root-view.service';
 export * from './services/shortcut.service';
 export * from './services/title.service';
 

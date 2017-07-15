@@ -56,7 +56,7 @@
 
 <router-outlet></router-outlet>
 
-<div class="modal" *sqxModalView="cancelDialog" [@fade]>
+<div class="modal" *sqxModalView="cancelDialog;onRoot:true" [@fade]>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
