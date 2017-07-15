@@ -5,9 +5,21 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Injectable, ViewContainerRef } from '@angular/core';
+import { EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef } from '@angular/core';
 
 @Injectable()
 export class RootViewService {
-    public rootView: ViewContainerRef;
+    private rootView: ViewContainerRef;
+
+    public init(view: ViewContainerRef) {
+        this.rootView = view;
+    }
+
+    public createEmbeddedView<C>(templateRef: TemplateRef<C>, context?: C, index?: number): EmbeddedViewRef<C> {
+        return this.rootView.createEmbeddedView(templateRef, context, index);
+    }
+
+    public clear() {
+        this.rootView.clear();
+    }
 }

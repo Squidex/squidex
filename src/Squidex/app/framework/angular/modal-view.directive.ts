@@ -31,7 +31,7 @@ export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
         private readonly templateRef: TemplateRef<any>,
         private readonly renderer: Renderer,
         private readonly viewContainer: ViewContainerRef,
-        private readonly rootViewService: RootViewService
+        private readonly rootContainer: RootViewService
     ) {
     }
 
@@ -82,7 +82,7 @@ export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
 
                     if (isOpen) {
                         if (this.placeOnRoot) {
-                            this.renderedView = this.rootViewService.rootView.createEmbeddedView(this.templateRef);
+                            this.renderedView = this.rootContainer.createEmbeddedView(this.templateRef);
                         } else {
                             this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
                         }
@@ -91,7 +91,7 @@ export class ModalViewDirective implements OnChanges, OnInit, OnDestroy {
                         this.renderedView = null;
 
                         if (this.placeOnRoot) {
-                            this.rootViewService.rootView.clear();
+                            this.rootContainer.clear();
                         } else {
                             this.viewContainer.clear();
                         }

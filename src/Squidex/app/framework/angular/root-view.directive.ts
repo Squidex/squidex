@@ -14,6 +14,6 @@ import { RootViewService } from './../services/root-view.service';
 })
 export class RootViewDirective {
     constructor(viewContainer: ViewContainerRef, rootViewService: RootViewService) {
-        rootViewService.rootView = viewContainer;
+        rootViewService.init(viewContainer);
     }
 }
