@@ -12,6 +12,8 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
+// ReSharper disable InvertIf
+
 namespace Squidex.Infrastructure.MongoDb.EventStore
 {
     public sealed class PollingSubscription : DisposableObjectBase, IEventSubscription
@@ -19,7 +21,8 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         private readonly IEventNotifier eventNotifier;
         private readonly MongoEventStore eventStore;
         private readonly string streamFilter;
-        private readonly string position;
+        private string position;
+        private IDisposable subscription;
         private CompletionTimer timer;
 
         public PollingSubscription(MongoEventStore eventStore, IEventNotifier eventNotifier, string streamFilter, string position)
@@ -34,7 +37,9 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             if (disposing)
             {
-                timer.Dispose();
+                subscription?.Dispose();
+
+                timer?.Dispose();
             }
         }
 
@@ -42,7 +47,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
         {
             Guard.NotNull(onNext, nameof(onNext));
 
-            if (timer == null)
+            if (timer != null)
             {
                 throw new InvalidOperationException("An handler has already been registered.");
             }
@@ -51,15 +56,26 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
             {
                 try
                 {
-                    await eventStore.GetEventsAsync(onNext, ct, streamFilter, position);
+                    await eventStore.GetEventsAsync(async storedEvent =>
+                    {
+                        await onNext(storedEvent);
+
+                        position = storedEvent.EventPosition;
+                    }, ct, streamFilter, position);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is OperationCanceledException))
                 {
                     onError?.Invoke(ex);
                 }
             });
 
-            eventNotifier.Subscribe(timer.Wakeup);
+            subscription = eventNotifier.Subscribe(() =>
+            {
+                if (!timer.IsDisposed)
+                {
+                    timer.Wakeup();
+                }
+            });
 
             return TaskHelper.Done;
         }

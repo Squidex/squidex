@@ -14,6 +14,6 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         void NotifyEventsStored();
 
-        void Subscribe(Action handler);
+        IDisposable Subscribe(Action handler);
     }
 }

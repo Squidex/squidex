@@ -28,9 +28,9 @@ namespace Squidex.Infrastructure.CQRS.Events
             invalidator.Publish(ChannelName, string.Empty, true);
         }
 
-        public void Subscribe(Action handler)
+        public IDisposable Subscribe(Action handler)
         {
-            invalidator.Subscribe(ChannelName, x => handler());
+            return invalidator.Subscribe(ChannelName, x => handler());
         }
     }
 }

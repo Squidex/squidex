@@ -19,7 +19,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.GetEventStore
 {
-    internal sealed class EventStoreSubscription : IEventSubscription
+    internal sealed class EventStoreSubscription : DisposableObjectBase, IEventSubscription
     {
         private static readonly ConcurrentDictionary<string, bool> subscriptionsCreated = new ConcurrentDictionary<string, bool>();
         private readonly IEventStoreConnection connection;
@@ -40,10 +40,13 @@ namespace Squidex.Infrastructure.GetEventStore
 
             streamName = $"by-{prefix.Simplify()}-{streamFilter.Simplify()}";
         }
-       
-        public void Dispose()
+
+        protected override void DisposeObject(bool disposing)
         {
-            internalSubscription?.Stop();
+            if (disposing)
+            {
+                internalSubscription?.Stop();
+            }
         }
 
         public async Task SubscribeAsync(Func<StoredEvent, Task> onNext, Func<Exception, Task> onError = null)

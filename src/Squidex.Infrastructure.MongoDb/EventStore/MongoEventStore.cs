@@ -26,6 +26,7 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore, IDisposable
     {
+        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
         private static readonly FieldDefinition<MongoEventCommit, long> EventsCountField = Fields.Build(x => x.EventsCount);
         private static readonly FieldDefinition<MongoEventCommit, long> EventStreamOffsetField = Fields.Build(x => x.EventStreamOffset);
@@ -209,7 +210,8 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     Events = commitEvents,
                     EventsCount = eventsCount,
                     EventStream = streamName,
-                    EventStreamOffset = expectedVersion
+                    EventStreamOffset = expectedVersion,
+                    Timestamp = EmptyTimestamp
                 }.ToBsonDocument();
 
                 pendingCommits.Enqueue((document, cts));

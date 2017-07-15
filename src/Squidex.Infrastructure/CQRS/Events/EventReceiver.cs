@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                     var position = status.Position;
 
-                    if (status.IsResetting || status.IsStopped)
+                    if (status.IsResetting)
                     {
                         currentSubscription?.Dispose();
                         currentSubscription = null;
