@@ -120,11 +120,11 @@ namespace Squidex.Infrastructure.GetEventStore
             var endpoints = await Dns.GetHostAddressesAsync(addressParts[0]);
             var endpoint = new IPEndPoint(endpoints.First(x => x.AddressFamily == AddressFamily.InterNetwork), port);
 
-            var projectsManager =
+            var projectionsManager =
                 new ProjectionsManager(
                     connection.Settings.Log, endpoint,
                     connection.Settings.OperationTimeout);
-            return projectsManager;
+            return projectionsManager;
         }
     }
 }
