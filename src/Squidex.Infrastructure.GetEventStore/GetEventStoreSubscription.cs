@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventStoreSubscription.cs
+//  GetEventStoreSubscription.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -18,7 +18,7 @@ using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
 using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Infrastructure.EventStore
+namespace Squidex.Infrastructure.GetEventStore
 {
     internal sealed class EventStoreSubscription : IEventSubscription
     {

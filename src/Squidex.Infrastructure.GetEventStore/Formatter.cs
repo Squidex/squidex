@@ -11,7 +11,7 @@ using EventStore.ClientAPI;
 using EventData = Squidex.Infrastructure.CQRS.Events.EventData;
 using EventStoreData = EventStore.ClientAPI.EventData;
 
-namespace Squidex.Infrastructure.EventStore
+namespace Squidex.Infrastructure.GetEventStore
 {
     public static class Formatter
     {

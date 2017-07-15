@@ -91,7 +91,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private readonly Mock<IEventConsumerInfoRepository> eventConsumerInfoRepository = new Mock<IEventConsumerInfoRepository>();
         private readonly Mock<IEventConsumer> eventConsumer = new Mock<IEventConsumer>();
-        private readonly Mock<IEventNotifier> eventNotifier = new Mock<IEventNotifier>();
         private readonly Mock<ISemanticLog> log = new Mock<ISemanticLog>();
         private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
         private readonly EventData eventData1 = new EventData();

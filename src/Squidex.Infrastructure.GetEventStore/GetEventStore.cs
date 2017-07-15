@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventStore.cs
+//  GetEventStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -17,9 +17,9 @@ using EventData = Squidex.Infrastructure.CQRS.Events.EventData;
 // ReSharper disable ConvertIfStatementToSwitchStatement
 // ReSharper disable InvertIf
 
-namespace Squidex.Infrastructure.EventStore
+namespace Squidex.Infrastructure.GetEventStore
 {
-    public sealed class EventStore : IEventStore, IExternalSystem
+    public sealed class GetEventStore : IEventStore, IExternalSystem
     {
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventStore
         private readonly string projectionHost;
         private readonly string prefix;
 
-        public EventStore(IEventStoreConnection connection, string prefix, string projectionHost)
+        public GetEventStore(IEventStoreConnection connection, string prefix, string projectionHost)
         {
             Guard.NotNull(connection, nameof(connection));
 
