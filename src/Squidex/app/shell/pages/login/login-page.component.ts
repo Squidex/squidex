@@ -16,13 +16,13 @@ import { AuthService } from 'shared';
 })
 export class LoginPageComponent implements OnInit {
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly router: Router
     ) {
     }
 
     public ngOnInit() {
-        this.auth.loginRedirectComplete()
+        this.authService.loginRedirectComplete()
             .subscribe(
                 () => {
                     this.router.navigate(['/app'], { replaceUrl: true });

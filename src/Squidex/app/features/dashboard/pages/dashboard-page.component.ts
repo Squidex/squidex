@@ -65,7 +65,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public callsMax: string | null = null;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly usagesService: UsagesService
     ) {
         super(notifications, apps);
@@ -155,8 +155,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
             });
 
         this.authenticationSubscription =
-            this.auth.isAuthenticated.subscribe(() => {
-                const user = this.auth.user;
+            this.authService.isAuthenticated.subscribe(() => {
+                const user = this.authService.user;
 
                 if (user) {
                     this.profileDisplayName = user.displayName;

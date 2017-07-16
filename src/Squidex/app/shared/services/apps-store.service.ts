@@ -44,10 +44,10 @@ export class AppsStoreService {
     }
 
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly appsService: AppsService
     ) {
-        if (!auth || !appsService) {
+        if (!authService || !appsService) {
             return;
         }
 
@@ -58,7 +58,7 @@ export class AppsStoreService {
             this.lastApps = apps;
         });
 
-        this.auth.isAuthenticated.subscribe(isAuthenticated => {
+        this.authService.isAuthenticated.subscribe(isAuthenticated => {
             this.isAuthenticated = isAuthenticated;
 
             if (isAuthenticated) {
@@ -83,7 +83,7 @@ export class AppsStoreService {
     public selectApp(name: string | null): Promise<boolean> {
         this.appName$.next(name);
 
-        return this.selectedApp.take(1).map(app => app !== null).toPromise();
+        return this.selectedApp.skip(1).map(app => app !== null).toPromise();
     }
 
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {

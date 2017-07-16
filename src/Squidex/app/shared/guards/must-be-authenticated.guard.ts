@@ -13,13 +13,13 @@ import { AuthService } from './../services/auth.service';
 @Injectable()
 export class MustBeAuthenticatedGuard implements CanActivate {
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly router: Router
     ) {
     }
 
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-        return this.auth.checkLogin().then(isAuthenticated => {
+        return this.authService.checkLogin().then(isAuthenticated => {
             if (!isAuthenticated) {
                 this.router.navigate(['']);
             }

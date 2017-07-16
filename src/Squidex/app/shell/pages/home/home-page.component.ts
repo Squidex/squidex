@@ -19,16 +19,16 @@ export class HomePageComponent {
     public showLoginError = false;
 
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly router: Router
     ) {
     }
 
     public login() {
         if (this.isIE()) {
-            this.auth.loginRedirect();
+            this.authService.loginRedirect();
         } else {
-            this.auth.loginPopup()
+            this.authService.loginPopup()
                 .subscribe(() => {
                     this.router.navigate(['/app']);
                 }, ex => {
