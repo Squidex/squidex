@@ -53,71 +53,47 @@ export class ErrorDto {
 
 export module HTTP {
     export function getVersioned(http: HttpClient, url: string, version?: Version): Observable<any> {
-        if (version) {
-            return http.get(url, { observe: 'response', headers: new HttpHeaders().set('If-Match', version.value) })
-                .do((response: HttpResponse<any>) => {
-                    if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                        const etag = response.headers.get('etag');
+        const headers = createHeaders(version);
 
-                        if (etag) {
-                            version.update(etag);
-                        }
-                    }
-                }).map((response: HttpResponse<any>) => response.body);
-        } else {
-            return http.get(url, { observe: 'response' }).map((response: HttpResponse<any>) => response.body);
-        }
+        return handleVersion(http.get(url, { observe: 'response', headers }), version);
     }
 
     export function postVersioned(http: HttpClient, url: string, body: any, version?: Version): Observable<any> {
-        if (version) {
-            return http.post(url, body, { observe: 'response', headers: new HttpHeaders().set('If-Match', version.value) })
-                .do((response: HttpResponse<any>) => {
-                    if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                        const etag = response.headers.get('etag');
+        const headers = createHeaders(version);
 
-                        if (etag) {
-                            version.update(etag);
-                        }
-                    }
-                }).map((response: HttpResponse<any>) => response.body);
-        } else {
-            return http.post(url, body, { observe: 'response' }).map((response: HttpResponse<any>) => response.body);
-        }
+        return handleVersion(http.post(url, body, { observe: 'response', headers }), version);
     }
 
     export function putVersioned(http: HttpClient, url: string, body: any, version?: Version): Observable<any> {
-        if (version) {
-            return http.put(url, body, { observe: 'response', headers: new HttpHeaders().set('If-Match', version.value) })
-                .do((response: HttpResponse<any>) => {
-                    if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                        const etag = response.headers.get('etag');
+        const headers = createHeaders(version);
 
-                        if (etag) {
-                            version.update(etag);
-                        }
-                    }
-                }).map((response: HttpResponse<any>) => response.body);
-        } else {
-            return http.put(url, body, { observe: 'response' }).map((response: HttpResponse<any>) => response.body);
-        }
+        return handleVersion(http.put(url, body, { observe: 'response', headers }), version);
     }
 
     export function deleteVersioned(http: HttpClient, url: string, version?: Version): Observable<any> {
-        if (version) {
-            return http.delete(url, { observe: 'response', headers: new HttpHeaders().set('If-Match', version.value) })
-                .do((response: HttpResponse<any>) => {
-                    if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                        const etag = response.headers.get('etag');
+        const headers = createHeaders(version);
 
-                        if (etag) {
-                            version.update(etag);
-                        }
-                    }
-                }).map((response: HttpResponse<any>) => response.body);
+        return handleVersion(http.delete(url, { observe: 'response', headers }), version);
+    }
+
+    function createHeaders(version?: Version): HttpHeaders {
+        if (version && version.value && version.value.length > 0) {
+            return new HttpHeaders().set('If-Match', version.value);
         } else {
-            return http.delete(url, { observe: 'response' }).map((response: HttpResponse<any>) => response.body);
+            return new HttpHeaders();
         }
+    }
+
+    function handleVersion(httpRequest: Observable<HttpResponse<any>>, version: Version): Observable<any> {
+        return httpRequest.do((response: HttpResponse<any>) => {
+                if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
+                    const etag = response.headers.get('etag');
+
+                    if (etag) {
+                        version.update(etag);
+                    }
+                }
+            }).map((response: HttpResponse<any>) => response.body);
     }
 }
 
