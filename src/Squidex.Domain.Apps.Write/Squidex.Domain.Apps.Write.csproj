@@ -15,7 +15,7 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NodaTime" Version="2.0.3" />
+    <PackageReference Include="NodaTime" Version="2.2.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
 </Project>
