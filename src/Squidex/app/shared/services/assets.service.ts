@@ -198,7 +198,7 @@ export class AssetsService {
         return new Observable<number | AssetReplacedDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
-            const req = new HttpRequest('PUT', url, file, {
+            const req = new HttpRequest('PUT', url, getFormData(file), {
                 headers: new HttpHeaders({
                     'If-Match': version.value
                 }),
