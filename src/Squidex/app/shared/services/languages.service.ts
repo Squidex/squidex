@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig } from 'framework';
-import { AuthService } from './auth.service';
+import { ApiUrlConfig, HTTP } from 'framework';
 
 export class LanguageDto {
     constructor(
@@ -24,7 +24,7 @@ export class LanguageDto {
 @Injectable()
 export class LanguageService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -32,8 +32,7 @@ export class LanguageService {
     public getLanguages(): Observable<LanguageDto[]> {
         const url = this.apiUrl.buildUrl('api/languages');
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -43,6 +42,6 @@ export class LanguageService {
                             item.englishName);
                     });
                 })
-                .catchError('Failed to load languages. Please reload.');
+                .pretifyError('Failed to load languages. Please reload.');
     }
 }

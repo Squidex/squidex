@@ -6,9 +6,9 @@
  */
 
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
 import {
@@ -68,7 +68,7 @@ import {
 
 @NgModule({
     imports: [
-        HttpModule,
+        HttpClientModule,
         FormsModule,
         CommonModule,
         RouterModule,
@@ -163,7 +163,7 @@ import {
         TitleComponent,
         ToggleComponent,
         UserReportComponent,
-        HttpModule,
+        HttpClientModule,
         FormsModule,
         CommonModule,
         RouterModule,

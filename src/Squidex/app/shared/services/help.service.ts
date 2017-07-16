@@ -5,14 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class HelpService {
     constructor(
-        private readonly http: Http
+        private readonly http: HttpClient
     ) {
     }
 
@@ -20,8 +20,7 @@ export class HelpService {
         const url = `https://api.gitbook.com/book/squidex/squidex/contents/${helpPage}.json`;
 
         return this.http.get(url)
-            .map(response => response.json())
-            .map(response => {
+            .map((response: any) => {
                 const result: string[] = [];
 
                 for (let section of response.sections) {

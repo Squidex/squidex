@@ -5,87 +5,76 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Http, Response, ResponseOptions } from '@angular/http';
-import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AccessTokenDto,
     ApiUrlConfig,
     AppClientDto,
     AppClientsService,
-    AuthService,
     CreateAppClientDto,
     UpdateAppClientDto,
     Version
 } from './../';
 
 describe('AppClientsService', () => {
-    let authService: IMock<AuthService>;
-    let appClientsService: AppClientsService;
     let version = new Version('1');
-    let http: IMock<Http>;
 
     beforeEach(() => {
-        http = Mock.ofType(Http);
-
-        authService = Mock.ofType(AuthService);
-        appClientsService = new AppClientsService(authService.object, new ApiUrlConfig('http://service/p/'), http.object);
+        TestBed.configureTestingModule({
+            imports: [
+                HttpClientTestingModule
+            ],
+            providers: [
+                AppClientsService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+            ]
+        });
     });
 
-    it('should make get request to get app clients', () => {
-        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/clients', version))
-            .returns(() => Observable.of(
-                new Response(
-                    new ResponseOptions({
-                        body: [
-                            {
-                                id: 'client1',
-                                name: 'Client 1',
-                                secret: 'secret1'
-                            },
-                            {
-                                id: 'client2',
-                                name: 'Client 2',
-                                secret: 'secret2'
-                            }
-                        ]
-                    })
-                )
-            ))
-            .verifiable(Times.once());
+    afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+        httpMock.verify();
+    }));
+
+    it('should make get request to get app clients',
+        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
         let clients: AppClientDto[] | null = null;
 
         appClientsService.getClients('my-app', version).subscribe(result => {
             clients = result;
-        }).unsubscribe();
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush([
+            {
+                id: 'client1',
+                name: 'Client 1',
+                secret: 'secret1'
+            },
+            {
+                id: 'client2',
+                name: 'Client 2',
+                secret: 'secret2'
+            }
+        ]);
 
         expect(clients).toEqual(
             [
                 new AppClientDto('client1', 'Client 1', 'secret1'),
                 new AppClientDto('client2', 'Client 2', 'secret2')
             ]);
+    }));
 
-        authService.verifyAll();
-    });
+    it('should make post request to create client',
+        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-    it('should make post request to create client', () => {
         const dto = new CreateAppClientDto('client1');
-
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/clients', dto, version))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions({
-                        body: {
-                            id: 'client1',
-                            name: 'Client 1',
-                            secret: 'secret1'
-                        }
-                    })
-                )
-            ))
-            .verifiable(Times.once());
 
         let client: AppClientDto | null = null;
 
@@ -93,56 +82,47 @@ describe('AppClientsService', () => {
             client = result;
         });
 
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1' });
+
         expect(client).toEqual(
             new AppClientDto('client1', 'Client 1', 'secret1'));
+    }));
 
-        authService.verifyAll();
-    });
+    it('should make put request to rename client',
+        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-    it('should make put request to rename client', () => {
         const dto = new UpdateAppClientDto('Client 1 New');
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/clients/client1', dto, version))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions()
-                )
-            ))
-            .verifiable(Times.once());
+        appClientsService.updateClient('my-app', 'client1', dto, version).subscribe();
 
-        appClientsService.updateClient('my-app', 'client1', dto, version);
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
-        authService.verifyAll();
-    });
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
 
-    it('should make delete request to remove client', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/clients/client1', version))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions()
-                )
-            ))
-            .verifiable(Times.once());
+        req.flush({});
+    }));
 
-        appClientsService.deleteClient('my-app', 'client1', version);
+    it('should make delete request to remove client',
+        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-        authService.verifyAll();
-    });
+        appClientsService.deleteClient('my-app', 'client1', version).subscribe();
 
-    it('should make form request to create token', () => {
-        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
-        http.setup(x => x.post('http://service/p/identity-server/connect/token', body, It.isAny()))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions({
-                        body: {
-                            access_token: 'token1', token_type: 'type1'
-                        }
-                    })
-                )
-            ))
-            .verifiable(Times.once());
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush({});
+    }));
+
+    it('should make form request to create token',
+        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
         let accessTokenDto: AccessTokenDto | null = null;
 
@@ -150,9 +130,16 @@ describe('AppClientsService', () => {
             accessTokenDto = result;
         });
 
+        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
+
+        const req = httpMock.expectOne('http://service/p/identity-server/connect/token');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.body).toEqual(body);
+
+        req.flush({ access_token: 'token1', token_type: 'type1' });
+
         expect(accessTokenDto).toEqual(
             new AccessTokenDto('token1', 'type1'));
-
-        http.verifyAll();
-    });
+    }));
 });

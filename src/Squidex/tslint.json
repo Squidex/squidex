@@ -21,10 +21,6 @@
       true, 
       "check-accessor"
     ],
-    "member-ordering": [
-      true,
-      "variables-before-functions"
-    ],
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [

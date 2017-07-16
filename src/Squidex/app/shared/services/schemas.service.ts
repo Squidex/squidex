@@ -5,6 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -15,11 +16,10 @@ import {
     ApiUrlConfig,
     DateTime,
     EntityCreatedDto,
+    HTTP,
     ValidatorsEx,
     Version
 } from 'framework';
-
-import { AuthService } from './auth.service';
 
 export const fieldTypes: string[] = [
     'Assets',
@@ -483,7 +483,7 @@ export class CreateSchemaDto {
 @Injectable()
 export class SchemasService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -491,8 +491,7 @@ export class SchemasService {
     public getSchemas(appName: string): Observable<SchemaDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -510,14 +509,13 @@ export class SchemasService {
                             new Version(item.version.toString()));
                     });
                 })
-                .catchError('Failed to load schemas. Please reload.');
+                .pretifyError('Failed to load schemas. Please reload.');
     }
 
     public getSchema(appName: string, id: string, version?: Version): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const fields = response.fields.map((item: any) => {
                         const propertiesDto =
@@ -547,105 +545,103 @@ export class SchemasService {
                         new Version(response.version.toString()),
                         fields);
                 })
-                .catchError('Failed to load schema. Please reload.');
+                .pretifyError('Failed to load schema. Please reload.');
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto, version?: Version): Observable<EntityCreatedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return this.authService.authPost(url, dto, version)
-                .map(response => response.json())
+        return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catchError('Failed to create schema. Please reload.');
+                .pretifyError('Failed to create schema. Please reload.');
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto, version?: Version): Observable<EntityCreatedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields`);
 
-        return this.authService.authPost(url, dto, version)
-                .map(response => response.json())
+        return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catchError('Failed to add field. Please reload.');
+                .pretifyError('Failed to add field. Please reload.');
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to update schema. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to update schema. Please reload.');
     }
 
     public putFieldOrdering(appName: string, schemaName: string, dto: number[], version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/ordering`);
 
-        return this.authService.authPut(url, { fieldIds: dto }, version)
-                .catchError('Failed to reorder fields. Please reload.');
+        return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version)
+                .pretifyError('Failed to reorder fields. Please reload.');
     }
 
     public publishSchema(appName: string, schemaName: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to publish schema. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to publish schema. Please reload.');
     }
 
     public unpublishSchema(appName: string, schemaName: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to unpublish schema. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to unpublish schema. Please reload.');
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to update field. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to update field. Please reload.');
     }
 
     public enableField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to enable field. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to enable field. Please reload.');
     }
 
     public disableField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to disable field. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to disable field. Please reload.');
     }
 
     public showField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to show field. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to show field. Please reload.');
     }
 
     public hideField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to hide field. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to hide field. Please reload.');
     }
 
     public deleteField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to delete field. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to delete field. Please reload.');
     }
 
     public deleteSchema(appName: string, schemaName: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to delete schema. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to delete schema. Please reload.');
     }
 }

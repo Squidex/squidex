@@ -14,6 +14,8 @@ export * from './guards/resolve-published-schema.guard';
 export * from './guards/resolve-schema.guard';
 export * from './guards/resolve-user.guard';
 
+export * from './interceptors/auth.interceptor';
+
 export * from './services/app-contributors.service';
 export * from './services/app-clients.service';
 export * from './services/app-languages.service';

@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig } from 'framework';
-import { AuthService } from './auth.service';
+import { ApiUrlConfig, HTTP } from 'framework';
 
 export class EventConsumerDto {
     constructor(
@@ -27,7 +27,7 @@ export class EventConsumerDto {
 @Injectable()
 export class EventConsumersService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -35,8 +35,7 @@ export class EventConsumersService {
     public getEventConsumers(): Observable<EventConsumerDto[]> {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -49,27 +48,27 @@ export class EventConsumersService {
                             item.position);
                     });
                 })
-                .catchError('Failed to load event consumers. Please reload.');
+                .pretifyError('Failed to load event consumers. Please reload.');
     }
 
     public startEventConsumer(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/start`);
 
-        return this.authService.authPut(url, {})
-                .catchError('Failed to start event consumer. Please reload.');
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to start event consumer. Please reload.');
     }
 
     public stopEventConsumer(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/stop`);
 
-        return this.authService.authPut(url, {})
-                .catchError('Failed to stop event consumer. Please reload.');
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to stop event consumer. Please reload.');
     }
 
     public resetEventConsumer(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/reset`);
 
-        return this.authService.authPut(url, {})
-                .catchError('Failed to reset event consumer. Please reload.');
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to reset event consumer. Please reload.');
     }
 }

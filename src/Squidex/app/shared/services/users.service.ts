@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig } from 'framework';
-import { AuthService } from './auth.service';
+import { ApiUrlConfig, HTTP } from 'framework';
 
 export class UsersDto {
     constructor(
@@ -61,7 +61,7 @@ export class UserDto {
 @Injectable()
 export class UsersService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -69,8 +69,7 @@ export class UsersService {
     public getUsers(query?: string): Observable<UserDto[]> {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -83,14 +82,13 @@ export class UsersService {
                             item.isLocked);
                     });
                 })
-                .catchError('Failed to load users. Please reload.');
+                .pretifyError('Failed to load users. Please reload.');
     }
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     return new UserDto(
                         response.id,
@@ -99,14 +97,14 @@ export class UsersService {
                         response.pictureUrl,
                         response.isLocked);
                 })
-                .catchError('Failed to load user. Please reload.');
+                .pretifyError('Failed to load user. Please reload.');
     }
 }
 
 @Injectable()
 export class UserManagementService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -114,8 +112,7 @@ export class UserManagementService {
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response.items;
 
@@ -130,14 +127,13 @@ export class UserManagementService {
 
                     return new UsersDto(response.total, users);
                 })
-                .catchError('Failed to load users. Please reload.');
+                .pretifyError('Failed to load users. Please reload.');
     }
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     return new UserDto(
                         response.id,
@@ -146,36 +142,37 @@ export class UserManagementService {
                         response.pictureUrl,
                         response.isLocked);
                 })
-                .catchError('Failed to load user. Please reload.');
+                .pretifyError('Failed to load user. Please reload.');
     }
 
     public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
-        return this.authService.authPost(url, dto)
-                .map(response => response.json())
-                .map(response => new UserCreatedDto(response.id, response.pictureUrl))
-                .catchError('Failed to create user. Please reload.');
+        return HTTP.postVersioned(this.http, url, dto)
+                .map(response => {
+                    return new UserCreatedDto(response.id, response.pictureUrl);
+                })
+                .pretifyError('Failed to create user. Please reload.');
     }
 
     public putUser(id: string, dto: UpdateUserDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return this.authService.authPut(url, dto)
-                .catchError('Failed to update user. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto)
+                .pretifyError('Failed to update user. Please reload.');
     }
 
     public lockUser(id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}/lock`);
 
-        return this.authService.authPut(url, {})
-                .catchError('Failed to load users. Please retry.');
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to load users. Please retry.');
     }
 
     public unlockUser(id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}/unlock`);
 
-        return this.authService.authPut(url, {})
-                .catchError('Failed to load users. Please retry.');
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to load users. Please retry.');
     }
 }

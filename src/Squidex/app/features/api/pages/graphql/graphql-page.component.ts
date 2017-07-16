@@ -6,6 +6,7 @@
  */
 
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -16,7 +17,6 @@ import {
     ApiUrlConfig,
     AppComponentBase,
     AppsStoreService,
-    AuthService,
     NotificationService
 } from 'shared';
 
@@ -31,8 +31,8 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
     public graphiQLContainer: ElementRef;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly authService: AuthService,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly http: HttpClient
     ) {
         super(notifications, apps);
     }
@@ -48,7 +48,7 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
 
     private request(params: any) {
         return this.appNameOnce()
-            .switchMap(app => this.authService.authPost(this.apiUrl.buildUrl(`api/content/${app}/graphql`), params).map(r => r.json()))
+            .switchMap(app => this.http.post(this.apiUrl.buildUrl(`api/content/${app}/graphql`), params))
             .toPromise();
     }
 }

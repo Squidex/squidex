@@ -5,83 +5,78 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Response, ResponseOptions } from '@angular/http';
-import { Observable } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AddAppLanguageDto,
     ApiUrlConfig,
     AppLanguageDto,
     AppLanguagesService,
-    AuthService,
     UpdateAppLanguageDto,
     Version
 } from './../';
 
 describe('AppLanguagesService', () => {
-    let authService: IMock<AuthService>;
-    let appLanguagesService: AppLanguagesService;
     let version = new Version('1');
 
     beforeEach(() => {
-        authService = Mock.ofType(AuthService);
-        appLanguagesService = new AppLanguagesService(authService.object, new ApiUrlConfig('http://service/p/'));
+        TestBed.configureTestingModule({
+            imports: [
+                HttpClientTestingModule
+            ],
+            providers: [
+                AppLanguagesService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+            ]
+        });
     });
 
-    it('should make get request to get app languages', () => {
-        authService.setup(x => x.authGet('http://service/p/api/apps/my-app/languages', version))
-            .returns(() => Observable.of(
-                new Response(
-                    new ResponseOptions({
-                        body: [
-                            {
-                                iso2Code: 'en',
-                                englishName: 'English',
-                                isMaster: true,
-                                isOptional: true,
-                                fallback: ['de', 'en']
-                            },
-                            {
-                                iso2Code: 'it',
-                                englishName: 'Italian'
-                            }
-                        ]
-                    })
-                )
-            ))
-            .verifiable(Times.once());
+    afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+        httpMock.verify();
+    }));
+
+    it('should make get request to get app languages',
+        inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
         let languages: AppLanguageDto[] | null = null;
 
         appLanguagesService.getLanguages('my-app', version).subscribe(result => {
             languages = result;
-        }).unsubscribe();
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush([
+            {
+                iso2Code: 'en',
+                englishName: 'English',
+                isMaster: true,
+                isOptional: true,
+                fallback: ['de', 'en']
+            },
+            {
+                iso2Code: 'it',
+                isMaster: false,
+                isOptional: false,
+                englishName: 'Italian'
+            }
+        ]);
 
         expect(languages).toEqual(
             [
                 new AppLanguageDto('en', 'English', true, true,  ['de', 'en']),
                 new AppLanguageDto('it', 'Italian', false, false, [])
             ]);
+    }));
 
-        authService.verifyAll();
-    });
+    it('should make post request to add language',
+        inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-    it('should make post request to add language', () => {
         const dto = new AddAppLanguageDto('de');
-
-        authService.setup(x => x.authPost('http://service/p/api/apps/my-app/languages', dto, version))
-            .returns(() => Observable.of(
-                new Response(
-                    new ResponseOptions({
-                        body: {
-                            iso2Code: 'de',
-                            englishName: 'German'
-                        }
-                    })
-                )
-            ))
-            .verifiable(Times.once());
 
         let language: AppLanguageDto | null = null;
 
@@ -89,39 +84,42 @@ describe('AppLanguagesService', () => {
             language = result;
         });
 
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush({ iso2Code: 'de', englishName: 'German' });
+
         expect(language).toEqual(
             new AppLanguageDto('de', 'German', false, false, []));
+    }));
 
-        authService.verifyAll();
-    });
+    it('should make put request to make master language',
+        inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-    it('should make put request to make master language', () => {
         const dto = new UpdateAppLanguageDto(true, true, []);
 
-        authService.setup(x => x.authPut('http://service/p/api/apps/my-app/languages/de', dto, version))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions()
-                )
-            ))
-            .verifiable(Times.once());
+        appLanguagesService.updateLanguage('my-app', 'de', dto, version).subscribe();
 
-        appLanguagesService.updateLanguage('my-app', 'de', dto, version);
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
-        authService.verifyAll();
-    });
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
 
-    it('should make delete request to remove language', () => {
-        authService.setup(x => x.authDelete('http://service/p/api/apps/my-app/languages/de', version))
-            .returns(() => Observable.of(
-               new Response(
-                    new ResponseOptions()
-                )
-            ))
-            .verifiable(Times.once());
+        req.flush({});
+    }));
 
-        appLanguagesService.deleteLanguage('my-app', 'de', version);
+    it('should make delete request to remove language',
+        inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        authService.verifyAll();
-    });
+        appLanguagesService.deleteLanguage('my-app', 'de', version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toEqual('1');
+
+        req.flush({});
+    }));
 });

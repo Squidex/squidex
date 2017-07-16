@@ -5,6 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -13,10 +14,9 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
+    HTTP,
     EntityCreatedDto
 } from 'framework';
-
-import { AuthService } from './auth.service';
 
 export class AppDto {
     constructor(
@@ -39,7 +39,7 @@ export class CreateAppDto {
 @Injectable()
 export class AppsService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -47,8 +47,7 @@ export class AppsService {
     public getApps(): Observable<AppDto[]> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -61,17 +60,16 @@ export class AppsService {
                             DateTime.parseISO(item.lastModified));
                     });
                 })
-                .catchError('Failed to load apps. Please reload.');
+                .pretifyError('Failed to load apps. Please reload.');
     }
 
     public postApp(dto: CreateAppDto): Observable<EntityCreatedDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.authService.authPost(url, dto)
-                .map(response => response.json())
+        return HTTP.postVersioned(this.http, url, dto)
                 .map(response => {
                     return new EntityCreatedDto(response.id);
                 })
-                .catchError('Failed to create app. Please reload.');
+                .pretifyError('Failed to create app. Please reload.');
     }
 }

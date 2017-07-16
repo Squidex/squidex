@@ -5,13 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, Version } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    HTTP,
+    Version
+} from 'framework';
 
 export class AppContributorDto {
     constructor(
@@ -32,7 +36,7 @@ export class AppContributorsDto {
 @Injectable()
 export class AppContributorsService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -40,8 +44,7 @@ export class AppContributorsService {
     public getContributors(appName: string, version?: Version): Observable<AppContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return this.authService.authGet(url, version)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url, version)
                 .map(response => {
                     const items: any[] = response.contributors;
 
@@ -53,20 +56,20 @@ export class AppContributorsService {
                         }),
                         response.maxContributors);
                 })
-                .catchError('Failed to load contributors. Please reload.');
+                .pretifyError('Failed to load contributors. Please reload.');
     }
 
     public postContributor(appName: string, dto: AppContributorDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return this.authService.authPost(url, dto, version)
-                .catchError('Failed to add contributors. Please reload.');
+        return HTTP.postVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to add contributors. Please reload.');
     }
 
     public deleteContributor(appName: string, contributorId: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to delete contributors. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to delete contributors. Please reload.');
     }
 }

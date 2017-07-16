@@ -5,18 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Headers } from '@angular/http';
 import { Observable } from 'rxjs';
-import { ProgressHttp } from 'angular-progress-http';
 
 import {
     ApiUrlConfig,
     DateTime,
+    HTTP,
     Version
 } from 'framework';
-
-import { AuthService } from './auth.service';
 
 export class AssetsDto {
     constructor(
@@ -83,9 +81,8 @@ export class AssetReplacedDto {
 @Injectable()
 export class AssetsService {
     constructor(
-        private readonly authService: AuthService,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly http: ProgressHttp
+        private readonly http: HttpClient,
+        private readonly apiUrl: ApiUrlConfig
     ) {
     }
 
@@ -111,8 +108,7 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response.items;
 
@@ -133,38 +129,40 @@ export class AssetsService {
                             new Version(item.version.toString()));
                     }));
                 })
-                .catchError('Failed to load assets. Please reload.');
+                .pretifyError('Failed to load assets. Please reload.');
     }
 
     public uploadFile(appName: string, file: File): Observable<number | AssetCreatedDto> {
         return new Observable<number | AssetCreatedDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-            const content = new FormData();
-            const headers = new Headers({
-                'Authorization': `${this.authService.user!.user.token_type} ${this.authService.user!.user.access_token}`
+            const req = new HttpRequest('POST', url, getFormData(file), {
+                reportProgress: true
             });
 
-            content.append('file', file);
+            this.http.request(req)
+                .pretifyError('Failed to upload asset. Please reload.')
+                .subscribe(event => {
+                    if (event.type === HttpEventType.UploadProgress) {
+                        const percentDone = Math.round(100 * event.loaded / event.total);
 
-            this.http.withUploadProgressListener(progress => subscriber.next(progress.percentage))
-                .post(url, content, { headers })
-                .map(response => response.json())
-                .map(response => {
-                    return new AssetCreatedDto(
-                        response.id,
-                        response.fileName,
-                        response.fileSize,
-                        response.fileVersion,
-                        response.mimeType,
-                        response.isImage,
-                        response.pixelWidth,
-                        response.pixelHeight,
-                        new Version(response.version.toString()));
-                })
-                .catchError('Failed to upload asset. Please reload.')
-                .subscribe(value => {
-                    subscriber.next(value);
+                        subscriber.next(percentDone);
+                    } else if (event instanceof HttpResponse) {
+                        const response = event.body;
+
+                        const dto =  new AssetCreatedDto(
+                            response.id,
+                            response.fileName,
+                            response.fileSize,
+                            response.fileVersion,
+                            response.mimeType,
+                            response.isImage,
+                            response.pixelWidth,
+                            response.pixelHeight,
+                            new Version(response.version.toString()));
+
+                        subscriber.next(dto);
+                    }
                 }, err => {
                     subscriber.error(err);
                 }, () => {
@@ -176,7 +174,7 @@ export class AssetsService {
     public getAsset(appName: string, id: string, version?: Version): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return this.authService.authGet(url)
+        return HTTP.getVersioned(this.http, url)
                 .map(response => response.json())
                 .map(response => {
                     return new AssetDto(
@@ -194,40 +192,41 @@ export class AssetsService {
                         response.pixelHeight,
                         new Version(response.version.toString()));
                 })
-                .catchError('Failed to load assets. Please reload.');
+                .pretifyError('Failed to load assets. Please reload.');
     }
 
     public replaceFile(appName: string, id: string, file: File, version?: Version): Observable<number | AssetReplacedDto> {
         return new Observable<number | AssetReplacedDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
-            const content = new FormData();
-            const headers = new Headers({
-                'Authorization': `${this.authService.user!.user.token_type} ${this.authService.user!.user.access_token}`
+            const req = new HttpRequest('POST', url, file, {
+                headers: new HttpHeaders({
+                    'If-Match': version.value
+                }),
+                reportProgress: true
             });
 
-            if (version && version.value.length > 0) {
-                headers.append('If-Match', version.value);
-            }
+            this.http.request(req)
+                .pretifyError('Failed to replace asset. Please reload.')
+                .subscribe(event => {
+                    if (event.type === HttpEventType.UploadProgress) {
+                        const percentDone = Math.round(100 * event.loaded / event.total);
 
-            content.append('file', file);
+                        subscriber.next(percentDone);
+                    } else if (event instanceof HttpResponse) {
+                        const response = event.body;
 
-            this.http.withUploadProgressListener(progress => subscriber.next(progress.percentage))
-                .put(url, content, { headers })
-                .map(response => response.json())
-                .map(response => {
-                    return new AssetReplacedDto(
-                        response.fileSize,
-                        response.fileVersion,
-                        response.mimeType,
-                        response.isImage,
-                        response.pixelWidth,
-                        response.pixelHeight,
-                        new Version(response.version.toString()));
-                })
-                .catchError('Failed to replace asset. Please reload.')
-                .subscribe(value => {
-                    subscriber.next(value);
+                        const dto =  new AssetReplacedDto(
+                            response.fileSize,
+                            response.fileVersion,
+                            response.mimeType,
+                            response.isImage,
+                            response.pixelWidth,
+                            response.pixelHeight,
+                            new Version(response.version.toString()));
+
+                        subscriber.next(dto);
+                    }
                 }, err => {
                     subscriber.error(err);
                 }, () => {
@@ -239,14 +238,22 @@ export class AssetsService {
     public putAsset(appName: string, id: string, dto: UpdateAssetDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to delete asset. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to delete asset. Please reload.');
     }
 
     public deleteAsset(appName: string, id: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to delete asset. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to delete asset. Please reload.');
     }
+}
+
+function getFormData(file: File) {
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return formData;
 }

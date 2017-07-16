@@ -5,13 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, Version } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    HTTP,
+    Version
+} from 'framework';
 
 export class AppPlansDto {
     constructor(
@@ -46,7 +50,7 @@ export class ChangePlanDto {
 @Injectable()
 export class PlansService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -54,8 +58,7 @@ export class PlansService {
     public getPlans(appName: string, version?: Version): Observable<AppPlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
-        return this.authService.authGet(url, version)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url, version)
                 .map(response => {
                     const items: any[] = response.plans;
 
@@ -74,13 +77,13 @@ export class PlansService {
                                 item.maxContributors);
                         }));
                 })
-                .catchError('Failed to load plans. Please reload.');
+                .pretifyError('Failed to load plans. Please reload.');
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to change plan. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to change plan. Please reload.');
     }
 }

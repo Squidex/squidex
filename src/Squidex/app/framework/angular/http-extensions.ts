@@ -6,12 +6,13 @@
  */
 
 import { Observable } from 'rxjs/Observable';
-import { catchError } from './http-utils';
+
+import { pretifyError } from './http-extensions-impl';
 
 declare module 'rxjs/Observable' {
     interface Observable<T> {
-        catchError(message: string): Observable<any>;
+        pretifyError(message: string): Observable<any>;
     }
 }
 
-Observable.prototype['catchError'] = catchError;
+Observable.prototype['pretifyError'] = pretifyError;

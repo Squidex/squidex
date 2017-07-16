@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { DndModule } from 'ng2-dnd';
-import { ProgressHttpModule } from 'angular-progress-http';
 
 import { SqxFrameworkModule } from 'framework';
 
@@ -21,6 +21,7 @@ import {
     AppMustExistGuard,
     AssetComponent,
     AssetsService,
+    AuthInterceptor,
     AuthService,
     ContentsService,
     EventConsumersService,
@@ -56,7 +57,6 @@ import {
 
 @NgModule({
     imports: [
-        ProgressHttpModule,
         DndModule,
         SqxFrameworkModule
     ],
@@ -122,7 +122,12 @@ export class SqxSharedModule {
                 UserManagementService,
                 UsersProviderService,
                 UsersService,
-                WebhooksService
+                WebhooksService,
+                {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: AuthInterceptor,
+                    multi: true
+                }
             ]
         };
     }

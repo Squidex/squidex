@@ -5,13 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, DateTime } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    HTTP,
+    DateTime
+} from 'framework';
 
 export class HistoryEventDto {
     constructor(
@@ -26,7 +30,7 @@ export class HistoryEventDto {
 @Injectable()
 export class HistoryService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -34,8 +38,7 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<HistoryEventDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -47,6 +50,6 @@ export class HistoryService {
                             DateTime.parseISO_UTC(item.created));
                     });
                 })
-                .catchError('Failed to load history. Please reload.');
+                .pretifyError('Failed to load history. Please reload.');
     }
 }

@@ -6,7 +6,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Headers, Http, RequestOptions, Response } from '@angular/http';
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -15,7 +14,7 @@ import {
     UserManager
 } from 'oidc-client';
 
-import { ApiUrlConfig, Version } from 'framework';
+import { ApiUrlConfig } from 'framework';
 
 export class Profile {
     public get id(): string {
@@ -32,6 +31,14 @@ export class Profile {
 
     public get isAdmin(): boolean {
         return this.user.profile['role'] && this.user.profile['role'].toUpperCase() === 'ADMINISTRATOR';
+    }
+
+    public get isExpired(): boolean {
+        return this.user.expired;
+    }
+
+    public get authToken(): string {
+        return `${this.user.token_type} ${this.user.access_token}`;
     }
 
     public get token(): string {
@@ -65,9 +72,7 @@ export class AuthService {
         return this.isAuthenticatedChangedPublished$;
     }
 
-    constructor(apiUrl: ApiUrlConfig,
-        private readonly http: Http
-    ) {
+    constructor(apiUrl: ApiUrlConfig) {
         if (!apiUrl) {
             return;
         }
@@ -165,79 +170,5 @@ export class AuthService {
                 });
 
         return resultPromise;
-    }
-
-    public authGet(url: string, version?: Version, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options, version);
-
-        return this.checkResponse(this.http.get(url, options), version);
-    }
-
-    public authPut(url: string, data: any, version?: Version, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options, version);
-
-        return this.checkResponse(this.http.put(url, data, options), version);
-    }
-
-    public authDelete(url: string, version?: Version, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options, version);
-
-        return this.checkResponse(this.http.delete(url, options), version);
-    }
-
-    public authPost(url: string, data: any, version?: Version, options?: RequestOptions): Observable<Response> {
-        options = this.setRequestOptions(options, version);
-
-        return this.checkResponse(this.http.post(url, data, options), version);
-    }
-
-    private checkResponse(responseStream: Observable<Response>, version?: Version) {
-        return responseStream
-            .do((response: Response) => {
-                if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                    const etag = response.headers.get('etag');
-
-                    if (etag) {
-                        version.update(etag);
-                    }
-                }
-            })
-            .catch((error: Response) => {
-                if (error.status === 404 && (!this.user || this.user.user.expired)) {
-                    this.logoutRedirect();
-
-                    return Observable.empty<Response>();
-                } else if (error.status === 401 || error.status === 403) {
-                    this.logoutRedirect();
-
-                    return Observable.empty<Response>();
-                }
-                return Observable.throw(error);
-            });
-    }
-
-    private setRequestOptions(options?: RequestOptions, version?: Version) {
-        if (!options) {
-            options = new RequestOptions();
-        }
-
-        if (!options.headers) {
-            options.headers = new Headers();
-            options.headers.append('Content-Type', 'application/json');
-        }
-
-        options.headers.append('Accept-Language', '*');
-
-        if (version && version.value.length > 0) {
-            options.headers.append('If-Match', version.value);
-        }
-
-        if (this.currentUser && this.currentUser.user) {
-            options.headers.append('Authorization', `${this.currentUser.user.token_type} ${this.currentUser.user.access_token}`);
-        }
-
-        options.headers.append('Pragma', 'no-cache');
-
-        return options;
     }
 }

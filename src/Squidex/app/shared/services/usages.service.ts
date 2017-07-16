@@ -5,13 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, DateTime } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    DateTime,
+    HTTP
+} from 'framework';
 
 export class CallsUsageDto {
     constructor(
@@ -50,7 +54,7 @@ export class CurrentCallsDto {
 @Injectable()
 export class UsagesService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -58,26 +62,27 @@ export class UsagesService {
     public getMonthCalls(app: string): Observable<CurrentCallsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/month`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
-                .map(response => new CurrentCallsDto(response.count, response.maxAllowed))
-                .catchError('Failed to load monthly api calls. Please reload.');
+        return HTTP.getVersioned(this.http, url)
+                .map(response => {
+                    return new CurrentCallsDto(response.count, response.maxAllowed);
+                })
+                .pretifyError('Failed to load monthly api calls. Please reload.');
     }
 
     public getTodayStorage(app: string): Observable<CurrentStorageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/today`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
-                .map(response => new CurrentStorageDto(response.size, response.maxAllowed))
-                .catchError('Failed to load todays storage size. Please reload.');
+        return HTTP.getVersioned(this.http, url)
+                .map(response => {
+                    return new CurrentStorageDto(response.size, response.maxAllowed);
+                })
+                .pretifyError('Failed to load todays storage size. Please reload.');
     }
 
     public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toStringFormat('YYYY-MM-DD')}/${toDate.toStringFormat('YYYY-MM-DD')}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -88,14 +93,13 @@ export class UsagesService {
                             item.averageMs);
                     });
                 })
-                .catchError('Failed to load calls usage. Please reload.');
+                .pretifyError('Failed to load calls usage. Please reload.');
     }
 
     public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<StorageUsageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toStringFormat('YYYY-MM-DD')}/${toDate.toStringFormat('YYYY-MM-DD')}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -106,6 +110,6 @@ export class UsagesService {
                             item.size);
                     });
                 })
-                .catchError('Failed to load storage usage. Please reload.');
+                .pretifyError('Failed to load storage usage. Please reload.');
     }
 }

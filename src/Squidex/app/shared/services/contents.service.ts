@@ -5,6 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -13,10 +14,9 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
+    HTTP,
     Version
 } from 'framework';
-
-import { AuthService } from './auth.service';
 
 export class ContentsDto {
     constructor(
@@ -43,7 +43,7 @@ export class ContentDto {
 @Injectable()
 export class ContentsService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -75,8 +75,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?nonPublished=true&hidden=true${fullQuery}`);
 
-        return this.authService.authGet(url)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response.items;
 
@@ -92,14 +91,13 @@ export class ContentsService {
                             new Version(item.version.toString()));
                     }));
                 })
-                .catchError('Failed to load contents. Please reload.');
+                .pretifyError('Failed to load contents. Please reload.');
     }
 
     public getContent(appName: string, schemaName: string, id: string, version?: Version): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?hidden=true`);
 
-        return this.authService.authGet(url, version)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url, version)
                 .map(response => {
                     return new ContentDto(
                         response.id,
@@ -111,14 +109,13 @@ export class ContentsService {
                         response.data,
                         new Version(response.version.toString()));
                 })
-                .catchError('Failed to load content. Please reload.');
+                .pretifyError('Failed to load content. Please reload.');
     }
 
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean, version?: Version): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
-        return this.authService.authPost(url, dto, version)
-                .map(response => response.json())
+        return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new ContentDto(
                         response.id,
@@ -130,34 +127,34 @@ export class ContentsService {
                         response.data,
                         new Version(response.version.toString()));
                 })
-                .catchError('Failed to create content. Please reload.');
+                .pretifyError('Failed to create content. Please reload.');
     }
 
     public putContent(appName: string, schemaName: string, id: string, dto: any, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to update content. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to update content. Please reload.');
     }
 
     public publishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to publish content. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to publish content. Please reload.');
     }
 
     public unpublishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
 
-        return this.authService.authPut(url, {}, version)
-                .catchError('Failed to unpublish content. Please reload.');
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to unpublish content. Please reload.');
     }
 
     public deleteContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to delete content. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to delete content. Please reload.');
     }
 }

@@ -5,13 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
-import { ApiUrlConfig, Version } from 'framework';
-import { AuthService } from './auth.service';
+import {
+    ApiUrlConfig,
+    HTTP,
+    Version
+} from 'framework';
 
 export class AppLanguageDto {
     constructor(
@@ -43,7 +47,7 @@ export class UpdateAppLanguageDto {
 @Injectable()
 export class AppLanguagesService {
     constructor(
-        private readonly authService: AuthService,
+        private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -51,8 +55,7 @@ export class AppLanguagesService {
     public getLanguages(appName: string, version?: Version): Observable<AppLanguageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return this.authService.authGet(url, version)
-                .map(response => response.json())
+        return HTTP.getVersioned(this.http, url, version)
                 .map(response => {
                     const items: any[] = response;
 
@@ -65,14 +68,13 @@ export class AppLanguagesService {
                             item.fallback || []);
                     });
                 })
-                .catchError('Failed to load languages. Please reload.');
+                .pretifyError('Failed to load languages. Please reload.');
     }
 
     public postLanguages(appName: string, dto: AddAppLanguageDto, version?: Version): Observable<AppLanguageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return this.authService.authPost(url, dto, version)
-                .map(response => response.json())
+        return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new AppLanguageDto(
                         response.iso2Code,
@@ -81,20 +83,20 @@ export class AppLanguagesService {
                         response.isOptional === true,
                         response.fallback || []);
                 })
-                .catchError('Failed to add language. Please reload.');
+                .pretifyError('Failed to add language. Please reload.');
     }
 
     public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
-        return this.authService.authPut(url, dto, version)
-                .catchError('Failed to change language. Please reload.');
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to change language. Please reload.');
     }
 
     public deleteLanguage(appName: string, languageCode: string, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
-        return this.authService.authDelete(url, version)
-                .catchError('Failed to add language. Please reload.');
+        return HTTP.deleteVersioned(this.http, url, version)
+                .pretifyError('Failed to add language. Please reload.');
     }
 }
