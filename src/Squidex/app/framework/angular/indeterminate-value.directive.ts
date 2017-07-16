@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, forwardRef, ElementRef, Renderer } from '@angular/core';
+import { Directive, forwardRef, ElementRef, HostListener, Renderer } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const NOOP = () => { /* NOOP */ };
@@ -16,10 +16,7 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
 
 @Directive({
     selector: '[sqxIndeterminateValue]',
-    providers: [SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR],
-    host: {
-        '(change)': 'onChange($event.target.checked)', '(blur)': 'onTouched()'
-    }
+    providers: [SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR]
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private changeCallback: (value: any) => void = NOOP;
@@ -29,6 +26,16 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
         private readonly renderer: Renderer,
         private readonly element: ElementRef
     ) {
+    }
+
+    @HostListener('onChange', ['$event.target.value'])
+    public onChange(value: any) {
+        this.changeCallback(value);
+    }
+
+    @HostListener('blur')
+    public onTouched() {
+        this.touchedCallback();
     }
 
     public writeValue(value: any) {
@@ -49,13 +56,5 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
 
     public registerOnTouched(fn: any) {
         this.touchedCallback = fn;
-    }
-
-    public onChange(value: any) {
-        this.changeCallback(value);
-    }
-
-    public onTouched() {
-        this.touchedCallback();
     }
 }

@@ -5,76 +5,76 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Pipe } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 import { DateTime } from './../utils/date-time';
 import { Duration } from './../utils/duration';
 
 @Pipe({
-    name: 'shortDate',
+    name: 'sqxShortDate',
     pure: true
 })
-export class ShortDatePipe {
+export class ShortDatePipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toStringFormat('DD.MMM');
     }
 }
 
 @Pipe({
-    name: 'month',
+    name: 'sqxMonth',
     pure: true
 })
-export class MonthPipe {
+export class MonthPipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toStringFormat('MMMM');
     }
 }
 
 @Pipe({
-    name: 'fromNow',
+    name: 'sqxFromNow',
     pure: true
 })
-export class FromNowPipe {
+export class FromNowPipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toFromNow();
     }
 }
 
 @Pipe({
-    name: 'dayOfWeek',
+    name: 'sqxDayOfWeek',
     pure: true
 })
-export class DayOfWeekPipe {
+export class DayOfWeekPipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toStringFormat('dd');
     }
 }
 
 @Pipe({
-    name: 'day',
+    name: 'sqxDay',
     pure: true
 })
-export class DayPipe {
+export class DayPipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toStringFormat('DD');
     }
 }
 
 @Pipe({
-    name: 'shortTime',
+    name: 'sqxShortTime',
     pure: true
 })
-export class ShortTimePipe {
+export class ShortTimePipe implements PipeTransform {
     public transform(value: DateTime): any {
         return value.toStringFormat('HH:mm');
     }
 }
 
 @Pipe({
-    name: 'duration',
+    name: 'sqxDuration',
     pure: true
 })
-export class DurationPipe {
+export class DurationPipe implements PipeTransform {
     public transform(value: Duration): any {
         return value.toString();
     }

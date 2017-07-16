@@ -10,7 +10,7 @@ import { AfterViewInit, Directive, ElementRef, HostListener, OnDestroy, Renderer
 import { PanelComponent } from './panel.component';
 
 @Directive({
-    selector: '.panel-container'
+    selector: '[sqxPanelContainer]'
 })
 export class PanelContainerDirective implements AfterViewInit, OnDestroy {
     private readonly panels: PanelComponent[] = [];

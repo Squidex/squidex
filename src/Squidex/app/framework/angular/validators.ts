@@ -14,20 +14,20 @@ import {
 import { DateTime } from './../utils/date-time';
 
 export module ValidatorsEx {
-    export function pattern(pattern: string | RegExp, message?: string): ValidatorFn {
-        if (!pattern) {
+    export function pattern(regex: string | RegExp, message?: string): ValidatorFn {
+        if (!regex) {
             return Validators.nullValidator;
         }
 
-        let regex: RegExp;
+        let regeExp: RegExp;
         let regexStr: string;
 
-        if (typeof pattern === 'string') {
-            regexStr = `^${pattern}$`;
-            regex = new RegExp(regexStr);
+        if (typeof regex === 'string') {
+            regexStr = `^${regex}$`;
+            regeExp = new RegExp(regexStr);
         } else {
-            regexStr = pattern.toString();
-            regex = pattern;
+            regexStr = regex.toString();
+            regeExp = regex;
         }
 
         return (control: AbstractControl): { [key: string]: any } => {
@@ -37,7 +37,7 @@ export module ValidatorsEx {
                 return null;
             }
 
-            if (!regex.test(n)) {
+            if (!regeExp.test(n)) {
                 if (message) {
                     return { patternmessage: { requiredPattern: regexStr, actualValue: n, message } };
                 } else {

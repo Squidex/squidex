@@ -30,7 +30,7 @@
             </div>
 
             <h3 class="panel-title">
-                {{schemaInformation | displayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
+                {{schemaInformation | sqxDisplayName}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
             </h3>
         </div>
 
@@ -41,7 +41,7 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll" dnd-sortable-container [sortableData]="schemaFields.mutableValues">
-            <div *ngFor="let field of schemaFields; let i = index" dnd-sortable [sortableIndex]="i" (sorted)="sortFields($event)">
+            <div *ngFor="let field of schemaFields; let i = index" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schemas]="schemas"
                     (disabling)="disableField(field)"
                     (deleting)="deleteField(field)"

@@ -12,7 +12,7 @@ import { MathHelper } from './../utils/math-helper';
 @Directive({
     selector: '[sqxImageSource]'
 })
-export class ImageSourceComponent implements OnChanges, OnInit, AfterViewInit {
+export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
     private retries = 0;
     private query: string | null = null;
 

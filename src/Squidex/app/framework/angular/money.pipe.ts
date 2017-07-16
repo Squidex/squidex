@@ -5,15 +5,15 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Pipe } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 import { CurrencyConfig, DecimalSeparatorConfig } from './../configurations';
 
 @Pipe({
-    name: 'money',
+    name: 'sqxMoney',
     pure: true
 })
-export class MoneyPipe {
+export class MoneyPipe implements PipeTransform {
     constructor(
         private readonly currency: CurrencyConfig,
         private readonly separator: DecimalSeparatorConfig

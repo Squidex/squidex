@@ -1,27 +1,49 @@
 {
+  "rulesDirectory": [
+    "node_modules/codelyzer"
+  ],
   "rules": {
+    "angular-whitespace": false,
+    "banana-in-box": true,
     "class-name": true,
     "comment-format": [
       true,
       "check-space"
     ],
+    "component-class-suffix": true,
+    "component-selector": [
+      true,
+      "element",
+      "sqx",
+      "kebab-case"
+    ],
     "curly": true,
+    "directive-class-suffix": true,
+    "directive-selector": [
+      true,
+      "attribute",
+      "sqx",
+      "camelCase"
+    ],
     "eofline": false,
     "forin": true,
     "indent": [
       true,
       "spaces"
     ],
+    "invoke-injectable": true,
     "label-position": true,
     "max-line-length": [
       true,
       240
     ],
     "member-access": [
-      true, 
+      true,
       "check-accessor"
     ],
+    "no-access-missing-member": false,
     "no-arg": true,
+    "no-attribute-parameter-decorator": true,
     "no-bitwise": true,
     "no-console": [
       true,
@@ -36,15 +58,17 @@
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
+    "no-forward-ref": false,
     "no-inferrable-types": [
-      true, 
+      true,
       "ignore-params"
     ],
+    "no-input-rename": false,
+    "no-output-rename": false,
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
-    
     "no-unused-expression": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
@@ -63,6 +87,11 @@
     "ordered-imports": [
       false
     ],
+    "pipe-naming": [
+      true,
+      "camelCase",
+      "sqx"
+    ],
     "prefer-for-of": true,
     "quotemark": [
       true,
@@ -72,10 +101,13 @@
     "semicolon": [
       "always"
     ],
+    "templates-no-negated-async": true,
+    "templates-use-public": true,
+    "template-to-ng-template": true,
     "trailing-comma": [
-      true, 
+      true,
       {
-        "multiline": "never", 
+        "multiline": "never",
         "singleline": "never"
       }
     ],
@@ -93,6 +125,12 @@
         "variable-declaration": "nospace"
       }
     ],
+    "use-host-property-decorator": true,
+    "use-input-property-decorator": true,
+    "use-life-cycle-interface": true,
+    "use-output-property-decorator": true,
+    "use-pipe-transform-interface": true,
+    "use-view-encapsulation": true,
     "variable-name": false,
     "whitespace": [
       true,

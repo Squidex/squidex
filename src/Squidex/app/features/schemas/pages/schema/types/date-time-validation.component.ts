@@ -23,8 +23,8 @@ export class DateTimeValidationComponent implements OnInit {
     @Input()
     public properties: DateTimeFieldPropertiesDto;
 
-    public hideDefaultValues: Observable<boolean>;
-    public hideDefaultValue: Observable<boolean>;
+    public showDefaultValues: Observable<boolean>;
+    public showDefaultValue: Observable<boolean>;
 
     public calculatedDefaultValues = ['Now', 'Today'];
 
@@ -47,14 +47,14 @@ export class DateTimeValidationComponent implements OnInit {
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.hideDefaultValues =
+        this.showDefaultValues =
             this.editForm.controls['isRequired'].valueChanges
                 .startWith(this.properties.isRequired)
-                .map(x => !!x);
+                .map(x => !x);
 
-        this.hideDefaultValue =
+        this.showDefaultValue =
             this.editForm.controls['calculatedDefaultValue'].valueChanges
                 .startWith(this.properties.calculatedDefaultValue)
-                .map(x => !!x);
+                .map(x => !x);
     }
 }

@@ -19,6 +19,8 @@ import {
     SchemaDto
 } from 'shared';
 
+/* tslint:disable:component-selector */
+
 @Component({
     selector: '[sqxContent]',
     styleUrls: ['./content-item.component.scss'],

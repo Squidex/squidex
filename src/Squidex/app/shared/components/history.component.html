@@ -13,13 +13,13 @@
         <div class="panel-content panel-content-blank">
             <div *ngFor="let event of events | async" class="event">
                 <div class="event-left">
-                    <img class="user-picture" [attr.title]="event.actor | userNameRef:'I'" [attr.src]="event.actor | userPictureRef" />
+                    <img class="user-picture" [attr.title]="event.actor | sqxUserNameRef:'I'" [attr.src]="event.actor | sqxUserPictureRef" />
                 </div>
                 <div class="event-main">
                     <div class="event-message">
-                        <span class="event-actor user-ref">{{event.actor | userNameRef:'I'}}</span> <span [innerHTML]="format(event.message) | async"></span>
+                        <span class="event-actor user-ref">{{event.actor | sqxUserNameRef:'I'}}</span> <span [innerHTML]="format(event.message) | async"></span>
                     </div>
-                    <div class="event-created">{{event.created | fromNow}}</div>
+                    <div class="event-created">{{event.created | sqxFromNow}}</div>
                 </div>
             </div>            
         </div>

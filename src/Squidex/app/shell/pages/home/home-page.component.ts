@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'shared';
 
 @Component({
-    selector: 'home-page',
+    selector: 'sqx-home-page',
     styleUrls: ['./home-page.component.scss'],
     templateUrl: './home-page.component.html'
 })

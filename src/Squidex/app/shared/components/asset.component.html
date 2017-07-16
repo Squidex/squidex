@@ -33,10 +33,10 @@
                     {{fileType}}
                 </span>
                 <span class="file-user">
-                    <i class="icon-user"></i> {{asset.lastModifiedBy | userNameRef}}
+                    <i class="icon-user"></i> {{asset.lastModifiedBy | sqxUserNameRef}}
                 </span>
                 <span class="file-modified">
-                    {{asset.lastModified | fromNow}}
+                    {{asset.lastModified | sqxFromNow}}
                 </span>
             </div>
         </div>

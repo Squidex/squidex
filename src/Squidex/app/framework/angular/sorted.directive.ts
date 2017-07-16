@@ -15,12 +15,12 @@ import {
 } from 'ng2-dnd';
 
 @Directive({
-    selector: '[sorted]'
+    selector: '[sqxSorted]'
 })
 export class SortedDirective {
     private oldArray: any[];
 
-    @Output()
+    @Output('sqxSorted')
     public sorted = new EventEmitter<Array<any>>();
 
     constructor(

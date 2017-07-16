@@ -31,15 +31,15 @@ export class ImmutableArray<T> implements Iterable<T> {
         this.items = items;
     }
 
-    public static empty<T>(): ImmutableArray<T> {
+    public static empty<V>(): ImmutableArray<V> {
         return ImmutableArray.EMPTY;
     }
 
-    public static of<T>(items?: T[]): ImmutableArray<T> {
+    public static of<V>(items?: V[]): ImmutableArray<V> {
         if (!items || items.length === 0) {
             return ImmutableArray.EMPTY;
         } else {
-            return new ImmutableArray<T>(freeze([...items]));
+            return new ImmutableArray<V>(freeze([...items]));
         }
     }
 

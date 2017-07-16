@@ -30,13 +30,13 @@
                     <ng-template ngFor let-contributor [ngForOf]="appContributors">
                         <tr>
                             <td>
-                                <img class="user-picture" [attr.title]="contributor.contributorId | userName" [attr.src]="contributor.contributorId | userPicture" />
+                                <img class="user-picture" [attr.title]="contributor.contributorId | sqxUserName" [attr.src]="contributor.contributorId | sqxUserPicture" />
                             </td>
                             <td>
-                                <span class="user-name table-cell">{{contributor.contributorId | userName}}</span>
+                                <span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
                             </td>
                             <td>
-                                <span class="user-email table-cell">{{contributor.contributorId | userEmail}}</span>
+                                <span class="user-email table-cell">{{contributor.contributorId | sqxUserEmail}}</span>
                             </td>
                             <td>
                                 <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
@@ -59,7 +59,7 @@
                     <div class="form-group mr-1">
                         <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="email">
                             <ng-template let-user="$implicit">
-                                <img class="user-picture autocomplete-user-picture" [attr.src]="user | userDtoPicture" />
+                                <img class="user-picture autocomplete-user-picture" [attr.src]="user | sqxUserDtoPicture" />
 
                                 <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
                                 <span class="user-email autocomplete-user-email">{{user.email}}</span>

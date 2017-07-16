@@ -5,15 +5,15 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Pipe } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 import { StringHelper } from './../utils/string-helper';
 
 @Pipe({
-    name: 'displayName',
+    name: 'sqxDisplayName',
     pure: true
 })
-export class DisplayNamePipe {
+export class DisplayNamePipe implements PipeTransform {
     public transform(value: any, field1 = 'label', field2  = 'name'): any {
         if (!value) {
             return '';

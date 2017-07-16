@@ -6,10 +6,10 @@
 <td>
     <span class="item-published" [class.unpublished]="!content.isPublished"></span>
     
-    <small class="item-modified">{{content.lastModified | fromNow}}</small>
+    <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
 <td>
-    <img class="user-picture" [attr.title]="content.lastModifiedBy | userNameRef" [attr.src]="content.lastModifiedBy | userPictureRef" />
+    <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 <td *ngIf="!isReadOnly">
     <div class="dropdown dropdown-options" *ngIf="content">

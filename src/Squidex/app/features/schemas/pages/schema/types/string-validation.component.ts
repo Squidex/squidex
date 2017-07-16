@@ -25,8 +25,8 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     @Input()
     public properties: StringFieldPropertiesDto;
 
-    public hideDefaultValue: Observable<boolean>;
-    public hidePatternMessage: Observable<boolean>;
+    public showDefaultValue: Observable<boolean>;
+    public showPatternMessage: Observable<boolean>;
 
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
@@ -48,15 +48,15 @@ export class StringValidationComponent implements OnDestroy, OnInit {
         this.editForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
-        this.hideDefaultValue =
+        this.showDefaultValue =
             this.editForm.controls['isRequired'].valueChanges
                 .startWith(this.properties.isRequired)
-                .map(x => !!x);
+                .map(x => !x);
 
-        this.hidePatternMessage =
+        this.showPatternMessage =
             this.editForm.controls['pattern'].valueChanges
                 .startWith('')
-                .map(x => !x || x.trim().length === 0);
+                .map(x => x && x.trim().length > 0);
 
         this.patternSubscription =
             this.editForm.controls['pattern'].valueChanges.subscribe((value: string) => {

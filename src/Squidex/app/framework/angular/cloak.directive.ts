@@ -8,7 +8,7 @@
 import { Directive, ElementRef, OnInit, Renderer } from '@angular/core';
 
 @Directive({
-    selector: '.sqx-cloak'
+    selector: '[sqxCloak]'
 })
 export class CloakDirective implements OnInit {
     constructor(

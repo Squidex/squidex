@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -34,7 +34,7 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './references-editor.component.html',
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor {
+export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor, OnInit {
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 

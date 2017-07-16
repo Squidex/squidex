@@ -192,7 +192,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         }
     }
 
-    private resetRename() {
+    public resetRename() {
         this.renameForm.enable();
         this.renameForm.controls['name'].setValue(this.asset.fileName);
         this.renameFormSubmitted = false;

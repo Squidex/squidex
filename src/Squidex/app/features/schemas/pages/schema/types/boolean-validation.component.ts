@@ -23,15 +23,15 @@ export class BooleanValidationComponent implements OnInit {
     @Input()
     public properties: BooleanFieldPropertiesDto;
 
-    public hideDefaultValue: Observable<boolean>;
+    public showDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
         this.editForm.addControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
-        this.hideDefaultValue =
+        this.showDefaultValue =
             this.editForm.controls['isRequired'].valueChanges
                 .startWith(this.properties.isRequired)
-                .map(x => !!x);
+                .map(x => !x);
     }
 }

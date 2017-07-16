@@ -159,6 +159,18 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
     }
 
+    public selectIndex(selection: number) {
+        if (selection < 0) {
+            selection = 0;
+        }
+
+        if (selection >= this.items.length) {
+            selection = this.items.length - 1;
+        }
+
+        this.selectedIndex = selection;
+    }
+
     private up() {
         this.selectIndex(this.selectedIndex - 1);
     }
@@ -169,18 +181,6 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     private resetValue() {
         this.queryInput.setValue('');
-    }
-
-    private selectIndex(selection: number) {
-        if (selection < 0) {
-            selection = 0;
-        }
-
-        if (selection >= this.items.length) {
-            selection = this.items.length - 1;
-        }
-
-        this.selectedIndex = selection;
     }
 
     private reset() {

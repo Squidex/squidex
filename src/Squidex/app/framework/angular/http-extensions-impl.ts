@@ -20,11 +20,12 @@ export class EntityCreatedDto {
 export class ErrorDto {
     public get displayMessage(): string {
         let result = this.message;
+        let lastChar = '';
 
         if (this.details && this.details.length > 0) {
             const detailMessage = this.details[0];
 
-            const lastChar = result[result.length - 1];
+            lastChar = result[result.length - 1];
 
             if (lastChar !== '.' && lastChar !== ',') {
                 result += '.';
@@ -34,7 +35,7 @@ export class ErrorDto {
             result += detailMessage;
         }
 
-        const lastChar = result[result.length - 1];
+        lastChar = result[result.length - 1];
 
         if (lastChar !== '.') {
             result += '.';

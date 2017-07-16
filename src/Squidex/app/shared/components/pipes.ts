@@ -49,7 +49,7 @@ class UserAsyncPipe implements OnDestroy {
 }
 
 @Pipe({
-    name: 'userName',
+    name: 'sqxUserName',
     pure: false
 })
 export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
@@ -63,7 +63,7 @@ export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userNameRef',
+    name: 'sqxUserNameRef',
     pure: false
 })
 export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
@@ -89,7 +89,7 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userEmail',
+    name: 'sqxUserEmail',
     pure: false
 })
 export class UserEmailPipe extends UserAsyncPipe implements PipeTransform {
@@ -103,7 +103,7 @@ export class UserEmailPipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userEmailRef',
+    name: 'sqxUserEmailRef',
     pure: false
 })
 export class UserEmailRefPipe extends UserAsyncPipe implements PipeTransform {
@@ -125,7 +125,7 @@ export class UserEmailRefPipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userDtoPicture',
+    name: 'sqxUserDtoPicture',
     pure: false
 })
 export class UserDtoPicture implements PipeTransform {
@@ -140,7 +140,7 @@ export class UserDtoPicture implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userIdPicture',
+    name: 'sqxUserIdPicture',
     pure: false
 })
 export class UserIdPicturePipe implements PipeTransform {
@@ -155,7 +155,7 @@ export class UserIdPicturePipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userPicture',
+    name: 'sqxUserPicture',
     pure: false
 })
 export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
@@ -171,7 +171,7 @@ export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'userPictureRef',
+    name: 'sqxUserPictureRef',
     pure: false
 })
 export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
