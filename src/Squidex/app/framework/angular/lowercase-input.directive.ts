@@ -28,7 +28,7 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
     ) {
     }
 
-    @HostListener('onChange', ['$event.target.value'])
+    @HostListener('input', ['$event.target.value'])
     public onChange(value: any) {
         const normalizedValue = (value == null ? '' : value.toString()).toLowerCase();
 

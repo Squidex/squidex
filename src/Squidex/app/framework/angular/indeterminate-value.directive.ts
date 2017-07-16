@@ -28,7 +28,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     ) {
     }
 
-    @HostListener('onChange', ['$event.target.value'])
+    @HostListener('change', ['$event.target.value'])
     public onChange(value: any) {
         this.changeCallback(value);
     }
