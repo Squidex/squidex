@@ -22,7 +22,7 @@ export class LanguageDto {
 }
 
 @Injectable()
-export class LanguageService {
+export class LanguagesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig

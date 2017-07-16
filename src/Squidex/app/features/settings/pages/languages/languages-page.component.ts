@@ -18,7 +18,7 @@ import {
     ImmutableArray,
     MessageBus,
     LanguageDto,
-    LanguageService,
+    LanguagesService,
     NotificationService,
     Version
 } from 'shared';
@@ -44,7 +44,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguageService,
+        private readonly languagesService: LanguagesService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
