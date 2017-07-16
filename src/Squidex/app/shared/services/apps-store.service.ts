@@ -16,8 +16,6 @@ import {
     CreateAppDto
 } from './apps.service';
 
-import { AuthService } from './auth.service';
-
 @Injectable()
 export class AppsStoreService {
     private readonly apps$ = new ReplaySubject<AppDto[]>();
@@ -32,21 +30,21 @@ export class AppsStoreService {
     }
 
     constructor(
-        private readonly authService: AuthService,
         private readonly appsService: AppsService
     ) {
         if (!appsService) {
             return;
         }
 
-        this.authService.isAuthenticated.filter(t => !!t).first()
-            .switchMap(() => this.appsService.getApps())
+       this.appsService.getApps()
             .subscribe(apps => {
                 this.apps$.next(apps);
+            }, error => {
+                this.apps$.next([]);
             });
     }
 
-    public selectApp(name: string | null): Promise<boolean> {
+    public selectApp(name: string | null): Observable<boolean> {
         return Observable.create((observer: Observer<boolean>) => {
             this.apps$.subscribe(apps => {
                 const app = apps.find(x => x.name === name) || null;
@@ -58,7 +56,7 @@ export class AppsStoreService {
             }, error => {
                 observer.error(error);
             });
-        }).toPromise();
+        });
     }
 
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
@@ -69,10 +67,8 @@ export class AppsStoreService {
                 return new AppDto(created.id, dto.name, 'Owner', now, now);
             })
             .do(app => {
-                this.apps$.defaultIfEmpty().first().subscribe(apps => {
-                    if (apps) {
-                        this.apps$.next(apps.concat([app]));
-                    }
+                this.apps$.first().subscribe(apps => {
+                    this.apps$.next(apps.concat([app]));
                 });
             });
     }

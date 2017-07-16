@@ -24,26 +24,30 @@ export class AuthInterceptor implements HttpInterceptor {
 
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (req.url.indexOf(this.baseUrl) === 0 && !req.headers.has('NoAuth')) {
-            const authReq = req.clone({
-                headers: req.headers
-                    .set('Authorization', this.authService.user ? this.authService.user.authToken : '')
-                    .set('Accept-Language', '*')
-                    .set('Pragma', 'no-cache')
-            });
+            return this.authService.userChanges.first().switchMap(user => {
+                const token = user ? user.authToken : '';
 
-            return next.handle(authReq)
-                .catch((error: HttpErrorResponse) => {
-                    if (error.status === 404 && (!this.authService.user || this.authService.user.isExpired)) {
-                        this.authService.logoutRedirect();
-
-                        return Observable.empty<Response>();
-                    } else if (error.status === 401 || error.status === 403) {
-                        this.authService.logoutRedirect();
-
-                        return Observable.empty<Response>();
-                    }
-                    return Observable.throw(error);
+                const authReq = req.clone({
+                    headers: req.headers
+                        .set('Authorization', token)
+                        .set('Accept-Language', '*')
+                        .set('Pragma', 'no-cache')
                 });
+
+                return next.handle(authReq)
+                    .catch((error: HttpErrorResponse) => {
+                        if (error.status === 404 && (!user || user.isExpired)) {
+                            this.authService.logoutRedirect();
+
+                            return Observable.empty<Response>();
+                        } else if (error.status === 401 || error.status === 403) {
+                            this.authService.logoutRedirect();
+
+                            return Observable.empty<Response>();
+                        }
+                        return Observable.throw(error);
+                    });
+            });
         } else {
             return next.handle(req);
         }

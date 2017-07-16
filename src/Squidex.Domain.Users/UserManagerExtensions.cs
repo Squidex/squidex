@@ -56,7 +56,7 @@ namespace Squidex.Domain.Users
 
             try
             {
-                user.UpdateDisplayName(displayName);
+                user.SetDisplayName(displayName);
                 user.SetPictureUrlFromGravatar(email);
 
                 await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(displayName))
             {
-                user.UpdateDisplayName(displayName);
+                user.SetDisplayName(displayName);
             }
 
             await DoChecked(() => userManager.UpdateAsync(user), "Cannot update user.");

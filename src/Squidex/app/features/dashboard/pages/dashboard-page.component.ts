@@ -154,14 +154,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
                 };
             });
 
-        this.authenticationSubscription =
-            this.authService.isAuthenticated.subscribe(() => {
-                const user = this.authService.user;
-
-                if (user) {
-                    this.profileDisplayName = user.displayName;
-                }
-            });
+        this.profileDisplayName = this.authService.user.displayName;
     }
 
     public showForum() {

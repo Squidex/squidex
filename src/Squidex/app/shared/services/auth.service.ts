@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 import {
     Log,
@@ -54,22 +54,15 @@ export class Profile {
 @Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
-    private readonly isAuthenticatedChanged$ = new Subject<boolean>();
-    private loginCompleted: boolean | null = false;
-    private loginCache: Promise<boolean> | null = null;
-    private currentUser: Profile | null = null;
-
-    private readonly isAuthenticatedChangedPublished$ =
-        this.isAuthenticatedChanged$
-            .distinctUntilChanged()
-            .publishReplay(1);
+    private readonly user$ = new ReplaySubject<Profile | null>();
+    private currentUser: Profile = null;
 
     public get user(): Profile | null {
         return this.currentUser;
     }
 
-    public get isAuthenticated(): Observable<boolean> {
-        return this.isAuthenticatedChangedPublished$;
+    public get userChanges(): Observable<Profile | null> {
+        return this.user$;
     }
 
     constructor(apiUrl: ApiUrlConfig) {
@@ -92,27 +85,18 @@ export class AuthService {
         });
 
         this.userManager.events.addUserLoaded(user => {
-            this.onAuthenticated(user);
+            this.user$.next(new Profile(user));
         });
 
         this.userManager.events.addUserUnloaded(() => {
-            this.onDeauthenticated();
+            this.user$.next(null);
         });
 
-        this.checkLogin();
+        this.user$.subscribe(user => {
+            this.currentUser = user;
+        });
 
-        this.isAuthenticatedChangedPublished$.connect();
-    }
-
-    public checkLogin(): Promise<boolean> {
-        if (this.loginCompleted) {
-            return Promise.resolve(this.currentUser !== null);
-        } else {
-            if (!this.loginCache) {
-                this.loginCache = this.checkState(this.userManager.signinSilent());
-            }
-            return this.loginCache;
-        }
+        this.userManager.signinSilent();
     }
 
     public logoutRedirect(): Observable<any> {
@@ -123,51 +107,15 @@ export class AuthService {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
+    public loginPopup(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signinPopup());
+    }
+
     public loginRedirect(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirect());
     }
 
     public loginRedirectComplete(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirectCallback());
-    }
-
-    public loginPopup(): Observable<boolean> {
-        const promise = this.checkState(this.userManager.signinPopup());
-
-        return Observable.fromPromise(promise);
-    }
-
-    private onAuthenticated(user: User) {
-        this.currentUser = new Profile(user);
-
-        this.isAuthenticatedChanged$.next(true);
-    }
-
-    private onDeauthenticated() {
-        this.currentUser = null;
-
-        this.isAuthenticatedChanged$.next(false);
-    }
-
-    private checkState(promise: Promise<User>): Promise<boolean> {
-        const resultPromise =
-            promise
-                .then(user => {
-                    this.loginCache = null;
-                    this.loginCompleted = null;
-
-                    this.onAuthenticated(user);
-
-                    return !!this.currentUser;
-                }).catch((err) => {
-                    this.loginCache = null;
-                    this.loginCompleted = null;
-
-                    this.onDeauthenticated();
-
-                    return false;
-                });
-
-        return resultPromise;
     }
 }

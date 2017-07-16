@@ -62,7 +62,7 @@ describe('ResolveContentGuard', () => {
         const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -78,7 +78,7 @@ describe('ResolveContentGuard', () => {
         const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -96,7 +96,7 @@ describe('ResolveContentGuard', () => {
         const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBe(content);
 
                 done();

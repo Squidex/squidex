@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { allParams } from 'framework';
 
@@ -20,7 +21,7 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<AppLanguageDto[]> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppLanguageDto[]> {
         const params = allParams(route);
 
         const appName = params['appName'];
@@ -30,19 +31,16 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
         }
 
         const result =
-            this.appLanguagesService.getLanguages(appName).toPromise()
-                .then(dto => {
+            this.appLanguagesService.getLanguages(appName)
+                .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
-
-                        return null;
                     }
-
-                    return dto;
-                }, error => {
+                })
+                .catch(error => {
                     this.router.navigate(['/404']);
 
-                    return null;
+                    return Observable.of(null);
                 });
 
         return result;

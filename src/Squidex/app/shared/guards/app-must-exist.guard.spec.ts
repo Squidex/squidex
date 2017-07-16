@@ -6,6 +6,7 @@
  */
 
 import { IMock, Mock } from 'typemoq';
+import { Observable } from 'rxjs';
 
 import { AppsStoreService } from 'shared';
 
@@ -21,14 +22,14 @@ describe('AppMustExistGuard', () => {
 
     it('should navigate to 404 page if app is not found', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Promise.resolve(false));
+            .returns(() => Observable.of(false));
         const router = new RouterMockup();
         const route = <any> { params: { appName: 'my-app' } };
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
         guard.canActivate(route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -38,14 +39,14 @@ describe('AppMustExistGuard', () => {
 
     it('should navigate to 404 page if app loading fails', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Promise.reject<boolean>('error'));
+            .returns(() => Observable.throw('error'));
         const router = new RouterMockup();
         const route = <any> { params: { appName: 'my-app' } };
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
         guard.canActivate(route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -55,14 +56,14 @@ describe('AppMustExistGuard', () => {
 
     it('should return true if app is found', (done) => {
         appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Promise.resolve(true));
+            .returns(() => Observable.of(true));
         const router = new RouterMockup();
         const route = <any> { params: { appName: 'my-app' } };
 
         const guard = new AppMustExistGuard(appsStore.object, <any>router);
 
         guard.canActivate(route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeTruthy();
                 expect(router.lastNavigation).toBeUndefined();
 

@@ -6,6 +6,7 @@
  */
 
 import { IMock, Mock } from 'typemoq';
+import { Observable } from 'rxjs';
 
 import { AuthService } from 'shared';
 
@@ -20,14 +21,14 @@ describe('MustBeAuthenticatedGuard', () => {
     });
 
     it('should navigate to default page if not authenticated', (done) => {
-        authService.setup(x => x.checkLogin())
-            .returns(() => Promise.resolve(false));
+        authService.setup(x => x.userChanges)
+            .returns(() => Observable.of(null));
         const router = new RouterMockup();
 
         const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
 
         guard.canActivate(<any>{}, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['']);
 
@@ -36,14 +37,14 @@ describe('MustBeAuthenticatedGuard', () => {
     });
 
     it('should return true if authenticated', (done) => {
-        authService.setup(x => x.checkLogin())
-            .returns(() => Promise.resolve(true));
+        authService.setup(x => x.userChanges)
+            .returns(() => Observable.of(<any>{}));
         const router = new RouterMockup();
 
         const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
 
         guard.canActivate(<any>{}, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeTruthy();
                 expect(router.lastNavigation).toBeUndefined();
 

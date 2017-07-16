@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { allParams } from 'framework';
 
@@ -20,7 +21,7 @@ export class ResolveUserGuard implements Resolve<UserDto> {
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<UserDto> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<UserDto> {
         const params = allParams(route);
 
         const userId = params['userId'];
@@ -30,19 +31,16 @@ export class ResolveUserGuard implements Resolve<UserDto> {
         }
 
         const result =
-            this.userManagementService.getUser(userId).toPromise()
-                .then(dto => {
+            this.userManagementService.getUser(userId)
+                .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
-
-                        return null;
                     }
-
-                    return dto;
-                }, error => {
+                })
+                .catch(error => {
                     this.router.navigate(['/404']);
 
-                    return null;
+                    return Observable.of(null);
                 });
 
         return result;

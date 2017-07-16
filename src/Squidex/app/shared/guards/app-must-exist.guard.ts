@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { AppsStoreService } from './../services/apps-store.service';
 
@@ -18,21 +19,20 @@ export class AppMustExistGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
+    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         const appName = route.params['appName'];
 
         const result =
             this.appsStore.selectApp(appName)
-                .then(hasApp => {
-                    if (!hasApp) {
+                .do(dto => {
+                    if (!dto) {
                         this.router.navigate(['/404']);
                     }
-
-                    return hasApp;
-                }, () => {
+                })
+                .catch(error => {
                     this.router.navigate(['/404']);
 
-                    return false;
+                    return Observable.of(false);
                 });
 
         return result;
