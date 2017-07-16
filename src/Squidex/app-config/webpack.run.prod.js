@@ -97,12 +97,10 @@ module.exports = webpackMerge(runConfig, {
         new webpack.optimize.UglifyJsPlugin({
             beautify: false,
             mangle: {
-                screw_ie8: true,
-                keep_fnames: true
+                screw_ie8: true
             },
             compress: {
-                warnings: false,
-                screw_ie8: true
+                screw_ie8: true, warnings: false
             },
             comments: false
         }),
