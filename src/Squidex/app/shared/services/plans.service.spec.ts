@@ -55,21 +55,24 @@ describe('PlansService', () => {
             hasConfigured: true,
             hasPortal: true,
             planOwner: '456',
-            plans: [{
-                id: 'free',
-                name: 'Free',
-                costs: '14 €',
-                maxApiCalls: 1000,
-                maxAssetSize: 1500,
-                maxContributors: 2500
-            }, {
-                id: 'prof',
-                name: 'Prof',
-                costs: '18 €',
-                maxApiCalls: 4000,
-                maxAssetSize: 5500,
-                maxContributors: 6500
-            }]
+            plans: [
+                {
+                    id: 'free',
+                    name: 'Free',
+                    costs: '14 €',
+                    maxApiCalls: 1000,
+                    maxAssetSize: 1500,
+                    maxContributors: 2500
+                },
+                {
+                    id: 'prof',
+                    name: 'Prof',
+                    costs: '18 €',
+                    maxApiCalls: 4000,
+                    maxAssetSize: 5500,
+                    maxContributors: 6500
+                }
+            ]
         });
 
         expect(plans).toEqual(

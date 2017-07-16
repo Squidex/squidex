@@ -47,11 +47,13 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
                     display: true
                 }
             ],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
+            yAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true
+                    }
                 }
-            }]
+            ]
         },
         maintainAspectRatio: false
     };
