@@ -175,7 +175,6 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.getVersioned(this.http, url)
-                .map(response => response.json())
                 .map(response => {
                     return new AssetDto(
                         response.id,
@@ -199,7 +198,7 @@ export class AssetsService {
         return new Observable<number | AssetReplacedDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
-            const req = new HttpRequest('POST', url, file, {
+            const req = new HttpRequest('PUT', url, file, {
                 headers: new HttpHeaders({
                     'If-Match': version.value
                 }),

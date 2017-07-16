@@ -46,7 +46,7 @@ describe('AppsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeUndefined();
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([
             {
@@ -85,7 +85,7 @@ describe('AppsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeUndefined();
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({ id: '123' });
 
