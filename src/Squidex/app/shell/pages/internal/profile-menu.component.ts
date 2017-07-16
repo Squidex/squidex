@@ -47,7 +47,7 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.authenticationSubscription =
-            this.authService.isAuthenticated.take(1)
+            this.authService.isAuthenticated.first()
                 .subscribe(() => {
                     const user = this.authService.user;
 

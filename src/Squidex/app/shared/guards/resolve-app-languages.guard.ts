@@ -39,7 +39,7 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
                     }
 
                     return dto;
-                }).catch(() => {
+                }, error => {
                     this.router.navigate(['/404']);
 
                     return null;

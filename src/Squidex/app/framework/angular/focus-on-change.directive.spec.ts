@@ -23,8 +23,8 @@ describe('FocusOnChangeDirective', () => {
         const calledElements: any[] = [];
 
         const renderer = {
-            invokeElementMethod: (element: any, method: any, args: any) => {
-                calledElements.push(element);
+            invokeElementMethod: (elem: any, method: any, args: any) => {
+                calledElements.push(elem);
                 calledMethods.push(method);
             }
         };

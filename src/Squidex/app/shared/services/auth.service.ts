@@ -107,11 +107,10 @@ export class AuthService {
     public checkLogin(): Promise<boolean> {
         if (this.loginCompleted) {
             return Promise.resolve(this.currentUser !== null);
-        } else if (this.loginCache) {
-            return this.loginCache;
         } else {
-            this.loginCache = this.checkState(this.userManager.signinSilent());
-
+            if (!this.loginCache) {
+                this.loginCache = this.checkState(this.userManager.signinSilent());
+            }
             return this.loginCache;
         }
     }

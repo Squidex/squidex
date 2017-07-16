@@ -54,14 +54,23 @@ namespace Squidex.Domain.Users
         {
             var user = factory.Create(email);
 
-            user.UpdateDisplayName(displayName);
-            user.SetPictureUrlFromGravatar(email);
-
-            await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
-
-            if (!string.IsNullOrWhiteSpace(password))
+            try
             {
-                await DoChecked(() => userManager.AddPasswordAsync(user, password), "Cannot create user.");
+                user.UpdateDisplayName(displayName);
+                user.SetPictureUrlFromGravatar(email);
+
+                await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
+
+                if (!string.IsNullOrWhiteSpace(password))
+                {
+                    await DoChecked(() => userManager.AddPasswordAsync(user, password), "Cannot create user.");
+                }
+            }
+            catch
+            {
+                await userManager.DeleteAsync(user);
+
+                throw;
             }
 
             return user;

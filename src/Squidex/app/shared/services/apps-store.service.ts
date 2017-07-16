@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Observer, ReplaySubject } from 'rxjs';
 
 import { DateTime } from 'framework';
 
@@ -20,70 +20,45 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AppsStoreService {
-    private readonly apps$ = new Subject<AppDto[]>();
-    private readonly appName$ = new BehaviorSubject<string | null>(null);
-    private lastApps: AppDto[] | null = null;
-    private isAuthenticated = false;
-
-    private readonly appsPublished$ =
-        this.apps$
-            .distinctUntilChanged()
-            .publishReplay(1);
-
-    private readonly selectedApp$ =
-        this.appsPublished$.combineLatest(this.appName$, (apps, name) => apps && name ? apps.find(x => x.name === name) || null : null)
-            .distinctUntilChanged()
-            .publishReplay(1);
+    private readonly apps$ = new ReplaySubject<AppDto[]>();
+    private readonly app$ = new BehaviorSubject<AppDto | null>(null);
 
     public get apps(): Observable<AppDto[]> {
-        return this.appsPublished$;
+        return this.apps$;
     }
 
     public get selectedApp(): Observable<AppDto | null> {
-        return this.selectedApp$;
+        return this.app$;
     }
 
     constructor(
         private readonly authService: AuthService,
         private readonly appsService: AppsService
     ) {
-        if (!authService || !appsService) {
+        if (!appsService) {
             return;
         }
 
-        this.selectedApp$.connect();
-
-        this.appsPublished$.connect();
-        this.appsPublished$.subscribe(apps => {
-            this.lastApps = apps;
-        });
-
-        this.authService.isAuthenticated.subscribe(isAuthenticated => {
-            this.isAuthenticated = isAuthenticated;
-
-            if (isAuthenticated) {
-                this.load();
-            }
-        });
-    }
-
-    public reload() {
-        if (this.isAuthenticated) {
-            this.load();
-        }
-    }
-
-    private load() {
-        this.appsService.getApps()
+        this.authService.isAuthenticated.filter(t => !!t).first()
+            .switchMap(() => this.appsService.getApps())
             .subscribe(apps => {
                 this.apps$.next(apps);
             });
     }
 
     public selectApp(name: string | null): Promise<boolean> {
-        this.appName$.next(name);
+        return Observable.create((observer: Observer<boolean>) => {
+            this.apps$.subscribe(apps => {
+                const app = apps.find(x => x.name === name) || null;
 
-        return this.selectedApp.skip(1).map(app => app !== null).toPromise();
+                this.app$.next(app);
+
+                observer.next(app !== null);
+                observer.complete();
+            }, error => {
+                observer.error(error);
+            });
+        }).toPromise();
     }
 
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
@@ -91,14 +66,14 @@ export class AppsStoreService {
             .map(created => {
                 now = now || DateTime.now();
 
-                const app = new AppDto(created.id, dto.name, 'Owner', now, now);
-
-                return app;
+                return new AppDto(created.id, dto.name, 'Owner', now, now);
             })
             .do(app => {
-                if (this.lastApps && app) {
-                    this.apps$.next(this.lastApps.concat([app]));
-                }
+                this.apps$.defaultIfEmpty().first().subscribe(apps => {
+                    if (apps) {
+                        this.apps$.next(apps.concat([app]));
+                    }
+                });
             });
     }
 }

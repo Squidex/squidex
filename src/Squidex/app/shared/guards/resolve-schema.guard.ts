@@ -45,7 +45,7 @@ export class ResolveSchemaGuard implements Resolve<SchemaDetailsDto> {
                     }
 
                     return dto;
-                }).catch(() => {
+                }, error => {
                     this.router.navigate(['/404']);
 
                     return null;

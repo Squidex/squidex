@@ -39,7 +39,7 @@ export class ResolveUserGuard implements Resolve<UserDto> {
                     }
 
                     return dto;
-                }).catch(() => {
+                }, error => {
                     this.router.navigate(['/404']);
 
                     return null;

@@ -59,36 +59,6 @@ describe('AppsStoreService', () => {
         appsService.verifyAll();
     });
 
-    it('should reload value from apps-service when called', () => {
-         authService.setup(x => x.isAuthenticated)
-            .returns(() => Observable.of(true))
-            .verifiable(Times.once());
-
-        appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
-            .verifiable(Times.exactly(2));
-
-        const store = new AppsStoreService(authService.object, appsService.object);
-
-        let result1: AppDto[] | null = null;
-        let result2: AppDto[] | null = null;
-
-        store.apps.subscribe(x => {
-            result1 = x;
-        }).unsubscribe();
-
-        store.reload();
-
-        store.apps.subscribe(x => {
-            result2 = x;
-        }).unsubscribe();
-
-        expect(result1).toEqual(oldApps);
-        expect(result2).toEqual(oldApps);
-
-        appsService.verifyAll();
-    });
-
     it('should add app to cache when created', () => {
         authService.setup(x => x.isAuthenticated)
             .returns(() => Observable.of(true))
