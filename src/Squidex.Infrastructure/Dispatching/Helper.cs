@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Reflection;
 
 namespace Squidex.Infrastructure.Dispatching
@@ -14,7 +15,7 @@ namespace Squidex.Infrastructure.Dispatching
     {
         public static bool HasRightName(MethodInfo method)
         {
-            return method.Name == "On";
+            return string.Equals(method.Name, "On", StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool HasRightReturnType<TOut>(MethodInfo method)

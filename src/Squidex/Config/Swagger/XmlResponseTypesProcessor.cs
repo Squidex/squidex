@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
@@ -43,7 +44,7 @@ namespace Squidex.Config.Swagger
 
                 response.Description = match.Groups["Description"].Value;
 
-                if (statusCode == "200")
+                if (string.Equals(statusCode, "200", StringComparison.OrdinalIgnoreCase))
                 {
                     hasOkResponse = true;
                 }

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -36,12 +37,17 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
         {
+            var scheme = 
+                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ? 
+                    SwaggerSchema.Http : 
+                    SwaggerSchema.Https;
+
             var document = new SwaggerDocument
             {
                 Tags = new List<SwaggerTag>(),
                 Schemes = new List<SwaggerSchema>
                 {
-                    context.Request.Scheme == "http" ? SwaggerSchema.Http : SwaggerSchema.Https
+                    scheme
                 },
                 Consumes = new List<string>
                 {

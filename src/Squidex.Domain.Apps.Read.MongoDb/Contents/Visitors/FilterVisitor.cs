@@ -36,6 +36,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             return node.Accept(visitor);
         }
 
+        public override FilterDefinition<MongoContentEntity> Visit(ConvertNode nodeIn)
+        {
+            return nodeIn.Source.Accept(this);
+        }
+
         public override FilterDefinition<MongoContentEntity> Visit(UnaryOperatorNode nodeIn)
         {
             if (nodeIn.OperatorKind == UnaryOperatorKind.Not)
@@ -51,19 +56,19 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             var fieldNode = nodeIn.Parameters.ElementAt(0);
             var valueNode = nodeIn.Parameters.ElementAt(1);
 
-            if (nodeIn.Name == "endswith")
+            if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
             {
                 var value = BuildRegex(valueNode, v => v + "$");
 
                 return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
-            if (nodeIn.Name == "startswith")
+            if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
             {
                 var value = BuildRegex(valueNode, v => "^" + v);
 
                 return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
-            if (nodeIn.Name == "contains")
+            if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
             {
                 var value = BuildRegex(valueNode, v => v);
 
@@ -83,29 +88,50 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 return Filter.Or(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
             }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
+
+            if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
             {
-                return Filter.Ne(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                var regexFilter = Visit(functionNode);
+                
+                var value = BuildValue(nodeIn.Right);
+
+                if (value is bool booleanRight)
+                {
+                    if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
+                        (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
+                    {
+                        regexFilter = Filter.Not(regexFilter);
+                    }
+
+                    return regexFilter;
+                }
             }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
+            else
             {
-                return Filter.Eq(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-            }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
-            {
-                return Filter.Lt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-            }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
-            {
-                return Filter.Lte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-            }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
-            {
-                return Filter.Gt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-            }
-            if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
-            {
-                return Filter.Gte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
+                {
+                    return Filter.Ne(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
+                if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
+                {
+                    return Filter.Eq(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
+                if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
+                {
+                    return Filter.Lt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
+                if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
+                {
+                    return Filter.Lte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
+                if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
+                {
+                    return Filter.Gt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
+                if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
+                {
+                    return Filter.Gte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                }
             }
 
             throw new NotSupportedException();
