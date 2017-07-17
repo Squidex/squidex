@@ -143,11 +143,6 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     await plainCollection.Value.InsertManyAsync(commitsToInsert.Select(x => x.Document), new InsertManyOptions { IsOrdered = false });
 
                     notifier.NotifyEventsStored();
-
-                    foreach (var commit in commitsToInsert)
-                    {
-                        commit.Completion.SetResult(true);
-                    }
                 }
                 catch (MongoBulkWriteException ex)
                 {
@@ -177,6 +172,13 @@ namespace Squidex.Infrastructure.MongoDb.EventStore
                     foreach (var commit in commitsToInsert)
                     {
                         commit.Completion.SetException(ex);
+                    }
+                }
+                finally
+                {
+                    foreach (var commit in commitsToInsert)
+                    {
+                        commit.Completion.TrySetResult(true);
                     }
                 }
             }
