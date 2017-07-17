@@ -9,7 +9,6 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angu
 
 import {
     AppComponentBase,
-    AppLanguageDto,
     AppsStoreService,
     ContentDto,
     fadeAnimation,
@@ -42,7 +41,7 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
     public deleting = new EventEmitter<ContentDto>();
 
     @Input()
-    public language: AppLanguageDto;
+    public languageCode: string;
 
     @Input()
     public schemaFields: FieldDto[];
@@ -88,7 +87,7 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
         if (contentField) {
             if (field.partitioning === 'language') {
-                return field.formatValue(contentField[this.language.iso2Code]);
+                return field.formatValue(contentField[this.languageCode]);
             } else {
                 return field.formatValue(contentField['iv']);
             }

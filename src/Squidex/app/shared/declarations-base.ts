@@ -25,6 +25,7 @@ export * from './services/assets.service';
 export * from './services/auth.service';
 export * from './services/contents.service';
 export * from './services/event-consumers.service';
+export * from './services/graphql.service';
 export * from './services/help.service';
 export * from './services/history.service';
 export * from './services/languages.service';

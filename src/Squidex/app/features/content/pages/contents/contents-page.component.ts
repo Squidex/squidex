@@ -163,10 +163,14 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     private loadFields() {
         this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
 
-        this.columnWidth = 100 / this.contentFields.length;
-
         if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
             this.contentFields = [this.schema.fields[0]];
+        }
+
+        if (this.contentFields.length > 0) {
+            this.columnWidth = 100 / this.contentFields.length;
+        } else {
+            this.columnWidth = 100;
         }
     }
 

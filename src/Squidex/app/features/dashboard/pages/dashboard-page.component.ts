@@ -5,8 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription} from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -29,9 +28,7 @@ declare var _urq: any;
         fadeAnimation
     ]
 })
-export class DashboardPageComponent extends AppComponentBase implements OnInit, OnDestroy {
-    private authenticationSubscription: Subscription;
-
+export class DashboardPageComponent extends AppComponentBase implements OnInit {
     public profileDisplayName = '';
 
     public chartStorageCount: any;
@@ -69,10 +66,6 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
         private readonly usagesService: UsagesService
     ) {
         super(notifications, apps);
-    }
-
-    public ngOnDestroy() {
-        this.authenticationSubscription.unsubscribe();
     }
 
     public ngOnInit() {
