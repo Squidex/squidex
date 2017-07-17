@@ -54,7 +54,7 @@ export class Profile {
 @Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
-    private readonly user$ = new ReplaySubject<Profile | null>();
+    private readonly user$ = new ReplaySubject<Profile | null>(1);
     private currentUser: Profile = null;
 
     public get user(): Profile | null {
@@ -96,7 +96,7 @@ export class AuthService {
             this.currentUser = user;
         });
 
-        this.userManager.signinSilent();
+        this.checkState(this.userManager.signinSilent());
     }
 
     public logoutRedirect(): Observable<any> {
@@ -117,5 +117,13 @@ export class AuthService {
 
     public loginRedirectComplete(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirectCallback());
+    }
+
+     private checkState(promise: Promise<User>) {
+        promise.catch((err) => {
+            this.user$.next(null);
+
+            return false;
+        });
     }
 }

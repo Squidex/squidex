@@ -18,7 +18,7 @@ import {
 
 @Injectable()
 export class AppsStoreService {
-    private readonly apps$ = new ReplaySubject<AppDto[]>();
+    private readonly apps$ = new ReplaySubject<AppDto[]>(1);
     private readonly app$ = new BehaviorSubject<AppDto | null>(null);
 
     public get apps(): Observable<AppDto[]> {
