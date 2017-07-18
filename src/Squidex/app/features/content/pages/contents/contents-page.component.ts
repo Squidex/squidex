@@ -177,16 +177,16 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public load(showInfo = false) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
-               .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(dtos.items);
-                    this.contentsPager = this.contentsPager.setCount(dtos.total);
+            .subscribe(dtos => {
+                this.contentItems = ImmutableArray.of(dtos.items);
+                this.contentsPager = this.contentsPager.setCount(dtos.total);
 
-                    if (showInfo) {
-                        this.notifyInfo('Contents reloaded.');
-                    }
-                }, error => {
-                    this.notifyError(error);
-                });
+                if (showInfo) {
+                    this.notifyInfo('Contents reloaded.');
+                }
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public dropData(content: ContentDto) {
