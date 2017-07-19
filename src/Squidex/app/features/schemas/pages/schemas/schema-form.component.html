@@ -8,9 +8,9 @@
 	<div class="form-group">
 		<label for="schema-name">Name</label>
         
-        <sqx-control-errors for="name" [submitted]="createFormSubmitted"></sqx-control-errors>
+        <sqx-control-errors for="name" submitOnly="true" [submitted]="createFormSubmitted"></sqx-control-errors>
 
-		<input type="text" class="form-control" id="schema-name" formControlName="name" autocomplete="off" sqxLowerCaseInput />
+		<input type="text" class="form-control" id="schema-name" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
         
         <small class="form-text text-muted">
             The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appName}}/<b>{{schemaName | async}}</b>/.
@@ -19,6 +19,11 @@
             It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
         </small>
 	</div>
+
+    <div class="form-group clearfix">
+        <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success">Create</button>
+    </div>
 
     <div>
         <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
@@ -29,10 +34,5 @@
         </button>
 
         <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
-    </div>
-
-    <div class="form-group clearfix">
-        <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="float-right btn btn-success">Create</button>
     </div>
 </form>

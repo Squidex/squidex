@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { allParams } from 'framework';
 
@@ -20,7 +21,7 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<ContentDto> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ContentDto> {
         const params = allParams(route);
 
         const appName = params['appName'];
@@ -42,19 +43,16 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
         }
 
         const result =
-            this.contentsService.getContent(appName, schemaName, contentId).toPromise()
-                .then(dto => {
+            this.contentsService.getContent(appName, schemaName, contentId)
+                .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
-
-                        return null;
                     }
-
-                    return dto;
-                }).catch(() => {
+                })
+                .catch(error => {
                     this.router.navigate(['/404']);
 
-                    return null;
+                    return Observable.of(null);
                 });
 
         return result;

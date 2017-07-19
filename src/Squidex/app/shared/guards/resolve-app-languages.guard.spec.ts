@@ -43,7 +43,7 @@ describe('ResolveAppLanguagesGuard', () => {
         const guard = new ResolveAppLanguagesGuard(appLanguagesService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -59,7 +59,7 @@ describe('ResolveAppLanguagesGuard', () => {
         const guard = new ResolveAppLanguagesGuard(appLanguagesService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -77,7 +77,7 @@ describe('ResolveAppLanguagesGuard', () => {
         const guard = new ResolveAppLanguagesGuard(appLanguagesService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBe(languages);
 
                 done();

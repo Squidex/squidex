@@ -16,6 +16,8 @@ import { AppLanguageDto, FieldDto } from 'shared';
     templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements OnInit {
+    private masterLanguageCode: string;
+
     @Input()
     public field: FieldDto;
 
@@ -36,6 +38,8 @@ export class ContentFieldComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.masterLanguageCode = this.languages.find(l => l.isMaster).iso2Code;
+
         if (this.field.isDisabled) {
             this.fieldForm.disable();
         }
@@ -47,6 +51,10 @@ export class ContentFieldComponent implements OnInit {
             this.fieldPartitions = ['iv'];
             this.fieldPartition = 'iv';
         }
+    }
+
+    public selectFieldLanguage(partition: string) {
+        return partition === 'iv' ? this.masterLanguageCode : partition;
     }
 }
 

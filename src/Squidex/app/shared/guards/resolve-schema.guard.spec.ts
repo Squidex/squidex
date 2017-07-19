@@ -51,7 +51,7 @@ describe('ResolveSchemaGuard', () => {
         const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -67,7 +67,7 @@ describe('ResolveSchemaGuard', () => {
         const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBeFalsy();
                 expect(router.lastNavigation).toEqual(['/404']);
 
@@ -85,7 +85,7 @@ describe('ResolveSchemaGuard', () => {
         const guard = new ResolveSchemaGuard(schemasService.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
-            .then(result => {
+            .subscribe(result => {
                 expect(result).toBe(schema);
 
                 done();

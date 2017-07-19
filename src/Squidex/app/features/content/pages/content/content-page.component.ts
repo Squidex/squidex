@@ -91,9 +91,9 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             });
     }
 
-    public canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    public canDeactivate(): Observable<boolean> {
         if (!this.contentForm.dirty) {
-            return true;
+            return Observable.of(true);
         } else {
             this.cancelDialog.show();
 

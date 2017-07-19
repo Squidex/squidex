@@ -6,12 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 import {
     Log,
     User,
-    UserManager
+    UserManager,
+    WebStorageStateStore
 } from 'oidc-client';
 
 import { ApiUrlConfig } from 'framework';
@@ -54,22 +55,15 @@ export class Profile {
 @Injectable()
 export class AuthService {
     private readonly userManager: UserManager;
-    private readonly isAuthenticatedChanged$ = new Subject<boolean>();
-    private loginCompleted: boolean | null = false;
-    private loginCache: Promise<boolean> | null = null;
-    private currentUser: Profile | null = null;
-
-    private readonly isAuthenticatedChangedPublished$ =
-        this.isAuthenticatedChanged$
-            .distinctUntilChanged()
-            .publishReplay(1);
+    private readonly user$ = new ReplaySubject<Profile | null>(1);
+    private currentUser: Profile = null;
 
     public get user(): Profile | null {
         return this.currentUser;
     }
 
-    public get isAuthenticated(): Observable<boolean> {
-        return this.isAuthenticatedChangedPublished$;
+    public get userChanges(): Observable<Profile | null> {
+        return this.user$;
     }
 
     constructor(apiUrl: ApiUrlConfig) {
@@ -88,32 +82,23 @@ export class AuthService {
              silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
               popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
                        authority: apiUrl.buildUrl('identity-server/'),
+                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
             automaticSilentRenew: true
         });
 
         this.userManager.events.addUserLoaded(user => {
-            this.onAuthenticated(user);
+            this.user$.next(new Profile(user));
         });
 
         this.userManager.events.addUserUnloaded(() => {
-            this.onDeauthenticated();
+            this.user$.next(null);
         });
 
-        this.checkLogin();
+        this.user$.subscribe(user => {
+            this.currentUser = user;
+        });
 
-        this.isAuthenticatedChangedPublished$.connect();
-    }
-
-    public checkLogin(): Promise<boolean> {
-        if (this.loginCompleted) {
-            return Promise.resolve(this.currentUser !== null);
-        } else if (this.loginCache) {
-            return this.loginCache;
-        } else {
-            this.loginCache = this.checkState(this.userManager.signinSilent());
-
-            return this.loginCache;
-        }
+        this.checkState(this.userManager.getUser());
     }
 
     public logoutRedirect(): Observable<any> {
@@ -124,51 +109,35 @@ export class AuthService {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
+    public loginPopup(): Observable<Profile> {
+        return Observable.fromPromise(this.userManager.signinPopup()).map(u => this.createProfile(u));
+    }
+
+    public loginSilent(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signinSilent()).map(u => this.createProfile(u));
+    }
+
     public loginRedirect(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirect());
     }
 
-    public loginRedirectComplete(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signinRedirectCallback());
+    public loginRedirectComplete(): Observable<Profile> {
+        return Observable.fromPromise(this.userManager.signinRedirectCallback()).map(u => this.createProfile(u));
     }
 
-    public loginPopup(): Observable<boolean> {
-        const promise = this.checkState(this.userManager.signinPopup());
-
-        return Observable.fromPromise(promise);
+    private createProfile(user: User) {
+        return user ? new Profile(user) : null;
     }
 
-    private onAuthenticated(user: User) {
-        this.currentUser = new Profile(user);
+    private checkState(promise: Promise<User>) {
+        promise.then(user => {
+            this.user$.next(this.createProfile(user));
 
-        this.isAuthenticatedChanged$.next(true);
-    }
+            return true;
+        }, err => {
+            this.user$.next(null);
 
-    private onDeauthenticated() {
-        this.currentUser = null;
-
-        this.isAuthenticatedChanged$.next(false);
-    }
-
-    private checkState(promise: Promise<User>): Promise<boolean> {
-        const resultPromise =
-            promise
-                .then(user => {
-                    this.loginCache = null;
-                    this.loginCompleted = null;
-
-                    this.onAuthenticated(user);
-
-                    return !!this.currentUser;
-                }).catch((err) => {
-                    this.loginCache = null;
-                    this.loginCompleted = null;
-
-                    this.onDeauthenticated();
-
-                    return false;
-                });
-
-        return resultPromise;
+            return false;
+        });
     }
 }

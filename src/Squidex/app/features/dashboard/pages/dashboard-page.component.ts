@@ -5,8 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription} from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import {
     AppComponentBase,
@@ -29,9 +28,7 @@ declare var _urq: any;
         fadeAnimation
     ]
 })
-export class DashboardPageComponent extends AppComponentBase implements OnInit, OnDestroy {
-    private authenticationSubscription: Subscription;
-
+export class DashboardPageComponent extends AppComponentBase implements OnInit {
     public profileDisplayName = '';
 
     public chartStorageCount: any;
@@ -65,14 +62,10 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
     public callsMax: string | null = null;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly usagesService: UsagesService
     ) {
         super(notifications, apps);
-    }
-
-    public ngOnDestroy() {
-        this.authenticationSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -154,14 +147,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit, 
                 };
             });
 
-        this.authenticationSubscription =
-            this.auth.isAuthenticated.subscribe(() => {
-                const user = this.auth.user;
-
-                if (user) {
-                    this.profileDisplayName = user.displayName;
-                }
-            });
+        this.profileDisplayName = this.authService.user.displayName;
     }
 
     public showForum() {

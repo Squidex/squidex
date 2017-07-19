@@ -16,13 +16,13 @@ import { AuthService } from 'shared';
 })
 export class LogoutPageComponent implements OnInit {
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly router: Router
     ) {
     }
 
     public ngOnInit() {
-        this.auth.logoutRedirectComplete()
+        this.authService.logoutRedirectComplete()
             .subscribe(
                 () => {
                     this.router.navigate(['/'], { replaceUrl: true });

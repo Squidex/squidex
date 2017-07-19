@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { allParams } from 'framework';
 
@@ -20,7 +21,7 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<SchemaDetailsDto> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SchemaDetailsDto> {
         const params = allParams(route);
 
         const appName = params['appName'];
@@ -36,19 +37,16 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
         }
 
         const result =
-            this.schemasService.getSchema(appName, schemaName).toPromise()
-                .then(dto => {
-                    if (!dto || !dto.isPublished) {
+            this.schemasService.getSchema(appName, schemaName).map(dto => dto && dto.isPublished ? dto : null)
+                .do(dto => {
+                    if (!dto) {
                         this.router.navigate(['/404']);
-
-                        return null;
                     }
-
-                    return dto;
-                }).catch(() => {
+                })
+                .catch(error => {
                     this.router.navigate(['/404']);
 
-                    return null;
+                    return Observable.of(error);
                 });
 
         return result;

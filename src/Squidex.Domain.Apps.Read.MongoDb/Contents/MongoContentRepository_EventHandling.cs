@@ -9,9 +9,9 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         public string EventsFilter
         {
-            get { return "^(content-)|(schema-)|(asset-)"; }
+            get { return "^(content-)|(app-)|(asset-)"; }
         }
 
         public async Task ClearAsync()
@@ -58,10 +58,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return this.DispatchActionAsync(@event.Payload, @event.Headers);
         }
 
-        protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
+        protected Task On(AppCreated @event, EnvelopeHeaders headers)
         {
             return ForAppIdAsync(@event.AppId.Id, async collection =>
             {
+                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaId).Descending(x => x.LastModified));
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsPublished));
                 await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
@@ -116,18 +117,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
-        {
-            return ForAppIdAsync(@event.AppId.Id, collection =>
-            {
-                return collection.UpdateManyAsync(
-                    Filter.And(
-                        Filter.AnyEq(x => x.ReferencedIds, @event.AssetId),
-                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.AssetId)),
-                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.AssetId));
-            });
-        }
-
         protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
         {
             return ForAppIdAsync(@event.AppId.Id, async collection =>
@@ -141,7 +130,19 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 await collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
             });
         }
-        
+
+        protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
+        {
+            return ForAppIdAsync(@event.AppId.Id, collection =>
+            {
+                return collection.UpdateManyAsync(
+                    Filter.And(
+                        Filter.AnyEq(x => x.ReferencedIds, @event.AssetId),
+                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.AssetId)),
+                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.AssetId));
+            });
+        }
+
         private Task ForAppIdAsync(Guid appId, Func<IMongoCollection<MongoContentEntity>, Task> action)
         {
             var collection = GetCollection(appId);

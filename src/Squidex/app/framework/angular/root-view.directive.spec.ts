@@ -7,6 +7,8 @@
 
 import { RootViewDirective } from './../';
 
+/* tslint:disable:no-unused-expression */
+
 describe('RootViewDirective', () => {
     it('should call init of service in ctor', () => {
         let viewRef = {};

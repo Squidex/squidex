@@ -27,7 +27,7 @@ export abstract class AppComponentBase extends ComponentBase {
     }
 
     public appNameOnce(): Observable<string> {
-        return this.appName$.take(1);
+        return this.appName$.first();
     }
 }
 

@@ -36,7 +36,7 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
     public profileUrl = this.apiUrl.buildUrl('/identity-server/account/profile');
 
     constructor(
-        private readonly auth: AuthService,
+        private readonly authService: AuthService,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
@@ -47,20 +47,16 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.authenticationSubscription =
-            this.auth.isAuthenticated.take(1)
-                .subscribe(() => {
-                    const user = this.auth.user;
+            this.authService.userChanges.filter(user => !!user)
+                .subscribe(user => {
+                    this.profileId = user.id;
+                    this.profileDisplayName = user.displayName;
 
-                    if (user) {
-                        this.profileId = user.id;
-                        this.profileDisplayName = user.displayName;
-
-                        this.isAdmin = user.isAdmin;
-                    }
+                    this.isAdmin = user.isAdmin;
                 });
     }
 
     public logout() {
-        this.auth.logoutRedirect();
+        this.authService.logoutRedirect();
     }
 }

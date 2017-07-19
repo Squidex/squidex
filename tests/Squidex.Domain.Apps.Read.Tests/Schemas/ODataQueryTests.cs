@@ -115,6 +115,33 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         }
 
         [Fact]
+        public void Should_create_contains_query_with_equals()
+        {
+            var i = F("$filter=contains(data/firstName/de, 'Sebastian') eq true");
+            var o = C("{ 'do.1.de' : /Sebastian/i }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_negated_contains_query_with_equals()
+        {
+            var i = F("$filter=contains(data/firstName/de, 'Sebastian') eq false");
+            var o = C("{ 'do.1.de' : { '$not' : /Sebastian/i } }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_negated_contains_query_and_other()
+        {
+            var i = F("$filter=contains(data/firstName/de, 'Sebastian') eq false and data/isAdmin/iv eq true");
+            var o = C("{ 'do.1.de' : { '$not' : /Sebastian/i }, 'do.3.iv' : true }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_create_string_equals_query()
         {
             var i = F("$filter=data/firstName/de eq 'Sebastian'");

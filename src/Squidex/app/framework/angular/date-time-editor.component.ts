@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, ElementRef, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import * as moment from 'moment';
 
 let Pikaday = require('pikaday/pikaday');
@@ -23,7 +24,9 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './date-time-editor.component.html',
     providers: [SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, AfterViewInit {
+export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy, OnInit, AfterViewInit {
+    private timeSubscription: Subscription;
+    private dateSubscription: Subscription;
     private picker: any;
     private timeValue: any | null = null;
     private dateValue: any | null = null;
@@ -54,26 +57,33 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnInit, Af
 
     public isDisabled = false;
 
+    public ngOnDestroy() {
+        this.dateSubscription.unsubscribe();
+        this.timeSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
-        this.timeControl.valueChanges.subscribe(value => {
-            if (!value || value.length === 0) {
-                this.timeValue = null;
-            } else {
-                this.timeValue = moment(value, 'HH:mm:ss');
-            }
+        this.timeSubscription =
+            this.timeControl.valueChanges.subscribe(value => {
+                if (!value || value.length === 0) {
+                    this.timeValue = null;
+                } else {
+                    this.timeValue = moment(value, 'HH:mm:ss');
+                }
 
-            this.updateValue();
-        });
+                this.updateValue();
+            });
 
-        this.dateControl.valueChanges.subscribe(value => {
-            if (!value || value.length === 0) {
-                this.dateValue = null;
-            } else {
-                this.dateValue = moment(value, 'YYYY-MM-DD');
-            }
+        this.dateSubscription =
+            this.dateControl.valueChanges.subscribe(value => {
+                if (!value || value.length === 0) {
+                    this.dateValue = null;
+                } else {
+                    this.dateValue = moment(value, 'YYYY-MM-DD');
+                }
 
-            this.updateValue();
-        });
+                this.updateValue();
+            });
     }
 
     public writeValue(value: any) {

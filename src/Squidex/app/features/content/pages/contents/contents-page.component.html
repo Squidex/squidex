@@ -69,7 +69,7 @@
                 <tbody *ngIf="!isReadOnly">
                     <ng-template ngFor let-content [ngForOf]="contentItems">
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                            [language]="languageSelected"
+                            [languageCode]="languageSelected.iso2Code"
                             [schemaFields]="contentFields"
                             [schema]="schema"
                             (unpublishing)="unpublishContent(content)"
@@ -82,7 +82,7 @@
                 <tbody *ngIf="isReadOnly">
                     <ng-template ngFor let-content [ngForOf]="contentItems">
                         <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
-                            [language]="languageSelected"
+                            [languageCode]="languageSelected.iso2Code"
                             [schemaFields]="contentFields"
                             [schema]="schema" 
                             isReadOnly="true"></tr>

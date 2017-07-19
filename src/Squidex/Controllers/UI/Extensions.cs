@@ -19,7 +19,7 @@ namespace Squidex.Controllers.UI
         public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName)
         {
             user.UpdateEmail(email);
-            user.UpdateDisplayName(displayName);
+            user.SetDisplayName(displayName);
 
             return userManager.UpdateAsync(user);
         }

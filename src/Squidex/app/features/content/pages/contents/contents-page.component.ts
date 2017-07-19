@@ -163,26 +163,30 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     private loadFields() {
         this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
 
-        this.columnWidth = 100 / this.contentFields.length;
-
         if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
             this.contentFields = [this.schema.fields[0]];
+        }
+
+        if (this.contentFields.length > 0) {
+            this.columnWidth = 100 / this.contentFields.length;
+        } else {
+            this.columnWidth = 100;
         }
     }
 
     public load(showInfo = false) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
-               .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(dtos.items);
-                    this.contentsPager = this.contentsPager.setCount(dtos.total);
+            .subscribe(dtos => {
+                this.contentItems = ImmutableArray.of(dtos.items);
+                this.contentsPager = this.contentsPager.setCount(dtos.total);
 
-                    if (showInfo) {
-                        this.notifyInfo('Contents reloaded.');
-                    }
-                }, error => {
-                    this.notifyError(error);
-                });
+                if (showInfo) {
+                    this.notifyInfo('Contents reloaded.');
+                }
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public dropData(content: ContentDto) {

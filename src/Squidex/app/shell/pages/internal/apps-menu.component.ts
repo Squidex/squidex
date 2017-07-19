@@ -49,7 +49,7 @@ export class AppsMenuComponent implements OnInit, OnDestroy {
     public ngOnInit() {
         this.appsSubscription =
             this.appsStore.apps.subscribe(apps => {
-                this.apps = apps || [];
+                this.apps = apps;
             });
 
         this.appSubscription =

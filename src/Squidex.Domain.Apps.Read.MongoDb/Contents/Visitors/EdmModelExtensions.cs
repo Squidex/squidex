@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
     {
         public static ODataUriParser ParseQuery(this IEdmModel model, string query)
         {
+            query = query ?? string.Empty;
+
             var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
 
             if (query.StartsWith("?"))

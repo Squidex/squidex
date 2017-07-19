@@ -8,6 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient, HttpHeaders, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { inject, TestBed } from '@angular/core/testing';
+import { Observable } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import {
@@ -16,12 +17,11 @@ import {
     AuthInterceptor
 } from './../';
 
-describe('AppClientsService', () => {
+describe('AuthInterceptor', () => {
     let authService: IMock<AuthService> = null;
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);
-        authService.setup(x => x.user).returns(() => { return <any>{ authToken: 'letmein' }; });
 
         TestBed.configureTestingModule({
             imports: [
@@ -46,6 +46,8 @@ describe('AppClientsService', () => {
     it('should append headers to request',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
+
         http.get('http://service/p/apps').subscribe();
 
         const req = httpMock.expectOne('http://service/p/apps');
@@ -58,6 +60,8 @@ describe('AppClientsService', () => {
 
     it('should not append headers for no auth headers',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
 
         http.get('http://service/p/apps', { headers: new HttpHeaders().set('NoAuth', '') }).subscribe();
 
@@ -72,6 +76,8 @@ describe('AppClientsService', () => {
     it('should not append headers for other requests',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
+
         http.get('http://cloud/p/apps').subscribe();
 
         const req = httpMock.expectOne('http://cloud/p/apps');
@@ -85,7 +91,7 @@ describe('AppClientsService', () => {
     it(`should logout for 404 status code when user is expired.`,
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
-        authService.setup(x => x.user).returns(() => { return <any>{ authToken: 'letmein', isExpired: true }; });
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein', isExpired: true }); });
 
         http.get('http://service/p/apps').subscribe(
             _ => { /* NOOP */ },
@@ -98,9 +104,29 @@ describe('AppClientsService', () => {
         authService.verify(x => x.logoutRedirect(), Times.once());
     }));
 
-    [401, 403].forEach(statusCode => {
+    it(`should logout for 401 status code`,
+        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
+        authService.setup(x => x.loginSilent()).returns(() => { return Observable.of(<any>{ authToken: 'letmereallyin' }); });
+
+        http.get('http://service/p/apps').subscribe(
+            _ => { /* NOOP */ },
+            _ => { /* NOOP */ });
+
+        // const req = httpMock.expectOne('http://service/p/apps');
+
+        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+
+        authService.verify(x => x.logoutRedirect(), Times.once());
+    }));
+
+    [403].forEach(statusCode => {
         it(`should logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+
+            authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
 
             http.get('http://service/p/apps').subscribe(
                 _ => { /* NOOP */ },
@@ -117,6 +143,8 @@ describe('AppClientsService', () => {
     [500, 404, 405].forEach(statusCode => {
         it(`should not logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+
+            authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
 
             http.get('http://service/p/apps').subscribe(
                 _ => { /* NOOP */ },
