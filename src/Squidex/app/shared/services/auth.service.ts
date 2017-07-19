@@ -11,7 +11,8 @@ import { Observable, ReplaySubject } from 'rxjs';
 import {
     Log,
     User,
-    UserManager
+    UserManager,
+    WebStorageStateStore
 } from 'oidc-client';
 
 import { ApiUrlConfig } from 'framework';
@@ -81,6 +82,7 @@ export class AuthService {
              silent_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-silent/'),
               popup_redirect_uri: apiUrl.buildUrl('identity-server/client-callback-popup/'),
                        authority: apiUrl.buildUrl('identity-server/'),
+                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
             automaticSilentRenew: true
         });
 
@@ -96,7 +98,7 @@ export class AuthService {
             this.currentUser = user;
         });
 
-        this.checkState(this.userManager.signinSilent());
+        this.checkState(this.userManager.getUser());
     }
 
     public logoutRedirect(): Observable<any> {
@@ -107,20 +109,32 @@ export class AuthService {
         return Observable.fromPromise(this.userManager.signoutRedirectCallback());
     }
 
-    public loginPopup(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signinPopup());
+    public loginPopup(): Observable<Profile> {
+        return Observable.fromPromise(this.userManager.signinPopup()).map(u => this.createProfile(u));
+    }
+
+    public loginSilent(): Observable<any> {
+        return Observable.fromPromise(this.userManager.signinSilent()).map(u => this.createProfile(u));
     }
 
     public loginRedirect(): Observable<any> {
         return Observable.fromPromise(this.userManager.signinRedirect());
     }
 
-    public loginRedirectComplete(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signinRedirectCallback());
+    public loginRedirectComplete(): Observable<Profile> {
+        return Observable.fromPromise(this.userManager.signinRedirectCallback()).map(u => this.createProfile(u));
     }
 
-     private checkState(promise: Promise<User>) {
-        promise.catch((err) => {
+    private createProfile(user: User) {
+        return user ? new Profile(user) : null;
+    }
+
+    private checkState(promise: Promise<User>) {
+        promise.then(user => {
+            this.user$.next(this.createProfile(user));
+
+            return true;
+        }, err => {
             this.user$.next(null);
 
             return false;

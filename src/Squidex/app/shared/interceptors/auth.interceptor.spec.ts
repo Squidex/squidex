@@ -104,7 +104,25 @@ describe('AuthInterceptor', () => {
         authService.verify(x => x.logoutRedirect(), Times.once());
     }));
 
-    [401, 403].forEach(statusCode => {
+    it(`should logout for 401 status code`,
+        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+
+        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein' }); });
+        authService.setup(x => x.loginSilent()).returns(() => { return Observable.of(<any>{ authToken: 'letmereallyin' }); });
+
+        http.get('http://service/p/apps').subscribe(
+            _ => { /* NOOP */ },
+            _ => { /* NOOP */ });
+
+        // const req = httpMock.expectOne('http://service/p/apps');
+
+        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+
+        authService.verify(x => x.logoutRedirect(), Times.once());
+    }));
+
+    [403].forEach(statusCode => {
         it(`should logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
