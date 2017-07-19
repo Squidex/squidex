@@ -13,6 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.AzureStorage;
 
 // ReSharper disable InvertIf
 
@@ -60,6 +61,37 @@ namespace Squidex.Config.Domain
                 }
 
                 builder.Register(c => new GoogleCloudAssetStore(bucketName))
+                    .As<IAssetStore>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+            }
+            else if (string.Equals(assetStoreType, "AzureBlobStorage", StringComparison.OrdinalIgnoreCase))
+            {
+                var containerName = Configuration.GetValue<string>("assetStore:azureStorage:containerName");
+                // NOTE: here it can be improved - if we use keyvault the secret key won't be in the app settings, rather the app has to run
+                // in the same active directory as the keyvault.
+                var connectionString = Configuration.GetValue<string>("assetStore:azureStorage:connectionString");
+
+                if (string.IsNullOrWhiteSpace(containerName))
+                {
+                    throw new ConfigurationException("Configure AssetStore AzureStorage container with 'assetStore:azureStorage:containerName'.");
+                }
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    throw new ConfigurationException(
+                        "Configure AssetStore AzureStorage connection string with 'assetStore:azureStorage:connectionString'.");
+                }
+
+                builder.Register(c => new StorageAccountManager(connectionString))
+                    .As<IStorageAccountManager>()
+                    .SingleInstance();
+
+                builder.RegisterType<BlobContainerProvider>()
+                    .As<IBlobContainerProvider>()
+                    .SingleInstance();
+
+                builder.Register(c => new AzureBlobAssetStore(c.Resolve<IBlobContainerProvider>(), containerName))
                     .As<IAssetStore>()
                     .As<IExternalSystem>()
                     .SingleInstance();
