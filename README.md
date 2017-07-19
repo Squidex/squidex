@@ -8,6 +8,10 @@ Squidex is an open source headless CMS and content management hub. In contrast t
 
 Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in progress) or just check out the code and play around.
 
+## Status
+
+Current Version 1.0-beta1
+
 ## Prerequisites
 
 * [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio 2017](https://www.visualstudio.com/vs/visual-studio-2017-rc/)
