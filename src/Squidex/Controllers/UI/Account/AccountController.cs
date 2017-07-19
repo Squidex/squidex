@@ -231,7 +231,8 @@ namespace Squidex.Controllers.UI.Account
                 {
                     user = CreateUser(externalLogin, email);
 
-                    var isFirst = userManager.Users.LongCount() == 0;
+                    var allUsers = userManager.Users.ToList();
+                    var isFirst = allUsers.Count == 0;
 
                     isLoggedIn =
                         await AddUserAsync(user) &&
