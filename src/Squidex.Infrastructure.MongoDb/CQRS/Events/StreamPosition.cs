@@ -10,7 +10,7 @@
 
 using MongoDB.Bson;
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class StreamPosition
     {

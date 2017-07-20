@@ -14,8 +14,6 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.GetEventStore;
-using Squidex.Infrastructure.MongoDb.EventStore;
 
 namespace Squidex.Config.Domain
 {

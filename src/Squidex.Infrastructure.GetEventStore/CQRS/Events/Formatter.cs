@@ -8,11 +8,9 @@
 
 using System.Text;
 using EventStore.ClientAPI;
-using Squidex.Infrastructure.CQRS.Events;
-using EventData = Squidex.Infrastructure.CQRS.Events.EventData;
 using EventStoreData = EventStore.ClientAPI.EventData;
 
-namespace Squidex.Infrastructure.GetEventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public static class Formatter
     {

@@ -11,7 +11,6 @@ using Autofac;
 using Autofac.Core;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Redis;
 using StackExchange.Redis;
 
 namespace Squidex.Config.Domain

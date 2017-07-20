@@ -30,8 +30,6 @@ using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb.EventStore;
-using Squidex.Infrastructure.MongoDb.UsageTracker;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
 

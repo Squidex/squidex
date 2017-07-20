@@ -6,22 +6,22 @@
 //  All rights reserved.
 // ==========================================================================
 
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Squidex.Infrastructure.CQRS.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable RedundantIfElseBlock
 // ReSharper disable InvertIf
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {

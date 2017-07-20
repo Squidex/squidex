@@ -11,7 +11,6 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Log;
 
 // ReSharper disable InvertIf
