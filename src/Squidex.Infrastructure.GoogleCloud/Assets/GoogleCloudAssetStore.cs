@@ -8,6 +8,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Google;
@@ -41,6 +42,36 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public Task UploadTemporaryAsync(string name, Stream stream)
+        {
+            return storageClient.UploadObjectAsync(bucketName, name, "application/octet-stream", stream);
+        }
+
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        {
+            var objectName = GetObjectName(id, version, suffix);
+
+            await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream);
+        }
+
+        public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        {
+            var objectName = GetObjectName(id, version, suffix);
+
+            try
+            {
+                await storageClient.CopyObjectAsync(bucketName, name, bucketName, objectName);
+            }
+            catch (GoogleApiException ex)
+            {
+                if (ex.HttpStatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                }
+                throw;
+            }
+        }
+
         public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
         {
             var objectName = GetObjectName(id, version, suffix);
@@ -59,11 +90,16 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DeleteTemporaryAsync(string name)
         {
-            var objectName = GetObjectName(id, version, suffix);
-
-            await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream);
+            try
+            {
+                await storageClient.DeleteObjectAsync(bucketName, name);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private string GetObjectName(string id, long version, string suffix)
@@ -75,14 +111,14 @@ namespace Squidex.Infrastructure.Assets
                 throw new InvalidOperationException("No connection established yet.");
             }
 
-            var name = $"{id}_{version}";
-
-            if (!string.IsNullOrWhiteSpace(suffix))
-            {
-                name += "_" + suffix;
-            }
+            var name = GetFileName(id, version, suffix);
 
             return name;
+        }
+
+        private static string GetFileName(string id, long version, string suffix)
+        {
+            return string.Join("_", new[] { id, version.ToString(), suffix }.Where(x => !string.IsNullOrWhiteSpace(x)));
         }
     }
 }

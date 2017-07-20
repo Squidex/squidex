@@ -48,11 +48,19 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public Task Should_throw_exception_if_asset_not_found()
+        public Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
             sut.Connect();
 
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(Guid.NewGuid().ToString(), 1, "suffix", new MemoryStream()));
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(Id(), 1, "suffix", new MemoryStream()));
+        }
+
+        [Fact]
+        public Task Should_throw_exception_if_asset_to_copy_is_not_found()
+        {
+            sut.Connect();
+
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.CopyTemporaryAsync(Id(), Id(), 1, null));
         }
 
         [Fact]
@@ -60,7 +68,7 @@ namespace Squidex.Infrastructure.Assets
         {
             sut.Connect();
 
-            var assetId = Guid.NewGuid().ToString();
+            var assetId = Id();
             var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
 
             await sut.UploadAsync(assetId, 1, "suffix", assetData);
@@ -70,6 +78,45 @@ namespace Squidex.Infrastructure.Assets
             await sut.DownloadAsync(assetId, 1, "suffix", readData);
 
             Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_commit_temporary_file()
+        {
+            sut.Connect();
+
+            var tempId = Id();
+
+            var assetId = Id();
+            var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
+
+            await sut.UploadTemporaryAsync(tempId, assetData);
+            await sut.CopyTemporaryAsync(tempId, assetId, 1, "suffix");
+
+            var readData = new MemoryStream();
+
+            await sut.DownloadAsync(assetId, 1, "suffix", readData);
+
+            Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_ignore_when_deleting_twice()
+        {
+            sut.Connect();
+
+            var tempId = Id();
+            
+            var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
+
+            await sut.UploadTemporaryAsync(tempId, assetData);
+            await sut.DeleteTemporaryAsync(tempId);
+            await sut.DeleteTemporaryAsync(tempId);
+        }
+
+        private static string Id()
+        {
+            return Guid.NewGuid().ToString();
         }
 
         private static string CreateInvalidPath()

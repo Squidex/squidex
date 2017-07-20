@@ -38,38 +38,55 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         protected async Task On(CreateAsset command, CommandContext context)
         {
-            await handler.CreateAsync<AssetDomainObject>(context, async c =>
+            command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
+            try
             {
-                command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
+                var asset = await handler.CreateAsync<AssetDomainObject>(context, async a =>
+                {
+                    a.Create(command);
 
-                c.Create(command);
+                    await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
 
-                await assetStore.UploadAsync(c.Id.ToString(), c.FileVersion, null, command.File.OpenRead());
+                    context.Succeed(EntityCreatedResult.Create(a.Id, a.Version));
+                });
 
-                context.Succeed(EntityCreatedResult.Create(c.Id, c.Version));
-            });
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), asset.Id.ToString(), asset.FileVersion, null);
+            }
+            finally
+            {
+                await assetStore.DeleteTemporaryAsync(context.ContextId.ToString());
+            }
         }
 
         protected async Task On(UpdateAsset command, CommandContext context)
         {
-            await handler.UpdateAsync<AssetDomainObject>(context, async c =>
+            command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
+            
+            try
             {
-                command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
+                var asset = await handler.UpdateAsync<AssetDomainObject>(context, async a =>
+                {
+                    a.Update(command);
 
-                c.Update(command);
+                    await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
+                });
 
-                await assetStore.UploadAsync(c.Id.ToString(), c.FileVersion, null, command.File.OpenRead());
-            });
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), asset.Id.ToString(), asset.FileVersion, null);
+            }
+            finally
+            {
+                await assetStore.DeleteTemporaryAsync(context.ContextId.ToString());
+            }
         }
 
         protected Task On(RenameAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, c => c.Rename(command));
+            return handler.UpdateAsync<AssetDomainObject>(context, a => a.Rename(command));
         }
 
         protected Task On(DeleteAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, c => c.Delete(command));
+            return handler.UpdateAsync<AssetDomainObject>(context, a => a.Delete(command));
         }
 
         public Task<bool> HandleAsync(CommandContext context)
