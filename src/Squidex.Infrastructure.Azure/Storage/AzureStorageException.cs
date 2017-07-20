@@ -9,7 +9,7 @@
 using System;
 using Microsoft.WindowsAzure.Storage;
 
-namespace Squidex.Infrastructure.AzureStorage
+namespace Squidex.Infrastructure.Azure.Storage
 {
     [Serializable]
     public class AzureStorageException : StorageException

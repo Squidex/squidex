@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.AzureStorage;
+using Squidex.Infrastructure.Azure.Storage;
 
 // ReSharper disable InvertIf
 
@@ -87,11 +87,7 @@ namespace Squidex.Config.Domain
                     .As<IStorageAccountManager>()
                     .SingleInstance();
 
-                builder.RegisterType<BlobContainerProvider>()
-                    .As<IBlobContainerProvider>()
-                    .SingleInstance();
-
-                builder.Register(c => new AzureBlobAssetStore(c.Resolve<IBlobContainerProvider>(), containerName))
+                builder.Register(c => new AzureBlobAssetStore(c.Resolve<IStorageAccountManager>(), containerName))
                     .As<IAssetStore>()
                     .As<IExternalSystem>()
                     .SingleInstance();

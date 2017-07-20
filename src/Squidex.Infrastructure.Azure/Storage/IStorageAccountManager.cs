@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IBlobContainerProvider.cs
+//  IStorageAccountManager.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,10 +9,14 @@
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Squidex.Infrastructure.AzureStorage
+namespace Squidex.Infrastructure.Azure.Storage
 {
-    public interface IBlobContainerProvider
+    public interface IStorageAccountManager
     {
-        Task<CloudBlobContainer> GetContainerAsync(string name);
+        CloudBlobClient CreateCloudBlobClient();
+
+        string GetSharedAccessSignature();
+
+        CloudBlobContainer GetContainer(string name);
     }
 }

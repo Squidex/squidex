@@ -7,10 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Squidex.Infrastructure.AzureStorage
+namespace Squidex.Infrastructure.Azure.Storage
 {
     public class StorageAccountManager : IStorageAccountManager
     {
@@ -42,6 +43,12 @@ namespace Squidex.Infrastructure.AzureStorage
                 SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddHours(1),
                 Permissions = SharedAccessAccountPermissions.Read | SharedAccessAccountPermissions.List
             });
+        }
+
+        public CloudBlobContainer GetContainer(string name)
+        {
+            var blobClient = CreateCloudBlobClient();
+            return blobClient.GetContainerReference(name);
         }
     }
 }
