@@ -96,9 +96,12 @@ namespace Squidex.Infrastructure.Assets
             {
                 await storageClient.DeleteObjectAsync(bucketName, name);
             }
-            catch
+            catch (GoogleApiException ex)
             {
-                // ignored
+                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
             }
         }
 
