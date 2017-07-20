@@ -50,7 +50,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     this.authService.logoutRedirect();
 
                     return Observable.empty<HttpEvent<any>>();
-                }else if (error.status === 401 || error.status === 403) {
+                } else if (error.status === 401 || error.status === 403) {
                     this.authService.logoutRedirect();
 
                     return Observable.empty<HttpEvent<any>>();
