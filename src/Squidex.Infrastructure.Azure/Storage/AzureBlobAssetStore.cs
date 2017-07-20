@@ -47,16 +47,7 @@ namespace Squidex.Infrastructure.Azure.Storage
             var blobName = GetObjectName(id, version, suffix);
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
-            if (await blob.ExistsAsync())
-            {
-                return;
-            }
-
-            if (!blob.Metadata.ContainsKey(AssetVersion))
-                blob.Metadata.Add(AssetVersion, version.ToString());
-            else
-                blob.Metadata[AssetVersion] = version.ToString();
-
+            blob.Metadata[AssetVersion] = version.ToString();
             blob.Metadata[AssetId] = id;
             
             await blob.UploadFromStreamAsync(stream);
@@ -65,7 +56,14 @@ namespace Squidex.Infrastructure.Azure.Storage
 
         public void Connect()
         {
-            blobContainer = azureStorageAccount.GetContainer(containerName);
+            try
+            {
+                blobContainer = azureStorageAccount.GetContainer(containerName);
+            }
+            catch (Exception)
+            {
+                throw new ConfigurationException($"Cannot connect to blob container '{containerName}'.");
+            }
         }
 
         private string GetObjectName(string id, long version, string suffix)

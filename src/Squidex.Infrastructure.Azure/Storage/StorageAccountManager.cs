@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Azure.Storage
             catch (Exception ex)
                 when (ex is FormatException || ex is ArgumentException)
             {
-                throw new AzureStorageException("Invalid storage account information provided. Please confirm the AccountName and AccountKey are valid in the app settings file.");
+                throw new ConfigurationException("Invalid storage account information provided. Please confirm the AccountName and AccountKey are valid in the app settings file.");
             }
         }
 
