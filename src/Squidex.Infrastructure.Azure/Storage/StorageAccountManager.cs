@@ -45,10 +45,13 @@ namespace Squidex.Infrastructure.Azure.Storage
             });
         }
 
-        public CloudBlobContainer GetContainer(string name)
+        public async Task<CloudBlobContainer> GetContainerAsync(string name)
         {
             var blobClient = CreateCloudBlobClient();
-            return blobClient.GetContainerReference(name);
+            var container = blobClient.GetContainerReference(name);
+            await container.CreateIfNotExistsAsync();
+
+            return container;
         }
     }
 }

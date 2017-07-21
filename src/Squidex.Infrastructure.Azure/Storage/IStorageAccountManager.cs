@@ -17,6 +17,6 @@ namespace Squidex.Infrastructure.Azure.Storage
 
         string GetSharedAccessSignature();
 
-        CloudBlobContainer GetContainer(string name);
+        Task<CloudBlobContainer> GetContainerAsync(string name);
     }
 }

@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Azure.Storage
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
             if (!await blob.ExistsAsync())
-                return;
+                throw new AssetNotFoundException($"Asset {blobName} not found.");
 
             await blob.DownloadToStreamAsync(stream);
         }
@@ -98,7 +98,10 @@ namespace Squidex.Infrastructure.Azure.Storage
         {
             try
             {
-                blobContainer = azureStorageAccount.GetContainer(containerName);
+                var task = azureStorageAccount.GetContainerAsync(containerName);
+                task.Wait();
+
+                blobContainer = task.Result;
             }
             catch (Exception)
             {
