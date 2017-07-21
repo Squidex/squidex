@@ -11,13 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using Squidex.Infrastructure.CQRS.Events;
-using EventData = Squidex.Infrastructure.CQRS.Events.EventData;
 
 // ReSharper disable ConvertIfStatementToSwitchStatement
 // ReSharper disable InvertIf
 
-namespace Squidex.Infrastructure.GetEventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class GetEventStore : IEventStore, IExternalSystem
     {

@@ -11,12 +11,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.MongoDb;
 
 // ReSharper disable ConvertIfStatementToReturnStatement
 // ReSharper disable RedundantIfElseBlock
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class MongoEventConsumerInfoRepository : MongoRepositoryBase<MongoEventConsumerInfo>, IEventConsumerInfoRepository
     {

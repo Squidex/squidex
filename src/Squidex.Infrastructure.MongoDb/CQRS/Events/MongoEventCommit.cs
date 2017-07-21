@@ -10,7 +10,7 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class MongoEventCommit
     {

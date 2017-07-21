@@ -15,9 +15,8 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
-using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Infrastructure.GetEventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     internal sealed class EventStoreSubscription : DisposableObjectBase, IEventSubscription
     {

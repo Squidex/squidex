@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.domainObjectRepository = domainObjectRepository;
         }
 
-        public async Task CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate
+        public async Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate
         {
             Guard.NotNull(creator, nameof(creator));
             Guard.NotNull(context, nameof(context));
@@ -54,9 +54,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 context.Succeed(new EntityCreatedResult<Guid>(aggregate.Id, aggregate.Version));
             }
+
+            return aggregate;
         }
 
-        public async Task UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IAggregate
+        public async Task<T> UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IAggregate
         {
             Guard.NotNull(updater, nameof(updater));
             Guard.NotNull(context, nameof(context));
@@ -72,6 +74,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
             {
                 context.Succeed(new EntitySavedResult(aggregate.Version));
             }
+
+            return aggregate;
         }
 
         private static IAggregateCommand GetCommand(CommandContext context)

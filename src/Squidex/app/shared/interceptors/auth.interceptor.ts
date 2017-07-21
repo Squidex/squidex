@@ -49,11 +49,11 @@ export class AuthInterceptor implements HttpInterceptor {
                 } else if (error.status === 404 && (!user || user.isExpired)) {
                     this.authService.logoutRedirect();
 
-                    return Observable.empty<Response>();
-                }else if (error.status === 401 || error.status === 403) {
+                    return Observable.empty<HttpEvent<any>>();
+                } else if (error.status === 401 || error.status === 403) {
                     this.authService.logoutRedirect();
 
-                    return Observable.empty<Response>();
+                    return Observable.empty<HttpEvent<any>>();
                 }
                 return Observable.throw(error);
             });

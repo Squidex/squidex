@@ -9,7 +9,7 @@
 using System;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public class MongoEvent
     {

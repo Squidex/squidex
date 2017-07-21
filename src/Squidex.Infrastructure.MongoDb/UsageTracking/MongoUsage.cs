@@ -10,7 +10,7 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.MongoDb.UsageTracker
+namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsage
     {

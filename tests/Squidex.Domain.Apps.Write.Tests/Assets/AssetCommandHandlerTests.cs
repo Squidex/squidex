@@ -17,6 +17,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
+// ReSharper disable ImplicitlyCapturedClosure
 // ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Domain.Apps.Write.Assets
@@ -44,10 +45,10 @@ namespace Squidex.Domain.Apps.Write.Assets
         [Fact]
         public async Task Create_should_create_asset()
         {
-            SetupStore(0);
-            SetupImageInfo();
-
             var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
+
+            SetupStore(0, context.ContextId);
+            SetupImageInfo();
 
             await TestCreate(asset, async _ =>
             {
@@ -63,12 +64,12 @@ namespace Squidex.Domain.Apps.Write.Assets
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            SetupStore(1);
+            var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
+
+            SetupStore(1, context.ContextId);
             SetupImageInfo();
 
             CreateAsset();
-
-            var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
 
             await TestUpdate(asset, async _ =>
             {
@@ -117,10 +118,18 @@ namespace Squidex.Domain.Apps.Write.Assets
                 .Verifiable();
         }
 
-        private void SetupStore(long version)
+        private void SetupStore(long version, Guid commitId)
         {
             assetStore
-                .Setup(x => x.UploadAsync(assetId.ToString(), version, null, stream)).Returns(TaskHelper.Done)
+                .Setup(x => x.UploadTemporaryAsync(commitId.ToString(), stream)).Returns(TaskHelper.Done)
+                .Verifiable();
+
+            assetStore
+                .Setup(x => x.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null)).Returns(TaskHelper.Done)
+                .Verifiable();
+
+            assetStore
+                .Setup(x => x.DeleteTemporaryAsync(commitId.ToString())).Returns(TaskHelper.Done)
                 .Verifiable();
         }
     }

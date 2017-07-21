@@ -14,7 +14,7 @@ using StackExchange.Redis;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Infrastructure.Redis
+namespace Squidex.Infrastructure
 {
     internal sealed class RedisSubscription
     {

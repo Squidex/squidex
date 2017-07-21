@@ -15,7 +15,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.MongoDb.EventStore;
 
 // ReSharper disable InvertIf
 

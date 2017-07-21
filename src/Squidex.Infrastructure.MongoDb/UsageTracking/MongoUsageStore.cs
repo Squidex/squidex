@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Infrastructure.UsageTracking;
+using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Infrastructure.MongoDb.UsageTracker
+namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsageStore : MongoRepositoryBase<MongoUsage>, IUsageStore
     {

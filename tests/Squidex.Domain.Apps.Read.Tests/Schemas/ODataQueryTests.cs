@@ -18,15 +18,15 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Edm;
+using Squidex.Domain.Apps.Read.MongoDb.Contents;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
-using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 // ReSharper disable SpecifyACultureInStringConversionExplicitly
 
-namespace Squidex.Domain.Apps.Read.MongoDb.Contents
+namespace Squidex.Domain.Apps.Read.Schemas
 {
     public class ODataQueryTests
     {

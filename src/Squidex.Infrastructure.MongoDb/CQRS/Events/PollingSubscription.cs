@@ -8,13 +8,12 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Infrastructure.MongoDb.EventStore
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class PollingSubscription : DisposableObjectBase, IEventSubscription
     {

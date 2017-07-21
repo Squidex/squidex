@@ -11,12 +11,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Infrastructure.RabbitMq
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer
     {
