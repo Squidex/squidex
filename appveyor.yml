@@ -45,9 +45,9 @@ deploy:
 
 after_deploy:
   - cmd: >-
-    docker login -u="%DOCKER_USER%" -p="%DOCKER_PASS%"
-    docker push squidex/squidex:latest
-    docker push squidex/squidex:%APPVEYOR_BUILD_VERSION%
+      docker login -u="%DOCKER_USER%" -p="%DOCKER_PASS%"
+      docker push squidex/squidex:latest
+      docker push squidex/squidex:%APPVEYOR_BUILD_VERSION%
   
 artifacts:
   - path: release
