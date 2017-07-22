@@ -80,7 +80,7 @@ export class UsagesService {
     }
 
     public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto[]> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toStringFormat('YYYY-MM-DD')}/${toDate.toStringFormat('YYYY-MM-DD')}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return HTTP.getVersioned(this.http, url)
                 .map(response => {
@@ -97,7 +97,7 @@ export class UsagesService {
     }
 
     public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<StorageUsageDto[]> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toStringFormat('YYYY-MM-DD')}/${toDate.toStringFormat('YYYY-MM-DD')}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
         return HTTP.getVersioned(this.http, url)
                 .map(response => {
