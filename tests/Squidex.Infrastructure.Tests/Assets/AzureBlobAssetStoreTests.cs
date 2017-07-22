@@ -8,7 +8,7 @@
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class AzureBlobAssetStoreTests : AssetStoreTests<AzureBlobAssetStore>
+    internal class AzureBlobAssetStoreTests : AssetStoreTests<AzureBlobAssetStore>
     {
         public override AzureBlobAssetStore CreateStore()
         {
