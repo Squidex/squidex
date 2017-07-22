@@ -1,4 +1,4 @@
-![Squidex Logo](media/logo-wide.png "Squidex")
+![Squidex Logo](https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-wide.png "Squidex")
 
 # What is Squidex?
 
