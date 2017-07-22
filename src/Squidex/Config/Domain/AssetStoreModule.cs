@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Azure.Storage;
 
 // ReSharper disable InvertIf
 
@@ -64,36 +63,30 @@ namespace Squidex.Config.Domain
                     .As<IExternalSystem>()
                     .SingleInstance();
             }
-            else if (string.Equals(assetStoreType, "AzureBlobStorage", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(assetStoreType, "AzureBlob", StringComparison.OrdinalIgnoreCase))
             {
-                var containerName = Configuration.GetValue<string>("assetStore:azureStorage:containerName");
-                // NOTE: here it can be improved - if we use keyvault the secret key won't be in the app settings, rather the app has to run
-                // in the same active directory as the keyvault.
-                var connectionString = Configuration.GetValue<string>("assetStore:azureStorage:connectionString");
-
-                if (string.IsNullOrWhiteSpace(containerName))
-                {
-                    throw new ConfigurationException("Configure AssetStore AzureStorage container with 'assetStore:azureStorage:containerName'.");
-                }
+                var connectionString = Configuration.GetValue<string>("assetStore:azureBlob:connectionString");
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
-                    throw new ConfigurationException(
-                        "Configure AssetStore AzureStorage connection string with 'assetStore:azureStorage:connectionString'.");
+                    throw new ConfigurationException("Configure AssetStore AzureBlob connection string with 'assetStore:azureBlob:connectionString'.");
                 }
 
-                builder.Register(c => new StorageAccountManager(connectionString))
-                    .As<IStorageAccountManager>()
-                    .SingleInstance();
+                var containerName = Configuration.GetValue<string>("assetStore:azureBlob:containerName");
 
-                builder.Register(c => new AzureBlobAssetStore(c.Resolve<IStorageAccountManager>(), containerName))
+                if (string.IsNullOrWhiteSpace(containerName))
+                {
+                    throw new ConfigurationException("Configure AssetStore AzureBlob container with 'assetStore:azureBlob:containerName'.");
+                }
+
+                builder.Register(c => new AzureBlobAssetStore(connectionString, containerName))
                     .As<IAssetStore>()
                     .As<IExternalSystem>()
                     .SingleInstance();
             }
             else
             {
-                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: Folder, GoogleCloud.");
+                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: AzureBlob, Folder, GoogleCloud.");
             }
         }
     }

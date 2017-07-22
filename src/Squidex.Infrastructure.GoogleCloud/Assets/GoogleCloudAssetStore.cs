@@ -62,13 +62,9 @@ namespace Squidex.Infrastructure.Assets
             {
                 await storageClient.CopyObjectAsync(bucketName, name, bucketName, objectName);
             }
-            catch (GoogleApiException ex)
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                if (ex.HttpStatusCode == HttpStatusCode.NotFound)
-                {
-                    throw new AssetNotFoundException($"Asset {name} not found.", ex);
-                }
-                throw;
+                throw new AssetNotFoundException($"Asset {name} not found.", ex);
             }
         }
 
@@ -80,13 +76,9 @@ namespace Squidex.Infrastructure.Assets
             {
                 await storageClient.DownloadObjectAsync(bucketName, objectName, stream);
             }
-            catch (GoogleApiException ex)
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                if (ex.HttpStatusCode == HttpStatusCode.NotFound)
-                {
-                    throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
-                }
-                throw;
+                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
             }
         }
 
@@ -96,12 +88,9 @@ namespace Squidex.Infrastructure.Assets
             {
                 await storageClient.DeleteObjectAsync(bucketName, name);
             }
-            catch (GoogleApiException ex)
+            catch (GoogleApiException ex) when (ex.HttpStatusCode != HttpStatusCode.NotFound)
             {
-                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
-                {
-                    throw;
-                }
+                throw;
             }
         }
 
