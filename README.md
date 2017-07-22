@@ -22,8 +22,14 @@ Current Version 1.0-beta1
 
 ## Contributors
 
+### Core Team
+
 * [Qaisar Ahmad](http://www.qaisarahmad.com/) Interaction Designer, Pakistan
-* [Sebastian Stehle](https://github.com/SebastianStehle) Software Engineer, German (currently Sweden)
+* [Sebastian Stehle](https://github.com/SebastianStehle) Software Engineer, Germany (currently Sweden)
+
+### Contributors
+
+* [pushrbx](https://pushrbx.net/): Azure Store Support.
 
 ## Contributing
 
