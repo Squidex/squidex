@@ -36,9 +36,6 @@ test_script:
   - dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj
   - cd src/Squidex
   - npm run test:coverage
-
-before_deploy:
-  - docker login -u="%DOCKER_USER%" -p="%DOCKER_PASS%"
  
 deploy:
   - provider: GitHub
@@ -47,8 +44,10 @@ deploy:
     artifact: release.zip
 
 after_deploy:
-  - docker push squidex/squidex:latest
-  - docker push squidex/squidex:%APPVEYOR_BUILD_VERSION%
+  - cmd: >-
+    docker login -u="%DOCKER_USER%" -p="%DOCKER_PASS%"
+    docker push squidex/squidex:latest
+    docker push squidex/squidex:%APPVEYOR_BUILD_VERSION%
   
 artifacts:
   - path: release
