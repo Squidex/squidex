@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Timers
         {
             if (initialDelay > 0)
             {
-                await WaitAsync(initialDelay);
+                await WaitAsync(initialDelay).ConfigureAwait(false);
             }
 
             while (requiresAtLeastOne == 2 || !disposeToken.IsCancellationRequested)
@@ -61,11 +61,15 @@ namespace Squidex.Infrastructure.Timers
                 {
                     await callback(disposeToken.Token).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) { }
+                catch (OperationCanceledException)
+                {
+                }
+                finally
+                {
+                    requiresAtLeastOne = 1;
+                }
 
-                requiresAtLeastOne = 1;
-
-                await WaitAsync(delay);
+                await WaitAsync(delay).ConfigureAwait(false);
             }
         }
 
@@ -80,7 +84,9 @@ namespace Squidex.Infrastructure.Timers
                     await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
                 }
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
         }
     }
 }

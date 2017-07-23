@@ -18,12 +18,12 @@ namespace Squidex.Infrastructure.Timers
         {
             var called = false;
 
-            var timer = new CompletionTimer(20000, ct =>
+            var timer = new CompletionTimer(2000, ct =>
             {
                 called = true;
 
                 return TaskHelper.Done;
-            }, 20000);
+            }, 2000);
 
             timer.Wakeup();
             timer.Dispose();
