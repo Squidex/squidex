@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,38 +18,17 @@ namespace Squidex.Infrastructure.Timers
     {
         private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Task runTask;
-        private CancellationTokenSource delayToken;
+        private int requiresAtLeastOne;
+        private CancellationTokenSource wakeupToken;
         
-        public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback)
+        public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
             Guard.NotNull(callback, nameof(callback));
             Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
 
-            runTask = RunInternal(delayInMs, callback);
+            runTask = RunInternal(delayInMs, initialDelay, callback);
         }
 
-        private async Task RunInternal(int delay, Func<CancellationToken, Task> callback)
-        {
-            while (!disposeToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await callback(disposeToken.Token).ConfigureAwait(false);
-
-                    delayToken = new CancellationTokenSource();
-
-                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(disposeToken.Token, delayToken.Token))
-                    {
-                        await Task.Delay(delay, cts.Token).ConfigureAwait(false);
-                    }
-                }
-                catch (TaskCanceledException)
-                {
-                    Debug.WriteLine("Task in TriggerTimer has been cancelled.");
-                }
-            }
-        }
-        
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
@@ -65,7 +43,44 @@ namespace Squidex.Infrastructure.Timers
         {
             ThrowIfDisposed();
 
-            delayToken?.Cancel();
+            Interlocked.CompareExchange(ref requiresAtLeastOne, 2, 0);
+
+            wakeupToken?.Cancel();
+        }
+
+        private async Task RunInternal(int delay, int initialDelay, Func<CancellationToken, Task> callback)
+        {
+            if (initialDelay > 0)
+            {
+                await WaitAsync(initialDelay);
+            }
+
+            while (requiresAtLeastOne == 2 || !disposeToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await callback(disposeToken.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) { }
+
+                requiresAtLeastOne = 1;
+
+                await WaitAsync(delay);
+            }
+        }
+
+        private async Task WaitAsync(int intervall)
+        {
+            try
+            {
+                wakeupToken = new CancellationTokenSource();
+
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(disposeToken.Token, wakeupToken.Token))
+                {
+                    await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException) { }
         }
     }
 }
