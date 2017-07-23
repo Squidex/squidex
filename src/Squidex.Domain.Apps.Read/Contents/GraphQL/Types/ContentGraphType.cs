@@ -9,27 +9,27 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
-using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
     {
-        private readonly Schema schema;
+        private readonly ISchemaEntity schemaEntity;
         private readonly IGraphQLContext context;
 
-        public ContentGraphType(Schema schema, IGraphQLContext context)
+        public ContentGraphType(ISchemaEntity schemaEntity, IGraphQLContext context)
         {
-            this.schema = schema;
             this.context = context;
+            this.schemaEntity = schemaEntity;
 
-            Name = $"{schema.Name.ToPascalCase()}Dto";
+            Name = $"{schemaEntity.Name.ToPascalCase()}Dto";
         }
 
         public void Initialize()
         {
-            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
+            var schemaName = schemaEntity.Schema.Properties.Label.WithFallback(schemaEntity.Name);
 
             AddField(new FieldType
             {
@@ -81,9 +81,17 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "url",
+                Resolver = context.ResolveContentUrl(schemaEntity),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = $"The url to the the {schemaName} content."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "data",
                 Resolver = Resolver(x => x.Data),
-                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema, context)),
+                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schemaEntity.Schema, context)),
                 Description = $"The data of the {schemaName} content."
             });
 

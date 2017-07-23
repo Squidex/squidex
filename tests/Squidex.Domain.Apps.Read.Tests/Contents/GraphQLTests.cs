@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             schemaRepository.Setup(x => x.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(schemas));
 
-            sut = new CachingGraphQLInvoker(cache, schemaRepository.Object, assetRepository.Object, contentRepository.Object);
+            sut = new CachingGraphQLInvoker(cache, schemaRepository.Object, assetRepository.Object, contentRepository.Object, new FakeUrlGenerator());
         }
 
         [Fact]
@@ -97,6 +97,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                     createdBy
                     lastModified
                     lastModifiedBy
+                    url
+                    thumbnailUrl
                     mimeType
                     fileName
                     fileSize
@@ -131,6 +133,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                             createdBy = "subject:user1",
                             lastModified = assetEntity.LastModified.ToDateTimeUtc(),
                             lastModifiedBy = "subject:user2",
+                            url = $"assets/{assetEntity.Id}",
+                            thumbnailUrl = $"assets/{assetEntity.Id}?width=100",
                             mimeType = "image/png",
                             fileName = "MyFile.png",
                             fileSize = 1024,
@@ -163,6 +167,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                     createdBy
                     lastModified
                     lastModifiedBy
+                    url
+                    thumbnailUrl
                     mimeType
                     fileName
                     fileSize
@@ -191,6 +197,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                         createdBy = "subject:user1",
                         lastModified = assetEntity.LastModified.ToDateTimeUtc(),
                         lastModifiedBy = "subject:user2",
+                        url = $"assets/{assetEntity.Id}",
+                        thumbnailUrl = $"assets/{assetEntity.Id}?width=100",
                         mimeType = "image/png",
                         fileName = "MyFile.png",
                         fileSize = 1024,
@@ -219,6 +227,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     createdBy
                     lastModified
                     lastModifiedBy
+                    url
                     data {
                       myString {
                         iv
@@ -266,6 +275,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                             createdBy = "subject:user1",
                             lastModified = contentEntity.LastModified.ToDateTimeUtc(),
                             lastModifiedBy = "subject:user2",
+                            url = $"contents/my-schema/{contentEntity.Id}",
                             data = new
                             {
                                 myString = new
@@ -325,6 +335,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     createdBy
                     lastModified
                     lastModifiedBy
+                    url
                     data {{
                       myString {{
                         iv
@@ -366,6 +377,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                         createdBy = "subject:user1",
                         lastModified = contentEntity.LastModified.ToDateTimeUtc(),
                         lastModifiedBy = "subject:user2",
+                        url = $"contents/my-schema/{contentEntity.Id}",
                         data = new
                         {
                             myString = new

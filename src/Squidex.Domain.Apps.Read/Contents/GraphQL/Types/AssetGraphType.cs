@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class AssetGraphType : ObjectGraphType<IAssetEntity>
     {
-        public AssetGraphType()
+        public AssetGraphType(IGraphQLContext context)
         {
             Name = "AssetDto";
 
@@ -73,6 +73,22 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Resolver = Resolver(x => x.MimeType),
                 ResolvedType = new NonNullGraphType(new StringGraphType()),
                 Description = "The mime type."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "url",
+                Resolver = context.ResolveAssetUrl(),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = "The url to the asset."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "thumbnailUrl",
+                Resolver = context.ResolveAssetThumbnailUrl(),
+                ResolvedType = new StringGraphType(),
+                Description = "The thumbnail url to the asset."
             });
 
             AddField(new FieldType

@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Pipeline;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -62,6 +63,10 @@ namespace Squidex.Config.Domain
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
                 .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<GraphQLUrlGenerator>()
+                .As<IGraphQLUrlGenerator>()
                 .SingleInstance();
 
             builder.RegisterType<AssetUserPictureStore>()

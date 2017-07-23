@@ -92,7 +92,7 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
             let source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop`;
 
             if (this.query !== null) {
-                source += `q=${this.query}`;
+                source += `&q=${this.query}`;
             }
 
             this.renderer.setElementAttribute(this.element.nativeElement, 'src', source);

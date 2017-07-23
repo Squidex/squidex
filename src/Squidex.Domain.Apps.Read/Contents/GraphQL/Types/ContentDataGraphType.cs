@@ -52,8 +52,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     fieldGraphType.Description = $"The structure of the {fieldName} of a {schemaName} content type.";
 
-                    var fieldResolver =
-                        new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
+                    var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
 
                     AddField(new FieldType
                     {

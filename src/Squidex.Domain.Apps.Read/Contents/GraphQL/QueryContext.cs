@@ -28,16 +28,24 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly ConcurrentDictionary<Guid, IAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IAssetEntity>();
         private readonly IContentRepository contentRepository;
         private readonly IAssetRepository assetRepository;
+        private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAppEntity app;
 
-        public QueryContext(IAppEntity app, IContentRepository contentRepository, IAssetRepository assetRepository)
+        public IGraphQLUrlGenerator UrlGenerator
+        {
+            get { return urlGenerator; }
+        }
+
+        public QueryContext(IAppEntity app, IContentRepository contentRepository, IAssetRepository assetRepository, IGraphQLUrlGenerator urlGenerator)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
             Guard.NotNull(app, nameof(app));
 
             this.contentRepository = contentRepository;
             this.assetRepository = assetRepository;
+            this.urlGenerator = urlGenerator;
 
             this.app = app;
         }

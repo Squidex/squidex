@@ -17,11 +17,13 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
 
+// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable InvertIf
 // ReSharper disable ParameterHidesMember
@@ -34,14 +36,19 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly Dictionary<Guid, ContentGraphType> schemaTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly Dictionary<Guid, ISchemaEntity> schemas;
         private readonly PartitionResolver partitionResolver;
-        private readonly IGraphType assetType = new AssetGraphType();
+        private readonly IAppEntity appEntity;
+        private readonly IGraphType assetType;
+        private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
-        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public GraphQLModel(IAppEntity appEntity, IEnumerable<ISchemaEntity> schemas)
         {
-            partitionResolver = app.PartitionResolver;
+            this.appEntity = appEntity;
+
+            partitionResolver = appEntity.PartitionResolver;
             
-            IGraphType assetListType = new ListGraphType(new NonNullGraphType(assetType));
+            assetType = new AssetGraphType(this);
+            assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
             fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
             {
@@ -92,6 +99,42 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(string name)
         {
             return (new NoopGraphType(name), new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+        }
+
+        public IFieldResolver ResolveAssetUrl()
+        {
+            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+
+                return context.UrlGenerator.GenerateAssetUrl(appEntity, c.Source);
+            });
+
+            return resolver;
+        }
+
+        public IFieldResolver ResolveAssetThumbnailUrl()
+        {
+            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+
+                return context.UrlGenerator.GenerateAssetThumbnailUrl(appEntity, c.Source);
+            });
+
+            return resolver;
+        }
+
+        public IFieldResolver ResolveContentUrl(ISchemaEntity schemaEntity)
+        {
+            var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+
+                return context.UrlGenerator.GenerateContentUrl(appEntity, schemaEntity, c.Source);
+            });
+
+            return resolver;
         }
 
         private static ValueTuple<IGraphType, IFieldResolver> ResolveAssets(IGraphType assetListType)
@@ -172,7 +215,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         {
             var schemaEntity = schemas.GetOrDefault(schemaId);
 
-            return schemaEntity != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schemaEntity.Schema, this)) : null;
+            return schemaEntity != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schemaEntity, this)) : null;
         }
     }
 }

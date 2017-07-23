@@ -11,6 +11,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
@@ -21,6 +22,12 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         IGraphType GetAssetType();
 
         IGraphType GetSchemaType(Guid schemaId);
+
+        IFieldResolver ResolveAssetUrl();
+
+        IFieldResolver ResolveAssetThumbnailUrl();
+
+        IFieldResolver ResolveContentUrl(ISchemaEntity schemaEntity);
 
         (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
     }
