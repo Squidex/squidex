@@ -1,0 +1,49 @@
+pipeline:
+  test_pull_request:
+    image: docker
+    commands:
+      - docker build -t squidex/squidex:test_pull_request .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker
+    when:
+      event: pull_request
+
+  build_dev:
+    image: docker
+    commands:
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - docker build -t squidex/squidex:dev .
+      - docker push squidex/squidex:dev
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: push
+
+  build_release:
+    image: docker
+    commands:
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - docker build -t squidex/squidex:latest -t squidex/squidex:$TAG .
+      - docker push squidex/squidex:latest
+      - docker push squidex/squidex:$TAG
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker
+    environment:
+      - TAG=${DRONE_TAG}
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: tag
+
+  slack:
+    image: plugins/slack
+    secrets: [ slack_webhook ]
+    template: >
+      {{#success build.status}}
+        build {{build.number}} succeeded. Good job.
+      {{else}}
+        build {{build.number}} failed. Fix me please.
+      {{/success}}
