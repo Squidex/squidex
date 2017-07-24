@@ -44,8 +44,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             Guard.NotNullOrEmpty(exchange, nameof(exchange));
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
 
-            connectionFactory = new ConnectionFactory { Uri = uri };
-
+            connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
             channel = new Lazy<IModel>(() => connection.Value.CreateModel());
 

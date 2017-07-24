@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 if (fieldInfo.ResolveType != null)
                 {
                     var fieldName = field.RawProperties.Label.WithFallback(field.Name);
+
                     var fieldGraphType = new ObjectGraphType
                     {
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
