@@ -29,7 +29,7 @@ RUN phantomjs --version
 
 COPY src/Squidex/package.json /tmp/package.json
 
-# Install Node Packages 
+# Install Node packages 
 RUN cd /tmp && npm install
 
 COPY . .
@@ -59,10 +59,12 @@ RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Rel
 #
 FROM microsoft/aspnetcore:1.1.2
 
-# Default AspNet Core Workdir
+# Default AspNetCore directory
 WORKDIR /app
 
-# Copy from Build Stage
+# Copy from nuild stage
 COPY --from=builder /out/ .
+
+EXPOSE 80
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
