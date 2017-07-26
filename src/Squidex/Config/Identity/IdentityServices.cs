@@ -98,7 +98,7 @@ namespace Squidex.Config.Identity
 
             services.AddIdentityServer(options =>
                 {
-                    options.UserInteraction.ErrorUrl = "/account/error/";
+                    options.UserInteraction.ErrorUrl = "/error/";
                 })
                 .AddAspNetIdentity<IUser>()
                 .AddInMemoryApiResources(GetApiResources())

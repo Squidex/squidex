@@ -36,7 +36,7 @@ namespace Squidex.Config.Identity
             return app;
         }
 
-        public static IApplicationBuilder UseAdminRole(this IApplicationBuilder app)
+        public static IApplicationBuilder UseMyAdminRole(this IApplicationBuilder app)
         {
             var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IRole>>();
             var roleFactory = app.ApplicationServices.GetRequiredService<IRoleFactory>();
