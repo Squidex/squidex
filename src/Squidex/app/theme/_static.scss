@@ -94,7 +94,7 @@ noscript {
         &-text {
             color: darken($color-border, 15%);
             display: inline-block;
-            background: $color-background;
+            background: $color-dark-foreground;
             border: 0;
             bottom: -.7rem;
             position: relative;

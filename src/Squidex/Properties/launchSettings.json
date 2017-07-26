@@ -18,8 +18,11 @@
       "commandName": "Project",
       "launchUrl": "http://localhost:5000",
       "environmentVariables": {
+        "IDENTITY__ADMINEMAIL": "sebastian@squidex.io",
+        "IDENTITY__ADMINPASSWORD": "1Xhn2a3b4!?",
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:5000"
     }
   }
 }

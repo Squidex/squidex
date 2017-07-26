@@ -26,8 +26,6 @@ namespace Squidex.Config.Identity
 
         public string MicrosoftSecret { get; set; }
 
-        public bool EnforceAdmin { get; set; }
-
         public bool RequiresHttps { get; set; }
 
         public bool AllowPasswordAuth { get; set; }
