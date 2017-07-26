@@ -68,7 +68,9 @@ namespace Squidex.Config.Identity
                     {
                         try
                         {
-                            await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
+                            var user =  await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
+
+                            await userManager.AddToRoleAsync(user, SquidexRoles.Administrator);
                         }
                         catch (Exception ex)
                         {
