@@ -44,7 +44,7 @@
   "devDependencies": {
     "@angular/compiler-cli": "4.3.0",
     "@angular/tsc-wrapped": "4.3.0",
-    "@ngtools/webpack": "1.5.1",
+    "@ngtools/webpack": "1.5.3",
     "@types/core-js": "0.9.35",
     "@types/jasmine": "2.5.43",
     "@types/mousetrap": "1.5.33",
