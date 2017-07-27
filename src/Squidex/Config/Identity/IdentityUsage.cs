@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -93,9 +94,18 @@ namespace Squidex.Config.Identity
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
             {
-                var apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityPrefix);
-
                 var identityOptions = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
+
+                string apiAuthorityUrl;
+
+                if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
+                {
+                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityPrefix);
+                }
+                else
+                {
+                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityPrefix);
+                }
 
                 app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
                 {

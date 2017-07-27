@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Config
@@ -23,17 +22,8 @@ namespace Squidex.Config
             {
                 throw new ConfigurationException("Configure BaseUrl with 'urls:baseUrl'.");
             }
-
-            var url = $"{BaseUrl.TrimEnd('/')}/{path.Trim('/')}";
-
-            if (trailingSlash &&
-                url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
-                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                url = url + "/";
-            }
-
-            return url;
+            
+            return BaseUrl.BuildFullUrl(path, trailingSlash);
         }
     }
 }
