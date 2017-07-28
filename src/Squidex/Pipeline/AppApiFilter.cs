@@ -81,13 +81,19 @@ namespace Squidex.Pipeline
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppOwner));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppReader));
                         break;
                     case PermissionLevel.Developer:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppDeveloper));
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppReader));
                         break;
                     case PermissionLevel.Editor:
                         defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppEditor));
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppReader));
+                        break;
+                    case PermissionLevel.Reader:
+                        defaultIdentity.AddClaim(new Claim(defaultIdentity.RoleClaimType, SquidexRoles.AppReader));
                         break;
                 }
 
@@ -97,20 +103,14 @@ namespace Squidex.Pipeline
 
         private static PermissionLevel? FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
-            var clientId = user.FindFirst(OpenIdClaims.ClientId)?.Value;
+            var client = app.Clients.FirstOrDefault(x => string.Equals(x.Id, user.GetClientId(), StringComparison.OrdinalIgnoreCase));
 
-            var clientIdParts = clientId?.Split(':');
-
-            if (clientIdParts?.Length != 2)
+            if (client == null)
             {
                 return null;
             }
 
-            clientId = clientIdParts[1];
-
-            var contributor = app.Clients.FirstOrDefault(x => string.Equals(x.Id, clientId, StringComparison.OrdinalIgnoreCase));
-
-            return contributor != null ? PermissionLevel.Owner : PermissionLevel.Editor;
+            return client.IsReader ? PermissionLevel.Reader : PermissionLevel.Editor;
         }
 
         private static PermissionLevel? FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)

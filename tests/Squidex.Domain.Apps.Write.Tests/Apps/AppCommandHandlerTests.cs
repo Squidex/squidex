@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             CreateApp()
                 .AttachClient(CreateCommand(new AttachClient { Id = clientName }));
 
-            var context = CreateContextForCommand(new RenameClient { Id = clientName, Name = "New Name" });
+            var context = CreateContextForCommand(new UpdateClient { Id = clientName, Name = "New Name" });
 
             await TestUpdate(app, async _ =>
             {

@@ -1,21 +1,20 @@
 ﻿// ==========================================================================
-//  IAppClientEntity.cs
+//  AppClientChanged.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Read.Apps
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public interface IAppClientEntity
+    [TypeName("AppClientChangedEvent")]
+    public sealed class AppClientChanged : AppEvent
     {
-        string Id { get; }
+        public string Id { get; set; }
 
-        string Name { get; }
-
-        string Secret { get; }
-
-        bool IsReader { get; }
+        public bool IsReader { get; set; }
     }
 }

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
@@ -48,11 +47,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             get { return contributors.Count; }
         }
 
-        public IReadOnlyDictionary<string, AppClient> Clients
-        {
-            get { return clients.Clients; }
-        }
-
         public AppDomainObject(Guid id, int version) 
             : base(id, version)
         {
@@ -76,6 +70,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         protected void On(AppClientAttached @event)
         {
             clients.Add(@event.Id, @event.Secret);
+        }
+
+        protected void On(AppClientChanged @event)
+        {
+            clients.Change(@event.Id, @event.IsReader);
         }
 
         protected void On(AppClientRenamed @event)
@@ -131,6 +130,25 @@ namespace Squidex.Domain.Apps.Write.Apps
             return this;
         }
 
+        public AppDomainObject UpdateClient(UpdateClient command)
+        {
+            Guard.Valid(command, nameof(command), () => "Cannot rename client");
+
+            ThrowIfNotCreated();
+
+            if (!string.IsNullOrWhiteSpace(command.Name))
+            {
+                RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
+            }
+
+            if (command.IsReader.HasValue)
+            {
+                RaiseEvent(SimpleMapper.Map(command, new AppClientChanged { IsReader = command.IsReader.Value }));
+            }
+
+            return this;
+        }
+
         public AppDomainObject AssignContributor(AssignContributor command)
         {
             Guard.Valid(command, nameof(command), () => "Cannot assign contributor");
@@ -160,17 +178,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientAttached()));
-
-            return this;
-        }
-
-        public AppDomainObject RenameClient(RenameClient command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot rename client");
-
-            ThrowIfNotCreated();
-
-            RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
 
             return this;
         }

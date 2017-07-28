@@ -338,66 +338,79 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void RenameClient_should_throw_exception_if_not_created()
+        public void UpdateClient_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.RenameClient(CreateCommand(new RenameClient { Id = "not-found", Name = clientNewName }));
+                sut.UpdateClient(CreateCommand(new UpdateClient { Id = "not-found", Name = clientNewName }));
             });
         }
 
         [Fact]
-        public void RenameClient_should_throw_exception_if_command_is_not_valid()
+        public void UpdateClient_should_throw_exception_if_command_is_not_valid()
         {
             CreateApp();
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.RenameClient(CreateCommand(new RenameClient()));
+                sut.UpdateClient(CreateCommand(new UpdateClient()));
             });
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.RenameClient(CreateCommand(new RenameClient { Id = string.Empty }));
+                sut.UpdateClient(CreateCommand(new UpdateClient { Id = string.Empty }));
             });
         }
 
         [Fact]
-        public void RenameClient_should_throw_exception_if_client_not_found()
+        public void UpdateClient_should_throw_exception_if_client_not_found()
         {
             CreateApp();
 
             Assert.Throws<DomainObjectNotFoundException>(() =>
             {
-                sut.RenameClient(CreateCommand(new RenameClient { Id = "not-found", Name = clientNewName }));
+                sut.UpdateClient(CreateCommand(new UpdateClient { Id = "not-found", Name = clientNewName }));
             });
         }
 
         [Fact]
-        public void RenameClient_should_throw_exception_if_same_client_name()
+        public void UpdateClient_should_throw_exception_if_client_has_same_reader_state()
         {
             CreateApp();
             CreateClient();
-
-            sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
+                sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, IsReader = false }));
             });
         }
 
         [Fact]
-        public void RenameClient_should_create_events()
+        public void UpdateClient_should_throw_exception_if_same_client_name()
         {
             CreateApp();
             CreateClient();
 
-            sut.RenameClient(CreateCommand(new RenameClient { Id = clientId, Name = clientNewName }));
+            sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName }));
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName }));
+            });
+        }
+
+        [Fact]
+        public void UpdateClient_should_create_events()
+        {
+            CreateApp();
+            CreateClient();
+
+            sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName, IsReader = true }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName })
+                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
+                    CreateEvent(new AppClientChanged { Id = clientId, IsReader = true })
                 );
         }
 

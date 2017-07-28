@@ -123,9 +123,9 @@ namespace Squidex.Domain.Apps.Write.Apps
             return handler.UpdateAsync<AppDomainObject>(context, a => a.RemoveContributor(command));
         }
 
-        protected Task On(RenameClient command, CommandContext context)
+        protected Task On(UpdateClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.RenameClient(command));
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateClient(command));
         }
 
         protected Task On(RevokeClient command, CommandContext context)

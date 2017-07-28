@@ -25,17 +25,23 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public void Add(string id, string secret)
         {
-            ThrowIfFound(id, () => "Cannot rename client");
+            ThrowIfFound(id, () => "Cannot add client");
 
-            clients[id] = new AppClient(id, secret);
+            clients[id] = new AppClient(secret, id, false);
         }
 
         public void Rename(string clientId, string name)
         {
             ThrowIfNotFound(clientId);
-            ThrowIfSameName(clientId, name, () => "Cannot rename client");
 
-            clients[clientId] = clients[clientId].Rename(name);
+            clients[clientId] = clients[clientId].Rename(name, () => "Cannot rename client");
+        }
+
+        public void Change(string clientId, bool isReader)
+        {
+            ThrowIfNotFound(clientId);
+
+            clients[clientId] = clients[clientId].Change(isReader, () => "Cannot change client");
         }
 
         public void Revoke(string clientId)
@@ -58,16 +64,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             if (clients.ContainsKey(clientId))
             {
                 var error = new ValidationError("Client id is alreay part of the app", "Id");
-
-                throw new ValidationException(message(), error);
-            }
-        }
-
-        private void ThrowIfSameName(string clientId, string name, Func<string> message)
-        {
-            if (string.Equals(clients[clientId].Name, name))
-            {
-                var error = new ValidationError("Client already has the name", "Id");
 
                 throw new ValidationException(message(), error);
             }

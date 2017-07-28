@@ -103,7 +103,7 @@ namespace Squidex.Controllers.Api.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateClient { Id = clientId }));
 
             return NoContent();
         }

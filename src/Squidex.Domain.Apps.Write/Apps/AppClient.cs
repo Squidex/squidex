@@ -6,44 +6,51 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure;
+
+// ReSharper disable InvertIf
 
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public sealed class AppClient
     {
         private readonly string name;
-        private readonly string id;
         private readonly string secret;
+        private readonly bool isReader;
 
-        public string Id
+        public AppClient(string secret, string name, bool isReader)
         {
-            get { return id; }
-        }
-
-        public string Name
-        {
-            get { return name ?? Id; }
-        }
-
-        public string Secret
-        {
-            get { return secret; }
-        }
-
-        public AppClient(string id, string secret, string name = null)
-        {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
-
-            this.id = id;
+            
             this.name = name;
             this.secret = secret;
+            this.isReader = isReader;
         }
 
-        public AppClient Rename(string newName)
+        public AppClient Change(bool newIsReader, Func<string> message)
         {
-            return new AppClient(Id, Secret, newName);
+            if (isReader == newIsReader)
+            {
+                var error = new ValidationError("Client has already the reader state.", "IsReader");
+
+                throw new ValidationException(message(), error);
+            }
+
+            return new AppClient(secret, name, newIsReader);
+        }
+
+        public AppClient Rename(string newName, Func<string> message)
+        {
+            if (string.Equals(name, newName))
+            {
+                var error = new ValidationError("Client already has the name", "Id");
+
+                throw new ValidationException(message(), error);
+            }
+
+            return new AppClient(secret, newName, isReader);
         }
     }
 }

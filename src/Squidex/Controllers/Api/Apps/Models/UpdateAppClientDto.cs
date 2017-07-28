@@ -15,8 +15,12 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// <summary>
         /// The new display name of the client.
         /// </summary>
-        [Required]
         [StringLength(20)]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Determines if the client is a reader.
+        /// </summary>
+        public bool IsReader { get; set; }
     }
 }

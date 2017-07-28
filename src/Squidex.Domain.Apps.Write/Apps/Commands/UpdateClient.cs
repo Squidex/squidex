@@ -11,22 +11,24 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public class RenameClient : AppAggregateCommand, IValidatable
+    public class UpdateClient : AppAggregateCommand, IValidatable
     {
         public string Id { get; set; }
 
         public string Name { get; set; }
 
+        public bool? IsReader { get; set; }
+
         public void Validate(IList<ValidationError> errors)
         {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                errors.Add(new ValidationError("Name cannot be null or empty", nameof(Name)));
-            }
-
             if (!Id.IsSlug())
             {
                 errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
+            }
+
+            if (string.IsNullOrWhiteSpace(Name) && IsReader == null)
+            {
+                errors.Add(new ValidationError("Either name or IsReader must be defined.", nameof(Name), nameof(IsReader)));
             }
         }
     }
