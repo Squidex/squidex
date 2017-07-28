@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Security.Claims;
 
@@ -41,6 +42,11 @@ namespace Squidex.Infrastructure.Security
         public static string OpenIdEmail(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Email)?.Value;
+        }
+
+        public static bool IsInClient(this ClaimsPrincipal principal, string client)
+        {
+            return principal.Claims.Any(x => x.Type == OpenIdClaims.ClientId && string.Equals(x.Value, client, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

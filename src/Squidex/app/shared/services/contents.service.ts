@@ -73,7 +73,7 @@ export class ContentsService {
             fullQuery += `&ids=${ids.join(',')}`;
         }
 
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?nonPublished=true&hidden=true${fullQuery}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
         return HTTP.getVersioned(this.http, url)
                 .map(response => {

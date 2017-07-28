@@ -1,18 +1,21 @@
 ﻿// ==========================================================================
-//  PermissionLevel.cs
+//  MustBeAppReaderAttribute.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Apps
+using Microsoft.AspNetCore.Authorization;
+using Squidex.Shared.Identity;
+
+namespace Squidex.Pipeline
 {
-    public enum PermissionLevel
+    public sealed class MustBeAppReaderAttribute : AuthorizeAttribute
     {
-        Owner,
-        Developer,
-        Editor,
-        Reader
+        public MustBeAppReaderAttribute()
+        {
+            Roles = SquidexRoles.AppReader;
+        }
     }
 }

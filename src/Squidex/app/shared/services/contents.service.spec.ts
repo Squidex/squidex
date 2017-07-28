@@ -45,7 +45,7 @@ describe('ContentsService', () => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$top=17&$skip=13');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -100,7 +100,7 @@ describe('ContentsService', () => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$search="my-query"&$top=17&$skip=13');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -117,7 +117,7 @@ describe('ContentsService', () => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$top=17&$skip=13&ids=id1,id2');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -134,7 +134,7 @@ describe('ContentsService', () => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?nonPublished=true&hidden=true&$filter=my-filter&$top=17&$skip=13');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

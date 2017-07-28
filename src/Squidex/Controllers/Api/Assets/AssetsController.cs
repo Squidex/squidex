@@ -30,7 +30,6 @@ namespace Squidex.Controllers.Api.Assets
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Assets")]
@@ -71,6 +70,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <remarks>
         /// Get all assets for the app. Mime types can be comma-separated, e.g. application/json,text/html.
         /// </remarks>
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
@@ -123,6 +123,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
@@ -156,6 +157,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <remarks>
         /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and must be defined correctly.
         /// </remarks>
+        [MustBeAppEditor]
         [HttpPost]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
@@ -184,6 +186,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 404 => Asset or app not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
+        [MustBeAppEditor]
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content")]
         [ProducesResponseType(typeof(AssetReplacedDto), 201)]
@@ -213,6 +216,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 400 => Asset name not valid.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppReader]
         [HttpPut]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
@@ -235,6 +239,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 204 => Asset has been deleted.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppEditor]
         [HttpDelete]
         [Route("apps/{app}/assets/{id}/")]
         [ApiCosts(1)]

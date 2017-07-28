@@ -1,18 +1,22 @@
 ﻿// ==========================================================================
-//  PermissionLevel.cs
+//  Extensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Apps
+using System.Security.Claims;
+using Squidex.Config;
+using Squidex.Infrastructure.Security;
+
+namespace Squidex.Pipeline
 {
-    public enum PermissionLevel
+    public static class Extensions
     {
-        Owner,
-        Developer,
-        Editor,
-        Reader
+        public static bool IsFrontendClient(this ClaimsPrincipal principal)
+        {
+            return principal.IsInClient(Constants.FrontendClient);
+        }
     }
 }
