@@ -80,10 +80,10 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public renameClient(client: AppClientDto, name: string) {
-        const request = new UpdateAppClientDto(name);
+        const requestDto = new UpdateAppClientDto(name);
 
         this.appNameOnce()
-            .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.replace(client, rename(client, name)));
             }, error => {
@@ -92,10 +92,10 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 
     public changeClient(client: AppClientDto, isReader: boolean) {
-        const request = new UpdateAppClientDto(undefined, isReader);
+        const requestDto = new UpdateAppClientDto(undefined, isReader);
 
         this.appNameOnce()
-            .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.version))
             .subscribe(() => {
                 this.updateClients(this.appClients.replace(client, change(client, isReader)));
             }, error => {
@@ -103,15 +103,10 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public resetClientForm() {
-        this.addClientFormSubmitted = false;
-        this.addClientForm.enable();
-        this.addClientForm.reset();
-    }
-
     public attachClient() {
+        this.addClientFormSubmitted = true;
+
         if (this.addClientForm.valid) {
-            this.addClientFormSubmitted = true;
             this.addClientForm.disable();
 
             const requestDto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
@@ -120,12 +115,18 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
                 .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.push(dto));
-                    this.resetClientForm();
                 }, error => {
                     this.notifyError(error);
+                }, () => {
                     this.resetClientForm();
                 });
         }
+    }
+
+    public resetClientForm() {
+        this.addClientFormSubmitted = false;
+        this.addClientForm.enable();
+        this.addClientForm.reset();
     }
 
     private updateClients(clients: ImmutableArray<AppClientDto>) {

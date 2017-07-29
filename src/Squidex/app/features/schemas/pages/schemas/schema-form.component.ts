@@ -31,14 +31,14 @@ const FALLBACK_NAME = 'my-schema';
     ]
 })
 export class SchemaFormComponent {
-    @Input()
-    public appName: string;
-
     @Output()
     public created = new EventEmitter<SchemaDto>();
 
     @Output()
     public cancelled = new EventEmitter();
+
+    @Input()
+    public appName: string;
 
     public showImport = false;
 

@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import {
     AppComponentBase,
     AppContributorDto,
+    AppContributorsDto,
     AppContributorsService,
     AppsStoreService,
     AuthService,
@@ -100,9 +101,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         this.appNameOnce()
             .switchMap(app => this.appContributorsService.getContributors(app, this.version).retry(2))
             .subscribe(dto => {
-                this.updateContributors(ImmutableArray.of(dto.contributors));
-
-                this.maxContributors = dto.maxContributors;
+                this.updateContributorsFromDto(dto);
             }, error => {
                 this.notifyError(error);
             });
@@ -118,20 +117,6 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
             });
     }
 
-    public assignContributor() {
-        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
-
-        this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
-            .subscribe(() => {
-                this.updateContributors(this.appContributors.push(requestDto));
-            }, error => {
-                this.notifyError(error);
-            });
-
-        this.addContributorForm.reset();
-    }
-
     public changePermission(contributor: AppContributorDto, permission: string) {
         const requestDto = changePermission(contributor, permission);
 
@@ -142,6 +127,26 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public assignContributor() {
+        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
+
+        this.appNameOnce()
+            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
+            .subscribe(() => {
+                this.updateContributors(this.appContributors.push(requestDto));
+            }, error => {
+                this.notifyError(error);
+            }, () => {
+                this.addContributorForm.reset();
+            });
+    }
+
+    private updateContributorsFromDto(dto: AppContributorsDto) {
+        this.updateContributors(ImmutableArray.of(dto.contributors));
+
+        this.maxContributors = dto.maxContributors;
     }
 
     private updateContributors(contributors: ImmutableArray<AppContributorDto>) {

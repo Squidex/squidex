@@ -25,8 +25,6 @@ import {
     ]
 })
 export class FieldComponent implements OnInit {
-    public dropdown = new ModalView(false, true);
-
     @Input()
     public field: FieldDto;
 
@@ -50,6 +48,8 @@ export class FieldComponent implements OnInit {
 
     @Output()
     public deleting = new EventEmitter<FieldDto>();
+
+    public dropdown = new ModalView(false, true);
 
     public isEditing = false;
     public selectedTab = 0;

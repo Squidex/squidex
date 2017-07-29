@@ -25,17 +25,6 @@ export class StarsComponent implements ControlValueAccessor {
     private touchedCallback: () => void = NOOP;
     private maximumStarsValue = 5;
 
-    public isDisabled = false;
-
-    public stars: number;
-    public starsArray: number[] = [1, 2, 3, 4, 5];
-
-    public value: number | null = 1;
-
-    public get maximumStars() {
-        return this.maximumStarsValue;
-    }
-
     @Input()
     public set maximumStars(value: any) {
         value = value || 5;
@@ -54,6 +43,17 @@ export class StarsComponent implements ControlValueAccessor {
             }
         }
     }
+
+    public get maximumStars() {
+        return this.maximumStarsValue;
+    }
+
+    public isDisabled = false;
+
+    public stars: number;
+    public starsArray: number[] = [1, 2, 3, 4, 5];
+
+    public value: number | null = 1;
 
     public writeValue(value: any) {
         this.value = this.stars = value;

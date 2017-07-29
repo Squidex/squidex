@@ -29,8 +29,6 @@ import {
     ]
 })
 export class ContentItemComponent extends AppComponentBase implements OnInit, OnChanges {
-    public dropdown = new ModalView(false, true);
-
     @Output()
     public publishing = new EventEmitter<ContentDto>();
 
@@ -57,6 +55,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
     @Input('sqxContent')
     public content: ContentDto;
+
+    public dropdown = new ModalView(false, true);
 
     public values: any[] = [];
 

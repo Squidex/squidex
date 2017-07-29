@@ -12,6 +12,7 @@ import {
     AccessTokenDto,
     AppClientDto,
     AppClientsService,
+    ComponentBase,
     fadeAnimation,
     ModalView,
     NotificationService
@@ -27,11 +28,7 @@ const ESCAPE_KEY = 27;
         fadeAnimation
     ]
 })
-export class ClientComponent {
-    public isRenaming = false;
-
-    public token: AccessTokenDto;
-
+export class ClientComponent extends ComponentBase {
     @Output()
     public renaming = new EventEmitter<string>();
 
@@ -47,11 +44,10 @@ export class ClientComponent {
     @Input()
     public client: AppClientDto;
 
-    public tokenDialog = new ModalView();
+    public isRenaming = false;
 
-    public get hasNewName() {
-        return this.renameForm.controls['name'].value !== this.client.name;
-    }
+    public token: AccessTokenDto;
+    public tokenDialog = new ModalView();
 
     public renameForm: FormGroup =
         this.formBuilder.group({
@@ -60,11 +56,15 @@ export class ClientComponent {
             ]
         });
 
-    constructor(
+    public get hasNewName() {
+        return this.renameForm.controls['name'].value !== this.client.name;
+    }
+
+    constructor(notifications: NotificationService,
         private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: FormBuilder,
-        private readonly notifications: NotificationService
+        private readonly formBuilder: FormBuilder
     ) {
+        super(notifications);
     }
 
     public cancelRename() {
@@ -89,7 +89,7 @@ export class ClientComponent {
                 this.token = dto;
                 this.tokenDialog.show();
             }, error => {
-                this.notifications.notify(error);
+                this.notifyError(error);
             });
     }
 }

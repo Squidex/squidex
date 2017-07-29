@@ -38,16 +38,6 @@ import {
 export class AssetComponent extends AppComponentBase implements OnInit {
     private version: Version;
 
-    public renameDialog = new ModalView();
-    public renameFormSubmitted = false;
-    public renameForm: FormGroup =
-        this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]]
-        });
-
     @Input()
     public initFile: File;
 
@@ -71,6 +61,16 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     @Output()
     public failed = new EventEmitter();
+
+    public renameDialog = new ModalView();
+    public renameFormSubmitted = false;
+    public renameForm: FormGroup =
+        this.formBuilder.group({
+            name: ['',
+                [
+                    Validators.required
+                ]]
+        });
 
     public progress = 0;
     public previewUrl: string;
@@ -168,7 +168,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
             this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.version))
-                .subscribe(_ => {
+                .subscribe(() => {
                     const me = `subject:${this.authService.user!.id}`;
 
                     const asset = new AssetDto(
@@ -184,9 +184,9 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                         this.asset.version);
 
                     this.updateAsset(asset, true);
-                    this.resetRename();
                 }, error => {
                     this.notifyError(error);
+                }, () => {
                     this.resetRename();
                 });
         }

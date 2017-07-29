@@ -34,15 +34,15 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
-    public timeControl = new FormControl();
-
-    public dateControl = new FormControl();
-
     @Input()
     public mode: string;
 
     @Input()
     public enforceTime: boolean;
+
+    public timeControl = new FormControl();
+
+    public dateControl = new FormControl();
 
     public get showTime() {
         return this.mode === 'DateTime';

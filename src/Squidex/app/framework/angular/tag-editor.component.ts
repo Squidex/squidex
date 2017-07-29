@@ -61,8 +61,6 @@ export class TagEditorComponent implements ControlValueAccessor {
     private changeCallback: (value: any) => void = NOOP;
     private touchedCallback: () => void = NOOP;
 
-    public addInput = new FormControl();
-
     @Input()
     public converter: Converter = new NoopConverter();
 
@@ -73,6 +71,8 @@ export class TagEditorComponent implements ControlValueAccessor {
     public inputName = 'tag-editor';
 
     public items: any[] = [];
+
+    public addInput = new FormControl();
 
     public writeValue(value: any) {
         this.addInput.setValue('');
