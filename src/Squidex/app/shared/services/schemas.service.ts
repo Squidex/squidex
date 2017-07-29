@@ -84,36 +84,36 @@ export class SchemaDto {
     ) {
     }
 
-    public publish(user: string): SchemaDto {
+    public publish(user: string, now?: DateTime): SchemaDto {
         return new SchemaDto(
             this.id,
             this.name,
             this.properties,
             true,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version);
     }
 
-    public unpublish(user: string): SchemaDto {
+    public unpublish(user: string, now?: DateTime): SchemaDto {
         return new SchemaDto(
             this.id,
             this.name,
             this.properties,
             false,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version);
     }
 
-    public update(user: string, properties: SchemaPropertiesDto): SchemaDto {
+    public update(properties: SchemaPropertiesDto, user: string, now?: DateTime): SchemaDto {
         return new SchemaDto(
             this.id,
             this.name,
             properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version);
     }
 }
@@ -125,86 +125,86 @@ export class SchemaDetailsDto extends SchemaDto {
         super(id, name, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
     }
 
-    public publish(user: string): SchemaDetailsDto {
+    public publish(user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             true,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             this.fields);
     }
 
-    public unpublish(user: string): SchemaDetailsDto {
+    public unpublish(user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             false,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             this.fields);
     }
 
-    public update(user: string, properties: SchemaPropertiesDto): SchemaDetailsDto {
+    public update(properties: SchemaPropertiesDto, user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             this.fields);
     }
 
-    public addField(user: string, field: FieldDto): SchemaDetailsDto {
+    public addField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             [...this.fields, field]);
     }
 
-    public updateField(user: string, field: FieldDto): SchemaDetailsDto {
+    public updateField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             this.fields.map(f => f.fieldId === field.fieldId ? field : f));
     }
 
-    public replaceFields(user: string, fields: FieldDto[]): SchemaDetailsDto {
+    public replaceFields(fields: FieldDto[], user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             fields);
     }
 
-    public removeField(user: string, field: FieldDto): SchemaDetailsDto {
+    public removeField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
         return new SchemaDetailsDto(
             this.id,
             this.name,
             this.properties,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.version,
             this.fields.filter(f => f.fieldId !== field.fieldId));
     }
@@ -226,7 +226,7 @@ export class FieldDto {
     }
 
     public hide(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, false, this.isDisabled, this.partitioning, this.properties);
+        return new FieldDto(this.fieldId, this.name, true, this.isDisabled, this.partitioning, this.properties);
     }
 
     public enable(): FieldDto {

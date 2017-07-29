@@ -17,6 +17,18 @@ import {
     Version
 } from './../';
 
+
+describe('AppLanguageDto', () => {
+    it('should update properties when updating', () => {
+        const language_1 = new AppLanguageDto('de', 'English', false, false, []);
+        const language_2 = language_1.update(true, true, ['de', 'it']);
+
+        expect(language_2.isMaster).toBeTruthy();
+        expect(language_2.isOptional).toBeTruthy();
+        expect(language_2.fallback).toEqual(['de', 'it']);
+    });
+});
+
 describe('AppLanguagesService', () => {
     let version = new Version('1');
 

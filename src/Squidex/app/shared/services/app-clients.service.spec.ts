@@ -18,6 +18,22 @@ import {
     Version
 } from './../';
 
+describe('AppClientDto', () => {
+    it('should update name property when renaming', () => {
+        const client_1 = new AppClientDto('1', 'old-name', 'secret', false);
+        const client_2 = client_1.rename('new-name');
+
+        expect(client_2.name).toBe('new-name');
+    });
+
+    it('should update isReader property when changing', () => {
+        const client_1 = new AppClientDto('1', 'old-name', 'secret', false);
+        const client_2 = client_1.change(true);
+
+        expect(client_2.isReader).toBeTruthy();
+    });
+});
+
 describe('AppClientsService', () => {
     let version = new Version('1');
 

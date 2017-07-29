@@ -17,6 +17,41 @@ import {
     Version
 } from './../';
 
+describe('ContentDto', () => {
+    it('should update data property and user info when updating', () => {
+        const now = DateTime.now();
+
+        const content_1 = new ContentDto('1', false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_2 = content_1.update({ data: 2 }, 'me', now);
+
+        expect(content_2.data).toEqual({ data: 2 });
+        expect(content_2.lastModified).toEqual(now);
+        expect(content_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update isPublished property and user info when publishing', () => {
+        const now = DateTime.now();
+
+        const content_1 = new ContentDto('1', false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_2 = content_1.publish('me', now);
+
+        expect(content_2.isPublished).toBeTruthy();
+        expect(content_2.lastModified).toEqual(now);
+        expect(content_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update isPublished property and user info when unpublishing', () => {
+        const now = DateTime.now();
+
+        const content_1 = new ContentDto('1', true, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_2 = content_1.unpublish('me', now);
+
+        expect(content_2.isPublished).toBeFalsy();
+        expect(content_2.lastModified).toEqual(now);
+        expect(content_2.lastModifiedBy).toEqual('me');
+    });
+});
+
 describe('ContentsService', () => {
     let version = new Version('1');
 

@@ -39,32 +39,32 @@ export class ContentDto {
     ) {
     }
 
-    public publish(user: string): ContentDto {
+    public publish(user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
             true,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.data,
             this.version);
     }
 
-    public unpublish(user: string): ContentDto {
+    public unpublish(user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
             false,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.data,
             this.version);
     }
 
-    public update(data: any, user: string): ContentDto {
+    public update(data: any, user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
             this.isPublished,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             data,
             this.version);
     }

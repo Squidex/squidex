@@ -24,6 +24,141 @@ import {
     Version
 } from './../';
 
+describe('SchemaDto', () => {
+    const properties = new SchemaPropertiesDto('Name', null);
+
+    it('should update isPublished property and user info when publishing', () => {
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_2 = schema_1.publish('me', now);
+
+        expect(schema_2.isPublished).toBeTruthy();
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update isPublished property and user info when unpublishing', () => {
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_2 = schema_1.unpublish('me', now);
+
+        expect(schema_2.isPublished).toBeFalsy();
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update properties property and user info when updating', () => {
+        const newProperties = new SchemaPropertiesDto('New Name', null);
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_2 = schema_1.update(newProperties, 'me', now);
+
+        expect(schema_2.properties).toEqual(newProperties);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+});
+
+describe('SchemaDetailsDto', () => {
+    const properties = new SchemaPropertiesDto('Name', null);
+
+    it('should update isPublished property and user info when publishing', () => {
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_2 = schema_1.publish('me', now);
+
+        expect(schema_2.isPublished).toBeTruthy();
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update isPublished property and user info when unpublishing', () => {
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_2 = schema_1.unpublish('me', now);
+
+        expect(schema_2.isPublished).toBeFalsy();
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update properties property and user info when updating', () => {
+        const newProperties = new SchemaPropertiesDto('New Name', null);
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_2 = schema_1.update(newProperties, 'me', now);
+
+        expect(schema_2.properties).toEqual(newProperties);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update fields property and user info when adding field', () => {
+        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1]);
+        const schema_2 = schema_1.addField(field2, 'me', now);
+
+        expect(schema_2.fields).toEqual([field1, field2]);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update fields property and user info when removing field', () => {
+        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2]);
+        const schema_2 = schema_1.removeField(field1, 'me', now);
+
+        expect(schema_2.fields).toEqual([field2]);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update fields property and user info when replacing fields', () => {
+        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2]);
+        const schema_2 = schema_1.replaceFields([field2, field1], 'me', now);
+
+        expect(schema_2.fields).toEqual([field2, field1]);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update fields property and user info when updatinmg field', () => {
+        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
+        const field2_1 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+        const field2_2 = new FieldDto(2, '2', false, false, 'l', createProperties('Boolean'));
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2_1]);
+        const schema_2 = schema_1.updateField(field2_2, 'me', now);
+
+        expect(schema_2.fields).toEqual([field1, field2_2]);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+});
+
 describe('SchemasService', () => {
     let now = DateTime.now();
     let user = 'me';

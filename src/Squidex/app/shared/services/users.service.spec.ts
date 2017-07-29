@@ -18,6 +18,30 @@ import {
     UsersService
 } from './../';
 
+describe('UserDto', () => {
+    it('should update email and display name property when unlocking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_2 = user_1.update('qaisar@squidex.io', 'Qaisar');
+
+        expect(user_2.email).toEqual('qaisar@squidex.io');
+        expect(user_2.displayName).toEqual('Qaisar');
+    });
+
+    it('should update isLocked property when locking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', false);
+        const user_2 = user_1.lock();
+
+        expect(user_2.isLocked).toBeTruthy();
+    });
+
+    it('should update isLocked property when unlocking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_2 = user_1.unlock();
+
+        expect(user_2.isLocked).toBeFalsy();
+    });
+});
+
 describe('UsersService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({

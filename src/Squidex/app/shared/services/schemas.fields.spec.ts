@@ -8,6 +8,7 @@
 import {
     AssetsFieldPropertiesDto,
     BooleanFieldPropertiesDto,
+    createProperties,
     DateTimeFieldPropertiesDto,
     FieldDto,
     FieldPropertiesDto,
@@ -17,6 +18,45 @@ import {
     ReferencesFieldPropertiesDto,
     StringFieldPropertiesDto
 } from './../';
+
+describe('FieldDto', () => {
+    it('should update isHidden property when hiding', () => {
+        const field_1 = createField(createProperties('String'));
+        const field_2 = field_1.hide();
+
+        expect(field_2.isHidden).toBeTruthy();
+    });
+
+    it('should update isHidden property when showing', () => {
+        const field_1 = createField(createProperties('String')).hide();
+        const field_2 = field_1.show();
+
+        expect(field_2.isHidden).toBeFalsy();
+    });
+
+    it('should update isDisabled property when disabling', () => {
+        const field_1 = createField(createProperties('String'));
+        const field_2 = field_1.disable();
+
+        expect(field_2.isDisabled).toBeTruthy();
+    });
+
+    it('should update isDisabled property when enabling', () => {
+        const field_1 = createField(createProperties('String')).disable();
+        const field_2 = field_1.enable();
+
+        expect(field_2.isDisabled).toBeFalsy();
+    });
+
+    it('should update properties property when updating', () => {
+        const newProperty = createProperties('Number');
+
+        const field_1 = createField(createProperties('String'));
+        const field_2 = field_1.update(newProperty);
+
+        expect(field_2.properties).toEqual(newProperty);
+    });
+});
 
 describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false, 1, 1));

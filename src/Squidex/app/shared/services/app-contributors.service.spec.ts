@@ -16,6 +16,15 @@ import {
     Version
 } from './../';
 
+describe('AppContributorDto', () => {
+    it('should update permission property when changing', () => {
+        const contributor_1 = new AppContributorDto('1', 'Owner');
+        const contributor_2 = contributor_1.changePermission('Editor');
+
+        expect(contributor_2.permission).toBe('Editor');
+    });
+});
+
 describe('AppContributorsService', () => {
     let version = new Version('1');
 

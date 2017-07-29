@@ -19,6 +19,37 @@ import {
     Version
 } from './../';
 
+describe('AssetDto', () => {
+    it('should update name property and user info when renaming', () => {
+        const now = DateTime.now();
+
+        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name', 1, 1, 'image/png', false, 1, 1, null);
+        const asset_2 = asset_1.rename('new-name', 'me', now);
+
+        expect(asset_2.fileName).toEqual('new-name');
+        expect(asset_2.lastModified).toEqual(now);
+        expect(asset_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update file properties when uploading', () => {
+        const now = DateTime.now();
+
+        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, null);
+
+        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name', 1, 1, 'image/png', false, 1, 1, null);
+        const asset_2 = asset_1.update(update, 'me', now);
+
+        expect(asset_2.fileSize).toEqual(2);
+        expect(asset_2.fileVersion).toEqual(2);
+        expect(asset_2.mimeType).toEqual('image/jpeg');
+        expect(asset_2.isImage).toBeTruthy();
+        expect(asset_2.pixelWidth).toEqual(2);
+        expect(asset_2.pixelHeight).toEqual(2);
+        expect(asset_2.lastModified).toEqual(now);
+        expect(asset_2.lastModifiedBy).toEqual('me');
+    });
+});
+
 describe('AssetsService', () => {
     let now = DateTime.now();
     let user = 'me';

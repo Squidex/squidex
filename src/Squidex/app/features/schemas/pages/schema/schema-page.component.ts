@@ -129,7 +129,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.enableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(this.authService.user.token, field.enable()));
+                this.updateSchema(this.schema.updateField(field.enable(), this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -139,7 +139,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.disableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(this.authService.user.token, field.disable()));
+                this.updateSchema(this.schema.updateField(field.disable(), this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -149,7 +149,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.showField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(this.authService.user.token, field.show()));
+                this.updateSchema(this.schema.updateField(field.show(), this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -159,7 +159,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.hideField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(this.authService.user.token, field.hide()));
+                this.updateSchema(this.schema.updateField(field.hide(), this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -169,7 +169,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.removeField(this.authService.user.token, field));
+                this.updateSchema(this.schema.removeField(field, this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -179,7 +179,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.putFieldOrdering(app, this.schema.name, fields.map(t => t.fieldId), this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.replaceFields(this.authService.user.token, fields));
+                this.updateSchema(this.schema.replaceFields(fields, this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -191,7 +191,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.putField(app, this.schema.name, field.fieldId, requestDto, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(this.authService.user.token, field));
+                this.updateSchema(this.schema.updateField(field, this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -231,7 +231,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             this.appNameOnce()
                 .switchMap(app => this.schemasService.postField(app, this.schema.name, requestDto, this.schema.version))
                 .subscribe(dto => {
-                    this.updateSchema(this.schema.addField(this.authService.user.token, dto));
+                    this.updateSchema(this.schema.addField(dto, this.authService.user.token));
                     reset();
                 }, error => {
                     this.notifyError(error);
@@ -246,7 +246,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto) {
-        this.updateSchema(this.schema.update(this.authService.user.token, properties));
+        this.updateSchema(this.schema.update(properties, this.authService.user.token));
 
         this.editSchemaDialog.hide();
     }

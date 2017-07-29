@@ -42,26 +42,27 @@ export class AssetDto {
     ) {
     }
 
-    public update(result: AssetReplacedDto, user: string): AssetDto {
+    public update(update: AssetReplacedDto, user: string, now?: DateTime): AssetDto {
         return new AssetDto(
             this.id,
             this.createdBy, user,
-            this.created, DateTime.now(),
+            this.created, now || DateTime.now(),
             this.fileName,
-            result.fileSize,
-            result.fileVersion,
-            result.mimeType,
-            result.isImage,
-            result.pixelWidth,
-            result.pixelHeight,
-            result.version)
+            update.fileSize,
+            update.fileVersion,
+            update.mimeType,
+            update.isImage,
+            update.pixelWidth,
+            update.pixelHeight,
+            update.version)
     }
 
-    public rename(name: string, user: string): AssetDto {
+    public rename(name: string, user: string, now?: DateTime): AssetDto {
         return new AssetDto(
             this.id,
             this.createdBy, user,
-            this.created, DateTime.now(), name,
+            this.created, now || DateTime.now(),
+            name,
             this.fileSize,
             this.fileVersion,
             this.mimeType,
