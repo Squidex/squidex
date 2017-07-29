@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject UpdateClient(UpdateClient command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot rename client");
+            Guard.Valid(command, nameof(command), () => "Cannot update client");
 
             ThrowIfNotCreated();
 

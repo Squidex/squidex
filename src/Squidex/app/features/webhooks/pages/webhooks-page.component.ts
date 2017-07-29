@@ -86,6 +86,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                 this.notifyError(error);
             });
     }
+
     public resetWebhookForm() {
         this.addWebhookFormSubmitted = false;
         this.addWebhookForm.enable();

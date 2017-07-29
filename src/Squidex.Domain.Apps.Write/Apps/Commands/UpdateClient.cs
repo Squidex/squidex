@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
 
             if (string.IsNullOrWhiteSpace(Name) && IsReader == null)
             {
-                errors.Add(new ValidationError("Either name or IsReader must be defined.", nameof(Name), nameof(IsReader)));
+                errors.Add(new ValidationError("Either name or reader state must be defined.", nameof(Name), nameof(IsReader)));
             }
         }
     }

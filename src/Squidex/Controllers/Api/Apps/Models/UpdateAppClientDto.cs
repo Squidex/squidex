@@ -21,6 +21,6 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// <summary>
         /// Determines if the client is a reader.
         /// </summary>
-        public bool IsReader { get; set; }
+        public bool? IsReader { get; set; }
     }
 }

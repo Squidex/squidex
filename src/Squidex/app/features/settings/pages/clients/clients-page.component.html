@@ -18,7 +18,8 @@
             </div>
 
             <div *ngFor="let client of appClients">
-                <sqx-client [client]="client" [appName]="appName() | async" 
+                <sqx-client [client]="client" [appName]="appName() | async"
+                    (changing)="changeClient(client, $event)"
                     (renaming)="renameClient(client, $event)" 
                     (revoking)="revokeClient(client)"></sqx-client>
             </div>

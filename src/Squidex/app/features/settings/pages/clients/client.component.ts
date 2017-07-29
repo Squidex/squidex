@@ -38,6 +38,9 @@ export class ClientComponent {
     @Output()
     public revoking = new EventEmitter();
 
+    @Output()
+    public changing = new EventEmitter<boolean>();
+
     @Input()
     public client: AppClientDto;
 

@@ -55,19 +55,21 @@ describe('AppClientsService', () => {
             {
                 id: 'client1',
                 name: 'Client 1',
-                secret: 'secret1'
+                secret: 'secret1',
+                isReader: true
             },
             {
                 id: 'client2',
                 name: 'Client 2',
-                secret: 'secret2'
+                secret: 'secret2',
+                isReader: true
             }
         ]);
 
         expect(clients).toEqual(
             [
-                new AppClientDto('client1', 'Client 1', 'secret1'),
-                new AppClientDto('client2', 'Client 2', 'secret2')
+                new AppClientDto('client1', 'Client 1', 'secret1', true),
+                new AppClientDto('client2', 'Client 2', 'secret2', true)
             ]);
     }));
 
@@ -87,10 +89,10 @@ describe('AppClientsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual('1');
 
-        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1' });
+        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', isReader: true });
 
         expect(client).toEqual(
-            new AppClientDto('client1', 'Client 1', 'secret1'));
+            new AppClientDto('client1', 'Client 1', 'secret1', true));
     }));
 
     it('should make put request to rename client',
@@ -126,7 +128,7 @@ describe('AppClientsService', () => {
 
         let accessTokenDto: AccessTokenDto | null = null;
 
-        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret')).subscribe(result => {
+        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', false)).subscribe(result => {
             accessTokenDto = result;
         });
 

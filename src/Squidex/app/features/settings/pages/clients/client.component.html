@@ -66,6 +66,16 @@
                 </button>
             </td>
         </tr>
+        <tr>
+            <td></td>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" [ngModel]="client.isReader" (ngModelChange)="changing.emit($event)" /> Reading only
+                    </label>
+                </div>
+            </td>
+        </tr>
     </table>
 </div>
 

@@ -91,6 +91,18 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
+    public changeClient(client: AppClientDto, isReader: boolean) {
+        const request = new UpdateAppClientDto(undefined, isReader);
+
+        this.appNameOnce()
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
+            .subscribe(() => {
+                this.updateClients(this.appClients.replace(client, change(client, isReader)));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
     public resetClientForm() {
         this.addClientFormSubmitted = false;
         this.addClientForm.enable();
@@ -123,6 +135,10 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     }
 }
 
+function change(client: AppClientDto, isReader: boolean): AppClientDto {
+    return new AppClientDto(client.id, client.name, client.secret, isReader);
+};
+
 function rename(client: AppClientDto, name: string): AppClientDto {
-    return new AppClientDto(client.id, name, client.secret);
+    return new AppClientDto(client.id, name, client.secret, client.isReader);
 };
