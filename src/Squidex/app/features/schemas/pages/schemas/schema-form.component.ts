@@ -72,8 +72,8 @@ export class SchemaFormComponent {
     }
 
     public cancel() {
-        this.resetForm();
-        this.cancelled.emit();
+        this.sendCancelled();
+        this.resetCreateForm();
     }
 
     public createSchema() {
@@ -91,19 +91,30 @@ export class SchemaFormComponent {
 
             this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
                 .subscribe(dto => {
-                    this.resetForm();
-                    this.created.emit(dto);
+                    this.sendCreated(dto);
+                    this.resetCreateForm();
                 }, error => {
-                    this.createForm.enable();
-                    this.createFormError = error.displayMessage;
+                    this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private resetForm() {
+    private sendCancelled() {
+        this.cancelled.emit();
+    }
+
+    private sendCreated(schema: SchemaDto) {
+        this.created.emit(schema);
+    }
+
+    private enableCreateForm(message: string) {
+        this.createForm.enable();
+        this.createFormError = message;
+    }
+
+    private resetCreateForm() {
         this.createFormError = '';
         this.createForm.reset();
         this.createFormSubmitted = false;
     }
-
 }

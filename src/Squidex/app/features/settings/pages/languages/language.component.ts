@@ -72,7 +72,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                     this.editForm.controls['isOptional'].setValue(false);
                 });
 
-        this.resetForm();
+        this.resetEditForm();
     }
 
     public ngOnDestroy() {
@@ -80,11 +80,11 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public ngOnChanges() {
-        this.resetForm();
+        this.resetEditForm();
     }
 
     public cancel() {
-        this.resetForm();
+        this.resetEditForm();
     }
 
     public toggleEditing() {
@@ -119,11 +119,15 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                     this.editForm.controls['isOptional'].value,
                     this.fallbackLanguages.map(l => l.iso2Code));
 
-            this.saving.emit(newLanguage);
+            this.sendSaving(newLanguage);
         }
     }
 
-    private resetForm() {
+    private sendSaving(language: AppLanguageDto) {
+        this.saving.emit(language);
+    }
+
+    private resetEditForm() {
         this.editFormSubmitted = false;
         this.editForm.reset(this.language);
 

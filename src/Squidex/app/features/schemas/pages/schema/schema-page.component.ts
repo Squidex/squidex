@@ -201,13 +201,12 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.messageBus.publish(new SchemaDeleted(this.schema));
-
-                this.router.navigate(['../'], { relativeTo: this.route });
+                this.sendSchemaDeleted(this.schema);
+                this.hideDeleteDialog();
+                this.back();
             }, error => {
+                this.hideDeleteDialog();
                 this.notifyError(error);
-            }, () => {
-                this.confirmDeleteDialog.hide();
             });
     }
 
@@ -222,27 +221,20 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
             const requestDto = new AddFieldDto(this.addFieldForm.controls['name'].value, partitioning, properties);
 
-            const reset = () => {
-                this.addFieldForm.reset({ type: 'String' });
-                this.addFieldForm.enable();
-                this.addFieldFormSubmitted = false;
-            };
-
             this.appNameOnce()
                 .switchMap(app => this.schemasService.postField(app, this.schema.name, requestDto, this.schema.version))
                 .subscribe(dto => {
                     this.updateSchema(this.schema.addField(dto, this.authService.user.token));
-                    reset();
+                    this.resetFieldForm();
                 }, error => {
                     this.notifyError(error);
-                    reset();
+                    this.resetFieldForm();
                 });
         }
     }
 
-    public resetFieldForm() {
-        this.addFieldForm.reset({ type: 'String' });
-        this.addFieldFormSubmitted = false;
+    public cancelAddField() {
+        this.resetFieldForm();
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto) {
@@ -251,9 +243,16 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.editSchemaDialog.hide();
     }
 
+    private resetFieldForm() {
+        this.addFieldForm.enable();
+        this.addFieldForm.reset({ type: 'String' });
+        this.addFieldFormSubmitted = false;
+    }
+
     private updateSchema(schema: SchemaDetailsDto) {
         this.schema = schema;
 
+        this.sendSchemaUpdated(schema);
         this.notify();
         this.export();
     }
@@ -289,9 +288,24 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.schemaExport = result;
     }
 
+    private hideDeleteDialog() {
+        this.confirmDeleteDialog.hide();
+    }
+
+    private back() {
+        this.router.navigate(['../'], { relativeTo: this.route });
+    }
+
+    private sendSchemaDeleted(schema: SchemaDto) {
+        this.messageBus.publish(new SchemaDeleted(schema));
+    }
+
+    private sendSchemaUpdated(schema: SchemaDto) {
+        this.messageBus.publish(new SchemaUpdated(schema));
+    }
+
     private notify() {
         this.messageBus.publish(new HistoryChannelUpdated());
-        this.messageBus.publish(new SchemaUpdated(this.schema));
     }
 }
 

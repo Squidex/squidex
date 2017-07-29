@@ -86,13 +86,13 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     }
                 });
 
-        this.setupForm(routeData['schema']);
+        this.setupContentForm(routeData['schema']);
 
         this.route.data.map(p => p['content'])
             .subscribe((content: ContentDto) => {
                 this.content = content;
 
-                this.populateForm();
+                this.populateContentForm();
             });
     }
 
@@ -136,13 +136,9 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentFormSubmitted = true;
 
         if (this.contentForm.valid) {
-            this.disable();
+            this.disableContentForm();
 
             const requestDto = this.contentForm.value;
-
-            const back = () => {
-                this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
-            };
 
             if (this.isNewMode) {
                 this.appNameOnce()
@@ -150,13 +146,12 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     .subscribe(dto => {
                         this.content = dto;
 
-                        this.messageBus.publish(new ContentCreated(dto));
-
+                        this.sendContentCreated(this.content);
                         this.notifyInfo('Content created successfully.');
-                        back();
+                        this.back();
                     }, error => {
                         this.notifyError(error);
-                        this.enable();
+                        this.enableContentForm();
                     });
             } else {
                 this.appNameOnce()
@@ -164,13 +159,12 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     .subscribe(() => {
                         this.content = this.content.update(requestDto, this.authService.user.token);
 
-                        this.messageBus.publish(new ContentUpdated(this.content));
-
+                        this.sendContentUpdated(this.content);
                         this.notifyInfo('Content saved successfully.');
-                        this.enable();
+                        this.enableContentForm();
                     }, error => {
                         this.notifyError(error);
-                        this.enable();
+                        this.enableContentForm();
                     });
             }
         } else {
@@ -178,7 +172,23 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         }
     }
 
-    private enable() {
+    private sendContentCreated(content: ContentDto) {
+        this.messageBus.publish(new ContentCreated(content));
+    }
+
+    private sendContentUpdated(content: ContentDto) {
+        this.messageBus.publish(new ContentUpdated(content));
+    }
+
+    private back() {
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+    }
+
+    private disableContentForm() {
+        this.contentForm.disable();
+    }
+
+    private enableContentForm() {
         this.contentForm.markAsPristine();
 
         for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
@@ -186,13 +196,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         }
     }
 
-    private disable() {
-        for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-            this.contentForm.controls[field.name].disable();
-        }
-    }
-
-    private setupForm(schema: SchemaDetailsDto) {
+    private setupContentForm(schema: SchemaDetailsDto) {
         this.schema = schema;
 
         const controls: { [key: string]: AbstractControl } = {};
@@ -214,7 +218,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentForm = new FormGroup(controls);
     }
 
-    private populateForm() {
+    private populateContentForm() {
         this.contentForm.markAsPristine();
 
         if (!this.content) {

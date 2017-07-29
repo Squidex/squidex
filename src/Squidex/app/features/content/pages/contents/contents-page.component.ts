@@ -98,7 +98,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .subscribe(schema => {
                 this.schema = schema;
 
-                this.reset();
+                this.resetContents();
                 this.load();
             });
 
@@ -110,15 +110,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentsPager = new Pager(0);
 
         this.load();
-    }
-
-    private reset() {
-        this.contentItems = ImmutableArray.empty<ContentDto>();
-        this.contentsQuery = '';
-        this.contentsFilter.setValue('');
-        this.contentsPager = new Pager(0);
-
-        this.loadFields();
     }
 
     public publishContent(content: ContentDto) {
@@ -148,28 +139,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
                 this.contentsPager = this.contentsPager.decrementCount();
 
-                this.messageBus.publish(new ContentDeleted(content));
+                this.sendContentDeleted(content);
             }, error => {
                 this.notifyError(error);
             });
-    }
-
-    public selectLanguage(language: AppLanguageDto) {
-        this.languageSelected = language;
-    }
-
-    private loadFields() {
-        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
-            this.contentFields = [this.schema.fields[0]];
-        }
-
-        if (this.contentFields.length > 0) {
-            this.columnWidth = 100 / this.contentFields.length;
-        } else {
-            this.columnWidth = 100;
-        }
     }
 
     public load(showInfo = false) {
@@ -187,6 +160,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             });
     }
 
+    public selectLanguage(language: AppLanguageDto) {
+        this.languageSelected = language;
+    }
+
     public dropData(content: ContentDto) {
         return { content, schemaId: this.schema.id };
     }
@@ -201,6 +178,33 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentsPager = this.contentsPager.goPrev();
 
         this.load();
+    }
+
+    private resetContents() {
+        this.contentItems = ImmutableArray.empty<ContentDto>();
+        this.contentsQuery = '';
+        this.contentsFilter.setValue('');
+        this.contentsPager = new Pager(0);
+
+        this.loadFields();
+    }
+
+    private loadFields() {
+        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
+
+        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
+            this.contentFields = [this.schema.fields[0]];
+        }
+
+        if (this.contentFields.length > 0) {
+            this.columnWidth = 100 / this.contentFields.length;
+        } else {
+            this.columnWidth = 100;
+        }
+    }
+
+    private sendContentDeleted(content: ContentDto) {
+        this.messageBus.publish(new ContentDeleted(content));
     }
 }
 

@@ -74,9 +74,9 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
                          this.plans.hasPortal,
                          this.plans.hasConfigured,
                          this.plans.plans);
+                this.isDisabled = false;
             }, error => {
                 this.notifyError(error);
-            }, () => {
                 this.isDisabled = false;
             });
     }

@@ -24,6 +24,12 @@ $field-header: #e7ebef;
         color: $color-subtext;
     }
 
+    &-partitioning {
+        color: $color-subtext;
+        font-weight: normal;
+        font-size: .85rem;
+    }
+
     .tag {
         @include opacity(.9);
         min-width: 4rem;

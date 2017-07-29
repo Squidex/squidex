@@ -54,8 +54,8 @@ export class AppFormComponent {
     }
 
     public cancel() {
-        this.reset();
-        this.cancelled.emit();
+        this.sendCancelled();
+        this.resetCreateForm();
     }
 
     public createApp() {
@@ -66,23 +66,31 @@ export class AppFormComponent {
 
             const request = new CreateAppDto(this.createForm.controls['name'].value);
 
-            const enable = (message?: string) => {
-                this.createForm.enable();
-                this.createFormSubmitted = false;
-                this.createFormError = message;
-            };
-
             this.appsStore.createApp(request)
                 .subscribe(dto => {
-                    this.reset();
-                    this.created.emit(dto);
+                    this.resetCreateForm();
+                    this.sendCreated(dto);
                 }, error => {
-                    enable(error.displayMessage);
+                    this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private reset() {
+    private sendCancelled() {
+        this.cancelled.emit();
+    }
+
+    private sendCreated(app: AppDto) {
+        this.created.emit(app);
+    }
+
+    private enableCreateForm(message: string) {
+        this.createForm.enable();
+        this.createFormSubmitted = false;
+        this.createFormError = message;
+    }
+
+    private resetCreateForm() {
         this.createFormError = '';
         this.createForm.enable();
         this.createFormSubmitted = false;

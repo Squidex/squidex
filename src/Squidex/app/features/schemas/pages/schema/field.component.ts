@@ -79,7 +79,19 @@ export class FieldComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.resetForm();
+        this.resetEditForm();
+    }
+
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
+    }
+
+    public selectTab(tab: number) {
+        this.selectedTab = tab;
+    }
+
+    public cancel() {
+        this.resetEditForm();
     }
 
     public save() {
@@ -97,23 +109,15 @@ export class FieldComponent implements OnInit {
                     this.field.partitioning,
                     properties);
 
-            this.saving.emit(field);
+            this.sendSaving(field);
         }
     }
 
-    public cancel() {
-        this.resetForm();
+    private sendSaving(field: FieldDto) {
+        this.saving.emit(field);
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
-    }
-
-    private resetForm() {
+    private resetEditForm() {
         this.editFormSubmitted = false;
         this.editForm.reset(this.field.properties);
 

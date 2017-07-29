@@ -123,7 +123,11 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         }
     }
 
-    public resetClientForm() {
+    public cancelAttachClient() {
+        this.resetClientForm();
+    }
+
+    private resetClientForm() {
         this.addClientFormSubmitted = false;
         this.addClientForm.enable();
         this.addClientForm.reset();

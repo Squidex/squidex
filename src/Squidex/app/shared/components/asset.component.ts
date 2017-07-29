@@ -91,19 +91,15 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         const initFile = this.initFile;
 
         if (initFile) {
-            const me = `subject:${this.authService.user!.id}`;
-
             this.appNameOnce()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile, me))
+                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.authService.user.token))
                 .subscribe(dto => {
                     if (dto instanceof AssetDto) {
-                        this.loaded.emit(dto);
+                        this.sendLoaded(dto);
                     } else {
                         this.progress = dto;
                     }
                 }, error => {
-                    this.failed.emit();
-
                     this.notifyError(error);
                 });
         } else {
@@ -113,20 +109,17 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
-            const me = `subject:${this.authService.user!.id}`;
-
             this.appNameOnce()
                 .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.version))
                 .subscribe(dto => {
                     if (dto instanceof AssetReplacedDto) {
-                        this.updateAsset(this.asset.update(dto, me), true);
+                        this.updateAsset(this.asset.update(dto, this.authService.user.token), true);
                     } else {
-                        this.progress = dto;
+                        this.setProgress(dto);
                     }
                 }, error => {
-                    this.notifyError(error);
-                }, () => {
-                    this.progress = 0;
+                    this.setProgress();
+                    this.sendFailed(error);
                 });
         }
     }
@@ -139,21 +132,43 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
             const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
-            const me = `subject:${this.authService.user!.id}`;
-
             this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.version))
                 .subscribe(() => {
-                    this.updateAsset(this.asset.rename(requestDto.fileName, me), true);
+                    this.updateAsset(this.asset.rename(requestDto.fileName, this.authService.user.token), true);
+                    this.resetRenameForm();
                 }, error => {
                     this.notifyError(error);
-                }, () => {
-                    this.resetRename();
+                    this.enableRenameForm();
                 });
         }
     }
 
-    public resetRename() {
+    public cancelRenameAsset() {
+        this.resetRenameForm();
+    }
+
+    private setProgress(progress = 0) {
+        this.progress = progress;
+    }
+
+    private sendFailed(error: any) {
+        this.failed.emit(error);
+    }
+
+    private sendLoaded(asset: AssetDto) {
+        this.loaded.emit(asset);
+    }
+
+    private sendUpdated(asset: AssetDto) {
+        this.updated.emit(asset);
+    }
+
+    private enableRenameForm() {
+        this.renameForm.enable();
+    }
+
+    private resetRenameForm() {
         this.renameForm.enable();
         this.renameForm.controls['name'].setValue(this.asset.fileName);
         this.renameFormSubmitted = false;
@@ -172,9 +187,9 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         this.version = asset.version;
 
         if (emitEvent) {
-            this.updated.emit(asset);
+            this.sendUpdated(asset);
         }
 
-        this.resetRename();
+        this.resetRenameForm();
     }
 }

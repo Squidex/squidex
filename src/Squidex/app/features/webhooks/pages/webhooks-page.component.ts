@@ -87,10 +87,14 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public resetWebhookForm() {
-        this.addWebhookFormSubmitted = false;
-        this.addWebhookForm.enable();
-        this.addWebhookForm.reset();
+    public deleteWebhook(webhook: WebhookWithSchema) {
+        this.appNameOnce()
+            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.schema.name, webhook.webhook.id, this.version))
+            .subscribe(dto => {
+                this.webhooks = this.webhooks.remove(webhook);
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public addWebhook() {
@@ -108,25 +112,30 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                 .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
                 .subscribe(dto => {
                     this.webhooks = this.webhooks.push({ webhook: dto, schema: schema, showDetails: false });
+
+                    this.resetWebhookForm();
                 }, error => {
                     this.notifyError(error);
-                }, () => {
-                    this.resetWebhookForm();
+                    this.enableWebhookForm();
                 });
         }
+    }
+
+    public cancelAddWebhook() {
+        this.resetWebhookForm();
     }
 
     public toggleDetails(webhook: WebhookWithSchema) {
         this.webhooks = this.webhooks.replace(webhook, { webhook: webhook.webhook, schema: webhook.schema, showDetails: !webhook.showDetails });
     }
 
-    public deleteWebhook(webhook: WebhookWithSchema) {
-        this.appNameOnce()
-            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.schema.name, webhook.webhook.id, this.version))
-            .subscribe(dto => {
-                this.webhooks = this.webhooks.remove(webhook);
-            }, error => {
-                this.notifyError(error);
-            });
+    private enableWebhookForm() {
+        this.addWebhookForm.enable();
+    }
+
+    private resetWebhookForm() {
+        this.addWebhookFormSubmitted = false;
+        this.addWebhookForm.enable();
+        this.addWebhookForm.reset();
     }
 }

@@ -56,7 +56,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             .subscribe((user: UserDto) => {
                 this.user = user;
 
-                this.populateForm();
+                this.setupAndPopulateForm();
             });
     }
 
@@ -68,18 +68,6 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
             const requestDto = this.userForm.value;
 
-            const enable = (message?: string) => {
-                this.userForm.enable();
-                this.userForm.controls['password'].reset();
-                this.userForm.controls['passwordConfirm'].reset();
-                this.userFormSubmitted = false;
-                this.userFormError = message;
-            };
-
-            const back = () => {
-                this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
-            };
-
             if (this.isNewMode) {
                 this.userManagementService.postUser(requestDto)
                     .subscribe(created => {
@@ -90,12 +78,12 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 requestDto.displayName,
                                 created.pictureUrl!,
                                 false);
-                        this.messageBus.publish(new UserCreated(this.user));
 
+                        this.sendUserCreated(this.user);
                         this.notifyInfo('User created successfully.');
-                        back();
+                        this.back();
                     }, error => {
-                        enable(error.displayMessage);
+                        this.resetUserForm(error.displayMessage);
                     });
             } else {
                 this.userManagementService.putUser(this.userId, requestDto)
@@ -105,24 +93,33 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 requestDto.email,
                                 requestDto.displayMessage);
 
-                        this.messageBus.publish(new UserUpdated(this.user));
-
+                        this.sendUserUpdated(this.user);
                         this.notifyInfo('User saved successfully.');
-                        enable();
+                        this.resetUserForm();
                     }, error => {
-                        enable(error.displayMessage);
+                        this.resetUserForm(error.displayMessage);
                     });
             }
         }
     }
 
-    private populateForm() {
+    private back() {
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+    }
+
+    private sendUserCreated(user: UserDto) {
+        this.messageBus.publish(new UserCreated(user));
+    }
+
+    private sendUserUpdated(user: UserDto) {
+        this.messageBus.publish(new UserUpdated(user));
+    }
+
+    private setupAndPopulateForm() {
         const input = this.user || {};
 
         this.isNewMode = !this.user;
         this.userId = input['id'];
-        this.userFormError = '';
-        this.userFormSubmitted = false;
         this.userForm =
             this.formBuilder.group({
                 email: [input['email'],
@@ -147,6 +144,16 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             });
 
         this.isCurrentUser = this.userId === this.currentUserId;
+
+        this.resetUserForm();
+    }
+
+    private resetUserForm(message: string = '') {
+        this.userForm.enable();
+        this.userForm.controls['password'].reset();
+        this.userForm.controls['passwordConfirm'].reset();
+        this.userFormSubmitted = false;
+        this.userFormError = message;
     }
 }
 
