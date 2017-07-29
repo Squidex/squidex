@@ -241,7 +241,7 @@ describe('SchemasService', () => {
 
         const dto = new CreateSchemaDto('name');
 
-        let schema: SchemaDto | null = null;
+        let schema: SchemaDetailsDto | null = null;
 
         schemasService.postSchema('my-app', dto, user, now, version).subscribe(result => {
             schema = result;
@@ -255,7 +255,7 @@ describe('SchemasService', () => {
         req.flush({ id: '1' });
 
         expect(schema).toEqual(
-            new SchemaDto('my-schema', dto.name, new SchemaPropertiesDto(null, null), false, user, user, now, now, version));
+            new SchemaDetailsDto('1', dto.name, new SchemaPropertiesDto(null, null), false, user, user, now, now, version, []));
     }));
 
     it('should make post request to add field',

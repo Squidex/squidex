@@ -207,7 +207,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto | null = null;
 
-        assetsService.uploadFile('my-app', null!, user).subscribe(result => {
+        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
             asset = <AssetDto>result;
         });
 

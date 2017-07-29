@@ -23,7 +23,7 @@ export class ContentUpdated {
 
 export class ContentDeleted {
     constructor(
-        public readonly contentId: string
+        public readonly content: ContentDto
     ) {
     }
 }

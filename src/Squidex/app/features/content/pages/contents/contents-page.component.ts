@@ -148,7 +148,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
                 this.contentsPager = this.contentsPager.decrementCount();
 
-                this.messageBus.publish(new ContentDeleted(content.id));
+                this.messageBus.publish(new ContentDeleted(content));
             }, error => {
                 this.notifyError(error);
             });

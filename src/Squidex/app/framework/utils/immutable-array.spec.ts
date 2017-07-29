@@ -161,6 +161,34 @@ describe('ImmutableArray', () => {
         expect(array_2.values).toEqual([1, 2, 3, 4]);
     });
 
+    it('should sort ascending by numbers', () => {
+        const array_1 = ImmutableArray.of([{ id: 3 }, { id: 2 }, { id: 1 }]);
+        const array_2 = array_1.sortByNumberAsc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    });
+
+    it('should sort descending by numbers', () => {
+        const array_1 = ImmutableArray.of([{ id: 1 }, { id: 2 }, { id: 3 }]);
+        const array_2 = array_1.sortByNumberDesc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: 3 }, { id: 2 }, { id: 1 }]);
+    });
+
+    it('should sort ascending by string', () => {
+        const array_1 = ImmutableArray.of([{ id: '3' }, { id: '2' }, { id: '1' }]);
+        const array_2 = array_1.sortByStringAsc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }]);
+    });
+
+    it('should sort descending by string', () => {
+        const array_1 = ImmutableArray.of([{ id: '1' }, { id: '2' }, { id: '3' }]);
+        const array_2 = array_1.sortByStringDesc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: '3' }, { id: '2' }, { id: '1' }]);
+    });
+
     it('should provide mutable values', () => {
         const array_1 = ImmutableArray.of([3, 1, 4, 2]);
 

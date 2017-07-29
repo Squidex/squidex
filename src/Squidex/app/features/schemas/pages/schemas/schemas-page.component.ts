@@ -80,7 +80,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         this.schemaDeletedSubscription =
             this.messageBus.of(SchemaDeleted)
                 .subscribe(m => {
-                    this.updateSchemas(this.schemas.filter(s => s.id !== m.schemaId));
+                    this.updateSchemas(this.schemas.filter(s => s.id !== m.schema.id));
                 });
 
         this.load();
@@ -111,18 +111,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             schemas = schemas.filter(t => t.name.indexOf(query!) >= 0);
         }
 
-        schemas =
-            schemas.sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
-
-        this.schemasFiltered = schemas;
+        this.schemasFiltered = schemas.sortByStringAsc(x => x.name);
     }
 }
 

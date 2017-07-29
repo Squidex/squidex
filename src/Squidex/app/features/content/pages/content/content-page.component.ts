@@ -81,7 +81,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
                 .subscribe(message => {
-                    if (message.contentId === this.contentId) {
+                    if (message.content.id === this.contentId) {
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }
                 });

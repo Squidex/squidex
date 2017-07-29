@@ -79,7 +79,7 @@ describe('AppsService', () => {
 
         let app: AppDto | null = null;
 
-        appsService.postApp(dto).subscribe(result => {
+        appsService.postApp(dto, now).subscribe(result => {
             app = result;
         });
 

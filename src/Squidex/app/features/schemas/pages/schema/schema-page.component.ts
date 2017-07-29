@@ -201,7 +201,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.messageBus.publish(new SchemaDeleted(this.schema.id));
+                this.messageBus.publish(new SchemaDeleted(this.schema));
 
                 this.router.navigate(['../'], { relativeTo: this.route });
             }, error => {

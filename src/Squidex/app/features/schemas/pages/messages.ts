@@ -16,7 +16,7 @@ export class SchemaUpdated {
 
 export class SchemaDeleted {
     constructor(
-        public readonly schemaId: string
+        public readonly schema: SchemaDto
     ) {
     }
 }

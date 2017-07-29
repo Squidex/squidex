@@ -73,6 +73,66 @@ export class ImmutableArray<T> implements Iterable<T> {
         return new ImmutableArray<T>(clone);
     }
 
+    public sortByStringAsc(filter: (a: T) => string): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return -1;
+            }
+            if (av > bv) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByStringDesc(filter: (a: T) => string): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return 1;
+            }
+            if (av > bv) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByNumberAsc(filter: (a: T) => number): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return -1;
+            }
+            if (av > bv) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByNumberDesc(filter: (a: T) => number): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return 1;
+            }
+            if (av > bv) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+
     public pushFront(...items: T[]): ImmutableArray<T> {
         if (!items || items.length === 0) {
             return this;
