@@ -21,11 +21,26 @@ export class UsersDto {
     }
 }
 
-export class UserCreatedDto {
+export class UserDto {
     constructor(
         public readonly id: string,
-        public readonly pictureUrl: string
+        public readonly email: string,
+        public readonly displayName: string,
+        public readonly pictureUrl: string | null,
+        public readonly isLocked: boolean
     ) {
+    }
+
+    public update(email: string, displayName: string): UserDto {
+        return new UserDto(this.id, email, displayName, this.pictureUrl, this.isLocked);
+    }
+
+    public lock(): UserDto {
+        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, true);
+    }
+
+    public unlock(): UserDto {
+        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, false);
     }
 }
 
@@ -43,17 +58,6 @@ export class UpdateUserDto {
         public readonly email: string,
         public readonly displayName: string,
         public readonly password: string
-    ) {
-    }
-}
-
-export class UserDto {
-    constructor(
-        public readonly id: string,
-        public readonly email: string,
-        public readonly displayName: string,
-        public readonly pictureUrl: string | null,
-        public readonly isLocked: boolean
     ) {
     }
 }
@@ -150,7 +154,7 @@ export class UserManagementService {
 
         return HTTP.postVersioned(this.http, url, dto)
                 .map(response => {
-                    return new UserCreatedDto(response.id, response.pictureUrl);
+                    return new UserDto(response.id, dto.email, dto.displayName, response.pictureUrl, false);
                 })
                 .pretifyError('Failed to create user. Please reload.');
     }

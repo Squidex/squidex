@@ -50,10 +50,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.sender !== this) {
-                        this.assetsItems =
-                            this.assetsItems.replaceAll(
-                                a => a.id === event.assetDto.id,
-                                a => event.assetDto);
+                        this.assetsItems = this.assetsItems.replaceBy('id', event.assetDto);
                     }
                 });
 

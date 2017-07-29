@@ -5,28 +5,25 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { ContentDto } from 'shared';
+
 export class ContentCreated {
     constructor(
-        public readonly id: string,
-        public readonly data: any,
-        public readonly version: string,
-        public readonly isPublished: boolean
+        public readonly content: ContentDto
     ) {
     }
 }
 
 export class ContentUpdated {
     constructor(
-        public readonly id: string,
-        public readonly data: any,
-        public readonly version: string
+        public readonly content: ContentDto
     ) {
     }
 }
 
 export class ContentDeleted {
     constructor(
-        public readonly id: string
+        public readonly contentId: string
     ) {
     }
 }

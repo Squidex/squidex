@@ -14,7 +14,6 @@ import {
     CreateSchemaDto,
     createProperties,
     DateTime,
-    EntityCreatedDto,
     FieldDto,
     SchemaDetailsDto,
     SchemaDto,
@@ -26,6 +25,8 @@ import {
 } from './../';
 
 describe('SchemasService', () => {
+    let now = DateTime.now();
+    let user = 'me';
     let version = new Version('1');
 
     beforeEach(() => {
@@ -240,10 +241,10 @@ describe('SchemasService', () => {
 
         const dto = new CreateSchemaDto('name');
 
-        let created: EntityCreatedDto | null = null;
+        let schema: SchemaDto | null = null;
 
-        schemasService.postSchema('my-app', dto, version).subscribe(result => {
-            created = result;
+        schemasService.postSchema('my-app', dto, user, now, version).subscribe(result => {
+            schema = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas');
@@ -251,10 +252,10 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({ id: 'my-schema' });
+        req.flush({ id: '1' });
 
-        expect(created).toEqual(
-            new EntityCreatedDto('my-schema'));
+        expect(schema).toEqual(
+            new SchemaDto('my-schema', dto.name, new SchemaPropertiesDto(null, null), false, user, user, now, now, version));
     }));
 
     it('should make post request to add field',
@@ -262,10 +263,10 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let created: EntityCreatedDto | null = null;
+        let field: FieldDto | null = null;
 
         schemasService.postField('my-app', 'my-schema', dto, version).subscribe(result => {
-            created = result;
+            field = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields');
@@ -275,8 +276,8 @@ describe('SchemasService', () => {
 
         req.flush({ id: 123 });
 
-        expect(created).toEqual(
-            new EntityCreatedDto(123));
+        expect(field).toEqual(
+            new FieldDto(123, dto.name, false, false, dto.partitioning, dto.properties));
     }));
 
     it('should make put request to update schema',

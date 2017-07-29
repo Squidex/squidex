@@ -12,7 +12,6 @@ import {
     ApiUrlConfig,
     AssetsDto,
     AssetDto,
-    AssetCreatedDto,
     AssetReplacedDto,
     AssetsService,
     DateTime,
@@ -21,6 +20,8 @@ import {
 } from './../';
 
 describe('AssetsService', () => {
+    let now = DateTime.now();
+    let user = 'me';
     let version = new Version('1');
 
     beforeEach(() => {
@@ -204,10 +205,10 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetCreatedDto | null = null;
+        let asset: AssetDto | null = null;
 
-        assetsService.uploadFile('my-app', null!).subscribe(result => {
-            asset = <AssetCreatedDto>result;
+        assetsService.uploadFile('my-app', null!, user).subscribe(result => {
+            asset = <AssetDto>result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
@@ -228,8 +229,12 @@ describe('AssetsService', () => {
         });
 
         expect(asset).toEqual(
-            new AssetCreatedDto(
+            new AssetDto(
                 'id1',
+                user,
+                user,
+                now,
+                now,
                 'my-asset1.png',
                 1024, 2,
                 'text/plain',

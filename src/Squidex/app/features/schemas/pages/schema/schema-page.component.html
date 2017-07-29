@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schemaName}}"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schema.name}}"></sqx-title>
 
 <sqx-panel panelWidth="48rem">
     <div class="panel-header">
@@ -9,10 +9,10 @@
                 </button>
 
                 <div class="btn-group btn-group-sm" data-toggle="buttons">
-                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="isPublished" [disabled]="isPublished" (click)="publish()">
+                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
                         Published
                     </button>
-                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-danger]="!isPublished" [disabled]="!isPublished" (click)="unpublish()">
+                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
                         Unpublished
                     </button>
                 </div>
@@ -48,7 +48,7 @@
                     (enabling)="enableField(field)"
                     (showing)="showField(field)"
                     (hiding)="hideField(field)"
-                    (saving)="saveField(field, $event)"></sqx-field>
+                    (saving)="saveField($event)"></sqx-field>
             </div>
             
             <div class="table-items-footer">
@@ -134,7 +134,7 @@
             </div>
 
             <div class="modal-body">
-                <sqx-schema-edit-form [appName]="appName() | async" [name]="schemaName" [properties]="schemaProperties" [version]="schemaVersion" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
+                <sqx-schema-edit-form [appName]="appName() | async" [name]="schema.name" [properties]="schema.properties" [version]="schema.version" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>
         </div>
     </div>

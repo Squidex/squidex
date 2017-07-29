@@ -11,10 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     ApiUrlConfig,
     AuthService,
-    DateTime,
     fadeAnimation,
     SchemaDto,
-    SchemaPropertiesDto,
     SchemasService,
     ValidatorsEx,
     Version
@@ -74,7 +72,7 @@ export class SchemaFormComponent {
     }
 
     public cancel() {
-        this.reset();
+        this.resetForm();
         this.cancelled.emit();
     }
 
@@ -87,14 +85,14 @@ export class SchemaFormComponent {
             const schemaVersion = new Version();
             const schemaName = this.createForm.controls['name'].value;
 
-            const requestDto = Object.assign(this.createForm.controls['import'].value || {}, {});
+            const requestDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
 
-            requestDto.name = schemaName;
+            const me = this.authService.user!.token;
 
-            this.schemas.postSchema(this.appName, requestDto, schemaVersion)
+            this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
                 .subscribe(dto => {
-                    this.reset();
-                    this.created.emit(this.createSchemaDto(dto.id, requestDto.properties || {}, schemaName, schemaVersion));
+                    this.resetForm();
+                    this.created.emit(dto);
                 }, error => {
                     this.createForm.enable();
                     this.createFormError = error.displayMessage;
@@ -102,16 +100,10 @@ export class SchemaFormComponent {
         }
     }
 
-    private reset() {
+    private resetForm() {
         this.createFormError = '';
         this.createForm.reset();
         this.createFormSubmitted = false;
     }
 
-    private createSchemaDto(id: string, properties: SchemaPropertiesDto, name: string, version: Version) {
-        const user = this.authService.user!.token;
-        const now = DateTime.now();
-
-        return new SchemaDto(id, name, properties, false, user, user, now, now, version);
-    }
 }

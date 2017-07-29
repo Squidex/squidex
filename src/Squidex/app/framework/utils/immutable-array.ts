@@ -1,3 +1,13 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+export interface IdField {
+    id: string;
+}
 
 function freeze<T>(items: T[]): T[] {
     for (let item of items) {
@@ -151,5 +161,9 @@ export class ImmutableArray<T> implements Iterable<T> {
         }
 
         return hasChange ? new ImmutableArray<T>(copy) : this;
+    }
+
+    public replaceBy(field: string, newValue: T, replacer?: (o: T, n: T) => T) {
+        return this.replaceAll(x => x[field] === newValue[field], o => replacer ? replacer(o, newValue) : newValue);
     }
 }

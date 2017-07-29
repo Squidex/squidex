@@ -25,6 +25,14 @@ export class AppClientDto {
         public readonly isReader: boolean
     ) {
     }
+
+    public rename(name: string): AppClientDto {
+        return new AppClientDto(this.id, name, this.secret, this.isReader);
+    }
+
+    public change(isReader: boolean): AppClientDto {
+        return new AppClientDto(this.id, this.name, this.secret, isReader);
+    }
 }
 
 export class CreateAppClientDto {

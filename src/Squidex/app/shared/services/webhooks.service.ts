@@ -32,14 +32,6 @@ export class WebhookDto {
     }
 }
 
-export class WebhookCreatedDto {
-    constructor(
-        public readonly id: string,
-        public readonly sharedSecret: string
-    ) {
-    }
-}
-
 export class CreateWebhookDto {
     constructor(
         public readonly url: string
@@ -78,14 +70,17 @@ export class WebhooksService {
                 .pretifyError('Failed to load webhooks. Please reload.');
     }
 
-    public postWebhook(appName: string, schemaName: string, dto: CreateWebhookDto, version?: Version): Observable<WebhookCreatedDto> {
+    public postWebhook(appName: string, schemaName: string, dto: CreateWebhookDto, version?: Version): Observable<WebhookDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/webhooks`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
-                    return new WebhookCreatedDto(
+                    return new WebhookDto(
                         response.id,
-                        response.sharedSecret);
+                        response.schemaId,
+                        response.sharedSecret,
+                        dto.url,
+                        0, 0, 0, 0, []);
                 })
                 .pretifyError('Failed to create webhook. Please reload.');
     }

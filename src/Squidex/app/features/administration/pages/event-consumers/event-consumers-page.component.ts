@@ -42,7 +42,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public ngOnInit() {
         this.subscription =
             Observable.timer(0, 4000)
-                .switchMap(_ => this.eventConsumersService.getEventConsumers())
+                .switchMap(() => this.eventConsumersService.getEventConsumers())
                 .subscribe(dtos => {
                     this.eventConsumers = ImmutableArray.of(dtos);
                 });
@@ -52,37 +52,28 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
         this.subscription.unsubscribe();
     }
 
-    public start(name: string) {
+    public start(consumer: EventConsumerDto) {
         this.eventConsumersService.startEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, false, e.isResetting, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public stop(name: string) {
+    public stop(consumer: EventConsumerDto) {
         this.eventConsumersService.stopEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, true, e.isResetting, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public reset(name: string) {
+    public reset(consumer: EventConsumerDto) {
         this.eventConsumersService.resetEventConsumer(name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, e.isStopped, true, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
             }, error => {
                 this.notifyError(error);
             });

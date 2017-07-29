@@ -85,7 +85,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.version))
             .subscribe(() => {
-                this.updateClients(this.appClients.replace(client, rename(client, name)));
+                this.updateClients(this.appClients.replaceBy('id', client.rename(name)));
             }, error => {
                 this.notifyError(error);
             });
@@ -97,7 +97,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.version))
             .subscribe(() => {
-                this.updateClients(this.appClients.replace(client, change(client, isReader)));
+                this.updateClients(this.appClients.replaceBy('id', client.change(isReader)));
             }, error => {
                 this.notifyError(error);
             });
@@ -135,11 +135,3 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         this.messageBus.publish(new HistoryChannelUpdated());
     }
 }
-
-function change(client: AppClientDto, isReader: boolean): AppClientDto {
-    return new AppClientDto(client.id, client.name, client.secret, isReader);
-};
-
-function rename(client: AppClientDto, name: string): AppClientDto {
-    return new AppClientDto(client.id, name, client.secret, client.isReader);
-};

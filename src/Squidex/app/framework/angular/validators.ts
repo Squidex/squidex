@@ -128,4 +128,10 @@ export module ValidatorsEx {
             return null;
         };
     }
+
+    export function noop() {
+        return (control: AbstractControl): { [key: string]: any } => {
+            return null;
+        };
+    }
 }

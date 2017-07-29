@@ -52,7 +52,6 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.plansService.getPlans(app, this.version).retry(2))
             .subscribe(dto => {
                 this.plans = dto;
-
                 this.planOwned = !dto.planOwner || (dto.planOwner === this.authService.user!.id);
 
                 if (showInfo) {
@@ -75,10 +74,9 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
                          this.plans.hasPortal,
                          this.plans.hasConfigured,
                          this.plans.plans);
-                this.isDisabled = false;
             }, error => {
                 this.notifyError(error);
-
+            }, () => {
                 this.isDisabled = false;
             });
     }

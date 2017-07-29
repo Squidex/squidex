@@ -94,23 +94,23 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
     }
 
     public addWebhook() {
+        this.addWebhookFormSubmitted = true;
+
         if (this.addWebhookForm.valid) {
-            this.addWebhookFormSubmitted = true;
             this.addWebhookForm.disable();
 
             const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value);
+
             const schemaId = this.addWebhookForm.controls['schemaId'].value;
             const schema = this.schemas.find(s => s.id === schemaId);
 
             this.appNameOnce()
                 .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
                 .subscribe(dto => {
-                    const webhook = new WebhookDto(dto.id, schemaId, dto.sharedSecret, requestDto.url, 0, 0, 0, 0, []);
-
-                    this.webhooks = this.webhooks.push({ schema, webhook, showDetails: false });
-                    this.resetWebhookForm();
+                    this.webhooks = this.webhooks.push({ webhook: dto, schema: schema, showDetails: false });
                 }, error => {
                     this.notifyError(error);
+                }, () => {
                     this.resetWebhookForm();
                 });
         }

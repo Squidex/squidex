@@ -243,3 +243,13 @@ describe('ValidatorsEx.pattern', () => {
         expect(error).toEqual(expected);
     });
 });
+
+describe('ValidatorsEx.noop', () => {
+    it('should return null validator', () => {
+        const input = new FormControl(null);
+
+        const error = <any>ValidatorsEx.noop()(input);
+
+        expect(error).toBeNull();
+    });
+});

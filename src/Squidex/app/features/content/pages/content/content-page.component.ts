@@ -21,6 +21,7 @@ import {
     AppLanguageDto,
     AppsStoreService,
     allData,
+    AuthService,
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
@@ -44,6 +45,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     private contentDeletedSubscription: Subscription;
     private version: Version = new Version('');
     private cancelPromise: Subject<boolean> | null = null;
+    private content: ContentDto;
 
     public schema: SchemaDetailsDto;
 
@@ -58,6 +60,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     public languages: AppLanguageDto[] = [];
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
+        private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
@@ -78,7 +81,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
                 .subscribe(message => {
-                    if (message.id === this.contentId) {
+                    if (message.contentId === this.contentId) {
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }
                 });
@@ -87,7 +90,9 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
         this.route.data.map(p => p['content'])
             .subscribe((content: ContentDto) => {
-                this.populateForm(content);
+                this.content = content;
+
+                this.populateForm();
             });
     }
 
@@ -142,8 +147,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             if (this.isNewMode) {
                 this.appNameOnce()
                     .switchMap(app => this.contentsService.postContent(app, this.schema.name, requestDto, publish, this.version))
-                    .subscribe(created => {
-                        this.messageBus.publish(new ContentCreated(created.id, created.data, this.version.value, publish));
+                    .subscribe(dto => {
+                        this.content = dto;
+
+                        this.messageBus.publish(new ContentCreated(dto));
 
                         this.notifyInfo('Content created successfully.');
                         back();
@@ -155,7 +162,9 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 this.appNameOnce()
                     .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, requestDto, this.version))
                     .subscribe(() => {
-                        this.messageBus.publish(new ContentUpdated(this.contentId!, requestDto, this.version.value));
+                        this.content = this.content.update(requestDto, this.authService.user.token);
+
+                        this.messageBus.publish(new ContentUpdated(this.content));
 
                         this.notifyInfo('Content saved successfully.');
                         this.enable();
@@ -205,23 +214,23 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentForm = new FormGroup(controls);
     }
 
-    private populateForm(content: ContentDto) {
+    private populateForm() {
         this.contentForm.markAsPristine();
 
-        if (!content) {
+        if (!this.content) {
             this.contentData = null;
             this.contentId = null;
             this.isNewMode = true;
             return;
         }
 
-        this.contentData = content.data;
-        this.contentId = content.id;
-        this.version = content.version;
+        this.contentData = this.content.data;
+        this.contentId = this.content.id;
+        this.version = this.content.version;
         this.isNewMode = false;
 
         for (const field of this.schema.fields) {
-            const fieldValue = content.data[field.name] || {};
+            const fieldValue = this.content.data[field.name] || {};
             const fieldForm = <FormGroup>this.contentForm.get(field.name);
 
              if (field.partitioning === 'language') {

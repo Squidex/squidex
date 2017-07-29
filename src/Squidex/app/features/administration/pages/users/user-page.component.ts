@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -19,7 +19,7 @@ import {
     ValidatorsEx
 } from 'shared';
 
-import { UserCreated, UserUpdated } from './messages';
+import { UserCreated, UserUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-user-page',
@@ -27,6 +27,8 @@ import { UserCreated, UserUpdated } from './messages';
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ComponentBase implements OnInit {
+    private user: UserDto;
+
     public currentUserId: string;
     public userFormSubmitted = false;
     public userForm: FormGroup;
@@ -52,7 +54,9 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
         this.route.data.map(p => p['user'])
             .subscribe((user: UserDto) => {
-                this.populateForm(user);
+                this.user = user;
+
+                this.populateForm();
             });
     }
 
@@ -79,12 +83,14 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             if (this.isNewMode) {
                 this.userManagementService.postUser(requestDto)
                     .subscribe(created => {
-                        this.messageBus.publish(
-                            new UserCreated(
+                        this.user =
+                            new UserDto(
                                 created.id,
                                 requestDto.email,
                                 requestDto.displayName,
-                                created.pictureUrl!));
+                                created.pictureUrl!,
+                                false);
+                        this.messageBus.publish(new UserCreated(this.user));
 
                         this.notifyInfo('User created successfully.');
                         back();
@@ -94,11 +100,12 @@ export class UserPageComponent extends ComponentBase implements OnInit {
             } else {
                 this.userManagementService.putUser(this.userId, requestDto)
                     .subscribe(() => {
-                        this.messageBus.publish(
-                            new UserUpdated(
-                                this.userId,
+                        this.user =
+                            this.user.update(
                                 requestDto.email,
-                                requestDto.displayName));
+                                requestDto.displayMessage);
+
+                        this.messageBus.publish(new UserUpdated(this.user));
 
                         this.notifyInfo('User saved successfully.');
                         enable();
@@ -109,10 +116,10 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         }
     }
 
-    private populateForm(user: UserDto) {
-        const input = user || {};
+    private populateForm() {
+        const input = this.user || {};
 
-        this.isNewMode = !user;
+        this.isNewMode = !this.user;
         this.userId = input['id'];
         this.userFormError = '';
         this.userFormSubmitted = false;
@@ -128,16 +135,16 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                     [
                         Validators.required,
                         Validators.maxLength(100)
+                    ]],
+                password: ['',
+                    [
+                        this.isNewMode ? Validators.required : Validators.nullValidator
+                    ]],
+                passwordConfirm: ['',
+                    [
+                        ValidatorsEx.match('password', 'Passwords must be the same.')
                     ]]
             });
-
-        if (user) {
-            this.userForm.addControl('password', new FormControl(''));
-        } else {
-            this.userForm.addControl('password', new FormControl('', Validators.required));
-        }
-
-        this.userForm.addControl('passwordConfirm', new FormControl('', ValidatorsEx.match('password', 'Passwords must be the same.')));
 
         this.isCurrentUser = this.userId === this.currentUserId;
     }

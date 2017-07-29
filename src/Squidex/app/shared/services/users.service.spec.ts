@@ -12,7 +12,6 @@ import {
     ApiUrlConfig,
     CreateUserDto,
     UpdateUserDto,
-    UserCreatedDto,
     UserDto,
     UserManagementService,
     UsersDto,
@@ -280,7 +279,7 @@ describe('UserManagementService', () => {
 
         req.flush({ id: '123', pictureUrl: 'path/to/image1' });
 
-        expect(user).toEqual(new UserCreatedDto('123', 'path/to/image1'));
+        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, 'path/to/image1', false));
     }));
 
     it('should make put request to update user',

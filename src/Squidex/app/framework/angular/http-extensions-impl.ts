@@ -10,13 +10,6 @@ import { Observable } from 'rxjs';
 
 import { Version } from './../utils/version';
 
-export class EntityCreatedDto {
-    constructor(
-        public readonly id: any
-    ) {
-    }
-}
-
 export class ErrorDto {
     public get displayMessage(): string {
         let result = this.message;

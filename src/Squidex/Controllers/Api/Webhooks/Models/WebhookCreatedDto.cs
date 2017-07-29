@@ -23,5 +23,10 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// </summary>
         [Required]
         public string SharedSecret { get; set; }
+
+        /// <summary>
+        /// The id of the schema.
+        /// </summary>
+        public string SchemaId { get; set; }
     }
 }

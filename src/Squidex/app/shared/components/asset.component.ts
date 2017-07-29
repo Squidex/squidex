@@ -13,12 +13,10 @@ import { AppComponentBase } from './app.component-base';
 import {
     ApiUrlConfig,
     AppsStoreService,
-    AssetCreatedDto,
     AssetDto,
     AssetReplacedDto,
     AssetsService,
     AuthService,
-    DateTime,
     fadeAnimation,
     FileHelper,
     ModalView,
@@ -93,28 +91,15 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         const initFile = this.initFile;
 
         if (initFile) {
-            this.appNameOnce()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile))
-                .subscribe(result => {
-                    if (result instanceof AssetCreatedDto) {
-                        const me = `subject:${this.authService.user!.id}`;
+            const me = `subject:${this.authService.user!.id}`;
 
-                        const asset = new AssetDto(
-                            result.id,
-                            me, me,
-                            DateTime.now(),
-                            DateTime.now(),
-                            result.fileName,
-                            result.fileSize,
-                            result.fileVersion,
-                            result.mimeType,
-                            result.isImage,
-                            result.pixelWidth,
-                            result.pixelHeight,
-                            result.version);
-                        this.loaded.emit(asset);
+            this.appNameOnce()
+                .switchMap(app => this.assetsService.uploadFile(app, initFile, me))
+                .subscribe(dto => {
+                    if (dto instanceof AssetDto) {
+                        this.loaded.emit(dto);
                     } else {
-                        this.progress = result;
+                        this.progress = dto;
                     }
                 }, error => {
                     this.failed.emit();
@@ -128,32 +113,20 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
+            const me = `subject:${this.authService.user!.id}`;
+
             this.appNameOnce()
                 .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.version))
-                .subscribe(result => {
-                    if (result instanceof AssetReplacedDto) {
-                        const me = `subject:${this.authService.user!.id}`;
-
-                        const asset = new AssetDto(
-                            this.asset.id,
-                            this.asset.createdBy, me,
-                            this.asset.created, DateTime.now(),
-                            this.asset.fileName,
-                            result.fileSize,
-                            result.fileVersion,
-                            result.mimeType,
-                            result.isImage,
-                            result.pixelWidth,
-                            result.pixelHeight,
-                            result.version);
-                        this.updateAsset(asset, true);
+                .subscribe(dto => {
+                    if (dto instanceof AssetReplacedDto) {
+                        this.updateAsset(this.asset.update(dto, me), true);
                     } else {
-                        this.progress = result;
+                        this.progress = dto;
                     }
                 }, error => {
-                    this.progress = 0;
-
                     this.notifyError(error);
+                }, () => {
+                    this.progress = 0;
                 });
         }
     }
@@ -166,24 +139,12 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
             const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
+            const me = `subject:${this.authService.user!.id}`;
+
             this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.version))
                 .subscribe(() => {
-                    const me = `subject:${this.authService.user!.id}`;
-
-                    const asset = new AssetDto(
-                        this.asset.id,
-                        this.asset.createdBy, me,
-                        this.asset.created, DateTime.now(), requestDto.fileName,
-                        this.asset.fileSize,
-                        this.asset.fileVersion,
-                        this.asset.mimeType,
-                        this.asset.isImage,
-                        this.asset.pixelWidth,
-                        this.asset.pixelHeight,
-                        this.asset.version);
-
-                    this.updateAsset(asset, true);
+                    this.updateAsset(this.asset.rename(requestDto.fileName, me), true);
                 }, error => {
                     this.notifyError(error);
                 }, () => {

@@ -26,6 +26,10 @@ export class AppLanguageDto {
         public readonly fallback: string[]
     ) {
     }
+
+    public update(isMaster: boolean, isOptional: boolean, fallback: string[]): AppLanguageDto {
+        return new AppLanguageDto(this.iso2Code, this.englishName, isMaster, isOptional, fallback);
+    }
 }
 
 export class AddAppLanguageDto {

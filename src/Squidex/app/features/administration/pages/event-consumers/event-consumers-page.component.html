@@ -48,13 +48,13 @@
                                 <span>{{eventConsumer.position}}</span>
                             </td>
                             <td class="text-right">
-                                <button class="btn btn-link" (click)="reset(eventConsumer.name)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
+                                <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
                                     <i class="icon icon-reset"></i>
                                 </button>
-                                <button class="btn btn-link" (click)="start(eventConsumer.name)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
+                                <button class="btn btn-link" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
                                     <i class="icon icon-play"></i>
                                 </button>
-                                <button class="btn btn-link" (click)="stop(eventConsumer.name)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
+                                <button class="btn btn-link" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
                                     <i class="icon icon-pause"></i>
                                 </button>
                             </td>

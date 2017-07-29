@@ -41,26 +41,40 @@ export class AssetDto {
         public readonly version: Version
     ) {
     }
+
+    public update(result: AssetReplacedDto, user: string): AssetDto {
+        return new AssetDto(
+            this.id,
+            this.createdBy, user,
+            this.created, DateTime.now(),
+            this.fileName,
+            result.fileSize,
+            result.fileVersion,
+            result.mimeType,
+            result.isImage,
+            result.pixelWidth,
+            result.pixelHeight,
+            result.version)
+    }
+
+    public rename(name: string, user: string): AssetDto {
+        return new AssetDto(
+            this.id,
+            this.createdBy, user,
+            this.created, DateTime.now(), name,
+            this.fileSize,
+            this.fileVersion,
+            this.mimeType,
+            this.isImage,
+            this.pixelWidth,
+            this.pixelHeight,
+            this.version);
+    }
 }
 
 export class UpdateAssetDto {
     constructor(
         public readonly fileName: string
-    ) {
-    }
-}
-
-export class AssetCreatedDto {
-    constructor(
-        public readonly id: string,
-        public readonly fileName: string,
-        public readonly fileSize: number,
-        public readonly fileVersion: number,
-        public readonly mimeType: string,
-        public readonly isImage: boolean,
-        public readonly pixelWidth: number | null,
-        public readonly pixelHeight: number | null,
-        public readonly version: Version
     ) {
     }
 }
@@ -132,8 +146,8 @@ export class AssetsService {
                 .pretifyError('Failed to load assets. Please reload.');
     }
 
-    public uploadFile(appName: string, file: File): Observable<number | AssetCreatedDto> {
-        return new Observable<number | AssetCreatedDto>(subscriber => {
+    public uploadFile(appName: string, file: File, user: string, now?: DateTime): Observable<number | AssetDto> {
+        return new Observable<number | AssetDto>(subscriber => {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
             const req = new HttpRequest('POST', url, getFormData(file), {
@@ -150,8 +164,14 @@ export class AssetsService {
                     } else if (event instanceof HttpResponse) {
                         const response = event.body;
 
-                        const dto =  new AssetCreatedDto(
+                        now = now || DateTime.now();
+
+                        const dto =  new AssetDto(
                             response.id,
+                            user,
+                            user,
+                            now,
+                            now,
                             response.fileName,
                             response.fileSize,
                             response.fileVersion,

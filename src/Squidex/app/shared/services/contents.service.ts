@@ -38,6 +38,36 @@ export class ContentDto {
         public readonly version: Version
     ) {
     }
+
+    public publish(user: string): ContentDto {
+        return new ContentDto(
+            this.id,
+            true,
+            this.createdBy, user,
+            this.created, DateTime.now(),
+            this.data,
+            this.version);
+    }
+
+    public unpublish(user: string): ContentDto {
+        return new ContentDto(
+            this.id,
+            false,
+            this.createdBy, user,
+            this.created, DateTime.now(),
+            this.data,
+            this.version);
+    }
+
+    public update(data: any, user: string): ContentDto {
+        return new ContentDto(
+            this.id,
+            this.isPublished,
+            this.createdBy, user,
+            this.created, DateTime.now(),
+            data,
+            this.version);
+    }
 }
 
 @Injectable()

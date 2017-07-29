@@ -14,8 +14,7 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
-    HTTP,
-    EntityCreatedDto
+    HTTP
 } from 'framework';
 
 export class AppDto {
@@ -63,12 +62,14 @@ export class AppsService {
                 .pretifyError('Failed to load apps. Please reload.');
     }
 
-    public postApp(dto: CreateAppDto): Observable<EntityCreatedDto> {
+    public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
         return HTTP.postVersioned(this.http, url, dto)
                 .map(response => {
-                    return new EntityCreatedDto(response.id);
+                    now = now || DateTime.now();
+
+                    return new AppDto(response.id, dto.name, 'Owner', now, now);
                 })
                 .pretifyError('Failed to create app. Please reload.');
     }

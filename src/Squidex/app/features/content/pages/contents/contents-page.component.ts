@@ -24,14 +24,12 @@ import {
     AuthService,
     ContentDto,
     ContentsService,
-    DateTime,
     FieldDto,
     ImmutableArray,
     MessageBus,
     NotificationService,
     Pager,
-    SchemaDetailsDto,
-    Version
+    SchemaDetailsDto
 } from 'shared';
 
 @Component({
@@ -81,14 +79,14 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentCreatedSubscription =
             this.messageBus.of(ContentCreated)
                 .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version, message.isPublished));
+                    this.contentItems = this.contentItems.pushFront(message.content);
                     this.contentsPager = this.contentsPager.incrementCount();
                 });
 
         this.contentUpdatedSubscription =
             this.messageBus.of(ContentUpdated)
                 .subscribe(message => {
-                    this.updateContents(message.id, undefined, message.data, message.version);
+                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy));
                 });
 
         this.route.params.map(p => <string> p['language'])
@@ -127,7 +125,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appNameOnce()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, true, content.data, content.version.value);
+                this.contentItems = this.contentItems.replaceBy('id', content.publish(this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -137,7 +135,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appNameOnce()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.updateContents(content.id, false, content.data, content.version.value);
+                this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -203,41 +201,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentsPager = this.contentsPager.goPrev();
 
         this.load();
-    }
-
-    private updateContents(id: string, p: boolean | undefined, data: any, version: string) {
-        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data, version));
-    }
-
-    private createContent(id: string, data: any, version: string, isPublished: boolean): ContentDto {
-        const me = `subject:${this.authService.user!.id}`;
-
-        const newContent =
-            new ContentDto(
-                id,
-                isPublished,
-                me, me,
-                DateTime.now(),
-                DateTime.now(),
-                data,
-                new Version(version));
-
-        return newContent;
-    }
-
-    private updateContent(content: ContentDto, isPublished: boolean, data: any, version: string): ContentDto {
-        const me = `subject:${this.authService.user!.id}`;
-
-        const newContent =
-            new ContentDto(
-                content.id,
-                isPublished,
-                content.createdBy, me,
-                content.created, DateTime.now(),
-                data,
-                new Version(version));
-
-        return newContent;
     }
 }
 

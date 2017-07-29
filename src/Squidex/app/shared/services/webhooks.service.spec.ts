@@ -12,7 +12,6 @@ import {
     ApiUrlConfig,
     CreateWebhookDto,
     Version,
-    WebhookCreatedDto,
     WebhookDto,
     WebhooksService
 } from './../';
@@ -86,7 +85,7 @@ describe('WebhooksService', () => {
 
         const dto = new CreateWebhookDto('http://squidex.io/hook');
 
-        let webhook: WebhookCreatedDto | null = null;
+        let webhook: WebhookDto | null = null;
 
         webhooksService.postWebhook('my-app', 'my-schema', dto, version).subscribe(result => {
             webhook = result;
@@ -97,9 +96,9 @@ describe('WebhooksService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({ id: 'id1', sharedSecret: 'token1' });
+        req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' });
 
-        expect(webhook).toEqual(new WebhookCreatedDto('id1', 'token1'));
+        expect(webhook).toEqual(new WebhookDto('id1', 'schema1', 'token1', dto.url, 0, 0, 0, 0, []));
     }));
 
     it('should make delete request to delete webhook',

@@ -65,7 +65,8 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     public usersPermissions = [
         'Owner',
         'Developer',
-        'Editor'
+        'Editor',
+        'Reader'
     ];
 
     public get canAddContributor() {
@@ -118,7 +119,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     }
 
     public changePermission(contributor: AppContributorDto, permission: string) {
-        const requestDto = changePermission(contributor, permission);
+        const requestDto = contributor.changePermission(permission);
 
         this.appNameOnce()
             .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
@@ -155,8 +156,3 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         this.messageBus.publish(new HistoryChannelUpdated());
     }
 }
-
-function changePermission(contributor: AppContributorDto, permission: string): AppContributorDto {
-    return new AppContributorDto(contributor.contributorId, permission);
-}
-

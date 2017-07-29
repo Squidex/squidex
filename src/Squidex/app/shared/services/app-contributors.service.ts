@@ -23,6 +23,10 @@ export class AppContributorDto {
         public readonly permission: string
     ) {
     }
+
+    public changePermission(permission: string): AppContributorDto {
+        return new AppContributorDto(this.contributorId, permission);
+    }
 }
 
 export class AppContributorsDto {
