@@ -13,14 +13,14 @@
                 </div>
 
                 <div class="client-header">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
                         <div class="form-group mr-1">
                             <sqx-control-errors for="name"></sqx-control-errors>
                             
                             <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                         </div>
 
-                        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid">Save</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
 
                         <button class="btn btn-link btn-decent btn-cancel" (click)="cancelRename()">
                             <i class="icon-close"></i>
@@ -47,7 +47,7 @@
         <tr>
             <td>Client Id:</td>
             <td>
-                <input readonly class="form-control" [attr.value]="clientId" #inputName />
+                <input readonly class="form-control" value="{{appName}}:{{client.id}}" #inputName />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
@@ -58,7 +58,7 @@
         <tr>
             <td>Client Secret:</td>
             <td>
-                <input readonly class="form-control" [attr.value]="clientSecret" #inputSecret />
+                <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">

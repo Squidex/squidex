@@ -151,7 +151,7 @@ describe('ContentsService', () => {
             content = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?hidden=true');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

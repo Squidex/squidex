@@ -49,29 +49,31 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<ContentsDto> {
-        let fullQuery = query ? query.trim() : '';
+        const queryParts: string[] = [];
 
-        if (fullQuery.length > 0) {
-            if (fullQuery.indexOf('$filter') < 0 &&
-                fullQuery.indexOf('$search') < 0 &&
-                fullQuery.indexOf('$orderby') < 0) {
-                fullQuery = `&$search="${fullQuery}"`;
+        if (query && query.length > 0) {
+            if (query.indexOf('$filter') < 0 &&
+                query.indexOf('$search') < 0 &&
+                query.indexOf('$orderby') < 0) {
+                queryParts.push(`$search="${query.trim()}"`);
             } else {
-                fullQuery = `&${fullQuery}`;
+                queryParts.push(`${query.trim()}`);
             }
         }
 
         if (take > 0) {
-            fullQuery += `&$top=${take}`;
+            queryParts.push(`$top=${take}`);
         }
 
         if (skip > 0) {
-            fullQuery += `&$skip=${skip}`;
+            queryParts.push(`$skip=${skip}`);
         }
 
         if (ids && ids.length > 0) {
-            fullQuery += `&ids=${ids.join(',')}`;
+            queryParts.push(`ids=${ids.join(',')}`);
         }
+
+        const fullQuery = queryParts.join('&');
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
@@ -95,7 +97,7 @@ export class ContentsService {
     }
 
     public getContent(appName: string, schemaName: string, id: string, version?: Version): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?hidden=true`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.getVersioned(this.http, url, version)
                 .map(response => {

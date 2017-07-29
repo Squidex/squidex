@@ -42,23 +42,15 @@ export class ClientComponent {
     public changing = new EventEmitter<boolean>();
 
     @Input()
-    public client: AppClientDto;
+    public appName: string;
 
     @Input()
-    public appName: string;
+    public client: AppClientDto;
 
     public tokenDialog = new ModalView();
 
-    public get clientName(): string {
-        return this.client.name || this.client.id;
-    }
-
-    public get clientId(): string {
-        return this.appName + ':' + this.client.id;
-    }
-
-    public get clientSecret(): string {
-        return this.client.secret;
+    public get hasNewName() {
+        return this.renameForm.controls['name'].value !== this.client.name;
     }
 
     public renameForm: FormGroup =
@@ -75,16 +67,12 @@ export class ClientComponent {
     ) {
     }
 
-    public resetForm() {
-        this.renameForm.controls['name'].setValue(this.clientName);
-    }
-
     public cancelRename() {
         this.isRenaming = false;
     }
 
     public startRename() {
-        this.resetForm();
+        this.renameForm.controls['name'].setValue(this.client.name);
 
         this.isRenaming = true;
     }
@@ -92,18 +80,6 @@ export class ClientComponent {
     public onKeyDown(keyCode: number) {
         if (keyCode === ESCAPE_KEY) {
             this.cancelRename();
-        }
-    }
-
-    public rename() {
-        try {
-            const newName = this.renameForm.controls['name'].value;
-
-            if (newName !== this.clientName) {
-                this.renaming.emit(newName);
-            }
-        } finally {
-            this.isRenaming = false;
         }
     }
 

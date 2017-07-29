@@ -68,7 +68,7 @@ export class AppClientsService {
                     return items.map(item => {
                         return new AppClientDto(
                             item.id,
-                            item.name,
+                            item.name || response.id,
                             item.secret,
                             item.isReader);
                     });
@@ -83,7 +83,7 @@ export class AppClientsService {
                 .map(response => {
                     return new AppClientDto(
                         response.id,
-                        response.name,
+                        response.name || response.id,
                         response.secret,
                         response.isReader);
                 })
