@@ -196,7 +196,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxAssetUrl',
-    pure: false
+    pure: true
 })
 export class AssetUrlPipe implements PipeTransform {
     constructor(
@@ -211,7 +211,7 @@ export class AssetUrlPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxAssetPreviewUrl',
-    pure: false
+    pure: true
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
     constructor(
@@ -226,7 +226,7 @@ export class AssetPreviewUrlPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxFileIcon',
-    pure: false
+    pure: true
 })
 export class FileIconPipe implements PipeTransform {
     public transform(asset: { mimeType: string, fileType: string }): string {

@@ -24,6 +24,8 @@ import { PanelContainerDirective } from './panel-container.directive';
     ]
 })
 export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
+    private clientWidthValue = 0;
+
     @Input()
     public theme = 'light';
 
@@ -35,6 +37,10 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     @ViewChild('panel')
     public panel: ElementRef;
+
+    public get clientWidth() {
+        return this.clientWidthValue;
+    }
 
     constructor(
         private readonly container: PanelContainerDirective
@@ -50,6 +56,8 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public ngAfterViewInit() {
+        this.clientWidthValue = this.panel.nativeElement.getBoundingClientRect().width;
+
         this.container.invalidate();
     }
 }

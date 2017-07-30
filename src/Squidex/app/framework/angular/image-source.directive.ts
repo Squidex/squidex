@@ -13,8 +13,9 @@ import { MathHelper } from './../utils/math-helper';
     selector: '[sqxImageSource]'
 })
 export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
-    private retries = 0;
-    private query: string | null = null;
+    private size: any;
+    private loadRetries = 0;
+    private loadQuery: string | null = null;
 
     @Input('sqxImageSource')
     public imageSource: string;
@@ -32,8 +33,8 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
     }
 
     public ngOnChanges() {
-        this.query = null;
-        this.retries = 0;
+        this.loadQuery = null;
+        this.loadRetries = 0;
 
         this.setImageSource();
     }
@@ -43,17 +44,18 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
     }
 
     public ngOnInit() {
-        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'inline-block');
-
         if (this.parent === null) {
             this.parent = this.element.nativeElement.parentElement;
         }
 
-        this.resize(this.parent);
-
         this.renderer.listen(this.parent, 'resize', () => {
             this.resize(this.parent);
         });
+    }
+
+    @HostListener('load')
+    public onLoad() {
+        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
     @HostListener('error')
@@ -63,36 +65,29 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
         this.retryLoadingImage();
     }
 
-    @HostListener('resize')
-    public onResize() {
-        this.setImageSource();
-    }
-
-    @HostListener('load')
-    public onLoad() {
-        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'visible');
-    }
-
     private resize(parent: any) {
-        const size = parent.getBoundingClientRect();
+        this.size = this.parent.getBoundingClientRect();
 
-        this.renderer.setElementStyle(this.element.nativeElement, 'width', size.width + 'px');
-        this.renderer.setElementStyle(this.element.nativeElement, 'height', size.height + 'px');
+        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'inline-block');
+        this.renderer.setElementStyle(this.element.nativeElement, 'width', this.size.width + 'px');
+        this.renderer.setElementStyle(this.element.nativeElement, 'height', this.size.height + 'px');
 
         this.setImageSource();
     }
 
     private setImageSource() {
-        const size = this.element.nativeElement.getBoundingClientRect();
+        if (!this.size) {
+            return;
+        }
 
-        const w = Math.round(size.width);
-        const h = Math.round(size.height);
+        const w = Math.round(this.size.width);
+        const h = Math.round(this.size.height);
 
         if (w > 0 && h > 0) {
             let source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop`;
 
-            if (this.query !== null) {
-                source += `&q=${this.query}`;
+            if (this.loadQuery !== null) {
+                source += `&q=${this.loadQuery}`;
             }
 
             this.renderer.setElementAttribute(this.element.nativeElement, 'src', source);
@@ -100,14 +95,14 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
     }
 
     private retryLoadingImage() {
-        this.retries++;
+        this.loadRetries++;
 
-        if (this.retries <= 10) {
+        if (this.loadRetries <= 10) {
             setTimeout(() => {
-                this.query = MathHelper.guid();
+                this.loadQuery = MathHelper.guid();
 
                 this.setImageSource();
-            }, this.retries * 1000);
+            }, this.loadRetries * 1000);
         }
     }
 }

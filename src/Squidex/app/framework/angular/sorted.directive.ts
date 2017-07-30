@@ -30,7 +30,7 @@ export class SortedDirective {
     ) {
         const oldDragStartCallback = sortableComponent._onDragStartCallback.bind(sortableComponent);
 
-        sortableComponent._onDragStartCallback = (event: Event) => {
+        sortableComponent._onDragStartCallback = () => {
             oldDragStartCallback();
 
             this.oldArray = [...sortableContainer.sortableData];
