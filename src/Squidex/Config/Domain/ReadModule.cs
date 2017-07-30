@@ -94,8 +94,8 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<CachingGraphQLInvoker>()
-                .As<IGraphQLInvoker>()
+            builder.RegisterType<CachingGraphQLService>()
+                .As<IGraphQLService>()
                 .AsSelf()
                 .InstancePerDependency();
         }

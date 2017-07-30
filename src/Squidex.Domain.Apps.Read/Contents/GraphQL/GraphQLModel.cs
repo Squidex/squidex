@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return (schemaFieldType, resolver);
         }
 
-        public async Task<object> ExecuteAsync(QueryContext context, GraphQLQuery query)
+        public async Task<(object Data, object[] Errors)> ExecuteAsync(QueryContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -186,14 +186,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 options.OperationName = query.OperationName;
             }).ConfigureAwait(false);
 
-            if (result.Errors != null && result.Errors.Count > 0)
-            {
-                var errors = result.Errors.Select(x => new ValidationError(x.Message)).ToArray();
-
-                throw new ValidationException("Failed to execute GraphQL query.", errors);
-            }
-
-            return result;
+            return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());
         }
 
         public IFieldPartitioning ResolvePartition(Partitioning key)

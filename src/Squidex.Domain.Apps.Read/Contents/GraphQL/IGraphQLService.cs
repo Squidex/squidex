@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IGraphQLInvoker.cs
+//  IGraphQLService.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,8 +11,8 @@ using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
-    public interface IGraphQLInvoker
+    public interface IGraphQLService
     {
-        Task<object> QueryAsync(IAppEntity app, GraphQLQuery query);
+        Task<(object Data, object[] Errors)> QueryAsync(IAppEntity app, GraphQLQuery query);
     }
 }

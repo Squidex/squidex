@@ -6,6 +6,11 @@
     <RootNamespace>Squidex.Domain.Apps.Read</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="MongoDb\**" />
+    <EmbeddedResource Remove="MongoDb\**" />
+    <None Remove="MongoDb\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
@@ -25,8 +30,5 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MongoDb\Contents\" />
   </ItemGroup>
 </Project>

@@ -169,7 +169,7 @@ namespace Squidex.Config.Domain
             builder.Register(c =>
                 new CompoundEventConsumer(
                     c.Resolve<MongoSchemaRepository>(), 
-                    c.Resolve<CachingGraphQLInvoker>(),
+                    c.Resolve<CachingGraphQLService>(),
                     c.Resolve<CachingSchemaProvider>()))
                 .As<IEventConsumer>()
                 .AsSelf()

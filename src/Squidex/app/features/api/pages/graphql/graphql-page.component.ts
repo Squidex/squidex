@@ -6,6 +6,7 @@
  */
 
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -56,7 +57,7 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
 
     private request(params: any) {
         return this.appNameOnce()
-            .switchMap(app => this.graphQlService.query(app, params))
+            .switchMap(app => this.graphQlService.query(app, params).catch(response => Observable.of(response.error)))
             .toPromise();
     }
 }

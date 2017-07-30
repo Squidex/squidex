@@ -24,6 +24,8 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
+// ReSharper disable RedundantIfElseBlock
+
 namespace Squidex.Controllers.ContentApi
 {
     [ApiExceptionFilter]
@@ -33,32 +35,22 @@ namespace Squidex.Controllers.ContentApi
     {
         private readonly ISchemaProvider schemas;
         private readonly IContentRepository contentRepository;
-        private readonly IGraphQLInvoker graphQL;
+        private readonly IGraphQLService graphQL;
 
         public ContentsController(
             ICommandBus commandBus, 
             ISchemaProvider schemas,
             IContentRepository contentRepository,
-            IGraphQLInvoker graphQL) 
+            IGraphQLService graphQL) 
             : base(commandBus)
         {
             this.graphQL = graphQL;
             this.schemas = schemas;
             this.contentRepository = contentRepository;
         }
-        
+
         [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/graphql")]
-        [ApiCosts(2)]
-        public async Task<IActionResult> GetGraphQL([FromQuery] GraphQLQuery query)
-        {
-            var result = await graphQL.QueryAsync(App, query);
-
-            return Ok(result);
-        }
-        
-        [MustBeAppReader]
         [HttpPost]
         [Route("content/{app}/graphql")]
         [ApiCosts(2)]
@@ -66,9 +58,16 @@ namespace Squidex.Controllers.ContentApi
         {
             var result = await graphQL.QueryAsync(App, query);
 
-            return Ok(result);
+            if (result.Errors?.Length > 0)
+            {
+                return BadRequest(new { result.Data, result.Errors });
+            }
+            else
+            {
+                return Ok(new { result.Data });
+            }
         }
-        
+
         [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}")]

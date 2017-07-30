@@ -96,11 +96,13 @@ export function pretifyError(message: string): Observable<any> {
         let result = new ErrorDto(500, message);
 
         if (!(response.error instanceof Error)) {
+            const errorDto = response.error;
+
             try {
                 if (response.status === 412) {
                     result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.');
                 } else if (response.status !== 500) {
-                    result = new ErrorDto(response.status, response.error.message, response.error.details);
+                    result = new ErrorDto(response.status, errorDto.message, errorDto.details);
                 }
             } catch (e) {
                 /* Ignore */

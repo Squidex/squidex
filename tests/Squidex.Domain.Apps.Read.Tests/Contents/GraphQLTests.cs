@@ -29,6 +29,8 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Infrastructure;
 
+// ReSharper disable SimilarAnonymousTypeNearby
+
 namespace Squidex.Domain.Apps.Read.Contents
 {
     public class GraphQLTests
@@ -62,7 +64,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         private readonly Mock<IAssetRepository> assetRepository = new Mock<IAssetRepository>();
         private readonly IAppEntity app;
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IGraphQLInvoker sut;
+        private readonly IGraphQLService sut;
 
         public GraphQLTests()
         {
@@ -82,7 +84,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             schemaRepository.Setup(x => x.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(schemas));
 
-            sut = new CachingGraphQLInvoker(cache, schemaRepository.Object, assetRepository.Object, contentRepository.Object, new FakeUrlGenerator());
+            sut = new CachingGraphQLService(cache, schemaRepository.Object, assetRepository.Object, contentRepository.Object, new FakeUrlGenerator());
         }
 
         [Fact]
@@ -117,7 +119,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(assets))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -147,7 +149,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             assetRepository.VerifyAll();
         }
@@ -183,7 +185,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult(assetEntity))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -210,7 +212,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             assetRepository.VerifyAll();
         }
@@ -259,7 +261,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(contents))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -315,7 +317,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             contentRepository.VerifyAll();
         }
@@ -363,7 +365,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult(contentEntity))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -416,7 +418,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             contentRepository.VerifyAll();
         }
@@ -454,7 +456,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(refContents))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -480,7 +482,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             contentRepository.VerifyAll();
         }
@@ -518,7 +520,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(refAssets))
                 .Verifiable();
 
-            dynamic result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(app, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -544,7 +546,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }
             };
 
-            AssertJson(expected, result);
+            AssertJson(expected, new { data = result.Data });
 
             contentRepository.VerifyAll();
         }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CachedGraphQLInvoker.cs
+//  CachingGraphQLService.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Read.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Infrastructure.CQRS.Events;
 using System;
+using GraphQL;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Domain.Apps.Events;
 
@@ -24,7 +25,7 @@ using Squidex.Domain.Apps.Events;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
-    public sealed class CachingGraphQLInvoker : CachingProviderBase, IGraphQLInvoker, IEventConsumer
+    public sealed class CachingGraphQLService : CachingProviderBase, IGraphQLService, IEventConsumer
     {
         private readonly IContentRepository contentRepository;
         private readonly IGraphQLUrlGenerator urlGenerator;
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             get { return "^(schema-)|(apps-)"; }
         }
 
-        public CachingGraphQLInvoker(IMemoryCache cache, ISchemaRepository schemaRepository, IAssetRepository assetRepository, IContentRepository contentRepository, IGraphQLUrlGenerator urlGenerator)
+        public CachingGraphQLService(IMemoryCache cache, ISchemaRepository schemaRepository, IAssetRepository assetRepository, IContentRepository contentRepository, IGraphQLUrlGenerator urlGenerator)
             : base(cache)
         {
             Guard.NotNull(schemaRepository, nameof(schemaRepository));
@@ -70,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return TaskHelper.Done;
         }
 
-        public async Task<object> QueryAsync(IAppEntity app, GraphQLQuery query)
+        public async Task<(object Data, object[] Errors)> QueryAsync(IAppEntity app, GraphQLQuery query)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));

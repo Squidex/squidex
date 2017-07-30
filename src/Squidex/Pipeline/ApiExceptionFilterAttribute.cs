@@ -47,17 +47,24 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
         {
-            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 412 };
+            return ErrorResult(412, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnDomainException(DomainException ex)
         {
-            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message });
+            return ErrorResult(400, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnValidationException(ValidationException ex)
         {
-            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+            return ErrorResult(400, new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+        }
+
+        private static IActionResult ErrorResult(int statusCode, ErrorDto error)
+        {
+            error.StatusCode = statusCode;
+
+            return new ObjectResult(error) { StatusCode = 412 };
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
