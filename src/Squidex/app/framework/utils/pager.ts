@@ -22,7 +22,7 @@ export class Pager {
         const totalPages = Math.ceil(numberOfItems / this.pageSize);
 
         if (this.page >= totalPages && this.page > 0) {
-            this.page = this.page = totalPages - 1;
+            this.page = page = totalPages - 1;
         }
 
         this.itemFirst = numberOfItems === 0 ? 0 : page * this.pageSize + 1;
