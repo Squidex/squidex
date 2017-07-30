@@ -135,7 +135,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
         this.updateNewLanguages();
 
-        this.messageBus.publish(new HistoryChannelUpdated());
+        this.messageBus.emit(new HistoryChannelUpdated());
     }
 
     private updateNewLanguages() {

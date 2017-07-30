@@ -109,11 +109,11 @@ export class FieldComponent implements OnInit {
                     this.field.partitioning,
                     properties);
 
-            this.sendSaving(field);
+            this.emitSaving(field);
         }
     }
 
-    private sendSaving(field: FieldDto) {
+    private emitSaving(field: FieldDto) {
         this.saving.emit(field);
     }
 

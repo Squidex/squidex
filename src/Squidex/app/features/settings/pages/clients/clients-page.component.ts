@@ -136,6 +136,6 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     private updateClients(clients: ImmutableArray<AppClientDto>) {
         this.appClients = clients;
 
-        this.messageBus.publish(new HistoryChannelUpdated());
+        this.messageBus.emit(new HistoryChannelUpdated());
     }
 }

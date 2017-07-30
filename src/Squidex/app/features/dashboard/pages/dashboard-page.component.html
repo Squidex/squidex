@@ -84,8 +84,8 @@
             <div class="card-block">
                 <div class="aggregation" *ngIf="callsCurrent">
                     <div class="aggregation-label">API calls this month</div>
-                    <div class="aggregation-value">{{callsCurrent}}</div>
-                    <div class="aggregation-label" *ngIf="callsMax">Monthly limit: {{callsMax}}</div>
+                    <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
+                    <div class="aggregation-label" *ngIf="callsMax > 0">Monthly limit: {{callsMax | sqxKNumber}}</div>
                 </div>
             </div>
         </div>
@@ -100,8 +100,8 @@
             <div class="card-block">
                 <div class="aggregation" *ngIf="assetsCurrent">
                     <div class="aggregation-label">Asset size today</div>
-                    <div class="aggregation-value">{{assetsCurrent}}</div>
-                    <div class="aggregation-label" *ngIf="callsMax">Total limit: {{assetsMax}}</div>
+                    <div class="aggregation-value">{{assetsCurrent | sqxFileSize}}</div>
+                    <div class="aggregation-label" *ngIf="assetsMax > 0">Total limit: {{assetsMax | sqxFileSize}}</div>
                 </div>
             </div>
         </div>

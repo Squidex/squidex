@@ -34,8 +34,8 @@ describe('MessageBus', () => {
             lastEvent = event;
         });
 
-        messageBus.publish(event1);
-        messageBus.publish(event2);
+        messageBus.emit(event1);
+        messageBus.emit(event2);
 
         expect(lastEvent).toBe(event1);
     });

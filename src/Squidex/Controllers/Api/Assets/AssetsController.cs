@@ -108,7 +108,7 @@ namespace Squidex.Controllers.Api.Assets
             var response = new AssetsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
+                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
 
             return Ok(response);
@@ -137,7 +137,7 @@ namespace Squidex.Controllers.Api.Assets
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new AssetDto());
+            var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 

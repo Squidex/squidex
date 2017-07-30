@@ -65,7 +65,7 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
     }
 
     public cancel() {
-        this.sendCancelled();
+        this.emitCancelled();
         this.resetEditForm();
     }
 
@@ -79,7 +79,7 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
 
             this.schemas.putSchema(this.appName, this.name, requestDto, this.version)
                 .subscribe(dto => {
-                    this.sendSaved(requestDto);
+                    this.emitSaved(requestDto);
                     this.resetEditForm();
                 }, error => {
                     this.notifyError(error);
@@ -88,11 +88,11 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
         }
     }
 
-    private sendCancelled() {
+    private emitCancelled() {
         this.cancelled.emit();
     }
 
-    private sendSaved(requestDto: any) {
+    private emitSaved(requestDto: any) {
         this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
     }
 

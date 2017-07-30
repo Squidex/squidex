@@ -14,7 +14,6 @@ import {
     AppsStoreService,
     AuthService,
     ChangePlanDto,
-    FileHelper,
     NotificationService,
     PlansService,
     Version
@@ -79,28 +78,6 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
                 this.notifyError(error);
                 this.isDisabled = false;
             });
-    }
-
-    public formatSize(count: number): string {
-        return FileHelper.fileSize(count);
-    }
-
-    public formatCalls(count: number): string | null {
-        if (count > 1000) {
-            count = count / 1000;
-
-            if (count < 10) {
-                count = Math.round(count * 10) / 10;
-            } else {
-                count = Math.round(count);
-            }
-
-            return count + 'k';
-        } else if (count < 0) {
-            return null;
-        } else {
-            return count.toString();
-        }
     }
 }
 

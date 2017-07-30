@@ -72,7 +72,7 @@ export class SchemaFormComponent {
     }
 
     public cancel() {
-        this.sendCancelled();
+        this.emitCancelled();
         this.resetCreateForm();
     }
 
@@ -91,7 +91,7 @@ export class SchemaFormComponent {
 
             this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
                 .subscribe(dto => {
-                    this.sendCreated(dto);
+                    this.emitCreated(dto);
                     this.resetCreateForm();
                 }, error => {
                     this.enableCreateForm(error.displayMessage);
@@ -99,11 +99,11 @@ export class SchemaFormComponent {
         }
     }
 
-    private sendCancelled() {
+    private emitCancelled() {
         this.cancelled.emit();
     }
 
-    private sendCreated(schema: SchemaDto) {
+    private emitCreated(schema: SchemaDto) {
         this.created.emit(schema);
     }
 

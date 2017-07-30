@@ -45,10 +45,10 @@
                         </div>
                         <div class="card-block">
                             <div class="plan-fact">
-                                {{formatCalls(plan.maxApiCalls)}} API Calls
+                                {{plan.maxApiCalls | sqxKNumber}} API Calls
                             </div>
                             <div class="plan-fact">
-                                {{formatSize(plan.maxAssetSize)}} Storage
+                                {{plan.maxAssetSize | sqxFileSize}} Storage
                             </div>
                             <div class="plan-fact">
                                 {{plan.maxContributors}} Contributors

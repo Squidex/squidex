@@ -119,11 +119,11 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                     this.editForm.controls['isOptional'].value,
                     this.fallbackLanguages.map(l => l.iso2Code));
 
-            this.sendSaving(newLanguage);
+            this.emitSaving(newLanguage);
         }
     }
 
-    private sendSaving(language: AppLanguageDto) {
+    private emitSaving(language: AppLanguageDto) {
         this.saving.emit(language);
     }
 

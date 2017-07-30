@@ -79,7 +79,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 created.pictureUrl!,
                                 false);
 
-                        this.sendUserCreated(this.user);
+                        this.emitUserCreated(this.user);
                         this.notifyInfo('User created successfully.');
                         this.back();
                     }, error => {
@@ -93,7 +93,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 requestDto.email,
                                 requestDto.displayMessage);
 
-                        this.sendUserUpdated(this.user);
+                        this.emitUserUpdated(this.user);
                         this.notifyInfo('User saved successfully.');
                         this.resetUserForm();
                     }, error => {
@@ -107,12 +107,12 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 
-    private sendUserCreated(user: UserDto) {
-        this.messageBus.publish(new UserCreated(user));
+    private emitUserCreated(user: UserDto) {
+        this.messageBus.emit(new UserCreated(user));
     }
 
-    private sendUserUpdated(user: UserDto) {
-        this.messageBus.publish(new UserUpdated(user));
+    private emitUserUpdated(user: UserDto) {
+        this.messageBus.emit(new UserUpdated(user));
     }
 
     private setupAndPopulateForm() {

@@ -54,7 +54,7 @@ export class AppFormComponent {
     }
 
     public cancel() {
-        this.sendCancelled();
+        this.emitCancelled();
         this.resetCreateForm();
     }
 
@@ -69,18 +69,18 @@ export class AppFormComponent {
             this.appsStore.createApp(request)
                 .subscribe(dto => {
                     this.resetCreateForm();
-                    this.sendCreated(dto);
+                    this.emitCreated(dto);
                 }, error => {
                     this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private sendCancelled() {
+    private emitCancelled() {
         this.cancelled.emit();
     }
 
-    private sendCreated(app: AppDto) {
+    private emitCreated(app: AppDto) {
         this.created.emit(app);
     }
 

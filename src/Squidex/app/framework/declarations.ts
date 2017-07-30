@@ -26,6 +26,7 @@ export * from './angular/modal-target.directive';
 export * from './angular/modal-view.directive';
 export * from './angular/money.pipe';
 export * from './angular/name.pipe';
+export * from './angular/numbers.pipes';
 export * from './angular/panel.component';
 export * from './angular/panel-container.directive';
 export * from './angular/parent-link.directive';

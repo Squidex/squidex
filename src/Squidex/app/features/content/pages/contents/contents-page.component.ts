@@ -105,6 +105,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.isReadOnly = routeData['isReadOnly'];
     }
 
+    public dropData(content: ContentDto) {
+        return { content, schemaId: this.schema.id };
+    }
+
     public search() {
         this.contentsQuery = this.contentsFilter.value;
         this.contentsPager = new Pager(0);
@@ -139,7 +143,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
                 this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
                 this.contentsPager = this.contentsPager.decrementCount();
 
-                this.sendContentDeleted(content);
+                this.emitContentDeleted(content);
             }, error => {
                 this.notifyError(error);
             });
@@ -164,10 +168,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.languageSelected = language;
     }
 
-    public dropData(content: ContentDto) {
-        return { content, schemaId: this.schema.id };
-    }
-
     public goNext() {
         this.contentsPager = this.contentsPager.goNext();
 
@@ -178,6 +178,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentsPager = this.contentsPager.goPrev();
 
         this.load();
+    }
+
+    private emitContentDeleted(content: ContentDto) {
+        this.messageBus.emit(new ContentDeleted(content));
     }
 
     private resetContents() {
@@ -201,10 +205,6 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         } else {
             this.columnWidth = 100;
         }
-    }
-
-    private sendContentDeleted(content: ContentDto) {
-        this.messageBus.publish(new ContentDeleted(content));
     }
 }
 

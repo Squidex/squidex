@@ -201,7 +201,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.sendSchemaDeleted(this.schema);
+                this.emitSchemaDeleted(this.schema);
                 this.hideDeleteDialog();
                 this.back();
             }, error => {
@@ -252,7 +252,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     private updateSchema(schema: SchemaDetailsDto) {
         this.schema = schema;
 
-        this.sendSchemaUpdated(schema);
+        this.emitSchemaUpdated(schema);
         this.notify();
         this.export();
     }
@@ -288,24 +288,24 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.schemaExport = result;
     }
 
-    private hideDeleteDialog() {
-        this.confirmDeleteDialog.hide();
-    }
-
     private back() {
         this.router.navigate(['../'], { relativeTo: this.route });
     }
 
-    private sendSchemaDeleted(schema: SchemaDto) {
-        this.messageBus.publish(new SchemaDeleted(schema));
+    private emitSchemaDeleted(schema: SchemaDto) {
+        this.messageBus.emit(new SchemaDeleted(schema));
     }
 
-    private sendSchemaUpdated(schema: SchemaDto) {
-        this.messageBus.publish(new SchemaUpdated(schema));
+    private emitSchemaUpdated(schema: SchemaDto) {
+        this.messageBus.emit(new SchemaUpdated(schema));
+    }
+
+    private hideDeleteDialog() {
+        this.confirmDeleteDialog.hide();
     }
 
     private notify() {
-        this.messageBus.publish(new HistoryChannelUpdated());
+        this.messageBus.emit(new HistoryChannelUpdated());
     }
 }
 

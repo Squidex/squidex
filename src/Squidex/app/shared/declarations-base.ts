@@ -36,7 +36,6 @@ export * from './services/users-provider.service';
 export * from './services/users.service';
 export * from './services/webhooks.service';
 
-export * from './utils/file-helper';
 export * from './utils/messages';
 
 export * from 'framework';

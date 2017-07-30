@@ -137,11 +137,15 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
             .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
             .subscribe(() => {
                 this.updateContributors(this.appContributors.push(requestDto));
+                this.resetContributorForm();
             }, error => {
                 this.notifyError(error);
-            }, () => {
-                this.addContributorForm.reset();
+                this.resetContributorForm();
             });
+    }
+
+    private resetContributorForm() {
+        this.addContributorForm.reset();
     }
 
     private updateContributorsFromDto(dto: AppContributorsDto) {
@@ -153,6 +157,6 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     private updateContributors(contributors: ImmutableArray<AppContributorDto>) {
         this.appContributors = contributors;
 
-        this.messageBus.publish(new HistoryChannelUpdated());
+        this.messageBus.emit(new HistoryChannelUpdated());
     }
 }

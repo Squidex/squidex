@@ -102,7 +102,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.publish(new AssetUpdated(asset, this));
+        this.messageBus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {

@@ -10,6 +10,7 @@ using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Read.Assets;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
@@ -97,6 +98,14 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Resolver = Resolver(x => x.FileName),
                 ResolvedType = new NonNullGraphType(new StringGraphType()),
                 Description = "The file name."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "fileType",
+                Resolver = Resolver(x => x.FileName.FileType()),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = "The file type."
             });
 
             AddField(new FieldType

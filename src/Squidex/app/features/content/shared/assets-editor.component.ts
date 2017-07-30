@@ -129,7 +129,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.publish(new AssetUpdated(asset, this));
+        this.messageBus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {

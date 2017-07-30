@@ -13,7 +13,6 @@ import {
     AuthService,
     DateTime,
     fadeAnimation,
-    FileHelper,
     NotificationService,
     UsagesService
 } from 'shared';
@@ -55,11 +54,11 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
         maintainAspectRatio: false
     };
 
-    public assetsCurrent: string | null = null;
-    public assetsMax: string | null = null;
+    public assetsCurrent = 0;
+    public assetsMax = 0;
 
-    public callsCurrent: string | null = null;
-    public callsMax: string | null = null;
+    public callsCurrent = 0;
+    public callsMax = 0;
 
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly authService: AuthService,
@@ -72,15 +71,15 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
         this.appName()
             .switchMap(app => this.usagesService.getTodayStorage(app))
             .subscribe(dto => {
-                this.assetsCurrent = FileHelper.fileSize(dto.size);
-                this.assetsMax = FileHelper.fileSize(dto.maxAllowed);
+                this.assetsCurrent = dto.size;
+                this.assetsMax = dto.maxAllowed;
             });
 
         this.appName()
             .switchMap(app => this.usagesService.getMonthCalls(app))
             .subscribe(dto => {
-                this.callsCurrent = formatCalls(dto.count);
-                this.callsMax = formatCalls(dto.maxAllowed);
+                this.callsCurrent = dto.count;
+                this.callsMax = dto.maxAllowed;
             });
 
         this.appName()
@@ -152,24 +151,6 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
 
     public showForum() {
         _urq.push(['Feedback_Open']);
-    }
-}
-
-function formatCalls(count: number): string | null {
-    if (count > 1000) {
-        count = count / 1000;
-
-        if (count < 10) {
-            count = Math.round(count * 10) / 10;
-        } else {
-            count = Math.round(count);
-        }
-
-        return count + 'k';
-    } else if (count < 0) {
-        return null;
-    } else {
-        return count.toString();
     }
 }
 

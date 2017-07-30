@@ -146,7 +146,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     .subscribe(dto => {
                         this.content = dto;
 
-                        this.sendContentCreated(this.content);
+                        this.emitContentCreated(this.content);
                         this.notifyInfo('Content created successfully.');
                         this.back();
                     }, error => {
@@ -159,7 +159,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     .subscribe(() => {
                         this.content = this.content.update(requestDto, this.authService.user.token);
 
-                        this.sendContentUpdated(this.content);
+                        this.emitContentUpdated(this.content);
                         this.notifyInfo('Content saved successfully.');
                         this.enableContentForm();
                     }, error => {
@@ -172,16 +172,16 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         }
     }
 
-    private sendContentCreated(content: ContentDto) {
-        this.messageBus.publish(new ContentCreated(content));
-    }
-
-    private sendContentUpdated(content: ContentDto) {
-        this.messageBus.publish(new ContentUpdated(content));
-    }
-
     private back() {
         this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+    }
+
+    private emitContentCreated(content: ContentDto) {
+        this.messageBus.emit(new ContentCreated(content));
+    }
+
+    private emitContentUpdated(content: ContentDto) {
+        this.messageBus.emit(new ContentUpdated(content));
     }
 
     private disableContentForm() {

@@ -21,7 +21,7 @@ export const MessageBusFactory = () => {
 export class MessageBus {
     private message$ = new Subject<Message>();
 
-    public publish<T>(message: T): void {
+    public emit<T>(message: T): void {
         const channel = (<any>message.constructor).name;
 
         this.message$.next({ channel: channel, data: message });
