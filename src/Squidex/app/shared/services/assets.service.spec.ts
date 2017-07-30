@@ -24,7 +24,7 @@ describe('AssetDto', () => {
         const now = DateTime.now();
 
         const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, null);
-        const asset_2 = asset_1.rename('new-name', 'me', now);
+        const asset_2 = asset_1.rename('new-name.png', 'me', now);
 
         expect(asset_2.fileName).toEqual('new-name.png');
         expect(asset_2.lastModified).toEqual(now);
@@ -256,6 +256,7 @@ describe('AssetsService', () => {
         req.flush({
             id: 'id1',
             fileName: 'my-asset1.png',
+            fileType: 'png',
             fileSize: 1024,
             fileVersion: 2,
             mimeType: 'image/png',

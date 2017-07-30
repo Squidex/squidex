@@ -25,6 +25,6 @@ describe('KNumberPipe', () => {
         expect(pipe.transform(-1)).toBe('');
         expect(pipe.transform(50)).toBe('50');
         expect(pipe.transform(1024)).toBe('1k');
-        expect(pipe.transform(1260000)).toBe('1000k');
+        expect(pipe.transform(1260000)).toBe('1260k');
     });
 });
