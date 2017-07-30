@@ -43,7 +43,7 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
-    private version: Version = new Version('');
+    private version = new Version('');
     private cancelPromise: Subject<boolean> | null = null;
     private content: ContentDto;
 

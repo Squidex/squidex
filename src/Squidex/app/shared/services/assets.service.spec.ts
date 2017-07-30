@@ -51,9 +51,9 @@ describe('AssetDto', () => {
 });
 
 describe('AssetsService', () => {
-    let now = DateTime.now();
-    let user = 'me';
-    let version = new Version('1');
+    const now = DateTime.now();
+    const user = 'me';
+    const version = new Version('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({

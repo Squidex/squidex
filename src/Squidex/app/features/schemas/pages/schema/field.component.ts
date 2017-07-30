@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     createProperties,
@@ -59,7 +59,7 @@ export class FieldComponent implements OnInit {
     }
 
     public editFormSubmitted = false;
-    public editForm: FormGroup =
+    public editForm =
         this.formBuilder.group({
             label: ['',
                 [

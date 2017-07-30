@@ -34,13 +34,13 @@ export class HistoryComponent extends AppComponentBase {
         let channelPath = this.route.snapshot.data['channel'];
 
         if (channelPath) {
-            let params = allParams(this.route);
+            const params = allParams(this.route);
 
             for (let key in params) {
                 if (params.hasOwnProperty(key)) {
                     const value = params[key];
 
-                    channelPath = channelPath.replace('{' + key + '}', value);
+                    channelPath = channelPath.replace(`{${key}}`, value);
                 }
             }
         }

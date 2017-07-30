@@ -15,7 +15,7 @@ describe('FocusOnInitDirective', () => {
         const calledElements: any[] = [];
 
         const renderer = {
-            invokeElementMethod: (elem: any, method: any, args: any) => {
+            invokeElementMethod: (elem: any, method: any) => {
                 calledElements.push(elem);
                 calledMethods.push(method);
             }

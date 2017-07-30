@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -55,7 +55,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public editSchemaDialog = new ModalView();
 
     public addFieldFormSubmitted = false;
-    public addFieldForm: FormGroup =
+    public addFieldForm =
         this.formBuilder.group({
             type: ['String',
                 [

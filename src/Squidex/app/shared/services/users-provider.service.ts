@@ -28,7 +28,7 @@ export class UsersProviderService {
         if (!result) {
             const request =
                 this.usersService.getUser(id).retry(2)
-                    .catch(err => {
+                    .catch(error => {
                         return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', null, false));
                     })
                     .publishLast();

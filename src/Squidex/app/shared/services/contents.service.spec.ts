@@ -53,7 +53,7 @@ describe('ContentDto', () => {
 });
 
 describe('ContentsService', () => {
-    let version = new Version('1');
+    const version = new Version('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -129,7 +129,7 @@ describe('ContentsService', () => {
     it('should append query to get request as search',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
+        let contents: ContentsDto | null;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
             contents = result;
@@ -146,7 +146,7 @@ describe('ContentsService', () => {
     it('should append ids to get request with ids',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
+        let contents: ContentsDto | null;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, null, ['id1', 'id2']).subscribe(result => {
             contents = result;
@@ -163,7 +163,7 @@ describe('ContentsService', () => {
     it('should append query to get request as plain query string',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
+        let contents: ContentsDto | null;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe(result => {
             contents = result;

@@ -95,7 +95,7 @@ export class SliderComponent implements ControlValueAccessor {
             });
 
         this.mouseUpSubscription =
-            this.renderer.listenGlobal('window', 'mouseup', (e: MouseEvent) => {
+            this.renderer.listenGlobal('window', 'mouseup', () => {
                 this.onMouseUp();
             });
 

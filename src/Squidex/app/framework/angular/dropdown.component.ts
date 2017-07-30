@@ -89,6 +89,8 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
                 this.close();
                 return false;
         }
+
+        return true;
     }
 
     public open() {

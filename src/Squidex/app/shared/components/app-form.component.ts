@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
@@ -32,7 +32,7 @@ export class AppFormComponent {
 
     public createFormError? = '';
     public createFormSubmitted = false;
-    public createForm: FormGroup =
+    public createForm =
         this.formBuilder.group({
             name: ['',
                 [

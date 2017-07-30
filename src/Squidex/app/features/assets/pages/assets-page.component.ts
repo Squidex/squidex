@@ -86,7 +86,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     public onAssetDeleting(asset: AssetDto) {
         this.appNameOnce()
             .switchMap(app => this.assetsService.deleteAsset(app, asset.id, asset.version))
-            .subscribe(dtos => {
+            .subscribe(dto => {
                 this.assetsItems = this.assetsItems.filter(x => x.id !== asset.id);
                 this.assetsPager = this.assetsPager.decrementCount();
             }, error => {

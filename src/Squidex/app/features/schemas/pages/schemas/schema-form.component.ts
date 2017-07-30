@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     ApiUrlConfig,
@@ -42,7 +42,7 @@ export class SchemaFormComponent {
 
     public createFormError = '';
     public createFormSubmitted = false;
-    public createForm: FormGroup =
+    public createForm =
         this.formBuilder.group({
             name: ['',
                 [

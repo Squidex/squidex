@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
@@ -73,7 +73,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.length < this.maxContributors);
     }
 
-    public addContributorForm: FormGroup =
+    public addContributorForm =
         this.formBuilder.group({
             user: [null,
                 [

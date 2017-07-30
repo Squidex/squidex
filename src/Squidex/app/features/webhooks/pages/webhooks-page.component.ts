@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppComponentBase,
@@ -36,7 +36,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
     public schemas: SchemaDto[];
 
     public addWebhookFormSubmitted = false;
-    public addWebhookForm: FormGroup =
+    public addWebhookForm =
         this.formBuilder.group({
             schemaId: ['',
                 [

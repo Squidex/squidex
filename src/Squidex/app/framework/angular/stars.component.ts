@@ -89,7 +89,7 @@ export class StarsComponent implements ControlValueAccessor {
 
     public reset() {
         if (this.isDisabled) {
-            return;
+            return false;
         }
 
         if (this.value !== null) {
@@ -105,7 +105,7 @@ export class StarsComponent implements ControlValueAccessor {
 
     public setValue(value: number) {
         if (this.isDisabled) {
-            return;
+            return false;
         }
 
         if (this.value !== value) {

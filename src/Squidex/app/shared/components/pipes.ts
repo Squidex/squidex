@@ -220,7 +220,7 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     }
 
     public transform(asset: { id: any, version: Version }): string {
-        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.version.value}`)
+        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.version.value}`);
     }
 }
 
@@ -241,13 +241,13 @@ export class FileIconPipe implements PipeTransform {
             'xlsx'
         ];
 
-        let mimeIcon = '';
+        let mimeIcon: string;
         let mimeParts = asset.mimeType.split('/');
 
         if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
             mimeIcon = 'video';
         } else {
-            mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic'
+            mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
         return `/images/asset_${mimeIcon}.png`;

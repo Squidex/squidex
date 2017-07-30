@@ -30,7 +30,7 @@ describe('AppLanguageDto', () => {
 });
 
 describe('AppLanguagesService', () => {
-    let version = new Version('1');
+    const version = new Version('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({

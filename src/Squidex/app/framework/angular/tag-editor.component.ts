@@ -120,6 +120,8 @@ export class TagEditorComponent implements ControlValueAccessor {
                 return false;
             }
         }
+
+        return true;
     }
 
     private updateItems(items: string[]) {

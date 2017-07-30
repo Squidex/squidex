@@ -20,7 +20,7 @@ export class GraphQlService {
     }
 
     public query(appName: string, params: any): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/content/${appName}/graphql`)
+        const url = this.apiUrl.buildUrl(`api/content/${appName}/graphql`);
 
         return this.http.post(url, params);
     }

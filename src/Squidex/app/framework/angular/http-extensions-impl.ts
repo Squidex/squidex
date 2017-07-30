@@ -13,7 +13,7 @@ import { Version } from './../utils/version';
 export class ErrorDto {
     public get displayMessage(): string {
         let result = this.message;
-        let lastChar = '';
+        let lastChar: string;
 
         if (this.details && this.details.length > 0) {
             const detailMessage = this.details[0];
@@ -103,7 +103,7 @@ export function pretifyError(message: string): Observable<any> {
                     result = new ErrorDto(response.status, response.error.message, response.error.details);
                 }
             } catch (e) {
-                result = result;
+                /* Ignore */
             }
         }
 

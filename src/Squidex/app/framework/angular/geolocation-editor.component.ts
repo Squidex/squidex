@@ -169,7 +169,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                     this.value = { latitude: latlng.lat, longitude: latlng.lng };
                 });
 
-                this.marker.on('dragend', (event: any) => {
+                this.marker.on('dragend', () => {
                     this.updateMarker(false, true);
                 });
 

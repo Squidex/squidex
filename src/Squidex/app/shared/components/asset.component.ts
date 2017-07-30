@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import { AppComponentBase } from './app.component-base';
 
@@ -60,7 +60,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public renameDialog = new ModalView();
     public renameFormSubmitted = false;
-    public renameForm: FormGroup =
+    public renameForm =
         this.formBuilder.group({
             name: ['',
                 [

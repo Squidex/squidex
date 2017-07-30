@@ -56,7 +56,7 @@ export class AssetDto {
             update.isImage,
             update.pixelWidth,
             update.pixelHeight,
-            update.version)
+            update.version);
     }
 
     public rename(name: string, user: string, now?: DateTime): AssetDto {
@@ -105,7 +105,7 @@ export class AssetsService {
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
-        let queries: string[] = [];
+        const queries: string[] = [];
 
         if (mimeTypes && mimeTypes.length > 0) {
             queries.push(`mimeTypes=${mimeTypes.join(',')}`);

@@ -26,7 +26,7 @@ describe('RootViewService', () => {
     });
 
     it('should call view when creating element', () => {
-        let view = {};
+        const view = {};
 
         const viewRef = {
             createEmbeddedView: () => {

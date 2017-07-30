@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
@@ -46,13 +46,13 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public isMaster = false;
 
     public editFormSubmitted = false;
-    public editForm: FormGroup =
+    public editForm =
         this.formBuilder.group({
             isMaster: [false, []],
             isOptional: [false, []]
         });
 
-    public addLanguageForm: FormGroup =
+    public addLanguageForm =
         this.formBuilder.group({
             language: [null,
                 Validators.required

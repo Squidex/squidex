@@ -59,7 +59,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         if (!value) {
             this.resetValue();
         } else {
-            let item = this.items.find(i => i === value);
+            const item = this.items.find(i => i === value);
 
             if (item) {
                 this.queryInput.setValue(value.title || '');
@@ -103,7 +103,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                     }
                 })
                 .filter(query => !!query && !!this.source)
-                .switchMap(query => this.source.find(query)).catch(_ => Observable.of([]))
+                .switchMap(query => this.source.find(query)).catch(error => Observable.of([]))
                 .subscribe(items => {
                     this.reset();
                     this.items = items || [];
@@ -129,6 +129,8 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 }
                 break;
         }
+
+        return true;
     }
 
     public blur() {

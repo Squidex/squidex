@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -49,7 +49,7 @@ export class ClientComponent extends ComponentBase {
     public token: AccessTokenDto;
     public tokenDialog = new ModalView();
 
-    public renameForm: FormGroup =
+    public renameForm =
         this.formBuilder.group({
             name: ['',
                 Validators.required

@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     ComponentBase,
@@ -41,7 +41,7 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
     public appName: string;
 
     public editFormSubmitted = false;
-    public editForm: FormGroup =
+    public editForm =
         this.formBuilder.group({
             label: ['',
                 [

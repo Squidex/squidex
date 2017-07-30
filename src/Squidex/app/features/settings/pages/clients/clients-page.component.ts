@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppClientDto,
@@ -34,7 +34,7 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
     public appClients: ImmutableArray<AppClientDto>;
 
     public addClientFormSubmitted = false;
-    public addClientForm: FormGroup =
+    public addClientForm =
         this.formBuilder.group({
             name: ['',
                 [
