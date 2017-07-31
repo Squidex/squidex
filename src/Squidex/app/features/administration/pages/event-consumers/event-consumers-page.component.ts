@@ -53,7 +53,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     }
 
     public start(consumer: EventConsumerDto) {
-        this.eventConsumersService.startEventConsumer(name)
+        this.eventConsumersService.startEventConsumer(consumer.name)
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
             }, error => {
@@ -62,7 +62,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     }
 
     public stop(consumer: EventConsumerDto) {
-        this.eventConsumersService.stopEventConsumer(name)
+        this.eventConsumersService.stopEventConsumer(consumer.name)
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
             }, error => {
@@ -71,7 +71,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     }
 
     public reset(consumer: EventConsumerDto) {
-        this.eventConsumersService.resetEventConsumer(name)
+        this.eventConsumersService.resetEventConsumer(consumer.name)
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
             }, error => {
