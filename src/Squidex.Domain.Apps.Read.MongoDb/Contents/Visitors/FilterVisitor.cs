@@ -110,7 +110,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
                 {
-                    return Filter.Ne(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var field = BuildFieldDefinition(nodeIn.Left);
+
+                    return Filter.Or(
+                        Filter.Not(Filter.Exists(field)),
+                        Filter.Ne(field, BuildValue(nodeIn.Right)));
                 }
                 if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
                 {

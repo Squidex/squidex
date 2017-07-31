@@ -20,13 +20,14 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.MongoDb.Contents;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 // ReSharper disable SpecifyACultureInStringConversionExplicitly
 
-namespace Squidex.Domain.Apps.Read.Schemas
+namespace Squidex.Domain.Apps.Read.Contents
 {
     public class ODataQueryTests
     {
@@ -41,7 +42,11 @@ namespace Squidex.Domain.Apps.Read.Schemas
                 .AddOrUpdateField(new NumberField(4, "age", Partitioning.Invariant,
                     new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
                 .AddOrUpdateField(new DateTimeField(5, "birthday", Partitioning.Invariant,
-                    new DateTimeFieldProperties()));
+                    new DateTimeFieldProperties()))
+                .AddOrUpdateField(new AssetsField(6, "pictures", Partitioning.Invariant,
+                    new AssetsFieldProperties()))
+                .AddOrUpdateField(new ReferencesField(7, "friends", Partitioning.Invariant,
+                    new ReferencesFieldProperties()));
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
@@ -172,7 +177,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         public void Should_create_string_not_equals_query()
         {
             var i = F("$filter=data/firstName/de ne 'Sebastian'");
-            var o = C("{ 'do.1.de' : { '$ne' : 'Sebastian' } }");
+            var o = C("{ '$or' : [{ 'do.1.de' : { '$exists' : false } }, { 'do.1.de' : { '$ne' : 'Sebastian' } }] }");
 
             Assert.Equal(o, i);
         }
@@ -209,6 +214,24 @@ namespace Squidex.Domain.Apps.Read.Schemas
         {
             var i = F("$filter=data/age/iv ge 1");
             var o = C("{ 'do.4.iv' : { '$gte' : 1.0 } }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_equals_query_for_assets()
+        {
+            var i = F("$filter=data/pictures/iv eq 'guid'");
+            var o = C("{ 'do.6.iv' : 'guid' }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_create_equals_query_for_references()
+        {
+            var i = F("$filter=data/friends/iv eq 'guid'");
+            var o = C("{ 'do.7.iv' : 'guid' }");
 
             Assert.Equal(o, i);
         }

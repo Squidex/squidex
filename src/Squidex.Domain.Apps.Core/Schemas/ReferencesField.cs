@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected override IEdmTypeReference CreateEdmType()
         {
-            return null;
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
         }
     }
 }
