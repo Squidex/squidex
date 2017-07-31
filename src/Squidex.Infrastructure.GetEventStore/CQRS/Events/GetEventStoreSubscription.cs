@@ -8,9 +8,11 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
@@ -22,21 +24,27 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     internal sealed class EventStoreSubscription : DisposableObjectBase, IEventSubscription
     {
+        private const int ReconnectWindowMax = 5;
+        private const int ReconnectWaitMs = 1000;
+        private static readonly TimeSpan TimeBetweenReconnects = TimeSpan.FromMinutes(5);
         private static readonly ConcurrentDictionary<string, bool> subscriptionsCreated = new ConcurrentDictionary<string, bool>();
         private readonly IEventStoreConnection connection;
-        private readonly string position;
         private readonly string streamFilter;
         private readonly string streamName;
         private readonly string prefix;
         private readonly string projectionHost;
+        private readonly ReaderWriterLockSlim connectionLock = new ReaderWriterLockSlim();
+        private readonly Queue<DateTime> reconnectTimes = new Queue<DateTime>();
+        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
+        private Func<StoredEvent, Task> publishNext;
+        private Func<Exception, Task> publishError;
         private EventStoreCatchUpSubscription internalSubscription;
-
-        public bool IsDropped { get; private set; }
+        private long? position;
 
         public EventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
         {
             this.prefix = prefix;
-            this.position = position;
+            this.position = ParsePosition(position);
             this.connection = connection;
             this.streamFilter = streamFilter;
             this.projectionHost = projectionHost;
@@ -48,7 +56,19 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             if (disposing)
             {
-                internalSubscription?.Stop();
+                disposeToken.Cancel();
+
+                try
+                {
+                    connectionLock.EnterWriteLock();
+
+                    internalSubscription?.Stop();
+                    internalSubscription = null;
+                }
+                finally
+                {
+                    connectionLock.ExitWriteLock();
+                }
             }
         }
 
@@ -56,40 +76,173 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             Guard.NotNull(onNext, nameof(onNext));
 
-            if (internalSubscription != null)
+            if (publishNext != null)
             {
                 throw new InvalidOperationException("An handler has already been registered.");
             }
 
+            publishNext = onNext;
+            publishError = onError;
+
             await CreateProjectionAsync();
 
-            long? eventStorePosition = null;
-
-            if (long.TryParse(position, out var parsedPosition))
+            try
             {
-                eventStorePosition = parsedPosition;
+                connectionLock.EnterWriteLock();
+
+                internalSubscription = SubscribeToEventStore();
+            }
+            finally
+            {
+                connectionLock.ExitWriteLock();
+            }
+        }
+
+        private EventStoreCatchUpSubscription SubscribeToEventStore()
+        {
+            return connection.SubscribeToStreamFrom(streamName, position, CatchUpSubscriptionSettings.Default, HandleEvent, null, HandleError);
+        }
+
+        private void HandleEvent(EventStoreCatchUpSubscription subscription, ResolvedEvent resolved)
+        {
+            if (!CanHandleSubscriptionEvent(subscription))
+            {
+                return;
             }
 
-            internalSubscription = connection.SubscribeToStreamFrom(streamName, eventStorePosition, CatchUpSubscriptionSettings.Default, 
-                (subscription, resolved) =>
+            try
+            {
+                connectionLock.EnterReadLock();
+
+                if (CanHandleSubscriptionEvent(subscription))
                 {
                     var storedEvent = Formatter.Read(resolved);
 
-                    onNext(storedEvent).Wait();
-                }, subscriptionDropped: (subscription, reason, ex) =>
+                    PublishAsync(storedEvent).Wait();
+
+                    position = resolved.OriginalEventNumber;
+                }
+            }
+            finally
+            {
+                connectionLock.ExitReadLock();
+            }
+        }
+
+        private void HandleError(EventStoreCatchUpSubscription subscription, SubscriptionDropReason reason, Exception ex)
+        {
+            if (!CanHandleSubscriptionEvent(subscription))
+            {
+                return;
+            }
+
+            try
+            {
+                connectionLock.EnterUpgradeableReadLock();
+
+                if (CanHandleSubscriptionEvent(subscription))
                 {
-                    if (reason != SubscriptionDropReason.UserInitiated &&
-                        reason != SubscriptionDropReason.ConnectionClosed)
+                    if (reason == SubscriptionDropReason.ConnectionClosed)
+                    {
+                        var utcNow = DateTime.UtcNow;
+
+                        if (CanReconnect(utcNow))
+                        {
+                            RegisterReconnectTime(utcNow);
+
+                            try
+                            {
+                                connectionLock.EnterWriteLock();
+
+                                internalSubscription.Stop();
+                                internalSubscription = null;
+
+                                internalSubscription = SubscribeToEventStore();
+                            }
+                            finally
+                            {
+                                connectionLock.ExitWriteLock();
+                            }
+
+                            DelayForReconnect().Wait();
+
+                            if (!CanHandleSubscriptionEvent(subscription))
+                            {
+                                return;
+                            }
+
+                            try
+                            {
+                                connectionLock.EnterWriteLock();
+
+                                if (CanHandleSubscriptionEvent(subscription))
+                                {
+                                    internalSubscription = SubscribeToEventStore();
+                                }
+                            }
+                            finally
+                            {
+                                connectionLock.ExitWriteLock();
+                            }
+
+                            return;
+                        }
+                    }
+
+                    if (reason != SubscriptionDropReason.UserInitiated && reason != SubscriptionDropReason.EventHandlerException)
                     {
                         var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
-                        onError?.Invoke(exception);
+                        publishError?.Invoke(exception);
                     }
-                    else
-                    {
-                        IsDropped = true;
-                    }
-                });
+                }
+            }
+            finally
+            {
+                connectionLock.ExitUpgradeableReadLock();
+            }
+        }
+
+        private bool CanHandleSubscriptionEvent(EventStoreCatchUpSubscription subscription)
+        {
+            return !disposeToken.IsCancellationRequested && subscription == internalSubscription;
+        }
+
+        private bool CanReconnect(DateTime utcNow)
+        {
+            return reconnectTimes.Count < ReconnectWindowMax && (reconnectTimes.Count == 0 || (utcNow - reconnectTimes.Peek()) > TimeBetweenReconnects);
+        }
+
+        private async Task PublishAsync(StoredEvent storedEvent)
+        {
+            await publishNext(storedEvent).ConfigureAwait(false);
+        }
+
+        private static long? ParsePosition(string position)
+        {
+            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
+        }
+
+        private void RegisterReconnectTime(DateTime utcNow)
+        {
+            reconnectTimes.Enqueue(utcNow);
+
+            while (reconnectTimes.Count >= ReconnectWindowMax)
+            {
+                reconnectTimes.Dequeue();
+            }
+        }
+
+        private async Task DelayForReconnect()
+        {
+            try
+            {
+                await Task.Delay(ReconnectWaitMs, disposeToken.Token).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException)
+            {
+                // Just ignore.
+            }
         }
 
         private async Task CreateProjectionAsync()
@@ -135,6 +288,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 new ProjectionsManager(
                     connection.Settings.Log, endpoint,
                     connection.Settings.OperationTimeout);
+
             return projectionsManager;
         }
     }

@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var filter = Filter.Eq(NameField, consumerName);
 
-            return Collection.UpdateOneAsync(filter, Update.Unset(IsStoppedField));
+            return Collection.UpdateOneAsync(filter, Update.Unset(IsStoppedField).Unset(ErrorField));
         }
 
         public Task StopAsync(string consumerName, string error = null)
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var filter = Filter.Eq(NameField, consumerName);
 
-            return Collection.UpdateOneAsync(filter, Update.Set(IsResettingField, true));
+            return Collection.UpdateOneAsync(filter, Update.Set(IsResettingField, true).Unset(ErrorField));
         }
 
         public Task SetPositionAsync(string consumerName, string position, bool reset)

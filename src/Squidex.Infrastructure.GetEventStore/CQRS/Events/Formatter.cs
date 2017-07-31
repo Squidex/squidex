@@ -23,7 +23,10 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             var eventData = new EventData { Type = @event.EventType, EventId = @event.EventId, Payload = body, Metadata = meta };
 
-            return new StoredEvent(resolvedEvent.OriginalEventNumber.ToString(), resolvedEvent.Event.EventNumber, eventData);
+            return new StoredEvent(
+                resolvedEvent.OriginalEventNumber.ToString(), 
+                resolvedEvent.Event.EventNumber, 
+                eventData);
         }
 
         public static EventStoreData Write(EventData eventData)

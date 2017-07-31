@@ -40,16 +40,31 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     }
 
     public ngOnInit() {
+        this.load(false, true);
+
         this.subscription =
-            Observable.timer(0, 4000)
-                .switchMap(() => this.eventConsumersService.getEventConsumers())
-                .subscribe(dtos => {
-                    this.eventConsumers = ImmutableArray.of(dtos);
-                });
+            Observable.timer(4000, 4000).subscribe(() => {
+                this.load();
+            });
     }
 
     public ngOnDestroy() {
         this.subscription.unsubscribe();
+    }
+
+    public load(showInfo = false, showError = false) {
+        this.eventConsumersService.getEventConsumers()
+            .subscribe(dtos => {
+                this.eventConsumers = ImmutableArray.of(dtos);
+
+                if (showInfo) {
+                    this.notifyInfo('Event Consumers reloaded.');
+                }
+            }, error => {
+                if (showError) {
+                    this.notifyError(error);
+                }
+            });
     }
 
     public start(consumer: EventConsumerDto) {

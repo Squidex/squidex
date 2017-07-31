@@ -3,6 +3,14 @@
 <sqx-panel theme="light" panelWidth="50rem">
     <div class="panel-header">
         <div class="panel-title-row">
+            <div class="float-right">
+                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Event Consumers (CTRL + SHIFT + R)">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+            </div>
+
             <h3 class="panel-title">Event Consumers</h3>
         </div>
 
