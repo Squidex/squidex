@@ -16,6 +16,8 @@ using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
 
+// ReSharper disable InvertIf
+
 namespace Squidex.Infrastructure.CQRS.Events
 {
     internal sealed class EventStoreSubscription : DisposableObjectBase, IEventSubscription
@@ -28,6 +30,8 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly string prefix;
         private readonly string projectionHost;
         private EventStoreCatchUpSubscription internalSubscription;
+
+        public bool IsDropped { get; private set; }
 
         public EventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
         {
@@ -74,9 +78,17 @@ namespace Squidex.Infrastructure.CQRS.Events
                     onNext(storedEvent).Wait();
                 }, subscriptionDropped: (subscription, reason, ex) =>
                 {
-                    var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
+                    if (reason != SubscriptionDropReason.UserInitiated &&
+                        reason != SubscriptionDropReason.ConnectionClosed)
+                    {
+                        var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
-                    onError?.Invoke(exception);
+                        onError?.Invoke(exception);
+                    }
+                    else
+                    {
+                        IsDropped = true;
+                    }
                 });
         }
 
