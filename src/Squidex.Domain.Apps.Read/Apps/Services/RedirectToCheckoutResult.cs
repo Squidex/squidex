@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppPlanBillingManager.cs
+//  RedirectToCheckoutResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,18 +7,19 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Apps.Services
 {
-    public interface IAppPlanBillingManager
+    public sealed class RedirectToCheckoutResult : IChangePlanResult
     {
-        bool HasPortal { get; }
+        public Uri Url { get; }
 
-        Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId);
+        public RedirectToCheckoutResult(Uri url)
+        {
+            Guard.NotNull(url, nameof(url));
 
-        Task<bool> HasPaymentOptionsAsync(string userId);
-
-        Task<string> GetPortalLinkAsync(string userId);
+            Url = url;
+        }
     }
 }

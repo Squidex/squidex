@@ -50,26 +50,33 @@ namespace Squidex.Infrastructure.Timers
 
         private async Task RunInternal(int delay, int initialDelay, Func<CancellationToken, Task> callback)
         {
-            if (initialDelay > 0)
+            try
             {
-                await WaitAsync(initialDelay).ConfigureAwait(false);
+                if (initialDelay > 0)
+                {
+                    await WaitAsync(initialDelay).ConfigureAwait(false);
+                }
+
+                while (requiresAtLeastOne == 2 || !disposeToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await callback(disposeToken.Token).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                    finally
+                    {
+                        requiresAtLeastOne = 1;
+                    }
+
+                    await WaitAsync(delay).ConfigureAwait(false);
+                }
             }
-
-            while (requiresAtLeastOne == 2 || !disposeToken.IsCancellationRequested)
+            catch
             {
-                try
-                {
-                    await callback(disposeToken.Token).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                finally
-                {
-                    requiresAtLeastOne = 1;
-                }
-
-                await WaitAsync(delay).ConfigureAwait(false);
+                
             }
         }
 

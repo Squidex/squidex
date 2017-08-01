@@ -6,8 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Threading;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
+
+// ReSharper disable AccessToModifiedClosure
 
 namespace Squidex.Infrastructure.Timers
 {
@@ -29,6 +32,23 @@ namespace Squidex.Infrastructure.Timers
             timer.Dispose();
 
             Assert.True(called);
+        }
+
+        public void Should_invoke_dispose_within_timer()
+        {
+            CompletionTimer timer = null;
+
+            timer = new CompletionTimer(10, ct =>
+            {
+                timer?.Dispose();
+
+                return TaskHelper.Done;
+            }, 10);
+
+            Thread.Sleep(1000);
+
+            timer.Wakeup();
+            timer.Dispose();
         }
     }
 }

@@ -233,6 +233,41 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
+        public async Task ChangePlan_should_not_make_update_for_redirect_result()
+        {
+            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+            appPlansBillingManager.Setup(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan")).Returns(CreateRedirectResult());
+
+            CreateApp();
+
+            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            Assert.Null(app.PlanId);
+        }
+
+        [Fact]
+        public async Task ChangePlan_should_not_call_billing_manager_for_callback()
+        {
+            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+
+            CreateApp();
+
+            var context = CreateContextForCommand(new ChangePlan { PlanId = "my-plan", FromCallback = true });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Never());
+        }
+
+        [Fact]
         public async Task AddLanguage_should_update_domain_object()
         {
             CreateApp();
@@ -278,6 +313,11 @@ namespace Squidex.Domain.Apps.Write.Apps
             app.Create(CreateCommand(new CreateApp { Name = AppName }));
 
             return app;
+        }
+
+        private static Task<IChangePlanResult> CreateRedirectResult()
+        {
+            return Task.FromResult<IChangePlanResult>(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
         }
     }
 }

@@ -1,24 +1,18 @@
 ﻿// ==========================================================================
-//  IAppPlanBillingManager.cs
+//  PlanChangeAsyncResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-
-using System;
-using System.Threading.Tasks;
-
 namespace Squidex.Domain.Apps.Read.Apps.Services
 {
-    public interface IAppPlanBillingManager
+    public sealed class PlanChangeAsyncResult : IChangePlanResult
     {
-        bool HasPortal { get; }
+        public static readonly PlanChangeAsyncResult Instance = new PlanChangeAsyncResult();
 
-        Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId);
-
-        Task<bool> HasPaymentOptionsAsync(string userId);
-
-        Task<string> GetPortalLinkAsync(string userId);
+        private PlanChangeAsyncResult()
+        {
+        }
     }
 }

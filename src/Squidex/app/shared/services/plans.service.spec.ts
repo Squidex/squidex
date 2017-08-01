@@ -12,6 +12,7 @@ import {
     AppPlansDto,
     ApiUrlConfig,
     ChangePlanDto,
+    PlanChangedDto,
     PlanDto,
     PlansService,
     Version
@@ -93,11 +94,19 @@ describe('PlansService', () => {
 
         const dto = new ChangePlanDto('enterprise');
 
-        plansService.putPlan('my-app', dto, version).subscribe();
+        let planChanged: PlanChangedDto | null = null;
+
+        plansService.putPlan('my-app', dto, version).subscribe(result => {
+            planChanged = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/plan');
 
+        req.flush({ redirectUri: 'my-url' });
+
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        expect(planChanged).toBe(new PlanChangedDto('my-url'));
     }));
 });

@@ -67,13 +67,17 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.version))
             .subscribe(dto => {
-                this.plans =
-                    new AppPlansDto(planId,
-                         this.plans.planOwner,
-                         this.plans.hasPortal,
-                         this.plans.hasConfigured,
-                         this.plans.plans);
-                this.isDisabled = false;
+                if (dto.redirectUri && dto.redirectUri.length > 0) {
+                    window.location.replace(dto.redirectUri);
+                } else {
+                    this.plans =
+                        new AppPlansDto(planId,
+                            this.plans.planOwner,
+                            this.plans.hasPortal,
+                            this.plans.hasConfigured,
+                            this.plans.plans);
+                    this.isDisabled = false;
+                }
             }, error => {
                 this.notifyError(error);
                 this.isDisabled = false;
