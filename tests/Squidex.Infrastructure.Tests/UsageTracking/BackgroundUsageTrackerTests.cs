@@ -143,6 +143,7 @@ namespace Squidex.Infrastructure.UsageTracking
             await sut.TrackAsync("key3", 0.5, 6000);
 
             sut.Next();
+            sut.Dispose();
 
             await Task.Delay(100);
 
