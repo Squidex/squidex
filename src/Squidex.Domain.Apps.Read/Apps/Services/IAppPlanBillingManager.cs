@@ -17,8 +17,6 @@ namespace Squidex.Domain.Apps.Read.Apps.Services
 
         Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId);
 
-        Task<bool> HasPaymentOptionsAsync(string userId);
-
         Task<string> GetPortalLinkAsync(string userId);
     }
 }

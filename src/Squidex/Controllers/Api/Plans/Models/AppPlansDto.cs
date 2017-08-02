@@ -31,10 +31,5 @@ namespace Squidex.Controllers.Api.Plans.Models
         /// Indicates if there is a billing portal.
         /// </summary>
         public bool HasPortal { get; set; }
-
-        /// <summary>
-        /// Indicates if the user has payment options entered so that the plan can be changed.
-        /// </summary>
-        public bool HasConfigured { get; set; }
     }
 }

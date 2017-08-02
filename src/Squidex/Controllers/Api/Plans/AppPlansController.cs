@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 
 // ReSharper disable RedundantIfElseBlock
@@ -54,22 +53,16 @@ namespace Squidex.Controllers.Api.Plans
         [Route("apps/{app}/plans/")]
         [ProducesResponseType(typeof(AppPlansDto), 200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetPlans(string app)
+        public IActionResult GetPlans(string app)
         {
-            var userId = User.FindFirst(OpenIdClaims.Subject).Value;
-
             var planId = appPlansProvider.GetPlanForApp(App).Id;
-
-            var hasPortal = appPlansBillingManager.HasPortal;
-            var hasConfigured = await appPlansBillingManager.HasPaymentOptionsAsync(userId);
-
+            
             var response = new AppPlansDto
             {
+                CurrentPlanId = planId,
                 Plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList(),
                 PlanOwner = App.PlanOwner,
-                HasPortal = hasPortal,
-                HasConfigured = hasConfigured,
-                CurrentPlanId = planId
+                HasPortal = appPlansBillingManager.HasPortal
             };
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());

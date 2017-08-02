@@ -22,7 +22,6 @@ export class AppPlansDto {
         public readonly currentPlanId: string,
         public readonly planOwner: string,
         public readonly hasPortal: boolean,
-        public readonly hasConfigured: boolean,
         public readonly plans: PlanDto[]
     ) {
     }
@@ -73,7 +72,6 @@ export class PlansService {
                         response.currentPlanId,
                         response.planOwner,
                         response.hasPortal,
-                        response.hasConfigured,
                         items.map(item => {
                             return new PlanDto(
                                 item.id,

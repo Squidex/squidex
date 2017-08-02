@@ -53,7 +53,6 @@ describe('PlansService', () => {
 
         req.flush({
             currentPlanId: '123',
-            hasConfigured: true,
             hasPortal: true,
             planOwner: '456',
             plans: [
@@ -80,7 +79,6 @@ describe('PlansService', () => {
             new AppPlansDto(
                 '123',
                 '456',
-                true,
                 true,
                 [
                     new PlanDto('free', 'Free', '14 €', 1000, 1500, 2500),

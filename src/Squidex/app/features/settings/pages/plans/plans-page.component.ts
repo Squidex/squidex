@@ -74,7 +74,6 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
                         new AppPlansDto(planId,
                             this.plans.planOwner,
                             this.plans.hasPortal,
-                            this.plans.hasConfigured,
                             this.plans.plans);
                     this.isDisabled = false;
                 }

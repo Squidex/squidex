@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
@@ -22,11 +21,6 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
         public Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId)
         {
             return Task.FromResult<IChangePlanResult>(PlanChangedResult.Instance);
-        }
-
-        public Task<bool> HasPaymentOptionsAsync(string userId)
-        {
-            return TaskHelper.True;
         }
 
         public Task<string> GetPortalLinkAsync(string userId)

@@ -22,13 +22,8 @@
     <div class="panel-main">
         <div class="panel-content">
             <div *ngIf="plans">
-                <div class="panel-alert panel-alert-danger" *ngIf="!plans.hasConfigured || !planOwned">
-                    <div *ngIf="!plans.hasConfigured">
-                        You have not configured your account yet. Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> to add payment options.
-                    </div>
-                    <div *ngIf="!planOwned">
-                        You have not created the subscription. Therefore you cannot change the plan.
-                    </div>
+                <div class="panel-alert panel-alert-danger" *ngIf="!planOwned">
+                    You have not created the subscription. Therefore you cannot change the plan.
                 </div>
 
                 <div class="text-muted text-center empty" *ngIf="plans.plans.length === 0">
@@ -59,7 +54,7 @@
                                 &#10003; Selected
                             </button>
                             
-                            <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled ||  !plans.hasConfigured || !planOwned" (click)="changePlan(plan.id)">
+                            <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.id)">
                                 Change
                             </button>
                         </div>
