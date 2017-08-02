@@ -68,7 +68,7 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.version))
             .subscribe(dto => {
                 if (dto.redirectUri && dto.redirectUri.length > 0) {
-                    window.location.replace(dto.redirectUri);
+                    window.location.href = dto.redirectUri;
                 } else {
                     this.plans =
                         new AppPlansDto(planId,
