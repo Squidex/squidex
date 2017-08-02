@@ -5,7 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     ApiUrlConfig,
@@ -24,7 +26,9 @@ import {
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html'
 })
-export class PlansPageComponent extends AppComponentBase implements OnInit {
+export class PlansPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private queryParamsSubscription: Subscription;
+    private overridePlanId: string;
     private version = new Version();
 
     public portalUrl = this.apiUrl.buildUrl('/identity-server/account/portal');
@@ -37,9 +41,19 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly authService: AuthService,
         private readonly plansService: PlansService,
+        private readonly route: ActivatedRoute,
         private readonly apiUrl: ApiUrlConfig
     ) {
         super(notifications, apps);
+    }
+
+    public ngOnDestroy() {
+        this.queryParamsSubscription.unsubscribe();
+
+        this.queryParamsSubscription =
+            this.route.queryParams.subscribe(params => {
+                this.overridePlanId = params['planId'];
+            });
     }
 
     public ngOnInit() {
@@ -50,7 +64,16 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.plansService.getPlans(app, this.version).retry(2))
             .subscribe(dto => {
-                this.plans = dto;
+                if (this.overridePlanId) {
+                    this.plans = new AppPlansDto(
+                        this.overridePlanId,
+                        dto.planOwner,
+                        dto.hasPortal,
+                        dto.plans);
+                } else {
+                    this.plans = dto;
+                }
+
                 this.planOwned = !dto.planOwner || (dto.planOwner === this.authService.user!.id);
 
                 if (showInfo) {

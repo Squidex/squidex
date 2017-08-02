@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -20,15 +21,18 @@ import {
 })
 export class InternalAreaComponent implements OnInit, OnDestroy {
     private notificationsSubscription: Subscription;
+    private queryParamsSubscription: Subscription;
 
     public notifications: Notification[] = [];
 
     constructor(
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
+        private readonly route: ActivatedRoute
     ) {
     }
 
     public ngOnDestroy() {
+        this.queryParamsSubscription.unsubscribe();
         this.notificationsSubscription.unsubscribe();
     }
 
@@ -41,6 +45,21 @@ export class InternalAreaComponent implements OnInit, OnDestroy {
                     setTimeout(() => {
                         this.close(notification);
                     }, notification.displayTime);
+                }
+            });
+
+        this.queryParamsSubscription =
+            this.route.queryParams.subscribe(params => {
+                const successMessage = params['successMessage'];
+
+                if (successMessage) {
+                    this.notificationService.notify(Notification.info(successMessage));
+                }
+
+                const errorMessage = params['errorMessage'];
+
+                if (errorMessage) {
+                    this.notificationService.notify(Notification.error(errorMessage));
                 }
             });
     }
