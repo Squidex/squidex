@@ -10,15 +10,19 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+// ReSharper disable RedundantJumpStatement
 // ReSharper disable InvertIf
 
 namespace Squidex.Infrastructure.Timers
 {
-    public sealed class CompletionTimer : DisposableObjectBase
+    public sealed class CompletionTimer
     {
-        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
+        private const int OneCallNotExecuted = 0;
+        private const int OneCallExecuted = 1;
+        private const int OneCallRequested = 2;
+        private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
         private readonly Task runTask;
-        private int requiresAtLeastOne;
+        private int oneCallState;
         private CancellationTokenSource wakeupToken;
         
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
@@ -29,23 +33,21 @@ namespace Squidex.Infrastructure.Timers
             runTask = RunInternal(delayInMs, initialDelay, callback);
         }
 
-        protected override void DisposeObject(bool disposing)
+        public Task StopAsync()
         {
-            if (disposing)
-            {
-                disposeToken.Cancel();
+            stopToken.Cancel();
 
-                runTask.Wait();
-            }
+            return runTask;
         }
 
-        public void Wakeup()
+        public void SkipCurrentDelay()
         {
-            ThrowIfDisposed();
+            if (!stopToken.IsCancellationRequested)
+            {
+                Interlocked.CompareExchange(ref oneCallState, OneCallRequested, OneCallNotExecuted);
 
-            Interlocked.CompareExchange(ref requiresAtLeastOne, 2, 0);
-
-            wakeupToken?.Cancel();
+                wakeupToken?.Cancel();
+            }
         }
 
         private async Task RunInternal(int delay, int initialDelay, Func<CancellationToken, Task> callback)
@@ -57,26 +59,18 @@ namespace Squidex.Infrastructure.Timers
                     await WaitAsync(initialDelay).ConfigureAwait(false);
                 }
 
-                while (requiresAtLeastOne == 2 || !disposeToken.IsCancellationRequested)
+                while (oneCallState == OneCallRequested || !stopToken.IsCancellationRequested)
                 {
-                    try
-                    {
-                        await callback(disposeToken.Token).ConfigureAwait(false);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                    }
-                    finally
-                    {
-                        requiresAtLeastOne = 1;
-                    }
+                    await callback(stopToken.Token).ConfigureAwait(false);
+
+                    oneCallState = OneCallExecuted;
 
                     await WaitAsync(delay).ConfigureAwait(false);
                 }
             }
             catch
             {
-                
+                return;
             }
         }
 
@@ -86,7 +80,7 @@ namespace Squidex.Infrastructure.Timers
             {
                 wakeupToken = new CancellationTokenSource();
 
-                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(disposeToken.Token, wakeupToken.Token))
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(stopToken.Token, wakeupToken.Token))
                 {
                     await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
                 }

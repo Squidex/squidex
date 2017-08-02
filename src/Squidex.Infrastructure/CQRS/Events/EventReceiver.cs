@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 try
                 {
-                    timer?.Dispose();
+                    timer?.StopAsync().Wait();
                 }
                 catch (Exception ex)
                 {
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             ThrowIfDisposed();
 
-            timer?.Wakeup();
+            timer?.SkipCurrentDelay();
         }
 
         public void Subscribe(IEventConsumer eventConsumer)

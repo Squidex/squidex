@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             if (disposing)
             {
-                timer.Dispose();
+                timer.StopAsync().Wait();
             }
         }
 
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             ThrowIfDisposed();
 
-            timer.Wakeup();
+            timer.SkipCurrentDelay();
         }
 
         private async Task TrackAsync()

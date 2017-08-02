@@ -80,6 +80,10 @@ namespace Squidex.Config.Domain
                 .As<IHistoryEventsCreator>()
                 .SingleInstance();
 
+            builder.RegisterType<NoopAppPlanBillingManager>()
+                .As<IAppPlanBillingManager>()
+                .InstancePerDependency();
+
             builder.RegisterType<WebhookInvoker>()
                 .As<IEventConsumer>()
                 .AsSelf()

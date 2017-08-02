@@ -161,7 +161,12 @@ export class AuthService {
                     });
             });
 
-        return observable.timeout(1000).retryWhen(errors => errors.filter(e => e instanceof TimeoutError));
+        return observable.timeout(2000)
+            .retryWhen(errors => errors
+                .filter(e => e instanceof TimeoutError)
+                .delay(500)
+                .take(5)
+                .concat(Observable.throw(new Error('Retry limit exceeeded.'))));
     }
 
     private createProfile(user: User) {

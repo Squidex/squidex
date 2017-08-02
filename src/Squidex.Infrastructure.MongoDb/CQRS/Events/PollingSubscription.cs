@@ -21,6 +21,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly MongoEventStore eventStore;
         private readonly string streamFilter;
         private string position;
+        private bool isStopped;
         private IDisposable subscription;
         private CompletionTimer timer;
 
@@ -36,9 +37,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             if (disposing)
             {
+                isStopped = true;
+
                 subscription?.Dispose();
 
-                timer?.Dispose();
+                timer?.StopAsync().Forget();
             }
         }
 
@@ -57,22 +60,28 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     await eventStore.GetEventsAsync(async storedEvent =>
                     {
-                        await onNext(storedEvent);
+                        if (!isStopped)
+                        {
+                            await onNext(storedEvent);
 
-                        position = storedEvent.EventPosition;
+                            position = storedEvent.EventPosition;
+                        }
                     }, ct, streamFilter, position);
                 }
                 catch (Exception ex) when (!(ex is OperationCanceledException))
                 {
-                    onError?.Invoke(ex);
+                    if (!isStopped)
+                    {
+                        onError?.Invoke(ex);
+                    }
                 }
             });
 
             subscription = eventNotifier.Subscribe(() =>
             {
-                if (!timer.IsDisposed)
+                if (!isStopped)
                 {
-                    timer.Wakeup();
+                    timer.SkipCurrentDelay();
                 }
             });
 

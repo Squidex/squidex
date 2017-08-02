@@ -10,6 +10,7 @@ using System.Threading;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
+// ReSharper disable MethodSupportsCancellation
 // ReSharper disable AccessToModifiedClosure
 
 namespace Squidex.Infrastructure.Timers
@@ -28,8 +29,8 @@ namespace Squidex.Infrastructure.Timers
                 return TaskHelper.Done;
             }, 2000);
 
-            timer.Wakeup();
-            timer.Dispose();
+            timer.SkipCurrentDelay();
+            timer.StopAsync().Wait();
 
             Assert.True(called);
         }
@@ -40,15 +41,15 @@ namespace Squidex.Infrastructure.Timers
 
             timer = new CompletionTimer(10, ct =>
             {
-                timer?.Dispose();
+                timer?.StopAsync().Wait();
 
                 return TaskHelper.Done;
             }, 10);
 
             Thread.Sleep(1000);
 
-            timer.Wakeup();
-            timer.Dispose();
+            timer.SkipCurrentDelay();
+            timer.StopAsync().Wait();
         }
     }
 }
