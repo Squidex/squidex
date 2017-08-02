@@ -9,10 +9,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Squidex.Chargebee;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -24,10 +22,8 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline;
-using Squidex.Shared.Users;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -97,23 +93,6 @@ namespace Squidex.Config.Domain
                 .As<IGraphQLService>()
                 .AsSelf()
                 .InstancePerDependency();
-
-            var chargebeeSiteName = Configuration.GetValue<string>("chargebee:siteName");
-            var chargebeeApiKey = Configuration.GetValue<string>("chargebee:apiKey");
-
-            if (string.IsNullOrWhiteSpace(chargebeeSiteName))
-            {
-                throw new ConfigurationException("Configure Chargebee SiteName type with 'chargebee:siteName'.");
-            }
-            if (string.IsNullOrWhiteSpace(chargebeeApiKey))
-            {
-                throw new ConfigurationException("Configure Chargebee ApiKey with 'chargebee:apiKey'.");
-            }
-
-            builder.Register(c => new ChargebeeAppPlanBillingManager(c.Resolve<UserManager<IUser>>(), chargebeeSiteName, chargebeeApiKey))
-                .As<IAppPlanBillingManager>()
-                .AsSelf()
-                .SingleInstance();
         }
     }
 }
