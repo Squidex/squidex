@@ -107,6 +107,6 @@ describe('PlansService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(planChanged).toBe(new PlanChangedDto('my-url'));
+        expect(planChanged).toEqual(new PlanChangedDto('my-url'));
     }));
 });
