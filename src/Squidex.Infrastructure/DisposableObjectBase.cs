@@ -14,6 +14,7 @@ namespace Squidex.Infrastructure
     {
         private readonly object disposeLock = new object();
         private bool isDisposed;
+
         public bool IsDisposed
         {
             get

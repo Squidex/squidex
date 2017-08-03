@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public async Task Should_fill_missing_days()
         {
             var dateFrom = DateTime.Today;
-            var dateTo = DateTime.Today.AddDays(7);
+            var dateTo   = DateTime.Today.AddDays(7);
 
             IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
             {
@@ -143,9 +143,10 @@ namespace Squidex.Infrastructure.UsageTracking
             await sut.TrackAsync("key3", 0.5, 6000);
 
             sut.Next();
-            sut.Dispose();
 
             await Task.Delay(100);
+
+            sut.Dispose();
 
             usageStore.VerifyAll();
         }
