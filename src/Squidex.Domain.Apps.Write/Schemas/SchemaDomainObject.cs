@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         protected void On(SchemaCreated @event)
         {
-            totalFields += @event?.Fields.Count ?? 0;
+            totalFields += @event.Fields?.Count ?? 0;
 
             schema = SchemaEventDispatcher.Dispatch(@event, registry);
         }
