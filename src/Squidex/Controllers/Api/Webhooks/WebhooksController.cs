@@ -110,7 +110,7 @@ namespace Squidex.Controllers.Api.Webhooks
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/webhooks/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteSchema(string app, string name, Guid id)
+        public async Task<IActionResult> DeleteWebhook(string app, string name, Guid id)
         {
             await CommandBus.PublishAsync(new DeleteWebhook { Id = id });
 
