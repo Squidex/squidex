@@ -33,7 +33,9 @@ namespace Squidex.Controllers.Api.Plans
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
 
-        public AppPlansController(ICommandBus commandBus, IAppPlansProvider appPlansProvider, IAppPlanBillingManager appPlansBillingManager)
+        public AppPlansController(ICommandBus commandBus, 
+            IAppPlansProvider appPlansProvider, 
+            IAppPlanBillingManager appPlansBillingManager)
             : base(commandBus)
         {
             this.appPlansProvider = appPlansProvider;

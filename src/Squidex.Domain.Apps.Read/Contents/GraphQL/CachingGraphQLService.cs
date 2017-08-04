@@ -6,20 +6,19 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Infrastructure;
 using Squidex.Domain.Apps.Read.Utils;
-using Microsoft.Extensions.Caching.Memory;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using System;
-using GraphQL;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Domain.Apps.Events;
 
 // ReSharper disable InvertIf
 

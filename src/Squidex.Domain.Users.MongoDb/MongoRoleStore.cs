@@ -14,9 +14,7 @@ using MongoDB.Driver;
 
 namespace Squidex.Domain.Users.MongoDb
 {
-    public sealed class MongoRoleStore : 
-        IRoleStore<IRole>, 
-        IRoleFactory
+    public sealed class MongoRoleStore : IRoleStore<IRole>, IRoleFactory
     {
         private readonly RoleStore<WrappedIdentityRole> innerStore;
 

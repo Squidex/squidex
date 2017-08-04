@@ -40,7 +40,8 @@ namespace Squidex.Controllers.ContentApi.Generator
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
+        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema, 
+            Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
         {
             this.document = document;
 

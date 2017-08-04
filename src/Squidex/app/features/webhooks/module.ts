@@ -8,7 +8,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SqxFrameworkModule } from 'shared';
+import {
+    HelpComponent,
+    SqxFrameworkModule,
+    SqxSharedModule
+} from 'shared';
 
 import {
     WebhooksPageComponent
@@ -17,13 +21,23 @@ import {
 const routes: Routes = [
     {
         path: '',
-        component: WebhooksPageComponent
+        component: WebhooksPageComponent,
+        children: [
+            {
+                path: 'help',
+                component: HelpComponent,
+                data: {
+                    helpPage: '05-integrated/webhooks'
+                }
+            }
+        ]
     }
 ];
 
 @NgModule({
     imports: [
         SqxFrameworkModule,
+        SqxSharedModule,
         RouterModule.forChild(routes)
     ],
     declarations: [

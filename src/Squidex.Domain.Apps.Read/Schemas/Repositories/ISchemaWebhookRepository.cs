@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Read.Schemas.Repositories
 {
     public interface ISchemaWebhookRepository
     {
-        Task AddInvokationAsync(Guid webhookId, string dump, WebhookResult result, TimeSpan elapsed);
+        Task TraceSentAsync(Guid webhookId, WebhookResult result, TimeSpan elapsed);
 
         Task<IReadOnlyList<ISchemaWebhookUrlEntity>> QueryUrlsBySchemaAsync(Guid appId, Guid schemaId);
 

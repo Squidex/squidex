@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -54,14 +53,5 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonRequired]
         [BsonElement]
         public long TotalRequestTime { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public List<string> LastDumps { get; set; } = new List<string>();
-
-        IEnumerable<string> ISchemaWebhookEntity.LastDumps
-        {
-            get { return LastDumps; }
-        }
     }
 }

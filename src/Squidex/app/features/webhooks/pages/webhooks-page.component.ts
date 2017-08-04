@@ -21,7 +21,7 @@ import {
     WebhooksService
 } from 'shared';
 
-interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; showDetails: boolean; };
+interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; };
 
 @Component({
     selector: 'sqx-webhooks-page',
@@ -111,7 +111,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             this.appNameOnce()
                 .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
                 .subscribe(dto => {
-                    this.webhooks = this.webhooks.push({ webhook: dto, schema: schema, showDetails: false });
+                    this.webhooks = this.webhooks.push({ webhook: dto, schema: schema });
 
                     this.resetWebhookForm();
                 }, error => {
@@ -123,10 +123,6 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
 
     public cancelAddWebhook() {
         this.resetWebhookForm();
-    }
-
-    public toggleDetails(webhook: WebhookWithSchema) {
-        this.webhooks = this.webhooks.replace(webhook, { webhook: webhook.webhook, schema: webhook.schema, showDetails: !webhook.showDetails });
     }
 
     private enableWebhookForm() {

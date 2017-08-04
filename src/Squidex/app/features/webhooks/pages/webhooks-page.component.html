@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Webhooks" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<sqx-panel panelWidth="46rem">
+<sqx-panel panelWidth="50rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -30,7 +30,7 @@
                     <div class="table-items-row">
                         <table class="table table-middle table-sm table-borderless table-fixed">
                             <colgroup>
-                                <col style="width: 160px; text-align: right;" />
+                                <col style="width: 120px; text-align: right;" />
                                 <col style="width: 100%" />
                                 <col style="width: 40px" />
                             </colgroup>
@@ -71,40 +71,28 @@
                             </tr>
                         </table>
                         
-                        <div class="webhook-stats" *ngIf="w.webhook.lastDumps.length > 0">
+                        <div class="webhook-stats" *ngIf="w.webhook.averageRequestTimeMs > 0">
                             <div class="row">
-                                <div class="col-8">
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <span title="Succeeded Requests" [class.success]="w.webhook.totalSucceeded > 0">
-                                                <i class="icon-checkmark"></i> {{w.webhook.totalSucceeded}}
-                                            </span>
-                                        </div>
-                                        <div class="col-3">
-                                            <span title="Failed Requests" [class.failed]="w.webhook.totalFailed > 0">
-                                                <i class="icon-bug"></i> {{w.webhook.totalFailed}}
-                                            </span>
-                                        </div>
-                                        <div class="col-3">
-                                            <span title="Timeout Requests" [class.failed]="w.webhook.totalTimedout > 0">
-                                                <i class="icon-timeout"></i> {{w.webhook.totalTimedout}}
-                                            </span>
-                                        </div>
-                                        <div class="col-3">
-                                            <span title="Average Request Time">
-                                                <i class="icon-elapsed"></i> {{w.webhook.averageRequestTimeMs}} ms
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div class="col-3">
+                                    <span title="Succeeded Requests" [class.success]="w.webhook.totalSucceeded > 0">
+                                        <i class="icon-checkmark"></i> {{w.webhook.totalSucceeded}}
+                                    </span>
                                 </div>
-                                <div class="col-4 text-right">
-                                    <a *ngIf="!w.showDetails" class="webhook-detail-link" (click)="toggleDetails(w)">Show Last Request</a>
-                                    <a *ngIf="w.showDetails"  class="webhook-detail-link" (click)="toggleDetails(w)">Hide Last Request</a>
+                                <div class="col-3">
+                                    <span title="Failed Requests" [class.failed]="w.webhook.totalFailed > 0">
+                                        <i class="icon-bug"></i> {{w.webhook.totalFailed}}
+                                    </span>
                                 </div>
-                            </div>
-                            <div *ngIf="w.showDetails" class="webhook-dumps">
-                                <h3>Last Request</h3>
-                                <textarea class="form-control webhook-dump" readonly>{{w.webhook.lastDumps[0]}}</textarea>
+                                <div class="col-3">
+                                    <span title="Timeout Requests" [class.failed]="w.webhook.totalTimedout > 0">
+                                        <i class="icon-timeout"></i> {{w.webhook.totalTimedout}}
+                                    </span>
+                                </div>
+                                <div class="col-3">
+                                    <span title="Average Response Time">
+                                        <i class="icon-elapsed"></i> {{w.webhook.averageRequestTimeMs}} ms
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,5 +119,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="panel-sidebar">
+            <a class="panel-link" routerLink="events" routerLinkActive="active">
+                <i class="icon-time"></i>
+            </a>
+            <a class="panel-link" routerLink="help" routerLinkActive="active">
+                <i class="icon-help"></i>
+            </a>
+        </div>
     </div>
 </sqx-panel>
+
+<router-outlet></router-outlet>

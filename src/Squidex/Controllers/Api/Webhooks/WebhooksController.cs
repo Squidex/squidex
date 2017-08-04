@@ -31,11 +31,15 @@ namespace Squidex.Controllers.Api.Webhooks
     public class WebhooksController : ControllerBase
     {
         private readonly ISchemaWebhookRepository webhooksRepository;
+        private readonly IWebhookEventRepository webhookEventsRepository;
 
-        public WebhooksController(ICommandBus commandBus, ISchemaWebhookRepository webhooksRepository) 
+        public WebhooksController(ICommandBus commandBus, 
+            ISchemaWebhookRepository webhooksRepository, 
+            IWebhookEventRepository webhookEventsRepository) 
             : base(commandBus)
         {
             this.webhooksRepository = webhooksRepository;
+            this.webhookEventsRepository = webhookEventsRepository;
         }
 
         /// <summary>
@@ -61,7 +65,7 @@ namespace Squidex.Controllers.Api.Webhooks
                 var count = w.TotalTimedout + w.TotalSucceeded + w.TotalFailed;
                 var average = count == 0 ? 0 : w.TotalRequestTime / count;
 
-                return SimpleMapper.Map(w, new WebhookDto { AverageRequestTimeMs = average, LastDumps = w.LastDumps.ToList() });
+                return SimpleMapper.Map(w, new WebhookDto { AverageRequestTimeMs = average });
             });
 
             return Ok(response);
@@ -115,6 +119,42 @@ namespace Squidex.Controllers.Api.Webhooks
             await CommandBus.PublishAsync(new DeleteWebhook { Id = id });
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Get webhook events.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Webhook events returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/webhooks/events")]
+        [ProducesResponseType(typeof(WebhookEventsDto), 200)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetEvents(string app)
+        {
+            var taskForItems = webhookEventsRepository.QueryByAppAsync(App.Id);
+            var taskForCount = webhookEventsRepository.CountByAppAsync(App.Id);
+
+            await Task.WhenAll(taskForItems, taskForCount);
+
+            var response = new WebhookEventsDto
+            {
+                Total = taskForCount.Result,
+                Items = taskForItems.Result.Select(x =>
+                {
+                    var itemModel = new WebhookEventDto();
+
+                    SimpleMapper.Map(x, itemModel);
+                    SimpleMapper.Map(x.Job, itemModel);
+
+                    return itemModel;
+                }).ToArray()
+            };
+
+            return Ok(response);
         }
     }
 }

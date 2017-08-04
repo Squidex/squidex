@@ -10,8 +10,9 @@ namespace Squidex.Domain.Apps.Read.Schemas
 {
     public enum WebhookResult
     {
+        Pending,
         Success,
-        Fail,
+        Failed,
         Timeout
     }
 }

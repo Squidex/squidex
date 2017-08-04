@@ -58,8 +58,7 @@ describe('WebhooksService', () => {
                 totalSucceeded: 1,
                 totalFailed: 2,
                 totalTimedout: 3,
-                averageRequestTimeMs: 4,
-                lastDumps: ['dump1']
+                averageRequestTimeMs: 4
             },
             {
                 id: 'id2',
@@ -69,14 +68,13 @@ describe('WebhooksService', () => {
                 totalSucceeded: 5,
                 totalFailed: 6,
                 totalTimedout: 7,
-                averageRequestTimeMs: 8,
-                lastDumps: ['dump2']
+                averageRequestTimeMs: 8
             }
         ]);
 
         expect(webhooks).toEqual([
-            new WebhookDto('id1', 'schemaId1', 'token1', 'http://squidex.io/1', 1, 2, 3, 4, ['dump1']),
-            new WebhookDto('id2', 'schemaId2', 'token2', 'http://squidex.io/2', 5, 6, 7, 8, ['dump2'])
+            new WebhookDto('id1', 'schemaId1', 'token1', 'http://squidex.io/1', 1, 2, 3, 4),
+            new WebhookDto('id2', 'schemaId2', 'token2', 'http://squidex.io/2', 5, 6, 7, 8)
         ]);
     }));
 
@@ -98,7 +96,7 @@ describe('WebhooksService', () => {
 
         req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' });
 
-        expect(webhook).toEqual(new WebhookDto('id1', 'schema1', 'token1', dto.url, 0, 0, 0, 0, []));
+        expect(webhook).toEqual(new WebhookDto('id1', 'schema1', 'token1', dto.url, 0, 0, 0, 0));
     }));
 
     it('should make delete request to delete webhook',

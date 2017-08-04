@@ -26,8 +26,7 @@ export class WebhookDto {
         public readonly totalSucceeded: number,
         public readonly totalFailed: number,
         public readonly totalTimedout: number,
-        public readonly averageRequestTimeMs: number,
-        public readonly lastDumps: string[]
+        public readonly averageRequestTimeMs: number
     ) {
     }
 }
@@ -63,8 +62,7 @@ export class WebhooksService {
                             item.totalSucceeded,
                             item.totalFailed,
                             item.totalTimedout,
-                            item.averageRequestTimeMs,
-                            item.lastDumps);
+                            item.averageRequestTimeMs);
                     });
                 })
                 .pretifyError('Failed to load webhooks. Please reload.');
@@ -80,7 +78,7 @@ export class WebhooksService {
                         response.schemaId,
                         response.sharedSecret,
                         dto.url,
-                        0, 0, 0, 0, []);
+                        0, 0, 0, 0);
                 })
                 .pretifyError('Failed to create webhook. Please reload.');
     }

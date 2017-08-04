@@ -24,6 +24,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
+// ReSharper disable PossibleNullReferenceException
 // ReSharper disable RedundantIfElseBlock
 
 namespace Squidex.Controllers.ContentApi

@@ -1,25 +1,18 @@
 ﻿// ==========================================================================
-//  ISchemaWebhookEntity.cs
+//  WebhookJobResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Read.Schemas
 {
-    public interface ISchemaWebhookEntity : ISchemaWebhookUrlEntity
+    public enum WebhookJobResult
     {
-        Guid SchemaId { get; }
-
-        long TotalSucceeded { get; }
-
-        long TotalFailed { get; }
-
-        long TotalTimedout { get; }
-
-        long TotalRequestTime { get; }
+        Pending,
+        Success,
+        Retry,
+        Failed
     }
 }

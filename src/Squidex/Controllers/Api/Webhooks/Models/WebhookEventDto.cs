@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebhookDto.cs
+//  WebhookEventDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,51 +8,53 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
+using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookDto
+    public class WebhookEventDto
     {
         /// <summary>
-        /// The id of the webhook.
+        /// The request url.
+        /// </summary>
+        [Required]
+        public Uri RequestUrl { get; set; }
+
+        /// <summary>
+        /// The name of the event.
+        /// </summary>
+        [Required]
+        public string EventName { get; set; }
+
+        /// <summary>
+        /// The webhook event id.
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The id of the schema.
+        /// The last dump.
         /// </summary>
-        public Guid SchemaId { get; set; }
+        public string LastDump { get; set; }
 
         /// <summary>
-        /// The number of succceeded calls.
+        /// The number of calls.
         /// </summary>
-        public long TotalSucceeded { get; set; }
+        public int NumCalls { get; set; }
 
         /// <summary>
-        /// The number of failed calls.
+        /// The next attempt.
         /// </summary>
-        public long TotalFailed { get; set; }
+        public Instant? NextAttempt { get; set; }
 
         /// <summary>
-        /// The number of timedout calls.
+        /// The result of the event.
         /// </summary>
-        public long TotalTimedout { get; set; }
+        public WebhookResult Result { get; set; }
 
         /// <summary>
-        /// The average response time in milliseconds.
+        /// The result of the job.
         /// </summary>
-        public long AverageRequestTimeMs { get; set; }
-
-        /// <summary>
-        /// The url of the webhook.
-        /// </summary>
-        [Required]
-        public Uri Url { get; set; }
-
-        /// <summary>
-        /// The shared secret that is used to calculate the signature.
-        /// </summary>
-        [Required]
-        public string SharedSecret { get; set; }
+        public WebhookJobResult JobResult { get; set; }
     }
 }

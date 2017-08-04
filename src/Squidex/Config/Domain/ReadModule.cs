@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline;
 
@@ -62,41 +63,56 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<GraphQLUrlGenerator>()
                 .As<IGraphQLUrlGenerator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<AssetUserPictureStore>()
                 .As<IUserPictureStore>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>()
+                .AsSelf()
                 .InstancePerDependency();
 
-            builder.RegisterType<WebhookInvoker>()
+            builder.RegisterType<CachingGraphQLService>()
+                .As<IGraphQLService>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookDequeuer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookEnqueuer>()
                 .As<IEventConsumer>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookSender>()
                 .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<EdmModelBuilder>()
                 .AsSelf()
                 .SingleInstance();
-
-            builder.RegisterType<CachingGraphQLService>()
-                .As<IGraphQLService>()
-                .AsSelf()
-                .InstancePerDependency();
         }
     }
 }

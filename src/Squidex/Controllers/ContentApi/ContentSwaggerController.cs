@@ -26,7 +26,8 @@ namespace Squidex.Controllers.ContentApi
         private readonly IAppProvider appProvider;
         private readonly SchemasSwaggerGenerator schemasSwaggerGenerator;
 
-        public ContentSwaggerController(ISchemaRepository schemaRepository, IAppProvider appProvider, SchemasSwaggerGenerator schemasSwaggerGenerator)
+        public ContentSwaggerController(ISchemaRepository schemaRepository, IAppProvider appProvider,
+            SchemasSwaggerGenerator schemasSwaggerGenerator)
         {
             this.appProvider = appProvider;
 

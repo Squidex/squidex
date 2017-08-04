@@ -26,7 +26,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaWebhookRepository : MongoRepositoryBase<MongoSchemaWebhookEntity>, ISchemaWebhookRepository, IEventConsumer
     {
-        private const int MaxDumps = 10;
         private static readonly List<ShortInfo> EmptyWebhooks = new List<ShortInfo>();
         private Dictionary<Guid, Dictionary<Guid, List<ShortInfo>>> inMemoryWebhooks;
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
@@ -67,7 +66,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return inMemoryWebhooks.GetOrDefault(appId)?.GetOrDefault(schemaId)?.ToList() ?? EmptyWebhooks;
         }
 
-        public async Task AddInvokationAsync(Guid webhookId, string dump, WebhookResult result, TimeSpan elapsed)
+        public async Task TraceSentAsync(Guid webhookId, WebhookResult result, TimeSpan elapsed)
         {
             var webhookEntity = 
                 await Collection.Find(x => x.Id == webhookId)
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
                     case WebhookResult.Success:
                         webhookEntity.TotalSucceeded++;
                         break;
-                    case WebhookResult.Fail:
+                    case WebhookResult.Failed:
                         webhookEntity.TotalFailed++;
                         break;
                     case WebhookResult.Timeout:
@@ -89,12 +88,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
                 }
 
                 webhookEntity.TotalRequestTime += (long)elapsed.TotalMilliseconds;
-                webhookEntity.LastDumps.Insert(0, dump);
-
-                while (webhookEntity.LastDumps.Count > MaxDumps)
-                {
-                    webhookEntity.LastDumps.RemoveAt(webhookEntity.LastDumps.Count - 1);
-                }
 
                 await Collection.ReplaceOneAsync(x => x.Id == webhookId, webhookEntity);
             }

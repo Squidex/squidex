@@ -1,25 +1,27 @@
 ﻿// ==========================================================================
-//  ISchemaWebhookEntity.cs
+//  IWebhookEventEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using NodaTime;
 
 namespace Squidex.Domain.Apps.Read.Schemas
 {
-    public interface ISchemaWebhookEntity : ISchemaWebhookUrlEntity
+    public interface IWebhookEventEntity
     {
-        Guid SchemaId { get; }
+        WebhookJob Job { get; }
 
-        long TotalSucceeded { get; }
+        Instant? NextAttempt { get; }
 
-        long TotalFailed { get; }
+        WebhookResult Result { get; }
 
-        long TotalTimedout { get; }
+        WebhookJobResult JobResult { get; }
 
-        long TotalRequestTime { get; }
+        int NumCalls { get; }
+
+        string LastDump { get; }
     }
 }
