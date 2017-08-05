@@ -81,6 +81,11 @@ namespace Squidex.Domain.Apps.Read.Schemas
         {
         }
 
+        public void Next()
+        {
+            timer.SkipCurrentDelay();
+        }
+
         private async Task QueryAsync(CancellationToken cancellationToken)
         {
             try
@@ -99,7 +104,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         {
             try
             {
-                await webhookEventRepository.TraceSendingAsync(@event.Job.Id);
+                await webhookEventRepository.TraceSendingAsync(@event.Id);
 
                 return @event;
             }
@@ -117,14 +122,14 @@ namespace Squidex.Domain.Apps.Read.Schemas
         {
             try
             {
-                var now = clock.GetCurrentInstant();
-
                 var response = await webhookSender.SendAsync(@event.Job);
 
                 Instant? nextCall = null;
 
                 if (response.Result != WebhookResult.Success)
                 {
+                    var now = clock.GetCurrentInstant();
+
                     switch (@event.NumCalls)
                     {
                         case 0:
@@ -144,7 +149,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
                 await Task.WhenAll(
                     webhookRepository.TraceSentAsync(@event.Job.WebhookId, response.Result, response.Elapsed),
-                    webhookEventRepository.TraceSentAsync(@event.Job.Id, response.Dump, response.Result, response.Elapsed, nextCall));
+                    webhookEventRepository.TraceSentAsync(@event.Id, response.Dump, response.Result, response.Elapsed, nextCall));
             }
             catch (Exception ex)
             {
