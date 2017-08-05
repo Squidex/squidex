@@ -55,8 +55,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public void Should_throw_exception_if_new_entity_has_invalid_version()
         {
-            var serviceProvider = A.Fake<IServiceProvider>();
-
             var factoryFunction = new DomainObjectFactoryFunction<DO>(passedId =>
             {
                 return new DO(passedId, 0);

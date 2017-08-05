@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Read.MongoDb\Squidex.Domain.Apps.Read.MongoDb.csproj" />
