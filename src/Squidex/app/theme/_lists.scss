@@ -63,11 +63,6 @@
                 margin-bottom: .5rem;
             }
 
-            // Transitioned hover effect.
-            &:hover {
-                background: darken($color-table, 2%);
-            }
-
             &:focus {
                 outline: none;
             }
@@ -127,7 +122,7 @@
             // Caret that is placed next to the expand button.
             &::before {
                 @include caret-top;
-                @include absolute(-.5rem, 5.5rem, auto, auto);
+                @include absolute(-.5rem, 5.7rem, auto, auto);
                 border-color: transparent transparent $color-border;
                 border-width: .6rem;
             }

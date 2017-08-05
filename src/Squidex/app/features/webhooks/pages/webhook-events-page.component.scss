@@ -48,4 +48,26 @@ h3 {
         font-weight: normal;
         height: 20rem;
     }
+
+    &-header {
+        & {
+            padding: 1rem 1.25rem;
+            position: relative;
+            background: $color-border;
+            border: 0;
+            margin: -1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        &::before {
+            @include caret-top;
+            @include absolute(-.5rem, 1.9rem, auto, auto);
+            border-color: transparent transparent $color-border;
+            border-width: .6rem;
+        }
+
+        h3 {
+            margin: 0;
+        }
+    }
 }
