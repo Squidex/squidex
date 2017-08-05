@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -18,13 +18,13 @@ namespace Squidex.Domain.Users
 {
     public class AssetUserPictureStoreTests
     {
-        private readonly Mock<IAssetStore> assetStore = new Mock<IAssetStore>();
+        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly AssetUserPictureStore sut;
         private readonly string userId = Guid.NewGuid().ToString();
 
         public AssetUserPictureStoreTests()
         {
-            sut = new AssetUserPictureStore(assetStore.Object);
+            sut = new AssetUserPictureStore(assetStore);
         }
 
         [Fact]
@@ -32,29 +32,29 @@ namespace Squidex.Domain.Users
         {
             var stream = new MemoryStream();
 
-            assetStore.Setup(x => x.UploadAsync(userId, 0, "picture", stream))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream))
+                .Returns(TaskHelper.Done);
 
             await sut.UploadAsync(userId, stream);
 
-            assetStore.VerifyAll();
+            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_invoke_asset_store_to_download_picture()
         {
-            assetStore.Setup(x => x.DownloadAsync(userId, 0, "picture", It.IsAny<Stream>()))
-                .Callback<string, long, string, Stream>((id, version, suffix, stream) => stream.Write(new byte[] { 1, 2, 3, 4 }, 0, 4 ))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => assetStore.DownloadAsync(userId, 0, "picture", A<Stream>.Ignored))
+                .Invokes(async (string id, long version, string suffix, Stream stream) =>
+                {
+                    await stream.WriteAsync(new byte[] { 1, 2, 3, 4 }, 0, 4);
+                });
 
             var result = await sut.DownloadAsync(userId);
 
             Assert.Equal(0, result.Position);
             Assert.Equal(4, result.Length);
 
-            assetStore.VerifyAll();
+            A.CallTo(() => assetStore.DownloadAsync(userId, 0, "picture", A<Stream>.Ignored)).MustHaveHappened();
         }
     }
 }
