@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         private readonly MyLog log = new MyLog();
         private readonly LogExecutingHandler sut;
-        private readonly ICommand command = new Mock<ICommand>().Object;
+        private readonly ICommand command = A.Dummy<ICommand>();
 
         private sealed class MyLog : ISemanticLog
         {

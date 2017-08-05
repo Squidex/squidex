@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -94,10 +94,10 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        private readonly Mock<IEventConsumerInfoRepository> eventConsumerInfoRepository = new Mock<IEventConsumerInfoRepository>();
-        private readonly Mock<IEventConsumer> eventConsumer = new Mock<IEventConsumer>();
-        private readonly Mock<ISemanticLog> log = new Mock<ISemanticLog>();
-        private readonly Mock<EventDataFormatter> formatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
+        private readonly IEventConsumerInfoRepository eventConsumerInfoRepository = A.Fake<IEventConsumerInfoRepository>();
+        private readonly IEventConsumer eventConsumer = A.Fake<IEventConsumer>();
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly EventDataFormatter formatter = A.Fake<EventDataFormatter>();
         private readonly EventData eventData1 = new EventData();
         private readonly EventData eventData2 = new EventData();
         private readonly EventData eventData3 = new EventData();
@@ -117,29 +117,29 @@ namespace Squidex.Infrastructure.CQRS.Events
                 new StoredEvent("5", 5, eventData3)
             };
 
-            consumerName = eventConsumer.Object.GetType().Name;
+            consumerName = eventConsumer.GetType().Name;
 
             var eventStore = new MyEventStore(events);
 
-            eventConsumer.Setup(x => x.Name).Returns(consumerName);
-            eventConsumerInfoRepository.Setup(x => x.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
+            A.CallTo(() => eventConsumer.Name).Returns(consumerName);
+            A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
 
-            formatter.Setup(x => x.Parse(eventData1)).Returns(envelope1);
-            formatter.Setup(x => x.Parse(eventData2)).Returns(envelope2);
-            formatter.Setup(x => x.Parse(eventData3)).Returns(envelope3);
+            A.CallTo(() => formatter.Parse(eventData1)).Returns(envelope1);
+            A.CallTo(() => formatter.Parse(eventData2)).Returns(envelope2);
+            A.CallTo(() => formatter.Parse(eventData3)).Returns(envelope3);
 
-            sut = new EventReceiver(formatter.Object, eventStore, eventConsumerInfoRepository.Object, log.Object);
+            sut = new EventReceiver(formatter, eventStore, eventConsumerInfoRepository, log);
         }
 
         [Fact]
         public void Should_only_connect_once()
         {
-            sut.Subscribe(eventConsumer.Object);
-            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer);
+            sut.Subscribe(eventConsumer);
             sut.Refresh();
             sut.Dispose();
 
-            eventConsumerInfoRepository.Verify(x => x.CreateAsync(consumerName), Times.Once());
+            A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName)).MustHaveHappened();
         }
 
         [Fact]
@@ -147,13 +147,13 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.Position = "2";
 
-            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer);
             sut.Refresh();
             sut.Dispose();
 
-            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope3), Times.Once());
+            A.CallTo(() => eventConsumer.On(envelope1)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope2)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope3)).MustHaveHappened();
         }
 
         [Fact]
@@ -161,18 +161,18 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.Position = "2";
 
-            eventConsumer.Setup(x => x.On(envelope1)).Returns(TaskHelper.True);
-            eventConsumer.Setup(x => x.On(envelope2)).Throws(new InvalidOperationException());
+            A.CallTo(() => eventConsumer.On(envelope1)).Returns(TaskHelper.True);
+            A.CallTo(() => eventConsumer.On(envelope2)).Throws(new InvalidOperationException());
 
-            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer);
             sut.Refresh();
             sut.Dispose();
 
-            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope3), Times.Never());
+            A.CallTo(() => eventConsumer.On(envelope1)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope2)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope3)).MustNotHaveHappened();
 
-            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName, It.IsAny<string>()), Times.Once());
+            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, A<string>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
@@ -180,17 +180,17 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.Position = "2";
 
-            formatter.Setup(x => x.Parse(eventData2)).Throws(new InvalidOperationException());
+            A.CallTo(() => formatter.Parse(eventData2)).Throws(new InvalidOperationException());
 
-            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer);
             sut.Refresh();
             sut.Dispose();
 
-            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope2), Times.Never());
-            eventConsumer.Verify(x => x.On(envelope3), Times.Never());
+            A.CallTo(() => eventConsumer.On(envelope1)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope2)).MustNotHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope3)).MustNotHaveHappened();
 
-            eventConsumerInfoRepository.Verify(x => x.StopAsync(consumerName, It.IsAny<string>()), Times.Once());
+            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, A<string>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
@@ -199,15 +199,15 @@ namespace Squidex.Infrastructure.CQRS.Events
             consumerInfo.IsResetting = true;
             consumerInfo.Position = "2";
 
-            sut.Subscribe(eventConsumer.Object);
+            sut.Subscribe(eventConsumer);
             sut.Refresh();
             sut.Dispose();
 
-            eventConsumer.Verify(x => x.On(envelope1), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope2), Times.Once());
-            eventConsumer.Verify(x => x.On(envelope3), Times.Once());
+            A.CallTo(() => eventConsumer.On(envelope1)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope2)).MustHaveHappened();
+            A.CallTo(() => eventConsumer.On(envelope3)).MustHaveHappened();
 
-            eventConsumer.Verify(x => x.ClearAsync(), Times.Once());
+            A.CallTo(() => eventConsumer.ClearAsync()).MustHaveHappened();
         }
     }
 }

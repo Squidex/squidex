@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using NodaTime;
 using Xunit;
 
@@ -22,15 +22,16 @@ namespace Squidex.Infrastructure.CQRS.Commands
             public long? ExpectedVersion { get; set; }
         }
 
-        private readonly Mock<IClock> clock = new Mock<IClock>();
+        private readonly IClock clock = A.Fake<IClock>();
 
         [Fact]
         public async Task Should_set_timestamp_for_timestamp_command()
         {
             var utc = Instant.FromUnixTimeSeconds(1000);
-            var sut = new EnrichWithTimestampHandler(clock.Object);
+            var sut = new EnrichWithTimestampHandler(clock);
 
-            clock.Setup(x => x.GetCurrentInstant()).Returns(utc);
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(utc);
 
             var command = new MyTimestampCommand();
 
@@ -43,13 +44,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_do_nothing_for_normal_command()
         {
-            var sut = new EnrichWithTimestampHandler(clock.Object);
+            var sut = new EnrichWithTimestampHandler(clock);
 
-            var result = await sut.HandleAsync(new CommandContext(new Mock<ICommand>().Object));
+            var result = await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>()));
 
             Assert.False(result);
 
-            clock.Verify(x => x.GetCurrentInstant(), Times.Never());
+            A.CallTo(() => clock.GetCurrentInstant()).MustNotHaveHappened();
         }
     }
 }

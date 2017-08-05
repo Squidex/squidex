@@ -7,14 +7,14 @@
 // ==========================================================================
 
 using System;
-using Moq;
+using FakeItEasy;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class CommandContextTests
     {
-        private readonly ICommand command = new Mock<ICommand>().Object;
+        private readonly ICommand command = A.Dummy<ICommand>();
 
         [Fact]
         public void Should_instantiate_and_provide_command()

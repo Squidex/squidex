@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
             }
         }
 
-        private readonly MockupHandler handler = A.DummyupHandler();
+        private readonly MockupHandler handler = new MockupHandler();
 
         protected RefToken User { get; } = new RefToken("subject", Guid.NewGuid().ToString());
 

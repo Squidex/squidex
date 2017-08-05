@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -21,10 +21,10 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class DefaultDomainObjectRepositoryTests
     {
-        private readonly Mock<IDomainObjectFactory> factory = new Mock<IDomainObjectFactory>();
-        private readonly Mock<IEventStore> eventStore = new Mock<IEventStore>();
-        private readonly Mock<IStreamNameResolver> streamNameResolver = new Mock<IStreamNameResolver>();
-        private readonly Mock<EventDataFormatter> eventDataFormatter = new Mock<EventDataFormatter>(new TypeNameRegistry(), null);
+        private readonly IDomainObjectFactory factory = A.Fake<IDomainObjectFactory>();
+        private readonly IEventStore eventStore = A.Fake<IEventStore>();
+        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
+        private readonly EventDataFormatter eventDataFormatter = A.Fake<EventDataFormatter>();
         private readonly string streamName = Guid.NewGuid().ToString();
         private readonly Guid aggregateId = Guid.NewGuid();
         private readonly MyDomainObject domainObject;
@@ -34,11 +34,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             domainObject = new MyDomainObject(aggregateId, 123);
 
-            streamNameResolver.Setup(x => x.GetStreamName(It.IsAny<Type>(), aggregateId)).Returns(streamName);
+            A.CallTo(() => streamNameResolver.GetStreamName(A<Type>.Ignored, aggregateId)).Returns(streamName);
 
-            factory.Setup(x => x.CreateNew(typeof(MyDomainObject), aggregateId)).Returns(domainObject);
+            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), aggregateId)).Returns(domainObject);
 
-            sut = new DefaultDomainObjectRepository(factory.Object, eventStore.Object, streamNameResolver.Object, eventDataFormatter.Object);
+            sut = new DefaultDomainObjectRepository(factory, eventStore, streamNameResolver, eventDataFormatter);
         }
 
         public sealed class MyEvent : IEvent
@@ -72,7 +72,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(new List<StoredEvent>()));
+            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(new List<StoredEvent>()));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
         }
@@ -92,10 +93,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
+            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
 
-            eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
-            eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
+            A.CallTo(() => eventDataFormatter.Parse(eventData1))
+                .Returns(new Envelope<IEvent>(event1));
+            A.CallTo(() => eventDataFormatter.Parse(eventData2))
+                .Returns(new Envelope<IEvent>(event2));
 
             var result = await sut.GetByIdAsync<MyDomainObject>(aggregateId);
 
@@ -117,10 +121,13 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent("1", 1, eventData2)
             };
 
-            eventStore.Setup(x => x.GetEventsAsync(streamName)).Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
+            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
 
-            eventDataFormatter.Setup(x => x.Parse(eventData1)).Returns(new Envelope<IEvent>(event1));
-            eventDataFormatter.Setup(x => x.Parse(eventData2)).Returns(new Envelope<IEvent>(event2));
+            A.CallTo(() => eventDataFormatter.Parse(eventData1))
+                .Returns(new Envelope<IEvent>(event1));
+            A.CallTo(() => eventDataFormatter.Parse(eventData2))
+                .Returns(new Envelope<IEvent>(event2));
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId, 200));
         }
@@ -136,19 +143,20 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var eventData1 = new EventData();
             var eventData2 = new EventData();
 
-            eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
-            eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
+            A.CallTo(() => eventDataFormatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId))
+                .Returns(eventData1);
+            A.CallTo(() => eventDataFormatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId))
+                .Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, It.Is<ICollection<EventData>>(e => e.Count == 2)))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2)))
+                .Returns(TaskHelper.Done);
 
             domainObject.AddEvent(event1);
             domainObject.AddEvent(event2);
 
             await sut.SaveAsync(domainObject, domainObject.GetUncomittedEvents(), commitId);
 
-            eventStore.VerifyAll();
+            A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2))).MustHaveHappened();
         }
 
         [Fact]
@@ -162,19 +170,20 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var eventData1 = new EventData();
             var eventData2 = new EventData();
 
-            eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event1), commitId)).Returns(eventData1);
-            eventDataFormatter.Setup(x => x.ToEventData(It.Is<Envelope<IEvent>>(e => e.Payload == event2), commitId)).Returns(eventData2);
+            A.CallTo(() => eventDataFormatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId))
+                .Returns(eventData1);
+            A.CallTo(() => eventDataFormatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId))
+                .Returns(eventData2);
 
-            eventStore.Setup(x => x.AppendEventsAsync(commitId, streamName, 123, new List<EventData> { eventData1, eventData2 }))
-                .Throws(new WrongEventVersionException(1, 2))
-                .Verifiable();
+            A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2)))
+                .Throws(new WrongEventVersionException(1, 2));
 
             domainObject.AddEvent(event1);
             domainObject.AddEvent(event2);
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.SaveAsync(domainObject, domainObject.GetUncomittedEvents(), commitId));
 
-            eventStore.VerifyAll();
+            A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2))).MustHaveHappened();
         }
     }
 }

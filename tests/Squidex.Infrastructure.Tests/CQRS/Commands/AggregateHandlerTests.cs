@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -48,8 +48,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
             }
         }
 
-        private readonly Mock<IDomainObjectFactory> factory = new Mock<IDomainObjectFactory>();
-        private readonly Mock<IDomainObjectRepository> repository = new Mock<IDomainObjectRepository>();
+        private readonly IDomainObjectFactory factory = A.Fake<IDomainObjectFactory>();
+        private readonly IDomainObjectRepository repository = A.Fake<IDomainObjectRepository>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
         private readonly CommandContext context;
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public AggregateHandlerTests()
         {
-            sut = new AggregateHandler(factory.Object, repository.Object);
+            sut = new AggregateHandler(factory, repository);
 
             domainObject =
                 new MyDomainObject(Guid.NewGuid(), 1)
@@ -73,31 +73,29 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public void Should_provide_access_to_factory()
         {
-            Assert.Equal(factory.Object, sut.Factory);
+            Assert.Equal(factory, sut.Factory);
         }
 
         [Fact]
         public void Should_provide_access_to_repository()
         {
-            Assert.Equal(repository.Object, sut.Repository);
+            Assert.Equal(repository, sut.Repository);
         }
 
         [Fact]
         public Task Create_async_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
         }
 
         [Fact]
         public async Task Create_async_should_create_domain_object_and_save()
         {
-            factory.Setup(x => x.CreateNew(typeof(MyDomainObject), domainObject.Id))
-                .Returns(domainObject)
-                .Verifiable();
+            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), domainObject.Id))
+                .Returns(domainObject);
 
-            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
+                .Returns(TaskHelper.Done);
 
             MyDomainObject passedDomainObject = null;
 
@@ -111,19 +109,17 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
-            repository.VerifyAll();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Create_sync_should_create_domain_object_and_save()
         {
-            factory.Setup(x => x.CreateNew(typeof(MyDomainObject), domainObject.Id))
-                .Returns(domainObject)
-                .Verifiable();
+            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), domainObject.Id))
+                .Returns(domainObject);
 
-            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
+                .Returns(TaskHelper.Done);
 
             MyDomainObject passedDomainObject = null;
 
@@ -135,25 +131,23 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
-            repository.VerifyAll();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public Task Update_async_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(new Mock<ICommand>().Object), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
         }
 
         [Fact]
         public async Task Update_async_should_create_domain_object_and_save()
         {
-            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
-                .Returns(Task.FromResult(domainObject))
-                .Verifiable();
+            A.CallTo(() => repository.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
+                .Returns(Task.FromResult(domainObject));
 
-            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
+                .Returns(TaskHelper.Done);
 
             MyDomainObject passedDomainObject = null;
 
@@ -167,19 +161,17 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
-            repository.VerifyAll();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Update_sync_should_create_domain_object_and_save()
         {
-            repository.Setup(x => x.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
-                .Returns(Task.FromResult(domainObject))
-                .Verifiable();
+            A.CallTo(() => repository.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
+                .Returns(Task.FromResult(domainObject));
 
-            repository.Setup(x => x.SaveAsync(domainObject, It.IsAny<ICollection<Envelope<IEvent>>>(), It.IsAny<Guid>()))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
+                .Returns(TaskHelper.Done);
 
             MyDomainObject passedDomainObject = null;
 
@@ -191,7 +183,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
-            repository.VerifyAll();
+            A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
     }
 }

@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class InMemoryCommandBusTests
     {
-        private readonly ICommand command = new Mock<ICommand>().Object;
+        private readonly ICommand command = A.Fake<ICommand>();
 
         private sealed class HandledHandler : ICommandHandler
         {

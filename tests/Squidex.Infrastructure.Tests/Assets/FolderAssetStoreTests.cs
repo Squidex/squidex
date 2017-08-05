@@ -8,7 +8,7 @@
 
 using System;
 using System.IO;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Assets
 
         public override FolderAssetStore CreateStore()
         {
-            return new FolderAssetStore(testFolder, new Mock<ISemanticLog>().Object);
+            return new FolderAssetStore(testFolder, A.Dummy<ISemanticLog>());
         }
 
         public override void Dispose()
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_throw_when_creating_directory_failed()
         {
-            Assert.Throws<ConfigurationException>(() => new FolderAssetStore(CreateInvalidPath(), new Mock<ISemanticLog>().Object).Connect());
+            Assert.Throws<ConfigurationException>(() => new FolderAssetStore(CreateInvalidPath(), A.Dummy<ISemanticLog>()).Connect());
         }
 
         [Fact]

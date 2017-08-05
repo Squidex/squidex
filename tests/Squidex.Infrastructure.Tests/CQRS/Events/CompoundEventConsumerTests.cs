@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public class CompoundEventConsumerTests
     {
-        private readonly Mock<IEventConsumer> consumer1 = new Mock<IEventConsumer>();
-        private readonly Mock<IEventConsumer> consumer2 = new Mock<IEventConsumer>();
+        private readonly IEventConsumer consumer1 = A.Fake<IEventConsumer>();
+        private readonly IEventConsumer consumer2 = A.Fake<IEventConsumer>();
 
         private sealed class MyEvent : IEvent
         {
@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_given_name()
         {
-            var sut = new CompoundEventConsumer("consumer-name", consumer1.Object);
+            var sut = new CompoundEventConsumer("consumer-name", consumer1);
 
             Assert.Equal("consumer-name", sut.Name);
         }
@@ -33,9 +33,9 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_first_inner_name()
         {
-            consumer1.Setup(x => x.Name).Returns("my-inner-consumer");
+            A.CallTo(() => consumer1.Name).Returns("my-inner-consumer");
 
-            var sut = new CompoundEventConsumer(consumer1.Object, consumer2.Object);
+            var sut = new CompoundEventConsumer(consumer1, consumer2);
 
             Assert.Equal("my-inner-consumer", sut.Name);
         }
@@ -43,10 +43,10 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_return_compound_filter()
         {
-            consumer1.Setup(x => x.EventsFilter).Returns("filter1");
-            consumer2.Setup(x => x.EventsFilter).Returns("filter2");
+            A.CallTo(() => consumer1.EventsFilter).Returns("filter1");
+            A.CallTo(() => consumer2.EventsFilter).Returns("filter2");
 
-            var sut = new CompoundEventConsumer("my", consumer1.Object, consumer2.Object);
+            var sut = new CompoundEventConsumer("my", consumer1, consumer2);
 
             Assert.Equal("(filter1)|(filter2)", sut.EventsFilter);
         }
@@ -54,10 +54,10 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public void Should_ignore_empty_filters()
         {
-            consumer1.Setup(x => x.EventsFilter).Returns("filter1");
-            consumer2.Setup(x => x.EventsFilter).Returns("");
+            A.CallTo(() => consumer1.EventsFilter).Returns("filter1");
+            A.CallTo(() => consumer2.EventsFilter).Returns("");
 
-            var sut = new CompoundEventConsumer("my", consumer1.Object, consumer2.Object);
+            var sut = new CompoundEventConsumer("my", consumer1, consumer2);
 
             Assert.Equal("(filter1)", sut.EventsFilter);
         }
@@ -65,20 +65,18 @@ namespace Squidex.Infrastructure.CQRS.Events
         [Fact]
         public async Task Should_clear_all_consumers()
         {
-            consumer1.Setup(x => x.ClearAsync()).
-                Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => consumer1.ClearAsync()).
+                Returns(TaskHelper.Done);
 
-            consumer2.Setup(x => x.ClearAsync())
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => consumer2.ClearAsync())
+                .Returns(TaskHelper.Done);
 
-            var sut = new CompoundEventConsumer("consumer-name", consumer1.Object, consumer2.Object);
+            var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
 
             await sut.ClearAsync();
 
-            consumer1.VerifyAll();
-            consumer2.VerifyAll();
+            A.CallTo(() => consumer1.ClearAsync()).MustHaveHappened();
+            A.CallTo(() => consumer2.ClearAsync()).MustHaveHappened();
         }
 
         [Fact]
@@ -86,20 +84,18 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var @event = Envelope.Create(new MyEvent());
 
-            consumer1.Setup(x => x.On(@event))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => consumer1.On(@event))
+                .Returns(TaskHelper.Done);
 
-            consumer2.Setup(x => x.On(@event))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => consumer2.On(@event))
+                .Returns(TaskHelper.Done);
 
-            var sut = new CompoundEventConsumer("consumer-name", consumer1.Object, consumer2.Object);
+            var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
 
             await sut.On(@event);
 
-            consumer1.VerifyAll();
-            consumer2.VerifyAll();
+            A.CallTo(() => consumer1.On(@event)).MustHaveHappened();
+            A.CallTo(() => consumer2.On(@event)).MustHaveHappened();
         }
     }
 }

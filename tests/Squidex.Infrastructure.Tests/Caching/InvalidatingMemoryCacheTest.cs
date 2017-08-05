@@ -6,9 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Moq;
 using Xunit;
 
 // ReSharper disable RedundantAssignment
@@ -27,13 +27,13 @@ namespace Squidex.Infrastructure.Caching
             public T Value { get; }
         }
 
-        private readonly Mock<IPubSub> pubsub = new Mock<IPubSub>();
-        private readonly Mock<IMemoryCache> cache = new Mock<IMemoryCache>();
+        private readonly IPubSub pubsub = A.Fake<IPubSub>();
+        private readonly IMemoryCache cache = A.Fake<IMemoryCache>();
         private readonly InvalidatingMemoryCache sut;
 
         public InvalidatingMemoryCacheTest()
         {
-            sut = new InvalidatingMemoryCache(cache.Object, pubsub.Object);
+            sut = new InvalidatingMemoryCache(cache, pubsub);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Dispose();
 
-            cache.Verify(x => x.Dispose(), Times.Once());
+            A.CallTo(() => cache.Dispose()).MustHaveHappened();
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Remove("a-key");
 
-            cache.Verify(x => x.Remove("a-key"), Times.Once());
+            A.CallTo(() => cache.Remove("a-key")).MustHaveHappened();
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate(123);
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", It.IsAny<string>(), true), Times.Never());
+            A.CallTo(() => pubsub.Publish("CacheInvalidations", A<string>.Ignored, true)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate("a-key");
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", true), Times.Once());
+            A.CallTo(() => pubsub.Publish("CacheInvalidations", "a-key", true)).MustHaveHappened();
         }
 
         [Fact]
@@ -79,20 +79,20 @@ namespace Squidex.Infrastructure.Caching
         {
             ((IMemoryCache)sut).Invalidate("a-key");
 
-            pubsub.Verify(x => x.Publish("CacheInvalidations", "a-key", true), Times.Once());
+            A.CallTo(() => pubsub.Publish("CacheInvalidations", "a-key", true)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_call_inner_to_create_value()
         {
-            var cacheEntry = new Mock<ICacheEntry>();
+            var cacheEntry = A.Dummy<ICacheEntry>();
 
-            cache.Setup(x => x.CreateEntry("a-key"))
-                .Returns(cacheEntry.Object);
+            A.CallTo(() => cache.CreateEntry("a-key"))
+                .Returns(cacheEntry);
 
             var result = sut.CreateEntry("a-key");
 
-            Assert.Equal(cacheEntry.Object, result);
+            Assert.Equal(cacheEntry, result);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.Caching
         {
             object currentOut = 123;
 
-            cache.Setup(x => x.TryGetValue("a-key", out currentOut))
+            A.CallTo(() => cache.TryGetValue("a-key", out currentOut))
                 .Returns(true);
 
             var exists = sut.TryGetValue("a-key", out object result);
