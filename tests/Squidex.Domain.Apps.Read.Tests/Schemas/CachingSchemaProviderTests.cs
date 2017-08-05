@@ -67,7 +67,8 @@ namespace Squidex.Domain.Apps.Read.Schemas
         [Fact]
         public async Task Should_also_retrieve_schema_by_name_if_retrieved_by_id_before()
         {
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).Returns(Task.FromResult(schemaV1));
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
+                .Returns(Task.FromResult(schemaV1));
 
             await ProvideSchemaById(schemaV1);
             await ProvideSchemaByName(schemaV1);
@@ -79,7 +80,8 @@ namespace Squidex.Domain.Apps.Read.Schemas
         [Fact]
         public async Task Should_also_retrieve_schema_by_id_if_retrieved_by_name_before()
         {
-            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(Task.FromResult(schemaV1));
+            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name))
+                .Returns(Task.FromResult(schemaV1));
 
             await ProvideSchemaByName(schemaV1);
             await ProvideSchemaById(schemaV1);
@@ -91,8 +93,10 @@ namespace Squidex.Domain.Apps.Read.Schemas
         [Fact]
         public async Task Should_clear_cache_for_id_after_update_event()
         {
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).Returns(schemaV2);
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).Returns(schemaV1).Once();
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
+                .Returns(schemaV2);
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
+                .Returns(schemaV1).Once();
 
             await ProvideSchemaById(schemaV1);
 
@@ -106,8 +110,10 @@ namespace Squidex.Domain.Apps.Read.Schemas
         [Fact]
         public async Task Should_clear_cache_for_name_after_update_event()
         {
-            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(schemaV2);
-            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name)).Returns(schemaV1).Once();
+            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name))
+                .Returns(schemaV2);
+            A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name))
+                .Returns(schemaV1).Once();
 
             await ProvideSchemaByName(schemaV1);
 

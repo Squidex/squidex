@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure.Assets;
@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Write.Assets
 {
     public class AssetCommandHandlerTests : HandlerTestBase<AssetDomainObject>
     {
-        private readonly Mock<IAssetThumbnailGenerator> assetThumbnailGenerator = new Mock<IAssetThumbnailGenerator>();
-        private readonly Mock<IAssetStore> assetStore = new Mock<IAssetStore>();
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly AssetCommandHandler sut;
         private readonly AssetDomainObject asset;
         private readonly Guid assetId = Guid.NewGuid();
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Write.Assets
 
             asset = new AssetDomainObject(assetId, -1);
 
-            sut = new AssetCommandHandler(Handler, assetStore.Object, assetThumbnailGenerator.Object);
+            sut = new AssetCommandHandler(Handler, assetStore, assetThumbnailGenerator);
         }
 
         [Fact]
@@ -57,8 +57,8 @@ namespace Squidex.Domain.Apps.Write.Assets
 
             Assert.Equal(assetId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
 
-            assetStore.VerifyAll();
-            assetThumbnailGenerator.VerifyAll();
+            VerifyStore(0, context.ContextId);
+            VerifyImageInfo();
         }
 
         [Fact]
@@ -76,8 +76,8 @@ namespace Squidex.Domain.Apps.Write.Assets
                 await sut.HandleAsync(context);
             });
 
-            assetStore.VerifyAll();
-            assetThumbnailGenerator.VerifyAll();
+            VerifyStore(1, context.ContextId);
+            VerifyImageInfo();
         }
 
         [Fact]
@@ -113,24 +113,30 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         private void SetupImageInfo()
         {
-            assetThumbnailGenerator
-                .Setup(x => x.GetImageInfoAsync(stream)).Returns(Task.FromResult(image))
-                .Verifiable();
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(Task.FromResult(image));
         }
 
         private void SetupStore(long version, Guid commitId)
         {
-            assetStore
-                .Setup(x => x.UploadTemporaryAsync(commitId.ToString(), stream)).Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+                .Returns(TaskHelper.Done);
+            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+                .Returns(TaskHelper.Done);
+            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+                .Returns(TaskHelper.Done);
+        }
 
-            assetStore
-                .Setup(x => x.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null)).Returns(TaskHelper.Done)
-                .Verifiable();
+        private void VerifyImageInfo()
+        {
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream)).MustHaveHappened();
+        }
 
-            assetStore
-                .Setup(x => x.DeleteTemporaryAsync(commitId.ToString())).Returns(TaskHelper.Done)
-                .Verifiable();
+        private void VerifyStore(long version, Guid commitId)
+        {
+            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream)).MustHaveHappened();
+            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null)).MustHaveHappened();
+            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString())).MustHaveHappened();
         }
     }
 }

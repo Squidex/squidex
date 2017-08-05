@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private readonly ContentCommandHandler sut;
         private readonly ContentDomainObject content;
-        private readonly Mock<ISchemaProvider> schemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<IAppProvider> appProvider = new Mock<IAppProvider>();
-        private readonly Mock<ISchemaEntity> schemaEntity = new Mock<ISchemaEntity>();
-        private readonly Mock<IAppEntity> appEntity = new Mock<IAppEntity>();
+        private readonly ISchemaProvider schemaProvider = A.Fake<ISchemaProvider>();
+        private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
         private readonly NamedContentData data = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(1));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
@@ -49,14 +49,14 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandHandler(Handler, appProvider.Object, new Mock<IAssetRepository>().Object, schemaProvider.Object, new Mock<IContentRepository>().Object);
+            sut = new ContentCommandHandler(Handler, appProvider, A.Dummy<IAssetRepository>(), schemaProvider, A.Dummy<IContentRepository>());
 
-            appEntity.Setup(x => x.LanguagesConfig).Returns(languagesConfig);
-            appEntity.Setup(x => x.PartitionResolver).Returns(languagesConfig.ToResolver());
-            appProvider.Setup(x => x.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity.Object));
+            A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
+            A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());
+            A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity));
 
-            schemaEntity.Setup(x => x.Schema).Returns(schema);
-            schemaProvider.Setup(x => x.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity.Object));
+            A.CallTo(() => schemaEntity.Schema).Returns(schema);
+            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity));
         }
 
         [Fact]

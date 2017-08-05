@@ -64,7 +64,8 @@ namespace Squidex.Domain.Apps.Read.Apps
         [Fact]
         public async Task Should_also_retrieve_app_by_name_if_retrieved_by_id_before()
         {
-            A.CallTo(() => repository.FindAppAsync(appId.Id)).Returns(Task.FromResult(appV1));
+            A.CallTo(() => repository.FindAppAsync(appId.Id))
+                .Returns(Task.FromResult(appV1));
 
             await ProvideAppById(appV1);
             await ProvideAppByName(appV1);
@@ -76,7 +77,8 @@ namespace Squidex.Domain.Apps.Read.Apps
         [Fact]
         public async Task Should_also_retrieve_app_by_id_if_retrieved_by_name_before()
         {
-            A.CallTo(() => repository.FindAppAsync(appId.Name)).Returns(Task.FromResult(appV1));
+            A.CallTo(() => repository.FindAppAsync(appId.Name))
+                .Returns(Task.FromResult(appV1));
 
             await ProvideAppByName(appV1);
             await ProvideAppById(appV1);
@@ -88,8 +90,10 @@ namespace Squidex.Domain.Apps.Read.Apps
         [Fact]
         public async Task Should_clear_cache_for_id_after_update_event()
         {
-            A.CallTo(() => repository.FindAppAsync(appId.Id)).Returns(appV2);
-            A.CallTo(() => repository.FindAppAsync(appId.Id)).Returns(appV1).Once();
+            A.CallTo(() => repository.FindAppAsync(appId.Id))
+                .Returns(appV2);
+            A.CallTo(() => repository.FindAppAsync(appId.Id))
+                .Returns(appV1).Once();
 
             await ProvideAppById(appV1);
 
@@ -103,8 +107,10 @@ namespace Squidex.Domain.Apps.Read.Apps
         [Fact]
         public async Task Should_clear_cache_for_name_after_update_event()
         {
-            A.CallTo(() => repository.FindAppAsync(appId.Name)).Returns(appV2);
-            A.CallTo(() => repository.FindAppAsync(appId.Name)).Returns(appV1).Once();
+            A.CallTo(() => repository.FindAppAsync(appId.Name))
+                .Returns(appV2);
+            A.CallTo(() => repository.FindAppAsync(appId.Name))
+                .Returns(appV1).Once();
 
             await ProvideAppByName(appV1);
 

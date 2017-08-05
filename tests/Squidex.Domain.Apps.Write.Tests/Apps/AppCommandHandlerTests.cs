@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services;
@@ -27,10 +27,10 @@ namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppCommandHandlerTests : HandlerTestBase<AppDomainObject>
     {
-        private readonly Mock<IAppRepository> appRepository = new Mock<IAppRepository>();
-        private readonly Mock<IAppPlansProvider> appPlansProvider = new Mock<IAppPlansProvider>();
-        private readonly Mock<IAppPlanBillingManager> appPlansBillingManager = new Mock<IAppPlanBillingManager>();
-        private readonly Mock<IUserResolver> userResolver = new Mock<IUserResolver>();
+        private readonly IAppRepository appRepository = A.Fake<IAppRepository>();
+        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
+        private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
+        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly AppCommandHandler sut;
         private readonly AppDomainObject app;
         private readonly Language language = Language.DE;
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             app = new AppDomainObject(AppId, -1);
 
-            sut = new AppCommandHandler(Handler, appRepository.Object, appPlansProvider.Object, appPlansBillingManager.Object, userResolver.Object);
+            sut = new AppCommandHandler(Handler, appRepository, appPlansProvider, appPlansBillingManager, userResolver);
         }
 
         [Fact]
@@ -49,16 +49,15 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName))
-                .Returns(Task.FromResult(new Mock<IAppEntity>().Object))
-                .Verifiable();
+            A.CallTo(() => appRepository.FindAppAsync(AppName))
+                .Returns(Task.FromResult(A.Dummy<IAppEntity>()));
 
             await TestCreate(app, async _ =>
             {
                 await Assert.ThrowsAsync<ValidationException>(async () => await sut.HandleAsync(context));
             }, false);
 
-            appRepository.VerifyAll();
+            A.CallTo(() => appRepository.FindAppAsync(AppName)).MustHaveHappened();
         }
 
         [Fact]
@@ -66,9 +65,8 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
-            appRepository.Setup(x => x.FindAppAsync(AppName))
-                .Returns(Task.FromResult<IAppEntity>(null))
-                .Verifiable();
+            A.CallTo(() => appRepository.FindAppAsync(AppName))
+                .Returns(Task.FromResult<IAppEntity>(null));
 
             await TestCreate(app, async _ =>
             {
@@ -85,7 +83,8 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult<IUser>(null));
+            A.CallTo(() => userResolver.FindByIdAsync(contributorId))
+                .Returns(Task.FromResult<IUser>(null));
 
             await TestUpdate(app, async _ =>
             {
@@ -96,7 +95,8 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task AssignContributor_throw_exception_if_reached_max_contributor_size()
         {
-            appPlansProvider.Setup(x => x.GetPlan(null)).Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
+            A.CallTo(() => appPlansProvider.GetPlan(null))
+                .Returns(new ConfigAppLimitsPlan { MaxContributors = 2 });
 
             CreateApp()
                 .AssignContributor(CreateCommand(new AssignContributor { ContributorId = "1" }))
@@ -104,7 +104,8 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Mock<IUser>().Object));
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>.Ignored))
+                .Returns(Task.FromResult(A.Dummy<IUser>()));
 
             await TestUpdate(app, async _ =>
             {
@@ -119,7 +120,8 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult<IUser>(null));
+            A.CallTo(() => userResolver.FindByIdAsync(contributorId))
+                .Returns(Task.FromResult<IUser>(null));
 
             await TestUpdate(app, async _ =>
             {
@@ -130,13 +132,15 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task AssignContributor_should_assign_if_user_found()
         {
-            appPlansProvider.Setup(x => x.GetPlan(null)).Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
+            A.CallTo(() => appPlansProvider.GetPlan(null))
+                .Returns(new ConfigAppLimitsPlan { MaxContributors = -1 });
 
             CreateApp();
 
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
-            userResolver.Setup(x => x.FindByIdAsync(contributorId)).Returns(Task.FromResult(new Mock<IUser>().Object));
+            A.CallTo(() => userResolver.FindByIdAsync(contributorId))
+                .Returns(Task.FromResult(A.Dummy<IUser>()));
 
             await TestUpdate(app, async _ =>
             {
@@ -174,7 +178,8 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task ChangePlan_should_throw_if_plan_not_found()
         {
-            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(false);
+            A.CallTo(() => appPlansProvider.IsConfiguredPlan("my-plan"))
+                .Returns(false);
 
             CreateApp()
                 .AttachClient(CreateCommand(new AttachClient { Id = clientName }));
@@ -218,7 +223,8 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task ChangePlan_should_update_domain_object()
         {
-            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+            A.CallTo(() => appPlansProvider.IsConfiguredPlan("my-plan"))
+                .Returns(true);
 
             CreateApp();
 
@@ -229,14 +235,17 @@ namespace Squidex.Domain.Apps.Write.Apps
                 await sut.HandleAsync(context);
             });
 
-            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Once());
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan")).MustHaveHappened();
         }
 
         [Fact]
         public async Task ChangePlan_should_not_make_update_for_redirect_result()
         {
-            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
-            appPlansBillingManager.Setup(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan")).Returns(CreateRedirectResult());
+            A.CallTo(() => appPlansProvider.IsConfiguredPlan("my-plan"))
+                .Returns(true);
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"))
+                .Returns(CreateRedirectResult());
 
             CreateApp();
 
@@ -253,7 +262,8 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task ChangePlan_should_not_call_billing_manager_for_callback()
         {
-            appPlansProvider.Setup(x => x.IsConfiguredPlan("my-plan")).Returns(true);
+            A.CallTo(() => appPlansProvider.IsConfiguredPlan("my-plan"))
+                .Returns(true);
 
             CreateApp();
 
@@ -264,7 +274,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                 await sut.HandleAsync(context);
             });
 
-            appPlansBillingManager.Verify(x => x.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan"), Times.Never());
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, app.Id, app.Name, "my-plan")).MustNotHaveHappened();
         }
 
         [Fact]

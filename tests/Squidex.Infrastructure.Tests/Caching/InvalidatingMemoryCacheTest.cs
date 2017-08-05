@@ -87,7 +87,8 @@ namespace Squidex.Infrastructure.Caching
         {
             var cacheEntry = new Mock<ICacheEntry>();
 
-            cache.Setup(x => x.CreateEntry("a-key")).Returns(cacheEntry.Object);
+            cache.Setup(x => x.CreateEntry("a-key"))
+                .Returns(cacheEntry.Object);
 
             var result = sut.CreateEntry("a-key");
 
@@ -99,7 +100,8 @@ namespace Squidex.Infrastructure.Caching
         {
             object currentOut = 123;
 
-            cache.Setup(x => x.TryGetValue("a-key", out currentOut)).Returns(true);
+            cache.Setup(x => x.TryGetValue("a-key", out currentOut))
+                .Returns(true);
 
             var exists = sut.TryGetValue("a-key", out object result);
 

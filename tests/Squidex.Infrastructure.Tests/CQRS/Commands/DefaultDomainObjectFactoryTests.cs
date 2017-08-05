@@ -39,7 +39,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 return new DO(passedId, -1);
             });
 
-            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>))).Returns(factoryFunction);
+            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>)))
+                .Returns(factoryFunction);
 
             var sut = new DefaultDomainObjectFactory(serviceProvider.Object);
 
@@ -61,7 +62,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 return new DO(passedId, 0);
             });
 
-            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>))).Returns(factoryFunction);
+            serviceProvider.Setup(x => x.GetService(typeof(DomainObjectFactoryFunction<DO>)))
+                .Returns(factoryFunction);
 
             var sut = new DefaultDomainObjectFactory(serviceProvider.Object);
 
