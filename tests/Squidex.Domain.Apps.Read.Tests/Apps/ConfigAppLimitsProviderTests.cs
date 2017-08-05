@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System.Linq;
+using FakeItEasy;
 using FluentAssertions;
-using Moq;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Xunit;
 
@@ -112,11 +112,11 @@ namespace Squidex.Domain.Apps.Read.Apps
 
         private static IAppEntity CreateApp(string plan)
         {
-            var app = new Mock<IAppEntity>();
+            var app = A.Dummy<IAppEntity>();
 
-            app.Setup(x => x.PlanId).Returns(plan);
+            A.CallTo(() => app.PlanId).Returns(plan);
 
-            return app.Object;
+            return app;
         }
     }
 }

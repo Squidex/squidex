@@ -8,12 +8,12 @@
 
 using System;
 using System.Collections.Immutable;
+using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Moq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
@@ -62,17 +62,17 @@ namespace Squidex.Domain.Apps.Read.Contents
         {
             var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
-            var schemaEntity = new Mock<ISchemaEntity>();
-            schemaEntity.Setup(x => x.Id).Returns(Guid.NewGuid());
-            schemaEntity.Setup(x => x.Version).Returns(3);
-            schemaEntity.Setup(x => x.Schema).Returns(schema);
+            var schemaEntity = A.Dummy<ISchemaEntity>();
+            A.CallTo(() => schemaEntity.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => schemaEntity.Version).Returns(3);
+            A.CallTo(() => schemaEntity.Schema).Returns(schema);
 
-            var appEntity = new Mock<IAppEntity>();
-            appEntity.Setup(x => x.Id).Returns(Guid.NewGuid());
-            appEntity.Setup(x => x.Version).Returns(3);
-            appEntity.Setup(x => x.PartitionResolver).Returns(languagesConfig.ToResolver());
+            var appEntity = A.Dummy<IAppEntity>();
+            A.CallTo(() => appEntity.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => appEntity.Version).Returns(3);
+            A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());
 
-            edmModel = builder.BuildEdmModel(schemaEntity.Object, appEntity.Object);
+            edmModel = builder.BuildEdmModel(schemaEntity, appEntity);
         }
 
         [Fact]
@@ -294,55 +294,55 @@ namespace Squidex.Domain.Apps.Read.Contents
         public void Should_set_top()
         {
             var parser = edmModel.ParseQuery("$top=3");
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Object.Take(parser);
+            cursor.Take(parser);
 
-            cursor.Verify(x => x.Limit(3));
+            A.CallTo(() => cursor.Limit(3)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_set_max_top_if_larger()
         {
             var parser = edmModel.ParseQuery("$top=300");
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Object.Take(parser);
+            cursor.Take(parser);
 
-            cursor.Verify(x => x.Limit(200));
+            A.CallTo(() => cursor.Limit(200)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_set_default_top()
         {
             var parser = edmModel.ParseQuery("");
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Object.Take(parser);
+            cursor.Take(parser);
 
-            cursor.Verify(x => x.Limit(20));
+            A.CallTo(() => cursor.Limit(20)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_set_skip()
         {
             var parser = edmModel.ParseQuery("$skip=3");
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Object.Skip(parser);
+            cursor.Skip(parser);
 
-            cursor.Verify(x => x.Skip(3));
+            A.CallTo(() => cursor.Skip(3)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_not_set_skip()
         {
             var parser = edmModel.ParseQuery("");
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Object.Take(parser);
+            cursor.Take(parser);
 
-            cursor.Verify(x => x.Skip(It.IsAny<int>()), Times.Never);
+            A.CallTo(() => cursor.Skip(A<int>.Ignored)).MustNotHaveHappened();
         }
 
         private static string C(string value)
@@ -353,16 +353,17 @@ namespace Squidex.Domain.Apps.Read.Contents
         private string S(string value)
         {
             var parser = edmModel.ParseQuery(value);
-            var cursor = new Mock<IFindFluent<MongoContentEntity, MongoContentEntity>>();
+            var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             var i = string.Empty;
 
-            cursor.Setup(x => x.Sort(It.IsAny<SortDefinition<MongoContentEntity>>())).Callback(new Action<SortDefinition<MongoContentEntity>>(s =>
-            {
-                i = s.Render(serializer, registry).ToString();
-            }));
+            A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>.Ignored))
+                .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
+                {
+                    i = sortDefinition.Render(serializer, registry).ToString();
+                });
 
-            cursor.Object.Sort(parser, schema);
+            cursor.Sort(parser, schema);
 
             return i;
         }
