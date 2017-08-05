@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Webhooks Events" parameter1="app" value1="{{appName() | async}}"></sqx-title>
 
-<sqx-panel panelWidth="60rem">
+<sqx-panel panelWidth="63rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -70,6 +70,8 @@
                         </tr>
                         <tr *ngIf="selectedEventId === event.id">
                             <td colspan="5">
+                                <h3>Last Request</h3>
+                                
                                 <div class="row event-stats">
                                     <div class="col-3">
                                         <span class="badge badge-small badge-{{event.result | lowercase}}">{{event.result}}</span>

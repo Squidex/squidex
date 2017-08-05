@@ -81,6 +81,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
             };
 
             request.Headers.Add("X-Signature", job.RequestSignature);
+            request.Headers.Add("User-Agent", "Squidex Webhook");
 
             return request;
         }

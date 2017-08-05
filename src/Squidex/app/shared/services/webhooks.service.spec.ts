@@ -11,8 +11,11 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     ApiUrlConfig,
     CreateWebhookDto,
+    DateTime,
     Version,
     WebhookDto,
+    WebhookEventDto,
+    WebhookEventsDto,
     WebhooksService
 } from './../';
 
@@ -99,16 +102,67 @@ describe('WebhooksService', () => {
         expect(webhook).toEqual(new WebhookDto('id1', 'schema1', 'token1', dto.url, 0, 0, 0, 0));
     }));
 
-    it('should make delete request to delete webhook',
+    it('should make get request to get app webhook events',
         inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
 
-        webhooksService.deleteWebhook('my-app', 'my-schema', '123', version).subscribe();
+        let webhooks: WebhookEventsDto | null = null;
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/webhooks/123');
+        webhooksService.getEvents('my-app', 10, 20).subscribe(result => {
+            webhooks = result;
+        });
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks/events?take=10&skip=20');
 
-        req.flush({ id: 'id1', sharedSecret: 'token1' });
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({
+            total: 20,
+            items: [
+                {
+                    id: 'id1',
+                    created: '2017-12-12T10:10',
+                    eventName: 'event1',
+                    nextAttempt: '2017-12-12T12:10',
+                    jobResult: 'Failed',
+                    lastDump: 'dump1',
+                    numCalls: 1,
+                    requestUrl: 'url1',
+                    result: 'Failed'
+                },
+                {
+                    id: 'id2',
+                    created: '2017-12-13T10:10',
+                    eventName: 'event2',
+                    nextAttempt: '2017-12-13T12:10',
+                    jobResult: 'Failed',
+                    lastDump: 'dump2',
+                    numCalls: 2,
+                    requestUrl: 'url2',
+                    result: 'Failed'
+                }
+            ]
+        });
+
+        expect(webhooks).toEqual(
+            new WebhookEventsDto(20, [
+                new WebhookEventDto('id1',
+                    DateTime.parseISO_UTC('2017-12-12T10:10'),
+                    DateTime.parseISO_UTC('2017-12-12T12:10'),
+                    'event1', 'url1', 'dump1', 'Failed', 'Failed', 1),
+                new WebhookEventDto('id2',
+                    DateTime.parseISO_UTC('2017-12-13T10:10'),
+                    DateTime.parseISO_UTC('2017-12-13T12:10'),
+                    'event2', 'url2', 'dump2', 'Failed', 'Failed', 2)
+            ]));
+    }));
+
+    it('should make delete request to enqueue webhook event',
+        inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
+
+        webhooksService.enqueueEvent('my-app', '123').subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks/events/123');
+
+        expect(req.request.method).toEqual('PUT');
     }));
 });

@@ -99,9 +99,9 @@ namespace Squidex.Controllers.Api.Webhooks
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(command, new WebhookCreatedDto { SchemaId = command.SchemaId.Id.ToString() };
+            var response = SimpleMapper.Map(command, new WebhookCreatedDto { SchemaId = command.SchemaId.Id.ToString() });
 
-            return CreatedAtAction(nameof(GetWebhooks), new { app }, response));
+            return CreatedAtAction(nameof(GetWebhooks), new { app }, response);
         }
 
         /// <summary>

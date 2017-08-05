@@ -143,7 +143,13 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoAppRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAppRepository>()
-                .As<IEventConsumer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoSchemaRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<ISchemaRepository>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -172,13 +178,6 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<MongoSchemaRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<ISchemaRepository>()
-                .As<IEventConsumer>()
-                .As<IExternalSystem>()
-                .AsSelf()
-                .SingleInstance();
 
             builder.Register(c =>
                 new CompoundEventConsumer(

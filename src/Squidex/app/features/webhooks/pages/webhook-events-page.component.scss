@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+h3 {
+    margin-bottom: 1rem;
+}
+
 .badge {
     & {
         @include border-radius(12px);
