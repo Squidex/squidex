@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 
         public async Task<IReadOnlyList<IAssetStatsEntity>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
         {
-            var originalSizesEntities = 
+            var originalSizesEntities =
                 await Collection.Find(x => x.AppId == appId && x.Date >= fromDate && x.Date <= toDate).SortBy(x => x.Date)
                     .ToListAsync();
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
                 {
                     if (previousSize < 0)
                     {
-                        var firstBeforeRangeEntity = 
+                        var firstBeforeRangeEntity =
                             await Collection.Find(x => x.AppId == appId && x.Date < fromDate).SortByDescending(x => x.Date)
                                 .FirstOrDefaultAsync();
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 
         public async Task<long> GetTotalSizeAsync(Guid appId)
         {
-            var totalSizeEntity = 
+            var totalSizeEntity =
                 await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date)
                     .FirstOrDefaultAsync();
 

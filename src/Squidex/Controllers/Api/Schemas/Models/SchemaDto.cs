@@ -19,7 +19,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// The id of the schema.
         /// </summary>
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// The name of the schema. Unique within the app.
         /// </summary>

@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Write.Assets
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetCommandHandler(
-            IAggregateHandler handler, 
-            IAssetStore assetStore, 
+            IAggregateHandler handler,
+            IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
         {
             Guard.NotNull(handler, nameof(handler));
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Write.Assets
         protected async Task On(UpdateAsset command, CommandContext context)
         {
             command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
-            
+
             try
             {
                 var asset = await handler.UpdateAsync<AssetDomainObject>(context, async a =>

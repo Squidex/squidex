@@ -25,12 +25,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset)
             : this(checkContent, checkAsset, false)
         {
-            
+
         }
 
         private ValidationContext(
-            Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent, 
-            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset, 
+            Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent,
+            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset,
             bool isOptional)
         {
             Guard.NotNull(checkAsset, nameof(checkAsset));

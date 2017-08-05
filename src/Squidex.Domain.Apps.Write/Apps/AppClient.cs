@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
-            
+
             this.name = name;
             this.secret = secret;
             this.isReader = isReader;

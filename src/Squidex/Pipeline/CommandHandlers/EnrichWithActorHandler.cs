@@ -32,8 +32,8 @@ namespace Squidex.Pipeline.CommandHandlers
         {
             if (context.Command is SquidexCommand squidexCommand && squidexCommand.Actor == null)
             {
-                var actorToken = 
-                    FindActorFromSubject() ?? 
+                var actorToken =
+                    FindActorFromSubject() ??
                     FindActorFromClient();
 
 #pragma warning disable

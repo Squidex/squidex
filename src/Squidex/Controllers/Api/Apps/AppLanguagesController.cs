@@ -50,8 +50,8 @@ namespace Squidex.Controllers.Api.Apps
         [ProducesResponseType(typeof(LanguageDto[]), 200)]
         public IActionResult GetLanguages(string app)
         {
-            var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
-                SimpleMapper.Map(x.Language, 
+            var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x =>
+                SimpleMapper.Map(x.Language,
                     new AppLanguageDto
                     {
                         IsMaster = x == App.LanguagesConfig.Master,
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.Api.Apps
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateLanguage { Language = language }));
-          
+
             return NoContent();
         }
 

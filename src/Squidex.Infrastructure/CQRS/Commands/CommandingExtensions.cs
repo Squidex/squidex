@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             return handler.UpdateAsync<T>(context, x =>
             {
                 updater(x);
-                
+
                 return TaskHelper.Done;
             });
         }

@@ -79,7 +79,7 @@ namespace Squidex.Controllers.Api.Apps
             var command = SimpleMapper.Map(request, new AttachClient());
 
             await CommandBus.PublishAsync(command);
-            
+
             var response = SimpleMapper.Map(command, new ClientDto { Name = command .Id });
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
     {
-        public MongoAppRepository(IMongoDatabase database) 
+        public MongoAppRepository(IMongoDatabase database)
             : base(database)
         {
         }

@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentCommandHandler(
             IAggregateHandler handler,
-            IAppProvider appProvider, 
-            IAssetRepository assetRepository, 
-            ISchemaProvider schemas, 
+            IAppProvider appProvider,
+            IAssetRepository assetRepository,
+            ISchemaProvider schemas,
             IContentRepository contentRepository)
         {
             Guard.NotNull(handler, nameof(handler));
@@ -109,13 +109,13 @@ namespace Squidex.Domain.Apps.Write.Contents
             var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
 
             await Task.WhenAll(taskForApp, taskForSchema);
-            
+
             var schemaObject = taskForSchema.Result.Schema;
             var schemaErrors = new List<ValidationError>();
 
             var appId = command.AppId.Id;
 
-            var validationContext = 
+            var validationContext =
                 new ValidationContext(
                     (contentIds, schemaId) =>
                     {

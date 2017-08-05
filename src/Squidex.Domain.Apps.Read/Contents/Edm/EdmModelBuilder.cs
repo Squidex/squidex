@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Read.Contents.Edm
 {
     public sealed class EdmModelBuilder : CachingProviderBase
     {
-        public EdmModelBuilder(IMemoryCache cache) 
+        public EdmModelBuilder(IMemoryCache cache)
             : base(cache)
         {
         }

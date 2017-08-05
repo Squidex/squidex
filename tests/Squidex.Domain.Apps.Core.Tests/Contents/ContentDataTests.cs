@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", 3));
-            
+
             Assert.Equal(expected, actual);
         }
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void Should_provide_invariant_from_master_language()
         {

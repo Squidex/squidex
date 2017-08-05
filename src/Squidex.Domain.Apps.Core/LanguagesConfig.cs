@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core
             {
                 if (languageConfig.Fallback.Contains(language))
                 {
-                    newLanguages = 
+                    newLanguages =
                         newLanguages.SetItem(languageConfig.Language,
                             new LanguageConfig(
                                 languageConfig.Language,

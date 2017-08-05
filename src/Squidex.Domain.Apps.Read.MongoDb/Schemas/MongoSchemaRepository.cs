@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         public async Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId)
         {
-            var schemaEntities = 
+            var schemaEntities =
                 await Collection.Find(s => s.AppId == appId && !s.IsDeleted)
                     .ToListAsync();
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         public async Task<ISchemaEntity> FindSchemaAsync(Guid appId, string name)
         {
-            var schemaEntity = 
+            var schemaEntity =
                 await Collection.Find(s => s.Name == name && s.AppId == appId && !s.IsDeleted)
                     .FirstOrDefaultAsync();
 
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         public async Task<ISchemaEntity> FindSchemaAsync(Guid schemaId)
         {
-            var schemaEntity = 
+            var schemaEntity =
                 await Collection.Find(s => s.Id == schemaId)
                     .FirstOrDefaultAsync();
 

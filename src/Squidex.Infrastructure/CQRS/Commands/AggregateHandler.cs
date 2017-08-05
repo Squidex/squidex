@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         }
 
         public AggregateHandler(
-            IDomainObjectFactory domainObjectFactory, 
+            IDomainObjectFactory domainObjectFactory,
             IDomainObjectRepository domainObjectRepository)
         {
             Guard.NotNull(domainObjectFactory, nameof(domainObjectFactory));

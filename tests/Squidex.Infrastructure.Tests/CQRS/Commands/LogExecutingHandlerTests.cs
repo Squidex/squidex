@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 throw new NotSupportedException();
             }
         }
-        
+
         public LogExecutingHandlerTests()
         {
             sut = new LogExecutingHandler(log);

@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure
     {
         private static readonly PropertyValue FallbackValue = new PropertyValue(null);
         private readonly Dictionary<string, PropertyValue> internalDictionary = new Dictionary<string, PropertyValue>(StringComparer.OrdinalIgnoreCase);
-        
+
         public int Count
         {
             get { return internalDictionary.Count; }
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure
         {
             return internalDictionary.Keys;
         }
-        
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             result = this[binder.Name];

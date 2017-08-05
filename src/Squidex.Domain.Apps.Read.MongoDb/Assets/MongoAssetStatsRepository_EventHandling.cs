@@ -53,13 +53,13 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
         {
             var id = $"{appId}_{date:yyyy-MM-dd}";
 
-            var assetStatsEntity = 
+            var assetStatsEntity =
                 await Collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
             if (assetStatsEntity == null)
             {
-                var lastEntity = 
+                var lastEntity =
                     await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Date)
                         .FirstOrDefaultAsync();
 

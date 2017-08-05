@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private static readonly FieldDefinition<MongoEventConsumerInfo, bool> IsStoppedField = Fields.Build(x => x.IsStopped);
         private static readonly FieldDefinition<MongoEventConsumerInfo, bool> IsResettingField = Fields.Build(x => x.IsResetting);
 
-        public MongoEventConsumerInfoRepository(IMongoDatabase database) 
+        public MongoEventConsumerInfoRepository(IMongoDatabase database)
             : base(database)
         {
         }

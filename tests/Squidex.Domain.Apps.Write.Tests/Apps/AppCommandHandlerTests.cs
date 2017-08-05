@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         public async Task AttachClient_should_update_domain_object()
         {
             CreateApp();
-            
+
             var context = CreateContextForCommand(new AttachClient { Id = clientName });
 
             await TestUpdate(app, async _ =>

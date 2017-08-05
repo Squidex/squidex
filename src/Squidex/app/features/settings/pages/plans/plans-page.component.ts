@@ -49,14 +49,14 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public ngOnDestroy() {
         this.queryParamsSubscription.unsubscribe();
+    }
 
+    public ngOnInit() {
         this.queryParamsSubscription =
             this.route.queryParams.subscribe(params => {
                 this.overridePlanId = params['planId'];
             });
-    }
 
-    public ngOnInit() {
         this.load();
     }
 

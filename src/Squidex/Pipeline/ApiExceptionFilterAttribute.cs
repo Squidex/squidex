@@ -71,7 +71,7 @@ namespace Squidex.Pipeline
         {
             if (!context.ModelState.IsValid)
             {
-                var errors = 
+                var errors =
                     context.ModelState.SelectMany(m =>
                         {
                             return m.Value.Errors.Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))

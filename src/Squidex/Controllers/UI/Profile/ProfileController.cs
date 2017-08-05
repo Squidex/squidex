@@ -40,7 +40,7 @@ namespace Squidex.Controllers.UI.Profile
             SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserPictureStore userPictureStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator, 
+            IAssetThumbnailGenerator assetThumbnailGenerator,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<IdentityCookieOptions> identityCookieOptions)
         {
@@ -106,7 +106,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/password-set")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
-            return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password), 
+            return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password),
                 "Password set successfully.");
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/password-change")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password), 
+            return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password),
                 "Password changed successfully.");
         }
 

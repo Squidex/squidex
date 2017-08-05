@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
             get { return ".*"; }
         }
 
-        public MongoHistoryEventRepository(IMongoDatabase database, IEnumerable<IHistoryEventsCreator> creators) 
+        public MongoHistoryEventRepository(IMongoDatabase database, IEnumerable<IHistoryEventsCreator> creators)
             : base(database)
         {
             this.creators = creators.ToList();

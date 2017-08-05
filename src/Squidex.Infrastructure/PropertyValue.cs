@@ -67,32 +67,32 @@ namespace Squidex.Infrastructure
 
             return true;
         }
-                
+
         public override string ToString()
         {
             return rawValue?.ToString();
         }
-        
+
         public bool ToBoolean(CultureInfo culture)
         {
             return ToOrParseValue(culture, ParseBoolean);
         }
-        
+
         public bool? ToNullableBoolean(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, ParseBoolean);
         }
-        
+
         public float ToSingle(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => float.Parse(x, culture));
         }
-        
+
         public float? ToNullableSingle(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => float.Parse(x, culture));
         }
-        
+
         public double ToDouble(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => double.Parse(x, culture));
@@ -102,32 +102,32 @@ namespace Squidex.Infrastructure
         {
             return ToNullableOrParseValue(culture, x => double.Parse(x, culture));
         }
-        
+
         public int ToInt32(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => int.Parse(x, culture));
         }
-        
+
         public int? ToNullableInt32(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => int.Parse(x, culture));
         }
-        
+
         public long ToInt64(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => long.Parse(x, culture));
         }
-        
+
         public long? ToNullableInt64(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => long.Parse(x, culture));
         }
-        
+
         public Instant ToInstant(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
         }
-        
+
         public Instant? ToNullableInstant(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);

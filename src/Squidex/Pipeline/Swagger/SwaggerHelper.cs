@@ -37,9 +37,9 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
         {
-            var scheme = 
-                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ? 
-                    SwaggerSchema.Http : 
+            var scheme =
+                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?
+                    SwaggerSchema.Http :
                     SwaggerSchema.Https;
 
             var document = new SwaggerDocument
@@ -85,7 +85,7 @@ namespace Squidex.Pipeline.Swagger
             var securityDocs = LoadDocs("security");
             var securityDescription = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
-            var result = 
+            var result =
                 new SwaggerSecurityScheme
                 {
                     TokenUrl = tokenUrl,

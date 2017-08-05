@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.Assets
         private FileInfo GetFile(string id, long version, string suffix)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
-            
+
             return GetFile(GetPath(id, version, suffix));
         }
 

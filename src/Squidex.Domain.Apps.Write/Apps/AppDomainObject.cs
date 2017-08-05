@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             get { return contributors.Count; }
         }
 
-        public AppDomainObject(Guid id, int version) 
+        public AppDomainObject(Guid id, int version)
             : base(id, version)
         {
         }

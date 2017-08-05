@@ -50,7 +50,12 @@ namespace Squidex.Controllers.Api.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var command = new AddField { Name = request.Name, Partitioning = request.Partitioning, Properties = request.Properties.ToProperties() };
+            var command = new AddField
+            {
+                Name = request.Name,
+                Partitioning = request.Partitioning,
+                Properties = request.Properties.ToProperties()
+            };
 
             var context = await CommandBus.PublishAsync(command);
 

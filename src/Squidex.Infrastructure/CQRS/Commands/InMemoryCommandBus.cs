@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         public InMemoryCommandBus(IEnumerable<ICommandHandler> handlers)
         {
             Guard.NotNull(handlers, nameof(handlers));
-            
+
             this.handlers = handlers;
         }
 

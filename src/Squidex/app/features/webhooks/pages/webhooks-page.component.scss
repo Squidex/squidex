@@ -13,27 +13,9 @@
     color: $color-theme-green;
 }
 
-.webhook {
-    &-stats {
-        border-top: 1px solid $color-border;
-        margin-left: -1.25rem;
-        margin-right: -1.25rem;
-        padding: 1rem 1rem 0;
-    }
-
-    &-detail-link {
-        color: $color-theme-blue !important;
-        cursor: pointer;
-        font-size: .9rem;
-    }
-
-    &-dumps {
-        margin-top: 1.5rem;
-    }
-
-    &-dump {
-        font-size: .8rem;
-        font-weight: normal;
-        height: 20rem;
-    }
+.webhook-stats {
+    border-top: 1px solid $color-border;
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    padding: 1rem 1rem 0;
 }

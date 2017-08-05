@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly EventDataFormatter formatter;
 
         public DefaultDomainObjectRepository(
-            IDomainObjectFactory factory, 
+            IDomainObjectFactory factory,
             IEventStore eventStore,
             IStreamNameResolver nameResolver,
             EventDataFormatter formatter)

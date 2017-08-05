@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Write.Assets
             get { return fileVersion; }
         }
 
-        public AssetDomainObject(Guid id, int version) 
+        public AssetDomainObject(Guid id, int version)
             : base(id, version)
         {
         }

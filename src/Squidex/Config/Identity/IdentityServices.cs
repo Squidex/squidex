@@ -46,7 +46,7 @@ namespace Squidex.Config.Identity
                 {
                     throw new ConfigurationException("Configure KeyStore Redis configuration with 'identity:keysStore:redis:configuration'.");
                 }
-                
+
                 var connectionMultiplexer = Singletons<ConnectionMultiplexer>.GetOrAdd(redisConfiguration, s => ConnectionMultiplexer.Connect(s));
 
                 dataProtection.PersistKeysToRedis(connectionMultiplexer);
@@ -81,7 +81,7 @@ namespace Squidex.Config.Identity
                 var certData = new byte[certStream.Length];
 
                 certStream.Read(certData, 0, certData.Length);
-                certificate = new X509Certificate2(certData, "password", 
+                certificate = new X509Certificate2(certData, "password",
                     X509KeyStorageFlags.MachineKeySet |
                     X509KeyStorageFlags.PersistKeySet |
                     X509KeyStorageFlags.Exportable);

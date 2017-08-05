@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private sealed class MyUserDomainObject : DomainObjectBase
         {
-            public MyUserDomainObject(Guid id, int version) 
+            public MyUserDomainObject(Guid id, int version)
                 : base(id, version)
             {
             }

@@ -32,7 +32,7 @@ namespace Squidex.Controllers.Api.Apps
     {
         private readonly IAppRepository appRepository;
 
-        public AppsController(ICommandBus commandBus, IAppRepository appRepository) 
+        public AppsController(ICommandBus commandBus, IAppRepository appRepository)
             : base(commandBus)
         {
             this.appRepository = appRepository;

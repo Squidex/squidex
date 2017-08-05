@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     public class InMemoryCommandBusTests
     {
         private readonly ICommand command = new Mock<ICommand>().Object;
-        
+
         private sealed class HandledHandler : ICommandHandler
         {
             public ICommand LastCommand;

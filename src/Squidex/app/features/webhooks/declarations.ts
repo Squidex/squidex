@@ -5,4 +5,5 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+export * from './pages/webhook-events-page.component';
 export * from './pages/webhooks-page.component';

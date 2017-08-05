@@ -60,7 +60,7 @@ namespace Benchmarks.Tests
                     eventOffset++;
                 }
             });
-            
+
             return numCommits * numStreams;
         }
 

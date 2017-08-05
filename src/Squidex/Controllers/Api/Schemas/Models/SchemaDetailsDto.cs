@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     public sealed class SchemaDetailsDto
-    {       
+    {
         /// <summary>
         /// The id of the schema.
         /// </summary>

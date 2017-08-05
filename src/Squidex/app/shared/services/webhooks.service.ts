@@ -13,6 +13,7 @@ import 'framework/angular/http-extensions';
 
 import {
     ApiUrlConfig,
+    DateTime,
     HTTP,
     Version
 } from 'framework';
@@ -27,6 +28,29 @@ export class WebhookDto {
         public readonly totalFailed: number,
         public readonly totalTimedout: number,
         public readonly averageRequestTimeMs: number
+    ) {
+    }
+}
+
+export class WebhookEventDto {
+    constructor(
+        public readonly id: string,
+        public readonly created: DateTime,
+        public readonly nextAttempt: DateTime | null,
+        public readonly eventName: string,
+        public readonly requestUrl: string,
+        public readonly lastDump: string,
+        public readonly result: string,
+        public readonly jobResult: string,
+        public readonly numCalls: number
+    ) {
+    }
+}
+
+export class WebhookEventsDto {
+    constructor(
+        public readonly total: number,
+        public readonly items: WebhookEventDto[]
     ) {
     }
 }
@@ -88,5 +112,35 @@ export class WebhooksService {
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .pretifyError('Failed to delete webhook. Please reload.');
+    }
+
+    public getEvents(appName: string, take: number, skip: number): Observable<WebhookEventsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/events?take=${take}&skip=${skip}`);
+
+        return HTTP.getVersioned(this.http, url)
+                .map(response => {
+                    const items: any[] = response.items;
+
+                    return new WebhookEventsDto(response.total, items.map(item => {
+                        return new WebhookEventDto(
+                            item.id,
+                            DateTime.parseISO_UTC(item.created),
+                            item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
+                            item.eventName,
+                            item.requestUrl,
+                            item.lastDump,
+                            item.result,
+                            item.jobResult,
+                            item.numCalls);
+                    }));
+                })
+                .pretifyError('Failed to load events. Please reload.');
+    }
+
+    public enqueueEvent(appName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/events/${id}`);
+
+        return HTTP.putVersioned(this.http, url, {})
+                .pretifyError('Failed to enqueue webhook event. Please reload.');
     }
 }

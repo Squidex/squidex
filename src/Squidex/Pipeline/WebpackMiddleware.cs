@@ -78,7 +78,7 @@ namespace Squidex.Pipeline
             {
                 return response;
             }
-            
+
             var stylesTag = string.Empty;
 
             foreach (var file in Styles)
@@ -97,7 +97,7 @@ namespace Squidex.Pipeline
             {
                 return response;
             }
-            
+
             var scriptsTag = string.Empty;
 
             foreach (var file in Scripts)

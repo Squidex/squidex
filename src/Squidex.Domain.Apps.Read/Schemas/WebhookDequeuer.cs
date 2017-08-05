@@ -33,10 +33,10 @@ namespace Squidex.Domain.Apps.Read.Schemas
         private readonly ISemanticLog log;
         private readonly IClock clock;
 
-        public WebhookDequeuer(WebhookSender webhookSender, 
-            IWebhookEventRepository webhookEventRepository, 
-            ISchemaWebhookRepository webhookRepository, 
-            IClock clock, 
+        public WebhookDequeuer(WebhookSender webhookSender,
+            IWebhookEventRepository webhookEventRepository,
+            ISchemaWebhookRepository webhookRepository,
+            IClock clock,
             ISemanticLog log)
         {
             Guard.NotNull(webhookEventRepository, nameof(webhookEventRepository));
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
                 new ActionBlock<IWebhookEventEntity>(MakeRequestAsync,
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
 
-            blockBlock = 
+            blockBlock =
                 new TransformBlock<IWebhookEventEntity, IWebhookEventEntity>(x => BlockAsync(x),
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, BoundedCapacity = 1 });
 

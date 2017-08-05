@@ -19,11 +19,11 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
 
-        public MongoUsageStore(IMongoDatabase database) 
+        public MongoUsageStore(IMongoDatabase database)
             : base(database)
         {
         }
-        
+
         protected override string CollectionName()
         {
             return "Usages";
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var id = $"{key}_{date:yyyy-MM-dd}";
 
-            return Collection.UpdateOneAsync(x => x.Id == id, 
+            return Collection.UpdateOneAsync(x => x.Id == id,
                 Update
                     .Inc(x => x.TotalCount, count)
                     .Inc(x => x.TotalElapsedMs, elapsedMs)

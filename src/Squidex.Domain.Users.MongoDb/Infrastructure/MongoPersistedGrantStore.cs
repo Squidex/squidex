@@ -27,11 +27,11 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             });
         }
 
-        public MongoPersistedGrantStore(IMongoDatabase database) 
+        public MongoPersistedGrantStore(IMongoDatabase database)
             : base(database)
         {
         }
-        
+
         protected override string CollectionName()
         {
             return "Identity_PersistedGrants";

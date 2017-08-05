@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         }
 
         public WebhookEnqueuer(TypeNameRegistry typeNameRegistry,
-            IWebhookEventRepository webhookEventRepository, 
+            IWebhookEventRepository webhookEventRepository,
             ISchemaWebhookRepository webhookRepository,
             IClock clock,
             JsonSerializer webhookSerializer)

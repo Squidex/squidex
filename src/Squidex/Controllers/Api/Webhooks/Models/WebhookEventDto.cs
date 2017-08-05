@@ -16,6 +16,16 @@ namespace Squidex.Controllers.Api.Webhooks.Models
     public class WebhookEventDto
     {
         /// <summary>
+        /// The id of the event.
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// The time when the event has been created.
+        /// </summary>
+        public Instant Created { get; set; }
+
+        /// <summary>
         /// The request url.
         /// </summary>
         [Required]
@@ -26,11 +36,6 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// </summary>
         [Required]
         public string EventName { get; set; }
-
-        /// <summary>
-        /// The webhook event id.
-        /// </summary>
-        public Guid Id { get; set; }
 
         /// <summary>
         /// The last dump.

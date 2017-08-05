@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Write.Assets
         public void Rename_should_throw_exception_if_new_name_is_equal_to_old_name()
         {
             CreateAsset();
-            
+
             Assert.Throws<ValidationException>(() =>
             {
                 sut.Rename(CreateAssetCommand(new RenameAsset { FileName = file.FileName }));

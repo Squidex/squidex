@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.Assets
 
             blobRef.Metadata[AssetVersion] = version.ToString();
             blobRef.Metadata[AssetId] = id;
-            
+
             await blobRef.UploadFromStreamAsync(stream);
             await blobRef.SetMetadataAsync();
         }

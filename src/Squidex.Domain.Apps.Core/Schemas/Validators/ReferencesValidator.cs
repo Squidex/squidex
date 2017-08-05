@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             }
 
             var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);
-            
+
             foreach (var invalidId in invalidIds)
             {
                 addError($"<FIELD> contains invalid reference '{invalidId}'");

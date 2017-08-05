@@ -97,10 +97,10 @@ namespace Squidex
             {
                 container.Dispose();
             });
-            
+
             return new AutofacServiceProvider(container);
         }
-        
+
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSemanticLog(app.ApplicationServices.GetRequiredService<ISemanticLog>());
@@ -184,8 +184,8 @@ namespace Squidex
             if (Environment.IsDevelopment())
             {
                 app.UseWebpackProxy();
-                
-                app.Use((context, next) => 
+
+                app.Use((context, next) =>
                 {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
@@ -196,7 +196,7 @@ namespace Squidex
             }
             else
             {
-                app.Use((context, next) => 
+                app.Use((context, next) =>
                 {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {

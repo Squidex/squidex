@@ -73,7 +73,8 @@ namespace Squidex.Controllers.ContentApi.Models
                 Created = now,
                 CreatedBy = command.Actor,
                 LastModified = now,
-                LastModifiedBy = command.Actor
+                LastModifiedBy = command.Actor,
+                IsPublished = command.Publish
             };
 
             return response;

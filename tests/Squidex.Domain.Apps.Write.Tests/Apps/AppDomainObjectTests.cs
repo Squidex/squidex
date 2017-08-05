@@ -505,7 +505,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             CreateApp();
             CreateLanguage(Language.DE);
-            
+
             sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
 
             sut.GetUncomittedEvents()

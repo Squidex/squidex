@@ -40,13 +40,13 @@ namespace Squidex.Controllers.ContentApi.Generator
             schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema, 
+        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema,
             Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
         {
             this.document = document;
 
             appPath = path;
-            
+
             schemaPath = schema.Name;
             schemaName = schema.Properties.Label.WithFallback(schema.Name);
             schemaKey = schema.Name.ToPascalCase();
@@ -96,7 +96,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
                 operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
                 operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
-                
+
                 operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
             });
         }

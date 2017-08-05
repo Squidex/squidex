@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             get { return isPublished; }
         }
 
-        public ContentDomainObject(Guid id, int version) 
+        public ContentDomainObject(Guid id, int version)
             : base(id, version)
         {
         }

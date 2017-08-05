@@ -18,7 +18,7 @@ namespace Squidex.Controllers.Api.Users.Models
 
         [Required]
         public string DisplayName { get; set; }
-        
+
         public string Password { get; set; }
     }
 }

@@ -34,9 +34,9 @@ namespace Squidex.Controllers.Api.Statistics
         private readonly IAssetStatsRepository assetStatsRepository;
 
         public UsagesController(
-            ICommandBus commandBus, 
+            ICommandBus commandBus,
             IUsageTracker usageTracker,
-            IAppPlansProvider appPlanProvider, 
+            IAppPlansProvider appPlanProvider,
             IAssetStatsRepository assetStatsRepository)
             : base(commandBus)
         {

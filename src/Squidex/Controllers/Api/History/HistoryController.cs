@@ -29,7 +29,7 @@ namespace Squidex.Controllers.Api.History
     {
         private readonly IHistoryEventRepository historyEventRepository;
 
-        public HistoryController(ICommandBus commandBus, IHistoryEventRepository historyEventRepository) 
+        public HistoryController(ICommandBus commandBus, IHistoryEventRepository historyEventRepository)
             : base(commandBus)
         {
             this.historyEventRepository = historyEventRepository;

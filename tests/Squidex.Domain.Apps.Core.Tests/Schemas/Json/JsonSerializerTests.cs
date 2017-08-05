@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
-            
+
             sut = new SchemaJsonSerializer(new FieldRegistry(typeNameRegistry), serializerSettings);
         }
 

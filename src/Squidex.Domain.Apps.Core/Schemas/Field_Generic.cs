@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        protected Field(long id, string name, Partitioning partitioning, T properties) 
+        protected Field(long id, string name, Partitioning partitioning, T properties)
             : base(id, name, partitioning)
         {
             Guard.NotNull(properties, nameof(properties));

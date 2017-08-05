@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public async Task Should_not_add_error_if_references_are_valid()
         {
             var referenceId = Guid.NewGuid();
-            
+
             var sut = new ReferencesField(1, "my-refs", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.ValidContext);

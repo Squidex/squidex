@@ -72,7 +72,7 @@ namespace Squidex.Pipeline
                     context.Result = new StatusCodeResult(429);
                     return;
                 }
-                
+
                 var defaultIdentity = context.HttpContext.User.Identities.First();
 
                 switch (permission.Value)

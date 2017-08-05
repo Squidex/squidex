@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var context = new CommandContext(command);
 
             context.Fail(new InvalidOperationException());
-            
+
             var isHandled = await sut.HandleAsync(context);
 
             Assert.False(isHandled);

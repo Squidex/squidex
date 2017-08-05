@@ -33,7 +33,7 @@ namespace Squidex.Controllers.Api.Schemas
     public class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
-        
+
         public SchemasController(ICommandBus commandBus, ISchemaRepository schemaRepository)
             : base(commandBus)
         {
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The schema object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => Schema created.  
+        /// 201 => Schema created.
         /// 400 => Schema name or properties are not valid.
         /// 409 => Schema name already in use.
         /// </returns>

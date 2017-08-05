@@ -79,6 +79,8 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                             return { webhook: w, schema: dtos.schemas.find(s => s.id === w.schemaId), showDetails: false };
                         }).filter(w => !!w.schema));
 
+                this.addWebhookForm.controls['schemaId'].setValue(this.schemas.map(x => x.id)[0]);
+
                 if (showInfo) {
                     this.notifyInfo('Webhooks reloaded.');
                 }

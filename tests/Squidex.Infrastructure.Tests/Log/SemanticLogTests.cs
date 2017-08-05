@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Log
 
             Log.LogFatal(w => {});
 
-            var expected = 
+            var expected =
                 MakeTestCall(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("timestamp", now));
@@ -279,7 +279,7 @@ namespace Squidex.Infrastructure.Log
             var loggerInstance = loggerFactory.CreateLogger<SemanticLogTests>();
 
             loggerInstance.LogCritical(new EventId(123, "EventName"), exception, "Log {0}", 123);
-            
+
             var expected =
                 MakeTestCall(w => w
                     .WriteProperty("logLevel", "Fatal")

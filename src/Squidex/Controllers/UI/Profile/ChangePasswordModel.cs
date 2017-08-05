@@ -17,7 +17,7 @@ namespace Squidex.Controllers.UI.Profile
 
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
-        
+
         [Compare(nameof(Password), ErrorMessage = "Passwords must be identitical.")]
         public string PasswordConfirm { get; set; }
     }

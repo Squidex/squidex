@@ -20,41 +20,42 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
     public static class SchemaConverter
     {
-        private static readonly Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>> Factories = new Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>>
-        {
+        private static readonly Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>> Factories =
+            new Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>>
             {
-                typeof(NumberFieldProperties),
-                p => Convert((NumberFieldProperties)p)
-            },
-            {
-                typeof(DateTimeFieldProperties),
-                p => Convert((DateTimeFieldProperties)p)
-            },
-            {
-                typeof(JsonFieldProperties),
-                p => Convert((JsonFieldProperties)p)
-            },
-            {
-                typeof(StringFieldProperties),
-                p => Convert((StringFieldProperties)p)
-            },
-            {
-                typeof(BooleanFieldProperties),
-                p => Convert((BooleanFieldProperties)p)
-            },
-            {
-                typeof(GeolocationFieldProperties),
-                p => Convert((GeolocationFieldProperties)p)
-            },
-            {
-                typeof(AssetsFieldProperties),
-                p => Convert((AssetsFieldProperties)p)
-            },
-            {
-                typeof(ReferencesFieldProperties),
-                p => Convert((ReferencesFieldProperties)p)
-            }
-        };
+                {
+                    typeof(NumberFieldProperties),
+                    p => Convert((NumberFieldProperties)p)
+                },
+                {
+                    typeof(DateTimeFieldProperties),
+                    p => Convert((DateTimeFieldProperties)p)
+                },
+                {
+                    typeof(JsonFieldProperties),
+                    p => Convert((JsonFieldProperties)p)
+                },
+                {
+                    typeof(StringFieldProperties),
+                    p => Convert((StringFieldProperties)p)
+                },
+                {
+                    typeof(BooleanFieldProperties),
+                    p => Convert((BooleanFieldProperties)p)
+                },
+                {
+                    typeof(GeolocationFieldProperties),
+                    p => Convert((GeolocationFieldProperties)p)
+                },
+                {
+                    typeof(AssetsFieldProperties),
+                    p => Convert((AssetsFieldProperties)p)
+                },
+                {
+                    typeof(ReferencesFieldProperties),
+                    p => Convert((ReferencesFieldProperties)p)
+                }
+            };
 
         public static SchemaDto ToModel(this ISchemaEntity entity)
         {

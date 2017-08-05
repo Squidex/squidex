@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly Guid contextId = Guid.NewGuid();
         private Exception exception;
         private Tuple<object> result;
-        
+
         public ICommand Command
         {
             get { return command; }

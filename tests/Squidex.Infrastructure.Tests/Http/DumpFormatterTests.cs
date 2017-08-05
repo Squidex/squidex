@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Http
                 "Accept-Encoding: UTF-8",
                 "",
                 "",
-                "Response:", 
+                "Response:",
                 "Timeout after 00:01:00");
 
             Assert.Equal(expected, dump);

@@ -68,7 +68,15 @@ namespace Squidex.Controllers.ContentApi.Generator
             {
                 new SwaggerSecurityRequirement
                 {
-                    { Constants.SecurityDefinition, new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
+                    {
+                        Constants.SecurityDefinition,
+                        new List<string>
+                        {
+                            SquidexRoles.AppOwner,
+                            SquidexRoles.AppDeveloper,
+                            SquidexRoles.AppEditor
+                        }
+                    }
                 }
             };
 

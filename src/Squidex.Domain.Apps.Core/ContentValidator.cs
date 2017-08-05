@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            
+
             this.schema = schema;
             this.context = context;
             this.partitionResolver = partitionResolver;

@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_get_read_write_property()
         {
             target.Write = 123;
-            
+
             Assert.Equal(123, accessor.GetValue(target, "ReadWrite"));
         }
 

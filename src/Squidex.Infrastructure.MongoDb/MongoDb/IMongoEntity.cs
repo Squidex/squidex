@@ -14,9 +14,9 @@ namespace Squidex.Infrastructure.MongoDb
     public interface IMongoEntity
     {
         Guid Id { get; set; }
-        
+
         Instant Created { get; set; }
-        
+
         Instant LastModified { get; set; }
     }
 }

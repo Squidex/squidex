@@ -15,6 +15,7 @@ import {
 } from 'shared';
 
 import {
+    WebhookEventsPageComponent,
     WebhooksPageComponent
 } from './declarations';
 
@@ -23,6 +24,10 @@ const routes: Routes = [
         path: '',
         component: WebhooksPageComponent,
         children: [
+            {
+                path: 'events',
+                component: WebhookEventsPageComponent
+            },
             {
                 path: 'help',
                 component: HelpComponent,
@@ -41,6 +46,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        WebhookEventsPageComponent,
         WebhooksPageComponent
     ]
 })

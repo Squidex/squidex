@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
             {
                 var regexFilter = Visit(functionNode);
-                
+
                 var value = BuildValue(nodeIn.Right);
 
                 if (value is bool booleanRight)

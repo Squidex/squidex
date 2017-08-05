@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         string Name { get; }
 
         bool IsPublished { get; }
-        
+
         bool IsDeleted { get; }
 
         Schema Schema { get; }

@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             geolocationSchema.AllowAdditionalProperties = false;
 
             var schemaReference = schemaResolver("GeolocationDto", geolocationSchema);
-            
+
             jsonProperty.SchemaReference = schemaReference;
         }
 

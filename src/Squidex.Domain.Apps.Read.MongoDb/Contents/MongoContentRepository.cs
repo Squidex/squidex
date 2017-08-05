@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
                     var parser = model.ParseQuery(odataQuery);
 
-                    cursor = 
+                    cursor =
                         collection
                             .Find(parser, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished)
                             .Take(parser)
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
             await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
             {
-                contentEntity = 
+                contentEntity =
                     await collection.Find(x => x.Id == id)
                         .FirstOrDefaultAsync();
 

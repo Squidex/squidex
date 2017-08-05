@@ -13,13 +13,13 @@ namespace Squidex.Controllers.Api.Apps.Models
     public class ClientDto
     {
         /// <summary>
-        /// The client id. 
+        /// The client id.
         /// </summary>
         [Required]
         public string Id { get; set; }
 
         /// <summary>
-        /// The client secret. 
+        /// The client secret.
         /// </summary>
         [Required]
         public string Secret { get; set; }

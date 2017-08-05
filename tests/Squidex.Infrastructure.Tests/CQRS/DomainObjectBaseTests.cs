@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.CQRS
 
         private sealed class DO : DomainObjectBase
         {
-            public DO(Guid id, int version) 
+            public DO(Guid id, int version)
                 : base(id, version)
             {
             }

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core
     public class ContentEnrichmentTests
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
-        
+
         [Fact]
         private void Should_enrich_with_default_values()
         {

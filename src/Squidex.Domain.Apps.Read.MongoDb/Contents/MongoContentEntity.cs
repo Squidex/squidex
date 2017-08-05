@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 var jsonString = DataObject.ToJson(Settings);
 
-                contentData = 
+                contentData =
                     JsonConvert.DeserializeObject<IdContentData>(jsonString)
                         .ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted))
                         .ToNameModel(schema, true);

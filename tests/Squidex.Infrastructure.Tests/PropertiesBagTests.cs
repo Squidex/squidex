@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure
 
             var content = JsonConvert.SerializeObject(bag, serializerSettings);
             var output  = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
-            
+
             Assert.Equal(bag.Count, output.Count);
         }
 
@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key1", 1);
             bag.Set("Key2", 1);
-            
+
             Assert.Equal(new[] { "Key1", "Key2" }, bag.PropertyNames.ToArray());
             Assert.Equal(new[] { "Key1", "Key2" }, bag.Properties.Keys.ToArray());
             Assert.Equal(new[] { "Key1", "Key2" }, bag.GetDynamicMemberNames().ToArray());

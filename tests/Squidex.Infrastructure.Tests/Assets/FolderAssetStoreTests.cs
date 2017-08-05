@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Assets
                 Directory.Delete(testFolder, true);
             }
         }
-        
+
         [Fact]
         public void Should_throw_when_creating_directory_failed()
         {

@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var model = new JsonSchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
 
-            model.Fields = 
+            model.Fields =
                 schema.Fields.Select(x =>
                     new JsonFieldModel
                     {

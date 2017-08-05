@@ -154,7 +154,7 @@ namespace Squidex.Infrastructure.Log
             IObjectWriter prettySut = new JsonLogWriter(Formatting.Indented);
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
-            
+
             Assert.Equal(@"{NL  ""property"": 1.5NL}".Replace("NL", Environment.NewLine), result);
         }
 

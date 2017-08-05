@@ -139,7 +139,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void NotDefault_should_do_nothing_for_non_default_value()
         {
-            Guard.NotDefault(Guid.NewGuid(), "parameter");   
+            Guard.NotDefault(Guid.NewGuid(), "parameter");
         }
 
         [Theory]

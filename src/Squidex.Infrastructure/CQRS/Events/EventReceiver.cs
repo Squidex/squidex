@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                         return;
                     }
-                    
+
                     if (currentSubscription == null)
                     {
                         await SubscribeAsync(eventConsumer, position);

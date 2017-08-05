@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         {
             Assert.Equal(typeof(CachingAppProvider).Name, sut.Name);
         }
-        
+
         [Fact]
         public void Should_do_nothing_when_clearing()
         {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Read.Apps
 
             repository.Verify(x => x.FindAppAsync(appId.Id), Times.Exactly(2));
         }
-        
+
         [Fact]
         public async Task Should_clear_cache_for_name_after_update_event()
         {

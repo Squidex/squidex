@@ -184,7 +184,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
         }
-    
+
         [Fact]
         public void Patch_should_not_create_event_for_same_data()
         {

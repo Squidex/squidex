@@ -10,7 +10,7 @@ using NodaTime;
 
 namespace Squidex.Domain.Apps.Read.Schemas
 {
-    public interface IWebhookEventEntity
+    public interface IWebhookEventEntity : IEntity
     {
         WebhookJob Job { get; }
 

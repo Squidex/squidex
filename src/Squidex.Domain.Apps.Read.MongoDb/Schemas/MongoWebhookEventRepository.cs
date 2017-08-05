@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return (int)await Collection.CountAsync(x => x.AppId == appId);
         }
 
+        public Task EnqueueAsync(Guid id, Instant nextAttempt)
+        {
+            return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt));
+        }
+
         public Task TraceSendingAsync(Guid jobId)
         {
             return Collection.UpdateOneAsync(x => x.Id == jobId, Update.Set(x => x.IsSending, true));
@@ -77,7 +82,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         public Task EnqueueAsync(WebhookJob job, Instant nextAttempt)
         {
-            var entity = SimpleMapper.Map(job, new MongoWebhookEventEntity { NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoWebhookEventEntity { Created = clock.GetCurrentInstant(), NextAttempt = nextAttempt });
 
             return Collection.InsertOneIfNotExistsAsync(entity);
         }
@@ -103,6 +108,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
                 Update.Set(x => x.Result, result)
                       .Set(x => x.LastDump, dump)
                       .Set(x => x.JobResult, jobResult)
+                      .Set(x => x.IsSending, false)
+                      .Set(x => x.NextAttempt, nextAttempt)
                       .Inc(x => x.NumCalls, 1));
         }
     }

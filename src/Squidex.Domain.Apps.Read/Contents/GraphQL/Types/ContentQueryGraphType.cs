@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private static string BuildODataQuery(ResolveFieldContext c)
         {
-            var odataQuery = "?" + 
+            var odataQuery = "?" +
                 string.Join("&",
                     c.Arguments
                         .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))

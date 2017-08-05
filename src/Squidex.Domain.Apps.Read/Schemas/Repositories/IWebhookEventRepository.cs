@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Read.Schemas.Repositories
     {
         Task EnqueueAsync(WebhookJob job, Instant nextAttempt);
 
+        Task EnqueueAsync(Guid id, Instant nextAttempt);
+
         Task TraceSendingAsync(Guid jobId);
 
         Task TraceSentAsync(Guid jobId, string dump, WebhookResult result, TimeSpan elapsed, Instant? nextCall);

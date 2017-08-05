@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaPublished())
                 );
         }
-    
+
         [Fact]
         public void Unpublish_should_throw_exception_if_not_created()
         {
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaUnpublished())
                 );
         }
-    
+
         [Fact]
         public void Delete_should_throw_exception_if_not_created()
         {
@@ -320,7 +320,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaDeleted())
                 );
         }
-        
+
         [Fact]
         public void AddField_should_throw_exception_if_not_created()
         {
@@ -376,7 +376,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldAdded { Name = fieldName, FieldId = fieldId, Properties = properties })
                 );
         }
-        
+
         [Fact]
         public void UpdateField_should_throw_exception_if_not_created()
         {
@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldHidden { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void ShowField_should_throw_exception_if_not_created()
         {
@@ -532,7 +532,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldShown { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void DisableField_should_throw_exception_if_not_created()
         {
@@ -580,7 +580,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldDisabled { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void EnableField_should_throw_exception_if_not_created()
         {
@@ -629,7 +629,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldEnabled { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void DeleteField_should_throw_exception_if_not_created()
         {
@@ -705,7 +705,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             CreateSchema();
 
             sut.AddWebhook(CreateCommand(command));
-            
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new WebhookAdded { Id = command.Id, Url = command.Url, SharedSecret = command.SharedSecret })

@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Core
         [Fact]
         public void Should_remove_fallbacks_when_removing_language()
         {
-            var config = 
+            var config =
                 LanguagesConfig.Create(Language.DE)
                     .Add(Language.IT)
                     .Add(Language.RU)

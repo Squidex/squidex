@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
     {
-        public MongoAssetRepository(IMongoDatabase database) 
+        public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
         }

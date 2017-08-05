@@ -33,6 +33,10 @@ $color-theme-green-dark: #47b353;
 $color-theme-error: #f00;
 $color-theme-error-dark: darken($color-theme-error, 5%);
 
+$color-badge-success: $color-theme-green-dark;
+$color-badge-error: $color-theme-error;
+$color-badge-warning: #ff7b00;
+
 $color-dark1-background: #2e3842;
 $color-dark1-foreground: #6a7681;
 $color-dark1-border1: #37424c;

@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure
 
                 var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(normalizedEmail));
                 var hashBuilder = new StringBuilder();
-  
+
                 for (var i = 0; i < hashBytes.Length; i++)
                 {
                     hashBuilder.Append(hashBytes[i].ToString("x2"));

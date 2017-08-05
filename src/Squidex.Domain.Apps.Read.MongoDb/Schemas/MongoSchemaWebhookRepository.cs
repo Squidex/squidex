@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         public async Task TraceSentAsync(Guid webhookId, WebhookResult result, TimeSpan elapsed)
         {
-            var webhookEntity = 
+            var webhookEntity =
                 await Collection.Find(x => x.Id == webhookId)
                     .FirstOrDefaultAsync();
 

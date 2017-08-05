@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             this.appEntity = appEntity;
 
             partitionResolver = appEntity.PartitionResolver;
-            
+
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             };
 
             this.schemas = schemas.ToDictionary(x => x.Id);
-            
+
             graphQLSchema = new GraphQLSchema { Query = new ContentQueryGraphType(this, this.schemas.Values) };
 
             foreach (var schemaType in schemaTypes.Values)

@@ -57,10 +57,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
             var properties = new SchemaProperties { Hints = "my-hint", Label = "my-label" };
 
             sut = sut.Update(properties);
-            
+
             Assert.Equal(properties, sut.Properties);
         }
-        
+
         [Fact]
         public void Should_add_field()
         {

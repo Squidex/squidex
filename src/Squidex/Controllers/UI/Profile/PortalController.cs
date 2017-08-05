@@ -13,7 +13,7 @@ using NSwag.Annotations;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Controllers.UI.Profile 
+namespace Squidex.Controllers.UI.Profile
 {
     [Authorize]
     [SwaggerIgnore]

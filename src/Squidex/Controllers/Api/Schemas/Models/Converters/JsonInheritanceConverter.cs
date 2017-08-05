@@ -40,7 +40,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
                 return IsWriting = false;
             }
         }
-        
+
         public override bool CanRead
         {
             get

@@ -22,7 +22,7 @@ namespace Squidex.Config
             {
                 throw new ConfigurationException("Configure BaseUrl with 'urls:baseUrl'.");
             }
-            
+
             return BaseUrl.BuildFullUrl(path, trailingSlash);
         }
     }

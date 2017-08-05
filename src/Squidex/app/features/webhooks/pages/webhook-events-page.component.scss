@@ -1,0 +1,47 @@
+@import '_vars';
+@import '_mixins';
+
+.badge {
+    & {
+        @include border-radius(12px);
+        font-size: .9rem;
+        font-weight: normal;
+        line-height: 1.5rem;
+        padding: 0 .5rem;
+    }
+
+    &-small {
+        font-size: .8rem;
+    }
+
+    &-pending {
+        background: $color-border;
+    }
+
+    &-success {
+        background: $color-badge-success;
+    }
+
+    &-retry {
+        background: $color-badge-warning;
+    }
+
+    &-failed {
+        background: $color-badge-error;
+    }
+}
+
+.event {
+    &-stats {
+        font-size: .8rem;
+        font-weight: normal;
+        line-height: 1.5rem;
+    }
+
+    &-dump {
+        margin-top: 1rem;
+        font-size: .8rem;
+        font-weight: normal;
+        height: 20rem;
+    }
+}

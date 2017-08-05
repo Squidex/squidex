@@ -22,14 +22,14 @@ namespace Squidex.Infrastructure
                 return isDisposed;
             }
         }
-        
+
         public void Dispose()
         {
             Dispose(true);
 
             GC.SuppressFinalize(this);
         }
-        
+
         protected void Dispose(bool disposing)
         {
             if (isDisposed)
@@ -47,9 +47,9 @@ namespace Squidex.Infrastructure
 
             isDisposed = true;
         }
-        
+
         protected abstract void DisposeObject(bool disposing);
-        
+
         protected void ThrowIfDisposed()
         {
             if (isDisposed)

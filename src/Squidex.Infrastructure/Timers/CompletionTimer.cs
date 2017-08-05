@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Timers
         private readonly Task runTask;
         private int oneCallState;
         private CancellationTokenSource wakeupToken;
-        
+
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
             Guard.NotNull(callback, nameof(callback));

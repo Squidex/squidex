@@ -48,27 +48,27 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.typeNameRegistry = typeNameRegistry;
 
             Add<BooleanFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new BooleanField(id, name, partitioning, (BooleanFieldProperties)properties));
 
             Add<NumberFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new NumberField(id, name, partitioning, (NumberFieldProperties)properties));
 
             Add<StringFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new StringField(id, name, partitioning, (StringFieldProperties)properties));
 
             Add<DateTimeFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new DateTimeField(id, name, partitioning, (DateTimeFieldProperties)properties));
 
             Add<JsonFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new JsonField(id, name, partitioning, (JsonFieldProperties)properties));
 
             Add<AssetsFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new AssetsField(id, name, partitioning, (AssetsFieldProperties)properties));
 
             Add<ReferencesFieldProperties>(
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                     new ReferencesField(id, name, partitioning, (ReferencesFieldProperties)properties));
 
             Add<GeolocationFieldProperties>(
-                (id, name, partitioning, properties) => 
+                (id, name, partitioning, properties) =>
                     new GeolocationField(id, name, partitioning, (GeolocationFieldProperties)properties));
         }
 
@@ -85,9 +85,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             Guard.NotNull(fieldFactory, nameof(fieldFactory));
 
             typeNameRegistry.Map(typeof(TFieldProperties));
-           
+
             var registered = new Registered(fieldFactory, typeof(TFieldProperties));
-            
+
             fieldsByPropertyType[registered.PropertiesType] = registered;
         }
 
