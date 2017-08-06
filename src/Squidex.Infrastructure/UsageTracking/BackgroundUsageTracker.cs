@@ -20,28 +20,11 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
+        private const int Intervall = 60 * 1000;
         private readonly IUsageStore usageStore;
         private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<string, Usage> usages = new ConcurrentDictionary<string, Usage>();
-
-        public sealed class Usage
-        {
-            public readonly double Count;
-            public readonly double ElapsedMs;
-
-            public Usage(double elapsed, double count)
-            {
-                ElapsedMs = elapsed;
-
-                Count = count;
-            }
-
-            public Usage Add(double elapsed, double weight)
-            {
-                return new Usage(ElapsedMs + elapsed, Count + weight);
-            }
-        }
 
         public BackgroundUsageTracker(IUsageStore usageStore, ISemanticLog log)
         {
@@ -52,7 +35,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             this.log = log;
 
-            timer = new CompletionTimer(60 * 1000, ct => TrackAsync());
+            timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
         }
 
         protected override void DisposeObject(bool disposing)
