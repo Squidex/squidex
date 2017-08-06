@@ -51,8 +51,12 @@ pipeline:
       status: [ failure, success ]
 	
   cleanup:
+    image: docker
     commands:
       - docker system prune -f
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker
     when:
       status: failure
     	  
