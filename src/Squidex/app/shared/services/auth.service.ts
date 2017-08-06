@@ -166,7 +166,7 @@ export class AuthService {
                 .filter(e => e instanceof TimeoutError)
                 .delay(500)
                 .take(5)
-                .concat(Observable.throw(new Error('Retry limit exceeeded.'))));
+                .concat(Observable.throw(new Error('Retry limit exceeded.'))));
     }
 
     private createProfile(user: User) {
