@@ -245,8 +245,8 @@ export class FieldDto {
         return this.properties.formatValue(value);
     }
 
-    public createValidators(): ValidatorFn[] {
-        return this.properties.createValidators();
+    public createValidators(isOptional: boolean): ValidatorFn[] {
+        return this.properties.createValidators(isOptional);
     }
 }
 
@@ -263,7 +263,7 @@ export abstract class FieldPropertiesDto {
 
     public abstract formatValue(value: any): string;
 
-    public abstract createValidators(): ValidatorFn[];
+    public abstract createValidators(isOptional: boolean): ValidatorFn[];
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -289,10 +289,10 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         return value;
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: false): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -337,10 +337,10 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         return value;
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -391,10 +391,10 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         }
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -420,10 +420,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         return value ? '✔' : '-';
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -448,10 +448,10 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
         return `${value.longitude}, ${value.latitude}`;
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -482,10 +482,10 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
         }
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -523,10 +523,10 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
         }
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 
@@ -558,10 +558,10 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
         return '<Json />';
     }
 
-    public createValidators(): ValidatorFn[] {
+    public createValidators(isOptional: boolean): ValidatorFn[] {
         const validators: ValidatorFn[] = [];
 
-        if (this.isRequired) {
+        if (this.isRequired && !isOptional) {
             validators.push(Validators.required);
         }
 

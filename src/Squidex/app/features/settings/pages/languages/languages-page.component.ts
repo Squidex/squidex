@@ -105,7 +105,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     private loadAllLanguages() {
         this.languagesService.getLanguages().retry(2)
             .subscribe(languages => {
-                this.allLanguages = languages;
+                this.allLanguages = ImmutableArray.of(languages).sortByStringAsc(l => l.englishName).values;
 
                 this.updateNewLanguages();
             }, error => {

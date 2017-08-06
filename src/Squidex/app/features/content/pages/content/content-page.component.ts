@@ -97,7 +97,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.dirty) {
+        if (!this.contentForm.dirty || this.isNewMode) {
             return Observable.of(true);
         } else {
             this.cancelDialog.show();
@@ -206,10 +206,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
             if (field.partitioning === 'language') {
                 for (let language of this.languages) {
-                    group.addControl(language.iso2Code, new FormControl(undefined, field.createValidators()));
+                    group.addControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
                 }
             } else {
-                group.addControl('iv', new FormControl(undefined, field.createValidators()));
+                group.addControl('iv', new FormControl(undefined, field.createValidators(false)));
             }
 
             controls[field.name] = group;

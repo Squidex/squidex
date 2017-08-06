@@ -62,7 +62,7 @@ describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false, 1, 1));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(3);
+        expect(field.createValidators(false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
@@ -82,7 +82,7 @@ describe('BooleanField', () => {
     const field = createField(new BooleanFieldPropertiesDto(null, null, null, true, false, 'Checkbox'));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(1);
+        expect(field.createValidators(false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
@@ -102,7 +102,7 @@ describe('DateTimeField', () => {
     const field = createField(new DateTimeFieldPropertiesDto(null, null, null, true, false, 'Date'));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(1);
+        expect(field.createValidators(false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
@@ -130,7 +130,7 @@ describe('GeolocationField', () => {
     const field = createField(new GeolocationFieldPropertiesDto(null, null, null, true, false, 'Default'));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(1);
+        expect(field.createValidators(false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
@@ -146,7 +146,7 @@ describe('JsonField', () => {
     const field = createField(new JsonFieldPropertiesDto(null, null, null, true, false));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(1);
+        expect(field.createValidators(false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
@@ -162,7 +162,7 @@ describe('NumberField', () => {
     const field = createField(new NumberFieldPropertiesDto(null, null, null, true, false, 'Input', undefined, 3, 1, [1, 2, 3]));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(4);
+        expect(field.createValidators(false).length).toBe(4);
     });
 
     it('should format to empty string if null', () => {
@@ -178,7 +178,7 @@ describe('ReferencesField', () => {
     const field = createField(new ReferencesFieldPropertiesDto(null, null, null, true, false, 1, 1));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(3);
+        expect(field.createValidators(false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
@@ -198,7 +198,7 @@ describe('NumberField', () => {
     const field = createField(new StringFieldPropertiesDto(null, null, null, true, false, 'Input', undefined, 'pattern', undefined, 3, 1, ['1', '2']));
 
     it('should create validators', () => {
-        expect(field.createValidators().length).toBe(5);
+        expect(field.createValidators(false).length).toBe(5);
     });
 
     it('should format to empty string if null', () => {
