@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure
             {
                 var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
 
-                if (typeNameAttribute != null && !string.IsNullOrWhiteSpace(typeNameAttribute.TypeName))
+                if (!string.IsNullOrWhiteSpace(typeNameAttribute?.TypeName))
                 {
                     Map(type, typeNameAttribute.TypeName);
                 }

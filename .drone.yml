@@ -40,10 +40,19 @@ pipeline:
 
   slack:
     image: plugins/slack
-    secrets: [ slack_webhook ]
     template: >
       {{#success build.status}}
         build {{build.number}} succeeded. Good job.
       {{else}}
         build {{build.number}} failed. Fix me please.
       {{/success}}
+    secrets: [ slack_webhook ]
+    when:
+      status: [ failure, success ]
+	
+  cleanup:
+    commands:
+      - docker system prune -f
+    when:
+      status: failure
+    	  
