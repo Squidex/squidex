@@ -140,6 +140,8 @@ namespace Squidex.Infrastructure.CQRS.Events
                     };
 
                     await Collection.InsertOneAsync(document);
+
+                    notifier.NotifyEventsStored();
                 }
                 catch (MongoWriteException ex)
                 {

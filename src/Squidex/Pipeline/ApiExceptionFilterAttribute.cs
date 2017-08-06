@@ -64,7 +64,7 @@ namespace Squidex.Pipeline
         {
             error.StatusCode = statusCode;
 
-            return new ObjectResult(error) { StatusCode = 412 };
+            return new ObjectResult(error) { StatusCode = statusCode };
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)

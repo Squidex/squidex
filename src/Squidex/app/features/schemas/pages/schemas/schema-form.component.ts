@@ -7,11 +7,15 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import {
     ApiUrlConfig,
     AuthService,
     fadeAnimation,
+    Notification,
+    NotificationService,
+    SchemaDetailsDto,
     SchemaDto,
     SchemasService,
     ValidatorsEx,
@@ -30,7 +34,7 @@ const FALLBACK_NAME = 'my-schema';
 })
 export class SchemaFormComponent {
     @Output()
-    public created = new EventEmitter<SchemaDto>();
+    public created = new EventEmitter<{ schema: SchemaDto, isAvailable: boolean }>();
 
     @Output()
     public cancelled = new EventEmitter();
@@ -59,6 +63,7 @@ export class SchemaFormComponent {
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
+        private readonly notifications: NotificationService,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder,
         private readonly authService: AuthService
@@ -90,11 +95,25 @@ export class SchemaFormComponent {
             const me = this.authService.user!.token;
 
             this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
+                .switchMap(dto => {
+                    return this.schemas.getSchema(this.appName, dto.id)
+                        .retryWhen(errors => errors
+                            .delay(500)
+                            .take(10)
+                            .concat(Observable.throw(dto)));
+                })
                 .subscribe(dto => {
-                    this.emitCreated(dto);
+                    this.emitCreated(dto, true);
                     this.resetCreateForm();
                 }, error => {
-                    this.enableCreateForm(error.displayMessage);
+                    if (error instanceof SchemaDetailsDto) {
+                        this.notifications.notify(Notification.error('Schema has been created but is awaiting to be processed. Reload in a few seconds.'));
+
+                        this.emitCreated(error, false);
+                        this.resetCreateForm();
+                    } else {
+                        this.enableCreateForm(error.displayMessage);
+                    }
                 });
         }
     }
@@ -103,8 +122,8 @@ export class SchemaFormComponent {
         this.cancelled.emit();
     }
 
-    private emitCreated(schema: SchemaDto) {
-        this.created.emit(schema);
+    private emitCreated(schema: SchemaDto, isAvailable: boolean) {
+        this.created.emit({ schema, isAvailable });
     }
 
     private enableCreateForm(message: string) {

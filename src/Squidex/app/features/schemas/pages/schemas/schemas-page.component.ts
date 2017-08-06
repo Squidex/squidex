@@ -6,7 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -46,6 +46,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
+        private readonly router: Router,
         private readonly route: ActivatedRoute
     ) {
         super(notifications, apps);
@@ -96,10 +97,14 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public onSchemaCreated(dto: SchemaDto) {
+    public onSchemaCreated(dto: SchemaDto, isAvailable: boolean) {
         this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
 
         this.addSchemaDialog.hide();
+
+        if (isAvailable) {
+            this.router.navigate([ dto.name ], { relativeTo: this.route });
+        }
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {

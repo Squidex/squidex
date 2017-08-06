@@ -88,22 +88,6 @@ describe('AuthInterceptor', () => {
         expect(req.request.headers.get('Pragma')).toBeNull();
     }));
 
-    it(`should logout for 404 status code when user is expired.`,
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-
-        authService.setup(x => x.userChanges).returns(() => { return Observable.of(<any>{ authToken: 'letmein', isExpired: true }); });
-
-        http.get('http://service/p/apps').subscribe(
-            _ => { /* NOOP */ },
-            _ => { /* NOOP */ });
-
-        const req = httpMock.expectOne('http://service/p/apps');
-
-        req.error(<any>{}, { status: 404 });
-
-        authService.verify(x => x.logoutRedirect(), Times.once());
-    }));
-
     it(`should logout for 401 status code`,
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
