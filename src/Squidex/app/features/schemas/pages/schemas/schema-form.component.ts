@@ -7,16 +7,12 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 import {
     ApiUrlConfig,
     AuthService,
     fadeAnimation,
-    Notification,
-    NotificationService,
     SchemaDetailsDto,
-    SchemaDto,
     SchemasService,
     ValidatorsEx,
     Version
@@ -34,7 +30,7 @@ const FALLBACK_NAME = 'my-schema';
 })
 export class SchemaFormComponent {
     @Output()
-    public created = new EventEmitter<{ schema: SchemaDto, isAvailable: boolean }>();
+    public created = new EventEmitter<SchemaDetailsDto>();
 
     @Output()
     public cancelled = new EventEmitter();
@@ -63,7 +59,6 @@ export class SchemaFormComponent {
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
-        private readonly notifications: NotificationService,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder,
         private readonly authService: AuthService
@@ -95,25 +90,11 @@ export class SchemaFormComponent {
             const me = this.authService.user!.token;
 
             this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
-                .switchMap(dto => {
-                    return this.schemas.getSchema(this.appName, dto.id)
-                        .retryWhen(errors => errors
-                            .delay(500)
-                            .take(10)
-                            .concat(Observable.throw(dto)));
-                })
                 .subscribe(dto => {
-                    this.emitCreated(dto, true);
+                    this.emitCreated(dto);
                     this.resetCreateForm();
                 }, error => {
-                    if (error instanceof SchemaDetailsDto) {
-                        this.notifications.notify(Notification.error('Schema has been created but is awaiting to be processed. Reload in a few seconds.'));
-
-                        this.emitCreated(error, false);
-                        this.resetCreateForm();
-                    } else {
-                        this.enableCreateForm(error.displayMessage);
-                    }
+                    this.enableCreateForm(error.displayMessage);
                 });
         }
     }
@@ -122,8 +103,8 @@ export class SchemaFormComponent {
         this.cancelled.emit();
     }
 
-    private emitCreated(schema: SchemaDto, isAvailable: boolean) {
-        this.created.emit({ schema, isAvailable });
+    private emitCreated(schema: SchemaDetailsDto) {
+        this.created.emit(schema);
     }
 
     private enableCreateForm(message: string) {

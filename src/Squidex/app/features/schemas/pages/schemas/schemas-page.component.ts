@@ -18,6 +18,7 @@ import {
     MessageBus,
     ModalView,
     NotificationService,
+    RoutingCache,
     SchemaDto,
     SchemasService
 } from 'shared';
@@ -47,7 +48,8 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly router: Router,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        private readonly routingCache: RoutingCache
     ) {
         super(notifications, apps);
     }
@@ -97,14 +99,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public onSchemaCreated(dto: SchemaDto, isAvailable: boolean) {
+    public onSchemaCreated(dto: SchemaDto) {
         this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
 
         this.addSchemaDialog.hide();
 
-        if (isAvailable) {
-            this.router.navigate([ dto.name ], { relativeTo: this.route });
-        }
+        this.routingCache.set(`schema.${dto.name}`, dto);
+        this.router.navigate([ dto.name ], { relativeTo: this.route });
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {

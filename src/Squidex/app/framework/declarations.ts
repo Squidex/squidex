@@ -54,6 +54,7 @@ export * from './services/message-bus';
 export * from './services/notification.service';
 export * from './services/resource-loader.service';
 export * from './services/root-view.service';
+export * from './services/routing-cache.service';
 export * from './services/shortcut.service';
 export * from './services/title.service';
 

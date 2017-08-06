@@ -67,8 +67,8 @@
                 </thead>
 
                 <tbody *ngIf="!isReadOnly">
-                    <ng-template ngFor let-content [ngForOf]="contentItems">
-                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+                    <ng-template ngFor let-content [ngForOf]="contentItems")>
+                        <tr [sqxContent]="content" (click)="cacheContent(content)" [routerLink]="[content.id]" routerLinkActive="active"
                             [languageCode]="languageSelected.iso2Code"
                             [schemaFields]="contentFields"
                             [schema]="schema"

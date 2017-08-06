@@ -50,6 +50,7 @@ import {
     RichEditorComponent,
     RootViewDirective,
     RootViewService,
+    RoutingCache,
     ScrollActiveDirective,
     ShortcutComponent,
     ShortcutService,
@@ -182,6 +183,7 @@ export class SqxFrameworkModule {
                 NotificationService,
                 ResourceLoaderService,
                 RootViewService,
+                RoutingCache,
                 ShortcutService,
                 TitleService
             ]

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams } from 'framework';
+import { allParams, RoutingCache } from 'framework';
 
 import { SchemaDetailsDto, SchemasService } from './../services/schemas.service';
 
@@ -17,7 +17,8 @@ import { SchemaDetailsDto, SchemasService } from './../services/schemas.service'
 export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
     constructor(
         private readonly schemasService: SchemasService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly routingCache: RoutingCache
     ) {
     }
 
@@ -36,10 +37,16 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
             throw 'Route must contain schema name.';
         }
 
+        const schema = this.routingCache.getValue<SchemaDetailsDto>(`schema.${schemaName}`);
+
+        if (schema && schema.isPublished) {
+            return Observable.of(schema);
+        }
+
         const result =
-            this.schemasService.getSchema(appName, schemaName).map(dto => dto && dto.isPublished ? dto : null)
+            this.schemasService.getSchema(appName, schemaName)
                 .do(dto => {
-                    if (!dto) {
+                    if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);
                     }
                 })

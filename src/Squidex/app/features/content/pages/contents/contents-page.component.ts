@@ -29,6 +29,7 @@ import {
     MessageBus,
     NotificationService,
     Pager,
+    RoutingCache,
     SchemaDetailsDto
 } from 'shared';
 
@@ -61,6 +62,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
+        private readonly routingCache: RoutingCache,
         private readonly messageBus: MessageBus
     ) {
         super(notifications, apps);
@@ -166,6 +168,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public selectLanguage(language: AppLanguageDto) {
         this.languageSelected = language;
+    }
+
+    public cacheContent(content: ContentDto) {
+        this.routingCache.set(`content.${content.id}`, content);
     }
 
     public goNext() {
