@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams, RoutingCache } from 'framework';
+import { allParams } from 'framework';
 
 import { ContentDto, ContentsService } from './../services/contents.service';
 
@@ -17,8 +17,7 @@ import { ContentDto, ContentsService } from './../services/contents.service';
 export class ResolveContentGuard implements Resolve<ContentDto> {
     constructor(
         private readonly contentsService: ContentsService,
-        private readonly router: Router,
-        private readonly routingCache: RoutingCache
+        private readonly router: Router
     ) {
     }
 
@@ -41,12 +40,6 @@ export class ResolveContentGuard implements Resolve<ContentDto> {
 
         if (!contentId) {
             throw 'Route must contain content id.';
-        }
-
-        const content = this.routingCache.getValue<ContentDto>(`content.${contentId}`);
-
-        if (content) {
-            return Observable.of(content);
         }
 
         const result =

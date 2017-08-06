@@ -32,6 +32,7 @@ import {
     IndeterminateValueDirective,
     JsonEditorComponent,
     KNumberPipe,
+    LocalCacheService,
     LocalStoreService,
     LowerCaseInputDirective,
     MarkdownEditorComponent,
@@ -50,7 +51,6 @@ import {
     RichEditorComponent,
     RootViewDirective,
     RootViewService,
-    RoutingCache,
     ScrollActiveDirective,
     ShortcutComponent,
     ShortcutService,
@@ -178,12 +178,12 @@ export class SqxFrameworkModule {
             providers: [
                 CanDeactivateGuard,
                 ClipboardService,
+                LocalCacheService,
                 LocalStoreService,
                 MessageBus,
                 NotificationService,
                 ResourceLoaderService,
                 RootViewService,
-                RoutingCache,
                 ShortcutService,
                 TitleService
             ]

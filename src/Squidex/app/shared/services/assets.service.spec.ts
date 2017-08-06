@@ -15,6 +15,7 @@ import {
     AssetReplacedDto,
     AssetsService,
     DateTime,
+    LocalCacheService,
     UpdateAssetDto,
     Version
 } from './../';
@@ -62,6 +63,7 @@ describe('AssetsService', () => {
             ],
             providers: [
                 AssetsService,
+                LocalCacheService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
             ]
         });
@@ -156,10 +158,10 @@ describe('AssetsService', () => {
     it('should make get request to get asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let assets: AssetDto | null = null;
+        let asset: AssetDto | null = null;
 
         assetsService.getAsset('my-app', '123').subscribe(result => {
-            assets = result;
+            asset = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
@@ -184,7 +186,7 @@ describe('AssetsService', () => {
             version: 11
         });
 
-        expect(assets).toEqual(
+        expect(asset).toEqual(
             new AssetDto(
                 'id1', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
@@ -198,6 +200,29 @@ describe('AssetsService', () => {
                 1024,
                 2048,
                 new Version('11')));
+    }));
+
+    it('should provide entry from cache if not found',
+        inject([LocalCacheService, AssetsService, HttpTestingController], (localCache: LocalCacheService, assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        const cached = {};
+
+        localCache.set('asset.123', cached, 10000);
+
+        let asset: AssetDto | null = null;
+
+        assetsService.getAsset('my-app', '123').subscribe(result => {
+            asset = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({}, { status: 404, statusText: '404' });
+
+        expect(asset).toBe(cached);
     }));
 
     it('should append query to find by name',

@@ -8,7 +8,7 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { ContentsService, RoutingCache } from 'shared';
+import { ContentsService } from 'shared';
 
 import { ResolveContentGuard } from './resolve-content.guard';
 import { RouterMockup } from './router-mockup';
@@ -31,46 +31,27 @@ describe('ResolveContentGuard', () => {
     };
 
     let appsStore: IMock<ContentsService>;
-    let routingCache: IMock<RoutingCache>;
 
     beforeEach(() => {
         appsStore = Mock.ofType(ContentsService);
-
-        routingCache = Mock.ofType(RoutingCache);
     });
 
     it('should throw if route does not contain app name', () => {
-        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup(), routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
 
         expect(() => guard.resolve(<any>{ params: {} }, <any>{})).toThrow('Route must contain app name.');
     });
 
     it('should throw if route does not contain schema name', () => {
-        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup(), routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
 
         expect(() => guard.resolve(<any>{ params: { appName: 'my-app' } }, <any>{})).toThrow('Route must contain schema name.');
     });
 
     it('should throw if route does not contain content id', () => {
-        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup(), routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup());
 
         expect(() => guard.resolve(<any>{ params: { appName: 'my-app', schemaName: 'my-schema' } }, <any>{})).toThrow('Route must contain content id.');
-    });
-
-    it('should provide content from cache if found', (done) => {
-        const content = { };
-
-        routingCache.setup(x => x.getValue('content.123'))
-            .returns(() => content);
-
-        const guard = new ResolveContentGuard(appsStore.object, <any>new RouterMockup(), routingCache.object);
-
-        guard.resolve(<any>route, <any>{})
-            .subscribe(result => {
-                expect(result).toBe(content);
-
-                done();
-            });
     });
 
     it('should navigate to 404 page if schema is not found', (done) => {
@@ -78,7 +59,7 @@ describe('ResolveContentGuard', () => {
             .returns(() => Observable.of(null!));
         const router = new RouterMockup();
 
-        const guard = new ResolveContentGuard(appsStore.object, <any>router, routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {
@@ -94,7 +75,7 @@ describe('ResolveContentGuard', () => {
             .returns(() => Observable.throw(null!));
         const router = new RouterMockup();
 
-        const guard = new ResolveContentGuard(appsStore.object, <any>router, routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {
@@ -112,7 +93,7 @@ describe('ResolveContentGuard', () => {
             .returns(() => Observable.of(content));
         const router = new RouterMockup();
 
-        const guard = new ResolveContentGuard(appsStore.object, <any>router, routingCache.object);
+        const guard = new ResolveContentGuard(appsStore.object, <any>router);
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {

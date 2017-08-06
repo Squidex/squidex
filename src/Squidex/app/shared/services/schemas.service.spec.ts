@@ -15,6 +15,7 @@ import {
     createProperties,
     DateTime,
     FieldDto,
+    LocalCacheService,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
@@ -143,7 +144,7 @@ describe('SchemaDetailsDto', () => {
         expect(schema_2.lastModifiedBy).toEqual('me');
     });
 
-    it('should update fields property and user info when updatinmg field', () => {
+    it('should update fields property and user info when updating field', () => {
         const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
         const field2_1 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
         const field2_2 = new FieldDto(2, '2', false, false, 'l', createProperties('Boolean'));
@@ -170,6 +171,7 @@ describe('SchemasService', () => {
                 HttpClientTestingModule
             ],
             providers: [
+                LocalCacheService,
                 SchemasService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
             ]
@@ -369,6 +371,29 @@ describe('SchemasService', () => {
                     new FieldDto(7, 'field7', true, true, 'language', createProperties('Assets')),
                     new FieldDto(8, 'field8', true, true, 'language', createProperties('References'))
                 ]));
+    }));
+
+    it('should provide entry from cache if not found',
+        inject([LocalCacheService, SchemasService, HttpTestingController], (localCache: LocalCacheService, schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const cached = {};
+
+        localCache.set('schema.my-app.my-schema', cached, 10000);
+
+        let schema: SchemaDetailsDto | null = null;
+
+        schemasService.getSchema('my-app', 'my-schema', version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({}, { status: 404, statusText: '404' });
+
+        expect(schema).toBe(cached);
     }));
 
     it('should make post request to create schema',

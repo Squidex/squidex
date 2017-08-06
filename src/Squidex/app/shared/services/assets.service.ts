@@ -5,13 +5,14 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
     ApiUrlConfig,
     DateTime,
+    LocalCacheService,
     HTTP,
     Version
 } from 'framework';
@@ -100,7 +101,8 @@ export class AssetReplacedDto {
 export class AssetsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly localCache: LocalCacheService
     ) {
     }
 
@@ -152,22 +154,20 @@ export class AssetsService {
     }
 
     public uploadFile(appName: string, file: File, user: string, now?: DateTime): Observable<number | AssetDto> {
-        return new Observable<number | AssetDto>(subscriber => {
-            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-            const req = new HttpRequest('POST', url, getFormData(file), {
-                reportProgress: true
-            });
+        const req = new HttpRequest('POST', url, getFormData(file), {
+            reportProgress: true
+        });
 
-            this.http.request(req)
-                .pretifyError('Failed to upload asset. Please reload.')
-                .subscribe(event => {
+        return this.http.request(req)
+                .map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
                         const percentDone = Math.round(100 * event.loaded / event.total);
 
-                        subscriber.next(percentDone);
+                        return percentDone;
                     } else if (event instanceof HttpResponse) {
-                        const response = event.body;
+                        const response: any = event.body;
 
                         now = now || DateTime.now();
 
@@ -187,14 +187,17 @@ export class AssetsService {
                             response.pixelHeight,
                             new Version(response.version.toString()));
 
-                        subscriber.next(dto);
+                        this.localCache.set(`asset.${dto.id}`, dto, 5000);
+
+                        return dto;
                     }
-                }, err => {
-                    subscriber.error(err);
-                }, () => {
-                    subscriber.complete();
-                });
-        });
+                })
+                .do(dto => {
+                    if (dto instanceof AssetDto) {
+                        this.localCache.set(`asset.${dto.id}`, dto, 5000);
+                    }
+                })
+                .pretifyError('Failed to upload asset. Please reload.');
     }
 
     public getAsset(appName: string, id: string, version?: Version): Observable<AssetDto> {
@@ -217,6 +220,17 @@ export class AssetsService {
                         response.pixelWidth,
                         response.pixelHeight,
                         new Version(response.version.toString()));
+                })
+                .catch(error => {
+                    if (error instanceof HttpErrorResponse && error.status === 404) {
+                        const cached = this.localCache.get(`asset.${id}`);
+
+                        if (cached) {
+                            return Observable.of(cached);
+                        }
+                    }
+
+                    return Observable.throw(error);
                 })
                 .pretifyError('Failed to load assets. Please reload.');
     }

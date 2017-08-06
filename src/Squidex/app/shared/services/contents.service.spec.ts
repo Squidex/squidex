@@ -14,6 +14,7 @@ import {
     ContentsDto,
     ContentsService,
     DateTime,
+    LocalCacheService,
     Version
 } from './../';
 
@@ -62,6 +63,7 @@ describe('ContentsService', () => {
             ],
             providers: [
                 ContentsService,
+                LocalCacheService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
             ]
         });
@@ -182,11 +184,11 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.getContent('my-app', 'my-schema', 'content1', version).subscribe(result => {
+        contentsService.getContent('my-app', 'my-schema', '1', version).subscribe(result => {
             content = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -208,6 +210,29 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
                 new Version('11')));
+    }));
+
+    it('should provide entry from cache if not found',
+        inject([LocalCacheService, ContentsService, HttpTestingController], (localCache: LocalCacheService, contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const cached = {};
+
+        localCache.set('content.1', cached, 10000);
+
+        let content: ContentDto | null = null;
+
+        contentsService.getContent('my-app', 'my-schema', '1', version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({}, { status: 404, statusText: '404' });
+
+        expect(content).toBe(cached);
     }));
 
     it('should make post request to create content',

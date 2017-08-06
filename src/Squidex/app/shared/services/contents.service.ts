@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -14,6 +14,7 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     DateTime,
+    LocalCacheService,
     HTTP,
     Version
 } from 'framework';
@@ -74,7 +75,8 @@ export class ContentDto {
 export class ContentsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly localCache: LocalCacheService
     ) {
     }
 
@@ -141,6 +143,17 @@ export class ContentsService {
                         response.data,
                         new Version(response.version.toString()));
                 })
+                .catch(error => {
+                    if (error instanceof HttpErrorResponse && error.status === 404) {
+                        const cached = this.localCache.get(`content.${id}`);
+
+                        if (cached) {
+                            return Observable.of(cached);
+                        }
+                    }
+
+                    return Observable.throw(error);
+                })
                 .pretifyError('Failed to load content. Please reload.');
     }
 
@@ -158,6 +171,9 @@ export class ContentsService {
                         DateTime.parseISO_UTC(response.lastModified),
                         response.data,
                         new Version(response.version.toString()));
+                })
+                .do(content => {
+                    this.localCache.set(`content.${content.id}`, content, 5000);
                 })
                 .pretifyError('Failed to create content. Please reload.');
     }

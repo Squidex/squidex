@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams, RoutingCache } from 'framework';
+import { allParams } from 'framework';
 
 import { SchemaDetailsDto, SchemasService } from './../services/schemas.service';
 
@@ -17,8 +17,7 @@ import { SchemaDetailsDto, SchemasService } from './../services/schemas.service'
 export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
     constructor(
         private readonly schemasService: SchemasService,
-        private readonly router: Router,
-        private readonly routingCache: RoutingCache
+        private readonly router: Router
     ) {
     }
 
@@ -35,12 +34,6 @@ export class ResolvePublishedSchemaGuard implements Resolve<SchemaDetailsDto> {
 
         if (!schemaName) {
             throw 'Route must contain schema name.';
-        }
-
-        const schema = this.routingCache.getValue<SchemaDetailsDto>(`schema.${schemaName}`);
-
-        if (schema && schema.isPublished) {
-            return Observable.of(schema);
         }
 
         const result =

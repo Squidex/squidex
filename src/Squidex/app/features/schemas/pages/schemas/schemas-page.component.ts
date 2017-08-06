@@ -6,7 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -18,7 +18,6 @@ import {
     MessageBus,
     ModalView,
     NotificationService,
-    RoutingCache,
     SchemaDto,
     SchemasService
 } from 'shared';
@@ -47,9 +46,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     constructor(apps: AppsStoreService, notifications: NotificationService,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly routingCache: RoutingCache
+        private readonly route: ActivatedRoute
     ) {
         super(notifications, apps);
     }
@@ -103,9 +100,6 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
 
         this.addSchemaDialog.hide();
-
-        this.routingCache.set(`schema.${dto.name}`, dto);
-        this.router.navigate([ dto.name ], { relativeTo: this.route });
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {
