@@ -49,7 +49,7 @@ pipeline:
     secrets: [ slack_webhook ]
     when:
       status: [ failure, success ]
-	
+
   cleanup:
     image: docker
     commands:
@@ -59,4 +59,3 @@ pipeline:
       - /var/lib/docker:/var/lib/docker
     when:
       status: failure
-    	  
