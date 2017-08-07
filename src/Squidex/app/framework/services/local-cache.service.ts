@@ -48,6 +48,10 @@ export class LocalCacheService {
         this.entries[key] = { value, expires: new Date().getTime() + expiresIn };
     }
 
+    public remove(key: string) {
+        delete this.entries[key];
+    }
+
     private static isExpired(now: number, entry: Entry): boolean {
         return entry.expires < now;
     }

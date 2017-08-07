@@ -733,6 +733,16 @@ export class SchemasService {
                 .pretifyError('Failed to add field. Please reload.');
     }
 
+    public deleteSchema(appName: string, schemaName: string, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
+
+        return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.localCache.remove(`service.${appName}.${schemaName}`);
+                })
+                .pretifyError('Failed to delete schema. Please reload.');
+    }
+
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version?: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
@@ -801,12 +811,5 @@ export class SchemasService {
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .pretifyError('Failed to delete field. Please reload.');
-    }
-
-    public deleteSchema(appName: string, schemaName: string, version?: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
-
-        return HTTP.deleteVersioned(this.http, url, version)
-                .pretifyError('Failed to delete schema. Please reload.');
     }
 }

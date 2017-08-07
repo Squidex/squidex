@@ -30,13 +30,24 @@ describe('LocalCache', () => {
         expect(localCacheService.get('key')).toBe(value);
     });
 
-    it('should get and store item in cache', () => {
+    it('should not retrieve item if cleared', () => {
         const localCacheService = new LocalCacheService();
 
         const value = {};
 
         localCacheService.set('key', value);
         localCacheService.clear(true);
+
+        expect(localCacheService.get('key')).toBeUndefined();
+    });
+
+    it('should not retrieve item if removed', () => {
+        const localCacheService = new LocalCacheService();
+
+        const value = {};
+
+        localCacheService.set('key', value);
+        localCacheService.remove('key');
 
         expect(localCacheService.get('key')).toBeUndefined();
     });

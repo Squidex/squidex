@@ -182,7 +182,20 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(content => {
+                    this.localCache.set(`content.${content.id}`, content, 5000);
+                })
                 .pretifyError('Failed to update content. Please reload.');
+    }
+
+    public deleteContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+
+        return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.localCache.remove(`content.${id}`);
+                })
+                .pretifyError('Failed to delete content. Please reload.');
     }
 
     public publishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
@@ -197,12 +210,5 @@ export class ContentsService {
 
         return HTTP.putVersioned(this.http, url, {}, version)
                 .pretifyError('Failed to unpublish content. Please reload.');
-    }
-
-    public deleteContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
-
-        return HTTP.deleteVersioned(this.http, url, version)
-                .pretifyError('Failed to delete content. Please reload.');
     }
 }
