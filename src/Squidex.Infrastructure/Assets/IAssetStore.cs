@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public interface IAssetStore
     {
+        string GenerateSourceUrl(string id, long version, string suffix);
+
         Task CopyTemporaryAsync(string name, string id, long version, string suffix);
 
         Task DownloadAsync(string id, long version, string suffix, Stream stream);

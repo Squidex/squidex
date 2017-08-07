@@ -45,6 +45,16 @@ namespace Squidex.Infrastructure.Assets
             Assert.True(Directory.Exists(testFolder));
         }
 
+        [Fact]
+        public void Should_calculate_source_url()
+        {
+            Sut.Connect();
+
+            var id = Guid.NewGuid().ToString();
+
+            Assert.Equal(Path.Combine(testFolder, $"{id}_1"), Sut.GenerateSourceUrl(id, 1, null));
+        }
+
         private static string CreateInvalidPath()
         {
             var windir = Environment.GetEnvironmentVariable("windir");

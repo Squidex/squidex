@@ -51,6 +51,13 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public string GenerateSourceUrl(string id, long version, string suffix)
+        {
+            var file = GetFile(id, version, suffix);
+
+            return file.FullName;
+        }
+
         public async Task UploadTemporaryAsync(string name, Stream stream)
         {
             var file = GetFile(name);

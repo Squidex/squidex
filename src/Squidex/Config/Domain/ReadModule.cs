@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline;
 
@@ -46,6 +47,14 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.Register(c => new GraphQLUrlGenerator(
+                    c.Resolve<IOptions<MyUrlsOptions>>(),
+                    c.Resolve<IAssetStore>(),
+                    Configuration.GetValue<bool>("assetStore:exposeSourceUrl")))
+                .As<IGraphQLUrlGenerator>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
                 .AsSelf()
@@ -58,11 +67,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<GraphQLUrlGenerator>()
-                .As<IGraphQLUrlGenerator>()
                 .AsSelf()
                 .SingleInstance();
 

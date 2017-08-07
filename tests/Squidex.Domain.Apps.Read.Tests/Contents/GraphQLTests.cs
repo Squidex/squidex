@@ -98,6 +98,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     lastModifiedBy
                     url
                     thumbnailUrl
+                    sourceUrl
                     mimeType
                     fileName
                     fileSize
@@ -133,6 +134,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                             lastModifiedBy = "subject:user2",
                             url = $"assets/{assetEntity.Id}",
                             thumbnailUrl = $"assets/{assetEntity.Id}?width=100",
+                            sourceUrl = $"assets/source/{assetEntity.Id}",
                             mimeType = "image/png",
                             fileName = "MyFile.png",
                             fileSize = 1024,
@@ -165,6 +167,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     lastModifiedBy
                     url
                     thumbnailUrl
+                    sourceUrl
                     mimeType
                     fileName
                     fileSize
@@ -194,6 +197,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                         lastModifiedBy = "subject:user2",
                         url = $"assets/{assetEntity.Id}",
                         thumbnailUrl = $"assets/{assetEntity.Id}?width=100",
+                        sourceUrl = $"assets/source/{assetEntity.Id}",
                         mimeType = "image/png",
                         fileName = "MyFile.png",
                         fileSize = 1024,

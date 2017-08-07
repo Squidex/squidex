@@ -50,6 +50,13 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public string GenerateSourceUrl(string id, long version, string suffix)
+        {
+            var blobName = GetObjectName(id, version, suffix);
+
+            return new Uri(blobContainer.StorageUri.PrimaryUri, $"/{containerName}/{blobName}").ToString();
+        }
+
         public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
         {
             var blobName = GetObjectName(id, version, suffix);

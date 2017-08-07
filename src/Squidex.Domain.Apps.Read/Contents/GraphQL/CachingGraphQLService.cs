@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 var schemas = await schemaRepository.QueryAllAsync(app.Id);
 
-                modelContext = new GraphQLModel(app, schemas.Where(x => x.IsPublished));
+                modelContext = new GraphQLModel(app, schemas.Where(x => x.IsPublished), urlGenerator);
 
                 Cache.Set(cacheKey, modelContext);
             }

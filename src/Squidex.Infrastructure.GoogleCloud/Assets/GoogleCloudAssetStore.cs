@@ -42,6 +42,13 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public string GenerateSourceUrl(string id, long version, string suffix)
+        {
+            var objectName = GetObjectName(id, version, suffix);
+
+            return $"https://storage.cloud.google.com/{bucketName}/{objectName}";
+        }
+
         public Task UploadTemporaryAsync(string name, Stream stream)
         {
             return storageClient.UploadObjectAsync(bucketName, name, "application/octet-stream", stream);
@@ -88,9 +95,12 @@ namespace Squidex.Infrastructure.Assets
             {
                 await storageClient.DeleteObjectAsync(bucketName, name);
             }
-            catch (GoogleApiException ex) when (ex.HttpStatusCode != HttpStatusCode.NotFound)
+            catch (GoogleApiException ex)
             {
-                throw;
+                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
             }
         }
 

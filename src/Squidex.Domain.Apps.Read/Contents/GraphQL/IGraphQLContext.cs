@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public interface IGraphQLContext
     {
+        bool CanGenerateAssetSourceUrl { get; }
+
         IFieldPartitioning ResolvePartition(Partitioning key);
 
         IGraphType GetAssetType();
@@ -24,6 +26,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         IGraphType GetSchemaType(Guid schemaId);
 
         IFieldResolver ResolveAssetUrl();
+
+        IFieldResolver ResolveAssetSourceUrl();
 
         IFieldResolver ResolveAssetThumbnailUrl();
 

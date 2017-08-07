@@ -41,9 +41,13 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
-        public GraphQLModel(IAppEntity appEntity, IEnumerable<ISchemaEntity> schemas)
+        public bool CanGenerateAssetSourceUrl { get; }
+
+        public GraphQLModel(IAppEntity appEntity, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
         {
             this.appEntity = appEntity;
+
+            CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
 
             partitionResolver = appEntity.PartitionResolver;
 
@@ -108,6 +112,18 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                 var context = (QueryContext)c.UserContext;
 
                 return context.UrlGenerator.GenerateAssetUrl(appEntity, c.Source);
+            });
+
+            return resolver;
+        }
+
+        public IFieldResolver ResolveAssetSourceUrl()
+        {
+            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
+            {
+                var context = (QueryContext)c.UserContext;
+
+                return context.UrlGenerator.GenerateAssetSourceUrl(appEntity, c.Source);
             });
 
             return resolver;

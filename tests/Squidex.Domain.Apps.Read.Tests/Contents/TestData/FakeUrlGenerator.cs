@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
 {
     public sealed class FakeUrlGenerator : IGraphQLUrlGenerator
     {
+        public bool CanGenerateAssetSourceUrl { get; } = true;
+
         public string GenerateAssetUrl(IAppEntity appEntity, IAssetEntity assetEntity)
         {
             return $"assets/{assetEntity.Id}";
@@ -23,6 +25,11 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
         public string GenerateAssetThumbnailUrl(IAppEntity appEntity, IAssetEntity assetEntity)
         {
             return $"assets/{assetEntity.Id}?width=100";
+        }
+
+        public string GenerateAssetSourceUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        {
+            return $"assets/source/{assetEntity.Id}";
         }
 
         public string GenerateContentUrl(IAppEntity appEntity, ISchemaEntity schemaEntity, IContentEntity contentEntity)

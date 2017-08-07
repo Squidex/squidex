@@ -148,6 +148,18 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The height of the image in pixels if the asset is an image."
             });
 
+            if (context.CanGenerateAssetSourceUrl)
+            {
+
+                AddField(new FieldType
+                {
+                    Name = "sourceUrl",
+                    Resolver = context.ResolveAssetSourceUrl(),
+                    ResolvedType = new StringGraphType(),
+                    Description = "The source url of the asset."
+                });
+            }
+
             Description = "An asset";
         }
 
