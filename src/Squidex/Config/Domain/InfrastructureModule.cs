@@ -125,7 +125,7 @@ namespace Squidex.Config.Domain
                 .As<IEventNotifier>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultNameResolver>()
+            builder.RegisterType<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>()
                 .SingleInstance();
 

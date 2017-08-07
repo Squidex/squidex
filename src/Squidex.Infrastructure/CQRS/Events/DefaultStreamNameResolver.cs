@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DefaultNameResolver.cs
+//  DefaultStreamNameResolver.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public sealed class DefaultNameResolver : IStreamNameResolver
+    public sealed class DefaultStreamNameResolver : IStreamNameResolver
     {
         private const string Suffix = "DomainObject";
 

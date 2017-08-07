@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  DefaultNameResolverTests.cs
+//  DefaultStreamNameResolverTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,9 +11,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class DefaultNameResolverTests
+    public class DefaultStreamNameResolverTests
     {
-        private readonly DefaultNameResolver sut = new DefaultNameResolver();
+        private readonly DefaultStreamNameResolver sut = new DefaultStreamNameResolver();
 
         private sealed class MyUser : DomainObjectBase
         {
