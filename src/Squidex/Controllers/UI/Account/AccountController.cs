@@ -239,6 +239,11 @@ namespace Squidex.Controllers.UI.Account
                         await MakeAdminAsync(user, isFirst) &&
                         await LockAsync(user, isFirst) &&
                         await LoginAsync(externalLogin);
+
+                    if (user.IsLocked)
+                    {
+                        return View("LockedOut");
+                    }
                 }
             }
 
