@@ -88,6 +88,11 @@ namespace Squidex.Infrastructure.CQRS.Events
                 throw new NotSupportedException();
             }
 
+            public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
+            {
+                throw new NotSupportedException();
+            }
+
             public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
             {
                 throw new NotSupportedException();

@@ -80,10 +80,22 @@ namespace Squidex.Infrastructure.CQRS.Events
             return result;
         }
 
-        public async Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
+        public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            Guard.NotNull(events, nameof(events));
+            return AppendEventsInternalAsync(streamName, ExpectedVersion.Any, events);
+        }
+
+        public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
+        {
+            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+
+            return AppendEventsInternalAsync(streamName, expectedVersion, events);
+        }
+
+        private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
+        {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
 
             if (events.Count == 0)
             {

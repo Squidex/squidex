@@ -25,6 +25,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
+        private const long AnyVersion = long.MinValue;
+        private const int AppendTimeoutMs = 1000000;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
         private static readonly FieldDefinition<MongoEventCommit, long> EventsCountField = Fields.Build(x => x.EventsCount);
@@ -107,39 +109,44 @@ namespace Squidex.Infrastructure.CQRS.Events
             }, cancellationToken);
         }
 
-        public async Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
+        public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
+        {
+            return AppendEventsInternalAsync(commitId, streamName, AnyVersion, events);
+        }
+
+        public Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events)
+        {
+            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+
+            return AppendEventsInternalAsync(commitId, streamName, expectedVersion, events);
+        }
+
+        private async Task AppendEventsInternalAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
             Guard.NotNull(events, nameof(events));
 
-            var eventsCount = events.Count;
-
-            if (eventsCount > 0)
+            if (events.Count == 0)
             {
-                var commitEvents = new MongoEvent[events.Count];
+                return;
+            }
 
-                var i = 0;
+            var currentVersion = await GetEventStreamOffset(streamName);
 
-                foreach (var e in events)
-                {
-                    var mongoEvent = new MongoEvent { EventId = e.EventId, Metadata = e.Metadata, Payload = e.Payload, Type = e.Type };
+            if (expectedVersion != AnyVersion && expectedVersion != currentVersion)
+            {
+                throw new WrongEventVersionException(currentVersion, expectedVersion);
+            }
 
-                    commitEvents[i++] = mongoEvent;
-                }
+            var cts = new CancellationTokenSource(AppendTimeoutMs);
 
+            var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
+
+            while (!cts.IsCancellationRequested)
+            {
                 try
                 {
-                    var document = new MongoEventCommit
-                    {
-                        Id = commitId,
-                        Events = commitEvents,
-                        EventsCount = eventsCount,
-                        EventStream = streamName,
-                        EventStreamOffset = expectedVersion,
-                        Timestamp = EmptyTimestamp
-                    };
-
-                    await Collection.InsertOneAsync(document);
+                    await Collection.InsertOneAsync(commit, new InsertOneOptions(), cts.Token);
 
                     notifier.NotifyEventsStored();
                 }
@@ -147,9 +154,20 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                     {
-                        var currentVersion = await GetEventStreamOffset(streamName);
+                        currentVersion = await GetEventStreamOffset(streamName);
 
-                        throw new WrongEventVersionException(currentVersion, expectedVersion);
+                        if (expectedVersion != AnyVersion)
+                        {
+                            throw new WrongEventVersionException(currentVersion, expectedVersion);
+                        }
+                        else if (!cts.IsCancellationRequested)
+                        {
+                            commit.EventStreamOffset = currentVersion;
+                        }
+                        else
+                        {
+                            throw new TaskCanceledException("Could not acquire a free slot for the commit within the provided time.");
+                        }
                     }
                     else
                     {
@@ -203,6 +221,32 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
 
             return Filter.And(filters);
+        }
+
+        private static MongoEventCommit BuildCommit(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+        {
+            var commitEvents = new MongoEvent[events.Count];
+
+            var i = 0;
+
+            foreach (var e in events)
+            {
+                var mongoEvent = new MongoEvent { EventId = e.EventId, Metadata = e.Metadata, Payload = e.Payload, Type = e.Type };
+
+                commitEvents[i++] = mongoEvent;
+            }
+
+            var mongoCommit = new MongoEventCommit
+            {
+                Id = commitId,
+                Events = commitEvents,
+                EventsCount = events.Count,
+                EventStream = streamName,
+                EventStreamOffset = expectedVersion,
+                Timestamp = EmptyTimestamp
+            };
+
+            return mongoCommit;
         }
     }
 }

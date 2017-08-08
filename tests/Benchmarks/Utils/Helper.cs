@@ -21,7 +21,7 @@ namespace Benchmarks.Utils
 
         public static void Warmup(this IEventStore eventStore)
         {
-            eventStore.AppendEventsAsync(Guid.NewGuid(), "my-stream", -1, new List<EventData> { CreateEventData() }).Wait();
+            eventStore.AppendEventsAsync(Guid.NewGuid(), "my-stream", new List<EventData> { CreateEventData() }).Wait();
         }
     }
 }

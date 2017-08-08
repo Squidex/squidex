@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName);
 
+        Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events);
+
         Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events);
 
         IEventSubscription CreateSubscription(string streamFilter = null, string position = null);
