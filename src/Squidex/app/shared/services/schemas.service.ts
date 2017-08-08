@@ -711,8 +711,8 @@ export class SchemasService {
                         dto.fields || []);
                 })
                 .do(schema => {
-                    this.localCache.set(`service.${appName}.${schema.id}`, schema, 5000);
-                    this.localCache.set(`service.${appName}.${schema.name}`, schema, 5000);
+                    this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
+                    this.localCache.set(`schema.${appName}.${schema.name}`, schema, 5000);
                 })
                 .pretifyError('Failed to create schema. Please reload.');
     }
@@ -738,7 +738,7 @@ export class SchemasService {
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
-                    this.localCache.remove(`service.${appName}.${schemaName}`);
+                    this.localCache.remove(`schema.${appName}.${schemaName}`);
                 })
                 .pretifyError('Failed to delete schema. Please reload.');
     }
