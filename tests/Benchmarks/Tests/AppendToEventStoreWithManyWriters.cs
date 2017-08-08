@@ -51,13 +51,11 @@ namespace Benchmarks.Tests
 
             Parallel.For(0, numStreams, streamId =>
             {
-                var eventOffset = -1;
                 var streamName = streamId.ToString();
 
                 for (var commitId = 0; commitId < numCommits; commitId++)
                 {
-                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset, new[] { Helper.CreateEventData() }).Wait();
-                    eventOffset++;
+                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, new[] { Helper.CreateEventData() }).Wait();
                 }
             });
 
