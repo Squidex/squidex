@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
         private const long AnyVersion = long.MinValue;
-        private const int AppendTimeoutMs = 1000000;
+        private const int AppendTimeoutMs = 5000;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
         private static readonly FieldDefinition<MongoEventCommit, long> EventsCountField = Fields.Build(x => x.EventsCount);
@@ -149,6 +149,8 @@ namespace Squidex.Infrastructure.CQRS.Events
                     await Collection.InsertOneAsync(commit, new InsertOneOptions(), cts.Token);
 
                     notifier.NotifyEventsStored();
+
+                    return;
                 }
                 catch (MongoWriteException ex)
                 {
