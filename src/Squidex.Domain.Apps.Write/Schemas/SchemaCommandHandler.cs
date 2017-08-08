@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Schemas.Services;
@@ -13,7 +14,6 @@ using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             {
                 s.Create(command);
 
-                context.Succeed(EntityCreatedResult.Create(s.Id, s.Version));
+                context.Complete(EntityCreatedResult.Create(s.Id, s.Version));
             });
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             {
                 s.AddField(command);
 
-                context.Succeed(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
+                context.Complete(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 
@@ -125,9 +125,12 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Unpublish(command));
         }
 
-        public Task<bool> HandleAsync(CommandContext context)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
+            if (!await this.DispatchActionAsync(context.Command, context))
+            {
+                await next();
+            }
         }
     }
 }

@@ -8,19 +8,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {
-        private readonly IEnumerable<ICommandHandler> handlers;
+        private readonly List<ICommandHandler> handlers;
 
         public InMemoryCommandBus(IEnumerable<ICommandHandler> handlers)
         {
             Guard.NotNull(handlers, nameof(handlers));
 
-            this.handlers = handlers;
+            this.handlers = handlers.Reverse().ToList();
         }
 
         public async Task<CommandContext> PublishAsync(ICommand command)
@@ -29,29 +31,21 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var context = new CommandContext(command);
 
+            var next = new Func<Task>(() => TaskHelper.Done);
+
             foreach (var handler in handlers)
             {
-                try
-                {
-                    var isHandled = await handler.HandleAsync(context);
-
-                    if (isHandled)
-                    {
-                        context.Succeed();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    context.Fail(ex);
-                }
+                next = Join(handler, context, next);
             }
 
-            if (context.Exception != null)
-            {
-                throw context.Exception;
-            }
+            await next();
 
             return context;
+        }
+
+        private static Func<Task> Join(ICommandHandler handler, CommandContext context, Func<Task> next)
+        {
+            return () => handler.HandleAsync(context, next);
         }
     }
 }

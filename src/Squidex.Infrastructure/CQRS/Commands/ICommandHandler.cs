@@ -6,12 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface ICommandHandler
     {
-        Task<bool> HandleAsync(CommandContext context);
+        Task HandleAsync(CommandContext context, Func<Task> next);
     }
 }

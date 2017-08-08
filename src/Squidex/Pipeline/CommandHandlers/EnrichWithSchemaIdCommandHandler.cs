@@ -20,19 +20,19 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithSchemaIdHandler : ICommandHandler
+    public sealed class EnrichWithSchemaIdCommandHandler : ICommandHandler
     {
         private readonly ISchemaProvider schemas;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithSchemaIdHandler(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaIdCommandHandler(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
         {
             this.schemas = schemas;
 
             this.actionContextAccessor = actionContextAccessor;
         }
 
-        public async Task<bool> HandleAsync(CommandContext context)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.Command is SchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
@@ -62,7 +62,7 @@ namespace Squidex.Pipeline.CommandHandlers
                 }
             }
 
-            return false;
+            await next();
         }
     }
 }

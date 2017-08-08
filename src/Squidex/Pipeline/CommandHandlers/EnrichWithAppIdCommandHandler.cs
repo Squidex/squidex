@@ -12,22 +12,21 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Write;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable InvertIf
 
 namespace Squidex.Pipeline.CommandHandlers
 {
-    public sealed class EnrichWithAppIdHandler : ICommandHandler
+    public sealed class EnrichWithAppIdCommandHandler : ICommandHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithAppIdHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithAppIdCommandHandler(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<bool> HandleAsync(CommandContext context)
+        public Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.Command is AppCommand appCommand && appCommand.AppId == null)
             {
@@ -41,7 +40,7 @@ namespace Squidex.Pipeline.CommandHandlers
                 appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
             }
 
-            return TaskHelper.False;
+            return next();
         }
     }
 }

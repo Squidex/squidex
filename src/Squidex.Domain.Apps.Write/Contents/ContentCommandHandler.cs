@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
-using Squidex.Infrastructure.Tasks;
 
 // ReSharper disable ConvertToLambdaExpression
 
@@ -63,7 +62,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             {
                 c.Create(command);
 
-                context.Succeed(EntityCreatedResult.Create(command.Data, c.Version));
+                context.Complete(EntityCreatedResult.Create(command.Data, c.Version));
             });
         }
 
@@ -96,9 +95,12 @@ namespace Squidex.Domain.Apps.Write.Contents
             return handler.UpdateAsync<ContentDomainObject>(context, c => c.Delete(command));
         }
 
-        public Task<bool> HandleAsync(CommandContext context)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
+            if (!await this.DispatchActionAsync(context.Command, context))
+            {
+                await next();
+            }
         }
 
         private async Task ValidateAsync(ContentDataCommand command, Func<string> message, bool enrich = false)

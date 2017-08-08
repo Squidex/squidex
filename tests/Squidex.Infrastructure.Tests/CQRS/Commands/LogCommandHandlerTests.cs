@@ -8,10 +8,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
@@ -19,16 +19,19 @@ namespace Squidex.Infrastructure.CQRS.Commands
     public class LogExceptionHandlerTests
     {
         private readonly MyLog log = new MyLog();
-        private readonly LogExceptionHandler sut;
+        private readonly LogCommandHandler sut;
         private readonly ICommand command = A.Dummy<ICommand>();
 
         private sealed class MyLog : ISemanticLog
         {
-            public HashSet<SemanticLogLevel> LogLevels { get; } = new HashSet<SemanticLogLevel>();
+            public int LogCount { get; private set; }
+
+            public Dictionary<SemanticLogLevel, int> LogLevels { get; } = new Dictionary<SemanticLogLevel, int>();
 
             public void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action)
             {
-                LogLevels.Add(logLevel);
+                LogCount++;
+                LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
             }
 
             public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
@@ -39,33 +42,38 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public LogExceptionHandlerTests()
         {
-            sut = new LogExceptionHandler(log);
+            sut = new LogCommandHandler(log);
         }
 
         [Fact]
-        public async Task Should_do_nothing_if_command_is_succeeded()
+        public async Task Should_log_before_and_after_request()
         {
             var context = new CommandContext(command);
 
-            context.Succeed();
+            await sut.HandleAsync(context, () =>
+            {
+                context.Complete(true);
 
-            var isHandled = await sut.HandleAsync(context);
+                return TaskHelper.Done;
+            });
 
-            Assert.False(isHandled);
-            Assert.Equal(0, log.LogLevels.Count);
+            Assert.Equal(3, log.LogCount);
+            Assert.Equal(3, log.LogLevels[SemanticLogLevel.Information]);
         }
 
         [Fact]
-        public async Task Should_log_if_command_failed()
+        public async Task Should_log_error_if_command_failed()
         {
             var context = new CommandContext(command);
 
-            context.Fail(new InvalidOperationException());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await sut.HandleAsync(context, () => throw new InvalidOperationException());
+            });
 
-            var isHandled = await sut.HandleAsync(context);
-
-            Assert.False(isHandled);
-            Assert.Equal(new[] { SemanticLogLevel.Error }, log.LogLevels.ToArray());
+            Assert.Equal(3, log.LogCount);
+            Assert.Equal(2, log.LogLevels[SemanticLogLevel.Information]);
+            Assert.Equal(1, log.LogLevels[SemanticLogLevel.Error]);
         }
 
         [Fact]
@@ -73,10 +81,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             var context = new CommandContext(command);
 
-            var isHandled = await sut.HandleAsync(context);
+            await sut.HandleAsync(context, () => TaskHelper.Done);
 
-            Assert.False(isHandled);
-            Assert.Equal(new[] { SemanticLogLevel.Fatal }, log.LogLevels.ToArray());
+            Assert.Equal(4, log.LogCount);
+            Assert.Equal(3, log.LogLevels[SemanticLogLevel.Information]);
+            Assert.Equal(1, log.LogLevels[SemanticLogLevel.Fatal]);
         }
     }
 }

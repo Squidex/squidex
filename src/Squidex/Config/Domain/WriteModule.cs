@@ -31,7 +31,7 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EnrichWithExpectedVersionHandler>()
+            builder.RegisterType<ETagCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
@@ -39,15 +39,15 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithActorHandler>()
+            builder.RegisterType<EnrichWithActorCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithAppIdHandler>()
+            builder.RegisterType<EnrichWithAppIdCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithSchemaIdHandler>()
+            builder.RegisterType<EnrichWithSchemaIdCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 
@@ -71,7 +71,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandHandler>()
                 .SingleInstance();
 
-            builder.RegisterType<SetVersionAsETagHandler>()
+            builder.RegisterType<ETagCommandHandler>()
                 .As<ICommandHandler>()
                 .SingleInstance();
 

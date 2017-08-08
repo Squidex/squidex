@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services;
@@ -13,7 +14,6 @@ using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 // ReSharper disable InvertIf
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             {
                 a.Create(command);
 
-                context.Succeed(EntityCreatedResult.Create(a.Id, a.Version));
+                context.Complete(EntityCreatedResult.Create(a.Id, a.Version));
             });
         }
 
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                         a.ChangePlan(command);
                     }
 
-                    context.Succeed(result);
+                    context.Complete(result);
                 }
             });
         }
@@ -160,9 +160,12 @@ namespace Squidex.Domain.Apps.Write.Apps
             return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateLanguage(command));
         }
 
-        public Task<bool> HandleAsync(CommandContext context)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            return context.IsHandled ? TaskHelper.False : this.DispatchActionAsync(context.Command, context);
+            if (!await this.DispatchActionAsync(context.Command, context))
+            {
+                await next();
+            }
         }
     }
 }

@@ -50,9 +50,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             await SaveAsync(aggregate);
 
-            if (!context.IsHandled)
+            if (!context.IsCompleted)
             {
-                context.Succeed(new EntityCreatedResult<Guid>(aggregate.Id, aggregate.Version));
+                context.Complete(new EntityCreatedResult<Guid>(aggregate.Id, aggregate.Version));
             }
 
             return aggregate;
@@ -70,9 +70,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             await SaveAsync(aggregate);
 
-            if (!context.IsHandled)
+            if (!context.IsCompleted)
             {
-                context.Succeed(new EntitySavedResult(aggregate.Version));
+                context.Complete(new EntitySavedResult(aggregate.Version));
             }
 
             return aggregate;

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithTimestampHandlerTests.cs
+//  EnrichWithTimestampCommandHandlerTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class EnrichWithTimestampHandlerTests
+    public sealed class EnrichWithTimestampCommandHandlerTests
     {
         private sealed class MyTimestampCommand : ITimestampCommand
         {
@@ -35,9 +35,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var command = new MyTimestampCommand();
 
-            var result = await sut.HandleAsync(new CommandContext(command));
+            await sut.HandleAsync(new CommandContext(command));
 
-            Assert.False(result);
             Assert.Equal(utc, command.Timestamp);
         }
 
@@ -46,9 +45,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             var sut = new EnrichWithTimestampHandler(clock);
 
-            var result = await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>()));
-
-            Assert.False(result);
+            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>()));
 
             A.CallTo(() => clock.GetCurrentInstant()).MustNotHaveHappened();
         }

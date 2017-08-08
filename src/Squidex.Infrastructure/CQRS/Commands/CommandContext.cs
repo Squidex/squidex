@@ -14,7 +14,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
     {
         private readonly ICommand command;
         private readonly Guid contextId = Guid.NewGuid();
-        private Exception exception;
         private Tuple<object> result;
 
         public ICommand Command
@@ -22,29 +21,14 @@ namespace Squidex.Infrastructure.CQRS.Commands
             get { return command; }
         }
 
-        public bool IsHandled
-        {
-            get { return IsSucceeded || IsFailed; }
-        }
-
-        public bool IsFailed
-        {
-            get { return exception != null; }
-        }
-
-        public bool IsSucceeded
-        {
-            get { return result != null; }
-        }
-
-        public Exception Exception
-        {
-            get { return exception; }
-        }
-
         public Guid ContextId
         {
             get { return contextId; }
+        }
+
+        public bool IsCompleted
+        {
+            get { return result != null; }
         }
 
         public CommandContext(ICommand command)
@@ -54,24 +38,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.command = command;
         }
 
-        public void Succeed(object resultValue = null)
+        public void Complete(object resultValue = null)
         {
-            if (IsHandled)
-            {
-                return;
-            }
-
             result = Tuple.Create(resultValue);
-        }
-
-        public void Fail(Exception handlerException)
-        {
-            if (IsFailed)
-            {
-                return;
-            }
-
-            exception = handlerException;
         }
 
         public T Result<T>()
