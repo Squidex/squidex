@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Create_async_should_create_domain_object_and_save()
         {
-            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), domainObject.Id))
+            A.CallTo(() => factory.CreateNew<MyDomainObject>(domainObject.Id))
                 .Returns(domainObject);
 
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Create_sync_should_create_domain_object_and_save()
         {
-            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), domainObject.Id))
+            A.CallTo(() => factory.CreateNew<MyDomainObject>(domainObject.Id))
                 .Returns(domainObject);
 
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))

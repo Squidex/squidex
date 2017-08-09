@@ -10,7 +10,7 @@ Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in p
 
 ## Status
 
-Current Version 1.0-beta2
+Current Version 1.0-beta3. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 
 ## Prerequisites
 

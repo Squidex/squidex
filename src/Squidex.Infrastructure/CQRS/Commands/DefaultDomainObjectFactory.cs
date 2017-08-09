@@ -23,19 +23,18 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.serviceProvider = serviceProvider;
         }
 
-        public IAggregate CreateNew(Type type, Guid id)
+        public T CreateNew<T>(Guid id) where T : IAggregate
         {
-            var factoryFunctionType = typeof(DomainObjectFactoryFunction<>).MakeGenericType(type);
-            var factoryFunction = (Delegate)serviceProvider.GetService(factoryFunctionType);
+            var factoryFunction = (DomainObjectFactoryFunction<T>)serviceProvider.GetService(typeof(DomainObjectFactoryFunction<T>));
 
-            var aggregate = (IAggregate)factoryFunction.DynamicInvoke(id);
+            var domainObject = factoryFunction.Invoke(id);
 
-            if (aggregate.Version != -1)
+            if (domainObject.Version != -1)
             {
                 throw new InvalidOperationException("Must have a version of -1");
             }
 
-            return aggregate;
+            return domainObject;
         }
     }
 }

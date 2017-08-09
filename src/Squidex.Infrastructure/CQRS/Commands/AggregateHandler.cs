@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Guard.NotNull(context, nameof(context));
 
             var aggregateCommand = GetCommand(context);
-            var aggregate = (T)domainObjectFactory.CreateNew(typeof(T), aggregateCommand.AggregateId);
+            var aggregate = domainObjectFactory.CreateNew<T>(aggregateCommand.AggregateId);
 
             await creator(aggregate);
 

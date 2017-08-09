@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var id = Guid.NewGuid();
 
-            var domainObject = sut.CreateNew(typeof(DO), id);
+            var domainObject = sut.CreateNew<DO>(id);
 
             Assert.Equal(id, domainObject.Id);
             Assert.Equal(-1, domainObject.Version);
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             var sut = new DefaultDomainObjectFactory(serviceProvider);
 
-            Assert.Throws<InvalidOperationException>(() => sut.CreateNew(typeof(DO), Guid.NewGuid()));
+            Assert.Throws<InvalidOperationException>(() => sut.CreateNew<DO>(Guid.NewGuid()));
         }
     }
 }

@@ -38,22 +38,22 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.nameResolver = nameResolver;
         }
 
-        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, long? expectedVersion = null) where TDomainObject : class, IAggregate
+        public async Task<T> GetByIdAsync<T>(Guid id, long? expectedVersion = null) where T : class, IAggregate
         {
-            var streamName = nameResolver.GetStreamName(typeof(TDomainObject), id);
+            var streamName = nameResolver.GetStreamName(typeof(T), id);
 
             var events = await eventStore.GetEventsAsync(streamName);
 
             if (events.Count == 0)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(TDomainObject));
+                throw new DomainObjectNotFoundException(id.ToString(), typeof(T));
             }
 
-            var domainObject = (TDomainObject)factory.CreateNew(typeof(TDomainObject), id);
+            var domainObject = factory.CreateNew<T>(id);
 
             foreach (var storedEvent in events)
             {
-                var envelope = ParseOrNull(storedEvent);
+                var envelope = ParseKnownCommand(storedEvent);
 
                 if (envelope != null)
                 {
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             if (expectedVersion != null && domainObject.Version != expectedVersion.Value)
             {
-                throw new DomainObjectVersionException(id.ToString(), typeof(TDomainObject), domainObject.Version, expectedVersion.Value);
+                throw new DomainObjectVersionException(id.ToString(), typeof(T), domainObject.Version, expectedVersion.Value);
             }
 
             return domainObject;
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             }
         }
 
-        private Envelope<IEvent> ParseOrNull(StoredEvent storedEvent)
+        private Envelope<IEvent> ParseKnownCommand(StoredEvent storedEvent)
         {
             try
             {

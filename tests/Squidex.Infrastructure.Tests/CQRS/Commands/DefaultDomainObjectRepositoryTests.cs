@@ -34,9 +34,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             domainObject = new MyDomainObject(aggregateId, 123);
 
-            A.CallTo(() => streamNameResolver.GetStreamName(A<Type>.Ignored, aggregateId)).Returns(streamName);
+            A.CallTo(() => streamNameResolver.GetStreamName(A<Type>.Ignored, aggregateId))
+                .Returns(streamName);
 
-            A.CallTo(() => factory.CreateNew(typeof(MyDomainObject), aggregateId)).Returns(domainObject);
+            A.CallTo(() => factory.CreateNew<MyDomainObject>(aggregateId))
+                .Returns(domainObject);
 
             sut = new DefaultDomainObjectRepository(factory, eventStore, streamNameResolver, eventDataFormatter);
         }
