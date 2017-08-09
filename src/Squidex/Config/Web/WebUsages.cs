@@ -21,9 +21,13 @@ namespace Squidex.Config.Web
     {
         public static void UseMyCors(this IApplicationBuilder app)
         {
-            app.UseCors(builder => builder.AllowAnyOrigin());
-
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
         }
+
         public static void UseMyForwardingRules(this IApplicationBuilder app)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
