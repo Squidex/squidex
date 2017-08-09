@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Assets.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Controllers.Api.Assets.Models
 {
@@ -50,12 +50,12 @@ namespace Squidex.Controllers.Api.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetReplacedDto Create(UpdateAsset command, EntitySavedResult result)
+        public static AssetReplacedDto Create(UpdateAsset command, AssetSavedResult result)
         {
             var response = new AssetReplacedDto
             {
                 FileSize = command.File.FileSize,
-                FileVersion = result.Version,
+                FileVersion = result.FileVersion,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
                 PixelWidth = command.ImageInfo?.PixelWidth,

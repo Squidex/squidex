@@ -8,7 +8,7 @@
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import { ApiUrlConfig, MathHelper, Version } from 'framework';
+import { ApiUrlConfig, MathHelper } from 'framework';
 
 import { UserDto, UsersProviderService } from './../declarations-base';
 
@@ -219,8 +219,8 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: { id: any, version: Version }): string {
-        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.version.value}`);
+    public transform(asset: { id: any, fileVersion: number }): string {
+        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.fileVersion}`);
     }
 }
 

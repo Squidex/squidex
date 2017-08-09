@@ -69,6 +69,8 @@ namespace Squidex.Domain.Apps.Write.Assets
                     a.Update(command);
 
                     await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
+
+                    context.Complete(new AssetSavedResult(a.Version, a.FileVersion));
                 });
 
                 await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), asset.Id.ToString(), asset.FileVersion, null);
