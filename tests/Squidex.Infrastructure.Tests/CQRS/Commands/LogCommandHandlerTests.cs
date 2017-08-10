@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
     public class LogExceptionHandlerTests
     {
         private readonly MyLog log = new MyLog();
-        private readonly LogCommandHandler sut;
+        private readonly LogCommandMiddleware sut;
         private readonly ICommand command = A.Dummy<ICommand>();
 
         private sealed class MyLog : ISemanticLog
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public LogExceptionHandlerTests()
         {
-            sut = new LogCommandHandler(log);
+            sut = new LogCommandMiddleware(log);
         }
 
         [Fact]

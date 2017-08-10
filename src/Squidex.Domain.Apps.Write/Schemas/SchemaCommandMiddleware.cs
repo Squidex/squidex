@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SchemaCommandHandler.cs
+//  SchemaCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -17,12 +17,12 @@ using Squidex.Infrastructure.Dispatching;
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {
-    public class SchemaCommandHandler : ICommandHandler
+    public class SchemaCommandMiddleware : ICommandMiddleware
     {
         private readonly ISchemaProvider schemas;
         private readonly IAggregateHandler handler;
 
-        public SchemaCommandHandler(IAggregateHandler handler, ISchemaProvider schemas)
+        public SchemaCommandMiddleware(IAggregateHandler handler, ISchemaProvider schemas)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(schemas, nameof(schemas));

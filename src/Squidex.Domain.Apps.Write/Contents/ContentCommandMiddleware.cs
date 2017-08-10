@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ContentCommandHandler.cs
+//  ContentCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -25,7 +25,7 @@ using Squidex.Infrastructure.Dispatching;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {
-    public class ContentCommandHandler : ICommandHandler
+    public class ContentCommandMiddleware : ICommandMiddleware
     {
         private readonly IAggregateHandler handler;
         private readonly IAppProvider appProvider;
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IContentRepository contentRepository;
         private readonly ISchemaProvider schemas;
 
-        public ContentCommandHandler(
+        public ContentCommandMiddleware(
             IAggregateHandler handler,
             IAppProvider appProvider,
             IAssetRepository assetRepository,

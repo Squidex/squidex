@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppCommandHandlerTests.cs
+//  AppCommandMiddlewareTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -25,23 +25,23 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Apps
 {
-    public class AppCommandHandlerTests : HandlerTestBase<AppDomainObject>
+    public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject>
     {
         private readonly IAppRepository appRepository = A.Fake<IAppRepository>();
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly AppCommandHandler sut;
+        private readonly AppCommandMiddleware sut;
         private readonly AppDomainObject app;
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
 
-        public AppCommandHandlerTests()
+        public AppCommandMiddlewareTests()
         {
             app = new AppDomainObject(AppId, -1);
 
-            sut = new AppCommandHandler(Handler, appRepository, appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppCommandMiddleware(Handler, appRepository, appPlansProvider, appPlansBillingManager, userResolver);
         }
 
         [Fact]

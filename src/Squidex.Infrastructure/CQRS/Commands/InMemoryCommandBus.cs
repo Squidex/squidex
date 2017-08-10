@@ -16,9 +16,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {
-        private readonly List<ICommandHandler> handlers;
+        private readonly List<ICommandMiddleware> handlers;
 
-        public InMemoryCommandBus(IEnumerable<ICommandHandler> handlers)
+        public InMemoryCommandBus(IEnumerable<ICommandMiddleware> handlers)
         {
             Guard.NotNull(handlers, nameof(handlers));
 
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             return context;
         }
 
-        private static Func<Task> Join(ICommandHandler handler, CommandContext context, Func<Task> next)
+        private static Func<Task> Join(ICommandMiddleware handler, CommandContext context, Func<Task> next)
         {
             return () => handler.HandleAsync(context, next);
         }

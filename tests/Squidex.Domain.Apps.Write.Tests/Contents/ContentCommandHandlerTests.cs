@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ContentCommandHandlerTests.cs
+//  ContentCommandMiddlewareTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -28,9 +28,9 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {
-    public class ContentCommandHandlerTests : HandlerTestBase<ContentDomainObject>
+    public class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomainObject>
     {
-        private readonly ContentCommandHandler sut;
+        private readonly ContentCommandMiddleware sut;
         private readonly ContentDomainObject content;
         private readonly ISchemaProvider schemaProvider = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
 
-        public ContentCommandHandlerTests()
+        public ContentCommandMiddlewareTests()
         {
             var schema =
                 Schema.Create("my-schema", new SchemaProperties())
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandHandler(Handler, appProvider, A.Dummy<IAssetRepository>(), schemaProvider, A.Dummy<IContentRepository>());
+            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemaProvider, A.Dummy<IContentRepository>());
 
             A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
             A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());

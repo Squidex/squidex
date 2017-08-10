@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SchemaCommandHandlerTests.cs
+//  SchemaCommandMiddlewareTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -23,19 +23,19 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {
-    public class SchemaCommandHandlerTests : HandlerTestBase<SchemaDomainObject>
+    public class SchemaCommandMiddlewareTests : HandlerTestBase<SchemaDomainObject>
     {
         private readonly ISchemaProvider schemaProvider = A.Fake<ISchemaProvider>();
-        private readonly SchemaCommandHandler sut;
+        private readonly SchemaCommandMiddleware sut;
         private readonly SchemaDomainObject schema;
         private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly string fieldName = "age";
 
-        public SchemaCommandHandlerTests()
+        public SchemaCommandMiddlewareTests()
         {
             schema = new SchemaDomainObject(SchemaId, -1, registry);
 
-            sut = new SchemaCommandHandler(Handler, schemaProvider);
+            sut = new SchemaCommandMiddleware(Handler, schemaProvider);
         }
 
         [Fact]

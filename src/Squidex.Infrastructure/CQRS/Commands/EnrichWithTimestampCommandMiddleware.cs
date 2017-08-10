@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithTimestampCommandHandler.cs
+//  EnrichWithTimestampCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,7 +12,7 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class EnrichWithTimestampHandler : ICommandHandler
+    public sealed class EnrichWithTimestampHandler : ICommandMiddleware
     {
         private readonly IClock clock;
 

@@ -15,13 +15,13 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandMiddlewares
 {
-    public sealed class EnrichWithAppIdCommandHandler : ICommandHandler
+    public sealed class EnrichWithAppIdCommandMiddleware : ICommandMiddleware
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithAppIdCommandHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithAppIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }

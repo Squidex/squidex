@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithTimestampCommandHandlerTests.cs
+//  EnrichWithTimestampCommandMiddlewareTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class EnrichWithTimestampCommandHandlerTests
+    public sealed class EnrichWithTimestampCommandMiddlewareTests
     {
         private sealed class MyTimestampCommand : ITimestampCommand
         {

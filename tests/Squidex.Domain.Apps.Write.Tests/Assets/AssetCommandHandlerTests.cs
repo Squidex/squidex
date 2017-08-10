@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetCommandHandlerTests.cs
+//  AssetCommandMiddlewareTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -22,24 +22,24 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Assets
 {
-    public class AssetCommandHandlerTests : HandlerTestBase<AssetDomainObject>
+    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject>
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly AssetCommandHandler sut;
+        private readonly AssetCommandMiddleware sut;
         private readonly AssetDomainObject asset;
         private readonly Guid assetId = Guid.NewGuid();
         private readonly Stream stream = new MemoryStream();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly AssetFile file;
 
-        public AssetCommandHandlerTests()
+        public AssetCommandMiddlewareTests()
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
             asset = new AssetDomainObject(assetId, -1);
 
-            sut = new AssetCommandHandler(Handler, assetStore, assetThumbnailGenerator);
+            sut = new AssetCommandMiddleware(Handler, assetStore, assetThumbnailGenerator);
         }
 
         [Fact]

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithActorCommandHandler.cs
+//  EnrichWithActorCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -17,13 +17,13 @@ using Squidex.Infrastructure.Security;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandMiddlewares
 {
-    public class EnrichWithActorCommandHandler : ICommandHandler
+    public class EnrichWithActorCommandMiddleware : ICommandMiddleware
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public EnrichWithActorCommandHandler(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithActorCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }

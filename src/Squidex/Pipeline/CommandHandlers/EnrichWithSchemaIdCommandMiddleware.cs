@@ -18,14 +18,14 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandMiddlewares
 {
-    public sealed class EnrichWithSchemaIdCommandHandler : ICommandHandler
+    public sealed class EnrichWithSchemaIdCommandMiddleware : ICommandMiddleware
     {
         private readonly ISchemaProvider schemas;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithSchemaIdCommandHandler(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaIdCommandMiddleware(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
         {
             this.schemas = schemas;
 

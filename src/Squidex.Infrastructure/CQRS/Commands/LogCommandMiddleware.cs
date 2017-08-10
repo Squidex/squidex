@@ -12,11 +12,11 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class LogCommandHandler : ICommandHandler
+    public sealed class LogCommandMiddleware : ICommandMiddleware
     {
         private readonly ISemanticLog log;
 
-        public LogCommandHandler(ISemanticLog log)
+        public LogCommandMiddleware(ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
 

@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Pipeline.CommandHandlers;
+using Squidex.Pipeline.CommandMiddlewares;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -31,48 +31,48 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<ETagCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<ETagCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
             builder.RegisterType<EnrichWithTimestampHandler>()
-                .As<ICommandHandler>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithActorCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithActorCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithAppIdCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithAppIdCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithSchemaIdCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithSchemaIdCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<AppCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<AppCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<AssetCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<AssetCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<ContentCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<ContentCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<SchemaCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<SchemaCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<ETagCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<ETagCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
             builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)))

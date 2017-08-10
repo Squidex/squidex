@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AppCommandHandler.cs
+//  AppCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -20,7 +20,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Write.Apps
 {
-    public class AppCommandHandler : ICommandHandler
+    public class AppCommandMiddleware : ICommandMiddleware
     {
         private readonly IAggregateHandler handler;
         private readonly IAppRepository appRepository;
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppCommandHandler(
+        public AppCommandMiddleware(
             IAggregateHandler handler,
             IAppRepository appRepository,
             IAppPlansProvider appPlansProvider,
