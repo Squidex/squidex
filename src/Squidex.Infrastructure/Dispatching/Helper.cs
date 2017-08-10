@@ -13,6 +13,11 @@ namespace Squidex.Infrastructure.Dispatching
 {
     internal static class Helper
     {
+        public static bool HasRightName(MethodInfo method, string name)
+        {
+            return string.Equals(method.Name, name, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static bool HasRightName(MethodInfo method)
         {
             return string.Equals(method.Name, "On", StringComparison.OrdinalIgnoreCase);
@@ -21,6 +26,11 @@ namespace Squidex.Infrastructure.Dispatching
         public static bool HasRightReturnType<TOut>(MethodInfo method)
         {
             return method.ReturnType == typeof(TOut);
+        }
+
+        public static bool HasRightVoidReturn(MethodInfo method)
+        {
+            return method.ReturnType == typeof(void);
         }
 
         public static bool HasRightParameters<TIn>(MethodInfo method)
