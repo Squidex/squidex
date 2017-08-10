@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface IDomainObjectRepository
     {
-        Task<T> GetByIdAsync<T>(Guid id, long? expectedVersion = null) where T : class, IAggregate;
+        Task LoadAsync(IAggregate domainObject, long? expectedVersion = null);
 
         Task SaveAsync(IAggregate domainObject, ICollection<Envelope<IEvent>> events, Guid commitId);
     }

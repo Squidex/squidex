@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Pipeline.CommandMiddlewares
+namespace Squidex.Pipeline.CommandHandlers
 {
     public class ETagCommandMiddleware : ICommandMiddleware
     {

@@ -53,7 +53,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
         private readonly CommandContext context;
-        private readonly MyCommand command;
         private readonly AggregateHandler sut;
         private readonly MyDomainObject domainObject;
 
@@ -66,20 +65,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                     .RaiseNewEvent(event1)
                     .RaiseNewEvent(event2);
 
-            command = new MyCommand { AggregateId = domainObject.Id };
-            context = new CommandContext(command);
-        }
-
-        [Fact]
-        public void Should_provide_access_to_factory()
-        {
-            Assert.Equal(factory, sut.Factory);
-        }
-
-        [Fact]
-        public void Should_provide_access_to_repository()
-        {
-            Assert.Equal(repository, sut.Repository);
+            context = new CommandContext(new MyCommand { AggregateId = domainObject.Id });
         }
 
         [Fact]
@@ -143,8 +129,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Update_async_should_create_domain_object_and_save()
         {
-            A.CallTo(() => repository.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
-                .Returns(Task.FromResult(domainObject));
+            A.CallTo(() => factory.CreateNew<MyDomainObject>(domainObject.Id))
+                .Returns(domainObject);
 
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
                 .Returns(TaskHelper.Done);
@@ -161,14 +147,15 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
+            A.CallTo(() => repository.LoadAsync(domainObject, null)).MustHaveHappened();
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Update_sync_should_create_domain_object_and_save()
         {
-            A.CallTo(() => repository.GetByIdAsync<MyDomainObject>(command.AggregateId, null))
-                .Returns(Task.FromResult(domainObject));
+            A.CallTo(() => factory.CreateNew<MyDomainObject>(domainObject.Id))
+                .Returns(domainObject);
 
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored))
                 .Returns(TaskHelper.Done);
@@ -183,6 +170,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
+            A.CallTo(() => repository.LoadAsync(domainObject, null)).MustHaveHappened();
             A.CallTo(() => repository.SaveAsync(domainObject, A<ICollection<Envelope<IEvent>>>.Ignored, A<Guid>.Ignored)).MustHaveHappened();
         }
     }

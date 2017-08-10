@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => factory.CreateNew<MyDomainObject>(aggregateId))
                 .Returns(domainObject);
 
-            sut = new DefaultDomainObjectRepository(factory, eventStore, streamNameResolver, eventDataFormatter);
+            sut = new DefaultDomainObjectRepository(eventStore, streamNameResolver, eventDataFormatter);
         }
 
         public sealed class MyEvent : IEvent
@@ -77,7 +77,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(new List<StoredEvent>()));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(domainObject, -1));
         }
 
         [Fact]
@@ -103,9 +103,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => eventDataFormatter.Parse(eventData2))
                 .Returns(new Envelope<IEvent>(event2));
 
-            var result = await sut.GetByIdAsync<MyDomainObject>(aggregateId);
+            await sut.LoadAsync(domainObject);
 
-            Assert.Equal(result.AppliedEvents, new[] { event1, event2 });
+            Assert.Equal(domainObject.AppliedEvents, new[] { event1, event2 });
         }
 
         [Fact]
@@ -131,7 +131,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => eventDataFormatter.Parse(eventData2))
                 .Returns(new Envelope<IEvent>(event2));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetByIdAsync<MyDomainObject>(aggregateId, 200));
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.LoadAsync(domainObject, 200));
         }
 
         [Fact]

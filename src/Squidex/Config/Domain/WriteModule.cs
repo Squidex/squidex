@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Pipeline.CommandMiddlewares;
+using Squidex.Pipeline.CommandHandlers;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 

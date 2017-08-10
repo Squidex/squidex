@@ -27,14 +27,15 @@ namespace Squidex.Infrastructure.Dispatching
                         BindingFlags.Public |
                         BindingFlags.NonPublic |
                         BindingFlags.Instance)
-                    .Where(m => Helper.HasRightName(m, methodName))
-                    .Where(m => Helper.HasRightParameters<TIn>(m))
-                    .Where(m => Helper.HasRightReturnType<TOut>(m))
+                    .Where(m =>
+                        m.HasMatchingName(methodName) &&
+                        m.HasMatchingParameters<TIn>() &&
+                        m.HasMatchingReturnType(typeof(TOut)))
                     .Select(m =>
                     {
                         var inputType = m.GetParameters()[0].ParameterType;
 
-                        var factoryMethod =
+                        var handler =
                             typeof(FuncDispatcher<TTarget, TIn, TOut>)
                                 .GetMethod(nameof(Factory),
                                     BindingFlags.Static |
@@ -42,7 +43,7 @@ namespace Squidex.Infrastructure.Dispatching
                                 .MakeGenericMethod(inputType)
                                 .Invoke(null, new object[] { m });
 
-                        return (inputType, factoryMethod);
+                        return (inputType, handler);
                     })
                     .ToDictionary(m => m.Item1, h => (FuncDelegate<TIn>)h.Item2);
 
