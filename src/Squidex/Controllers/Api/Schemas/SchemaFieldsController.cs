@@ -98,7 +98,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 204 => Schema field updated.
-        /// 400 => Schema field properties not valid.
+        /// 400 => Schema field properties not valid or field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
@@ -109,6 +109,33 @@ namespace Squidex.Controllers.Api.Schemas
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
             var command = new UpdateField { FieldId = id, Properties = request.Properties.ToProperties() };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Lock a schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the field to lock.</param>
+        /// <returns>
+        /// 204 => Schema field shown.
+        /// 400 => Schema field already locked.
+        /// 404 => Schema, field or app not found.
+        /// </returns>
+        /// <remarks>
+        /// A hidden field is not part of the API response, but can still be edited in the portal.
+        /// </remarks>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/fields/{id:long}/lock/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> LockField(string app, string name, long id)
+        {
+            var command = new LockField { FieldId = id };
 
             await CommandBus.PublishAsync(command);
 
@@ -127,7 +154,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A hidden field is not part of the API response, but can still be edited in the portal.
+        /// A locked field cannot be edited or deleted.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
@@ -147,7 +174,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the field to shows.</param>
+        /// <param name="id">The id of the field to show.</param>
         /// <returns>
         /// 204 => Schema field shown.
         /// 400 => Schema field already visible.
@@ -233,6 +260,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
         /// 204 => Schema field deleted.
+        /// 400 => Field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]

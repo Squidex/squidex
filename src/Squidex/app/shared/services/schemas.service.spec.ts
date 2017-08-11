@@ -103,8 +103,8 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should update fields property and user info when adding field', () => {
-        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
-        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+        const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2', false, false, false, 'l', createProperties('Number'));
 
         const now = DateTime.now();
 
@@ -117,8 +117,8 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should update fields property and user info when removing field', () => {
-        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
-        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+        const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2',false,  false, false, 'l', createProperties('Number'));
 
         const now = DateTime.now();
 
@@ -131,8 +131,8 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should update fields property and user info when replacing fields', () => {
-        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
-        const field2 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
+        const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
+        const field2 = new FieldDto(2, '2', false, false, false, 'l', createProperties('Number'));
 
         const now = DateTime.now();
 
@@ -145,16 +145,16 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should update fields property and user info when updating field', () => {
-        const field1 = new FieldDto(1, '1', false, false, 'l', createProperties('String'));
-        const field2_1 = new FieldDto(2, '2', false, false, 'l', createProperties('Number'));
-        const field2_2 = new FieldDto(2, '2', false, false, 'l', createProperties('Boolean'));
+        const field1_0 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
+        const field2_1 = new FieldDto(2, '2', false, false, false, 'l', createProperties('Number'));
+        const field2_2 = new FieldDto(2, '2', false, false, false, 'l', createProperties('Boolean'));
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2_1]);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1_0, field2_1]);
         const schema_2 = schema_1.updateField(field2_2, 'me', now);
 
-        expect(schema_2.fields).toEqual([field1, field2_2]);
+        expect(schema_2.fields).toEqual([field1_0, field2_2]);
         expect(schema_2.lastModified).toEqual(now);
         expect(schema_2.lastModifiedBy).toEqual('me');
     });
@@ -276,6 +276,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 1,
                     name: 'field1',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -286,6 +287,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 2,
                     name: 'field2',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -296,6 +298,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 3,
                     name: 'field3',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -306,6 +309,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 4,
                     name: 'field4',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -316,6 +320,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 5,
                     name: 'field5',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -326,6 +331,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 6,
                     name: 'field6',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -336,6 +342,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 7,
                     name: 'field7',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -346,6 +353,7 @@ describe('SchemasService', () => {
                 {
                     fieldId: 8,
                     name: 'field8',
+                    isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
@@ -362,14 +370,14 @@ describe('SchemasService', () => {
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('11'),
                 [
-                    new FieldDto(1, 'field1', true, true, 'language', createProperties('Number')),
-                    new FieldDto(2, 'field2', true, true, 'language', createProperties('String')),
-                    new FieldDto(3, 'field3', true, true, 'language', createProperties('Boolean')),
-                    new FieldDto(4, 'field4', true, true, 'language', createProperties('DateTime')),
-                    new FieldDto(5, 'field5', true, true, 'language', createProperties('Json')),
-                    new FieldDto(6, 'field6', true, true, 'language', createProperties('Geolocation')),
-                    new FieldDto(7, 'field7', true, true, 'language', createProperties('Assets')),
-                    new FieldDto(8, 'field8', true, true, 'language', createProperties('References'))
+                    new FieldDto(1, 'field1', true, true, true, 'language', createProperties('Number')),
+                    new FieldDto(2, 'field2', true, true, true, 'language', createProperties('String')),
+                    new FieldDto(3, 'field3', true, true, true, 'language', createProperties('Boolean')),
+                    new FieldDto(4, 'field4', true, true, true, 'language', createProperties('DateTime')),
+                    new FieldDto(5, 'field5', true, true, true, 'language', createProperties('Json')),
+                    new FieldDto(6, 'field6', true, true, true, 'language', createProperties('Geolocation')),
+                    new FieldDto(7, 'field7', true, true, true, 'language', createProperties('Assets')),
+                    new FieldDto(8, 'field8', true, true, true, 'language', createProperties('References'))
                 ]));
     }));
 
@@ -437,7 +445,7 @@ describe('SchemasService', () => {
         req.flush({ id: 123 });
 
         expect(field).toEqual(
-            new FieldDto(123, dto.name, false, false, dto.partitioning, dto.properties));
+            new FieldDto(123, dto.name, false, false, false, dto.partitioning, dto.properties));
     }));
 
     it('should make put request to update schema',
@@ -530,6 +538,19 @@ describe('SchemasService', () => {
         schemasService.disableField('my-app', 'my-schema', 1, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to lock field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.lockField('my-app', 'my-schema', 1, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

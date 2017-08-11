@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
 
         public bool IsHidden { get; set; }
 
+        public bool IsLocked { get; set; }
+
         public bool IsDisabled { get; set; }
 
         public FieldProperties Properties { get; set; }

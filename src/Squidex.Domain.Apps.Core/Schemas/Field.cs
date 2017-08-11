@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private string fieldName;
         private bool isDisabled;
         private bool isHidden;
+        private bool isLocked;
 
         public long Id
         {
@@ -37,6 +38,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string Name
         {
             get { return fieldName; }
+        }
+
+        public bool IsLocked
+        {
+            get { return isLocked; }
         }
 
         public bool IsHidden
@@ -75,9 +81,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             validators = new Lazy<List<IValidator>>(() => new List<IValidator>(CreateValidators()));
         }
 
-        public abstract Field Update(FieldProperties newProperties);
+        protected abstract Field UpdateInternal(FieldProperties newProperties);
 
         public abstract object ConvertValue(JToken value);
+
+        public Field Lock()
+        {
+            return Clone<Field>(clone => clone.isLocked = true);
+        }
 
         public Field Hide()
         {
@@ -99,7 +110,30 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone<Field>(clone => clone.isDisabled = false);
         }
 
+        public Field Update(FieldProperties newProperties)
+        {
+            ThrowIfLocked();
+
+            return UpdateInternal(newProperties);
+        }
+
         public Field Rename(string newName)
+        {
+            ThrowIfLocked();
+            ThrowIfSameName(newName);
+
+            return Clone<Field>(clone => clone.fieldName = newName);
+        }
+
+        private void ThrowIfLocked()
+        {
+            if (isLocked)
+            {
+                throw new DomainException($"Field {fieldId} is locked.");
+            }
+        }
+
+        private void ThrowIfSameName(string newName)
         {
             if (!newName.IsSlug())
             {
@@ -107,8 +141,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
                 throw new ValidationException($"Cannot rename the field '{fieldName}' ({fieldId})", error);
             }
-
-            return Clone<Field>(clone => clone.fieldName = newName);
         }
 
         public void AddToEdmType(EdmStructuredType edmType, PartitionResolver partitionResolver, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)

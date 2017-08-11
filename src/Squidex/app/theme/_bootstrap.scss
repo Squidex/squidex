@@ -19,6 +19,49 @@ h3 {
 }
 
 //
+// Bade colors
+//
+.badge {
+    & {
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .3rem .6rem;
+    }
+
+    &-default {
+        color: $color-badge-default-foreground;
+    }
+
+    &-primary {
+        color: $color-badge-primary-foreground;
+    }
+
+    &-success {
+        color: $color-badge-success-foreground;
+    }
+
+    &-info {
+        color: $color-badge-info-foreground;
+    }
+
+    &-warning {
+        color: $color-badge-warning-foreground;
+    }
+
+    &-danger {
+        color: $color-badge-danger-foreground;
+    }
+}
+
+a {
+    &:disabled,
+    &.disabled {
+        @include opacity(.8);
+        pointer-events: none;
+    }
+}
+
+//
 // Fix navbar.
 // 
 .navbar {
@@ -67,6 +110,11 @@ h3 {
 
             &:active {
                 background: $color-theme-error-dark;
+            }
+
+            &:disabled,
+            &.disabled {
+                color: lighten($color-theme-error, 20%);
             }
         }
 

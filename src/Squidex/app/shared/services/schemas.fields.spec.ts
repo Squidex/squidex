@@ -20,6 +20,13 @@ import {
 } from './../';
 
 describe('FieldDto', () => {
+    it('should update isLocked property when locking', () => {
+        const field_1 = createField(createProperties('String'));
+        const field_2 = field_1.lock();
+
+        expect(field_2.isLocked).toBeTruthy();
+    });
+
     it('should update isHidden property when hiding', () => {
         const field_1 = createField(createProperties('String'));
         const field_2 = field_1.hide();
@@ -211,5 +218,5 @@ describe('NumberField', () => {
 });
 
 function createField(properties: FieldPropertiesDto) {
-    return new FieldDto(1, 'field1', false, false, 'languages', properties);
+    return new FieldDto(1, 'field1', false, false, false, 'languages', properties);
 }
