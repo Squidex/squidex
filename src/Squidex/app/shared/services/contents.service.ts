@@ -182,8 +182,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
-                .do(content => {
-                    this.localCache.set(`content.${content.id}`, content, 5000);
+                .do(() => {
+                    this.localCache.set(`content.${id}`, dto, 5000);
                 })
                 .pretifyError('Failed to update content. Please reload.');
     }
