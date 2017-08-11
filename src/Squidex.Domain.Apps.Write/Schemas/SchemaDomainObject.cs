@@ -65,6 +65,11 @@ namespace Squidex.Domain.Apps.Write.Schemas
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
+        protected void On(FieldLocked @event)
+        {
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+        }
+
         protected void On(FieldHidden @event)
         {
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
@@ -213,6 +218,17 @@ namespace Squidex.Domain.Apps.Write.Schemas
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
+
+            return this;
+        }
+
+        public SchemaDomainObject LockField(LockField command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(command, new FieldLocked());
 
             return this;
         }

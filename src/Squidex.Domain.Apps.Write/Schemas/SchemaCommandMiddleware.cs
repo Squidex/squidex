@@ -80,14 +80,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DeleteField(command));
         }
 
-        protected Task On(DisableField command, CommandContext context)
+        protected Task On(LockField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DisableField(command));
-        }
-
-        protected Task On(EnableField command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.EnableField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.LockField(command));
         }
 
         protected Task On(HideField command, CommandContext context)
@@ -98,6 +93,16 @@ namespace Squidex.Domain.Apps.Write.Schemas
         protected Task On(ShowField command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ShowField(command));
+        }
+
+        protected Task On(DisableField command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DisableField(command));
+        }
+
+        protected Task On(EnableField command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.EnableField(command));
         }
 
         protected Task On(ReorderFields command, CommandContext context)

@@ -42,6 +42,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Id = x.Id,
                         Name = x.Name,
                         IsHidden = x.IsHidden,
+                        IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
                         Partitioning = x.Paritioning.Key,
                         Properties = x.RawProperties
@@ -64,6 +65,11 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                     if (fieldModel.IsDisabled)
                     {
                         field = field.Disable();
+                    }
+
+                    if (fieldModel.IsLocked)
+                    {
+                        field = field.Lock();
                     }
 
                     if (fieldModel.IsHidden)

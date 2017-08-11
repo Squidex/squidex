@@ -7,6 +7,17 @@ $field-header: #e7ebef;
     cursor: default;
 }
 
+.col {
+    &-tags,
+    &-options {
+        white-space: nowrap;
+    }
+
+    &-options {
+        max-width: 140px;
+    }
+}
+
 .field {
     &-icon {
         margin-right: 1rem;

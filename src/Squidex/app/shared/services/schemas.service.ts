@@ -215,6 +215,7 @@ export class FieldDto {
     constructor(
         public readonly fieldId: number,
         public readonly name: string,
+        public readonly isLocked: boolean,
         public readonly isHidden: boolean,
         public readonly isDisabled: boolean,
         public readonly partitioning: string,
@@ -222,24 +223,28 @@ export class FieldDto {
     ) {
     }
 
+    public lock(): FieldDto {
+        return new FieldDto(this.fieldId, this.name, true, this.isHidden, this.isDisabled, this.partitioning, this.properties);
+    }
+
     public show(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, false, this.isDisabled, this.partitioning, this.properties);
+        return new FieldDto(this.fieldId, this.name, this.isLocked, false, this.isDisabled, this.partitioning, this.properties);
     }
 
     public hide(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, true, this.isDisabled, this.partitioning, this.properties);
+        return new FieldDto(this.fieldId, this.name, this.isLocked, true, this.isDisabled, this.partitioning, this.properties);
     }
 
     public enable(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isHidden, false, this.partitioning, this.properties);
+        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, false, this.partitioning, this.properties);
     }
 
     public disable(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isHidden, true, this.partitioning, this.properties);
+        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, true, this.partitioning, this.properties);
     }
 
     public update(properties: FieldPropertiesDto): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isHidden, this.isDisabled, this.partitioning, properties);
+        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, this.isDisabled, this.partitioning, properties);
     }
 
     public formatValue(value: any): string {
@@ -658,6 +663,7 @@ export class SchemasService {
                         return new FieldDto(
                             item.fieldId,
                             item.name,
+                            item.isLocked,
                             item.isHidden,
                             item.isDisabled,
                             item.partitioning,
@@ -727,6 +733,7 @@ export class SchemasService {
                         dto.name,
                         false,
                         false,
+                        false,
                         dto.partitioning,
                         dto.properties);
                 })
@@ -790,6 +797,13 @@ export class SchemasService {
 
         return HTTP.putVersioned(this.http, url, {}, version)
                 .pretifyError('Failed to disable field. Please reload.');
+    }
+
+    public lockField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/lock`);
+
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to lock field. Please reload.');
     }
 
     public showField(appName: string, schemaName: string, fieldId: number, version?: Version): Observable<any> {

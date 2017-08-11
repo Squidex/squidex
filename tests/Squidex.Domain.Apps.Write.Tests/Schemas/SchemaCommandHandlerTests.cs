@@ -168,6 +168,20 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
+        public async Task LockField_should_update_domain_object()
+        {
+            CreateSchema();
+            CreateField();
+
+            var context = CreateContextForCommand(new LockField { FieldId = 1 });
+
+            await TestUpdate(schema, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
         public async Task HideField_should_update_domain_object()
         {
             CreateSchema();

@@ -437,6 +437,54 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
+        public void LockField_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_throw_exception_if_field_is_not_found()
+        {
+            CreateSchema();
+
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 2 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_throw_exception_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_update_schema_and_create_events()
+        {
+            CreateSchema();
+            CreateField();
+
+            sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+
+            Assert.False(sut.Schema.FieldsById[1].IsDisabled);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldLocked { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
         public void HideField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>

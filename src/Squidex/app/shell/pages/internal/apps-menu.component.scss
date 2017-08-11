@@ -51,13 +51,5 @@
 
     &-pill {
         @include absolute(.8rem, .625rem, auto, auto);
-        @include border-radius(8px);
-        padding: 0 .4rem;
-        background: $color-theme-blue-lightest;
-        border: 0;
-        line-height: 1.2rem;
-        font-size: .8rem;
-        font-weight: normal;
-        color: $color-theme-blue;
     }
 }

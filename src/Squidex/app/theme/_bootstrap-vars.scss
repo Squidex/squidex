@@ -1,18 +1,25 @@
 @import '_mixins.scss';
 @import '_vars.scss';
 
-$brand-primary: $color-theme-blue;
-$brand-success: $color-theme-green;
-$brand-danger: $color-theme-error;
+$brand-primary:             $color-theme-blue;
+$brand-success:             $color-theme-green;
+$brand-danger:              $color-theme-error;
 
-$btn-secondary-bg: $color-theme-secondary;
-$btn-secondary-border: $color-theme-secondary;
+$btn-secondary-bg:          $color-theme-secondary;
+$btn-secondary-border:      $color-theme-secondary;
 
-$input-bg-disabled: $color-disabled;
-$input-border-color: $color-input;
-$input-color-placeholder: $color-empty;
+$input-bg-disabled:         $color-disabled;
+$input-border-color:        $color-input;
+$input-color-placeholder:   $color-empty;
 
-$dropdown-border-color: $color-border;
+$badge-default-bg:          $color-badge-default-background;
+$badge-primary-bg:          $color-badge-primary-background;
+$badge-success-bg:          $color-badge-success-background;
+$badge-info-bg:             $color-badge-info-background;
+$badge-warning-bg:          $color-badge-warning-background;
+$badge-danger-bg:           $color-badge-danger-background;
 
-$card-border-color: $color-border;
-$card-cap-bg: #fff;
+$dropdown-border-color:     $color-border;
+
+$card-border-color:         $color-border;
+$card-cap-bg:               $panel-light-background;

@@ -51,7 +51,7 @@
                     <ng-template ngFor let-event [ngForOf]="eventsItems">
                         <tr [class.expanded]="selectedEventId === event.id">
                             <td>
-                                <span class="badge badge-{{event.jobResult | lowercase}}">{{event.jobResult}}</span>
+                                <span class="badge badge-pill badge-{{getBadgeClass(event.jobResult)}}">{{event.jobResult}}</span>
                             </td>
                             <td>
                                 <span class="truncate">{{event.eventName}}</span>
@@ -76,7 +76,7 @@
                                 
                                 <div class="row event-stats">
                                     <div class="col-3">
-                                        <span class="badge badge-small badge-{{event.result | lowercase}}">{{event.result}}</span>
+                                        <span class="badge badge-pill badge-{{getBadgeClass(event.result)}}">{{event.result}}</span>
                                     </div>
                                     <div class="col-3">
                                         Attempts: {{event.numCalls}}

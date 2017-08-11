@@ -48,12 +48,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
-        protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
-        {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
-        }
-
-        protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
+        protected Task On(FieldLocked @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
@@ -64,6 +59,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         }
 
         protected Task On(FieldShown @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+        }
+
+        protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+        }
+
+        protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }

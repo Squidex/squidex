@@ -78,5 +78,17 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
 
         this.load();
     }
+
+    public getBadgeClass(status: string) {
+        if (status === 'Retry') {
+            return 'warning';
+        } else if (status === 'Failed') {
+            return 'danger';
+        } else if (status === 'Pending') {
+            return 'default';
+        } else {
+            return status.toLowerCase();
+        }
+    }
 }
 

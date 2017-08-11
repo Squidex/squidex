@@ -145,11 +145,11 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public showField(field: FieldDto) {
+    public lockField(field: FieldDto) {
         this.appNameOnce()
-            .switchMap(app => this.schemasService.showField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+            .switchMap(app => this.schemasService.lockField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.show(), this.authService.user.token));
+                this.updateSchema(this.schema.updateField(field.lock(), this.authService.user.token));
             }, error => {
                 this.notifyError(error);
             });

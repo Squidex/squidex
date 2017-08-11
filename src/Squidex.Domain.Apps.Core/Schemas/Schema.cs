@@ -101,6 +101,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return UpdateField(fieldId, field => field.Update(newProperties));
         }
 
+        public Schema LockField(long fieldId)
+        {
+            return UpdateField(fieldId, field => field.Lock());
+        }
+
         public Schema DisableField(long fieldId)
         {
             return UpdateField(fieldId, field => field.Disable());
@@ -128,6 +133,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Schema DeleteField(long fieldId)
         {
+            if (fieldsById.TryGetValue(fieldId, out var field) && field.IsLocked)
+            {
+                throw new DomainException($"Field {fieldId} is locked.");
+            }
+
             return new Schema(name, isPublished, properties, fields.Where(x => x.Id != fieldId).ToImmutableList());
         }
 

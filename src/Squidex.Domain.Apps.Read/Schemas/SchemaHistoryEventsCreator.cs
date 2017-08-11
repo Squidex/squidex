@@ -46,17 +46,20 @@ namespace Squidex.Domain.Apps.Read.Schemas
             AddEventMessage<FieldDeleted>(
                 "deleted field {[Field]} from schema {[Name]}");
 
-            AddEventMessage<FieldDisabled>(
-                "disabled field {[Field]} of schema {[Name]}");
-
-            AddEventMessage<FieldEnabled>(
-                "disabled field {[Field]} of schema {[Name]}");
+            AddEventMessage<FieldLocked>(
+                "has locked field {[Field]} of schema {[Name]}");
 
             AddEventMessage<FieldHidden>(
                 "has hidden field {[Field]} of schema {[Name]}");
 
             AddEventMessage<FieldShown>(
                 "has shown field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldDisabled>(
+                "disabled field {[Field]} of schema {[Name]}");
+
+            AddEventMessage<FieldEnabled>(
+                "disabled field {[Field]} of schema {[Name]}");
 
             AddEventMessage<FieldUpdated>(
                 "has updated field {[Field]} of schema {[Name]}");

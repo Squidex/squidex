@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.properties = ValidateProperties(properties);
         }
 
-        public override Field Update(FieldProperties newProperties)
+        protected override Field UpdateInternal(FieldProperties newProperties)
         {
             var typedProperties = ValidateProperties(newProperties);
 

@@ -44,6 +44,11 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
                         field = field.Disable();
                     }
 
+                    if (eventField.IsLocked)
+                    {
+                        field = field.Lock();
+                    }
+
                     schema = schema.AddOrUpdateField(field);
 
                     fieldId++;
@@ -66,6 +71,11 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
         public static Schema Dispatch(FieldUpdated @event, Schema schema)
         {
             return schema.UpdateField(@event.FieldId.Id, @event.Properties);
+        }
+
+        public static Schema Dispatch(FieldLocked @event, Schema schema)
+        {
+            return schema.LockField(@event.FieldId.Id);
         }
 
         public static Schema Dispatch(FieldHidden @event, Schema schema)

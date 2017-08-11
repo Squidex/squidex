@@ -148,6 +148,52 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
+        public void Should_lock_field()
+        {
+            AddField();
+
+            sut = sut.LockField(1);
+
+            Assert.True(sut.FieldsById[1].IsLocked);
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_field_to_lock_does_not_exist()
+        {
+            Assert.Throws<DomainObjectNotFoundException>(() => sut.LockField(1));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_updating_locked_field()
+        {
+            AddField();
+
+            sut = sut.LockField(1);
+
+            Assert.Throws<DomainException>(() => sut.UpdateField(1, new NumberFieldProperties { IsRequired = true }));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_renaming_locked_field()
+        {
+            AddField();
+
+            sut = sut.LockField(1);
+
+            Assert.Throws<DomainException>(() => sut.RenameField(1, "new-name"));
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_deleting_locked_field()
+        {
+            AddField();
+
+            sut = sut.LockField(1);
+
+            Assert.Throws<DomainException>(() => sut.DeleteField(1));
+        }
+
+        [Fact]
         public void Should_rename_field()
         {
             AddField();

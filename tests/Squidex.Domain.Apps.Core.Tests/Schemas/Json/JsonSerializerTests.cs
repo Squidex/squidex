@@ -55,6 +55,9 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
                     .AddOrUpdateField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
+                    .HideField(1)
+                    .LockField(2)
+                    .DisableField(3)
                     .Publish();
 
             var deserialized = sut.Deserialize(sut.Serialize(schema));
