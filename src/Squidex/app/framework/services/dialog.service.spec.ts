@@ -59,6 +59,9 @@ describe('DialogService', () => {
         }, undefined, () => {
             isCompleted = true;
         })
+
+        dialog.complete(true);
+
         expect(isCompleted).toBeTruthy();
         expect(isNext).toBeTruthy();
     });
