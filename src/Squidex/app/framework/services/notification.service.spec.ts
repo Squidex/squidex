@@ -29,7 +29,7 @@ describe('NotificationService', () => {
 
         expect(notification.displayTime).toBe(5000);
         expect(notification.message).toBe('MyError');
-        expect(notification.messageType).toBe('error');
+        expect(notification.messageType).toBe('danger');
     });
 
     it('should create info', () => {

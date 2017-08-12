@@ -4,6 +4,8 @@
 *.vs
 *.log
 
+.vscode
+
 # Build results
 build/
 bin/

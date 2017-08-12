@@ -54,7 +54,7 @@
     &-icon {
         @include absolute(0, auto, auto, 0);
         @include border-radius-left(3px);
-        @include transition(background .4s ease);
+        @include transition(background-color .4s ease);
         background: lighten($color-extern-github, 10%);
         display: inline-block;
         line-height: 44px;
@@ -69,26 +69,8 @@
 .notification {
     &-container {
         @include fixed(auto, .625rem, .625rem, auto);
-        width: 20rem;
+        max-width: 20rem;
+        min-width: 20rem;
         z-index: 100000;
-    }
-
-    &-item {
-        @include border-radius;
-        @include box-shadow;
-        padding: .625rem;
-        margin-top: .625rem;
-        font-size: .8rem;
-        font-weight: normal;
-        color: $color-dark-foreground;
-        cursor: pointer;
-    }
-
-    &-error {
-        background: $color-theme-error;
-    }
-
-    &-info {
-        background: $color-theme-blue;
     }
 }

@@ -21,7 +21,7 @@ export class Notification {
     }
 
     public static error(message: string): Notification {
-        return new Notification(message, 'error');
+        return new Notification(message, 'danger');
     }
 
     public static info(message: string): Notification {

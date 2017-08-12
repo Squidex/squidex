@@ -1,9 +1,31 @@
 @import '_mixins.scss';
 @import '_vars.scss';
 
+$font-size-h1:              1.25rem;
+$font-size-h2:              1.2rem;
+$font-size-h3:              1.15rem;
+$font-size-h4:              1.1rem;
+$font-size-h5:              1.05rem;
+$font-size-h6:              1rem;
+
+$body-bg:                   $color-background;
+
 $brand-primary:             $color-theme-blue;
 $brand-success:             $color-theme-green;
 $brand-danger:              $color-theme-error;
+$brand-warning:             $color-theme-orange;
+
+$alert-success-bg:          $color-theme-green;
+$alert-success-text:        #fff;
+
+$alert-info-bg:             $color-theme-blue;
+$alert-info-text:           #fff;
+
+$alert-warning-bg:          $color-theme-orange;
+$alert-warning-text:        #fff;
+
+$alert-danger-bg:           $color-theme-error;
+$alert-danger-text:         #fff;
 
 $btn-secondary-bg:          $color-theme-secondary;
 $btn-secondary-border:      $color-theme-secondary;

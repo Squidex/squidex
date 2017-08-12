@@ -4,21 +4,6 @@
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
 //
-// Override most common header sizes
-//
-h1 {
-    font-size: 1.3rem;
-}
-
-h2 {
-    font-size: 1.1rem;
-}
-
-h3 {
-    font-size: 1.05rem;
-}
-
-//
 // Bade colors
 //
 .badge {
@@ -53,6 +38,33 @@ h3 {
     }
 }
 
+// 
+// Alert overrides.
+//
+.alert-info,
+.alert-warning,
+.alert-info,
+.alert-danger {
+    .alert-link {
+        color: $color-dark-foreground;
+        font-size: inherit;
+        font-weight: normal;
+        text-decoration: underline;
+    }
+
+    .close {
+        & {
+            font-weight: 400;
+            font-size: 1.6rem;
+        }
+
+        &:hover,
+        &:focus {
+            color: inherit;
+        }
+    }
+}
+
 a {
     &:disabled,
     &.disabled {
@@ -72,6 +84,10 @@ a {
 
     &-nav {
         line-height: 2.2rem;
+    }
+
+    &-toggler {
+        padding: .18rem .6rem;
     }
 
     // Ensure that dropdown is always under nav bar.
@@ -335,9 +351,12 @@ a {
     &-header {
         @include border-radius-top(.3rem);
         background: $color-modal-header-background;
+        font-size: 1rem;
+        font-weight: normal;
+        color: $color-modal-header-foreground;
 
-        h4 {
-            color: $color-modal-header-foreground;
+        h4,
+        h5 {
             font-size: 1rem;
             font-weight: normal;
         }
