@@ -28,7 +28,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 
             if (propertyNames.Length == 3)
             {
-                if (!schema.FieldsByName.TryGetValue(propertyNames[1], out Field field))
+                var edmName = propertyNames[1].Replace("_", "-");
+
+                if (!schema.FieldsByName.TryGetValue(edmName, out Field field))
                 {
                     throw new NotSupportedException();
                 }

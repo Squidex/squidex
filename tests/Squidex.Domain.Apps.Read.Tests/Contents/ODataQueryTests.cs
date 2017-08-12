@@ -46,7 +46,9 @@ namespace Squidex.Domain.Apps.Read.Contents
                 .AddOrUpdateField(new AssetsField(6, "pictures", Partitioning.Invariant,
                     new AssetsFieldProperties()))
                 .AddOrUpdateField(new ReferencesField(7, "friends", Partitioning.Invariant,
-                    new ReferencesFieldProperties()));
+                    new ReferencesFieldProperties()))
+                .AddOrUpdateField(new StringField(8, "dashed-field", Partitioning.Invariant,
+                    new StringFieldProperties()));
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
@@ -81,6 +83,15 @@ namespace Squidex.Domain.Apps.Read.Contents
             var parser = edmModel.ParseQuery("$filter=data/firstName/de eq 'Sebastian'");
 
             Assert.NotNull(parser);
+        }
+
+        [Fact]
+        public void Should_make_query_with_underscore_field()
+        {
+            var i = F("$filter=data/dashed_field/iv eq 'Value'");
+            var o = C("{ 'do.8.iv' : 'Value' }");
+
+            Assert.Equal(o, i);
         }
 
         [Fact]
