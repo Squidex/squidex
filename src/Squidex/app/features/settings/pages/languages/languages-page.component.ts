@@ -14,12 +14,12 @@ import {
     AppLanguageDto,
     AppLanguagesService,
     AppsStoreService,
+    DialogService,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
     LanguageDto,
     LanguagesService,
-    NotificationService,
     Version
 } from 'shared';
 
@@ -42,13 +42,13 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             ]
         });
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly appLanguagesService: AppLanguagesService,
         private readonly languagesService: LanguagesService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

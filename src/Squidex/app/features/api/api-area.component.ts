@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 import {
     AppComponentBase,
     AppsStoreService,
-    NotificationService
+    DialogService
 } from 'shared';
 
 @Component({
@@ -19,8 +19,8 @@ import {
     templateUrl: './api-area.component.html'
 })
 export class ApiAreaComponent extends AppComponentBase {
-    constructor(apps: AppsStoreService, notifications: NotificationService
+    constructor(apps: AppsStoreService, dialogs: DialogService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 }

@@ -11,10 +11,10 @@ import {
     AppComponentBase,
     AppsStoreService,
     ContentDto,
+    DialogService,
     fadeAnimation,
     FieldDto,
     ModalView,
-    NotificationService,
     SchemaDto
 } from 'shared';
 
@@ -60,8 +60,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
     public values: any[] = [];
 
-    constructor(apps: AppsStoreService, notifications: NotificationService) {
-        super(notifications, apps);
+    constructor(apps: AppsStoreService, dialogs: DialogService) {
+        super(dialogs, apps);
     }
 
     public ngOnChanges() {

@@ -13,9 +13,9 @@ import {
     AppClientDto,
     AppClientsService,
     ComponentBase,
+    DialogService,
     fadeAnimation,
-    ModalView,
-    NotificationService
+    ModalView
 } from 'shared';
 
 const ESCAPE_KEY = 27;
@@ -60,11 +60,11 @@ export class ClientComponent extends ComponentBase {
         return this.renameForm.controls['name'].value !== this.client.name;
     }
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly appClientsService: AppClientsService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public cancelRename() {

@@ -15,9 +15,9 @@ import {
     AppsStoreService,
     ContentDto,
     ContentsService,
+    DialogService,
     FieldDto,
     ImmutableArray,
-    NotificationService,
     SchemaDetailsDto,
     SchemasService
 } from 'shared';
@@ -54,11 +54,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     public isDisabled = false;
     public isInvalidSchema = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

@@ -14,10 +14,10 @@ import {
     AppComponentBase,
     AppsStoreService,
     CreateAppClientDto,
+    DialogService,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     UpdateAppClientDto,
     ValidatorsEx,
     Version
@@ -47,12 +47,12 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly appClientsService: AppClientsService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

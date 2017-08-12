@@ -10,12 +10,12 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ComponentBase,
+    DialogService,
     EventConsumerDto,
     EventConsumersService,
     fadeAnimation,
     ImmutableArray,
-    ModalView,
-    NotificationService
+    ModalView
 } from 'shared';
 
 @Component({
@@ -33,10 +33,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnInit
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnInit() {

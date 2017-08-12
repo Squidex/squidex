@@ -17,10 +17,10 @@ import {
     AppsStoreService,
     AuthService,
     AutocompleteSource,
+    DialogService,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     UsersService,
     Version
 } from 'shared';
@@ -81,13 +81,13 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
                 ]]
         });
 
-    constructor(apps: AppsStoreService, notifications: NotificationService, usersService: UsersService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, usersService: UsersService,
         private readonly appContributorsService: AppContributorsService,
         private readonly messageBus: MessageBus,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
 
         this.usersDataSource = new UsersDataSource(usersService, this);
     }

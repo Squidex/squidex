@@ -25,10 +25,10 @@ import {
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
+    DialogService,
     fadeAnimation,
     ModalView,
     MessageBus,
-    NotificationService,
     SchemaDetailsDto,
     Version
 } from 'shared';
@@ -59,14 +59,14 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     public languages: AppLanguageDto[] = [];
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnDestroy() {

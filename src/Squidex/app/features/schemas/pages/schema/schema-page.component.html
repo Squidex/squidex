@@ -22,7 +22,7 @@
                         <i class="icon-dots"></i>
                     </button>
                     <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
-                        <a class="dropdown-item dropdown-item-delete" (click)="confirmDeleteDialog.show()">
+                        <a class="dropdown-item dropdown-item-delete" (sqxConfirmClick)="deleteSchema()" confirmTitle="Delete schema" confirmText="Do you really want to delete the schema?">
                             Delete
                         </a>
                     </div>

@@ -12,8 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
     AuthService,
     ComponentBase,
+    DialogService,
     MessageBus,
-    NotificationService,
     UserDto,
     UserManagementService,
     ValidatorsEx
@@ -38,7 +38,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     public isCurrentUser = false;
     public isNewMode = false;
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
@@ -46,7 +46,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         private readonly router: Router,
         private readonly userManagementService: UserManagementService
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnInit() {

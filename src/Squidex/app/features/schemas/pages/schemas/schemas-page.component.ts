@@ -13,11 +13,11 @@ import { Subscription } from 'rxjs';
 import {
     AppComponentBase,
     AppsStoreService,
+    DialogService,
     fadeAnimation,
     ImmutableArray,
     MessageBus,
     ModalView,
-    NotificationService,
     SchemaDto,
     SchemasService
 } from 'shared';
@@ -43,12 +43,12 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     public schemasFilter = new FormControl();
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly schemasService: SchemasService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnDestroy() {

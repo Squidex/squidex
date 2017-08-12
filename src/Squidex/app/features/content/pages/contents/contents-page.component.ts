@@ -24,10 +24,10 @@ import {
     AuthService,
     ContentDto,
     ContentsService,
+    DialogService,
     FieldDto,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     Pager,
     SchemaDetailsDto
 } from 'shared';
@@ -57,13 +57,13 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public columnWidth: number;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnDestroy() {

@@ -16,7 +16,7 @@ import {
     AppsStoreService,
     AuthService,
     ChangePlanDto,
-    NotificationService,
+    DialogService,
     PlansService,
     Version
 } from 'shared';
@@ -38,13 +38,13 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly plansService: PlansService,
         private readonly route: ActivatedRoute,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnDestroy() {

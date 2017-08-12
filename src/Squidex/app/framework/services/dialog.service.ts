@@ -8,9 +8,28 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-export const NotificationServiceFactory = () => {
-    return new NotificationService();
+export const DialogServiceFactory = () => {
+    return new DialogService();
 };
+
+export class DialogRequest {
+    private readonly resultStream$ = new Subject<boolean>();
+
+    public get closed(): Observable<boolean> {
+        return this.resultStream$;
+    }
+
+    constructor(
+        public readonly title: string,
+        public readonly text: string
+    ) {
+    }
+
+    public complete(value: boolean) {
+        this.resultStream$.next(value);
+        this.resultStream$.complete();
+    }
+}
 
 export class Notification {
     constructor(
@@ -30,8 +49,13 @@ export class Notification {
 }
 
 @Injectable()
-export class NotificationService {
+export class DialogService {
+    private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
+
+    public get dialogs(): Observable<DialogRequest> {
+        return this.requestStream$;
+    }
 
     public get notifications(): Observable<Notification> {
         return this.notificationsStream$;
@@ -39,5 +63,13 @@ export class NotificationService {
 
     public notify(notification: Notification) {
         this.notificationsStream$.next(notification);
+    }
+
+    public confirm(title: string, text: string): Observable<boolean> {
+        const request = new DialogRequest(title, text);
+
+        this.requestStream$.next(request);
+
+        return request.closed;
     }
 }

@@ -15,13 +15,13 @@ import {
     AppsStoreService,
     AuthService,
     createProperties,
+    DialogService,
     fadeAnimation,
     FieldDto,
     fieldTypes,
     HistoryChannelUpdated,
     MessageBus,
     ModalView,
-    NotificationService,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
@@ -73,7 +73,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
@@ -81,7 +81,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

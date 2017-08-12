@@ -8,10 +8,12 @@
 export * from './angular/animations';
 export * from './angular/autocomplete.component';
 export * from './angular/can-deactivate.guard';
+export * from './angular/confirm-click.directive';
 export * from './angular/control-errors.component';
 export * from './angular/copy.directive';
 export * from './angular/date-time-editor.component';
 export * from './angular/date-time.pipes';
+export * from './angular/dialog-renderer.component';
 export * from './angular/dropdown.component';
 export * from './angular/file-drop.directive';
 export * from './angular/focus-on-init.directive';
@@ -49,10 +51,10 @@ export * from './angular/validators';
 export * from './configurations';
 
 export * from './services/clipboard.service';
+export * from './services/dialog.service';
 export * from './services/local-store.service';
 export * from './services/local-cache.service';
 export * from './services/message-bus';
-export * from './services/notification.service';
 export * from './services/resource-loader.service';
 export * from './services/root-view.service';
 export * from './services/shortcut.service';

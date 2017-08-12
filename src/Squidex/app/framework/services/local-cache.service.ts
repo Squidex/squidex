@@ -5,12 +5,15 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { Injectable } from '@angular/core';
+
 interface Entry { value: any, expires: number };
 
 export const LocalCacheServiceFactory = () => {
     return new LocalCacheService();
 };
 
+@Injectable()
 export class LocalCacheService {
     private readonly entries: { [key: string]: Entry } = {};
 

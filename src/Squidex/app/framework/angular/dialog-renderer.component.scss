@@ -1,0 +1,28 @@
+@import '_mixins';
+@import '_vars';
+
+.notification-container {
+    & {
+        margin: .625rem;
+        max-width: 20rem;
+        min-width: 20rem;
+        position: fixed;
+        z-index: 100000;
+    }
+
+    &-righttop {
+        @include fixed(0, 0, auto, auto);
+    }
+
+    &-rightbottom {
+        @include fixed(auto, 0, 0, auto);
+    }
+
+    &-lefttop {
+        @include fixed(0, auto, auto, 0);
+    }
+
+    &-leftbottom {
+        @include fixed(auto, auto, 0, 0);
+    }
+}

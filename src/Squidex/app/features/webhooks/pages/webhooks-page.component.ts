@@ -12,8 +12,8 @@ import {
     AppComponentBase,
     AppsStoreService,
     CreateWebhookDto,
+    DialogService,
     ImmutableArray,
-    NotificationService,
     SchemaDto,
     SchemasService,
     Version,
@@ -52,12 +52,12 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         return this.addWebhookForm.controls['url'].value && this.addWebhookForm.controls['url'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly schemasService: SchemasService,
         private readonly webhooksService: WebhooksService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

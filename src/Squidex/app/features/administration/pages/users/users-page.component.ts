@@ -12,9 +12,9 @@ import { Subscription } from 'rxjs';
 import {
     AuthService,
     ComponentBase,
+    DialogService,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     Pager,
     UserDto,
     UserManagementService
@@ -38,12 +38,12 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
     public usersFilter = new FormControl();
     public usersQuery = '';
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly userManagementService: UserManagementService,
         private readonly authService: AuthService,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnDestroy() {

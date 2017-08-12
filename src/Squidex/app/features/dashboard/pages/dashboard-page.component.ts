@@ -12,8 +12,8 @@ import {
     AppsStoreService,
     AuthService,
     DateTime,
+    DialogService,
     fadeAnimation,
-    NotificationService,
     UsagesService
 } from 'shared';
 
@@ -60,11 +60,11 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
     public callsCurrent = 0;
     public callsMax = 0;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly usagesService: UsagesService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

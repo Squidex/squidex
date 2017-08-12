@@ -18,9 +18,9 @@ const GraphiQL = require('graphiql');
 import {
     AppComponentBase,
     AppsStoreService,
+    DialogService,
     GraphQlService,
-    LocalStoreService,
-    NotificationService
+    LocalStoreService
 } from 'shared';
 
 @Component({
@@ -33,11 +33,11 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly graphQlService: GraphQlService,
         private readonly localStoreService: LocalStoreService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

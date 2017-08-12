@@ -17,9 +17,9 @@ import {
     AssetDto,
     AssetsService,
     AssetUpdated,
+    DialogService,
     ImmutableArray,
-    MessageBus,
-    NotificationService
+    MessageBus
 } from 'shared';
 
 const NOOP = () => { /* NOOP */ };
@@ -44,11 +44,11 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly assetsService: AssetsService,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

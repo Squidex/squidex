@@ -10,8 +10,8 @@ import { Component, OnInit } from '@angular/core';
 import {
     AppComponentBase,
     AppsStoreService,
+    DialogService,
     ImmutableArray,
-    NotificationService,
     Pager,
     WebhookEventDto,
     WebhooksService
@@ -28,10 +28,10 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
 
     public selectedEventId: string;
 
-    constructor(notifications: NotificationService, appsStore: AppsStoreService,
+    constructor(dialogs: DialogService, appsStore: AppsStoreService,
         private readonly webhooksService: WebhooksService
     ) {
-        super(notifications, appsStore);
+        super(dialogs, appsStore);
     }
 
     public ngOnInit() {

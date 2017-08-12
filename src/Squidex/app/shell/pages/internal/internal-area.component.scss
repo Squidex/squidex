@@ -65,12 +65,3 @@
         color: $color-dark-foreground;
     }
 }
-
-.notification {
-    &-container {
-        @include fixed(auto, .625rem, .625rem, auto);
-        max-width: 20rem;
-        min-width: 20rem;
-        z-index: 100000;
-    }
-}

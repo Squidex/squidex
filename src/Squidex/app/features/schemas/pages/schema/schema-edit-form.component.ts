@@ -10,7 +10,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     ComponentBase,
-    NotificationService,
+    DialogService,
     SchemaPropertiesDto,
     SchemasService,
     Version
@@ -53,11 +53,11 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
                 ]]
         });
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnInit() {

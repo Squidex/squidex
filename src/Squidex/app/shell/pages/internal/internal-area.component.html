@@ -16,14 +16,6 @@
     <router-outlet></router-outlet>
 </div>
 
-<div class="notification-container">
-    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" [@fade]>
-        <button type="button" class="close" data-dismiss="alert" (close)="close(notification)">&times;</button>
-
-        {{notification.message}}
-    </div>
-</div>
-
 <a class="github-button" href="https://github.com/Squidex/squidex/issues" target="_blank">
     <i class="icon-github github-icon"></i>
 
@@ -31,5 +23,6 @@
 </a>
 
 <sqx-user-report></sqx-user-report>
+<sqx-dialog-renderer></sqx-dialog-renderer>
 
 <div sqxRootView></div>

@@ -17,9 +17,9 @@ import {
     AssetDto,
     AssetsService,
     AssetUpdated,
+    DialogService,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     Pager
 } from 'shared';
 
@@ -38,11 +38,11 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     public assetsFilter = new FormControl();
     public assertQuery = '';
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly assetsService: AssetsService,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {

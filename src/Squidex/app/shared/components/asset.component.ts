@@ -16,9 +16,9 @@ import {
     AssetReplacedDto,
     AssetsService,
     AuthService,
+    DialogService,
     fadeAnimation,
     ModalView,
-    NotificationService,
     UpdateAssetDto,
     Version
 } from './../declarations-base';
@@ -70,12 +70,12 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public progress = 0;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly assetsService: AssetsService,
         private readonly authService: AuthService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps);
     }
 
     public ngOnInit() {
