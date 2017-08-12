@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 partitionType.AddStructuralProperty(partitionItem.Key, edmValueType);
             }
-            
+
             edmType.AddStructuralProperty(Name.EscapeEdmField(), new EdmComplexTypeReference(partitionType, false));
         }
 
