@@ -8,8 +8,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { fadeAnimation } from './animations';
-
 import {
     DialogRequest,
     DialogService,
@@ -21,12 +19,10 @@ import { ModalView } from './../utils/modal-view';
 @Component({
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
-    templateUrl: './dialog-renderer.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './dialog-renderer.component.html'
 })
 export class DialogRendererComponent implements OnDestroy, OnInit {
+    private dialogSubscription: Subscription;
     private dialogsSubscription: Subscription;
     private notificationsSubscription: Subscription;
 
@@ -45,10 +41,18 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
 
     public ngOnDestroy() {
         this.notificationsSubscription.unsubscribe();
+        this.dialogSubscription.unsubscribe();
         this.dialogsSubscription.unsubscribe();
     }
 
     public ngOnInit() {
+        this.dialogSubscription =
+            this.dialogView.isOpen.subscribe(isOpen => {
+                if (!isOpen) {
+                    this.cancel();
+                }
+            });
+
         this.notificationsSubscription =
             this.dialogService.notifications.subscribe(notification => {
                 this.notifications.push(notification);

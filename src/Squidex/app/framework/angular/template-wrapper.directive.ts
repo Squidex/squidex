@@ -10,7 +10,7 @@ import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, Simple
 @Directive({
     selector: '[sqxTemplateWrapper]'
 })
-export class TemplateWrapperDirective implements OnInit, OnDestroy, OnChanges {
+export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     @Input()
     public item: any;
 

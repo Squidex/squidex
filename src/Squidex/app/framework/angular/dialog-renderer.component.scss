@@ -10,19 +10,19 @@
         z-index: 100000;
     }
 
-    &-righttop {
+    &-topright {
         @include fixed(0, 0, auto, auto);
     }
 
-    &-rightbottom {
-        @include fixed(auto, 0, 0, auto);
-    }
-
-    &-lefttop {
+    &-topleft {
         @include fixed(0, auto, auto, 0);
     }
 
-    &-leftbottom {
+    &-bottomright {
+        @include fixed(auto, 0, 0, auto);
+    }
+
+    &-bottomleft {
         @include fixed(auto, auto, 0, 0);
     }
 }

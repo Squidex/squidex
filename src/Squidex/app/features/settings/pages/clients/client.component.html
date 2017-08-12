@@ -39,7 +39,10 @@
                 <div class="client-expires">Access tokens expire after 30 days</div>
             </td>
             <td class="client-delete">
-                <button type="button" class="btn btn-link btn-danger" (click)="revoking.emit()">
+                <button type="button" class="btn btn-link btn-danger"
+                    (sqxConfirmClick)="revoking.emit()"
+                    confirmTitle="Revoke client" 
+                    confirmText="Do you really want to revoke the client?">
                     <i class="icon-bin2"></i>
                 </button>
             </td>

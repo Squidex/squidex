@@ -32,28 +32,27 @@ export class FieldComponent implements OnInit {
     public schemas: SchemaDto[];
 
     @Output()
-    public locking = new EventEmitter<FieldDto>();
+    public locking = new EventEmitter();
 
     @Output()
-    public hiding = new EventEmitter<FieldDto>();
+    public hiding = new EventEmitter();
 
     @Output()
-    public showing = new EventEmitter<FieldDto>();
+    public showing = new EventEmitter();
 
     @Output()
-    public saving= new EventEmitter<FieldDto>();
+    public saving= new EventEmitter();
 
     @Output()
-    public enabling = new EventEmitter<FieldDto>();
+    public enabling = new EventEmitter();
 
     @Output()
-    public disabling = new EventEmitter<FieldDto>();
+    public disabling = new EventEmitter();
 
     @Output()
-    public deleting = new EventEmitter<FieldDto>();
+    public deleting = new EventEmitter();
 
     public dropdown = new ModalView(false, true);
-    public lockDialog = new ModalView(false, true);
 
     public isEditing = false;
     public selectedTab = 0;
@@ -116,23 +115,6 @@ export class FieldComponent implements OnInit {
 
             this.emitSaving(field);
         }
-    }
-
-    public confirmLock() {
-        this.lockDialog.hide();
-        this.emitLocking(this.field);
-    }
-
-    public cancelLock() {
-        this.lockDialog.hide();
-    }
-
-    public askLock() {
-        this.lockDialog.show();
-    }
-
-    private emitLocking(field: FieldDto) {
-        this.locking.emit(field);
     }
 
     private emitSaving(field: FieldDto) {

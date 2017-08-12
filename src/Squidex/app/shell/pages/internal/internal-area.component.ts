@@ -16,7 +16,7 @@ import { DialogService, Notification } from 'shared';
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html'
 })
-export class InternalAreaComponent implements OnInit, OnDestroy {
+export class InternalAreaComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
 
     public notifications: Notification[] = [];

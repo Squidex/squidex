@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 @Directive({
     selector: '[sqxParentLink]'
 })
-export class ParentLinkDirective implements OnInit, OnDestroy {
+export class ParentLinkDirective implements OnDestroy, OnInit {
     private urlSubscription: Subscription;
     private url: string;
 

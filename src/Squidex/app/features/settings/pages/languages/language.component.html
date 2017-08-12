@@ -13,7 +13,10 @@
                         <i class="icon-settings2"></i>
                     </button>
 
-                    <button type="button" class="btn btn-link btn-danger" (click)="removing.emit(language)" [class.invisible]="language.isMaster">
+                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="language.isMaster"
+                        (sqxConfirmClick)="removing.emit(language)"
+                        confirmTitle="Remove language" 
+                        confirmText="Do you really want to remove the language?">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>

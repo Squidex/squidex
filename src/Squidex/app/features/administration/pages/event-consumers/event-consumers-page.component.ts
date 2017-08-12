@@ -26,7 +26,7 @@ import {
         fadeAnimation
     ]
 })
-export class EventConsumersPageComponent extends ComponentBase implements OnInit, OnDestroy {
+export class EventConsumersPageComponent extends ComponentBase implements OnDestroy, OnInit {
     private subscription: Subscription;
 
     public eventConsumerErrorDialog = new ModalView();

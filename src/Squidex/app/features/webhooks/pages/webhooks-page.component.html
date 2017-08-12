@@ -42,7 +42,10 @@
                                     </h3>
                                 </td>
                                 <td class="client-delete">
-                                    <button type="button" class="btn btn-link btn-danger" (click)="deleteWebhook(w)">
+                                    <button type="button" class="btn btn-link btn-danger"
+                                        (sqxConfirmClick)="deleteWebhook(w)"
+                                        confirmTitle="Delete webhook" 
+                                        confirmText="Do you really want to delete the webhook?">
                                         <i class="icon-bin2"></i>
                                     </button>
                                 </td>

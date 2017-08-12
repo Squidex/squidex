@@ -13,7 +13,7 @@ import {
 
 export abstract class ComponentBase {
     constructor(
-        private readonly dialogs: DialogService
+        public readonly dialogs: DialogService
     ) {
     }
 

@@ -23,7 +23,7 @@ import {
         fadeAnimation
     ]
 })
-export class ProfileMenuComponent implements OnInit, OnDestroy {
+export class ProfileMenuComponent implements OnDestroy, OnInit {
     private authenticationSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);

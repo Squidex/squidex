@@ -23,7 +23,10 @@
             <a class="dropdown-item" (click)="unpublishing.emit(); $event.stopPropagation()" *ngIf="content.isPublished">
                 Unpublish
             </a>
-            <a class="dropdown-item dropdown-item-delete" (click)="deleting.emit(); $event.stopPropagation()">
+            <a class="dropdown-item dropdown-item-delete"
+                (sqxConfirmClick)="deleting.emit()"
+                confirmTitle="Delete content" 
+                confirmText="Do you really want to delete the content?">
                 Delete
             </a>
         </div>

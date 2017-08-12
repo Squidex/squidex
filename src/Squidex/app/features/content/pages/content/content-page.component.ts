@@ -8,7 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
@@ -26,8 +26,6 @@ import {
     ContentDto,
     ContentsService,
     DialogService,
-    fadeAnimation,
-    ModalView,
     MessageBus,
     SchemaDetailsDto,
     Version
@@ -36,20 +34,15 @@ import {
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
-    templateUrl: './content-page.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './content-page.component.html'
 })
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
     private version = new Version('');
-    private cancelPromise: Subject<boolean> | null = null;
     private content: ContentDto;
 
     public schema: SchemaDetailsDto;
 
-    public cancelDialog = new ModalView();
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
     public contentData: any = null;
@@ -100,27 +93,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         if (!this.contentForm.dirty || this.isNewMode) {
             return Observable.of(true);
         } else {
-            this.cancelDialog.show();
-
-            return this.cancelPromise = new Subject<boolean>();
-        }
-    }
-
-    public confirmLeave() {
-        this.cancelDialog.hide();
-
-        if (this.cancelPromise) {
-            this.cancelPromise.next(true);
-            this.cancelPromise = null;
-        }
-    }
-
-    public cancelLeave() {
-        this.cancelDialog.hide();
-
-        if (this.cancelPromise) {
-            this.cancelPromise.next(false);
-            this.cancelPromise = null;
+            return this.dialogs.confirmUnsavedChanges();
         }
     }
 

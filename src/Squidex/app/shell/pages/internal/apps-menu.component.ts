@@ -25,7 +25,7 @@ const FALLBACK_NAME = 'Apps Overview';
         fadeAnimation
     ]
 })
-export class AppsMenuComponent implements OnInit, OnDestroy {
+export class AppsMenuComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
     private appSubscription: Subscription;
 

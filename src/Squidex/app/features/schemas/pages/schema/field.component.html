@@ -27,9 +27,6 @@
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
-                            <a class="dropdown-item" (click)="askLock()" *ngIf="!field.isLocked">
-                                Lock
-                            </a>
                             <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
                                 Enable
                             </a>
@@ -41,8 +38,17 @@
                             </a>
                             <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
                                 Show
+                            </a>                           
+                            <a class="dropdown-item" *ngIf="!field.isLocked" 
+                                (sqxConfirmClick)="locking.emit()"
+                                confirmTitle="Lock field" 
+                                confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
+                                Lock
                             </a>
-                            <a class="dropdown-item dropdown-item-delete" (click)="deleting.emit()" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item dropdown-item-delete" (sqxConfirmClick)="deleting.emit()" [class.disabled]="field.isLocked"
+                                (sqxConfirmClick)="deleting.emit()"
+                                confirmTitle="Delete field" 
+                                confirmText="Do you really want to delete the field?">
                                 Delete
                             </a>
                         </div>
@@ -185,25 +191,5 @@
                 </div>
             </div>
         </form> 
-    </div>
-</div>
-
-<div class="modal" *sqxModalView="lockDialog;onRoot:true" [@fade]>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Lock Field</h4>
-            </div>
-
-            <div class="modal-body">
-                Do you really want to lock the field? Lock fields cannot be changed and deleted.
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" (click)="confirmLock()">Yes</button>
-                <button type="button" class="btn btn-secondary" (click)="cancelLock()">No</button>
-            </div>
-        </div>
     </div>
 </div>

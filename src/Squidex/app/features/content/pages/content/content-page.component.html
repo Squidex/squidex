@@ -55,23 +55,3 @@
 </form>
 
 <router-outlet></router-outlet>
-
-<div class="modal" *sqxModalView="cancelDialog;onRoot:true" [@fade]>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Unsaved changes</h4>
-            </div>
-
-            <div class="modal-body">
-                You have unsaved changes, do you want to close the current content view?
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" (click)="confirmLeave()">Yes</button>
-                <button type="button" class="btn btn-secondary" (click)="cancelLeave()">No</button>
-            </div>
-        </div>
-    </div>
-</div>

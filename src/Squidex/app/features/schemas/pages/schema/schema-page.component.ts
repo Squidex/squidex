@@ -47,8 +47,6 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
     public schema: SchemaDetailsDto;
     public schemas: SchemaDto[];
 
-    public confirmDeleteDialog = new ModalView();
-
     public exportSchemaDialog = new ModalView();
 
     public editOptionsDropdown = new ModalView();
@@ -202,10 +200,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
             .subscribe(() => {
                 this.emitSchemaDeleted(this.schema);
-                this.hideDeleteDialog();
                 this.back();
             }, error => {
-                this.hideDeleteDialog();
                 this.notifyError(error);
             });
     }
@@ -298,10 +294,6 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     private emitSchemaUpdated(schema: SchemaDto) {
         this.messageBus.emit(new SchemaUpdated(schema));
-    }
-
-    private hideDeleteDialog() {
-        this.confirmDeleteDialog.hide();
     }
 
     private notify() {
