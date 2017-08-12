@@ -163,10 +163,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 partitionType.AddStructuralProperty(partitionItem.Key, edmValueType);
             }
-
-            var edmName = Name.Replace("-", "_");
-
-            edmType.AddStructuralProperty(edmName, new EdmComplexTypeReference(partitionType, false));
+            
+            edmType.AddStructuralProperty(Name.EscapeEdmField(), new EdmComplexTypeReference(partitionType, false));
         }
 
         public void AddToJsonSchema(JsonSchema4 schema, PartitionResolver partitionResolver, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
