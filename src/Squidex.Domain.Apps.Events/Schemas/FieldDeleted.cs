@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("FieldDeletedEvent")]
-    public class FieldDeleted : FieldEvent
+    public sealed class FieldDeleted : FieldEvent
     {
     }
 }

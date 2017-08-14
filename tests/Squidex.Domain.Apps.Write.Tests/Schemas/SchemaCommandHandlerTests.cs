@@ -251,40 +251,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             });
         }
 
-        [Fact]
-        public async Task AddWebhook_should_update_domain_object()
-        {
-            CreateSchema();
-
-            var context = CreateContextForCommand(new AddWebhook { Url = new Uri("http://cloud.squidex.io") });
-
-            await TestUpdate(schema, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-        }
-
-        [Fact]
-        public async Task DeleteWebhook_should_update_domain_object()
-        {
-            var createCommand = new AddWebhook { Url = new Uri("http://cloud.squidex.io") };
-
-            CreateSchema();
-            CreateWebhook(createCommand);
-
-            var context = CreateContextForCommand(new DeleteWebhook { Id = createCommand.Id });
-
-            await TestUpdate(schema, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-        }
-
-        private void CreateWebhook(AddWebhook command)
-        {
-            schema.AddWebhook(command);
-        }
-
         private void CreateSchema()
         {
             schema.Create(CreateCommand(new CreateSchema { Name = SchemaName }));

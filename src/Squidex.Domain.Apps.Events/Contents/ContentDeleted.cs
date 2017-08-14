@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentDeletedEvent")]
-    public class ContentDeleted : ContentEvent
+    public sealed class ContentDeleted : ContentEvent
     {
     }
 }

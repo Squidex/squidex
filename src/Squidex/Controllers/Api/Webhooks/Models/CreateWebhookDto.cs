@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
@@ -18,5 +19,11 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// </summary>
         [Required]
         public Uri Url { get; set; }
+
+        /// <summary>
+        /// The schema settings.
+        /// </summary>
+        [Required]
+        public List<WebhookSchemaDto> Schemas { get; set; }
     }
 }

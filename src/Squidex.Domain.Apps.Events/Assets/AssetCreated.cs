@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [TypeName("AssetCreatedEvent")]
-    public class AssetCreated : AssetEvent
+    public sealed class AssetCreated : AssetEvent
     {
         public string FileName { get; set; }
 

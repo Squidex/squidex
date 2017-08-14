@@ -59,8 +59,8 @@ namespace Squidex.Controllers.Api.Schemas
 
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<long>>().IdOrValue;
-            var response = new EntityCreatedDto { Id = result.ToString() };
+            var result = context.Result<EntityCreatedResult<long>>();
+            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
 
             return StatusCode(201, response);
         }

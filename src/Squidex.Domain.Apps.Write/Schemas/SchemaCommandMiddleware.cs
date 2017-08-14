@@ -60,16 +60,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             });
         }
 
-        protected Task On(AddWebhook command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.AddWebhook(command));
-        }
-
-        protected Task On(DeleteWebhook command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DeleteWebhook(command));
-        }
-
         protected Task On(DeleteSchema command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Delete(command));

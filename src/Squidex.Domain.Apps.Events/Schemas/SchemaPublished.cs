@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("SchemaPublishedEvent")]
-    public class SchemaPublished : SchemaEvent
+    public sealed class SchemaPublished : SchemaEvent
     {
     }
 }

@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [TypeName("AssetRenamedEvent")]
-    public class AssetRenamed : AssetEvent
+    public sealed class AssetRenamed : AssetEvent
     {
         public string FileName { get; set; }
     }

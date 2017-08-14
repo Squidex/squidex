@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("SchemaFieldsReorderedEvent")]
-    public class SchemaFieldsReordered : SchemaEvent
+    public sealed class SchemaFieldsReordered : SchemaEvent
     {
         public List<long> FieldIds { get; set; }
     }

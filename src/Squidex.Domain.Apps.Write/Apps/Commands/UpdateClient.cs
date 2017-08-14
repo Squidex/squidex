@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public class UpdateClient : AppAggregateCommand, IValidatable
+    public sealed class UpdateClient : AppAggregateCommand, IValidatable
     {
         public string Id { get; set; }
 

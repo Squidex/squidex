@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class DeleteField : FieldCommand
+    public sealed class DeleteField : FieldCommand
     {
     }
 }

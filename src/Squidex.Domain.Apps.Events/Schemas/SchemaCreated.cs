@@ -13,7 +13,7 @@ using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Events.
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("SchemaCreatedEvent")]
-    public class SchemaCreated : SchemaEvent
+    public sealed class SchemaCreated : SchemaEvent
     {
         public string Name { get; set; }
 
