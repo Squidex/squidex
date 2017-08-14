@@ -67,8 +67,8 @@ namespace Squidex.Domain.Apps.Read.Apps
             A.CallTo(() => repository.FindAppAsync(appId.Id))
                 .Returns(Task.FromResult(appV1));
 
-            await ProvideAppById(appV1);
-            await ProvideAppByName(appV1);
+            await ProvideAppByIdAsync(appV1);
+            await ProvideAppByNameAsync(appV1);
 
             A.CallTo(() => repository.FindAppAsync(appId.Id)).MustHaveHappened();
             A.CallTo(() => repository.FindAppAsync(appId.Name)).MustNotHaveHappened();
@@ -80,8 +80,8 @@ namespace Squidex.Domain.Apps.Read.Apps
             A.CallTo(() => repository.FindAppAsync(appId.Name))
                 .Returns(Task.FromResult(appV1));
 
-            await ProvideAppByName(appV1);
-            await ProvideAppById(appV1);
+            await ProvideAppByNameAsync(appV1);
+            await ProvideAppByIdAsync(appV1);
 
             A.CallTo(() => repository.FindAppAsync(appId.Id)).MustNotHaveHappened();
             A.CallTo(() => repository.FindAppAsync(appId.Name)).MustHaveHappened();
@@ -95,11 +95,11 @@ namespace Squidex.Domain.Apps.Read.Apps
             A.CallTo(() => repository.FindAppAsync(appId.Id))
                 .Returns(appV1).Once();
 
-            await ProvideAppById(appV1);
+            await ProvideAppByIdAsync(appV1);
 
             sut.On(Envelope.Create(new AppLanguageAdded {AppId = appId }).To<IEvent>()).Wait();
 
-            await ProvideAppById(appV2);
+            await ProvideAppByIdAsync(appV2);
 
             A.CallTo(() => repository.FindAppAsync(appId.Id)).MustHaveHappened(Repeated.Exactly.Times(2));
         }
@@ -112,21 +112,21 @@ namespace Squidex.Domain.Apps.Read.Apps
             A.CallTo(() => repository.FindAppAsync(appId.Name))
                 .Returns(appV1).Once();
 
-            await ProvideAppByName(appV1);
+            await ProvideAppByNameAsync(appV1);
 
             sut.On(Envelope.Create(new AppLanguageAdded { AppId = appId }).To<IEvent>()).Wait();
 
-            await ProvideAppByName(appV2);
+            await ProvideAppByNameAsync(appV2);
 
             A.CallTo(() => repository.FindAppAsync(appId.Name)).MustHaveHappened(Repeated.Exactly.Times(2));
         }
 
-        private async Task ProvideAppById(IAppEntity app)
+        private async Task ProvideAppByIdAsync(IAppEntity app)
         {
             Assert.Equal(app, await sut.FindAppByIdAsync(appId.Id));
         }
 
-        private async Task ProvideAppByName(IAppEntity app)
+        private async Task ProvideAppByNameAsync(IAppEntity app)
         {
             Assert.Equal(app, await sut.FindAppByNameAsync(appId.Name));
         }
