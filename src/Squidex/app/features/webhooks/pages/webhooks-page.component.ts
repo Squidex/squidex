@@ -11,7 +11,9 @@ import { FormBuilder, Validators } from '@angular/forms';
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     CreateWebhookDto,
+    DateTime,
     DialogService,
     ImmutableArray,
     SchemaDto,
@@ -21,27 +23,18 @@ import {
     WebhooksService
 } from 'shared';
 
-interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; };
-
 @Component({
     selector: 'sqx-webhooks-page',
     styleUrls: ['./webhooks-page.component.scss'],
     templateUrl: './webhooks-page.component.html'
 })
 export class WebhooksPageComponent extends AppComponentBase implements OnInit {
-    private readonly version = new Version();
-
-    public webhooks: ImmutableArray<WebhookWithSchema>;
-
+    public webhooks: ImmutableArray<WebhookDto>;
     public schemas: SchemaDto[];
 
     public addWebhookFormSubmitted = false;
     public addWebhookForm =
         this.formBuilder.group({
-            schemaId: ['',
-                [
-                    Validators.required
-                ]],
             url: ['',
                 [
                     Validators.required
@@ -53,6 +46,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
     }
 
     constructor(apps: AppsStoreService, dialogs: DialogService,
+        private readonly authService: AuthService,
         private readonly schemasService: SchemasService,
         private readonly webhooksService: WebhooksService,
         private readonly formBuilder: FormBuilder
@@ -72,14 +66,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                         (s, w) => { return { webhooks: w, schemas: s }; }))
             .subscribe(dtos => {
                 this.schemas = dtos.schemas;
-
-                this.webhooks =
-                    ImmutableArray.of(
-                        dtos.webhooks.map(w => {
-                            return { webhook: w, schema: dtos.schemas.find(s => s.id === w.schemaId), showDetails: false };
-                        }).filter(w => !!w.schema));
-
-                this.addWebhookForm.controls['schemaId'].setValue(this.schemas.map(x => x.id)[0]);
+                this.webhooks = ImmutableArray.of(dtos.webhooks);
 
                 if (showInfo) {
                     this.notifyInfo('Webhooks reloaded.');
@@ -89,9 +76,9 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public deleteWebhook(webhook: WebhookWithSchema) {
+    public deleteWebhook(webhook: WebhookDto) {
         this.appNameOnce()
-            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.schema.name, webhook.webhook.id, this.version))
+            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.id, webhook.version))
             .subscribe(dto => {
                 this.webhooks = this.webhooks.remove(webhook);
             }, error => {
@@ -105,15 +92,14 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         if (this.addWebhookForm.valid) {
             this.addWebhookForm.disable();
 
-            const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value);
+            const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value, []);
 
-            const schemaId = this.addWebhookForm.controls['schemaId'].value;
-            const schema = this.schemas.find(s => s.id === schemaId);
+            const me = this.authService.user!.token;
 
             this.appNameOnce()
-                .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
+                .switchMap(app => this.webhooksService.postWebhook(app, requestDto, me, DateTime.now(), new Version()))
                 .subscribe(dto => {
-                    this.webhooks = this.webhooks.push({ webhook: dto, schema: schema });
+                    this.webhooks = this.webhooks.push(dto);
 
                     this.resetWebhookForm();
                 }, error => {

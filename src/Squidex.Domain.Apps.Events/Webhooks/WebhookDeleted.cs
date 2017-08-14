@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Events.Webhooks
 {
-    [TypeName("WebhookDeletedEvent")]
+    [TypeName("WebhookDeletedEventV2")]
     public sealed class WebhookDeleted : WebhookEvent
     {
     }

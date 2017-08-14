@@ -99,7 +99,7 @@ namespace Squidex.Controllers.Api.Webhooks
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = new WebhookCreatedDto { Id = result.IdOrValue, SharedSecret = command.SharedSecret, Version = result.Version };
 
             return CreatedAtAction(nameof(GetWebhooks), new { app }, response);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// <returns>
         /// 203 => Webhook updated.
         /// 400 => Webhook is not valid.
-        /// 404 => App or webhook not found.
+        /// 404 => Webhook or app not found.
         /// </returns>
         /// <remarks>
         /// All events for the specified schemas will be sent to the url. The timeout is 2 seconds.
@@ -140,10 +140,10 @@ namespace Squidex.Controllers.Api.Webhooks
         /// <param name="id">The id of the webhook to delete.</param>
         /// <returns>
         /// 204 => Webhook has been deleted.
-        /// 404 => Webhook or shema or app not found.
+        /// 404 => Webhook or app not found.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}//webhooks/{id}")]
+        [Route("apps/{app}/webhooks/{id}")]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteWebhook(string app, Guid id)
         {

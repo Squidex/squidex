@@ -1,8 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
-.schemas-control {
-    width: 10rem;
+.url-control {
+    width: 24rem;
 }
 
 .failed {
@@ -11,11 +11,4 @@
 
 .success {
     color: $color-theme-green;
-}
-
-.webhook-stats {
-    border-top: 1px solid $color-border;
-    margin-left: -1.25rem;
-    margin-right: -1.25rem;
-    padding: 1rem 1rem 0;
 }

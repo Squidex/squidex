@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         {
             await ValidateAsync(command, () => "Failed to create webhook");
 
-            await handler.UpdateAsync<WebhookDomainObject>(context, c => c.Create(command));
+            await handler.CreateAsync<WebhookDomainObject>(context, c => c.Create(command));
         }
 
         protected async Task On(UpdateWebhook command, CommandContext context)

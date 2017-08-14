@@ -13,5 +13,6 @@ namespace Squidex.Domain.Apps.Events.Webhooks
     [TypeName("WebhookCreatedEvent")]
     public sealed class WebhookCreated : WebhookEditEvent
     {
+        public string SharedSecret { get; set; }
     }
 }
