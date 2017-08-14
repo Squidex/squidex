@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateWebhookDto.cs
+//  UpdateWebhookDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,11 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-// ReSharper disable CollectionNeverUpdated.Global
-
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class CreateWebhookDto
+    public class UpdateWebhookDto
     {
         /// <summary>
         /// The url of the webhook.
