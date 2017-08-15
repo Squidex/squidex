@@ -8,6 +8,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
+import { fadeAnimation } from './animations';
+
 import {
     DialogRequest,
     DialogService,
@@ -19,7 +21,10 @@ import { ModalView } from './../utils/modal-view';
 @Component({
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
-    templateUrl: './dialog-renderer.component.html'
+    templateUrl: './dialog-renderer.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class DialogRendererComponent implements OnDestroy, OnInit {
     private dialogSubscription: Subscription;

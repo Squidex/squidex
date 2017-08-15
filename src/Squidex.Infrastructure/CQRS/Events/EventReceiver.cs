@@ -142,7 +142,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await subscription.SubscribeAsync(async storedEvent =>
             {
-                await DispatchConsumer(ParseEvent(storedEvent), eventConsumer, eventConsumer.Name);
+                await DispatchConsumerAsync(ParseEvent(storedEvent), eventConsumer, eventConsumer.Name);
 
                 await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, storedEvent.EventPosition, false);
             }, async exception =>
@@ -187,7 +187,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        private async Task DispatchConsumer(Envelope<IEvent> @event, IEventConsumer eventConsumer, string consumerName)
+        private async Task DispatchConsumerAsync(Envelope<IEvent> @event, IEventConsumer eventConsumer, string consumerName)
         {
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;

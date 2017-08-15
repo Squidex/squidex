@@ -1,94 +1,93 @@
-$color-background: #eef1f4;
+$color-background:          #eef1f4;
 
-$color-border: #dae4e9;
-$color-border-dark: darken($color-border, 20%);
+$color-border:              #dae4e9;
+$color-border-dark:         #b3bbbf;
 
-$color-title: #000;
-$color-text: #373a3c;
-$color-text-decent: #a9b2bb;
-$color-subtext: $color-text-decent;
-$color-empty: $color-text-decent;
-$color-control: rgba(0, 0, 0, .15);
-$color-input: #dbe4eb;
-$color-input-border: rgba(0, 0, 0, .15);
-$color-input-background: #fff;
-$color-disabled: #eef1f4;
+$color-title:               #000;
+$color-text:                #373a3c;
+$color-text-decent:         #a9b2bb;
 
-$color-extern-google: #d34836;
-$color-extern-google-icon: #b02c1b;
-$color-extern-microsoft: #004185;
-$color-extern-microsoft-icon: #1b67b7;
-$color-extern-github: #191919;
-$color-extern-github-icon: #4a4a4a;
+$color-input:               #dbe4eb;
+$color-input-background:    #fff;
+$color-input-disabled:      #eef1f4;
+$color-input-border:        rgba(0, 0, 0, .15);
 
-$color-theme-blue: #438cef;
-$color-theme-blue-dark: #3d7dd5;
-$color-theme-blue-light: #9ebeea;
+$color-extern-google:           #d34836;
+$color-extern-google-icon:      #b02c1b;
+$color-extern-microsoft:        #004185;
+$color-extern-microsoft-icon:   #1b67b7;
+$color-extern-github:           #191919;
+$color-extern-github-icon:      #4a4a4a;
+
+$color-theme-blue:          #438cef;
+$color-theme-blue-dark:     #3d7dd5;
+$color-theme-blue-light:    #9ebeea;
 $color-theme-blue-lightest: #d9e8fc;
-$color-theme-secondary: #dce5e8;
+$color-theme-secondary:     #dce5e8;
 
-$color-theme-green: #4cc159;
-$color-theme-green-dark: #47b353;
+$color-theme-green:         #4cc159;
+$color-theme-green-dark:    #47b353;
+$color-theme-orange:        #ffb136;
+$color-theme-orange-dark:   #a65b00;
 
-$color-theme-orange: #ffb136;
-$color-theme-orange-dark: #a65b00;
+$color-theme-error:         #f00;
+$color-theme-error-dark:    #c00;
 
-$color-theme-error: #f00;
-$color-theme-error-dark: darken($color-theme-error, 5%);
-
-$color-dark1-background: #2e3842;
-$color-dark1-foreground: #6a7681;
-$color-dark1-border1: #37424c;
-$color-dark1-border2: #222a32;
-$color-dark1-focus-foreground: #fff;
+$color-dark1-background:        #2e3842;
+$color-dark1-foreground:        #6a7681;
+$color-dark1-border1:           #37424c;
+$color-dark1-border2:           #222a32;
+$color-dark1-focus-foreground:  #fff;
 $color-dark1-active-background: #273039;
 
-$color-dark2-background: #273039;
-$color-dark2-foreground: #6a7681;
-$color-dark2-border1: #37424c;
-$color-dark2-border2: #222a32;
-$color-dark2-focus-foreground: #fff;
+$color-dark2-background:        #273039;
+$color-dark2-foreground:        #6a7681;
+$color-dark2-border1:           #37424c;
+$color-dark2-border2:           #222a32;
+$color-dark2-focus-foreground:  #fff;
 $color-dark2-active-background: #222931;
-$color-dark2-control: #2e3842;
-$color-dark2-separator: #2e3842;
+$color-dark2-control:           #2e3842;
+$color-dark2-separator:         #2e3842;
 
-$color-panel-icon: #a2b0b6;
+$color-panel-icon:              #a2b0b6;
 
-$color-badge-success-background: #d6ffdb;
-$color-badge-success-foreground: #3bab48;
+$color-badge-success-background:    #d6ffdb;
+$color-badge-success-foreground:    #3bab48;
 
-$color-badge-warning-background: #ffe8cc;
-$color-badge-warning-foreground: #efa243;
+$color-badge-warning-background:    #ffe8cc;
+$color-badge-warning-foreground:    #efa243;
 
-$color-badge-danger-background: #fcc;
-$color-badge-danger-foreground: #ef4343;
+$color-badge-danger-background:     #fcc;
+$color-badge-danger-foreground:     #ef4343;
 
-$color-badge-info-background: #d0f2fb;
-$color-badge-info-foreground: #43ccef;
+$color-badge-info-background:       #d0f2fb;
+$color-badge-info-foreground:       #43ccef;
 
-$color-badge-primary-background: #cce1ff;
-$color-badge-primary-foreground: #438cef;
+$color-badge-primary-background:    #cce1ff;
+$color-badge-primary-foreground:    #438cef;
 
-$color-badge-default-background: #e6e6e6;
-$color-badge-default-foreground: #999;
+$color-badge-default-background:    #e6e6e6;
+$color-badge-default-foreground:    #999;
 
-$color-table: #fff;
-$color-table-footer: #ecf2f6;
-$color-table-border: $color-border;
-$color-table-header: $color-text-decent;
+$color-table-background:    #fff;
+$color-table-footer:        #ecf2f6;
+
+$color-table-border:        $color-border;
+$color-table-header:        $color-text-decent;
 
 $color-modal-header-background: #2e3842;
 $color-modal-header-foreground: #6a7681;
 
-$color-dark-black: #000;
-$color-dark-foreground: #fff;
+$color-dark-black:          #000;
+$color-dark-foreground:     #fff;
 
-$size-navbar-height: 3.25rem;
-$size-sidebar-width: 7rem;
+$size-navbar-height:        3.25rem;
 
-$panel-padding: 1.5rem;
-$panel-header: 5.4rem;
-$panel-sidebar: 3.75rem;
-$panel-light-background: #fff;
+$size-sidebar-width:        7rem;
 
-$asset-height: 13rem;
+$panel-padding:             1.5rem;
+$panel-header:              5.4rem;
+$panel-sidebar:             3.75rem;
+$panel-light-background:    #fff;
+
+$asset-height:              13rem;
