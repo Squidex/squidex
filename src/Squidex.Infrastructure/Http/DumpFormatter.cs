@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Http
 {
     public static class DumpFormatter
     {
-        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody, TimeSpan elapsed)
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody, TimeSpan elapsed, bool isTimeout)
         {
             var writer = new StringBuilder();
 
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Http
             writer.AppendLine();
 
             writer.AppendLine("Response:");
-            writer.AppendResponse(response, responseBody, elapsed);
+            writer.AppendResponse(response, responseBody, elapsed, isTimeout);
 
             return writer.ToString();
         }
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Http
             }
         }
 
-        private static void AppendResponse(this StringBuilder writer, HttpResponseMessage response, string responseBody, TimeSpan elapsed)
+        private static void AppendResponse(this StringBuilder writer, HttpResponseMessage response, string responseBody, TimeSpan elapsed, bool isTimeout)
         {
             if (response != null)
             {
@@ -61,17 +61,21 @@ namespace Squidex.Infrastructure.Http
 
                 writer.AppendHeaders(response.Headers);
                 writer.AppendHeaders(response.Content?.Headers);
+            }
 
-                if (!string.IsNullOrWhiteSpace(responseBody))
-                {
-                    writer.AppendLine();
-                    writer.AppendLine(responseBody);
-                }
+            if (!string.IsNullOrWhiteSpace(responseBody))
+            {
+                writer.AppendLine();
+                writer.AppendLine(responseBody);
+            }
 
+            if (response != null)
+            {
                 writer.AppendLine();
                 writer.AppendLine($"Elapsed: {elapsed}");
             }
-            else
+
+            if (isTimeout)
             {
                 writer.AppendLine($"Timeout after {elapsed}");
             }

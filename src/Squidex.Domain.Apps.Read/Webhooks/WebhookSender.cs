@@ -26,6 +26,8 @@ namespace Squidex.Domain.Apps.Read.Webhooks
             HttpRequestMessage request = BuildRequest(job);
             HttpResponseMessage response = null;
 
+            var responseString = string.Empty;
+
             var isTimeout = false;
 
             var watch = Stopwatch.StartNew();
@@ -45,19 +47,21 @@ namespace Squidex.Domain.Apps.Read.Webhooks
             {
                 isTimeout = true;
             }
+            catch (Exception ex)
+            {
+                responseString = ex.Message;
+            }
             finally
             {
                 watch.Stop();
             }
-
-            var responseString = string.Empty;
 
             if (response != null)
             {
                 responseString = await response.Content.ReadAsStringAsync();
             }
 
-            var dump = DumpFormatter.BuildDump(request, response, job.RequestBody, responseString, watch.Elapsed);
+            var dump = DumpFormatter.BuildDump(request, response, job.RequestBody, responseString, watch.Elapsed, isTimeout);
 
             var result = WebhookResult.Failed;
 
