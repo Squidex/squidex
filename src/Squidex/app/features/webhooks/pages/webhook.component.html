@@ -1,0 +1,143 @@
+<div class="table-items-row">
+    <table class="table table-middle table-sm table-borderless table-fixed">
+        <colgroup>
+            <col style="width: 120px; text-align: right;" />
+            <col style="width: 100%" />
+            <col style="width: 40px" />
+        </colgroup>
+
+        <tr>
+            <td class="text-right" colspan="2">
+                <button class="btn btn-primary" [disabled]="!hasUrl">Save</button>
+            </td>
+            <td class="client-delete">
+                <button type="button" class="btn btn-link btn-danger"
+                    (sqxConfirmClick)="deleting.emit()"
+                    confirmTitle="Delete webhook" 
+                    confirmText="Do you really want to delete the webhook?">
+                    <i class="icon-bin2"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>Url:</td>
+            <td>
+                <input class="form-control" [attr.value]="webhook.url" #inputUrl />
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputUrl">
+                    <i class="icon-copy"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>Secret:</td>
+            <td>
+                <input readonly class="form-control" [attr.value]="webhook.sharedSecret" #inputSecret />
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
+                    <i class="icon-copy"></i>
+                </button>
+            </td>
+        </tr>
+    </table>
+
+    <div class="webhook-section">
+        <table *ngIf="schemas.length > 0" class="table table-middle table-sm table-fixed table-borderless">
+            <colgroup>
+                <col style="width: 100%" />
+                <col style="width: 40px" />
+                <col style="width: 40px" />
+                <col style="width: 40px" />
+                <col style="width: 40px" />
+                <col style="width: 40px" />
+                <col style="width: 40px" />
+            </colgroup>
+
+            <tr>
+                <th>Schema</th>
+                <th title="Created">
+                    C
+                </th>
+                <th title="Updated">
+                    U
+                </th>
+                <th title="Deleted">
+                    D
+                </th>
+                <th title="Published">
+                    P
+                </th>
+                <th title="Unpublished">
+                    U
+                </th>
+                <th></th>
+            </tr>
+
+            <tr *ngFor="let schema of schemas">
+                <td>
+                    <span class="truncate">{{schema.schema.name}}</span>
+                </td>
+                <td title="Created">
+                    <input type="checkbox" [(ngModel)]="schema.sendCreate" />
+                </td>
+                <td title="Updated">
+                    <input type="checkbox" [(ngModel)]="schema.sendUpdate" />
+                </td>
+                <td title="Deleted">
+                    <input type="checkbox" [(ngModel)]="schema.sendDelete" />
+                </td>
+                <td title="Published">
+                    <input type="checkbox" [(ngModel)]="schema.sendPublish" />
+                </td>
+                <td title="Unpublished">
+                    <input type="checkbox" [(ngModel)]="schema.sendUnpublish" />
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link btn-danger"
+                        (sqxConfirmClick)="removeSchema(schema)"
+                        confirmTitle="Remove schema" 
+                        confirmText="Do you really want to remove the schema?">
+                        <i class="icon-bin2"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+
+        <form class="form-inline" [formGroup]="addSchemaForm" (ngSubmit)="addSchema()">
+            <div class="form-group mr-1">
+                <select class="form-control schemas-control" formControlName="schema">
+                    <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.name}}</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
+        </form>
+    </div>
+    
+    <div class="webhook-section" *ngIf="webhook.averageRequestTimeMs > 0">
+        <div class="row">
+            <div class="col-3">
+                <span title="Succeeded Requests" [class.success]="webhook.totalSucceeded > 0">
+                    <i class="icon-checkmark"></i> {{webhook.totalSucceeded}}
+                </span>
+            </div>
+            <div class="col-3">
+                <span title="Failed Requests" [class.failed]="webhook.totalFailed > 0">
+                    <i class="icon-bug"></i> {{webhook.totalFailed}}
+                </span>
+            </div>
+            <div class="col-3">
+                <span title="Timeout Requests" [class.failed]="webhook.totalTimedout > 0">
+                    <i class="icon-timeout"></i> {{webhook.totalTimedout}}
+                </span>
+            </div>
+            <div class="col-3">
+                <span title="Average Response Time">
+                    <i class="icon-elapsed"></i> {{webhook.averageRequestTimeMs}} ms
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

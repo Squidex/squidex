@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (isDeleted || isCreated)
+            if (isDeleted || !isCreated)
             {
                 throw new DomainException("Webhook has already been deleted or not created yet.");
             }
