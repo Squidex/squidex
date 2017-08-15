@@ -25,7 +25,7 @@ noscript {
     // Lightweight, table like headline.
     &-headline {
         & {
-            color: $color-empty;
+            color: $color-text-decent;
             display: block;
             margin-bottom: 1rem;
             font-size: 1.3rem;
@@ -51,7 +51,7 @@ noscript {
     }
 
     &-password-signup {
-        color: $color-empty;
+        color: $color-text-decent;
     }
 
     &-section {

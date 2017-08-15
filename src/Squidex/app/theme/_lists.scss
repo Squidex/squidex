@@ -57,7 +57,7 @@
             // Each row is white and a has a border.
             & {
                 @include transition(all .2s ease);
-                background: $color-table;
+                background: $color-table-background;
                 border: 1px solid $color-table-border;
                 border-bottom: 2px solid $color-table-border;
                 margin-bottom: .5rem;
@@ -92,7 +92,7 @@
     &-row {
         & {
             padding: 1rem 1.25rem;
-            background: $color-table;
+            background: $color-table-background;
             border: 1px solid $color-border;
             border-top: 0;
             border-bottom-width: 2px;
@@ -111,7 +111,7 @@
         }
 
         &-empty {
-            color: $color-empty;
+            color: $color-text-decent;
         }
 
         // Detail row for expandable rows.

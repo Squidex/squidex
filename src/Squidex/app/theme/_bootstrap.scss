@@ -321,6 +321,10 @@ a {
             @include build-link-button($color-theme-blue);
         }
 
+        &.btn-secondary {
+            @include build-link-button($color-text-decent);
+        }
+
         &.btn-danger {
             @include build-link-button($color-theme-error);
         }
@@ -330,7 +334,7 @@ a {
         }
 
         &.btn-decent {
-            @include build-link-button($color-subtext);
+            @include build-link-button($color-text-decent);
         }
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
@@ -39,6 +39,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public saving = new EventEmitter<AppLanguageDto>();
 
     public otherLanguages: ImmutableArray<AppLanguageDto>;
+    public otherLanguage: AppLanguageDto;
 
     public fallbackLanguages: AppLanguageDto[] = [];
 
@@ -50,13 +51,6 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
         this.formBuilder.group({
             isMaster: [false, []],
             isOptional: [false, []]
-        });
-
-    public addLanguageForm =
-        this.formBuilder.group({
-            language: [null,
-                Validators.required
-            ]
         });
 
     constructor(
@@ -92,19 +86,21 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public addLanguage() {
-        this.addFallbackLanguage(this.addLanguageForm.controls['language'].value);
+        this.addFallbackLanguage(this.otherLanguage);
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {
         this.fallbackLanguages.splice(this.fallbackLanguages.indexOf(language), 1);
 
         this.otherLanguages = this.otherLanguages.push(language);
+        this.otherLanguage = this.otherLanguages.values[0];
     }
 
     public addFallbackLanguage(language: AppLanguageDto) {
         this.fallbackLanguages.push(language);
 
         this.otherLanguages = this.otherLanguages.filter(l => l.iso2Code !== language.iso2Code);
+        this.otherLanguage = this.otherLanguages.values[0];
     }
 
     public save() {
@@ -138,6 +134,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                 this.allLanguages.filter(l =>
                     this.language.iso2Code !== l.iso2Code &&
                     this.language.fallback.indexOf(l.iso2Code) < 0);
+            this.otherLanguage = this.otherLanguages.values[0];
         }
 
         if (this.language) {

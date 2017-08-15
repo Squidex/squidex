@@ -11,7 +11,7 @@ $thumb-margin: ($thumb-size - $bar-height) * .5;
         & {
             @include border-radius($bar-height * .5);
             position: relative;
-            border: 1px solid $color-control;
+            border: 1px solid $color-input-border;
             margin-bottom: 1.25rem;
             margin-top: .25rem;
             margin-right: $thumb-size * .5;
@@ -30,7 +30,7 @@ $thumb-margin: ($thumb-size - $bar-height) * .5;
             position: absolute;
             width: $thumb-size;
             height: $thumb-size;
-            border: 1px solid $color-control;
+            border: 1px solid $color-input-border;
             background: $color-dark-foreground;
             margin-top: -$thumb-margin;
             margin-left: -$thumb-size * .5;
