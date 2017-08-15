@@ -65,7 +65,7 @@ describe('AppClientsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush([
             {
@@ -103,7 +103,7 @@ describe('AppClientsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', isReader: true });
 
@@ -121,7 +121,7 @@ describe('AppClientsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
         expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));
@@ -134,7 +134,7 @@ describe('AppClientsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));

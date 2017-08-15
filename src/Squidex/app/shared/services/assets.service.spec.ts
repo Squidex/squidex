@@ -320,7 +320,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
 
         expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
             fileSize: 1024,
@@ -352,7 +352,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
         expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));
@@ -365,7 +365,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));

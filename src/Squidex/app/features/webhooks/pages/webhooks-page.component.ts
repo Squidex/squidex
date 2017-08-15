@@ -20,7 +20,8 @@ import {
     SchemasService,
     Version,
     WebhookDto,
-    WebhooksService
+    WebhooksService,
+    UpdateWebhookDto
 } from 'shared';
 
 @Component({
@@ -81,6 +82,18 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
             .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.id, webhook.version))
             .subscribe(dto => {
                 this.webhooks = this.webhooks.remove(webhook);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public updateWebhook(webhook: WebhookDto, requestDto: UpdateWebhookDto) {
+        this.appNameOnce()
+            .switchMap(app => this.webhooksService.putWebhook(app, webhook.id, requestDto, webhook.version))
+            .subscribe(dto => {
+                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.authService.user.token));
+
+                this.notifyInfo('Webhook saved.');
             }, error => {
                 this.notifyError(error);
             });

@@ -27,7 +27,7 @@
 
             <div *ngIf="webhooks">
                 <sqx-webhook *ngFor="let webhook of webhooks" [webhook]="webhook" [allSchemas]="schemas"  
-                    (updating)="deleteWebhook(webhook)"
+                    (updating)="updateWebhook(webhook, $event)"
                     (deleting)="deleteWebhook(webhook)"></sqx-webhook>
 
                 <div class="table-items-footer">

@@ -118,7 +118,7 @@ describe('SchemaDetailsDto', () => {
 
     it('should update fields property and user info when removing field', () => {
         const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
-        const field2 = new FieldDto(2, '2',false,  false, false, 'l', createProperties('Number'));
+        const field2 = new FieldDto(2, '2', false, false, false, 'l', createProperties('Number'));
 
         const now = DateTime.now();
 

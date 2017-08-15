@@ -12,11 +12,13 @@ import {
     ImmutableArray,
     SchemaDto,
     UpdateWebhookDto,
-    WebhookDto
+    WebhookDto,
+    WebhookSchemaDto
 } from 'shared';
 
-interface WebhookSchemaForm {
+export interface WebhookSchemaForm {
     schema: SchemaDto;
+    sendAll: boolean;
     sendCreate: boolean;
     sendUpdate: boolean;
     sendDelete: boolean;
@@ -44,9 +46,9 @@ export class WebhookComponent implements OnInit {
 
     public schemas: ImmutableArray<WebhookSchemaForm>;
 
+    public schemaToAdd: SchemaDto;
     public schemasToAdd: ImmutableArray<SchemaDto>;
 
-    public webhookFormSubmitted = false;
     public webhookForm =
         this.formBuilder.group({
             url: ['',
@@ -55,17 +57,12 @@ export class WebhookComponent implements OnInit {
                 ]]
         });
 
-    public addSchemaForm =
-        this.formBuilder.group({
-            schema: [null]
-        });
-
     public get hasUrl() {
         return this.webhookForm.controls['url'].value && this.webhookForm.controls['url'].value.length > 0;
     }
 
     public get hasSchema() {
-        return this.addSchemaForm.controls['schema'].value;
+        return !!this.schemaToAdd;
     }
 
     constructor(
@@ -76,54 +73,109 @@ export class WebhookComponent implements OnInit {
     public ngOnInit() {
         this.webhookForm.controls['url'].setValue(this.webhook.url);
 
-        this.schemasToAdd =
-            ImmutableArray.of(
-                this.allSchemas.filter(schema =>
-                    !this.webhook.schemas.find(w => w.schemaId === schema.id)))
-                .sortByStringAsc(x => x.name);
-
         this.schemas =
             ImmutableArray.of(
                 this.webhook.schemas.map(webhookSchema => {
                     const schema = this.allSchemas.find(s => s.id === webhookSchema.schemaId);
 
                     if (schema) {
-                        return {
+                        return this.updateSendAll({
                             schema: schema,
+                            sendAll: false,
                             sendCreate: webhookSchema.sendCreate,
                             sendUpdate: webhookSchema.sendUpdate,
                             sendDelete: webhookSchema.sendDelete,
                             sendPublish: webhookSchema.sendPublish,
                             sendUnpublish: webhookSchema.sendUnpublish
-                        };
+                        });
                     } else {
                         return null;
                     }
                 }).filter(w => !!w)).sortByStringAsc(x => x.schema.name);
 
-        this.addSchemaForm.controls['schema'].setValue(this.schemasToAdd.find(x => true));
+        this.schemasToAdd =
+            ImmutableArray.of(
+                this.allSchemas.filter(schema =>
+                    !this.webhook.schemas.find(w => w.schemaId === schema.id)))
+                .sortByStringAsc(x => x.name);
+        this.schemaToAdd = this.schemasToAdd.values[0];
     }
 
-    public removeSchema(webhookSchema: WebhookSchemaForm) {
-        this.schemasToAdd = this.schemasToAdd.push(webhookSchema.schema).sortByStringAsc(x => x.name);
-        this.schemas = this.schemas.remove(webhookSchema);
+    public removeSchema(schemaForm: WebhookSchemaForm) {
+        this.schemas = this.schemas.remove(schemaForm);
 
-        this.addSchemaForm.controls['schema'].setValue(this.schemasToAdd.find(x => true));
+        this.schemasToAdd = this.schemasToAdd.push(schemaForm.schema).sortByStringAsc(x => x.name);
+        this.schemaToAdd = this.schemasToAdd.values[0];
     }
 
     public addSchema() {
-        const schema: SchemaDto = this.addSchemaForm.controls['schema'].value;
+        this.schemas =
+            this.schemas.push(
+                this.updateSendAll({
+                    schema: this.schemaToAdd,
+                    sendAll: false,
+                    sendCreate: false,
+                    sendUpdate: false,
+                    sendDelete: false,
+                    sendPublish: false,
+                    sendUnpublish: false
+                })).sortByStringAsc(x => x.schema.name);
 
-        this.schemasToAdd = this.schemasToAdd.remove(schema).sortByStringAsc(x => x.name);
-        this.schemas = this.schemas.push({
-            schema: schema,
-            sendCreate: false,
-            sendUpdate: false,
-            sendDelete: false,
-            sendPublish: false,
-            sendUnpublish: false
-        }).sortByStringAsc(x => x.schema.name);
+        this.schemasToAdd = this.schemasToAdd.remove(this.schemaToAdd).sortByStringAsc(x => x.name);
+        this.schemaToAdd = this.schemasToAdd.values[0];
+    }
 
-        this.addSchemaForm.controls['schema'].setValue(this.schemasToAdd.find(x => true));
+    public save() {
+        const requestDto =
+            new UpdateWebhookDto(
+                this.webhookForm.controls['url'].value,
+                this.schemas.values.map(schema =>
+                    new WebhookSchemaDto(
+                        schema.schema.id,
+                        schema.sendCreate,
+                        schema.sendUpdate,
+                        schema.sendDelete,
+                        schema.sendPublish,
+                        schema.sendUnpublish)));
+
+        this.emitUpdating(requestDto);
+    }
+
+    public toggle(schemaForm: WebhookSchemaForm, property: string) {
+        const newSchema = this.updateSendAll(Object.assign({}, schemaForm, { [property]: !schemaForm[property] }));
+
+        this.schemas = this.schemas.replace(schemaForm, newSchema);
+    }
+
+    public toggleAll(schemaForm: WebhookSchemaForm) {
+        const newSchema = this.updateAll(<any>{ schema: schemaForm.schema }, !schemaForm.sendAll);
+
+        this.schemas = this.schemas.replace(schemaForm, newSchema);
+    }
+
+    private emitUpdating(dto: UpdateWebhookDto) {
+        this.updating.emit(dto);
+    }
+
+    private updateAll(schemaForm: WebhookSchemaForm, value: boolean): WebhookSchemaForm {
+        schemaForm.sendAll = value;
+        schemaForm.sendCreate = value;
+        schemaForm.sendUpdate = value;
+        schemaForm.sendDelete = value;
+        schemaForm.sendPublish = value;
+        schemaForm.sendUnpublish = value;
+
+        return schemaForm;
+    }
+
+    private updateSendAll(schemaForm: WebhookSchemaForm): WebhookSchemaForm {
+        schemaForm.sendAll =
+            schemaForm.sendCreate &&
+            schemaForm.sendUpdate &&
+            schemaForm.sendDelete &&
+            schemaForm.sendPublish &&
+            schemaForm.sendUnpublish;
+
+        return schemaForm;
     }
 }

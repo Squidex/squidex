@@ -150,7 +150,7 @@ export class WebhooksService {
     public postWebhook(appName: string, dto: CreateWebhookDto, user: string, now?: DateTime, version?: Version): Observable<WebhookDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks`);
 
-        return HTTP.postVersioned(this.http, url, dto)
+        return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new WebhookDto(
                         response.id,
