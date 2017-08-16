@@ -23,7 +23,7 @@
             <tr>
                 <td>Url:</td>
                 <td>
-                    <input class="form-control" formControlName="url" [attr.value]="webhook.url" #inputUrl />
+                    <input type="url" class="form-control" formControlName="url" [attr.value]="webhook.url" #inputUrl />
                 </td>
                 <td>
                     <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputUrl">

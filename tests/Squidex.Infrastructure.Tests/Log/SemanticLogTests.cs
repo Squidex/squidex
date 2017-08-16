@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Log.Adapter;
@@ -291,6 +292,33 @@ namespace Squidex.Infrastructure.Log
                     .WriteProperty("category", "Squidex.Infrastructure.Log.SemanticLogTests"));
 
             Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_catch_all_exceptions_from_all_channels_when_exceptions_are_thrown()
+        {
+            var exception1 = new InvalidOperationException();
+            var exception2 = new InvalidOperationException();
+
+            var channel1 = A.Fake<ILogChannel>();
+            var channel2 = A.Fake<ILogChannel>();
+
+            A.CallTo(() => channel1.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception1);
+            A.CallTo(() => channel2.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception2);
+
+            var sut = new SemanticLog(new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), () => new JsonLogWriter());
+
+            try
+            {
+                sut.Log(SemanticLogLevel.Debug, w => w.WriteProperty("should", "throw"));
+
+                Assert.False(true);
+            }
+            catch (AggregateException ex)
+            {
+                Assert.Equal(exception1, ex.InnerExceptions[0]);
+                Assert.Equal(exception2, ex.InnerExceptions[1]);
+            }
         }
 
         private static string LogTest(Action<IObjectWriter> writer)
