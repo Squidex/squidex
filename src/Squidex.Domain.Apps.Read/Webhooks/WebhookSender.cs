@@ -23,58 +23,65 @@ namespace Squidex.Domain.Apps.Read.Webhooks
 
         public virtual async Task<(string Dump, WebhookResult Result, TimeSpan Elapsed)> SendAsync(WebhookJob job)
         {
-            HttpRequestMessage request = BuildRequest(job);
-            HttpResponseMessage response = null;
-
-            var responseString = string.Empty;
-
-            var isTimeout = false;
-
-            var watch = Stopwatch.StartNew();
-
             try
             {
-                using (var client = new HttpClient { Timeout = Timeout })
+                HttpRequestMessage request = BuildRequest(job);
+                HttpResponseMessage response = null;
+
+                var responseString = string.Empty;
+
+                var isTimeout = false;
+
+                var watch = Stopwatch.StartNew();
+
+                try
                 {
-                    response = await client.SendAsync(request);
+                    using (var client = new HttpClient { Timeout = Timeout })
+                    {
+                        response = await client.SendAsync(request);
+                    }
                 }
-            }
-            catch (TimeoutException)
-            {
-                isTimeout = true;
-            }
-            catch (OperationCanceledException)
-            {
-                isTimeout = true;
+                catch (TimeoutException)
+                {
+                    isTimeout = true;
+                }
+                catch (OperationCanceledException)
+                {
+                    isTimeout = true;
+                }
+                catch (Exception ex)
+                {
+                    responseString = ex.Message;
+                }
+                finally
+                {
+                    watch.Stop();
+                }
+
+                if (response != null)
+                {
+                    responseString = await response.Content.ReadAsStringAsync();
+                }
+
+                var dump = DumpFormatter.BuildDump(request, response, job.RequestBody, responseString, watch.Elapsed, isTimeout);
+
+                var result = WebhookResult.Failed;
+
+                if (isTimeout)
+                {
+                    result = WebhookResult.Timeout;
+                }
+                else if (response?.IsSuccessStatusCode == true)
+                {
+                    result = WebhookResult.Success;
+                }
+
+                return (dump, result, watch.Elapsed);
             }
             catch (Exception ex)
             {
-                responseString = ex.Message;
+                return (ex.Message, WebhookResult.Failed, TimeSpan.Zero);
             }
-            finally
-            {
-                watch.Stop();
-            }
-
-            if (response != null)
-            {
-                responseString = await response.Content.ReadAsStringAsync();
-            }
-
-            var dump = DumpFormatter.BuildDump(request, response, job.RequestBody, responseString, watch.Elapsed, isTimeout);
-
-            var result = WebhookResult.Failed;
-
-            if (isTimeout)
-            {
-                result = WebhookResult.Timeout;
-            }
-            else if (response?.IsSuccessStatusCode == true)
-            {
-                result = WebhookResult.Success;
-            }
-
-            return (dump, result, watch.Elapsed);
         }
 
         private static HttpRequestMessage BuildRequest(WebhookJob job)

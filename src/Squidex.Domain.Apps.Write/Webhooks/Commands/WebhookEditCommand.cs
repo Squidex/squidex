@@ -37,11 +37,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks.Commands
             {
                 errors.Add(new ValidationError("Url must be specified and absolute", nameof(Url)));
             }
-
-            if (Schemas == null)
-            {
-                errors.Add(new ValidationError("Schemas must be specified.", nameof(Schemas)));
-            }
         }
     }
 }

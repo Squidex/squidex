@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Http
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
             request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("UTF-8"));
 
-            var dump = DumpFormatter.BuildDump(request, null, null, null, TimeSpan.FromMinutes(1));
+            var dump = DumpFormatter.BuildDump(request, null, null, null, TimeSpan.FromMinutes(1), true);
 
             var expected = MakeDump(
                 "Request:",
@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Http
             response.Headers.TransferEncoding.Add(new TransferCodingHeaderValue("UTF-8"));
             response.Headers.Trailer.Add("Expires");
 
-            var dump = DumpFormatter.BuildDump(request, response, null, null, TimeSpan.FromMinutes(1));
+            var dump = DumpFormatter.BuildDump(request, response, null, null, TimeSpan.FromMinutes(1), false);
 
             var expected = MakeDump(
                 "Request:",
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.Http
             response.Headers.Trailer.Add("Expires");
             response.Content = new StringContent("Hello Back", Encoding.UTF8, "text/plain");
 
-            var dump = DumpFormatter.BuildDump(request, response, "Hello Squidex", "Hello Back", TimeSpan.FromMinutes(1));
+            var dump = DumpFormatter.BuildDump(request, response, "Hello Squidex", "Hello Back", TimeSpan.FromMinutes(1), true);
 
             var expected = MakeDump(
                 "Request:",
