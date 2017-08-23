@@ -115,6 +115,7 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoHistoryEventRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IHistoryEventRepository>()
+                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
