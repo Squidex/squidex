@@ -189,7 +189,7 @@ a {
 //
 // Tab control navigation.
 //
-.nav-field-tabs {
+.nav-tabs2 {
     & {
         @include absolute(auto, auto, 0, 1.25rem);
     }
@@ -198,9 +198,9 @@ a {
         & {
             color: $color-text;
             cursor: pointer;
-            padding: 1rem .625rem;
+            padding: 1rem 0;
             border-bottom: .25rem solid transparent;
-            width: 6.25rem;
+            margin: 0 1rem;
             text-align: center;
         }
 

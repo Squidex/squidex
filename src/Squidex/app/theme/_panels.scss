@@ -94,14 +94,16 @@
             overflow-y: scroll;
         }
 
-        & .flex-column {
-            margin-left: -$panel-padding;
-            margin-right: -$panel-padding;
-        }
+        & .nav-panel {
+            & {
+                margin-left: -$panel-padding;
+                margin-right: -$panel-padding;
+            }
 
-        & .nav-link {
-            padding-left: $panel-padding;
-            padding-right: $panel-padding;
+            & .nav-link {
+                padding-left: $panel-padding;
+                padding-right: $panel-padding;
+            }
         }
     }
 

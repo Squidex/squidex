@@ -19,7 +19,7 @@
             <div class="col col-options">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
-                        <i class="icon-settings2"></i>
+                        <i class="icon-settings"></i>
                     </button>
 
                     <div class="dropdown dropdown-options">
@@ -61,7 +61,7 @@
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm" (ngSubmit)="save()" [attr.disabled]="field.isLocked">
             <div class="table-items-row-details-tabs clearfix">
-                <ul class="nav nav-inline nav-field-tabs">
+                <ul class="nav nav-tabs2">
                     <li class="nav-item">
                         <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
                     </li>
