@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="isEditing" (dragstart)="alert('ff');">
+    <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm" (ngSubmit)="save()" [attr.disabled]="field.isLocked">
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-inline nav-field-tabs">

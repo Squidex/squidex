@@ -45,7 +45,13 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(authReq)
             .catch((error: HttpErrorResponse) => {
                 if (error.status === 401 && renew) {
-                    return this.authService.loginSilent().switchMap(u => this.makeRequest(req, next, u));
+                    return this.authService.loginSilent()
+                        .catch(_ => {
+                            this.authService.logoutRedirect();
+
+                            return Observable.empty<Profile>();
+                        })
+                        .switchMap(u => this.makeRequest(req, next, u));
                 } else if (error.status === 401 || error.status === 403) {
                     this.authService.logoutRedirect();
 

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 64 64"
+   style="enable-background:new 0 0 64 64;"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="dashboard-github.svg"
+   inkscape:export-filename="E:\Google Drive\Design Assets\Icons\New Icons - Aug 2017\dashboard-github.png"
+   inkscape:export-xdpi="126.56"
+   inkscape:export-ydpi="126.56"><metadata
+     id="metadata10569"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs10567" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="742"
+     inkscape:window-height="405"
+     id="namedview10565"
+     showgrid="false"
+     inkscape:zoom="3.6875"
+     inkscape:cx="24.949153"
+     inkscape:cy="32"
+     inkscape:window-x="2381"
+     inkscape:window-y="222"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" /><style
+     type="text/css"
+     id="style10533">
+	.st0{opacity:0;}
+	.st1{fill:#0074FF;}
+	.st2{fill:#B4BCC1;}
+	.st3{fill:#D7D7F9;}
+	.st4{fill:#2E3842;}
+	.st5{fill:#EDEDF9;}
+	.st6{fill:#B5B5EA;}
+	.st7{fill:#C7E0FF;}
+	.st8{fill:#7D878E;}
+	.st9{fill:#EEF6FF;}
+	.st10{opacity:0.2;}
+	.st11{fill:#3389FF;}
+	.st12{fill:#F2BDBD;}
+	.st13{fill:#F7DCDC;}
+	.st14{fill:#E29393;}
+	.st15{fill:#FFFFFF;}
+	.st16{fill:#F7F6E7;}
+	.st17{fill:#EFEBBF;}
+	.st18{fill:#FCFBEB;}
+	.st19{fill:#CEC395;}
+	.st20{fill:#F9C553;}
+	.st21{fill-rule:evenodd;clip-rule:evenodd;fill:#D6E2B3;}
+	.st22{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;}
+	.st23{fill:#77BA61;}
+	.st24{fill:#E7F7DC;}
+</style><g
+     class="st0"
+     id="g10535"><rect
+       class="st1"
+       width="64"
+       height="64"
+       id="rect10537" /></g><g
+     id="g10539"><circle
+       class="st21"
+       cx="32"
+       cy="32"
+       r="29"
+       id="circle10541" /><path
+       class="st4"
+       d="M32,62C15.5,62,2,48.5,2,32S15.5,2,32,2s30,13.5,30,30S48.5,62,32,62z M32,4C16.6,4,4,16.6,4,32s12.6,28,28,28   s28-12.6,28-28S47.4,4,32,4z"
+       id="path10543" /></g><g
+     id="g10545"><path
+       class="st22"
+       d="M26.9,46.9C26.9,46.9,26.9,47,26.9,46.9c2.7,0.3,7.1,0.4,13.4-0.6c4.8-1.2,9-4.4,9-12.8c0-3-1.1-5.4-2.8-7.3   c0.3-0.7,1.2-3.5-0.3-7.2c0,0-2.3-0.7-7.5,2.8c-2.2-0.6-4.5-0.9-6.8-0.9c-2.3,0-4.6,0.3-6.8,0.9c-5.2-3.5-7.5-2.8-7.5-2.8   c-1.5,3.7-0.5,6.5-0.3,7.2c-1.7,1.9-2.8,4.3-2.8,7.3C14.5,43.9,20.8,46.3,26.9,46.9z"
+       id="path10547" /></g><g
+     id="g10549"><path
+       class="st23"
+       d="M42.3,33.1c-2.2-2.1-6-1-10.3-1c0,0,0,0-0.1,0c0,0,0,0,0,0c-4.3,0-8.1-1.1-10.3,1c-1.3,1.2-1.9,2.7-1.9,4.3   c0,6.7,5.4,7.5,12.2,7.5H32c6.9,0,12.2-0.8,12.2-7.5C44.2,35.8,43.6,34.3,42.3,33.1z M26.1,41.2c-1.3,0-2.4-1.5-2.4-3.3   c0-1.8,1.1-3.3,2.4-3.3c1.3,0,2.4,1.5,2.4,3.3C28.5,39.7,27.4,41.2,26.1,41.2z M37.7,41.2c-1.3,0-2.4-1.5-2.4-3.3   c0-1.8,1.1-3.3,2.4-3.3c1.3,0,2.4,1.5,2.4,3.3C40.1,39.7,39,41.2,37.7,41.2z"
+       id="path10551" /></g><g
+     id="g10553"><path
+       class="st24"
+       d="M32,60C16.5,60,4,47.5,4,32S16.5,4,32,4s28,12.6,28,28S47.5,60,32,60z M32,6C17.6,6,6,17.6,6,32   s11.7,26,26,26c14.4,0,26-11.7,26-26S46.4,6,32,6z"
+       id="path10555" /></g><g
+     id="g10557"><path
+       class="st8"
+       d="M10,9H4C3.4,9,3,8.6,3,8s0.4-1,1-1h6c0.6,0,1,0.4,1,1S10.6,9,10,9z"
+       id="path10559" /></g><g
+     id="g10561"><path
+       class="st2"
+       d="M60,59h-7c-0.6,0-1-0.4-1-1s0.4-1,1-1h7c0.6,0,1,0.4,1,1S60.6,59,60,59z"
+       id="path10563" /></g></svg>

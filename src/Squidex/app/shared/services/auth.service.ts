@@ -163,7 +163,7 @@ export class AuthService {
 
         return observable.timeout(2000)
             .retryWhen(errors => errors
-                .filter(e => e instanceof TimeoutError)
+                .mergeMap(e => e instanceof TimeoutError ? Observable.of(e) : Observable.throw(e))
                 .delay(500)
                 .take(5)
                 .concat(Observable.throw(new Error('Retry limit exceeded.'))));
