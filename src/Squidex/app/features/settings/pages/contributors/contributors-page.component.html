@@ -55,19 +55,22 @@
             </table>
             
             <div class="table-items-footer">
-                <form class="form-inline" [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
-                    <div class="form-group mr-1">
-                        <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="email">
-                            <ng-template let-user="$implicit">
-                                <img class="user-picture autocomplete-user-picture" [attr.src]="user | sqxUserDtoPicture" />
+                <form [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
+                    <div class="row no-gutters">
+                        <div class="col">
+                            <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="email">
+                                <ng-template let-user="$implicit">
+                                    <img class="user-picture autocomplete-user-picture" [attr.src]="user | sqxUserDtoPicture" />
 
-                                <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
-                                <span class="user-email autocomplete-user-email">{{user.email}}</span>
-                            </ng-template>
-                        </sqx-autocomplete>
+                                    <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
+                                    <span class="user-email autocomplete-user-email">{{user.email}}</span>
+                                </ng-template>
+                            </sqx-autocomplete>
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="submit" class="btn btn-success" [disabled]="!canAddContributor">Add Contributor</button>
+                        </div>
                     </div>
-
-                    <button type="submit" class="btn btn-success" [disabled]="!canAddContributor">Add Contributor</button>
                 </form>
             </div>
         </div>

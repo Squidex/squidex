@@ -20,14 +20,17 @@
             </div>
 
             <div class="table-items-footer">
-                <form class="form-inline" [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()">
-                    <div class="form-group mr-1">
-                        <select class="form-control language-select" formControlName="language">
-                            <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
-                        </select>
+                <form [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()">
+                    <div class="row no-gutters">
+                        <div class="col">
+                            <select class="form-control language-select" formControlName="language">
+                                <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
+                            </select>
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="submit" class="btn btn-success" [disabled]="!addLanguageForm.valid">Add Language</button>
+                        </div>
                     </div>
-
-                    <button type="submit" class="btn btn-success" [disabled]="!addLanguageForm.valid">Add Language</button>
                 </form>
             </div>
         </div>

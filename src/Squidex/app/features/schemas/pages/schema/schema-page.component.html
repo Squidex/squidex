@@ -54,35 +54,40 @@
             
             <div class="table-items-footer">
                 <form [formGroup]="addFieldForm" (ngSubmit)="addField()">
-                    <div class="form-inline">
-                        <div class="form-group types-group mr-1">
+                    <div class="row no-gutters">
+                        <div class="col-4">
                             <sqx-dropdown formControlName="type" [items]="fieldTypes">
                                 <ng-template let-type="$implicit">
                                     <i class="field-icon icon-type-{{type}}"></i> <span>{{type}}</span>
                                 </ng-template>
                             </sqx-dropdown>
                         </div>
-
-                        <div class="form-group mr-1">
+                        
+                        <div class="col-8 pl-1">
                             <sqx-control-errors for="name" [submitted]="addFieldFormSubmitted"></sqx-control-errors>
 
                             <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" />
                         </div>
-
-                        <button type="submit" class="btn btn-success" [disabled]="!hasName">Add Field</button>
-                        <button type="button" class="btn btn-link" (click)="cancelAddField()">Cancel</button>
                     </div>
 
-                    <div>
-                        <div class="form-check">
-                            <label class="form-check-label pull-left">
-                                <input class="form-check-input" type="checkbox" formControlName="isLocalizable"> Localizable
-                            </label>
+                    <div class="row no-gutters mt-3">
+                        <div class="col">
+                            <div class="form-check">
+                                <label class="form-check-label pull-left">
+                                    <input class="form-check-input" type="checkbox" formControlName="isLocalizable"> Localizable
+                                </label>
+                            </div>
+    
+                            <small class="form-text text-muted">
+                                You can the field as localizable. It means that is dependent on the language, for example a city name.
+                            </small>
                         </div>
-
-                        <small class="form-text text-muted">
-                            You can the field as localizable. It means that is dependent on the language, e.g. a city name.
-                        </small>
+                        <div class="col col-auto pl-1">
+                            <button type="button" class="btn btn-secondary" (click)="cancelAddField()">Cancel</button>
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="submit" class="btn btn-success" [disabled]="!hasName">Add Field</button>
+                        </div>
                     </div>
                 </form>
             </div>

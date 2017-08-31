@@ -25,15 +25,20 @@
             </div>
 
             <div class="table-items-footer">
-                <form class="form-inline" [formGroup]="addClientForm" (ngSubmit)="attachClient()">
-                    <div class="form-group mr-1">
-                        <sqx-control-errors for="name" [submitted]="addClientFormSubmitted"></sqx-control-errors>
-
-                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxLowerCaseInput />
+                <form [formGroup]="addClientForm" (ngSubmit)="attachClient()">
+                    <div class="row no-gutters">
+                        <div class="col">
+                            <sqx-control-errors for="name" [submitted]="addClientFormSubmitted"></sqx-control-errors>
+                                
+                            <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxLowerCaseInput />
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="submit" class="btn btn-success" [disabled]="!hasName">Add Client</button>
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="reset" class="btn btn-secondary" (click)="cancelAttachClient()">Cancel</button>
+                        </div>
                     </div>
-
-                    <button type="submit" class="btn btn-success" [disabled]="!hasName">Add Client</button>
-                    <button type="reset" class="btn btn-link" (click)="cancelAttachClient()">Cancel</button>
                 </form>
             </div>
         </div>

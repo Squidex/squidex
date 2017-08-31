@@ -31,15 +31,20 @@
                     (deleting)="deleteWebhook(webhook)"></sqx-webhook>
 
                 <div class="table-items-footer">
-                    <form class="form-inline" [formGroup]="addWebhookForm" (ngSubmit)="addWebhook()">
-                        <div class="form-group mr-1">
-                            <sqx-control-errors for="url" [submitted]="addWebhookFormSubmitted"></sqx-control-errors>
-
-                            <input type="text" class="form-control url-control" formControlName="url" placeholder="Enter webhook url" autocomplete="off" />
+                    <form [formGroup]="addWebhookForm" (ngSubmit)="addWebhook()">
+                        <div class="row no-gutters">
+                            <div class="col">
+                                <sqx-control-errors for="url" [submitted]="addWebhookFormSubmitted"></sqx-control-errors>
+    
+                                <input type="text" class="form-control url-control" formControlName="url" placeholder="Enter webhook url" autocomplete="off" />
+                            </div>
+                            <div class="col col-auto pl-1">
+                                <button type="submit" class="btn btn-success" [disabled]="!hasUrl">Add Webhook</button>
+                            </div>
+                            <div class="col col-auto pl-1">
+                                <button type="reset" class="btn btn-secondary" (click)="cancelAddWebhook()" [disabled]="addWebhookFormSubmitted">Cancel</button>
+                            </div>
                         </div>
-                        
-                        <button type="submit" class="btn btn-success" [disabled]="!hasUrl">Add Webhook</button>
-                        <button type="reset" class="btn btn-link" (click)="cancelAddWebhook()" [disabled]="addWebhookFormSubmitted">Cancel</button>
                     </form>
                 </div>
             </div>
