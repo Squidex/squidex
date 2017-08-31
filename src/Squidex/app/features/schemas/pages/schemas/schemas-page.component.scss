@@ -20,9 +20,15 @@ $button-size: calc(2.5rem - 2px);
     line-height: 2.5rem;
 }
 
+.nav-link {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+}
+
 .schema {
     &-name {
         @include truncate;
+        color: $color-dark-foreground;
     }
 
     &-modified {
