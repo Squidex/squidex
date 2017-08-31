@@ -2,20 +2,24 @@
 @import '_mixins';
 
 .navbar {
-    @include box-shadow(0, 4px, 4px, .2px);
+    @include box-shadow(0, 3px, 5px, .13px);
     display: block;
 }
 
 .navbar-brand {
-    width: $size-sidebar-width - 2rem;
+    width: $size-sidebar-width;
+    background: $color-theme-blue-dark;
     padding-top: 0;
     padding-bottom: 0;
     cursor: pointer;
-    margin-top: -.2rem;
-    margin-bottom: -.2rem;
+    margin-top: -.5rem;
+    margin-left: -1rem;
     margin-right: 2rem;
     font-size: 1.8rem;
+    height: $size-navbar-height;
+    text-decoration: none;
     text-align: center;
+    line-height: $size-navbar-height;
     float: left;
 }
 

@@ -148,7 +148,7 @@
 
     // Search icon that is placed within the form control.
     .icon-search {
-        @include absolute(.625rem, 1rem, auto, auto);
+        @include absolute(.7rem, .7rem, auto, auto);
         color: $color-dark2-focus-foreground;
         font-size: 1.1rem;
         font-weight: lighter;
@@ -159,7 +159,7 @@
 .form-control-dark {
     & {
         @include transition(background-color .3s ease);
-        @include placeholder-color(darken($color-dark-foreground, 30%));
+        @include placeholder-color($color-dark2-placeholder);
         background: $color-dark2-control;
         border: 1px solid $color-dark2-control;
         color: darken($color-dark-foreground, 20%);
