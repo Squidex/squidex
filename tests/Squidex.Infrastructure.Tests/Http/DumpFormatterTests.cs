@@ -20,15 +20,11 @@ namespace Squidex.Infrastructure.Http
         [Fact]
         public void Should_format_dump_without_response()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, new Uri("https://cloud.squidex.io"));
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Squidex", "1.0"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
-            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("UTF-8"));
+            var httpRequest = CreateRequest();
 
-            var dump = DumpFormatter.BuildDump(request, null, null, null, TimeSpan.FromMinutes(1));
+            var dump = DumpFormatter.BuildDump(httpRequest, null, null, null, TimeSpan.FromMinutes(1), true);
 
-            var expected = MakeDump(
+            var expected = CreateExpectedDump(
                 "Request:",
                 "POST: https://cloud.squidex.io/ HTTP/1.1",
                 "User-Agent: Squidex/1.0",
@@ -45,19 +41,12 @@ namespace Squidex.Infrastructure.Http
         [Fact]
         public void Should_format_dump_without_content()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, new Uri("https://cloud.squidex.io"));
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Squidex", "1.0"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
-            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("UTF-8"));
+            var httpRequest  = CreateRequest();
+            var httpResponse = CreateResponse();
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.Headers.TransferEncoding.Add(new TransferCodingHeaderValue("UTF-8"));
-            response.Headers.Trailer.Add("Expires");
+            var dump = DumpFormatter.BuildDump(httpRequest, httpResponse, null, null, TimeSpan.FromMinutes(1), false);
 
-            var dump = DumpFormatter.BuildDump(request, response, null, null, TimeSpan.FromMinutes(1));
-
-            var expected = MakeDump(
+            var expected = CreateExpectedDump(
                 "Request:",
                 "POST: https://cloud.squidex.io/ HTTP/1.1",
                 "User-Agent: Squidex/1.0",
@@ -76,23 +65,14 @@ namespace Squidex.Infrastructure.Http
         }
 
         [Fact]
-        public void Should_format_dump_with_content()
+        public void Should_format_dump_with_content_without_timeout()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, new Uri("https://cloud.squidex.io"));
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Squidex", "1.0"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de"));
-            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
-            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("UTF-8"));
-            request.Content = new StringContent("Hello Squidex", Encoding.UTF8, "text/plain");
+            var httpRequest  = CreateRequest(new StringContent("Hello Squidex", Encoding.UTF8, "text/plain"));
+            var httpResponse = CreateResponse(new StringContent("Hello Back", Encoding.UTF8, "text/plain"));
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.Headers.TransferEncoding.Add(new TransferCodingHeaderValue("UTF-8"));
-            response.Headers.Trailer.Add("Expires");
-            response.Content = new StringContent("Hello Back", Encoding.UTF8, "text/plain");
+            var dump = DumpFormatter.BuildDump(httpRequest, httpResponse, "Hello Squidex", "Hello Back", TimeSpan.FromMinutes(1), false);
 
-            var dump = DumpFormatter.BuildDump(request, response, "Hello Squidex", "Hello Back", TimeSpan.FromMinutes(1));
-
-            var expected = MakeDump(
+            var expected = CreateExpectedDump(
                 "Request:",
                 "POST: https://cloud.squidex.io/ HTTP/1.1",
                 "User-Agent: Squidex/1.0",
@@ -116,7 +96,33 @@ namespace Squidex.Infrastructure.Http
             Assert.Equal(expected, dump);
         }
 
-        private static string MakeDump(params string[] input)
+        private static HttpRequestMessage CreateRequest(HttpContent content = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, new Uri("https://cloud.squidex.io"));
+
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Squidex", "1.0"));
+            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de"));
+            request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("UTF-8"));
+
+            request.Content = content;
+
+            return request;
+        }
+
+        private static HttpResponseMessage CreateResponse(HttpContent content = null)
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+            response.Headers.TransferEncoding.Add(new TransferCodingHeaderValue("UTF-8"));
+            response.Headers.Trailer.Add("Expires");
+
+            response.Content = content;
+
+            return response;
+        }
+
+        private static string CreateExpectedDump(params string[] input)
         {
             return string.Join(Environment.NewLine, input) + Environment.NewLine;
         }

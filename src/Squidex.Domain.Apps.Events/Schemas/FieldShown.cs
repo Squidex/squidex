@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("FieldShownEvent")]
-    public class FieldShown : FieldEvent
+    public sealed class FieldShown : FieldEvent
     {
     }
 }

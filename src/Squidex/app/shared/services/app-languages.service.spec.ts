@@ -60,7 +60,7 @@ describe('AppLanguagesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush([
             {
@@ -99,7 +99,7 @@ describe('AppLanguagesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({ iso2Code: 'de', englishName: 'German' });
 
@@ -117,7 +117,7 @@ describe('AppLanguagesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
         expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));
@@ -130,7 +130,7 @@ describe('AppLanguagesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));

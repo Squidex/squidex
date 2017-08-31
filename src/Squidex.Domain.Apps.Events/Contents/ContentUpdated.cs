@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentUpdatedEvent")]
-    public class ContentUpdated : ContentEvent
+    public sealed class ContentUpdated : ContentEvent
     {
         public NamedContentData Data { get; set; }
     }

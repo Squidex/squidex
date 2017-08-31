@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -712,100 +711,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldDeleted { FieldId = fieldId })
-                );
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook { Url = new Uri("https://cloud.squidex.io") }));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook()));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_schema_is_deleted()
-        {
-            CreateSchema();
-            DeleteSchema();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook { Url = new Uri("https://cloud.squidex.io") }));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_update_schema_and_create_events()
-        {
-            var command = new AddWebhook { Url = new Uri("https://cloud.squidex.io") };
-
-            CreateSchema();
-
-            sut.AddWebhook(CreateCommand(command));
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = command.Id, Url = command.Url, SharedSecret = command.SharedSecret })
-                );
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook()));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_webhook_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = Guid.NewGuid() }));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_schema_is_deleted()
-        {
-            CreateSchema();
-            DeleteSchema();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = Guid.NewGuid() }));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_update_schema_and_create_events()
-        {
-            var createCommand = new AddWebhook { Url = new Uri("https://cloud.squidex.io") };
-
-            CreateSchema();
-
-            sut.AddWebhook(CreateCommand(createCommand));
-            sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = createCommand.Id }));
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = createCommand.Id, Url = createCommand.Url, SharedSecret = createCommand.SharedSecret }),
-                    CreateEvent(new WebhookDeleted { Id = createCommand.Id })
                 );
         }
 

@@ -122,9 +122,12 @@ namespace Squidex.Controllers.Api.Schemas
         {
             var command = request.ToCommand();
 
-            await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, new EntityCreatedDto { Id = command.Name });
+            var result = context.Result<EntityCreatedResult<Guid>>();
+            var response = new EntityCreatedDto { Id = command.Name, Version = result.Version };
+
+            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, response);
         }
 
         /// <summary>

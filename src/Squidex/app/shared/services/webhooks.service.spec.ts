@@ -5,6 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
@@ -12,14 +13,37 @@ import {
     ApiUrlConfig,
     CreateWebhookDto,
     DateTime,
+    UpdateWebhookDto,
     Version,
     WebhookDto,
     WebhookEventDto,
     WebhookEventsDto,
+    WebhookSchemaDto,
     WebhooksService
 } from './../';
 
+describe('WebhookDto', () => {
+    const now = DateTime.now();
+    const user = 'me';
+    const version = new Version('1');
+
+    it('should update url and schemas', () => {
+        const webhook_1 = new WebhookDto('id1', 'token1', user, user, now, now, version, [], 'http://squidex.io/hook', 1, 2, 3, 4);
+        const webhook_2 =
+            webhook_1.update(new UpdateWebhookDto('http://squidex.io/hook2',
+            [
+                new WebhookSchemaDto('1', true, true, true, true, true),
+                new WebhookSchemaDto('2', true, true, true, true, true)
+            ]), user, now);
+
+        expect(webhook_2.url).toEqual('http://squidex.io/hook2');
+        expect(webhook_2.schemas.length).toEqual(2);
+    });
+});
+
 describe('WebhooksService', () => {
+    const now = DateTime.now();
+    const user = 'me';
     const version = new Version('1');
 
     beforeEach(() => {
@@ -55,51 +79,94 @@ describe('WebhooksService', () => {
         req.flush([
             {
                 id: 'id1',
-                schemaId: 'schemaId1',
                 sharedSecret: 'token1',
-                url: 'http://squidex.io/1',
+                created: '2016-12-12T10:10',
+                createdBy: 'CreatedBy1',
+                lastModified: '2017-12-12T10:10',
+                lastModifiedBy: 'LastModifiedBy1',
+                url: 'http://squidex.io/hook',
+                version: '1',
                 totalSucceeded: 1,
                 totalFailed: 2,
                 totalTimedout: 3,
-                averageRequestTimeMs: 4
-            },
-            {
-                id: 'id2',
-                schemaId: 'schemaId2',
-                sharedSecret: 'token2',
-                url: 'http://squidex.io/2',
-                totalSucceeded: 5,
-                totalFailed: 6,
-                totalTimedout: 7,
-                averageRequestTimeMs: 8
+                averageRequestTimeMs: 4,
+                schemas: [{
+                    schemaId: '1',
+                    sendCreate: true,
+                    sendUpdate: true,
+                    sendDelete: true,
+                    sendPublish: true,
+                    sendUnpublish: true
+                }, {
+                    schemaId: '2',
+                    sendCreate: true,
+                    sendUpdate: true,
+                    sendDelete: true,
+                    sendPublish: true,
+                    sendUnpublish: true
+                }]
             }
         ]);
 
         expect(webhooks).toEqual([
-            new WebhookDto('id1', 'schemaId1', 'token1', 'http://squidex.io/1', 1, 2, 3, 4),
-            new WebhookDto('id2', 'schemaId2', 'token2', 'http://squidex.io/2', 5, 6, 7, 8)
+            new WebhookDto('id1', 'token1', 'CreatedBy1', 'LastModifiedBy1',
+                DateTime.parseISO_UTC('2016-12-12T10:10'),
+                DateTime.parseISO_UTC('2017-12-12T10:10'),
+                version,
+                [
+                    new WebhookSchemaDto('1', true, true, true, true, true),
+                    new WebhookSchemaDto('2', true, true, true, true, true)
+                ],
+                'http://squidex.io/hook', 1, 2, 3, 4)
         ]);
     }));
 
     it('should make post request to create webhook',
         inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateWebhookDto('http://squidex.io/hook');
+        const dto = new CreateWebhookDto('http://squidex.io/hook', []);
 
         let webhook: WebhookDto | null = null;
 
-        webhooksService.postWebhook('my-app', 'my-schema', dto, version).subscribe(result => {
+        webhooksService.postWebhook('my-app', dto, user, now, version).subscribe(result => {
             webhook = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/webhooks');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' });
 
-        expect(webhook).toEqual(new WebhookDto('id1', 'schema1', 'token1', dto.url, 0, 0, 0, 0));
+        expect(webhook).toEqual(
+            new WebhookDto('id1', 'token1', user, user, now, now, version, [], 'http://squidex.io/hook', 0, 0, 0, 0));
+    }));
+
+    it('should make put request to update webhook',
+        inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
+
+        const dto = new UpdateWebhookDto('http://squidex.io/hook', []);
+
+        webhooksService.putWebhook('my-app', '123', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks/123');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make delete request to delete webhook',
+        inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
+
+        webhooksService.deleteWebhook('my-app', '123', version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks/123');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
     }));
 
     it('should make get request to get app webhook events',
@@ -156,7 +223,7 @@ describe('WebhooksService', () => {
             ]));
     }));
 
-    it('should make delete request to enqueue webhook event',
+    it('should make put request to enqueue webhook event',
         inject([WebhooksService, HttpTestingController], (webhooksService: WebhooksService, httpMock: HttpTestingController) => {
 
         webhooksService.enqueueEvent('my-app', '123').subscribe();

@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Apps
 {
     [TypeName("AppContributorAssignedEvent")]
-    public class AppContributorAssigned : AppEvent
+    public sealed class AppContributorAssigned : AppEvent
     {
         public string ContributorId { get; set; }
 

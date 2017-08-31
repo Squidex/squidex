@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("FieldDisabledEvent")]
-    public class FieldDisabled : FieldEvent
+    public sealed class FieldDisabled : FieldEvent
     {
     }
 }

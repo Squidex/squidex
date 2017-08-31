@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public class AssignContributor : AppAggregateCommand, IValidatable
+    public sealed class AssignContributor : AppAggregateCommand, IValidatable
     {
         public string ContributorId { get; set; }
 

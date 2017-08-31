@@ -25,8 +25,8 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public string SharedSecret { get; set; }
 
         /// <summary>
-        /// The id of the schema.
+        /// The version of the schema.
         /// </summary>
-        public string SchemaId { get; set; }
+        public long Version { get; set; }
     }
 }

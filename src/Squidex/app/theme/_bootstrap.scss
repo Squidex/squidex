@@ -414,7 +414,8 @@ a {
 
     // Remove all borders.
     &-borderless {
-        td {
+        td,
+        th {
             border: 0;
         }
     }

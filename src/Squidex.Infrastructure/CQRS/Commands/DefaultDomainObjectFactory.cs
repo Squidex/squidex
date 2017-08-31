@@ -27,6 +27,11 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             var factoryFunction = (DomainObjectFactoryFunction<T>)serviceProvider.GetService(typeof(DomainObjectFactoryFunction<T>));
 
+            if (factoryFunction == null)
+            {
+                throw new InvalidOperationException($"No factory registered for {typeof(T)}");
+            }
+
             var domainObject = factoryFunction.Invoke(id);
 
             if (domainObject.Version != -1)

@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Apps
 {
     [TypeName("AppContributorRemovedEvent")]
-    public class AppContributorRemoved : AppEvent
+    public sealed class AppContributorRemoved : AppEvent
     {
         public string ContributorId { get; set; }
     }

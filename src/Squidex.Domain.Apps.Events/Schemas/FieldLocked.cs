@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Schemas
 {
     [TypeName("FieldLockedEvent")]
-    public class FieldLocked : FieldEvent
+    public sealed class FieldLocked : FieldEvent
     {
     }
 }

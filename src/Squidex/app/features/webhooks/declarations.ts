@@ -6,4 +6,5 @@
  */
 
 export * from './pages/webhook-events-page.component';
+export * from './pages/webhook.component';
 export * from './pages/webhooks-page.component';

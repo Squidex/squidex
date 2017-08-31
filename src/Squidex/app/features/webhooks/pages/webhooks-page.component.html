@@ -26,96 +26,18 @@
             </div>
 
             <div *ngIf="webhooks">
-                <div *ngFor="let w of webhooks">
-                    <div class="table-items-row">
-                        <table class="table table-middle table-sm table-borderless table-fixed">
-                            <colgroup>
-                                <col style="width: 120px; text-align: right;" />
-                                <col style="width: 100%" />
-                                <col style="width: 40px" />
-                            </colgroup>
-
-                            <tr>
-                                <td colspan="2">
-                                    <h3 class="client-name">
-                                        Schema: {{w.schema.name}}
-                                    </h3>
-                                </td>
-                                <td class="client-delete">
-                                    <button type="button" class="btn btn-link btn-danger"
-                                        (sqxConfirmClick)="deleteWebhook(w)"
-                                        confirmTitle="Delete webhook" 
-                                        confirmText="Do you really want to delete the webhook?">
-                                        <i class="icon-bin2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Url:</td>
-                                <td>
-                                    <input readonly class="form-control" [attr.value]="w.webhook.url" #inputUrl />
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputUrl">
-                                        <i class="icon-copy"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Secret:</td>
-                                <td>
-                                    <input readonly class="form-control" [attr.value]="w.webhook.sharedSecret" #inputSecret />
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
-                                        <i class="icon-copy"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </table>
-                        
-                        <div class="webhook-stats" *ngIf="w.webhook.averageRequestTimeMs > 0">
-                            <div class="row">
-                                <div class="col-3">
-                                    <span title="Succeeded Requests" [class.success]="w.webhook.totalSucceeded > 0">
-                                        <i class="icon-checkmark"></i> {{w.webhook.totalSucceeded}}
-                                    </span>
-                                </div>
-                                <div class="col-3">
-                                    <span title="Failed Requests" [class.failed]="w.webhook.totalFailed > 0">
-                                        <i class="icon-bug"></i> {{w.webhook.totalFailed}}
-                                    </span>
-                                </div>
-                                <div class="col-3">
-                                    <span title="Timeout Requests" [class.failed]="w.webhook.totalTimedout > 0">
-                                        <i class="icon-timeout"></i> {{w.webhook.totalTimedout}}
-                                    </span>
-                                </div>
-                                <div class="col-3">
-                                    <span title="Average Response Time">
-                                        <i class="icon-elapsed"></i> {{w.webhook.averageRequestTimeMs}} ms
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <sqx-webhook *ngFor="let webhook of webhooks" [webhook]="webhook" [allSchemas]="schemas"  
+                    (updating)="updateWebhook(webhook, $event)"
+                    (deleting)="deleteWebhook(webhook)"></sqx-webhook>
 
                 <div class="table-items-footer">
                     <form class="form-inline" [formGroup]="addWebhookForm" (ngSubmit)="addWebhook()">
                         <div class="form-group mr-1">
-                            <select class="form-control schemas-control" formControlName="schemaId">
-                                <option *ngFor="let schema of schemas" [ngValue]="schema.id">{{schema.name}}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mr-1">
                             <sqx-control-errors for="url" [submitted]="addWebhookFormSubmitted"></sqx-control-errors>
 
-                            <input type="text" class="form-control" formControlName="url" placeholder="Enter webhook url" autocomplete="off" />
+                            <input type="text" class="form-control url-control" formControlName="url" placeholder="Enter webhook url" autocomplete="off" />
                         </div>
                         
-
                         <button type="submit" class="btn btn-success" [disabled]="!hasUrl">Add Webhook</button>
                         <button type="reset" class="btn btn-link" (click)="cancelAddWebhook()" [disabled]="addWebhookFormSubmitted">Cancel</button>
                     </form>

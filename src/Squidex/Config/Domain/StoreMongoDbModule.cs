@@ -23,8 +23,10 @@ using Squidex.Domain.Apps.Read.MongoDb.Assets;
 using Squidex.Domain.Apps.Read.MongoDb.Contents;
 using Squidex.Domain.Apps.Read.MongoDb.History;
 using Squidex.Domain.Apps.Read.MongoDb.Schemas;
+using Squidex.Domain.Apps.Read.MongoDb.Webhooks;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Webhooks.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
@@ -171,9 +173,9 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<MongoSchemaWebhookRepository>()
+            builder.RegisterType<MongoWebhookRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<ISchemaWebhookRepository>()
+                .As<IWebhookRepository>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()

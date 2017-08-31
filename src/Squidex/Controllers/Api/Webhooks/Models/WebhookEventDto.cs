@@ -9,7 +9,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
-using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Read.Webhooks;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {

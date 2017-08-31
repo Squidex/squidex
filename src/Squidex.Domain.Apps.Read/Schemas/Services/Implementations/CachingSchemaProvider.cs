@@ -125,14 +125,6 @@ namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
             {
                 Remove(schemaUpdatedEvent.AppId, schemaUpdatedEvent.SchemaId);
             }
-            else if (@event.Payload is WebhookAdded webhookAddedEvent)
-            {
-                Remove(webhookAddedEvent.AppId, webhookAddedEvent.SchemaId);
-            }
-            else if (@event.Payload is WebhookDeleted webhookDeletedEvent)
-            {
-                Remove(webhookDeletedEvent.AppId, webhookDeletedEvent.SchemaId);
-            }
 
             return TaskHelper.Done;
         }

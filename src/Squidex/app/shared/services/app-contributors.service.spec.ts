@@ -56,7 +56,7 @@ describe('AppContributorsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
             contributors: [
@@ -89,7 +89,7 @@ describe('AppContributorsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));
@@ -102,7 +102,7 @@ describe('AppContributorsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/123');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual('1');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));

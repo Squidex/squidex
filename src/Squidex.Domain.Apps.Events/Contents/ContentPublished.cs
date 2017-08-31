@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Contents
 {
     [TypeName("ContentPublishedEvent")]
-    public class ContentPublished : ContentEvent
+    public sealed class ContentPublished : ContentEvent
     {
     }
 }

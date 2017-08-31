@@ -42,7 +42,6 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(schemas, nameof(schemas));
-            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(contentRepository, nameof(contentRepository));

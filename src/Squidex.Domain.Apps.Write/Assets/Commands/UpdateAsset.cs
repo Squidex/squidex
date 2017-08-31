@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Write.Assets.Commands
 {
-    public class UpdateAsset : AssetAggregateCommand
+    public sealed class UpdateAsset : AssetAggregateCommand
     {
         public AssetFile File { get; set; }
 

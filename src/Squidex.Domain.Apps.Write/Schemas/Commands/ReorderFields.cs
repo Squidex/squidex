@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class ReorderFields : SchemaAggregateCommand, IValidatable
+    public sealed class ReorderFields : SchemaAggregateCommand, IValidatable
     {
         public List<long> FieldIds { get; set; }
 

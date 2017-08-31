@@ -15,7 +15,7 @@ using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Write.S
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class CreateSchema : AppCommand, IValidatable, IAggregateCommand
+    public sealed class CreateSchema : AppCommand, IValidatable, IAggregateCommand
     {
         private SchemaProperties properties;
         private SchemaFields fields;

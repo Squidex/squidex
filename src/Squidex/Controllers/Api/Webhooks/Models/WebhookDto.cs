@@ -8,6 +8,9 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
+using Squidex.Infrastructure;
+using System.Collections.Generic;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
@@ -19,9 +22,31 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The id of the schema.
+        /// The user that has created the webhook.
         /// </summary>
-        public Guid SchemaId { get; set; }
+        [Required]
+        public RefToken CreatedBy { get; set; }
+
+        /// <summary>
+        /// The user that has updated the webhook.
+        /// </summary>
+        [Required]
+        public RefToken LastModifiedBy { get; set; }
+
+        /// <summary>
+        /// The date and time when the webhook has been created.
+        /// </summary>
+        public Instant Created { get; set; }
+
+        /// <summary>
+        /// The date and time when the webhook has been modified last.
+        /// </summary>
+        public Instant LastModified { get; set; }
+
+        /// <summary>
+        /// The version of the webhook.
+        /// </summary>
+        public int Version { get; set; }
 
         /// <summary>
         /// The number of succceeded calls.
@@ -54,5 +79,11 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// </summary>
         [Required]
         public string SharedSecret { get; set; }
+
+        /// <summary>
+        /// The schema settings.
+        /// </summary>
+        [Required]
+        public List<WebhookSchemaDto> Schemas { get; set; }
     }
 }

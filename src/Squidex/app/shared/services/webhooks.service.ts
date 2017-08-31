@@ -21,13 +21,45 @@ import {
 export class WebhookDto {
     constructor(
         public readonly id: string,
-        public readonly schemaId: string,
         public readonly sharedSecret: string,
+        public readonly createdBy: string,
+        public readonly lastModifiedBy: string,
+        public readonly created: DateTime,
+        public readonly lastModified: DateTime,
+        public readonly version: Version,
+        public readonly schemas: WebhookSchemaDto[],
         public readonly url: string,
         public readonly totalSucceeded: number,
         public readonly totalFailed: number,
         public readonly totalTimedout: number,
         public readonly averageRequestTimeMs: number
+    ) {
+    }
+
+    public update(update: UpdateWebhookDto, user: string, now?: DateTime): WebhookDto {
+        return new WebhookDto(
+            this.id,
+            this.sharedSecret,
+            this.createdBy, user,
+            this.created, now || DateTime.now(),
+            this.version,
+            update.schemas,
+            update.url,
+            this.totalSucceeded,
+            this.totalFailed,
+            this.totalTimedout,
+            this.averageRequestTimeMs);
+    }
+}
+
+export class WebhookSchemaDto {
+    constructor(
+        public readonly schemaId: string,
+        public readonly sendCreate: boolean,
+        public readonly sendUpdate: boolean,
+        public readonly sendDelete: boolean,
+        public readonly sendPublish: boolean,
+        public readonly sendUnpublish: boolean
     ) {
     }
 }
@@ -57,7 +89,16 @@ export class WebhookEventsDto {
 
 export class CreateWebhookDto {
     constructor(
-        public readonly url: string
+        public readonly url: string,
+        public readonly schemas: WebhookSchemaDto[]
+    ) {
+    }
+}
+
+export class UpdateWebhookDto {
+    constructor(
+        public readonly url: string,
+        public readonly schemas: WebhookSchemaDto[]
     ) {
     }
 }
@@ -78,10 +119,24 @@ export class WebhooksService {
                     const items: any[] = response;
 
                     return items.map(item => {
+                        const schemas = item.schemas.map((schema: any) =>
+                            new WebhookSchemaDto(
+                                schema.schemaId,
+                                schema.sendCreate,
+                                schema.sendUpdate,
+                                schema.sendDelete,
+                                schema.sendPublish,
+                                schema.sendUnpublish));
+
                         return new WebhookDto(
                             item.id,
-                            item.schemaId,
                             item.sharedSecret,
+                            item.createdBy,
+                            item.lastModifiedBy,
+                            DateTime.parseISO_UTC(item.created),
+                            DateTime.parseISO_UTC(item.lastModified),
+                            new Version(item.version.toString()),
+                            schemas,
                             item.url,
                             item.totalSucceeded,
                             item.totalFailed,
@@ -92,23 +147,35 @@ export class WebhooksService {
                 .pretifyError('Failed to load webhooks. Please reload.');
     }
 
-    public postWebhook(appName: string, schemaName: string, dto: CreateWebhookDto, version?: Version): Observable<WebhookDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/webhooks`);
+    public postWebhook(appName: string, dto: CreateWebhookDto, user: string, now?: DateTime, version?: Version): Observable<WebhookDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new WebhookDto(
                         response.id,
-                        response.schemaId,
                         response.sharedSecret,
+                        user,
+                        user,
+                        now,
+                        now,
+                        version,
+                        dto.schemas,
                         dto.url,
                         0, 0, 0, 0);
                 })
                 .pretifyError('Failed to create webhook. Please reload.');
     }
 
-    public deleteWebhook(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/webhooks/${id}`);
+    public putWebhook(appName: string, id: string, dto: UpdateWebhookDto, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
+
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to update webhook. Please reload.');
+    }
+
+    public deleteWebhook(appName: string, id: string, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .pretifyError('Failed to delete webhook. Please reload.');
