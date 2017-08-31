@@ -1,23 +1,27 @@
 @import '_vars';
 @import '_mixins';
 
+$color-apps-border: #65a6ff;
+
 .nav {
     .nav-item {
         .nav-link {
             & {
+                @include box-shadow-colored(0, 2px, 4px, rgba(26, 93, 184, .26));
                 @include transition(opacity .4 ease);
                 @include opacity(.95);
                 @include no-selection;
                 @include border-radius;
-                color: $color-dark-foreground;
                 cursor: pointer;
-                border: 0;
-                background: $color-theme-blue-dark;
-                padding-top: .25rem;
+                color: $color-dark-foreground;
+                border: 1px solid $color-theme-blue-lighter;
+                background: $color-theme-blue;
+                padding-top: .1rem;
                 padding-left: 1rem;
                 padding-right: 2rem;
-                padding-bottom: .25rem;
-                margin-top: -.2rem;
+                padding-bottom: .1rem;
+                min-width: 150px;
+                margin-top: -.1rem;
             }
 
             &:hover {
@@ -25,8 +29,7 @@
             }
 
             &::after {
-                @include absolute(50%, 1rem, auto, auto);
-                color: $color-theme-blue-light;
+                @include absolute(45%, 1rem, auto, auto);
             }
         }
     }
@@ -34,6 +37,10 @@
 
 .drodown-button {
     padding: 1rem 1.5rem;
+}
+
+.dropdown-menu {
+    top: 2.65rem;
 }
 
 .icon-plus {
