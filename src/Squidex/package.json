@@ -47,7 +47,7 @@
     "@angular/tsc-wrapped": "4.3.6",
     "@ngtools/webpack": "1.6.2",
     "@types/core-js": "0.9.35",
-    "@types/jasmine": "2.5.54",
+    "@types/jasmine": "2.5.45",
     "@types/mousetrap": "1.5.34",
     "@types/node": "7.0.5",
     "@types/react": "16.0.5",
