@@ -92,8 +92,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                             label: 'Number of Assets',
                             lineTension: 0,
                             fill: false,
-                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                            borderColor: 'rgba(61, 135, 213, 1)',
+                            backgroundColor: 'rgba(51, 137, 213, 0.6)',
+                            borderColor: 'rgba(51, 137, 213, 1)',
                             borderWidth: 1,
                             data: dtos.map(x => x.count)
                         }
@@ -107,8 +107,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                             label: 'Size of Assets (MB)',
                             lineTension: 0,
                             fill: false,
-                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                            borderColor: 'rgba(61, 135, 213, 1)',
+                            backgroundColor: 'rgba(51, 137, 213, 0.6)',
+                            borderColor: 'rgba(51, 137, 213, 1)',
                             borderWidth: 1,
                             data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
                         }
@@ -124,8 +124,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                     datasets: [
                         {
                             label: 'Number of API Calls',
-                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                            borderColor: 'rgba(61, 135, 213, 1)',
+                            backgroundColor: 'rgba(51, 137, 213, 0.6)',
+                            borderColor: 'rgba(51, 137, 213, 1)',
                             borderWidth: 1,
                             data: dtos.map(x => x.count)
                         }
@@ -137,8 +137,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                     datasets: [
                         {
                             label: 'API Performance (Milliseconds)',
-                            backgroundColor: 'rgba(61, 135, 213, 0.6)',
-                            borderColor: 'rgba(61, 135, 213, 1)',
+                            backgroundColor: 'rgba(51, 137, 213, 0.6)',
+                            borderColor: 'rgba(51, 137, 213, 1)',
                             borderWidth: 1,
                             data: dtos.map(x => x.averageMs)
                         }
