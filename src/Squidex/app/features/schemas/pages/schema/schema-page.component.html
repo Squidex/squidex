@@ -4,21 +4,21 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button type="button" class="btn btn-link btn-sm btn-export" (click)="exportSchemaDialog.show()">
-                    JSON
+                <button type="button" class="btn btn-link btn-export" (click)="exportSchemaDialog.show()">
+                    JSON Preview
                 </button>
 
-                <div class="btn-group btn-group-sm" data-toggle="buttons">
-                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
                         Published
                     </button>
-                    <button type="button" class="btn btn-publishing btn-secondary" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
+                    <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
                         Unpublished
                     </button>
                 </div>
 
                <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-link btn-decent btn-sm" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #optionsButton>
+                    <button type="button" class="btn btn-link btn-decent" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #optionsButton>
                         <i class="icon-dots"></i>
                     </button>
                     <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>

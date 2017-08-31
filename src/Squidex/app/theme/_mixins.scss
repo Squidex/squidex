@@ -10,6 +10,15 @@
     }
 }
 
+@mixin build-toggle-button($color) {
+    & {
+        color: $color;
+        border-color: $color;
+        background: lighten($color, 40%);
+        z-index: 1000;
+    }
+}
+
 @mixin build-link-button($color) {
     & {
         color: $color;

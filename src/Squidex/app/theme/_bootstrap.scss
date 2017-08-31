@@ -315,6 +315,41 @@ a {
         }
     }
 
+    // Special button groups
+    &-group {
+
+        .btn-toggle {
+            & {
+                border: 2px solid $color-border;
+                background: $color-dark-foreground;
+            }
+
+            &.btn-primary {
+                @include build-toggle-button($color-theme-blue);
+            }
+
+            &.btn-info {
+                @include build-toggle-button($color-theme-blue);
+            }
+
+            &.btn-danger {
+                @include build-toggle-button($color-theme-error);
+            }
+
+            &.btn-success {
+                @include build-toggle-button($color-theme-green);
+            }
+
+            &.btn-warning {
+                @include build-toggle-button($color-theme-orange);
+            }
+        }
+
+        .btn + .btn-toggle {
+            margin-left: -2px;
+        }
+    }
+
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-link {
         & {
