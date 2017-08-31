@@ -24,21 +24,7 @@ noscript {
 
     // Lightweight, table like headline.
     &-headline {
-        & {
-            color: $color-text-decent;
-            display: block;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            font-weight: normal;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        &.active {
-            color: $color-text;
-            cursor: pointer;
-            pointer-events: none;
-        }
+        margin: 0 auto 2rem;
     }
 
     // Fix logo on the top right corner of the screen.

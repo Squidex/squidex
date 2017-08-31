@@ -10,11 +10,11 @@
     }
 }
 
-@mixin build-toggle-button($color) {
+@mixin build-toggle-button($color, $background) {
     & {
         color: $color;
         border-color: $color;
-        background: lighten($color, 40%);
+        background: $background;
         z-index: 1000;
     }
 }

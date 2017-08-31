@@ -325,23 +325,23 @@ a {
             }
 
             &.btn-primary {
-                @include build-toggle-button($color-theme-blue);
+                @include build-toggle-button($color-theme-blue, $color-badge-primary-background);
             }
 
             &.btn-info {
-                @include build-toggle-button($color-theme-blue);
+                @include build-toggle-button($color-theme-info, $color-badge-info-background);
             }
 
             &.btn-danger {
-                @include build-toggle-button($color-theme-error);
+                @include build-toggle-button($color-theme-error, $color-badge-danger-background);
             }
 
             &.btn-success {
-                @include build-toggle-button($color-theme-green);
+                @include build-toggle-button($color-theme-green, $color-badge-success-background);
             }
 
             &.btn-warning {
-                @include build-toggle-button($color-theme-orange);
+                @include build-toggle-button($color-theme-orange, $color-badge-warning-background);
             }
         }
 

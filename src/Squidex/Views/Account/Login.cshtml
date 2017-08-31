@@ -11,25 +11,23 @@
     <img class="profile-logo" src="~/images/logo-small.png" />
     
     <div class="container">
-        <div class="row">
-            <div class="col-6">
+        <div class="row text-center">
+            <div class="btn-group profile-headline">
                 @if (Model.IsLogin)
                 {
-                    <a class="profile-headline active" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
                 }
                 else
                 {
-                    <a class="profile-headline" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
                 }
-            </div>
-            <div class="col-6 profile-headline">
                 @if (!Model.IsLogin)
                 {
-                    <a class="profile-headline active" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
                 }
                 else
                 {
-                    <a class="profile-headline" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
                 }
             </div>
         </div>
