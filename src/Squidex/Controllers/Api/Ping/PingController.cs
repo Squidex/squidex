@@ -15,7 +15,7 @@ namespace Squidex.Controllers.Api.Ping
     /// <summary>
     /// Makes a ping request.
     /// </summary>
-    [MustBeAppEditor]
+    [MustBeAppReader]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Ping")]

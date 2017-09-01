@@ -44,10 +44,10 @@ namespace Squidex.Controllers.Api.Apps
         /// 200 => Language configuration returned.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppEditor]
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(LanguageDto[]), 200)]
+        [ProducesResponseType(typeof(AppLanguageDto[]), 200)]
         public IActionResult GetLanguages(string app)
         {
             var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x =>
