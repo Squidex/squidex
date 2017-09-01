@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Statistics.Models
 {
-    public class CurrentStorageDto
+    public sealed class CurrentStorageDto
     {
         /// <summary>
         /// The size in bytes.

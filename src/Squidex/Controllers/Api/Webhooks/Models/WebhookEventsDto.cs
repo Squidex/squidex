@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookEventsDto
+    public sealed class WebhookEventsDto
     {
         /// <summary>
         /// The total number of webhook events.

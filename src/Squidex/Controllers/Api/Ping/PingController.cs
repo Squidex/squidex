@@ -19,7 +19,7 @@ namespace Squidex.Controllers.Api.Ping
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Ping")]
-    public class PingController : Controller
+    public sealed class PingController : Controller
     {
         /// <summary>
         /// Get ping status.

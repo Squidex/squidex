@@ -11,11 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
+using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Contents.JsonSchema;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
+using Squidex.Shared.Identity;
 
 // ReSharper disable InvertIf
 
@@ -23,8 +25,10 @@ namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemaSwaggerGenerator
     {
-        private static readonly string schemaQueryDescription;
-        private static readonly string schemaBodyDescription;
+        private static readonly string SchemaQueryDescription;
+        private static readonly string SchemaBodyDescription;
+        private static readonly List<SwaggerSecurityRequirement> EditorSecurity;
+        private static readonly List<SwaggerSecurityRequirement> ReaderSecurity;
         private readonly ContentSchemaBuilder schemaBuilder = new ContentSchemaBuilder();
         private readonly SwaggerDocument document;
         private readonly JsonSchema4 contentSchema;
@@ -36,8 +40,28 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         static SchemaSwaggerGenerator()
         {
-            schemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
-            schemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
+            SchemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
+            SchemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
+
+            ReaderSecurity = new List<SwaggerSecurityRequirement>
+            {
+                new SwaggerSecurityRequirement
+                {
+                    {
+                        Constants.SecurityDefinition, new[] { SquidexRoles.AppReader }
+                    }
+                }
+            };
+
+            EditorSecurity = new List<SwaggerSecurityRequirement>
+            {
+                new SwaggerSecurityRequirement
+                {
+                    {
+                        Constants.SecurityDefinition, new[] { SquidexRoles.AppEditor }
+                    }
+                }
+            };
         }
 
         public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema,
@@ -89,7 +113,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.OperationId = $"Query{schemaKey}Contents";
                 operation.Summary = $"Queries {schemaName} contents.";
 
-                operation.Description = schemaQueryDescription;
+                operation.Description = SchemaQueryDescription;
 
                 operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take.");
                 operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
@@ -98,6 +122,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
 
                 operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+
+                operation.Security = ReaderSecurity;
             });
         }
 
@@ -109,6 +135,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Get a {schemaName} content.";
 
                 operation.AddResponse("200", $"{schemaName} content found.", contentSchema);
+
+                operation.Security = ReaderSecurity;
             });
         }
 
@@ -119,10 +147,12 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.OperationId = $"Create{schemaKey}Content";
                 operation.Summary = $"Create a {schemaName} content.";
 
-                operation.AddBodyParameter("data", dataSchema, schemaBodyDescription);
+                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
                 operation.AddResponse("201", $"{schemaName} created.", contentSchema);
+
+                operation.Security = EditorSecurity;
             });
         }
 
@@ -133,9 +163,11 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.OperationId = $"Update{schemaKey}Content";
                 operation.Summary = $"Update a {schemaName} content.";
 
-                operation.AddBodyParameter("data", dataSchema, schemaBodyDescription);
+                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("204", $"{schemaName} element updated.");
+
+                operation.Security = EditorSecurity;
             });
         }
 
@@ -146,9 +178,11 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.OperationId = $"Path{schemaKey}Content";
                 operation.Summary = $"Patchs a {schemaName} content.";
 
-                operation.AddBodyParameter("data", contentSchema, schemaBodyDescription);
+                operation.AddBodyParameter("data", contentSchema, SchemaBodyDescription);
 
                 operation.AddResponse("204", $"{schemaName} element updated.");
+
+                operation.Security = EditorSecurity;
             });
         }
 
@@ -160,6 +194,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Publish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} element published.");
+
+                operation.Security = EditorSecurity;
             });
         }
 
@@ -171,6 +207,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Unpublish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} element unpublished.");
+
+                operation.Security = EditorSecurity;
             });
         }
 
@@ -182,6 +220,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Delete a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content deleted.");
+
+                operation.Security = EditorSecurity;
             });
         }
 

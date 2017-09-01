@@ -28,7 +28,7 @@ namespace Squidex.Controllers.Api.Apps
     [Authorize]
     [ApiExceptionFilter]
     [SwaggerTag("Apps")]
-    public class AppsController : ControllerBase
+    public sealed class AppsController : ControllerBase
     {
         private readonly IAppRepository appRepository;
 

@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Plans.Models
 {
-    public class PlanChangedDto
+    public sealed class PlanChangedDto
     {
         /// <summary>
         /// Optional redirect uri.

@@ -17,7 +17,7 @@ namespace Squidex.Controllers.UI.Profile
 {
     [Authorize]
     [SwaggerIgnore]
-    public class PortalController : Controller
+    public sealed class PortalController : Controller
     {
         private readonly IAppPlanBillingManager appPlansBillingManager;
 

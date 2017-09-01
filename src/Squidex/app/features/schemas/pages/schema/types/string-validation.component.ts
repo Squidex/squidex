@@ -9,7 +9,12 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { StringFieldPropertiesDto } from 'shared';
+import {
+    ModalView,
+    StringFieldPropertiesDto,
+    UIRegexSuggestionDto,
+    UIService
+} from 'shared';
 
 @Component({
     selector: 'sqx-string-validation',
@@ -18,6 +23,7 @@ import { StringFieldPropertiesDto } from 'shared';
 })
 export class StringValidationComponent implements OnDestroy, OnInit {
     private patternSubscription: Subscription;
+    private uiSettingsSubscription: Subscription;
 
     @Input()
     public editForm: FormGroup;
@@ -27,9 +33,20 @@ export class StringValidationComponent implements OnDestroy, OnInit {
 
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: Observable<boolean>;
+    public showPatternSuggestions: Observable<boolean>;
+
+    public regexSuggestions: UIRegexSuggestionDto[] = [];
+
+    public regexSuggestionsModal = new ModalView(false, false);
+
+    constructor(
+        private readonly uiService: UIService
+    ) {
+    }
 
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
+        this.uiSettingsSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -58,11 +75,27 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                 .startWith('')
                 .map(x => x && x.trim().length > 0);
 
+        this.showPatternSuggestions =
+            this.editForm.controls['pattern'].valueChanges
+                .startWith('')
+                .map(x => !x || x.trim().length === 0);
+
+        this.uiSettingsSubscription =
+            this.uiService.getSettings()
+                .subscribe(settings => {
+                    this.regexSuggestions = settings.regexSuggestions;
+                });
+
         this.patternSubscription =
-            this.editForm.controls['pattern'].valueChanges.subscribe((value: string) => {
-                if (!value || value.length === 0) {
-                    this.editForm.controls['patternMessage'].setValue(undefined);
-                }
-            });
+            this.editForm.controls['pattern'].valueChanges
+                .subscribe((value: string) => {
+                    if (!value || value.length === 0) {
+                        this.editForm.controls['patternMessage'].setValue(undefined);
+                    }
+                });
+    }
+
+    public setPattern(pattern: string) {
+        this.editForm.controls['pattern'].setValue(pattern);
     }
 }

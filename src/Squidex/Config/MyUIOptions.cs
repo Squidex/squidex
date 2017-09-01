@@ -1,21 +1,19 @@
 ﻿// ==========================================================================
-//  UserCreatedDto.cs
+//  MyUIOptions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
-namespace Squidex.Controllers.Api.Users.Models
+// ReSharper disable CollectionNeverUpdated.Global
+
+namespace Squidex.Config
 {
-    public sealed class UserCreatedDto
+    public sealed class MyUIOptions
     {
-        [Required]
-        public string Id { get; set; }
-
-        [Required]
-        public string PictureUrl { get; set; }
+        public Dictionary<string, string> RegexSuggestions { get; set; }
     }
 }

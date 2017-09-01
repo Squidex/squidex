@@ -12,7 +12,7 @@ using NodaTime;
 
 namespace Squidex.Controllers.Api.History.Models
 {
-    public class HistoryEventDto
+    public sealed class HistoryEventDto
     {
         /// <summary>
         /// The message of the event.

@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public class ReorderFieldsDto
+    public sealed class ReorderFieldsDto
     {
         /// <summary>
         /// The field ids in the target order.
