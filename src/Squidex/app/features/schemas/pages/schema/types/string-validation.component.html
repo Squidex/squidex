@@ -24,7 +24,20 @@
         <label class="col col-3 col-form-label" for="field-pattern">Pattern</label>
 
         <div class="col col-6">
-            <input type="text" class="form-control" id="field-pattern" formControlName="pattern" placeholder="Regex Pattern" />
+            <input type="text" class="form-control" id="field-pattern" formControlName="pattern" placeholder="Regex Pattern" #patternInput
+                autocomplete="off" 
+                autocorrect="off"
+                autocapitalize="off" 
+                (focus)="regexSuggestionsModal.show()" (blur)="regexSuggestionsModal.hide()" />
+
+            <div *ngIf="regexSuggestions.length > 0 && (regexSuggestionsModal.isOpen | async) && (showPatternSuggestions | async)" [sqxModalTarget]="patternInput" class="control-dropdown">
+                <h4>Suggestions</h4>
+
+                <div *ngFor="let suggestion of regexSuggestions" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(suggestion.pattern)">
+                    <div class="truncate">{{suggestion.name}}</div>
+                    <div class="truncate text-muted">{{suggestion.pattern}}</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="form-group row" *ngIf="showPatternMessage | async">

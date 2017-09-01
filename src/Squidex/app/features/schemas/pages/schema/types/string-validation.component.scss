@@ -11,6 +11,33 @@
     }
 }
 
+.control-dropdown {
+    & {
+        max-width: 285px;
+        min-height: 220px;
+    }
+
+    h4 {
+        padding: .5rem 0 0 .5rem;
+    }
+
+    &-item {
+        & {
+            font-size: .85rem;
+        }
+
+        &:hover {
+            .text-muted {
+                color: $color-dark-foreground !important;
+            }
+        }
+    }
+}
+
 .form-check-input {
     margin: 0;
+}
+
+.truncate {
+    @include truncate;
 }

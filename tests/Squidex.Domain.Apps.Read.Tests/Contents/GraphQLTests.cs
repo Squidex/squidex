@@ -35,8 +35,8 @@ namespace Squidex.Domain.Apps.Read.Contents
 {
     public class GraphQLTests
     {
-        private static readonly Guid schemaId = Guid.NewGuid();
-        private static readonly Guid appId = Guid.NewGuid();
+        private readonly Guid schemaId = Guid.NewGuid();
+        private readonly Guid appId = Guid.NewGuid();
 
         private readonly Schema schema =
             Schema.Create("my-schema", new SchemaProperties())

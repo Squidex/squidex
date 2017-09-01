@@ -43,11 +43,11 @@ namespace Squidex.Controllers.Api.UI
             var dto = new UISettingsDto
             {
                 RegexSuggestions =
-                    uiOptions?.RegexSuggestions.Where(x =>
+                    uiOptions.RegexSuggestions?
+                        .Where(x =>
                             !string.IsNullOrWhiteSpace(x.Key) &&
                             !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value })
-                        .ToList()
+                        .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value }).ToList()
                     ?? new List<UIRegexSuggestionDto>()
             };
 
