@@ -76,6 +76,8 @@ namespace Squidex
                 Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 Configuration.GetSection("identity"));
+            services.Configure<MyUrlsOptions>(
+                Configuration.GetSection("ui"));
             services.Configure<MyUsageOptions>(
                 Configuration.GetSection("usage"));
 

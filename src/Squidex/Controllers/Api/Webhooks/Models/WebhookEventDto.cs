@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Read.Webhooks;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookEventDto
+    public sealed class WebhookEventDto
     {
         /// <summary>
         /// The id of the event.

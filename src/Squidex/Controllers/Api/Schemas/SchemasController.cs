@@ -30,7 +30,7 @@ namespace Squidex.Controllers.Api.Schemas
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Schemas")]
-    public class SchemasController : ControllerBase
+    public sealed class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
 

@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookCreatedDto
+    public sealed class WebhookCreatedDto
     {
         /// <summary>
         /// The id of the webhook.

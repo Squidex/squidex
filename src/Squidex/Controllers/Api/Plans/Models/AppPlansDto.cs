@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Controllers.Api.Plans.Models
 {
-    public class AppPlansDto
+    public sealed class AppPlansDto
     {
         /// <summary>
         /// The available plans.

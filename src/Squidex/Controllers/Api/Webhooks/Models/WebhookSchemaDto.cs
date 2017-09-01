@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookSchemaDto
+    public sealed class WebhookSchemaDto
     {
         /// <summary>
         /// The id of the schema.

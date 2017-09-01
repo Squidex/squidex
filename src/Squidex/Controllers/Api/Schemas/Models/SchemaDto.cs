@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public class SchemaDto
+    public sealed class SchemaDto
     {
         /// <summary>
         /// The id of the schema.

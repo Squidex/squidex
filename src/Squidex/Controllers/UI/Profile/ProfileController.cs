@@ -27,7 +27,7 @@ namespace Squidex.Controllers.UI.Profile
 {
     [Authorize]
     [SwaggerIgnore]
-    public class ProfileController : Controller
+    public sealed class ProfileController : Controller
     {
         private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;

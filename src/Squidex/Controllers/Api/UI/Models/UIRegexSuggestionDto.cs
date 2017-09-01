@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  UpdateAppClientDto.cs
+//  UIRegexSuggestionDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,19 +8,20 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api.Apps.Models
+namespace Squidex.Controllers.Api.UI.Models
 {
-    public sealed class UpdateAppClientDto
+    public sealed class UIRegexSuggestionDto
     {
         /// <summary>
-        /// The new display name of the client.
+        /// The name of the suggestion.
         /// </summary>
-        [StringLength(20)]
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
-        /// Determines if the client is a reader.
+        /// The regex pattern.
         /// </summary>
-        public bool? IsReader { get; set; }
+        [Required]
+        public string Pattern { get; set; }
     }
 }

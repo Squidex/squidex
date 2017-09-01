@@ -30,7 +30,7 @@ namespace Squidex.Controllers.Api.Users
     /// </summary>
     [ApiExceptionFilter]
     [SwaggerTag("Users")]
-    public class UsersController : Controller
+    public sealed class UsersController : Controller
     {
         private static readonly byte[] AvatarBytes;
         private readonly UserManager<IUser> userManager;

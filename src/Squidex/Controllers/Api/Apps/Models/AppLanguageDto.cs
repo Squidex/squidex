@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class AppLanguageDto
+    public sealed class AppLanguageDto
     {
         /// <summary>
         /// The iso code of the language.

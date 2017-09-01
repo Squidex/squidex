@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class ContributorsDto
+    public sealed class ContributorsDto
     {
         /// <summary>
         /// The contributors.
