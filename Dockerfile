@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM microsoft/aspnetcore-build:2.2.0 as builder
+FROM microsoft/aspnetcore-build:2.0.0 as builder
 
 # Install runtime dependencies
 RUN apt-get update \
