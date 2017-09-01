@@ -10,8 +10,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using ImageSharp;
-using ImageSharp.Formats;
 using ImageSharp.Processing;
+using SixLabors.Primitives;
 
 namespace Squidex.Infrastructure.Assets.ImageSharp
 {
@@ -19,8 +19,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
     {
         public ImageSharpAssetThumbnailGenerator()
         {
-            Configuration.Default.AddImageFormat(new JpegFormat());
-            Configuration.Default.AddImageFormat(new PngFormat());
+            Configuration.Default.AddImageFormat(ImageFormats.Jpeg);
+            Configuration.Default.AddImageFormat(ImageFormats.Png);
         }
 
         public Task CreateThumbnailAsync(Stream source, Stream destination, int? width, int? height, string mode)
@@ -42,22 +42,16 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                 var w = width ?? int.MaxValue;
                 var h = height ?? int.MaxValue;
 
-                using (var sourceImage = Image.Load(source))
+                using (var sourceImage = Image.Load(source, out var format))
                 {
                     if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop)
                     {
                         resizeMode = ResizeMode.BoxPad;
                     }
 
-                    var options =
-                        new ResizeOptions
-                        {
-                            Size = new Size(w, h),
-                            Mode = resizeMode
-                        };
+                    var options = new ResizeOptions { Size = new Size(w, h), Mode = resizeMode };
 
-                    sourceImage.MetaData.Quality = 0;
-                    sourceImage.Resize(options).Save(destination);
+                    sourceImage.Resize(options).Save(destination, format);
                 }
             });
         }

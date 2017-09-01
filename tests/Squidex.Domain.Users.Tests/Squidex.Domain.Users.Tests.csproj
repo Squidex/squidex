@@ -2,7 +2,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RootNamespace>Squidex.Domain.Users</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -13,9 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="4.0.0" />
-    <PackageReference Include="FluentAssertions" Version="4.19.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+    <PackageReference Include="FluentAssertions" Version="4.19.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>

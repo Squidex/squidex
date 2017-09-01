@@ -14,8 +14,8 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.OData.Core" Version="7.2.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 </Project>
