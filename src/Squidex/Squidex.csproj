@@ -7,8 +7,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>Squidex</PackageId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <RuntimeFrameworkVersion>1.1.2</RuntimeFrameworkVersion>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 

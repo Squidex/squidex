@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:1.1.2
+FROM microsoft/aspnetcore-build:2.0.0
 
 # Install runtime dependencies
 RUN apt-get update \
