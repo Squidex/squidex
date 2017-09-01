@@ -23,7 +23,7 @@ namespace Squidex.Controllers.Api.Schemas
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag("Schemas")]
-    public class SchemaFieldsController : ControllerBase
+    public sealed class SchemaFieldsController : ControllerBase
     {
         public SchemaFieldsController(ICommandBus commandBus)
             : base(commandBus)

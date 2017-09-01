@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class UpdateWebhookDto
+    public sealed class UpdateWebhookDto
     {
         /// <summary>
         /// The url of the webhook.

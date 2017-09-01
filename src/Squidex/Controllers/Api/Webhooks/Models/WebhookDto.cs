@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookDto
+    public sealed class WebhookDto
     {
         /// <summary>
         /// The id of the webhook.

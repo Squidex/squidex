@@ -14,7 +14,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class CreateWebhookDto
+    public sealed class CreateWebhookDto
     {
         /// <summary>
         /// The url of the webhook.

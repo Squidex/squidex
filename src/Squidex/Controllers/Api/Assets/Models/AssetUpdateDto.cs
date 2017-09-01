@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Assets.Models
 {
-    public class AssetUpdateDto
+    public sealed class AssetUpdateDto
     {
         /// <summary>
         /// The new name of the asset.

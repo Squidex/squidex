@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api
 {
-    public class LanguageDto
+    public sealed class LanguageDto
     {
         /// <summary>
         /// The iso code of the language.

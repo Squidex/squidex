@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api
 {
-    public class EntityCreatedDto
+    public sealed class EntityCreatedDto
     {
         /// <summary>
         /// Id of the created entity.

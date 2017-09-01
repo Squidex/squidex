@@ -29,7 +29,7 @@ namespace Squidex.Controllers.Api.Webhooks
     [AppApi]
     [SwaggerTag("Webhooks")]
     [MustBeAppDeveloper]
-    public class WebhooksController : ControllerBase
+    public sealed class WebhooksController : ControllerBase
     {
         private readonly IWebhookRepository webhooksRepository;
         private readonly IWebhookEventRepository webhookEventsRepository;
