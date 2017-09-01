@@ -70,15 +70,19 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
         {
             await EnsureWebooksLoadedAsync();
 
-            await Collection.UpdateAsync(@event, headers, w =>
+            var webhooks = await Collection.Find(t => t.SchemaIds.Contains(@event.SchemaId.Id)).ToListAsync();
+
+            foreach (var webhook in webhooks)
             {
-                w.Schemas.RemoveAll(s => s.SchemaId == @event.SchemaId.Id);
+                webhook.Schemas.RemoveAll(s => s.SchemaId == @event.SchemaId.Id);
 
-                w.SchemaIds = w.Schemas.Select(x => x.SchemaId).ToList();
+                webhook.SchemaIds = webhook.Schemas.Select(x => x.SchemaId).ToList();
 
-                inMemoryWebhooks.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
-                inMemoryWebhooks.GetOrAddNew(w.AppId).Add(w);
-            });
+                inMemoryWebhooks.GetOrAddNew(webhook.AppId).RemoveAll(x => x.Id == webhook.Id);
+                inMemoryWebhooks.GetOrAddNew(webhook.AppId).Add(webhook);
+
+                await Collection.ReplaceOneAsync(x => x.Id == webhook.Id, webhook);
+            }
         }
 
         protected async Task On(WebhookDeleted @event, EnvelopeHeaders headers)
