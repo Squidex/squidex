@@ -15,6 +15,7 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
@@ -91,6 +92,8 @@ namespace Squidex.Config.Identity
                 GetApiResources());
             services.AddSingleton(
                 GetIdentityResources());
+            services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
+                UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,
                 LazyClientStore>();
             services.AddSingleton<IResourceStore,
@@ -121,6 +124,7 @@ namespace Squidex.Config.Identity
             {
                 UserClaims = new List<string>
                 {
+                    JwtClaimTypes.Email,
                     JwtClaimTypes.Role
                 }
             };
@@ -130,7 +134,7 @@ namespace Squidex.Config.Identity
         {
             yield return new IdentityResources.OpenId();
             yield return new IdentityResources.Profile();
-            yield return new IdentityResources.Profile();
+            yield return new IdentityResources.Email();
             yield return new IdentityResource(Constants.RoleScope,
                 new[]
                 {

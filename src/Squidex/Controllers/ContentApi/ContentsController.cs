@@ -123,7 +123,7 @@ namespace Squidex.Controllers.ContentApi
 
                         if (hasScript && !isFrontendClient)
                         {
-                            data = scriptEngine.ExecuteAndTransform(new ScriptContext { Data = data, ContentId = item.Id, User = scriptUser }, scriptText, "transform item");
+                            data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = item.Id, User = scriptUser }, scriptText);
                         }
 
                         itemModel.Data = data;
@@ -173,7 +173,7 @@ namespace Squidex.Controllers.ContentApi
 
                     if (hasScript)
                     {
-                        data = scriptEngine.ExecuteAndTransform(new ScriptContext { Data = data, ContentId = entity.Id, User = scriptUser }, scriptText, "transform item");
+                        data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = entity.Id, User = scriptUser }, scriptText);
                     }
                 }
 
@@ -191,7 +191,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent([FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            var command = new CreateContent { ContentId = Guid.NewGuid(), Principal = User, Data = request.ToCleaned(), Publish = publish };
+            var command = new CreateContent { ContentId = Guid.NewGuid(), User = User, Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -207,7 +207,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(Guid id, [FromBody] NamedContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Principal = User, Data = request.ToCleaned() };
+            var command = new UpdateContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -223,7 +223,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(Guid id, [FromBody] NamedContentData request)
         {
-            var command = new PatchContent { ContentId = id, Principal = User, Data = request.ToCleaned() };
+            var command = new PatchContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -239,7 +239,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(Guid id)
         {
-            var command = new PublishContent { ContentId = id, Principal = User };
+            var command = new PublishContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
@@ -252,7 +252,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(Guid id)
         {
-            var command = new UnpublishContent { ContentId = id, Principal = User };
+            var command = new UnpublishContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
@@ -265,7 +265,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(Guid id)
         {
-            var command = new DeleteContent { ContentId = id, Principal = User };
+            var command = new DeleteContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 

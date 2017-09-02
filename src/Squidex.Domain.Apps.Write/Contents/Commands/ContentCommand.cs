@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
     public abstract class ContentCommand : SchemaCommand, IAggregateCommand
     {
-        public ClaimsPrincipal Principal { get; set; }
+        public ClaimsPrincipal User { get; set; }
 
         public Guid ContentId { get; set; }
 

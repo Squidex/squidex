@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
@@ -38,6 +39,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
+        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly NamedContentData invalidData = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(null));
         private readonly NamedContentData data = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(1));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
@@ -67,7 +69,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(invalidData);
 
-            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = invalidData });
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = invalidData, User = user });
 
             await TestCreate(content, async _ =>
             {
@@ -81,7 +83,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(data);
             A.CallTo(() => schemaEntity.ScriptCreate).Returns("<create-script>");
 
-            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data });
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data, User = user });
 
             await TestCreate(content, async _ =>
             {
@@ -100,7 +102,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = invalidData });
+            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = invalidData, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -116,7 +118,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = data });
+            var context = CreateContextForCommand(new UpdateContent { ContentId = contentId, Data = data, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -135,7 +137,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = invalidData });
+            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = invalidData, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -149,13 +151,13 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(data);
             A.CallTo(() => schemaEntity.ScriptUpdate).Returns("<update-script>");
 
-            var path = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
+            var patch = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(path);
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(patch);
 
             CreateContent();
 
-            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = path });
+            var context = CreateContextForCommand(new PatchContent { ContentId = contentId, Data = patch, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -174,7 +176,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var context = CreateContextForCommand(new PublishContent { ContentId = contentId });
+            var context = CreateContextForCommand(new PublishContent { ContentId = contentId, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -191,7 +193,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var context = CreateContextForCommand(new UnpublishContent { ContentId = contentId });
+            var context = CreateContextForCommand(new UnpublishContent { ContentId = contentId, User = user });
 
             await TestUpdate(content, async _ =>
             {
@@ -208,7 +210,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             CreateContent();
 
-            var command = CreateContextForCommand(new DeleteContent { ContentId = contentId });
+            var command = CreateContextForCommand(new DeleteContent { ContentId = contentId, User = user });
 
             await TestUpdate(content, async _ =>
             {

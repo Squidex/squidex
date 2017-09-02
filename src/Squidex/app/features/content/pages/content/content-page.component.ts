@@ -135,6 +135,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                         this.emitContentUpdated(this.content);
                         this.notifyInfo('Content saved successfully.');
                         this.enableContentForm();
+                        this.populateContentForm();
                     }, error => {
                         this.notifyError(error);
                         this.enableContentForm();
