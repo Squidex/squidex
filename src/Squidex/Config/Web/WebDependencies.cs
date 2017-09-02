@@ -6,11 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
-using Squidex.Pipeline;
 
 namespace Squidex.Config.Web
 {
@@ -18,16 +15,7 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvc(this IServiceCollection services)
         {
-            services
-                .AddMvc()
-                .AddMySerializers()
-                .ConfigureApplicationPartManager(manager =>
-                {
-                    var oldMetadataReferenceFeatureProvider = manager.FeatureProviders.First(f => f is MetadataReferenceFeatureProvider);
-
-                    manager.FeatureProviders.Remove(oldMetadataReferenceFeatureProvider);
-                    manager.FeatureProviders.Add(new ReferencesMetadataReferenceFeatureProvider());
-                });
+            services.AddMvc().AddMySerializers();
         }
     }
 }
