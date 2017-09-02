@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
