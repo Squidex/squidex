@@ -87,7 +87,8 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                user.UpdateEmail(email);
+                await DoChecked(() => userManager.SetEmailAsync(user, email), "Cannot update email.");
+                await DoChecked(() => userManager.SetUserNameAsync(user, email), "Cannot update email.");
             }
 
             if (!string.IsNullOrWhiteSpace(displayName))
