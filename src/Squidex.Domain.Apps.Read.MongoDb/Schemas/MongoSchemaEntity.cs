@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public string Name { get; set; }
 
+        public string ScriptUnpublish { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public string Schema { get; set; }
@@ -52,6 +54,26 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonRequired]
         [BsonElement]
         public bool IsDeleted { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptQuery { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptCreate { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptUpdate { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptDelete { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptPublish { get; set; }
 
         Schema ISchemaEntity.Schema
         {

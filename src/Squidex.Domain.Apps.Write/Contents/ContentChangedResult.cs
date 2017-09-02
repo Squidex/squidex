@@ -1,26 +1,24 @@
 ﻿// ==========================================================================
-//  ContentCommand.cs
+//  ContentChangedResult.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Security.Claims;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Domain.Apps.Write.Contents.Commands
+namespace Squidex.Domain.Apps.Write.Contents
 {
-    public abstract class ContentCommand : SchemaCommand, IAggregateCommand
+    public sealed class ContentChangedResult : EntitySavedResult
     {
-        public ClaimsPrincipal Principal { get; set; }
+        public NamedContentData Content { get; }
 
-        public Guid ContentId { get; set; }
-
-        Guid IAggregateCommand.AggregateId
+        public ContentChangedResult(NamedContentData content, long version) 
+            : base(version)
         {
-            get { return ContentId; }
+            Content = content;
         }
     }
 }

@@ -92,12 +92,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             engine.SetGlobalFunction("disallow", new Action<string>(message =>
             {
-                throw new DomainForbiddenException(!string.IsNullOrWhiteSpace(message) ? message : "Not allowed");
+                var exMessage = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
+
+                throw new DomainForbiddenException(exMessage);
             }));
 
             engine.SetGlobalFunction("reject", new Action<string>(message =>
             {
-                throw new ValidationException($"Failed to {operationName}", !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null);
+                var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
+
+                throw new ValidationException($"Script rejected to to {operationName}.", errors);
             }));
 
             var json = JsonConvert.SerializeObject(context, serializerSettings);

@@ -160,6 +160,56 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
+        public void ConfigureScripts_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ConfigureScripts(CreateCommand(new ConfigureScripts()));
+            });
+        }
+
+        [Fact]
+        public void ConfigureScripts_should_throw_exception_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ConfigureScripts(CreateCommand(new ConfigureScripts()));
+            });
+        }
+
+        [Fact]
+        public void ConfigureScripts_should_create_events()
+        {
+            CreateSchema();
+
+            sut.ConfigureScripts(CreateCommand(new ConfigureScripts
+            {
+                ScriptCreate = "<create>",
+                ScriptUpdate = "<update>",
+                ScriptDelete = "<delete>",
+                ScriptPublish = "<publish>",
+                ScriptUnpublish = "<unpublish>",
+                ScriptQuery = "<query>",
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new ScriptsConfigured
+                    {
+                        ScriptCreate = "<create>",
+                        ScriptUpdate = "<update>",
+                        ScriptDelete = "<delete>",
+                        ScriptPublish = "<publish>",
+                        ScriptUnpublish = "<unpublish>",
+                        ScriptQuery = "<query>",
+                    })
+                );
+        }
+
+        [Fact]
         public void Reorder_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>

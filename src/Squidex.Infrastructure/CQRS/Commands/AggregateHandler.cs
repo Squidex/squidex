@@ -87,9 +87,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private static IAggregateCommand GetCommand(CommandContext context)
         {
-            var command = context.Command as IAggregateCommand;
-
-            if (command == null)
+            if (!(context.Command is IAggregateCommand command))
             {
                 throw new ArgumentException("Context must have an aggregate command.", nameof(context));
             }

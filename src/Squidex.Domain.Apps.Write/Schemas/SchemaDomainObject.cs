@@ -276,6 +276,17 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return this;
         }
 
+        public SchemaDomainObject ConfigureScripts(ConfigureScripts command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
+
+            return this;
+        }
+
         public SchemaDomainObject Delete(DeleteSchema command)
         {
             VerifyCreatedAndNotDeleted();

@@ -35,6 +35,11 @@ namespace Squidex.Domain.Apps.Write.Contents
             get { return isPublished; }
         }
 
+        public NamedContentData Data
+        {
+            get { return data; }
+        }
+
         public ContentDomainObject(Guid id, int version)
             : base(id, version)
         {
@@ -122,7 +127,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             VerifyCreatedAndNotDeleted();
 
-            if (!command.Data.Equals(data))
+            if (!command.Data.Equals(Data))
             {
                 RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
             }
@@ -136,9 +141,9 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             VerifyCreatedAndNotDeleted();
 
-            var newData = data.MergeInto(command.Data);
+            var newData = Data.MergeInto(command.Data);
 
-            if (!newData.Equals(data))
+            if (!newData.Equals(Data))
             {
                 RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = newData }));
             }

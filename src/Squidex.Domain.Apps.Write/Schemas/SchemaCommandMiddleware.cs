@@ -120,6 +120,11 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Unpublish(command));
         }
 
+        protected Task On(ConfigureScripts command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ConfigureScripts(command));
+        }
+
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (!await this.DispatchActionAsync(context.Command, context))

@@ -1,4 +1,12 @@
-﻿using System.Collections.Generic;
+﻿// ==========================================================================
+//  ScriptUser.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Squidex.Domain.Apps.Core.Scripting
