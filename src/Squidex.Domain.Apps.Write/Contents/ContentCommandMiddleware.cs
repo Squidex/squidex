@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
                 content.Update(command);
 
-                context.Complete(new ContentChangedResult(content.Data, content.Version));
+                context.Complete(new ContentDataChangedResult(content.Data, content.Version));
             });
         }
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
                 content.Patch(command);
 
-                context.Complete(new ContentChangedResult(content.Data, content.Version));
+                context.Complete(new ContentDataChangedResult(content.Data, content.Version));
             });
         }
 

@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 await sut.HandleAsync(context);
             });
 
-            Assert.Equal(data, context.Result<ContentChangedResult>().Content);
+            Assert.Equal(data, context.Result<ContentDataChangedResult>().Data);
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>", "update content", true)).MustHaveHappened();
         }
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 await sut.HandleAsync(context);
             });
 
-            Assert.NotNull(context.Result<ContentChangedResult>().Content);
+            Assert.NotNull(context.Result<ContentDataChangedResult>().Data);
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>", "patch content", true)).MustHaveHappened();
         }

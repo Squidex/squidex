@@ -11,14 +11,14 @@ using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {
-    public sealed class ContentChangedResult : EntitySavedResult
+    public sealed class ContentDataChangedResult : EntitySavedResult
     {
-        public NamedContentData Content { get; }
+        public NamedContentData Data { get; }
 
-        public ContentChangedResult(NamedContentData content, long version) 
+        public ContentDataChangedResult(NamedContentData data, long version)
             : base(version)
         {
-            Content = content;
+            Data = data;
         }
     }
 }

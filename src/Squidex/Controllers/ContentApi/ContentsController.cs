@@ -15,15 +15,18 @@ using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
+// ReSharper disable InvertIf
 // ReSharper disable PossibleNullReferenceException
 // ReSharper disable RedundantIfElseBlock
 
@@ -35,17 +38,20 @@ namespace Squidex.Controllers.ContentApi
     public sealed class ContentsController : ControllerBase
     {
         private readonly ISchemaProvider schemas;
+        private readonly IScriptEngine scriptEngine;
         private readonly IContentRepository contentRepository;
         private readonly IGraphQLService graphQL;
 
         public ContentsController(
             ICommandBus commandBus,
-            ISchemaProvider schemas,
+            ISchemaProvider schemas, 
+            IScriptEngine scriptEngine,
             IContentRepository contentRepository,
             IGraphQLService graphQL)
             : base(commandBus)
         {
             this.graphQL = graphQL;
+            this.scriptEngine = scriptEngine;
             this.schemas = schemas;
             this.contentRepository = contentRepository;
         }
@@ -99,16 +105,28 @@ namespace Squidex.Controllers.ContentApi
 
             await Task.WhenAll(taskForItems, taskForCount);
 
+            var scriptUser = ScriptUser.Create(User);
+            var scriptText = schemaEntity.ScriptQuery;
+
+            var hasScript = !string.IsNullOrWhiteSpace(scriptText);
+
             var response = new AssetsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForItems.Result.Take(200).Select(x =>
+                Items = taskForItems.Result.Take(200).Select(item =>
                 {
-                    var itemModel = SimpleMapper.Map(x, new ContentDto());
+                    var itemModel = SimpleMapper.Map(item, new ContentDto());
 
-                    if (x.Data != null)
+                    if (item.Data != null)
                     {
-                        itemModel.Data = x.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
+                        var data = item.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
+
+                        if (hasScript && !isFrontendClient)
+                        {
+                            data = scriptEngine.ExecuteAndTransform(new ScriptContext { Data = data, ContentId = item.Id, User = scriptUser }, scriptText, "transform item");
+                        }
+
+                        itemModel.Data = data;
                     }
 
                     return itemModel;
@@ -144,7 +162,22 @@ namespace Squidex.Controllers.ContentApi
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                response.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
+                var data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
+
+                if (!isFrontendClient)
+                {
+                    var scriptUser = ScriptUser.Create(User);
+                    var scriptText = schemaEntity.ScriptQuery;
+
+                    var hasScript = !string.IsNullOrWhiteSpace(scriptText);
+
+                    if (hasScript)
+                    {
+                        data = scriptEngine.ExecuteAndTransform(new ScriptContext { Data = data, ContentId = entity.Id, User = scriptUser }, scriptText, "transform item");
+                    }
+                }
+
+                response.Data = data;
             }
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
@@ -163,9 +196,9 @@ namespace Squidex.Controllers.ContentApi
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<NamedContentData>>();
-            var response = ContentDto.Create(command, result);
+            var response = result.IdOrValue;
 
-            return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
+            return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
         }
 
         [MustBeAppEditor]
@@ -176,9 +209,12 @@ namespace Squidex.Controllers.ContentApi
         {
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
-            await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var result = context.Result<ContentDataChangedResult>();
+            var response = result.Data;
+
+            return Ok(response);
         }
 
         [MustBeAppEditor]
@@ -189,9 +225,12 @@ namespace Squidex.Controllers.ContentApi
         {
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
-            await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var result = context.Result<ContentDataChangedResult>();
+            var response = result.Data;
+
+            return Ok(response);
         }
 
         [MustBeAppEditor]
