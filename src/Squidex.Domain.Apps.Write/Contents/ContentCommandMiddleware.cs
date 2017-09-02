@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptCreate, "create content", true);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptCreate, "create content");
                 command.Data.Enrich(schemaAndApp.SchemaEntity.Schema, schemaAndApp.AppEntity.PartitionResolver);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to create content", false);
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "update content", true);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "update content");
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to update content", false);
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "patch content", true);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "patch content");
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to patch content", true);
 

@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Security;
 
 // ReSharper disable InvertIf
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandMiddlewares
 {
     public class EnrichWithActorCommandMiddleware : ICommandMiddleware
     {

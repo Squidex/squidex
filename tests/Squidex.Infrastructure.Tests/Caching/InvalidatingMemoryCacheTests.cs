@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public class InvalidatingMemoryCacheTest
+    public class InvalidatingMemoryCacheTests
     {
         internal sealed class MyOptions<T> : IOptions<T> where T : class, new()
         {
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Caching
         private readonly IMemoryCache cache = A.Fake<IMemoryCache>();
         private readonly InvalidatingMemoryCache sut;
 
-        public InvalidatingMemoryCacheTest()
+        public InvalidatingMemoryCacheTests()
         {
             sut = new InvalidatingMemoryCache(cache, pubsub);
         }
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public void Should_use_inner_cache_to_get_value()
         {
-            object outValue;
+            object outValue = 123;
 
             A.CallTo(() => cache.TryGetValue("a-key", out outValue))
                 .Returns(true);

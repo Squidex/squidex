@@ -37,6 +37,7 @@ import {
     SchemaFormComponent,
     SchemaPageComponent,
     SchemasPageComponent,
+    SchemaScriptsFormComponent,
     StringUIComponent,
     StringValidationComponent
 } from './declarations';
@@ -101,6 +102,7 @@ const routes: Routes = [
         SchemaEditFormComponent,
         SchemaFormComponent,
         SchemaPageComponent,
+        SchemaScriptsFormComponent,
         SchemasPageComponent,
         StringUIComponent,
         StringValidationComponent

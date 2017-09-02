@@ -50,20 +50,29 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_catch_script_runtime_errors_on_transform()
+        public void Should_catch_script_runtime_errors_on_execute_and_transform()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(new ScriptContext(), "throw 'Error';", "update", true));
+            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(new ScriptContext(), "throw 'Error';", "update"));
         }
 
         [Fact]
-        public void Should_return_original_content_when_script_failed()
+        public void Should_return_original_content_when_transform_script_failed()
         {
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.ExecuteAndTransform(context, "x => x", "update");
+            var result = scriptEngine.Transform(context, "x => x");
 
             Assert.Same(content, result);
+        }
+
+        [Fact]
+        public void Should_throw_when_execute_and_transform_script_failed()
+        {
+            var content = new NamedContentData();
+            var context = new ScriptContext { Data = content };
+
+            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(context, "x => x", "update"));
         }
 
         [Fact]
@@ -78,7 +87,26 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_returning_empty_content_when_replacing_with_invalid_content()
+        public void Should_return_original_content_when_replacing_with_invalid_content_in_transform()
+        {
+            var content =
+                new NamedContentData()
+                    .AddField("number0",
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField("number1",
+                        new ContentFieldData()
+                            .AddValue("iv", 1));
+
+            var context = new ScriptContext { Data = content };
+
+            var result = scriptEngine.Transform(context, @"replace({ test: 1 });");
+
+            Assert.Equal(content, result);
+        }
+
+        [Fact]
+        public void Should_return_empty_content_when_replacing_with_invalid_content_in_execute_and_transform()
         {
             var content =
                 new NamedContentData()

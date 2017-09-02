@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public class CollectionExtensionTest
+    public class CollectionExtensionTests
     {
         private readonly Dictionary<int, int> valueDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();
@@ -256,6 +256,17 @@ namespace Squidex.Infrastructure
             };
 
             Assert.NotEqual(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
+        }
+
+        [Fact]
+        public void Foreach_should_call_action_foreach_item()
+        {
+            var source = new List<int> { 3, 5, 1 };
+            var target = new List<int>();
+
+            source.Foreach(target.Add);
+
+            Assert.Equal(source, target);
         }
     }
 }

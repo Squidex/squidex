@@ -388,12 +388,12 @@ describe('SchemasService', () => {
                     }
                 }
             ],
-            scriptsQuery: '<script-query>',
-            scriptsCreate: '<script-create>',
-            scriptsUpdate: '<script-update>',
-            scriptsDelete: '<script-delete>',
-            scriptsPublish: '<script-publish>',
-            scriptsUnpublish: '<script-unpublish>'
+            scriptQuery: '<script-query>',
+            scriptCreate: '<script-create>',
+            scriptUpdate: '<script-update>',
+            scriptDelete: '<script-delete>',
+            scriptPublish: '<script-publish>',
+            scriptUnpublish: '<script-unpublish>'
         });
 
         expect(schema).toEqual(

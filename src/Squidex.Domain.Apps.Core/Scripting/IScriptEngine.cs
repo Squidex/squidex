@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         void Execute(ScriptContext context, string script, string operationName);
 
-        NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName, bool failOnError = false);
+        NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName);
+
+        NamedContentData Transform(ScriptContext context, string script);
     }
 }

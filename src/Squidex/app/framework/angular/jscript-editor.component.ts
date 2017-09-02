@@ -101,8 +101,8 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
         this.oldValue = newValue;
     }
 
-    private setValue(value: any) {
-        this.aceEditor.setValue(value);
+    private setValue(value: string) {
+        this.aceEditor.setValue(value || '');
         this.aceEditor.clearSelection();
     }
 }

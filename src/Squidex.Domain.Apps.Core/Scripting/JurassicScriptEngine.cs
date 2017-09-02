@@ -35,13 +35,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var engine = CreateScriptEngine(context, operationName);
+                var engine = CreateScriptEngine(context);
 
-                Execute(script, operationName, engine, true);
+                EnableDisallow(engine);
+                EnableReject(engine, operationName);
+
+                Execute(engine, script, operationName);
             }
         }
 
-        public NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName, bool failOnError = false)
+        public NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -49,7 +52,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var engine = CreateScriptEngine(context, operationName);
+                var engine = CreateScriptEngine(context);
+
+                EnableDisallow(engine);
+                EnableReject(engine, operationName);
 
                 engine.SetGlobalFunction("replace", new Action<object>(data =>
                 {
@@ -63,13 +69,39 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     }
                 }));
 
-                Execute(script, operationName, engine, failOnError);
+                Execute(engine, script, operationName);
             }
 
             return result;
         }
 
-        private static void Execute(string script, string operationName, ScriptEngine engine, bool failOnError = false)
+        public NamedContentData Transform(ScriptContext context, string script)
+        {
+            Guard.NotNull(context, nameof(context));
+
+            var result = context.Data;
+
+            if (!string.IsNullOrWhiteSpace(script))
+            {
+                try
+                {
+                    var engine = CreateScriptEngine(context);
+
+                    engine.SetGlobalFunction("replace", new Action<object>(data =>
+                    {
+                        result = JsonConvert.DeserializeObject<NamedContentData>(JSONObject.Stringify(engine, data));
+                    }));
+                }
+                catch (Exception)
+                {
+                    result = context.Data;
+                }
+            }
+
+            return result;
+        }
+
+        private static void Execute(ScriptEngine engine, string script, string operationName)
         {
             try
             {
@@ -77,25 +109,22 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (JavaScriptException ex)
             {
-                if (failOnError)
-                {
-                    throw new ValidationException($"Failed to {operationName} with javascript error.", new ValidationError(ex.Message));
-                }
+                throw new ValidationException($"Failed to {operationName} with javascript error.", new ValidationError(ex.Message));
             }
         }
 
-        private ScriptEngine CreateScriptEngine(ScriptContext context, string operationName)
+        private ScriptEngine CreateScriptEngine(ScriptContext context)
         {
-            Guard.NotNullOrEmpty(operationName, nameof(operationName));
-
             var engine = new ScriptEngine { ForceStrictMode = true };
 
-            engine.SetGlobalFunction("disallow", new Action<string>(message =>
-            {
-                var exMessage = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
+            engine.SetGlobalValue("ctx", JSONObject.Parse(engine, JsonConvert.SerializeObject(context, serializerSettings)));
 
-                throw new DomainForbiddenException(exMessage);
-            }));
+            return engine;
+        }
+
+        private static void EnableReject(ScriptEngine engine, string operationName)
+        {
+            Guard.NotNullOrEmpty(operationName, nameof(operationName));
 
             engine.SetGlobalFunction("reject", new Action<string>(message =>
             {
@@ -103,12 +132,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 throw new ValidationException($"Script rejected to to {operationName}.", errors);
             }));
+        }
 
-            var json = JsonConvert.SerializeObject(context, serializerSettings);
+        private static void EnableDisallow(ScriptEngine engine)
+        {
+            engine.SetGlobalFunction("disallow", new Action<string>(message =>
+            {
+                var exMessage = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
 
-            engine.SetGlobalValue("ctx", JSONObject.Parse(engine, json));
-
-            return engine;
+                throw new DomainForbiddenException(exMessage);
+            }));
         }
     }
 }

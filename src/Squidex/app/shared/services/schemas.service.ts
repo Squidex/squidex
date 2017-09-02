@@ -760,12 +760,12 @@ export class SchemasService {
                         DateTime.parseISO_UTC(response.lastModified),
                         new Version(response.version.toString()),
                         fields,
-                        response.scriptsQuery,
-                        response.scriptsCreate,
-                        response.scriptsUpdate,
-                        response.scriptsDelete,
-                        response.scriptsPublish,
-                        response.scriptsUnpublish);
+                        response.scriptQuery,
+                        response.scriptCreate,
+                        response.scriptUpdate,
+                        response.scriptDelete,
+                        response.scriptPublish,
+                        response.scriptUnpublish);
                 })
                 .catch(error => {
                     if (error instanceof HttpErrorResponse && error.status === 404) {
@@ -799,12 +799,12 @@ export class SchemasService {
                         now,
                         version,
                         dto.fields || [],
-                        response.scriptsQuery,
-                        response.scriptsCreate,
-                        response.scriptsUpdate,
-                        response.scriptsDelete,
-                        response.scriptsPublish,
-                        response.scriptsUnpublish);
+                        response.scriptQuery,
+                        response.scriptCreate,
+                        response.scriptUpdate,
+                        response.scriptDelete,
+                        response.scriptPublish,
+                        response.scriptUnpublish);
                 })
                 .do(schema => {
                     this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
