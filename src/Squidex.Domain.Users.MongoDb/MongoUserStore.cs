@@ -13,13 +13,15 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using MongoDB.Driver;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users.MongoDb
 {
     public sealed class MongoUserStore :
+        MongoRepositoryBase<MongoUser>,
         IUserPasswordStore<IUser>,
         IUserRoleStore<IUser>,
         IUserLoginStore<IUser>,
@@ -34,296 +36,357 @@ namespace Squidex.Domain.Users.MongoDb
         IUserResolver,
         IQueryableUserStore<IUser>
     {
-        private readonly UserStore<WrappedIdentityUser> innerStore;
-
         public MongoUserStore(IMongoDatabase database)
+            : base(database)
         {
-            var usersCollection = database.GetCollection<WrappedIdentityUser>("Identity_Users");
+        }
 
-            IndexChecks.EnsureUniqueIndexOnNormalizedEmail(usersCollection);
-            IndexChecks.EnsureUniqueIndexOnNormalizedUserName(usersCollection);
+        protected override string CollectionName()
+        {
+            return "Identity_Users";
+        }
 
-            innerStore = new UserStore<WrappedIdentityUser>(usersCollection);
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection)
+        {
+            return Task.WhenAll(
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true }));
+        }
+
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
         public void Dispose()
         {
-            innerStore.Dispose();
         }
 
         public IQueryable<IUser> Users
         {
-            get { return innerStore.Users; }
+            get { return Collection.AsQueryable(); }
         }
 
         public IUser Create(string email)
         {
-            return new WrappedIdentityUser { Email = email, UserName = email };
+            return new MongoUser { Email = email, UserName = email };
         }
 
-        public async Task<IUser> FindByIdAsync(string userId)
+        public async Task<IUser> FindByIdAsync(string id)
         {
-            return await innerStore.FindByIdAsync(userId, CancellationToken.None);
+            return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByIdAsync(userId, cancellationToken);
+            return await Collection.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByEmailAsync(normalizedEmail, cancellationToken);
+            return await Collection.Find(x => x.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByNameAsync(normalizedUserName, cancellationToken);
+            return await Collection.Find(x => x.NormalizedEmail == normalizedUserName).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByLoginAsync(loginProvider, providerKey, cancellationToken);
+            return await Collection.Find(x => x.Logins.Any(y => y.LoginProvider == loginProvider && y.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IList<IUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
         {
-            return (await innerStore.GetUsersForClaimAsync(claim, cancellationToken)).OfType<IUser>().ToList();
+            return (await Collection.Find(x => x.Claims.Any(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken)).OfType<IUser>().ToList();
         }
 
         public async Task<IList<IUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            return (await innerStore.GetUsersInRoleAsync(roleName, cancellationToken)).OfType<IUser>().ToList();
+            return (await Collection.Find(x => x.Roles.Contains(roleName)).ToListAsync(cancellationToken)).OfType<IUser>().ToList();
         }
 
-        public Task<IdentityResult> CreateAsync(IUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.CreateAsync((WrappedIdentityUser)user, cancellationToken);
+            await Collection.InsertOneAsync((MongoUser)user, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> UpdateAsync(IUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.UpdateAsync((WrappedIdentityUser)user, cancellationToken);
+            await Collection.ReplaceOneAsync(x => x.Id == user.Id, (MongoUser)user, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> DeleteAsync(IUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> DeleteAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.DeleteAsync((WrappedIdentityUser)user, cancellationToken);
+            await Collection.DeleteOneAsync(x => x.Id == user.Id, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
         public Task<string> GetUserIdAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetUserIdAsync((WrappedIdentityUser)user, cancellationToken);
+            return Task.FromResult(((MongoUser)user).Id);
         }
 
         public Task<string> GetUserNameAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetUserNameAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetUserNameAsync(IUser user, string userName, CancellationToken cancellationToken)
-        {
-            return innerStore.SetUserNameAsync((WrappedIdentityUser)user, userName, cancellationToken);
+            return Task.FromResult(((MongoUser)user).UserName);
         }
 
         public Task<string> GetNormalizedUserNameAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetNormalizedUserNameAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetNormalizedUserNameAsync(IUser user, string normalizedName, CancellationToken cancellationToken)
-        {
-            return innerStore.SetNormalizedUserNameAsync((WrappedIdentityUser)user, normalizedName, cancellationToken);
+            return Task.FromResult(((MongoUser)user).NormalizedUserName);
         }
 
         public Task<string> GetPasswordHashAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetPasswordHashAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetPasswordHashAsync(IUser user, string passwordHash, CancellationToken cancellationToken)
-        {
-            return innerStore.SetPasswordHashAsync((WrappedIdentityUser)user, passwordHash, cancellationToken);
-        }
-
-        public Task AddToRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
-        {
-            return innerStore.AddToRoleAsync((WrappedIdentityUser)user, roleName, cancellationToken);
-        }
-
-        public Task RemoveFromRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
-        {
-            return innerStore.RemoveFromRoleAsync((WrappedIdentityUser)user, roleName, cancellationToken);
+            return Task.FromResult(((MongoUser)user).PasswordHash);
         }
 
         public Task<IList<string>> GetRolesAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetRolesAsync((WrappedIdentityUser)user, cancellationToken);
+            return Task.FromResult<IList<string>>(((MongoUser)user).Roles);
         }
 
         public Task<bool> IsInRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
         {
-            return innerStore.IsInRoleAsync((WrappedIdentityUser)user, roleName, cancellationToken);
-        }
-
-        public Task AddLoginAsync(IUser user, UserLoginInfo login, CancellationToken cancellationToken)
-        {
-            return innerStore.AddLoginAsync((WrappedIdentityUser)user, login, cancellationToken);
-        }
-
-        public Task RemoveLoginAsync(IUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
-        {
-            return innerStore.RemoveLoginAsync((WrappedIdentityUser)user, loginProvider, providerKey, cancellationToken);
+            return Task.FromResult(((MongoUser)user).Roles.Contains(roleName));
         }
 
         public Task<IList<UserLoginInfo>> GetLoginsAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetLoginsAsync((WrappedIdentityUser)user, cancellationToken);
+            return Task.FromResult<IList<UserLoginInfo>>(((MongoUser)user).Logins.Select(x => (UserLoginInfo)x).ToList());
         }
 
         public Task<string> GetSecurityStampAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetSecurityStampAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetSecurityStampAsync(IUser user, string stamp, CancellationToken cancellationToken)
-        {
-            return innerStore.SetSecurityStampAsync((WrappedIdentityUser)user, stamp, cancellationToken);
+            return Task.FromResult(((MongoUser)user).SecurityStamp);
         }
 
         public Task<string> GetEmailAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetEmailAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetEmailAsync(IUser user, string email, CancellationToken cancellationToken)
-        {
-            return innerStore.SetEmailAsync((WrappedIdentityUser)user, email, cancellationToken);
+            return Task.FromResult(((MongoUser)user).Email);
         }
 
         public Task<bool> GetEmailConfirmedAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetEmailConfirmedAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetEmailConfirmedAsync(IUser user, bool confirmed, CancellationToken cancellationToken)
-        {
-            return innerStore.SetEmailConfirmedAsync((WrappedIdentityUser)user, confirmed, cancellationToken);
+            return Task.FromResult(((MongoUser)user).EmailConfirmed);
         }
 
         public Task<string> GetNormalizedEmailAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetNormalizedEmailAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetNormalizedEmailAsync(IUser user, string normalizedEmail, CancellationToken cancellationToken)
-        {
-            return innerStore.SetNormalizedEmailAsync((WrappedIdentityUser)user, normalizedEmail, cancellationToken);
+            return Task.FromResult(((MongoUser)user).NormalizedEmail);
         }
 
         public Task<IList<Claim>> GetClaimsAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetClaimsAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task AddClaimsAsync(IUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
-        {
-            return innerStore.AddClaimsAsync((WrappedIdentityUser)user, claims, cancellationToken);
-        }
-
-        public Task ReplaceClaimAsync(IUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
-        {
-            return innerStore.ReplaceClaimAsync((WrappedIdentityUser)user, claim, newClaim, cancellationToken);
-        }
-
-        public Task RemoveClaimsAsync(IUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
-        {
-            return innerStore.RemoveClaimsAsync((WrappedIdentityUser)user, claims, cancellationToken);
+            return Task.FromResult<IList<Claim>>(((MongoUser)user).Claims.Select(x => (Claim)x).ToList());
         }
 
         public Task<string> GetPhoneNumberAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetPhoneNumberAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetPhoneNumberAsync(IUser user, string phoneNumber, CancellationToken cancellationToken)
-        {
-            return innerStore.SetPhoneNumberAsync((WrappedIdentityUser)user, phoneNumber, cancellationToken);
+            return Task.FromResult(((MongoUser)user).PhoneNumber);
         }
 
         public Task<bool> GetPhoneNumberConfirmedAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetPhoneNumberConfirmedAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetPhoneNumberConfirmedAsync(IUser user, bool confirmed, CancellationToken cancellationToken)
-        {
-            return innerStore.SetPhoneNumberConfirmedAsync((WrappedIdentityUser)user, confirmed, cancellationToken);
+            return Task.FromResult(((MongoUser)user).PhoneNumberConfirmed);
         }
 
         public Task<bool> GetTwoFactorEnabledAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetTwoFactorEnabledAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetTwoFactorEnabledAsync(IUser user, bool enabled, CancellationToken cancellationToken)
-        {
-            return innerStore.SetTwoFactorEnabledAsync((WrappedIdentityUser)user, enabled, cancellationToken);
+            return Task.FromResult(((MongoUser)user).TwoFactorEnabled);
         }
 
         public Task<DateTimeOffset?> GetLockoutEndDateAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetLockoutEndDateAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetLockoutEndDateAsync(IUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
-        {
-            return innerStore.SetLockoutEndDateAsync((WrappedIdentityUser)user, lockoutEnd, cancellationToken);
+            return Task.FromResult<DateTimeOffset?>(((MongoUser)user).LockoutEndDateUtc);
         }
 
         public Task<int> GetAccessFailedCountAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetAccessFailedCountAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task<int> IncrementAccessFailedCountAsync(IUser user, CancellationToken cancellationToken)
-        {
-            return innerStore.IncrementAccessFailedCountAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task ResetAccessFailedCountAsync(IUser user, CancellationToken cancellationToken)
-        {
-            return innerStore.ResetAccessFailedCountAsync((WrappedIdentityUser)user, cancellationToken);
+            return Task.FromResult(((MongoUser)user).AccessFailedCount);
         }
 
         public Task<bool> GetLockoutEnabledAsync(IUser user, CancellationToken cancellationToken)
         {
-            return innerStore.GetLockoutEnabledAsync((WrappedIdentityUser)user, cancellationToken);
-        }
-
-        public Task SetLockoutEnabledAsync(IUser user, bool enabled, CancellationToken cancellationToken)
-        {
-            return innerStore.SetLockoutEnabledAsync((WrappedIdentityUser)user, enabled, cancellationToken);
-        }
-
-        public Task SetTokenAsync(IUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
-        {
-            return innerStore.SetTokenAsync((WrappedIdentityUser)user, loginProvider, name, value, cancellationToken);
-        }
-
-        public Task RemoveTokenAsync(IUser user, string loginProvider, string name, CancellationToken cancellationToken)
-        {
-            return innerStore.RemoveTokenAsync((WrappedIdentityUser)user, loginProvider, name, cancellationToken);
+            return Task.FromResult(((MongoUser)user).LockoutEnabled);
         }
 
         public Task<string> GetTokenAsync(IUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
-            return innerStore.GetTokenAsync((WrappedIdentityUser)user, loginProvider, name, cancellationToken);
+            return Task.FromResult(((MongoUser)user).GetToken(loginProvider, name));
         }
 
         public Task<bool> HasPasswordAsync(IUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(!string.IsNullOrWhiteSpace(((WrappedIdentityUser)user).PasswordHash));
+            return Task.FromResult(!string.IsNullOrWhiteSpace(((MongoUser)user).PasswordHash));
+        }
+
+        public Task SetUserNameAsync(IUser user, string userName, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).UserName = userName;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetNormalizedUserNameAsync(IUser user, string normalizedName, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).NormalizedUserName = normalizedName;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetPasswordHashAsync(IUser user, string passwordHash, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).PasswordHash = passwordHash;
+
+            return TaskHelper.Done;
+        }
+
+        public Task AddToRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).AddRole(roleName);
+
+            return TaskHelper.Done;
+        }
+
+        public Task RemoveFromRoleAsync(IUser user, string roleName, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).RemoveRole(roleName);
+
+            return TaskHelper.Done;
+        }
+
+        public Task AddLoginAsync(IUser user, UserLoginInfo login, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).AddLogin(login);
+
+            return TaskHelper.Done;
+        }
+
+        public Task RemoveLoginAsync(IUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).RemoveLogin(loginProvider, providerKey);
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetSecurityStampAsync(IUser user, string stamp, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).SecurityStamp = stamp;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetEmailAsync(IUser user, string email, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).Email = email;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetEmailConfirmedAsync(IUser user, bool confirmed, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).EmailConfirmed = confirmed;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetNormalizedEmailAsync(IUser user, string normalizedEmail, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).NormalizedEmail = normalizedEmail;
+
+            return TaskHelper.Done;
+        }
+
+        public Task AddClaimsAsync(IUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).AddClaims(claims);
+
+            return TaskHelper.Done;
+        }
+
+        public Task ReplaceClaimAsync(IUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).ReplaceClaim(claim, newClaim);
+
+            return TaskHelper.Done;
+        }
+
+        public Task RemoveClaimsAsync(IUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).RemoveClaims(claims);
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetPhoneNumberAsync(IUser user, string phoneNumber, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).PhoneNumber = phoneNumber;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetPhoneNumberConfirmedAsync(IUser user, bool confirmed, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).PhoneNumberConfirmed = confirmed;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetTwoFactorEnabledAsync(IUser user, bool enabled, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).TwoFactorEnabled = enabled;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetLockoutEndDateAsync(IUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).LockoutEndDateUtc = lockoutEnd?.UtcDateTime;
+
+            return TaskHelper.Done;
+        }
+
+        public Task<int> IncrementAccessFailedCountAsync(IUser user, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).AccessFailedCount++;
+
+            return Task.FromResult(((MongoUser)user).AccessFailedCount);
+        }
+
+        public Task ResetAccessFailedCountAsync(IUser user, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).AccessFailedCount = 0;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetLockoutEnabledAsync(IUser user, bool enabled, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).LockoutEnabled = enabled;
+
+            return TaskHelper.Done;
+        }
+
+        public Task SetTokenAsync(IUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).SetToken(loginProvider, name, value);
+
+            return TaskHelper.Done;
+        }
+
+        public Task RemoveTokenAsync(IUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            ((MongoUser)user).RemoveToken(loginProvider, name);
+
+            return TaskHelper.Done;
         }
     }
 }

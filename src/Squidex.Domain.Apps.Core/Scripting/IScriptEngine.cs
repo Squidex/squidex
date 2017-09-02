@@ -6,15 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     public interface IScriptEngine
     {
-        Task ExecuteAsync(ScriptContext context, string operationName, string script);
+        void Execute(ScriptContext context, string script, string operationName);
 
-        Task<NamedContentData> ExecuteAndTransformAsync(ScriptContext context, string operationName, string script);
+        NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName, bool failOnError = false);
     }
 }

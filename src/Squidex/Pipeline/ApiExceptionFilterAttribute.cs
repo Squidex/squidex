@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Controllers.Api;
@@ -24,19 +25,15 @@ namespace Squidex.Pipeline
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
-            Handlers.Add(ex =>
-            {
-                var typed = ex as T;
-
-                return typed != null ? handler(typed) : null;
-            });
+            Handlers.Add(ex => ex is T typed ? handler(typed) : null);
         }
 
         static ApiExceptionFilterAttribute()
         {
-            AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
-            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
             AddHandler<DomainException>(OnDomainException);
+            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
+            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
+            AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
             AddHandler<ValidationException>(OnValidationException);
         }
 
@@ -53,6 +50,11 @@ namespace Squidex.Pipeline
         private static IActionResult OnDomainException(DomainException ex)
         {
             return ErrorResult(400, new ErrorDto { Message = ex.Message });
+        }
+
+        private static IActionResult OnDomainForbiddenException(DomainForbiddenException ex)
+        {
+            return ErrorResult(401, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnValidationException(ValidationException ex)

@@ -7,15 +7,13 @@
 // ==========================================================================
 
 using System;
-using System.Security;
-using System.Threading.Tasks;
 using Jurassic;
 using Jurassic.Library;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
+// ReSharper disable InvertIf
 // ReSharper disable ConvertToLambdaExpression
 
 namespace Squidex.Domain.Apps.Core.Scripting
@@ -31,66 +29,75 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.serializerSettings = serializerSettings;
         }
 
-        public Task ExecuteAsync(ScriptContext context, string operationName, string script)
+        public void Execute(ScriptContext context, string script, string operationName)
         {
             Guard.NotNull(context, nameof(context));
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                return TaskHelper.False;
+                var engine = CreateScriptEngine(context, operationName);
+
+                Execute(script, operationName, engine, true);
             }
-
-            var engine = CreateScriptEngine(context, operationName);
-
-            engine.Execute(script);
-
-            return TaskHelper.False;
         }
 
-        public Task<NamedContentData> ExecuteAndTransformAsync(ScriptContext context, string operationName, string script)
+        public NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName, bool failOnError = false)
         {
             Guard.NotNull(context, nameof(context));
-
-            if (!string.IsNullOrWhiteSpace(script))
-            {
-                return Task.FromResult(context.Data);
-            }
 
             var result = context.Data;
 
-            var engine = CreateScriptEngine(context, operationName);
-
-            engine.SetGlobalFunction("replace", new Action<ObjectInstance>(data =>
+            if (!string.IsNullOrWhiteSpace(script))
             {
-                try
-                {
-                    result = JsonConvert.DeserializeObject<NamedContentData>(JSONObject.Stringify(engine, data));
-                }
-                catch
-                {
-                    result = new NamedContentData();
-                }
-            }));
+                var engine = CreateScriptEngine(context, operationName);
 
-            engine.Execute(script);
+                engine.SetGlobalFunction("replace", new Action<object>(data =>
+                {
+                    try
+                    {
+                        result = JsonConvert.DeserializeObject<NamedContentData>(JSONObject.Stringify(engine, data));
+                    }
+                    catch
+                    {
+                        result = new NamedContentData();
+                    }
+                }));
 
-            return Task.FromResult(result);
+                Execute(script, operationName, engine, failOnError);
+            }
+
+            return result;
+        }
+
+        private static void Execute(string script, string operationName, ScriptEngine engine, bool failOnError = false)
+        {
+            try
+            {
+                engine.Execute(script);
+            }
+            catch (JavaScriptException ex)
+            {
+                if (failOnError)
+                {
+                    throw new ValidationException($"Failed to {operationName} with javascript error.", new ValidationError(ex.Message));
+                }
+            }
         }
 
         private ScriptEngine CreateScriptEngine(ScriptContext context, string operationName)
         {
             Guard.NotNullOrEmpty(operationName, nameof(operationName));
 
-            var engine = new ScriptEngine();
+            var engine = new ScriptEngine { ForceStrictMode = true };
 
             engine.SetGlobalFunction("disallow", new Action<string>(message =>
             {
-                throw new SecurityException(message);
+                throw new DomainForbiddenException(!string.IsNullOrWhiteSpace(message) ? message : "Not allowed");
             }));
 
             engine.SetGlobalFunction("reject", new Action<string>(message =>
             {
-                throw new ValidationException($"Failed to '{operationName}", !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null);
+                throw new ValidationException($"Failed to {operationName}", !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null);
             }));
 
             var json = JsonConvert.SerializeObject(context, serializerSettings);
