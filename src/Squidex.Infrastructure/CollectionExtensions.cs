@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure
 
         public static TValue GetOrCreate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
         {
-            if (!dictionary.TryGetValue(key, out TValue result))
+            if (!dictionary.TryGetValue(key, out var result))
             {
                 result = creator(key);
             }
@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure
 
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
         {
-            if (!dictionary.TryGetValue(key, out TValue result))
+            if (!dictionary.TryGetValue(key, out var result))
             {
                 result = creator(key);
 

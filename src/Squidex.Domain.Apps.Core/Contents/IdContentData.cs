@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out Field field))
+                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out var field))
                 {
                     continue;
                 }

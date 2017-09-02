@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure
                 throw new ArgumentException($"The property names '{newPropertyName}' are equal.", newPropertyName);
             }
 
-            if (!internalDictionary.TryGetValue(oldPropertyName, out PropertyValue property))
+            if (!internalDictionary.TryGetValue(oldPropertyName, out var property))
             {
                 return false;
             }

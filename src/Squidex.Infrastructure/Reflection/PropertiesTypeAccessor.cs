@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Reflection
         {
             Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
-            if (!accessors.TryGetValue(propertyName, out IPropertyAccessor accessor))
+            if (!accessors.TryGetValue(propertyName, out var accessor))
             {
                 throw new ArgumentException("Property does not exist.", nameof(propertyName));
             }

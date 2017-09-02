@@ -9,7 +9,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Controllers.ContentApi.Models
 {
@@ -57,5 +60,24 @@ namespace Squidex.Controllers.ContentApi.Models
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
+
+        public static ContentDto Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
+        {
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var response = new ContentDto
+            {
+                Id = command.ContentId,
+                Data = result.IdOrValue,
+                Version = result.Version,
+                Created = now,
+                CreatedBy = command.Actor,
+                LastModified = now,
+                LastModifiedBy = command.Actor,
+                IsPublished = command.Publish
+            };
+
+            return response;
+        }
     }
 }

@@ -121,7 +121,13 @@ export class SchemaDto {
 
 export class SchemaDetailsDto extends SchemaDto {
     constructor(id: string, name: string, properties: SchemaPropertiesDto, isPublished: boolean, createdBy: string, lastModifiedBy: string, created: DateTime, lastModified: DateTime, version: Version,
-        public readonly fields: FieldDto[]
+        public readonly fields: FieldDto[],
+        public readonly scriptQuery?: string,
+        public readonly scriptCreate?: string,
+        public readonly scriptUpdate?: string,
+        public readonly scriptDelete?: string,
+        public readonly scriptPublish?: string,
+        public readonly scriptUnpublish?: string
     ) {
         super(id, name, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
     }
@@ -135,7 +141,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            this.fields);
+            this.fields,
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 
     public unpublish(user: string, now?: DateTime): SchemaDetailsDto {
@@ -147,7 +159,31 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            this.fields);
+            this.fields,
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
+    }
+
+    public configureScripts(scripts: UpdateSchemaScriptsDto, user: string, now?: DateTime): SchemaDetailsDto {
+        return new SchemaDetailsDto(
+            this.id,
+            this.name,
+            this.properties,
+            this.isPublished,
+            this.createdBy, user,
+            this.created, now || DateTime.now(),
+            this.version,
+            this.fields,
+            scripts.scriptQuery,
+            scripts.scriptCreate,
+            scripts.scriptUpdate,
+            scripts.scriptDelete,
+            scripts.scriptPublish,
+            scripts.scriptUnpublish);
     }
 
     public update(properties: SchemaPropertiesDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -159,7 +195,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            this.fields);
+            this.fields,
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 
     public addField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -171,7 +213,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            [...this.fields, field]);
+            [...this.fields, field],
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 
     public updateField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -183,7 +231,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            this.fields.map(f => f.fieldId === field.fieldId ? field : f));
+            this.fields.map(f => f.fieldId === field.fieldId ? field : f),
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 
     public replaceFields(fields: FieldDto[], user: string, now?: DateTime): SchemaDetailsDto {
@@ -195,7 +249,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            fields);
+            fields,
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 
     public removeField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -207,7 +267,13 @@ export class SchemaDetailsDto extends SchemaDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.version,
-            this.fields.filter(f => f.fieldId !== field.fieldId));
+            this.fields.filter(f => f.fieldId !== field.fieldId),
+            this.scriptQuery,
+            this.scriptCreate,
+            this.scriptUpdate,
+            this.scriptDelete,
+            this.scriptPublish,
+            this.scriptUnpublish);
     }
 }
 
@@ -616,6 +682,18 @@ export class CreateSchemaDto {
     }
 }
 
+export class UpdateSchemaScriptsDto {
+    constructor(
+        public readonly scriptQuery?: string,
+        public readonly scriptCreate?: string,
+        public readonly scriptUpdate?: string,
+        public readonly scriptDelete?: string,
+        public readonly scriptPublish?: string,
+        public readonly scriptUnpublish?: string
+    ) {
+    }
+}
+
 @Injectable()
 export class SchemasService {
     constructor(
@@ -681,7 +759,13 @@ export class SchemasService {
                         DateTime.parseISO_UTC(response.created),
                         DateTime.parseISO_UTC(response.lastModified),
                         new Version(response.version.toString()),
-                        fields);
+                        fields,
+                        response.scriptsQuery,
+                        response.scriptsCreate,
+                        response.scriptsUpdate,
+                        response.scriptsDelete,
+                        response.scriptsPublish,
+                        response.scriptsUnpublish);
                 })
                 .catch(error => {
                     if (error instanceof HttpErrorResponse && error.status === 404) {
@@ -714,7 +798,13 @@ export class SchemasService {
                         now,
                         now,
                         version,
-                        dto.fields || []);
+                        dto.fields || [],
+                        response.scriptsQuery,
+                        response.scriptsCreate,
+                        response.scriptsUpdate,
+                        response.scriptsDelete,
+                        response.scriptsPublish,
+                        response.scriptsUnpublish);
                 })
                 .do(schema => {
                     this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
@@ -748,6 +838,13 @@ export class SchemasService {
                     this.localCache.remove(`schema.${appName}.${schemaName}`);
                 })
                 .pretifyError('Failed to delete schema. Please reload.');
+    }
+
+    public putSchemaScripts(appName: string, schemaName: string, dto: UpdateSchemaScriptsDto, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
+
+        return HTTP.putVersioned(this.http, url, dto, version)
+                .pretifyError('Failed to update schema scripts. Please reload.');
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version?: Version): Observable<any> {

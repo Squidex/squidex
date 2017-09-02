@@ -187,24 +187,24 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             sut.ConfigureScripts(CreateCommand(new ConfigureScripts
             {
-                ScriptCreate = "<create>",
-                ScriptUpdate = "<update>",
-                ScriptDelete = "<delete>",
-                ScriptPublish = "<publish>",
-                ScriptUnpublish = "<unpublish>",
-                ScriptQuery = "<query>",
+                ScriptQuery = "<script-query>",
+                ScriptCreate = "<script-create>",
+                ScriptUpdate = "<script-update>",
+                ScriptDelete = "<script-delete>",
+                ScriptPublish = "<script-publish>",
+                ScriptUnpublish = "<script-unpublish>"
             }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new ScriptsConfigured
                     {
-                        ScriptCreate = "<create>",
-                        ScriptUpdate = "<update>",
-                        ScriptDelete = "<delete>",
-                        ScriptPublish = "<publish>",
-                        ScriptUnpublish = "<unpublish>",
-                        ScriptQuery = "<query>",
+                        ScriptQuery = "<script-query>",
+                        ScriptCreate = "<script-create>",
+                        ScriptUpdate = "<script-update>",
+                        ScriptDelete = "<script-delete>",
+                        ScriptPublish = "<script-publish>",
+                        ScriptUnpublish = "<script-unpublish>"
                     })
                 );
         }

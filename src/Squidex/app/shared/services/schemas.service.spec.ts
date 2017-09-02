@@ -22,6 +22,7 @@ import {
     SchemasService,
     UpdateFieldDto,
     UpdateSchemaDto,
+    UpdateSchemaScriptsDto,
     Version
 } from './../';
 
@@ -59,6 +60,31 @@ describe('SchemaDto', () => {
         const schema_2 = schema_1.update(newProperties, 'me', now);
 
         expect(schema_2.properties).toEqual(newProperties);
+        expect(schema_2.lastModified).toEqual(now);
+        expect(schema_2.lastModifiedBy).toEqual('me');
+    });
+
+    it('should update scripts properties and user info when configure scripts', () => {
+        const newScripts =
+            new UpdateSchemaScriptsDto(
+                '<script-query>',
+                '<script-create>',
+                '<script-update>',
+                '<script-delete>',
+                '<script-publish>',
+                '<script-unpublish>');
+
+        const now = DateTime.now();
+
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_2 = schema_1.configureScripts(newScripts, 'me', now);
+
+        expect(schema_2.scriptQuery).toEqual('<script-query>');
+        expect(schema_2.scriptCreate).toEqual('<script-create>');
+        expect(schema_2.scriptUpdate).toEqual('<script-update>');
+        expect(schema_2.scriptDelete).toEqual('<script-delete>');
+        expect(schema_2.scriptPublish).toEqual('<script-publish>');
+        expect(schema_2.scriptUnpublish).toEqual('<script-unpublish>');
         expect(schema_2.lastModified).toEqual(now);
         expect(schema_2.lastModifiedBy).toEqual('me');
     });
@@ -361,7 +387,13 @@ describe('SchemasService', () => {
                         fieldType: 'References'
                     }
                 }
-            ]
+            ],
+            scriptsQuery: '<script-query>',
+            scriptsCreate: '<script-create>',
+            scriptsUpdate: '<script-update>',
+            scriptsDelete: '<script-delete>',
+            scriptsPublish: '<script-publish>',
+            scriptsUnpublish: '<script-unpublish>'
         });
 
         expect(schema).toEqual(
@@ -378,7 +410,13 @@ describe('SchemasService', () => {
                     new FieldDto(6, 'field6', true, true, true, 'language', createProperties('Geolocation')),
                     new FieldDto(7, 'field7', true, true, true, 'language', createProperties('Assets')),
                     new FieldDto(8, 'field8', true, true, true, 'language', createProperties('References'))
-                ]));
+                ],
+                '<script-query>',
+                '<script-create>',
+                '<script-update>',
+                '<script-delete>',
+                '<script-publish>',
+                '<script-unpublish>'));
     }));
 
     it('should provide entry from cache if not found',
@@ -460,7 +498,22 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({ id: 123 });
+        req.flush({});
+    }));
+
+    it('should make put request to update schema scripts',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = new UpdateSchemaScriptsDto();
+
+        schemasService.putSchemaScripts('my-app', 'my-schema', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/scripts');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
     }));
 
     it('should make put request to update field',

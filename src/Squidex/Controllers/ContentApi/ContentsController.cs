@@ -44,7 +44,7 @@ namespace Squidex.Controllers.ContentApi
 
         public ContentsController(
             ICommandBus commandBus,
-            ISchemaProvider schemas, 
+            ISchemaProvider schemas,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository,
             IGraphQLService graphQL)
@@ -196,7 +196,7 @@ namespace Squidex.Controllers.ContentApi
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<NamedContentData>>();
-            var response = result.IdOrValue;
+            var response = ContentDto.Create(command, result);
 
             return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
         }

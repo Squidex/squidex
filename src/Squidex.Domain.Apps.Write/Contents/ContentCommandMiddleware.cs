@@ -68,8 +68,8 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.Schema.ScriptCreate, "create content", true);
-                command.Data.Enrich(schemaAndApp.Schema.Schema, schemaAndApp.App.PartitionResolver);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptCreate, "create content", true);
+                command.Data.Enrich(schemaAndApp.SchemaEntity.Schema, schemaAndApp.AppEntity.PartitionResolver);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to create content", false);
 
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.Schema.ScriptUpdate, "update content", true);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "update content", true);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to update content", false);
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.Schema.ScriptUpdate, "patch content", true);
+                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "patch content", true);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to patch content", true);
 
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command);
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.Schema.ScriptPublish, "publish content");
+                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptPublish, "publish content");
 
                 content.Publish(command);
             });
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command);
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.Schema.ScriptUnpublish, "unpublish content");
+                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptUnpublish, "unpublish content");
 
                 content.Unpublish(command);
             });
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
                 var scriptContext = CreateScriptContext(content, command);
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.Schema.ScriptDelete, "delete content");
+                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptDelete, "delete content");
 
                 content.Delete(command);
             });
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             return new ScriptContext { ContentId = content.Id, Data = data, OldData = content.Data, User = ScriptUser.Create(command.Principal) };
         }
 
-        private async Task<(ISchemaEntity Schema, IAppEntity App)> ResolveSchemaAndAppAsync(SchemaCommand command)
+        private async Task<(ISchemaEntity SchemaEntity, IAppEntity AppEntity)> ResolveSchemaAndAppAsync(SchemaCommand command)
         {
             var taskForApp = appProvider.FindAppByIdAsync(command.AppId.Id);
             var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);

@@ -150,7 +150,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
-                operation.AddResponse("201", $"{schemaName} created.", dataSchema);
+                operation.AddResponse("201", $"{schemaName} created.", contentSchema);
 
                 operation.Security = EditorSecurity;
             });

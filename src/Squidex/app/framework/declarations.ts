@@ -21,6 +21,7 @@ export * from './angular/geolocation-editor.component';
 export * from './angular/http-extensions-impl';
 export * from './angular/image-source.directive';
 export * from './angular/indeterminate-value.directive';
+export * from './angular/jscript-editor.component';
 export * from './angular/json-editor.component';
 export * from './angular/lowercase-input.directive';
 export * from './angular/markdown-editor.component';
