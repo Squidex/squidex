@@ -45,6 +45,7 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
         'Unpublish'
     ];
 
+    public editFormSubmitted = false;
     public editForm =
         this.formBuilder.group({
             scriptQuery: '',
@@ -72,6 +73,8 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
     }
 
     public saveSchema() {
+        this.editFormSubmitted = true;
+
         if (this.editForm.valid) {
             this.editForm.disable();
 
@@ -109,10 +112,12 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
 
     private enableEditForm() {
         this.editForm.enable();
+        this.editFormSubmitted = false;
     }
 
     private resetEditForm() {
         this.editForm.reset();
         this.editForm.enable();
+        this.editFormSubmitted = false;
     }
 }

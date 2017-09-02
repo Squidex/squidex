@@ -102,8 +102,8 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
     }
 
     private resetEditForm() {
-        this.editFormSubmitted = false;
         this.editForm.reset();
         this.editForm.enable();
+        this.editFormSubmitted = false;
     }
 }
