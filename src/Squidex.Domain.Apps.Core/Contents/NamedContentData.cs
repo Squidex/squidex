@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
+// ReSharper disable SuspiciousTypeConversion.Global
 // ReSharper disable InvertIf
 
 namespace Squidex.Domain.Apps.Core.Contents
