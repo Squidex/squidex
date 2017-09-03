@@ -24,8 +24,10 @@
     </div>
 
     <div class="modal-footer">
-        <button type="reset" class="float-left btn btn-secondary" (click)="cancel()" [disabled]="editFormSubmitted">Cancel</button>
-        <button type="submit" class="float-right btn btn-primary">Save</button>
+        <div class="clearfix">
+            <button type="reset" class="float-left btn btn-secondary" (click)="cancel()" [disabled]="editFormSubmitted">Cancel</button>
+            <button type="submit" class="float-right btn btn-primary">Save</button>
+        </div>
     </div>
 </form>
 

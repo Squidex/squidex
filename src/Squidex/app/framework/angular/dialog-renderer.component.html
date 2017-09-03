@@ -11,8 +11,10 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" (click)="confirm()">Yes</button>
-                <button type="button" class="btn btn-secondary" (click)="cancel()">No</button>
+                <div class="clearfix">
+                    <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
+                    <button type="button" class="float-right btn btn-danger" (click)="confirm()">Yes</button>
+                </div>
             </div>
         </div>
     </div>
