@@ -53,7 +53,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<JurassicScriptEngine>()
+            builder.RegisterType<JintScriptEngine>()
                 .As<IScriptEngine>()
                 .SingleInstance();
 
