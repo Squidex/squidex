@@ -53,7 +53,7 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnDomainForbiddenException(DomainForbiddenException ex)
         {
-            return ErrorResult(401, new ErrorDto { Message = ex.Message });
+            return ErrorResult(403, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnValidationException(ValidationException ex)
