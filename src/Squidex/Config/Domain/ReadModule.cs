@@ -56,6 +56,12 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.RegisterType<CachingGraphQLService>()
+                .As<IGraphQLService>()
+                .As<IEventConsumer>()
+                .AsSelf()
+                .InstancePerDependency();
+
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
                 .AsSelf()
@@ -93,11 +99,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>()
-                .AsSelf()
-                .InstancePerDependency();
-
-            builder.RegisterType<CachingGraphQLService>()
-                .As<IGraphQLService>()
                 .AsSelf()
                 .InstancePerDependency();
 
