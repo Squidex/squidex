@@ -26,47 +26,47 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 {
     public class WebhookCommandMiddlewareTests : HandlerTestBase<WebhookDomainObject>
     {
-        private readonly ISchemaProvider schemaProvider = A.Fake<ISchemaProvider>();
+        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly WebhookCommandMiddleware sut;
         private readonly WebhookDomainObject webhook;
         private readonly Uri url = new Uri("http://squidex.io");
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid webhookId = Guid.NewGuid();
-        private readonly List<WebhookSchema> schemas;
+        private readonly List<WebhookSchema> webhookSchemas;
 
         public WebhookCommandMiddlewareTests()
         {
             webhook = new WebhookDomainObject(webhookId, -1);
 
-            schemas = new List<WebhookSchema>
+            webhookSchemas = new List<WebhookSchema>
             {
                 new WebhookSchema { SchemaId = schemaId }
             };
 
-            sut = new WebhookCommandMiddleware(Handler, schemaProvider);
+            sut = new WebhookCommandMiddleware(Handler, schemas);
         }
 
         [Fact]
         public async Task Create_should_create_webhook()
         {
-            var context = CreateContextForCommand(new CreateWebhook { Schemas = schemas, Url = url, WebhookId = webhookId });
+            var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
 
             await TestCreate(webhook, async _ =>
             {
                 await sut.HandleAsync(context);
             });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).MustHaveHappened();
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Create_should_throw_exception_when_schema_is_not_found()
         {
-            var context = CreateContextForCommand(new CreateWebhook { Schemas = schemas, Url = url, WebhookId = webhookId });
+            var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
 
             await Assert.ThrowsAsync<ValidationException>(async () =>
             {
@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            var context = CreateContextForCommand(new UpdateWebhook { Schemas = schemas, Url = url, WebhookId = webhookId });
+            var context = CreateContextForCommand(new UpdateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
 
             CreateWebhook();
 
@@ -91,15 +91,15 @@ namespace Squidex.Domain.Apps.Write.Webhooks
                 await sut.HandleAsync(context);
             });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).MustHaveHappened();
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Update_should_throw_exception_when_schema_is_not_found()
         {
-            var context = CreateContextForCommand(new UpdateWebhook { Schemas = schemas, Url = url, WebhookId = webhookId });
+            var context = CreateContextForCommand(new UpdateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
 
             CreateWebhook();
 

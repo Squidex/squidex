@@ -13,10 +13,13 @@ using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Infrastructure;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services;
 
 // ReSharper disable InvertIf
 
@@ -29,23 +32,40 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IContentRepository contentRepository;
         private readonly IAssetRepository assetRepository;
         private readonly IGraphQLUrlGenerator urlGenerator;
+        private readonly IScriptEngine scriptEngine;
+        private readonly ISchemaProvider schemas;
         private readonly IAppEntity app;
+        private readonly ClaimsPrincipal user;
 
         public IGraphQLUrlGenerator UrlGenerator
         {
             get { return urlGenerator; }
         }
 
-        public QueryContext(IAppEntity app, IContentRepository contentRepository, IAssetRepository assetRepository, IGraphQLUrlGenerator urlGenerator)
+        public QueryContext(
+            IAppEntity app,
+            IAssetRepository assetRepository,
+            IContentRepository contentRepository,
+            IGraphQLUrlGenerator urlGenerator,
+            ISchemaProvider schemas,
+            IScriptEngine scriptEngine,
+            ClaimsPrincipal user)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(user, nameof(user));
             Guard.NotNull(app, nameof(app));
 
             this.contentRepository = contentRepository;
             this.assetRepository = assetRepository;
+            this.schemas = schemas;
+            this.scriptEngine = scriptEngine;
             this.urlGenerator = urlGenerator;
+
+            this.user = user;
 
             this.app = app;
         }
@@ -73,11 +93,18 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (content == null)
             {
-                content = await contentRepository.FindContentAsync(app, schemaId, id).ConfigureAwait(false);
+                var schema = await schemas.FindSchemaByIdAsync(schemaId).ConfigureAwait(false);
 
-                if (content != null)
+                if (schema != null)
                 {
-                    cachedContents[content.Id] = content;
+                    content = await contentRepository.FindContentAsync(app, schemaId, id).ConfigureAwait(false);
+
+                    if (content != null)
+                    {
+                        content.Data = scriptEngine.Transform(new ScriptContext { Data = content.Data, ContentId = content.Id, User = user }, schema.ScriptQuery);
+
+                        cachedContents[content.Id] = content;
+                    }
                 }
             }
 
@@ -98,14 +125,23 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
         {
-            var contents = await contentRepository.QueryAsync(app, schemaId, false, null, query).ConfigureAwait(false);
+            var result = new List<IContentEntity>();
 
-            foreach (var content in contents)
+            var schema = await schemas.FindSchemaByIdAsync(schemaId).ConfigureAwait(false);
+
+            if (schema != null)
             {
-                cachedContents[content.Id] = content;
+                result.AddRange(await contentRepository.QueryAsync(app, schemaId, false, null, query).ConfigureAwait(false));
+
+                foreach (var content in result)
+                {
+                    content.Data = scriptEngine.Transform(new ScriptContext { Data = content.Data, ContentId = content.Id, User = user }, schema.ScriptQuery);
+
+                    cachedContents[content.Id] = content;
+                }
             }
 
-            return contents;
+            return result;
         }
 
         public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(JToken value)
@@ -149,11 +185,18 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedContents.Count > 0)
             {
-                var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, null).ConfigureAwait(false);
+                var schema = await schemas.FindSchemaByIdAsync(schemaId).ConfigureAwait(false);
 
-                foreach (var content in contents)
+                if (schema != null)
                 {
-                    cachedContents[content.Id] = content;
+                    var contents = await contentRepository.QueryAsync(app, schemaId, false, notLoadedContents, null).ConfigureAwait(false);
+
+                    foreach (var content in contents)
+                    {
+                        content.Data = scriptEngine.Transform(new ScriptContext { Data = content.Data, ContentId = content.Id, User = user }, schema.ScriptQuery);
+
+                        cachedContents[content.Id] = content;
+                    }
                 }
             }
 

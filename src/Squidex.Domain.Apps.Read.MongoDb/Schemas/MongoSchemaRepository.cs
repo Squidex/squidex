@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return schemaEntity;
         }
 
-        public async Task<ISchemaEntity> FindSchemaAsync(Guid schemaId)
+        public async Task<ISchemaEntity> FindSchemaAsync(Guid schemaId, bool provideDeleted = false)
         {
             var schemaEntity =
                 await Collection.Find(s => s.Id == schemaId)
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
             schemaEntity?.DeserializeSchema(serializer);
 
-            return schemaEntity;
+            return schemaEntity != null && (provideDeleted || !schemaEntity.IsDeleted) ? schemaEntity : null;
         }
     }
 }

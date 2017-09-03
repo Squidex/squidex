@@ -94,6 +94,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 return contentData;
             }
+            set
+            {
+                contentData = value;
+            }
         }
 
         public void ParseData(Schema schema)

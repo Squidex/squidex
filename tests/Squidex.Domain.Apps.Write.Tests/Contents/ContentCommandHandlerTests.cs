@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private readonly ContentCommandMiddleware sut;
         private readonly ContentDomainObject content;
-        private readonly ISchemaProvider schemaProvider = A.Fake<ISchemaProvider>();
+        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
@@ -54,14 +54,14 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemaProvider, scriptEngine, A.Dummy<IContentRepository>());
+            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemas, scriptEngine, A.Dummy<IContentRepository>());
 
             A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
             A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());
             A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity));
 
             A.CallTo(() => schemaEntity.Schema).Returns(schema);
-            A.CallTo(() => schemaProvider.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity));
         }
 
         [Fact]

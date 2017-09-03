@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -51,8 +52,8 @@ namespace Squidex.Controllers.ContentApi
             : base(commandBus)
         {
             this.graphQL = graphQL;
-            this.scriptEngine = scriptEngine;
             this.schemas = schemas;
+            this.scriptEngine = scriptEngine;
             this.contentRepository = contentRepository;
         }
 
@@ -63,7 +64,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL([FromBody] GraphQLQuery query)
         {
-            var result = await graphQL.QueryAsync(App, query);
+            var result = await graphQL.QueryAsync(App, User, query);
 
             if (result.Errors?.Length > 0)
             {
@@ -143,11 +144,6 @@ namespace Squidex.Controllers.ContentApi
         {
             var schemaEntity = await FindSchemaAsync(name);
 
-            if (schemaEntity == null)
-            {
-                return NotFound();
-            }
-
             var entity = await contentRepository.FindContentAsync(App, schemaEntity.Id, id);
 
             if (entity == null)
@@ -187,8 +183,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpPost]
         [Route("content/{app}/{name}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent([FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
+            await FindSchemaAsync(name);
+
             var command = new CreateContent { ContentId = Guid.NewGuid(), User = User, Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
@@ -203,8 +201,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string name, Guid id, [FromBody] NamedContentData request)
         {
+            await FindSchemaAsync(name);
+
             var command = new UpdateContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
@@ -219,8 +219,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpPatch]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string name, Guid id, [FromBody] NamedContentData request)
         {
+            await FindSchemaAsync(name);
+
             var command = new PatchContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
@@ -235,8 +237,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PublishContent(Guid id)
+        public async Task<IActionResult> PublishContent(string name, Guid id)
         {
+            await FindSchemaAsync(name);
+
             var command = new PublishContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
@@ -248,8 +252,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish")]
         [ApiCosts(1)]
-        public async Task<IActionResult> UnpublishContent(Guid id)
+        public async Task<IActionResult> UnpublishContent(string name, Guid id)
         {
+            await FindSchemaAsync(name);
+
             var command = new UnpublishContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
@@ -261,8 +267,10 @@ namespace Squidex.Controllers.ContentApi
         [HttpDelete]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(Guid id)
+        public async Task<IActionResult> DeleteContent(string name, Guid id)
         {
+            await FindSchemaAsync(name);
+
             var command = new DeleteContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
@@ -281,6 +289,11 @@ namespace Squidex.Controllers.ContentApi
             else
             {
                 schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
+            }
+
+            if (schemaEntity == null || !schemaEntity.IsPublished)
+            {
+                throw new DomainObjectNotFoundException(name, typeof(ISchemaEntity));
             }
 
             return schemaEntity;

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,7 +27,9 @@ using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Xunit;
 using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Read.Assets;
+using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 
 // ReSharper disable SimilarAnonymousTypeNearby
@@ -60,11 +63,14 @@ namespace Squidex.Domain.Apps.Read.Contents
                     new GeolocationFieldProperties()));
 
         private readonly ISchemaRepository schemaRepository = A.Fake<ISchemaRepository>();
+        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
+        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity appEntity = A.Dummy<IAppEntity>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly IGraphQLService sut;
 
         public GraphQLTests()
@@ -76,12 +82,19 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => schemaEntity.Name).Returns(schema.Name);
             A.CallTo(() => schemaEntity.Schema).Returns(schema);
             A.CallTo(() => schemaEntity.IsPublished).Returns(true);
+            A.CallTo(() => schemaEntity.ScriptQuery).Returns("<script-query>");
 
-            var schemas = new List<ISchemaEntity> { schemaEntity };
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user), "<script-query>"))
+                .ReturnsLazily((ScriptContext c, string s) => c.Data);
 
-            A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(schemas));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+                .Returns(Task.FromResult(schemaEntity));
 
-            sut = new CachingGraphQLService(cache, schemaRepository, assetRepository, contentRepository, new FakeUrlGenerator());
+            var allSchemas = new List<ISchemaEntity> { schemaEntity };
+
+            A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(allSchemas));
+
+            sut = new CachingGraphQLService(cache, assetRepository, contentRepository, new FakeUrlGenerator(), schemaRepository, schemas, scriptEngine);
         }
 
         [Fact]
@@ -116,7 +129,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => assetRepository.QueryAsync(appEntity.Id, null, null, "my-query", 30, 5))
                 .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(assets));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -181,7 +194,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => assetRepository.FindAssetAsync(assetId))
                 .Returns(Task.FromResult(assetEntity));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -255,7 +268,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => contentRepository.QueryAsync(appEntity, schemaId, false, null, "?$top=30&$skip=5"))
                 .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(contents));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -356,7 +369,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
                 .Returns(Task.FromResult(contentEntity));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -443,7 +456,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => contentRepository.QueryAsync(appEntity, schemaId, false, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
                 .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(refContents));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -503,7 +516,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => assetRepository.QueryAsync(appEntity.Id, null, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId)), null, int.MaxValue, 0))
                 .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(refAssets));
 
-            var result = await sut.QueryAsync(appEntity, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -532,11 +545,64 @@ namespace Squidex.Domain.Apps.Read.Contents
             AssertJson(expected, new { data = result.Data });
         }
 
-        private static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId)
+        [Fact]
+        public async Task Should_not_return_value_when_field_not_part_of_content()
+        {
+            var contentId = Guid.NewGuid();
+            var contentEntity = CreateContent(contentId, Guid.Empty, Guid.Empty, new NamedContentData());
+
+            var query = $@"
+                query {{
+                  findMySchemaContent(id: ""{contentId}"") {{
+                    id
+                    version
+                    created
+                    createdBy
+                    lastModified
+                    lastModifiedBy
+                    url
+                    data {{
+                      myString {{
+                        iv
+                      }}
+                    }}
+                  }}
+                }}";
+
+            A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
+                .Returns(Task.FromResult(contentEntity));
+
+            var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = contentEntity.Id,
+                        version = 1,
+                        created = contentEntity.Created.ToDateTimeUtc(),
+                        createdBy = "subject:user1",
+                        lastModified = contentEntity.LastModified.ToDateTimeUtc(),
+                        lastModifiedBy = "subject:user2",
+                        url = $"contents/my-schema/{contentEntity.Id}",
+                        data = new
+                        {
+                            myString = (object)null
+                        }
+                    }
+                }
+            };
+
+            AssertJson(expected, new { data = result.Data });
+        }
+
+        private static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)
         {
             var now = DateTime.UtcNow.ToInstant();
 
-            var data =
+            data = data ??
                 new NamedContentData()
                     .AddField("my-json",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })))
