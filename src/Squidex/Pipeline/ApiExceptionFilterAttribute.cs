@@ -29,10 +29,10 @@ namespace Squidex.Pipeline
 
         static ApiExceptionFilterAttribute()
         {
-            AddHandler<DomainException>(OnDomainException);
-            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
-            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
+            AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
+            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
+            AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
         }
 

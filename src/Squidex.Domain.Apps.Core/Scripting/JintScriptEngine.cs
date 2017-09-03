@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class JintScriptEngine : IScriptEngine
     {
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
+
         public void Execute(ScriptContext context, string script, string operationName)
         {
             Guard.NotNull(context, nameof(context));
@@ -86,6 +88,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
                             data.TryUpdate(out result);
                         }
                     }));
+
+                    engine.Execute(script);
                 }
                 catch (Exception)
                 {
@@ -112,9 +116,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        private static Engine CreateScriptEngine(ScriptContext context)
+        private Engine CreateScriptEngine(ScriptContext context)
         {
-            var engine = new Engine(options => options.TimeoutInterval(TimeSpan.FromMilliseconds(100)).Strict());
+            var engine = new Engine(options => options.TimeoutInterval(Timeout).Strict());
 
             var contextInstance = new ObjectInstance(engine);
 
@@ -156,7 +160,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
 
-                throw new ValidationException($"Script rejected to to {operationName}.", errors);
+                throw new ValidationException($"Script rejected to {operationName}.", errors);
             }));
         }
     }

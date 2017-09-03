@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
     public sealed class ContentDataObjectTests
     {
         [Fact]
-        public void Should_update_content_when_setting_field()
+        public void Should_update_data_when_setting_field()
         {
             var original = new NamedContentData();
 
@@ -34,7 +34,31 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_update_content_when_deleting_field()
+        public void Should_update_data_defining_property_for_content()
+        {
+            var original = new NamedContentData();
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", 1.0));
+
+            var result = ExecuteScript(original, "Object.defineProperty(data, 'number', { value: { iv: 1 } })");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_throw_exception_when_assigning_non_object_as_field()
+        {
+            var original = new NamedContentData();
+
+            Assert.Throws<JavaScriptException>(() => ExecuteScript(original, @"data.number = 1"));
+        }
+
+        [Fact]
+        public void Should_update_data_when_deleting_field()
         {
             var original =
                 new NamedContentData()
@@ -50,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_update_content_when_setting_field_value_with_string()
+        public void Should_update_data_when_setting_field_value_with_string()
         {
             var original =
                 new NamedContentData()
@@ -70,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_update_content_when_setting_field_value_with_number()
+        public void Should_update_data_when_setting_field_value_with_number()
         {
             var original =
                 new NamedContentData()
@@ -90,47 +114,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_update_content_when_setting_field_value_with_array()
-        {
-            var original =
-                new NamedContentData()
-                    .AddField("number",
-                        new ContentFieldData()
-                            .AddValue("iv", new JArray(1.0, 2.0)));
-
-            var expected =
-                new NamedContentData()
-                    .AddField("number",
-                        new ContentFieldData()
-                            .AddValue("iv", new JArray(1.0, 4.0, 5.0)));
-
-            var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_update_content_when_setting_field_value_with_object()
-        {
-            var original =
-                new NamedContentData()
-                    .AddField("number",
-                        new ContentFieldData()
-                            .AddValue("iv", new JObject(new JProperty("lat", 1.0))));
-
-            var expected =
-                new NamedContentData()
-                    .AddField("number",
-                        new ContentFieldData()
-                            .AddValue("iv", new JObject(new JProperty("lat", 1.0), new JProperty("lon", 4.0))));
-
-            var result = ExecuteScript(original, @"data.number.iv = { lat: data.number.iv.lat, lon: data.number.iv.lat + 3 }");
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Should_update_content_when_setting_field_value_with_boolean()
+        public void Should_update_data_when_setting_field_value_with_boolean()
         {
             var original =
                 new NamedContentData()
@@ -150,7 +134,66 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_update_content_when_deleting_field_value()
+        public void Should_update_data_when_setting_field_value_with_array()
+        {
+            var original =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(1.0, 2.0)));
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(1.0, 4.0, 5.0)));
+
+            var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_update_data_when_setting_field_value_with_object()
+        {
+            var original =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", new JObject(new JProperty("lat", 1.0))));
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", new JObject(new JProperty("lat", 1.0), new JProperty("lon", 4.0))));
+
+            var result = ExecuteScript(original, @"data.number.iv = { lat: data.number.iv.lat, lon: data.number.iv.lat + 3 }");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_throw_when_defining_property_for_field()
+        {
+            var original =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData());
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", 1.0));
+
+            var result = ExecuteScript(original, "Object.defineProperty(data.number, 'iv', { value: 1 })");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_update_data_when_deleting_field_value()
         {
             var original =
                 new NamedContentData()
@@ -166,6 +209,38 @@ namespace Squidex.Domain.Apps.Core.Scripting
             var result = ExecuteScript(original, @"delete data.string.iv");
 
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_be_able_to_iterate_over_fields()
+        {
+            var content =
+                new NamedContentData()
+                    .AddField("f1",
+                        new ContentFieldData()
+                            .AddValue("v11", "1")
+                            .AddValue("v12", "2"))
+                    .AddField("f2",
+                        new ContentFieldData()
+                            .AddValue("v21", "3")
+                            .AddValue("v22", "4"));
+
+            var engine = new Engine();
+
+            engine.SetValue("data", new ContentDataObject(engine, content));
+
+            var result = engine.Execute(@"
+                var result = [];
+                for (var x in data) {
+                    var field = data[x];
+
+                    for (var y in field) {
+                        result.push(field[y]);
+                    }
+                }
+                result;").GetCompletionValue().ToObject();
+
+            Assert.Equal(new[] { "1", "2", "3", "4" }, result);
         }
 
         [Fact]
