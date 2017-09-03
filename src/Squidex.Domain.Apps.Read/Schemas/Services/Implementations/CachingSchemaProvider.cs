@@ -17,6 +17,7 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
+// ReSharper disable ConvertIfStatementToSwitchStatement
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable InvertIf
 
@@ -124,6 +125,10 @@ namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
             else if (@event.Payload is SchemaUpdated schemaUpdatedEvent)
             {
                 Remove(schemaUpdatedEvent.AppId, schemaUpdatedEvent.SchemaId);
+            }
+            else if (@event.Payload is ScriptsConfigured scriptsConfiguredEvent)
+            {
+                Remove(scriptsConfiguredEvent.AppId, scriptsConfiguredEvent.SchemaId);
             }
 
             return TaskHelper.Done;

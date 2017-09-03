@@ -46,9 +46,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             newProperties.Freeze();
 
-            var typedProperties = newProperties as T;
-
-            if (typedProperties == null)
+            if (!(newProperties is T typedProperties))
             {
                 throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
             }

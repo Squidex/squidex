@@ -22,6 +22,9 @@
                         <i class="icon-dots"></i>
                     </button>
                     <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
+                        <a class="dropdown-item" (click)="configureScriptsDialog.show()">
+                            Scripts
+                        </a>
                         <a class="dropdown-item dropdown-item-delete" (sqxConfirmClick)="deleteSchema()" confirmTitle="Delete schema" confirmText="Do you really want to delete the schema?">
                             Delete
                         </a>
@@ -137,6 +140,15 @@
             <div class="modal-body">
                 <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" [@fade]>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <sqx-schema-scripts-form [appName]="appName() | async" [schema]="schema" (saved)="onSchemaScriptsSaved($event)" (cancelled)="configureScriptsDialog.hide()"></sqx-schema-scripts-form>
         </div>
     </div>
 </div>

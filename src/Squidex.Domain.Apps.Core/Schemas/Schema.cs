@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(updater, nameof(updater));
 
-            if (!fieldsById.TryGetValue(fieldId, out Field field))
+            if (!fieldsById.TryGetValue(fieldId, out var field))
             {
                 throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
             }

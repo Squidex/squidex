@@ -115,6 +115,7 @@ namespace Squidex.Config.Identity
                 {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
                     Constants.ApiScope,
                     Constants.ProfileScope,
                     Constants.RoleScope

@@ -14,6 +14,8 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 
+// ReSharper disable ImpureMethodCallOnReadonlyValueField
+
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentQueryGraphType : ObjectGraphType

@@ -276,6 +276,17 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return this;
         }
 
+        public SchemaDomainObject ConfigureScripts(ConfigureScripts command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
+
+            return this;
+        }
+
         public SchemaDomainObject Delete(DeleteSchema command)
         {
             VerifyCreatedAndNotDeleted();
@@ -289,7 +300,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             SimpleMapper.Map(fieldCommand, @event);
 
-            if (schema.FieldsById.TryGetValue(fieldCommand.FieldId, out Field field))
+            if (schema.FieldsById.TryGetValue(fieldCommand.FieldId, out var field))
             {
                 @event.FieldId = new NamedId<long>(field.Id, field.Name);
             }

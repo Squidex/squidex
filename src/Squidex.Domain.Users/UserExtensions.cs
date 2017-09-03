@@ -12,6 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
+// ReSharper disable PossibleNullReferenceException
 // ReSharper disable InvertIf
 
 namespace Squidex.Domain.Users

@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core
 
             var key = partitionItem.Key;
 
-            if (!fieldData.TryGetValue(key, out JToken value) || value == null || value.Type == JTokenType.Null)
+            if (!fieldData.TryGetValue(key, out var value) || value == null || value.Type == JTokenType.Null)
             {
                 fieldData.AddValue(key, defaultValue);
             }

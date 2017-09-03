@@ -24,18 +24,14 @@ namespace Squidex.Pipeline
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
-            Handlers.Add(ex =>
-            {
-                var typed = ex as T;
-
-                return typed != null ? handler(typed) : null;
-            });
+            Handlers.Add(ex => ex is T typed ? handler(typed) : null);
         }
 
         static ApiExceptionFilterAttribute()
         {
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
             AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
+            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
         }
@@ -53,6 +49,11 @@ namespace Squidex.Pipeline
         private static IActionResult OnDomainException(DomainException ex)
         {
             return ErrorResult(400, new ErrorDto { Message = ex.Message });
+        }
+
+        private static IActionResult OnDomainForbiddenException(DomainForbiddenException ex)
+        {
+            return ErrorResult(403, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnValidationException(ValidationException ex)

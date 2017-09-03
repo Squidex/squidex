@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure
                 input = match.Groups[0].Value;
             }
 
-            if (TryGetLanguage(input.ToLowerInvariant(), out Language result))
+            if (TryGetLanguage(input.ToLowerInvariant(), out var result))
             {
                 return result;
             }

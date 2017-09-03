@@ -9,13 +9,14 @@
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Write.Apps;
 using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Domain.Apps.Write.Webhooks;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Pipeline.CommandHandlers;
+using Squidex.Pipeline.CommandMiddlewares;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
@@ -50,6 +51,10 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>()
+                .SingleInstance();
+
+            builder.RegisterType<JintScriptEngine>()
+                .As<IScriptEngine>()
                 .SingleInstance();
 
             builder.RegisterType<FieldRegistry>()

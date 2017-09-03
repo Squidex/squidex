@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks
         {
             try
             {
-                HttpRequestMessage request = BuildRequest(job);
+                var request = BuildRequest(job);
                 HttpResponseMessage response = null;
 
                 var responseString = string.Empty;

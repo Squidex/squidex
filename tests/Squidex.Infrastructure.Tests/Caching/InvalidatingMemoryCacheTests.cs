@@ -11,11 +11,12 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Xunit;
 
+// ReSharper disable NotAccessedVariable
 // ReSharper disable RedundantAssignment
 
 namespace Squidex.Infrastructure.Caching
 {
-    public class InvalidatingMemoryCacheTest
+    public class InvalidatingMemoryCacheTests
     {
         internal sealed class MyOptions<T> : IOptions<T> where T : class, new()
         {
@@ -31,7 +32,7 @@ namespace Squidex.Infrastructure.Caching
         private readonly IMemoryCache cache = A.Fake<IMemoryCache>();
         private readonly InvalidatingMemoryCache sut;
 
-        public InvalidatingMemoryCacheTest()
+        public InvalidatingMemoryCacheTests()
         {
             sut = new InvalidatingMemoryCache(cache, pubsub);
         }
@@ -98,12 +99,12 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public void Should_use_inner_cache_to_get_value()
         {
-            object currentOut = 123;
+            object outValue = 123;
 
-            A.CallTo(() => cache.TryGetValue("a-key", out currentOut))
+            A.CallTo(() => cache.TryGetValue("a-key", out outValue))
                 .Returns(true);
 
-            var exists = sut.TryGetValue("a-key", out object result);
+            var exists = sut.TryGetValue("a-key", out var result);
 
             Assert.Equal(123, result);
             Assert.True(exists);

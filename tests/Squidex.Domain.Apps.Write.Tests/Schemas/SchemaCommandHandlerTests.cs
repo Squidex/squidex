@@ -126,6 +126,19 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
+        public async Task ConfigureScripts_should_update_domain_object()
+        {
+            CreateSchema();
+
+            var context = CreateContextForCommand(new ConfigureScripts());
+
+            await TestUpdate(schema, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
         public async Task DeleteSchema_should_update_domain_object()
         {
             CreateSchema();

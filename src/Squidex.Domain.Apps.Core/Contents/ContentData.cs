@@ -9,9 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 // ReSharper disable InvertIf
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 var resultValue = new ContentFieldData();
 
-                foreach (var partitionValue in fieldValue.Value.Where(x => IsNotNull(x.Value)))
+                foreach (var partitionValue in fieldValue.Value.Where(x => !x.Value.IsNull()))
                 {
                     resultValue[partitionValue.Key] = partitionValue.Value;
                 }
@@ -118,16 +118,6 @@ namespace Squidex.Domain.Apps.Core.Contents
         public override int GetHashCode()
         {
             return this.DictionaryHashCode();
-        }
-
-        protected static bool IsNull(JToken value)
-        {
-            return value == null || value.Type == JTokenType.Null;
-        }
-
-        protected static bool IsNotNull(JToken value)
-        {
-            return value != null && value.Type != JTokenType.Null;
         }
 
         public abstract T GetKey(Field field);

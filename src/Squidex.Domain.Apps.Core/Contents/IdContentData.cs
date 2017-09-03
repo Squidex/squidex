@@ -13,6 +13,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 // ReSharper disable InvertIf
 
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                         continue;
                     }
 
-                    foreach (var partitionValue in fieldData.Where(x => IsNotNull(x.Value)).ToList())
+                    foreach (var partitionValue in fieldData.Where(x => !x.Value.IsNull()).ToList())
                     {
                         var newValue = referenceField.RemoveDeletedReferences(partitionValue.Value, deletedReferencedIds);
 
@@ -85,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out Field field))
+                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out var field))
                 {
                     continue;
                 }
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                     foreach (var partitionValue in fieldValue.Value)
                     {
-                        if (IsNull(partitionValue.Value))
+                        if (partitionValue.Value.IsNull())
                         {
                             encodedValue[partitionValue.Key] = null;
                         }

@@ -13,7 +13,9 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
+// ReSharper disable SuspiciousTypeConversion.Global
 // ReSharper disable InvertIf
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -52,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out Field field))
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field))
                 {
                     continue;
                 }
@@ -65,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                     foreach (var partitionValue in fieldValue.Value)
                     {
-                        if (IsNull(partitionValue.Value))
+                        if (partitionValue.Value.IsNull())
                         {
                             encodedValue[partitionValue.Key] = null;
                         }
@@ -100,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var fieldValue in this)
             {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out Field field) || (excludeHidden && field.IsHidden))
+                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field) || (excludeHidden && field.IsHidden))
                 {
                     continue;
                 }
@@ -114,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                     {
                         var languageCode = languageConfig.Key;
 
-                        if (fieldValues.TryGetValue(languageCode, out JToken value))
+                        if (fieldValues.TryGetValue(languageCode, out var value))
                         {
                             fieldResult.Add(languageCode, value);
                         }
@@ -126,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 }
                 else
                 {
-                    if (fieldValues.TryGetValue(codeForInvariant, out JToken value))
+                    if (fieldValues.TryGetValue(codeForInvariant, out var value))
                     {
                         fieldResult.Add(codeForInvariant, value);
                     }
@@ -168,7 +170,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                 foreach (var language in languagePreferences)
                 {
-                    if (fieldValues.TryGetValue(language, out JToken value) && value != null)
+                    if (fieldValues.TryGetValue(language, out var value) && value != null)
                     {
                         result[fieldValue.Key] = value;
 

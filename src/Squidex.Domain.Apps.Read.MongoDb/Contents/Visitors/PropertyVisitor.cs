@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 var edmName = propertyNames[1].UnescapeEdmField();
 
-                if (!schema.FieldsByName.TryGetValue(edmName, out Field field))
+                if (!schema.FieldsByName.TryGetValue(edmName, out var field))
                 {
                     throw new NotSupportedException();
                 }

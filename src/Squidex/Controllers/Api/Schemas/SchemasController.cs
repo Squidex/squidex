@@ -155,6 +155,30 @@ namespace Squidex.Controllers.Api.Schemas
         }
 
         /// <summary>
+        /// Update the scripts of a schema.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The schema scripts object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Schema has been updated.
+        /// 400 => Schema properties are not valid.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [MustBeAppDeveloper]
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/scripts/")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] ConfigureScriptsDto request)
+        {
+            var command = SimpleMapper.Map(request, new ConfigureScripts());
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Publish a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>

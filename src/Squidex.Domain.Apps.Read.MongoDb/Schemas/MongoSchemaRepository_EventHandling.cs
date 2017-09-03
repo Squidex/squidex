@@ -103,6 +103,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
+        protected Task On(ScriptsConfigured @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, e => SimpleMapper.Map(@event, e));
+        }
+
         protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);

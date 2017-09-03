@@ -165,7 +165,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("204", $"{schemaName} element updated.");
+                operation.AddResponse("201", $"{schemaName} element updated.", dataSchema);
 
                 operation.Security = EditorSecurity;
             });
@@ -180,7 +180,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 operation.AddBodyParameter("data", contentSchema, SchemaBodyDescription);
 
-                operation.AddResponse("204", $"{schemaName} element updated.");
+                operation.AddResponse("201", $"{schemaName} element patched.", dataSchema);
 
                 operation.Security = EditorSecurity;
             });

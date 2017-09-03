@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure
                     return;
                 }
 
-                if (!Guid.TryParse(parts[0], out Guid sender))
+                if (!Guid.TryParse(parts[0], out var sender))
                 {
                     return;
                 }

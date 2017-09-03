@@ -129,12 +129,13 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             } else {
                 this.appNameOnce()
                     .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, requestDto, this.version))
-                    .subscribe(() => {
-                        this.content = this.content.update(requestDto, this.authService.user.token);
+                    .subscribe(dto => {
+                        this.content = this.content.update(dto, this.authService.user.token);
 
                         this.emitContentUpdated(this.content);
                         this.notifyInfo('Content saved successfully.');
                         this.enableContentForm();
+                        this.populateContentForm();
                     }, error => {
                         this.notifyError(error);
                         this.enableContentForm();

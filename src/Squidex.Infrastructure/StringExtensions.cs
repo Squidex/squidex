@@ -356,7 +356,7 @@ namespace Squidex.Infrastructure
 
                     var lower = char.ToLowerInvariant(character);
 
-                    if (LowerCaseDiacritics.TryGetValue(character, out string replacement))
+                    if (LowerCaseDiacritics.TryGetValue(character, out var replacement))
                     {
                         if (singleCharDiactric)
                         {

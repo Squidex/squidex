@@ -97,7 +97,7 @@ namespace Squidex.Pipeline.Swagger
                         { SquidexRoles.AppOwner, "App contributor with Owner permission." },
                         { SquidexRoles.AppEditor, "Client (writer) or App contributor with Editor permission." },
                         { SquidexRoles.AppReader, "Client (readonly) or App contributor with Editor permission." },
-                        { SquidexRoles.AppDeveloper, "App contributor with Developer permission." },
+                        { SquidexRoles.AppDeveloper, "App contributor with Developer permission." }
                     },
                     Description = securityDescription
                 };

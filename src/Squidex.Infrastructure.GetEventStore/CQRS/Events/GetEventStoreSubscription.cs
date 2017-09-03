@@ -276,7 +276,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var addressParts = projectionHost.Split(':');
 
-            if (addressParts.Length < 2 || !int.TryParse(addressParts[1], out int port))
+            if (addressParts.Length < 2 || !int.TryParse(addressParts[1], out var port))
             {
                 port = 2113;
             }

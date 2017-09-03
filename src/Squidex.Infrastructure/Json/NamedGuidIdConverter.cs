@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Json
                 throw new JsonException("Named id must have more than 2 parts divided by commata");
             }
 
-            if (!Guid.TryParse(parts[0], out Guid id))
+            if (!Guid.TryParse(parts[0], out var id))
             {
                 throw new JsonException("Named id must be a valid guid");
             }

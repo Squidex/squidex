@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Reflection;
 using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Extensions;
@@ -38,9 +37,9 @@ namespace Squidex.Infrastructure.Json
 
                 var value = reader.Value;
 
-                if (value is DateTime)
+                if (value is DateTime dateTime)
                 {
-                    properties.Set(key, ((DateTime)value).ToInstant());
+                    properties.Set(key, dateTime.ToInstant());
                 }
                 else
                 {

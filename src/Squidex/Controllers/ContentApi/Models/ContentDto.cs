@@ -54,7 +54,7 @@ namespace Squidex.Controllers.ContentApi.Models
         /// <summary>
         /// Indicates if the content element is publihed.
         /// </summary>
-        public bool IsPublished { get; set; }
+        public bool? IsPublished { get; set; }
 
         /// <summary>
         /// The version of the content.

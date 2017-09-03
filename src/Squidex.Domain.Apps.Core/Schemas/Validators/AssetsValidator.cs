@@ -26,9 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
-            var assets = value as AssetsValue;
-
-            if (assets == null || assets.AssetIds.Count == 0)
+            if (!(value is AssetsValue assets) || assets.AssetIds.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {

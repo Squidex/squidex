@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Pipeline.CommandHandlers
+namespace Squidex.Pipeline.CommandMiddlewares
 {
     public class ETagCommandMiddleware : ICommandMiddleware
     {
@@ -29,7 +29,7 @@ namespace Squidex.Pipeline.CommandHandlers
             var headers = httpContextAccessor.HttpContext.Request.Headers;
             var headerMatch = headers["If-Match"].ToString();
 
-            if (!string.IsNullOrWhiteSpace(headerMatch) && long.TryParse(headerMatch, NumberStyles.Any, CultureInfo.InvariantCulture, out long expectedVersion))
+            if (!string.IsNullOrWhiteSpace(headerMatch) && long.TryParse(headerMatch, NumberStyles.Any, CultureInfo.InvariantCulture, out var expectedVersion))
             {
                 context.Command.ExpectedVersion = expectedVersion;
             }

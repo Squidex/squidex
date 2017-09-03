@@ -35,7 +35,7 @@ namespace Squidex.Config.Swagger
             {
                 var statusCode = match.Groups["Code"].Value;
 
-                if (!operation.Responses.TryGetValue(statusCode, out SwaggerResponse response))
+                if (!operation.Responses.TryGetValue(statusCode, out var response))
                 {
                     response = new SwaggerResponse();
 
@@ -72,7 +72,7 @@ namespace Squidex.Config.Swagger
 
         private static void RemoveOkResponse(SwaggerOperation operation)
         {
-            if (operation.Responses.TryGetValue("200", out SwaggerResponse response) &&
+            if (operation.Responses.TryGetValue("200", out var response) &&
                 response.Description != null &&
                 response.Description.Contains("=>"))
             {
