@@ -19,7 +19,7 @@ namespace Squidex.Domain.Users
 {
     public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IUser, IRole>
     {
-        public UserClaimsPrincipalFactoryWithEmail(UserManager<IUser> userManager, RoleManager<IRole> roleManager, IOptions<IdentityOptions> optionsAccessor) 
+        public UserClaimsPrincipalFactoryWithEmail(UserManager<IUser> userManager, RoleManager<IRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
             : base(userManager, roleManager, optionsAccessor)
         {
         }

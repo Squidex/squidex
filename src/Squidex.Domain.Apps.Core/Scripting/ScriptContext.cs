@@ -7,13 +7,14 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class ScriptContext
     {
-        public ScriptUser User { get; set; }
+        public ClaimsPrincipal User { get; set; }
 
         public Guid ContentId { get; set; }
 

@@ -105,7 +105,6 @@ namespace Squidex.Controllers.ContentApi
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var scriptUser = ScriptUser.Create(User);
             var scriptText = schemaEntity.ScriptQuery;
 
             var hasScript = !string.IsNullOrWhiteSpace(scriptText);
@@ -123,7 +122,7 @@ namespace Squidex.Controllers.ContentApi
 
                         if (hasScript && !isFrontendClient)
                         {
-                            data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = item.Id, User = scriptUser }, scriptText);
+                            data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = item.Id, User = User }, scriptText);
                         }
 
                         itemModel.Data = data;
@@ -166,14 +165,13 @@ namespace Squidex.Controllers.ContentApi
 
                 if (!isFrontendClient)
                 {
-                    var scriptUser = ScriptUser.Create(User);
                     var scriptText = schemaEntity.ScriptQuery;
 
                     var hasScript = !string.IsNullOrWhiteSpace(scriptText);
 
                     if (hasScript)
                     {
-                        data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = entity.Id, User = scriptUser }, scriptText);
+                        data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = entity.Id, User = User }, scriptText);
                     }
                 }
 

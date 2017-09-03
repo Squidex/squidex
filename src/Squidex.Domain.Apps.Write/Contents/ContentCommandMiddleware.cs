@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         private static ScriptContext CreateScriptContext(ContentDomainObject content, ContentCommand command, NamedContentData data = null)
         {
-            return new ScriptContext { ContentId = content.Id, Data = data, OldData = content.Data, User = ScriptUser.Create(command.User) };
+            return new ScriptContext { ContentId = content.Id, Data = data, OldData = content.Data, User = command.User };
         }
 
         private async Task<(ISchemaEntity SchemaEntity, IAppEntity AppEntity)> ResolveSchemaAndAppAsync(SchemaCommand command)

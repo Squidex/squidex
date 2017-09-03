@@ -1,27 +1,20 @@
 ﻿// ==========================================================================
-//  JurassicScriptEngineTests.cs
+//  JintScriptEngineTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public class JurassicScriptEngineTests
+    public class JintScriptEngineTests
     {
-        private readonly JurassicScriptEngine scriptEngine =
-            new JurassicScriptEngine(
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                });
+        private readonly JintScriptEngine scriptEngine = new JintScriptEngine();
 
         [Fact]
         public void Should_throw_validation_exception_when_calling_reject()
@@ -87,62 +80,24 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
-        public void Should_return_original_content_when_replacing_with_invalid_content_in_transform()
-        {
-            var content =
-                new NamedContentData()
-                    .AddField("number0",
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField("number1",
-                        new ContentFieldData()
-                            .AddValue("iv", 1));
-
-            var context = new ScriptContext { Data = content };
-
-            var result = scriptEngine.Transform(context, @"replace({ test: 1 });");
-
-            Assert.Equal(content, result);
-        }
-
-        [Fact]
-        public void Should_return_empty_content_when_replacing_with_invalid_content_in_execute_and_transform()
-        {
-            var content =
-                new NamedContentData()
-                    .AddField("number0",
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField("number1",
-                        new ContentFieldData()
-                            .AddValue("iv", 1));
-
-            var context = new ScriptContext { Data = content };
-
-            var result = scriptEngine.ExecuteAndTransform(context, @"replace({ test: 1 });", "update");
-
-            Assert.Equal(new NamedContentData(), result);
-        }
-
-        [Fact]
         public void Should_transform_content_and_return()
         {
             var content =
                 new NamedContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddValue("iv", 1.0))
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 1));
+                            .AddValue("iv", 1.0));
             var expected =
                 new NamedContentData()
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddValue("iv", 2.0))
                     .AddField("number2",
                         new ContentFieldData()
-                            .AddValue("iv", 10));
+                            .AddValue("iv", 10.0));
 
             var context = new ScriptContext { Data = content };
 

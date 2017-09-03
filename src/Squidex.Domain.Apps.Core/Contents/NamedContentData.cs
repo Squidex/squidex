@@ -13,6 +13,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 // ReSharper disable InvertIf
 
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                     foreach (var partitionValue in fieldValue.Value)
                     {
-                        if (IsNull(partitionValue.Value))
+                        if (partitionValue.Value.IsNull())
                         {
                             encodedValue[partitionValue.Key] = null;
                         }
