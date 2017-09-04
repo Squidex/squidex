@@ -60,11 +60,13 @@ namespace Squidex.Domain.Apps.Read.Contents
             Guard.NotNull(user, nameof(user));
             Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
 
+            var isFrontendClient = user.IsInClient("squidex-frontend");
+
             var schema = await FindSchemaAsync(app, schemaIdOrName);
 
             var content = await contentRepository.FindContentAsync(app, schema, id);
 
-            if (content == null)
+            if (content == null || (!content.IsPublished && !isFrontendClient))
             {
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
             }
