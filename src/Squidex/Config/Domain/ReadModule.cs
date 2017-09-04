@@ -62,6 +62,11 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .InstancePerDependency();
 
+            builder.RegisterType<ContentQueryService>()
+                .As<IContentQueryService>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
                 .AsSelf()
