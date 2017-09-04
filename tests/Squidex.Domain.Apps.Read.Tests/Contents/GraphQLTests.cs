@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var allSchemas = new List<ISchemaEntity> { schema };
 
-            A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(allSchemas));
+            A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(allSchemas);
 
             sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository);
         }
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             var assets = new List<IAssetEntity> { asset };
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, null, null, "my-query", 30, 5))
-                .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(assets));
+                .Returns(assets);
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }}";
 
             A.CallTo(() => assetRepository.FindAssetAsync(assetId))
-                .Returns(Task.FromResult(asset));
+                .Returns(asset);
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -255,7 +255,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             var contents = new List<IContentEntity> { content };
 
             A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, null, "?$top=30&$skip=5"))
-                .Returns(Task.FromResult((schema, 0L, (IReadOnlyList<IContentEntity>)contents)));
+                .Returns((schema, 0L, (IReadOnlyList<IContentEntity>)contents));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -356,7 +356,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }}";
 
             A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
-                .Returns(Task.FromResult((schema, content)));
+                .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -440,10 +440,10 @@ namespace Squidex.Domain.Apps.Read.Contents
             var refContents = new List<IContentEntity> { contentRef };
 
             A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
-                .Returns(Task.FromResult((schema, content)));
+                .Returns((schema, content));
 
             A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
-                .Returns(Task.FromResult((schema, 0L, (IReadOnlyList<IContentEntity>)refContents)));
+                .Returns((schema, 0L, (IReadOnlyList<IContentEntity>)refContents));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -500,10 +500,10 @@ namespace Squidex.Domain.Apps.Read.Contents
             var refAssets = new List<IAssetEntity> { assetRef };
 
             A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
-                .Returns(Task.FromResult((schema, content)));
+                .Returns((schema, content));
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, null, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId)), null, int.MaxValue, 0))
-                .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(refAssets));
+                .Returns(refAssets);
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -559,7 +559,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 }}";
 
             A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
-                .Returns(Task.FromResult((schema, content)));
+                .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 

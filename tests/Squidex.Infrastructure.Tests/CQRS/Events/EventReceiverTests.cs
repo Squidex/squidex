@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             var eventStore = new MyEventStore(events);
 
             A.CallTo(() => eventConsumer.Name).Returns(consumerName);
-            A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(consumerInfo));
+            A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(consumerInfo);
 
             A.CallTo(() => formatter.Parse(eventData1)).Returns(envelope1);
             A.CallTo(() => formatter.Parse(eventData2)).Returns(envelope2);

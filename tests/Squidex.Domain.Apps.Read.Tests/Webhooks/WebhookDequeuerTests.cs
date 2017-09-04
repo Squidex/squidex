@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks
         private void SetupSender(IWebhookEventEntity @event, string requestDump, WebhookResult requestResult, TimeSpan requestTime)
         {
             A.CallTo(() => webhookSender.SendAsync(@event.Job))
-                .Returns(Task.FromResult((requestDump, requestResult, requestTime)));
+                .Returns((requestDump, requestResult, requestTime));
         }
 
         private void SetupPendingEvents(IWebhookEventEntity @event)

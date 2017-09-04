@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
-                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(new List<StoredEvent>()));
+                .Returns(new List<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(domainObject, -1));
         }
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             };
 
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
-                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
+                .Returns(events);
 
             A.CallTo(() => eventDataFormatter.Parse(eventData1))
                 .Returns(new Envelope<IEvent>(event1));
@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             };
 
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
-                .Returns(Task.FromResult<IReadOnlyList<StoredEvent>>(events));
+                .Returns(events);
 
             A.CallTo(() => eventDataFormatter.Parse(eventData1))
                 .Returns(new Envelope<IEvent>(event1));

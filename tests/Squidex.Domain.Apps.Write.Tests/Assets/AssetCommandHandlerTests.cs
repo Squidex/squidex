@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Write.Assets
         private void SetupImageInfo()
         {
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(Task.FromResult(image));
+                .Returns(image);
         }
 
         private void SetupStore(long version, Guid commitId)

@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks
             var webhook2 = CreateWebhook(2);
 
             A.CallTo(() => webhookRepository.QueryByAppAsync(appId.Id))
-                .Returns(Task.FromResult<IReadOnlyList<IWebhookEntity>>(new List<IWebhookEntity> { webhook1, webhook2 }));
+                .Returns(new List<IWebhookEntity> { webhook1, webhook2 });
 
             await sut.On(@event);
 

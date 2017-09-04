@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName))
-                .Returns(Task.FromResult(A.Dummy<ISchemaEntity>()));
+                .Returns(A.Dummy<ISchemaEntity>());
 
             await TestCreate(schema, async _ =>
             {
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName))
-                .Returns(Task.FromResult<ISchemaEntity>(null));
+                .Returns((ISchemaEntity)null);
 
             await TestCreate(schema, async _ =>
             {

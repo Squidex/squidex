@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.UsageTracking
             };
 
             A.CallTo(() => usageStore.QueryAsync("key", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
-                .Returns(Task.FromResult(originalData));
+                .Returns(originalData);
 
             var result = await sut.GetMonthlyCalls("key", date);
 
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.UsageTracking
             };
 
             A.CallTo(() => usageStore.QueryAsync("key", dateFrom, dateTo))
-                .Returns(Task.FromResult(originalData));
+                .Returns(originalData);
 
             var result = await sut.QueryAsync("key", dateFrom, dateTo);
 

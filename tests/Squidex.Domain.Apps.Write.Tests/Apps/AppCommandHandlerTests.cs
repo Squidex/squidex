@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
             A.CallTo(() => appRepository.FindAppAsync(AppName))
-                .Returns(Task.FromResult(A.Dummy<IAppEntity>()));
+                .Returns(A.Dummy<IAppEntity>());
 
             await TestCreate(app, async _ =>
             {
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId });
 
             A.CallTo(() => appRepository.FindAppAsync(AppName))
-                .Returns(Task.FromResult<IAppEntity>(null));
+                .Returns((IAppEntity)null);
 
             await TestCreate(app, async _ =>
             {
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
             A.CallTo(() => userResolver.FindByIdAsync(contributorId))
-                .Returns(Task.FromResult<IUser>(null));
+                .Returns((IUser)null);
 
             await TestUpdate(app, async _ =>
             {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
             A.CallTo(() => userResolver.FindByIdAsync(A<string>.Ignored))
-                .Returns(Task.FromResult(A.Dummy<IUser>()));
+                .Returns(A.Dummy<IUser>());
 
             await TestUpdate(app, async _ =>
             {
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
             A.CallTo(() => userResolver.FindByIdAsync(contributorId))
-                .Returns(Task.FromResult<IUser>(null));
+                .Returns((IUser)null);
 
             await TestUpdate(app, async _ =>
             {
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             var context = CreateContextForCommand(new AssignContributor { ContributorId = contributorId });
 
             A.CallTo(() => userResolver.FindByIdAsync(contributorId))
-                .Returns(Task.FromResult(A.Dummy<IUser>()));
+                .Returns(A.Dummy<IUser>());
 
             await TestUpdate(app, async _ =>
             {

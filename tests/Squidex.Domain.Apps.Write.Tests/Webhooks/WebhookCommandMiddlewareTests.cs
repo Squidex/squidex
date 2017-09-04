@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         {
             var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(A.Fake<ISchemaEntity>());
 
             await TestCreate(webhook, async _ =>
             {
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         {
             var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns((ISchemaEntity)null);
 
             await Assert.ThrowsAsync<ValidationException>(async () =>
             {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         {
             var context = CreateContextForCommand(new UpdateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(A.Fake<ISchemaEntity>());
 
             CreateWebhook();
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         {
             var context = CreateContextForCommand(new UpdateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(Task.FromResult<ISchemaEntity>(null));
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns((ISchemaEntity)null);
 
             CreateWebhook();
 

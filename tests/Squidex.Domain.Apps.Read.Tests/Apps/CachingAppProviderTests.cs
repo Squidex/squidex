@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         public async Task Should_also_retrieve_app_by_name_if_retrieved_by_id_before()
         {
             A.CallTo(() => repository.FindAppAsync(appId.Id))
-                .Returns(Task.FromResult(appV1));
+                .Returns(appV1);
 
             await ProvideAppByIdAsync(appV1);
             await ProvideAppByNameAsync(appV1);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         public async Task Should_also_retrieve_app_by_id_if_retrieved_by_name_before()
         {
             A.CallTo(() => repository.FindAppAsync(appId.Name))
-                .Returns(Task.FromResult(appV1));
+                .Returns(appV1);
 
             await ProvideAppByNameAsync(appV1);
             await ProvideAppByIdAsync(appV1);
