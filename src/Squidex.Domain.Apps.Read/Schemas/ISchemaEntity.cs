@@ -30,6 +30,6 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
         string ScriptUnpublish { get; }
 
-        Schema Schema { get; }
+        Schema SchemaDef { get; }
     }
 }

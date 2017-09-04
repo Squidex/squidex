@@ -71,19 +71,19 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             this.database = database;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
-            var collection = GetCollection(appEntity.Id);
+            var collection = GetCollection(app.Id);
 
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
                 cursor =
                     collection
-                        .Find(odataQuery, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished)
+                        .Find(odataQuery, ids, schema.Id, schema.SchemaDef, nonPublished)
                         .Take(odataQuery)
                         .Skip(odataQuery)
-                        .Sort(odataQuery, schemaEntity.Schema);
+                        .Sort(odataQuery, schema.SchemaDef);
             }
             catch (NotSupportedException)
             {
@@ -98,20 +98,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
             foreach (var entity in entities)
             {
-                entity.ParseData(schemaEntity.Schema);
+                entity.ParseData(schema.SchemaDef);
             }
 
             return entities;
         }
 
-        public Task<long> CountAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
-            var collection = GetCollection(appEntity.Id);
+            var collection = GetCollection(app.Id);
 
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
-                cursor = collection.Find(odataQuery, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished);
+                cursor = collection.Find(odataQuery, ids, schema.Id, schema.SchemaDef, nonPublished);
             }
             catch (NotSupportedException)
             {
@@ -136,15 +136,15 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, Guid id)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
-            var collection = GetCollection(appEntity.Id);
+            var collection = GetCollection(app.Id);
 
             var contentEntity =
                 await collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
-            contentEntity?.ParseData(schemaEntity.Schema);
+            contentEntity?.ParseData(schema.SchemaDef);
 
             return contentEntity;
         }
@@ -153,14 +153,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         {
             var collection = GetCollection(appId);
 
-            var schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
+            var schema = await schemas.FindSchemaByIdAsync(schemaId);
 
-            if (schemaEntity == null)
+            if (schema == null)
             {
                 return;
             }
 
-            await action(collection, schemaEntity);
+            await action(collection, schema);
         }
     }
 }

@@ -35,10 +35,10 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly ContentCommandMiddleware sut;
         private readonly ContentDomainObject content;
         private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
-        private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
+        private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
+        private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly NamedContentData invalidData = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(null));
         private readonly NamedContentData data = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(1));
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentCommandMiddlewareTests()
         {
-            var schema =
+            var schemaDef =
                 Schema.Create("my-schema", new SchemaProperties())
                     .AddOrUpdateField(new NumberField(1, "my-field", Partitioning.Invariant,
                         new NumberFieldProperties { IsRequired = true }));
@@ -56,12 +56,12 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemas, scriptEngine, A.Dummy<IContentRepository>());
 
-            A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
-            A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());
-            A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(Task.FromResult(appEntity));
+            A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
+            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
+            A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(Task.FromResult(app));
 
-            A.CallTo(() => schemaEntity.Schema).Returns(schema);
-            A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schemaEntity));
+            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(Task.FromResult(schema));
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         public async Task Create_should_create_content()
         {
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(data);
-            A.CallTo(() => schemaEntity.ScriptCreate).Returns("<create-script>");
+            A.CallTo(() => schema.ScriptCreate).Returns("<create-script>");
 
             var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data, User = user });
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         public async Task Update_should_update_domain_object()
         {
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(data);
-            A.CallTo(() => schemaEntity.ScriptUpdate).Returns("<update-script>");
+            A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
 
             CreateContent();
 
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         public async Task Patch_should_update_domain_object()
         {
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(data);
-            A.CallTo(() => schemaEntity.ScriptUpdate).Returns("<update-script>");
+            A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
 
             var patch = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Publish_should_publish_domain_object()
         {
-            A.CallTo(() => schemaEntity.ScriptPublish).Returns("<publish-script>");
+            A.CallTo(() => schema.ScriptPublish).Returns("<publish-script>");
 
             CreateContent();
 
@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Unpublish_should_unpublish_domain_object()
         {
-            A.CallTo(() => schemaEntity.ScriptUnpublish).Returns("<unpublish-script>");
+            A.CallTo(() => schema.ScriptUnpublish).Returns("<unpublish-script>");
 
             CreateContent();
 
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Delete_should_update_domain_object()
         {
-            A.CallTo(() => schemaEntity.ScriptDelete).Returns("<delete-script>");
+            A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
 
             CreateContent();
 

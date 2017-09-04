@@ -62,8 +62,8 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             var dto = new SchemaDto { Properties = new SchemaPropertiesDto() };
 
             SimpleMapper.Map(entity, dto);
-            SimpleMapper.Map(entity.Schema, dto);
-            SimpleMapper.Map(entity.Schema.Properties, dto.Properties);
+            SimpleMapper.Map(entity.SchemaDef, dto);
+            SimpleMapper.Map(entity.SchemaDef.Properties, dto.Properties);
 
             return dto;
         }
@@ -73,12 +73,12 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             var dto = new SchemaDetailsDto { Properties = new SchemaPropertiesDto() };
 
             SimpleMapper.Map(entity, dto);
-            SimpleMapper.Map(entity.Schema, dto);
-            SimpleMapper.Map(entity.Schema.Properties, dto.Properties);
+            SimpleMapper.Map(entity.SchemaDef, dto);
+            SimpleMapper.Map(entity.SchemaDef.Properties, dto.Properties);
 
             dto.Fields = new List<FieldDto>();
 
-            foreach (var field in entity.Schema.Fields)
+            foreach (var field in entity.SchemaDef.Fields)
             {
                 var fieldPropertiesDto = Factories[field.RawProperties.GetType()](field.RawProperties);
                 var fieldInstanceDto = SimpleMapper.Map(field,

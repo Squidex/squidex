@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 var scriptContext = CreateScriptContext(content, command, command.Data);
 
                 command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptCreate, "create content");
-                command.Data.Enrich(schemaAndApp.SchemaEntity.Schema, schemaAndApp.AppEntity.PartitionResolver);
+                command.Data.Enrich(schemaAndApp.SchemaEntity.SchemaDef, schemaAndApp.AppEntity.PartitionResolver);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to create content", false);
 
@@ -181,11 +181,11 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             if (partial)
             {
-                await command.Data.ValidatePartialAsync(validationContext, schemaAndApp.Schema.Schema, schemaAndApp.App.PartitionResolver, schemaErrors);
+                await command.Data.ValidatePartialAsync(validationContext, schemaAndApp.Schema.SchemaDef, schemaAndApp.App.PartitionResolver, schemaErrors);
             }
             else
             {
-                await command.Data.ValidateAsync(validationContext, schemaAndApp.Schema.Schema, schemaAndApp.App.PartitionResolver, schemaErrors);
+                await command.Data.ValidateAsync(validationContext, schemaAndApp.Schema.SchemaDef, schemaAndApp.App.PartitionResolver, schemaErrors);
             }
 
             if (schemaErrors.Count > 0)

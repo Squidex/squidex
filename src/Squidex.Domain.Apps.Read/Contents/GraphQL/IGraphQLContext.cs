@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         IFieldResolver ResolveAssetThumbnailUrl();
 
-        IFieldResolver ResolveContentUrl(ISchemaEntity schemaEntity);
+        IFieldResolver ResolveContentUrl(ISchemaEntity schema);
 
         (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
     }

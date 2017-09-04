@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schemaEntity) =>
+            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
             {
                 return collection.CreateAsync(@event, headers, x =>
                 {
@@ -79,18 +79,18 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
                     SimpleMapper.Map(@event, x);
 
-                    x.SetData(schemaEntity.Schema, @event.Data);
+                    x.SetData(schema.SchemaDef, @event.Data);
                 });
             });
         }
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schemaEntity) =>
+            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.SetData(schemaEntity.Schema, @event.Data);
+                    x.SetData(schema.SchemaDef, @event.Data);
                 });
             });
         }

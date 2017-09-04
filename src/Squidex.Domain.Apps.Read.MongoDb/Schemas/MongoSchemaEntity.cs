@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public string ScriptPublish { get; set; }
 
-        Schema ISchemaEntity.Schema
+        Schema ISchemaEntity.SchemaDef
         {
             get { return schema.Value; }
         }

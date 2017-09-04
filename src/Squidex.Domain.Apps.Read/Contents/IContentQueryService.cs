@@ -17,10 +17,10 @@ namespace Squidex.Domain.Apps.Read.Contents
 {
     public interface IContentQueryService
     {
-        Task<(ISchemaEntity SchemaEntity, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity appEntity, string schemaIdOrName, ClaimsPrincipal user, HashSet<Guid> ids, string query);
+        Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, HashSet<Guid> ids, string query);
 
-        Task<(ISchemaEntity SchemaEntity, IContentEntity ContentEntity)> FindContentAsync(IAppEntity appEntity, string schemaIdOrName, ClaimsPrincipal user, Guid id);
+        Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id);
 
-        Task<ISchemaEntity> FindSchemaAsync(IEntity appEntity, string schemaIdOrName);
+        Task<ISchemaEntity> FindSchemaAsync(IEntity app, string schemaIdOrName);
     }
 }

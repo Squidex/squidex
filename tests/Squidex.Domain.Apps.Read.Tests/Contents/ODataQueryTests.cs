@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 {
     public class ODataQueryTests
     {
-        private readonly Schema schema =
+        private readonly Schema schemaDef =
             Schema.Create("user", new SchemaProperties { Hints = "The User" })
                 .AddOrUpdateField(new StringField(1, "firstName", Partitioning.Language,
                     new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
@@ -64,17 +64,17 @@ namespace Squidex.Domain.Apps.Read.Contents
         {
             var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
-            var schemaEntity = A.Dummy<ISchemaEntity>();
-            A.CallTo(() => schemaEntity.Id).Returns(Guid.NewGuid());
-            A.CallTo(() => schemaEntity.Version).Returns(3);
-            A.CallTo(() => schemaEntity.Schema).Returns(schema);
+            var schema = A.Dummy<ISchemaEntity>();
+            A.CallTo(() => schema.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => schema.Version).Returns(3);
+            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
 
-            var appEntity = A.Dummy<IAppEntity>();
-            A.CallTo(() => appEntity.Id).Returns(Guid.NewGuid());
-            A.CallTo(() => appEntity.Version).Returns(3);
-            A.CallTo(() => appEntity.PartitionResolver).Returns(languagesConfig.ToResolver());
+            var app = A.Dummy<IAppEntity>();
+            A.CallTo(() => app.Id).Returns(Guid.NewGuid());
+            A.CallTo(() => app.Version).Returns(3);
+            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
 
-            edmModel = builder.BuildEdmModel(schemaEntity, appEntity);
+            edmModel = builder.BuildEdmModel(schema, app);
         }
 
         [Fact]
@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     i = sortDefinition.Render(serializer, registry).ToString();
                 });
 
-            cursor.Sort(parser, schema);
+            cursor.Sort(parser, schemaDef);
 
             return i;
         }
@@ -383,7 +383,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         {
             var parser = edmModel.ParseQuery(value);
 
-            var query = FilterBuilder.Build(parser, schema).Render(serializer, registry).ToString();
+            var query = FilterBuilder.Build(parser, schemaDef).Render(serializer, registry).ToString();
 
             return query;
         }

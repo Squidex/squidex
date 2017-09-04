@@ -16,12 +16,12 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
     {
         bool CanGenerateAssetSourceUrl { get; }
 
-        string GenerateAssetUrl(IAppEntity app, IAssetEntity assetEntity);
+        string GenerateAssetUrl(IAppEntity app, IAssetEntity asset);
 
         string GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset);
 
-        string GenerateAssetSourceUrl(IAppEntity appEntity, IAssetEntity assetEntity);
+        string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset);
 
-        string GenerateContentUrl(IAppEntity appEntity, ISchemaEntity schemaEntity, IContentEntity contentEntity);
+        string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content);
     }
 }

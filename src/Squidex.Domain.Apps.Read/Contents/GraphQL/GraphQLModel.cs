@@ -36,20 +36,20 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly Dictionary<Guid, ContentGraphType> schemaTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly Dictionary<Guid, ISchemaEntity> schemas;
         private readonly PartitionResolver partitionResolver;
-        private readonly IAppEntity appEntity;
+        private readonly IAppEntity app;
         private readonly IGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
         public bool CanGenerateAssetSourceUrl { get; }
 
-        public GraphQLModel(IAppEntity appEntity, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
+        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
         {
-            this.appEntity = appEntity;
+            this.app = app;
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
 
-            partitionResolver = appEntity.PartitionResolver;
+            partitionResolver = app.PartitionResolver;
 
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 var context = (QueryContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetUrl(appEntity, c.Source);
+                return context.UrlGenerator.GenerateAssetUrl(app, c.Source);
             });
 
             return resolver;
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 var context = (QueryContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetSourceUrl(appEntity, c.Source);
+                return context.UrlGenerator.GenerateAssetSourceUrl(app, c.Source);
             });
 
             return resolver;
@@ -135,19 +135,19 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 var context = (QueryContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateAssetThumbnailUrl(appEntity, c.Source);
+                return context.UrlGenerator.GenerateAssetThumbnailUrl(app, c.Source);
             });
 
             return resolver;
         }
 
-        public IFieldResolver ResolveContentUrl(ISchemaEntity schemaEntity)
+        public IFieldResolver ResolveContentUrl(ISchemaEntity schema)
         {
             var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
             {
                 var context = (QueryContext)c.UserContext;
 
-                return context.UrlGenerator.GenerateContentUrl(appEntity, schemaEntity, c.Source);
+                return context.UrlGenerator.GenerateContentUrl(app, schema, c.Source);
             });
 
             return resolver;
@@ -222,9 +222,9 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public IGraphType GetSchemaType(Guid schemaId)
         {
-            var schemaEntity = schemas.GetOrDefault(schemaId);
+            var schema = schemas.GetOrDefault(schemaId);
 
-            return schemaEntity != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schemaEntity, this)) : null;
+            return schema != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schema, this)) : null;
         }
     }
 }

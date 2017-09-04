@@ -44,19 +44,19 @@ namespace Squidex.Pipeline
             return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}&width=100&mode=Max");
         }
 
-        public string GenerateAssetUrl(IAppEntity app, IAssetEntity assetEntity)
+        public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)
         {
-            return urlsOptions.BuildUrl($"api/assets/{assetEntity.Id}?version={assetEntity.Version}");
+            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}");
         }
 
-        public string GenerateContentUrl(IAppEntity appEntity, ISchemaEntity schemaEntity, IContentEntity contentEntity)
+        public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
         {
-            return urlsOptions.BuildUrl($"api/content/{appEntity.Name}/{schemaEntity.Name}/{contentEntity.Id}");
+            return urlsOptions.BuildUrl($"api/content/{app.Name}/{schema.Name}/{content.Id}");
         }
 
-        public string GenerateAssetSourceUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)
         {
-            return assetStore.GenerateSourceUrl(assetEntity.Id.ToString(), assetEntity.FileVersion, null);
+            return assetStore.GenerateSourceUrl(asset.Id.ToString(), asset.FileVersion, null);
         }
     }
 }

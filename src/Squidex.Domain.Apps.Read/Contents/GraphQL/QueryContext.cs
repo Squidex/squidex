@@ -9,17 +9,14 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Infrastructure;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 
 // ReSharper disable InvertIf
 
@@ -32,7 +29,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IContentQueryService contentQuery;
         private readonly IAssetRepository assetRepository;
         private readonly IGraphQLUrlGenerator urlGenerator;
-        private readonly IAppEntity appEntity;
+        private readonly IAppEntity app;
         private readonly ClaimsPrincipal user;
 
         public IGraphQLUrlGenerator UrlGenerator
@@ -41,7 +38,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         }
 
         public QueryContext(
-            IAppEntity appEntity,
+            IAppEntity app,
             IAssetRepository assetRepository,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator,
@@ -50,14 +47,16 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
             Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(appEntity, nameof(appEntity));
+            Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
 
             this.assetRepository = assetRepository;
-            this.appEntity = appEntity;
             this.contentQuery = contentQuery;
             this.urlGenerator = urlGenerator;
+
             this.user = user;
+
+            this.app = app;
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
@@ -83,7 +82,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (content == null)
             {
-                content = (await contentQuery.FindContentAsync(appEntity, schemaId.ToString(), user, id).ConfigureAwait(false)).ContentEntity;
+                content = (await contentQuery.FindContentAsync(app, schemaId.ToString(), user, id).ConfigureAwait(false)).Content;
 
                 if (content != null)
                 {
@@ -96,7 +95,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAssetsAsync(string query, int skip = 0, int take = 10)
         {
-            var assets = await assetRepository.QueryAsync(appEntity.Id, null, null, query, take, skip);
+            var assets = await assetRepository.QueryAsync(app.Id, null, null, query, take, skip);
 
             foreach (var asset in assets)
             {
@@ -108,7 +107,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
         {
-            var contents = (await contentQuery.QueryWithCountAsync(appEntity, schemaId.ToString(), user, null, query).ConfigureAwait(false)).Items;
+            var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, null, query).ConfigureAwait(false)).Items;
 
             foreach (var content in contents)
             {
@@ -133,7 +132,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetRepository.QueryAsync(appEntity.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
+                var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
 
                 foreach (var asset in assets)
                 {
@@ -159,7 +158,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedContents.Count > 0)
             {
-                var contents = (await contentQuery.QueryWithCountAsync(appEntity, schemaId.ToString(), user, notLoadedContents, null).ConfigureAwait(false)).Items;
+                var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, notLoadedContents, null).ConfigureAwait(false)).Items;
 
                 foreach (var content in contents)
                 {

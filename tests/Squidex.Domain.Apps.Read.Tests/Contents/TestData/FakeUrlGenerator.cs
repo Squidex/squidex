@@ -17,9 +17,9 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
     {
         public bool CanGenerateAssetSourceUrl { get; } = true;
 
-        public string GenerateAssetUrl(IAppEntity app, IAssetEntity assetEntity)
+        public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)
         {
-            return $"assets/{assetEntity.Id}";
+            return $"assets/{asset.Id}";
         }
 
         public string GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
             return $"assets/{asset.Id}?width=100";
         }
 
-        public string GenerateAssetSourceUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)
         {
-            return $"assets/source/{assetEntity.Id}";
+            return $"assets/source/{asset.Id}";
         }
 
-        public string GenerateContentUrl(IAppEntity appEntity, ISchemaEntity schemaEntity, IContentEntity contentEntity)
+        public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
         {
-            return $"contents/{schemaEntity.Name}/{contentEntity.Id}";
+            return $"contents/{schema.Name}/{content.Id}";
         }
     }
 }

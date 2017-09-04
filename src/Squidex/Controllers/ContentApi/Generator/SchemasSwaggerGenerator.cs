@@ -64,7 +64,7 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             var appBasePath = $"/content/{app.Name}";
 
-            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
+            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
             {
                 new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
             }

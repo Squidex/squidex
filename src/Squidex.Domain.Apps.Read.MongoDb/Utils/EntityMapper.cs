@@ -82,9 +82,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Utils
 
         private static void SetAppId(SquidexEvent @event, IMongoEntity entity)
         {
-            if (entity is IAppRefEntity appEntity && @event is AppEvent appEvent)
+            if (entity is IAppRefEntity app && @event is AppEvent appEvent)
             {
-                appEntity.AppId = appEvent.AppId.Id;
+                app.AppId = appEvent.AppId.Id;
             }
         }
     }
