@@ -18,14 +18,14 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.Edm
 {
-    public sealed class EdmModelBuilder : CachingProviderBase
+    public class EdmModelBuilder : CachingProviderBase
     {
         public EdmModelBuilder(IMemoryCache cache)
             : base(cache)
         {
         }
 
-        public IEdmModel BuildEdmModel(ISchemaEntity schema, IAppEntity app)
+        public virtual IEdmModel BuildEdmModel(ISchemaEntity schema, IAppEntity app)
         {
             Guard.NotNull(schema, nameof(schema));
 
