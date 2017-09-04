@@ -63,10 +63,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                     new GeolocationFieldProperties()));
 
         private readonly ISchemaRepository schemaRepository = A.Fake<ISchemaRepository>();
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schemaEntity = A.Fake<ISchemaEntity>();
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
+        private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity appEntity = A.Dummy<IAppEntity>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -84,17 +82,11 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => schemaEntity.IsPublished).Returns(true);
             A.CallTo(() => schemaEntity.ScriptQuery).Returns("<script-query>");
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user), "<script-query>"))
-                .ReturnsLazily((ScriptContext c, string s) => c.Data);
-
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
-                .Returns(Task.FromResult(schemaEntity));
-
             var allSchemas = new List<ISchemaEntity> { schemaEntity };
 
             A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(Task.FromResult<IReadOnlyList<ISchemaEntity>>(allSchemas));
 
-            sut = new CachingGraphQLService(cache, assetRepository, contentRepository, new FakeUrlGenerator(), schemaRepository, schemas, scriptEngine);
+            sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository);
         }
 
         [Fact]
@@ -265,8 +257,8 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var contents = new List<IContentEntity> { contentEntity };
 
-            A.CallTo(() => contentRepository.QueryAsync(appEntity, schemaId, false, null, "?$top=30&$skip=5"))
-                .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(contents));
+            A.CallTo(() => contentQuery.QueryWithCountAsync(appEntity, schemaEntity.Id.ToString(), user, null, "?$top=30&$skip=5"))
+                .Returns(Task.FromResult((schemaEntity, 0L, (IReadOnlyList<IContentEntity>)contents)));
 
             var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
@@ -366,8 +358,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                   }}
                 }}";
 
-            A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
-                .Returns(Task.FromResult(contentEntity));
+            A.CallTo(() => contentQuery.FindContentAsync(appEntity, schemaEntity.ToString(), user, contentId))
+                .Returns(Task.FromResult((schemaEntity, contentEntity)));
 
             var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
@@ -450,11 +442,11 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var refContents = new List<IContentEntity> { contentRefEntity };
 
-            A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
-                .Returns(Task.FromResult(contentEntity));
+            A.CallTo(() => contentQuery.FindContentAsync(appEntity, schemaEntity.ToString(), user, contentId))
+                .Returns(Task.FromResult((schemaEntity, contentEntity)));
 
-            A.CallTo(() => contentRepository.QueryAsync(appEntity, schemaId, false, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
-                .Returns(Task.FromResult<IReadOnlyList<IContentEntity>>(refContents));
+            A.CallTo(() => contentQuery.QueryWithCountAsync(appEntity, schemaEntity.Id.ToString(), user, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
+                .Returns(Task.FromResult((schemaEntity, 0L, (IReadOnlyList<IContentEntity>)refContents)));
 
             var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
@@ -510,8 +502,8 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var refAssets = new List<IAssetEntity> { assetRefEntity };
 
-            A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
-                .Returns(Task.FromResult(contentEntity));
+            A.CallTo(() => contentQuery.FindContentAsync(appEntity, schemaEntity.ToString(), user, contentId))
+                .Returns(Task.FromResult((schemaEntity, contentEntity)));
 
             A.CallTo(() => assetRepository.QueryAsync(appEntity.Id, null, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId)), null, int.MaxValue, 0))
                 .Returns(Task.FromResult<IReadOnlyList<IAssetEntity>>(refAssets));
@@ -569,8 +561,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                   }}
                 }}";
 
-            A.CallTo(() => contentRepository.FindContentAsync(appEntity, schemaId, contentId))
-                .Returns(Task.FromResult(contentEntity));
+            A.CallTo(() => contentQuery.FindContentAsync(appEntity, schemaEntity.ToString(), user, contentId))
+                .Returns(Task.FromResult((schemaEntity, contentEntity)));
 
             var result = await sut.QueryAsync(appEntity, user, new GraphQLQuery { Query = query });
 
