@@ -47,6 +47,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             A.CallTo(() => content.Id).Returns(contentId);
             A.CallTo(() => content.Data).Returns(data);
+            A.CallTo(() => content.IsPublished).Returns(true);
 
             sut = new ContentQueryService(contentRepository, schemas, scriptEngine, modelBuilder);
         }
