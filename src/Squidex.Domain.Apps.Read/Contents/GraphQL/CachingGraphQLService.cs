@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public sealed class CachingGraphQLService : CachingProviderBase, IGraphQLService, IEventConsumer
     {
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(60);
         private readonly IContentRepository contentRepository;
         private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
@@ -108,7 +109,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
                 modelContext = new GraphQLModel(app, allSchemas.Where(x => x.IsPublished), urlGenerator);
 
-                Cache.Set(cacheKey, modelContext);
+                Cache.Set(cacheKey, modelContext, CacheDuration);
             }
 
             return modelContext;
