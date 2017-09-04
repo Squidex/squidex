@@ -16,6 +16,7 @@ using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -38,23 +39,15 @@ namespace Squidex.Controllers.ContentApi
     [SwaggerIgnore]
     public sealed class ContentsController : ControllerBase
     {
-        private readonly ISchemaProvider schemas;
-        private readonly IScriptEngine scriptEngine;
-        private readonly IContentRepository contentRepository;
-        private readonly IGraphQLService graphQL;
+        private readonly IContentQueryService contentQuery;
+        private readonly IGraphQLService graphQl;
 
-        public ContentsController(
-            ICommandBus commandBus,
-            ISchemaProvider schemas,
-            IScriptEngine scriptEngine,
-            IContentRepository contentRepository,
-            IGraphQLService graphQL)
+        public ContentsController(ICommandBus commandBus, IContentQueryService contentQuery, IGraphQLService graphQl)
             : base(commandBus)
         {
-            this.graphQL = graphQL;
-            this.schemas = schemas;
-            this.scriptEngine = scriptEngine;
-            this.contentRepository = contentRepository;
+            this.contentQuery = contentQuery;
+
+            this.graphQl = graphQl;
         }
 
         [MustBeAppReader]
@@ -64,7 +57,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL([FromBody] GraphQLQuery query)
         {
-            var result = await graphQL.QueryAsync(App, User, query);
+            var result = await graphQl.QueryAsync(App, User, query);
 
             if (result.Errors?.Length > 0)
             {
@@ -82,8 +75,6 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string name, [FromQuery] string ids = null)
         {
-            var schemaEntity = await FindSchemaAsync(name);
-
             var idsList = new HashSet<Guid>();
 
             if (!string.IsNullOrWhiteSpace(ids))
@@ -99,34 +90,18 @@ namespace Squidex.Controllers.ContentApi
 
             var isFrontendClient = User.IsFrontendClient();
 
-            var query = Request.QueryString.ToString();
-
-            var taskForItems = contentRepository.QueryAsync(App, schemaEntity.Id, isFrontendClient, idsList, query);
-            var taskForCount = contentRepository.CountAsync(App, schemaEntity.Id, isFrontendClient, idsList, query);
-
-            await Task.WhenAll(taskForItems, taskForCount);
-
-            var scriptText = schemaEntity.ScriptQuery;
-
-            var hasScript = !string.IsNullOrWhiteSpace(scriptText);
+            var contents = await contentQuery.QueryWithCountAsync(App, name, User, idsList, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Take(200).Select(item =>
+                Total = contents.Total,
+                Items = contents.Items.Take(200).Select(item =>
                 {
                     var itemModel = SimpleMapper.Map(item, new ContentDto());
 
                     if (item.Data != null)
                     {
-                        var data = item.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
-
-                        if (hasScript && !isFrontendClient)
-                        {
-                            data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = item.Id, User = User }, scriptText);
-                        }
-
-                        itemModel.Data = data;
+                        itemModel.Data = item.Data.ToApiModel(contents.SchemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
                     }
 
                     return itemModel;
@@ -142,39 +117,18 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string name, Guid id)
         {
-            var schemaEntity = await FindSchemaAsync(name);
+            var content = await contentQuery.FindContentAsync(App, name, User, id);
 
-            var entity = await contentRepository.FindContentAsync(App, schemaEntity.Id, id);
+            var response = SimpleMapper.Map(content.ContentEntity, new ContentDto());
 
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var response = SimpleMapper.Map(entity, new ContentDto());
-
-            if (entity.Data != null)
+            if (content.ContentEntity.Data != null)
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                var data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
-
-                if (!isFrontendClient)
-                {
-                    var scriptText = schemaEntity.ScriptQuery;
-
-                    var hasScript = !string.IsNullOrWhiteSpace(scriptText);
-
-                    if (hasScript)
-                    {
-                        data = scriptEngine.Transform(new ScriptContext { Data = data, ContentId = entity.Id, User = User }, scriptText);
-                    }
-                }
-
-                response.Data = data;
+                response.Data = content.ContentEntity.Data.ToApiModel(content.SchemaEntity.Schema, App.LanguagesConfig, null, !isFrontendClient);
             }
 
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = new StringValues(content.ContentEntity.Version.ToString());
 
             return Ok(response);
         }
@@ -185,7 +139,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), User = User, Data = request.ToCleaned(), Publish = publish };
 
@@ -203,7 +157,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string name, Guid id, [FromBody] NamedContentData request)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new UpdateContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
@@ -221,7 +175,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string name, Guid id, [FromBody] NamedContentData request)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new PatchContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
@@ -239,7 +193,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(string name, Guid id)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new PublishContent { ContentId = id, User = User };
 
@@ -254,7 +208,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(string name, Guid id)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new UnpublishContent { ContentId = id, User = User };
 
@@ -269,34 +223,13 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string name, Guid id)
         {
-            await FindSchemaAsync(name);
+            await contentQuery.FindSchemaAsync(App, name);
 
             var command = new DeleteContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
             return NoContent();
-        }
-
-        private async Task<ISchemaEntity> FindSchemaAsync(string name)
-        {
-            ISchemaEntity schemaEntity;
-
-            if (Guid.TryParse(name, out var schemaId))
-            {
-                schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
-            }
-            else
-            {
-                schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
-            }
-
-            if (schemaEntity == null || !schemaEntity.IsPublished)
-            {
-                throw new DomainObjectNotFoundException(name, typeof(ISchemaEntity));
-            }
-
-            return schemaEntity;
         }
     }
 }

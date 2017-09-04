@@ -34,17 +34,17 @@ namespace Squidex.Pipeline
             CanGenerateAssetSourceUrl = allowAssetSourceUrl;
         }
 
-        public string GenerateAssetThumbnailUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
         {
-            if (!assetEntity.IsImage)
+            if (!asset.IsImage)
             {
                 return null;
             }
 
-            return urlsOptions.BuildUrl($"api/assets/{assetEntity.Id}?version={assetEntity.Version}&width=100&mode=Max");
+            return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}&width=100&mode=Max");
         }
 
-        public string GenerateAssetUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetUrl(IAppEntity app, IAssetEntity assetEntity)
         {
             return urlsOptions.BuildUrl($"api/assets/{assetEntity.Id}?version={assetEntity.Version}");
         }

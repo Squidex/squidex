@@ -17,14 +17,14 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
     {
         public bool CanGenerateAssetSourceUrl { get; } = true;
 
-        public string GenerateAssetUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetUrl(IAppEntity app, IAssetEntity assetEntity)
         {
             return $"assets/{assetEntity.Id}";
         }
 
-        public string GenerateAssetThumbnailUrl(IAppEntity appEntity, IAssetEntity assetEntity)
+        public string GenerateAssetThumbnailUrl(IAppEntity app, IAssetEntity asset)
         {
-            return $"assets/{assetEntity.Id}?width=100";
+            return $"assets/{asset.Id}?width=100";
         }
 
         public string GenerateAssetSourceUrl(IAppEntity appEntity, IAssetEntity assetEntity)

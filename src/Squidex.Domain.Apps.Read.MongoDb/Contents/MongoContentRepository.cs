@@ -10,12 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OData;
+using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -30,7 +29,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemas;
-        private readonly EdmModelBuilder modelBuilder;
 
         protected static FilterDefinitionBuilder<MongoContentEntity> Filter
         {
@@ -64,123 +62,89 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
         }
 
-        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas, EdmModelBuilder modelBuilder)
+        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas)
         {
             Guard.NotNull(database, nameof(database));
-            Guard.NotNull(modelBuilder, nameof(modelBuilder));
             Guard.NotNull(schemas, nameof(schemas));
 
             this.schemas = schemas;
             this.database = database;
-            this.modelBuilder = modelBuilder;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
-            var contentEntities = (List<IContentEntity>)null;
+            var collection = GetCollection(appEntity.Id);
 
-            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
+            IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
+            try
             {
-                IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
-                try
-                {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, app);
+                cursor =
+                    collection
+                        .Find(odataQuery, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished)
+                        .Take(odataQuery)
+                        .Skip(odataQuery)
+                        .Sort(odataQuery, schemaEntity.Schema);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException("This odata operation is not supported");
+            }
+            catch (NotImplementedException)
+            {
+                throw new ValidationException("This odata operation is not supported");
+            }
 
-                    var parser = model.ParseQuery(odataQuery);
+            var entities = await cursor.ToListAsync();
 
-                    cursor =
-                        collection
-                            .Find(parser, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished)
-                            .Take(parser)
-                            .Skip(parser)
-                            .Sort(parser, schemaEntity.Schema);
-                }
-                catch (NotSupportedException)
-                {
-                    throw new ValidationException("This odata operation is not supported");
-                }
-                catch (NotImplementedException)
-                {
-                    throw new ValidationException("This odata operation is not supported");
-                }
-                catch (ODataException ex)
-                {
-                    throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-                }
+            foreach (var entity in entities)
+            {
+                entity.ParseData(schemaEntity.Schema);
+            }
 
-                var entities = await cursor.ToListAsync();
-
-                foreach (var entity in entities)
-                {
-                    entity.ParseData(schemaEntity.Schema);
-                }
-
-                contentEntities = entities.OfType<IContentEntity>().ToList();
-            });
-
-            return contentEntities;
+            return entities;
         }
 
-        public async Task<long> CountAsync(IAppEntity app, Guid schemaId, bool nonPublished, HashSet<Guid> ids, string odataQuery)
+        public Task<long> CountAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, bool nonPublished, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
-            var contentsCount = 0L;
+            var collection = GetCollection(appEntity.Id);
 
-            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
+            IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
+            try
             {
-                IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
-                try
-                {
-                    var model = modelBuilder.BuildEdmModel(schemaEntity, app);
+                cursor = collection.Find(odataQuery, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException("This odata operation is not supported");
+            }
+            catch (NotImplementedException)
+            {
+                throw new ValidationException("This odata operation is not supported");
+            }
 
-                    var parser = model.ParseQuery(odataQuery);
-
-                    cursor = collection.Find(parser, ids, schemaEntity.Id, schemaEntity.Schema, nonPublished);
-                }
-                catch (NotSupportedException)
-                {
-                    throw new ValidationException("This odata operation is not supported");
-                }
-                catch (NotImplementedException)
-                {
-                    throw new ValidationException("This odata operation is not supported");
-                }
-                catch (ODataException ex)
-                {
-                    throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-                }
-
-                contentsCount = await cursor.CountAsync();
-            });
-
-            return contentsCount;
+            return cursor.CountAsync();
         }
 
         public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds)
         {
-            var contentEntities = (List<BsonDocument>)null;
+            var collection = GetCollection(appId);
 
-            await ForAppIdAsync(appId, async collection =>
-            {
-                contentEntities =
-                    await collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Projection.Include(x => x.Id))
-                        .ToListAsync();
-            });
+            var contentEntities =
+                await collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Projection.Include(x => x.Id))
+                    .ToListAsync();
 
             return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, Guid schemaId, Guid id)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity appEntity, ISchemaEntity schemaEntity, Guid id)
         {
-            var contentEntity = (MongoContentEntity)null;
+            var collection = GetCollection(appEntity.Id);
 
-            await ForSchemaAsync(app.Id, schemaId, async (collection, schemaEntity) =>
-            {
-                contentEntity =
-                    await collection.Find(x => x.Id == id)
-                        .FirstOrDefaultAsync();
+            var contentEntity =
+                await collection.Find(x => x.Id == id)
+                    .FirstOrDefaultAsync();
 
-                contentEntity?.ParseData(schemaEntity.Schema);
-            });
+            contentEntity?.ParseData(schemaEntity.Schema);
 
             return contentEntity;
         }
