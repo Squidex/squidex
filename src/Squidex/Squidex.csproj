@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
+    <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572</NoWarn>
     <PackageId>Squidex</PackageId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-	<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
