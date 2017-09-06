@@ -8,9 +8,6 @@
 
 using System;
 using Squidex.Infrastructure;
-
-#pragma warning disable SA1649 // File name must match first type name
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class Field<T> : Field where T : FieldProperties
