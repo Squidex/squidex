@@ -11,8 +11,6 @@ using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Text;
 
-// ReSharper disable ConvertIfStatementToSwitchStatement
-
 namespace Squidex.Infrastructure.Json
 {
     public sealed class InstantConverter : JsonConverter

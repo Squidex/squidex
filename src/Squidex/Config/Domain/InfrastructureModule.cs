@@ -27,8 +27,6 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Local
-
 namespace Squidex.Config.Domain
 {
     public sealed class InfrastructureModule : Module

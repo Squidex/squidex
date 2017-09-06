@@ -17,8 +17,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
-// ReSharper disable InvertIf
-
 namespace Benchmarks.Tests
 {
     public sealed class HandleEventsWithManyWriters : IBenchmark

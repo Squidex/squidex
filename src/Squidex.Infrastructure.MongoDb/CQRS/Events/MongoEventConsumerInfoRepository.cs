@@ -13,9 +13,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-// ReSharper disable RedundantIfElseBlock
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class MongoEventConsumerInfoRepository : MongoRepositoryBase<MongoEventConsumerInfo>, IEventConsumerInfoRepository

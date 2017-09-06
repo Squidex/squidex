@@ -12,8 +12,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppContributors

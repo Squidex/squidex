@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-// ReSharper disable InvertIf
-
 using MongoDB.Bson;
 
 namespace Squidex.Infrastructure.CQRS.Events

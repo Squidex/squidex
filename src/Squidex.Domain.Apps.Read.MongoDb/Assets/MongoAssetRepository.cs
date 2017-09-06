@@ -17,8 +17,6 @@ using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable ClassNeverInstantiated.Local
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer

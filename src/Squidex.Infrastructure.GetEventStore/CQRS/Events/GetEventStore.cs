@@ -12,9 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 
-// ReSharper disable ConvertIfStatementToSwitchStatement
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class GetEventStore : IEventStore, IExternalSystem

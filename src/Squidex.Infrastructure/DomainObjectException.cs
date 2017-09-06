@@ -8,8 +8,6 @@
 
 using System;
 
-// ReSharper disable SuggestBaseTypeForParameter
-
 namespace Squidex.Infrastructure
 {
     public class DomainObjectException : Exception

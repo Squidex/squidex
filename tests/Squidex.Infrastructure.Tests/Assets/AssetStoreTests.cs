@@ -11,9 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
-// ReSharper disable VirtualMemberCallInConstructor
-// ReSharper disable MemberCanBeProtected.Global
-
 namespace Squidex.Infrastructure.Assets
 {
     public abstract class AssetStoreTests<T> : IDisposable where T : IAssetStore

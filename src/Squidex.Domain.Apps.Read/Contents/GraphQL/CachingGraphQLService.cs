@@ -20,8 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public sealed class CachingGraphQLService : CachingProviderBase, IGraphQLService, IEventConsumer

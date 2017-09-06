@@ -19,8 +19,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Xunit;
 
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaCommandMiddlewareTests : HandlerTestBase<SchemaDomainObject>

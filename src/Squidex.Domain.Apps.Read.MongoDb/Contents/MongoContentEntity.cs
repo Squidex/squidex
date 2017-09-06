@@ -22,11 +22,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
-// ReSharper disable CollectionNeverUpdated.Global
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity

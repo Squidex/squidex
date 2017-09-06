@@ -11,8 +11,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer

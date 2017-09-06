@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure.CQRS.Events;
 
-#pragma warning disable SA1107 // Code must not contain multiple statements on one line
-
 namespace Squidex.Infrastructure.CQRS
 {
     public abstract class DomainObjectBase : IAggregate, IEquatable<IAggregate>

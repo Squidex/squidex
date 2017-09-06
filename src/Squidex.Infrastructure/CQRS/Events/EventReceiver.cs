@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class EventReceiver : DisposableObjectBase

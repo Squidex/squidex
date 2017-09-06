@@ -18,8 +18,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
 {
     public partial class MongoWebhookRepository : MongoRepositoryBase<MongoWebhookEntity>, IWebhookRepository, IEventConsumer

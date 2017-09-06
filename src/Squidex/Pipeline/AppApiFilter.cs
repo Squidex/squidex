@@ -19,8 +19,6 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Identity;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-
 namespace Squidex.Pipeline
 {
     public sealed class AppApiFilter : IAsyncAuthorizationFilter

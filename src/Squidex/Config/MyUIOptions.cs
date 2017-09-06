@@ -8,8 +8,6 @@
 
 using System.Collections.Generic;
 
-// ReSharper disable CollectionNeverUpdated.Global
-
 namespace Squidex.Config
 {
     public sealed class MyUIOptions

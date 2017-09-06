@@ -19,9 +19,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Xunit;
 
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Write.Webhooks
 {
     public class WebhookCommandMiddlewareTests : HandlerTestBase<WebhookDomainObject>

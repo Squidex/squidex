@@ -20,9 +20,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Shared.Users;
 using Xunit;
 
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject>

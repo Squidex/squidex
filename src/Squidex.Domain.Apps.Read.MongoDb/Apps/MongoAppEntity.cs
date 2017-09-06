@@ -15,9 +15,6 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable InvertIf
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public sealed class MongoAppEntity : MongoEntity, IAppEntity

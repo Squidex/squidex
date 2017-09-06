@@ -17,10 +17,6 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable ConvertIfStatementToSwitchStatement
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
 {
     public class CachingSchemaProvider : CachingProviderBase, ISchemaProvider, IEventConsumer

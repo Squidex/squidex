@@ -14,10 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable InvertIf
-// ReSharper disable ReturnTypeCanBeEnumerable.Local
-
 namespace Squidex.Domain.Users
 {
     public static class UserManagerExtensions

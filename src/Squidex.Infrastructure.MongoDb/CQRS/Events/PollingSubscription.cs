@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class PollingSubscription : DisposableObjectBase, IEventSubscription

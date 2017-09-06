@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Net.Http.Headers;
 using Squidex.Pipeline;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Web
 {
     public static class WebUsages

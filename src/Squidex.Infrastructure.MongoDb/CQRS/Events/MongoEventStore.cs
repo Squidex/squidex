@@ -17,10 +17,6 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable RedundantIfElseBlock
-// ReSharper disable InvertIf
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore

@@ -16,8 +16,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Shared.Users;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppCommandMiddleware : ICommandMiddleware

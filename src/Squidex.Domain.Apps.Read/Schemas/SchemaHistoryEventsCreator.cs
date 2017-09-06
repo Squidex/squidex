@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Schemas
 {
     public sealed class SchemaHistoryEventsCreator : HistoryEventsCreatorBase

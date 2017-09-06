@@ -25,9 +25,6 @@ using Squidex.Config.Web;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 
-// ReSharper disable ConvertClosureToMethodGroup
-// ReSharper disable AccessToModifiedClosure
-
 namespace Squidex
 {
     public class Startup

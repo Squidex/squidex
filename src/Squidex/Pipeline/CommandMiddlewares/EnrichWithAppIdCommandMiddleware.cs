@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Write;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Pipeline.CommandMiddlewares
 {
     public sealed class EnrichWithAppIdCommandMiddleware : ICommandMiddleware

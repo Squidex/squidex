@@ -11,9 +11,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-// ReSharper disable NotAccessedVariable
-// ReSharper disable RedundantAssignment
-
 namespace Squidex.Infrastructure.Caching
 {
     public class InvalidatingMemoryCacheTests

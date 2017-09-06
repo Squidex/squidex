@@ -12,8 +12,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
 
-// ReSharper disable LoopCanBeConvertedToQuery
-
 namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     internal sealed class ParsedHistoryEvent : IHistoryEventEntity

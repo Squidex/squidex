@@ -11,10 +11,6 @@ using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable RedundantIfElseBlock
-// ReSharper disable ConvertIfStatementToReturnStatement
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public static class SortBuilder

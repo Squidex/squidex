@@ -15,10 +15,6 @@ using Squidex.Domain.Apps.Read.Webhooks.Repositories;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
-// ReSharper disable MethodSupportsCancellation
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Read.Webhooks
 {
     public class WebhookDequeuerTests

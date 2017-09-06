@@ -13,10 +13,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable InvertIf
-// ReSharper disable SwitchStatementMissingSomeCases
-// ReSharper disable ConvertIfStatementToSwitchStatement
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public class FilterVisitor : QueryNodeVisitor<FilterDefinition<MongoContentEntity>>

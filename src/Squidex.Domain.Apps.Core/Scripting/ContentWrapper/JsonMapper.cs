@@ -12,9 +12,6 @@ using Jint.Native;
 using Jint.Native.Object;
 using Newtonsoft.Json.Linq;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper

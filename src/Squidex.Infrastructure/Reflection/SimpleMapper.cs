@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-// ReSharper disable StaticMemberInGenericType
-
 namespace Squidex.Infrastructure.Reflection
 {
     public static class SimpleMapper

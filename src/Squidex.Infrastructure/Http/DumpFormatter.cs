@@ -12,8 +12,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Http
 {
     public static class DumpFormatter

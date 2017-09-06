@@ -19,10 +19,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-// ReSharper disable MethodSupportsCancellation
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Read.Webhooks
 {
     public class WebhookEnqueuerTests

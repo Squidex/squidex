@@ -18,8 +18,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-// ReSharper disable RedundantIfElseBlock
-
 namespace Squidex.Controllers.Api.Plans
 {
     /// <summary>

@@ -17,9 +17,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 
-// ReSharper disable UnusedParameterGlobal
-// ReSharper disable ConvertToLambdaExpression
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public partial class MongoContentRepository

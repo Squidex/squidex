@@ -59,5 +59,6 @@
     <Rule Id="SA1634" Action="None" />
     <Rule Id="SA1635" Action="None" />
     <Rule Id="SA1652" Action="None" />
+    <Rule Id="SA1404" Action="None" />
   </Rules>
 </RuleSet>

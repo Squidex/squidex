@@ -21,10 +21,6 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
-// ReSharper disable InvertIf
-// ReSharper disable SuggestBaseTypeForParameter
-// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-
 namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemasSwaggerGenerator

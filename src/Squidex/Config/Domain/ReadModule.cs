@@ -28,8 +28,6 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Pipeline;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Local
-
 namespace Squidex.Config.Domain
 {
     public sealed class ReadModule : Module

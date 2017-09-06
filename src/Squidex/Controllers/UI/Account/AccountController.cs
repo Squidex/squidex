@@ -27,10 +27,6 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-// ReSharper disable InvertIf
-// ReSharper disable RedundantIfElseBlock
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Controllers.UI.Account
 {
     [SwaggerIgnore]

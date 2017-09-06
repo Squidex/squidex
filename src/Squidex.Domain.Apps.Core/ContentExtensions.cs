@@ -12,8 +12,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core
 {
     public static class ContentExtensions

@@ -14,8 +14,6 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Local
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class EventReceiverTests

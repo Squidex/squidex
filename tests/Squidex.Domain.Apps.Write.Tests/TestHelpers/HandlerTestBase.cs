@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
-#pragma warning disable IDE0019
+#pragma warning disable IDE0019 // Use pattern matching
 
 namespace Squidex.Domain.Apps.Write.TestHelpers
 {
@@ -160,5 +160,4 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
     }
 }
 
-
-#pragma warning restore IDE0019
+#pragma warning restore IDE0019 // Use pattern matching

@@ -13,8 +13,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Log;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Domain
 {
     public sealed class AssetStoreModule : Module

@@ -9,8 +9,6 @@
 using System.Security.Cryptography;
 using System.Text;
 
-// ReSharper disable ForCanBeConvertedToForeach
-
 namespace Squidex.Infrastructure
 {
     public static class GravatarHelper

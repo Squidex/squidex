@@ -11,8 +11,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-// ReSharper disable RedundantCast
-
 namespace Squidex.Infrastructure
 {
     public class RefTokenTests

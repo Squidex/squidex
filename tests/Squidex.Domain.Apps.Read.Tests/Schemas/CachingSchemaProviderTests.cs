@@ -18,9 +18,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-// ReSharper disable ConvertToConstant.Local
-// ReSharper disable UnusedParameter.Local
-
 namespace Squidex.Domain.Apps.Read.Schemas
 {
     public class CachingSchemaProviderTests

@@ -14,8 +14,6 @@ using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-// ReSharper disable UseObjectOrCollectionInitializer
-
 namespace Squidex.Controllers.ContentApi
 {
     [ApiExceptionFilter]

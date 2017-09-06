@@ -18,8 +18,6 @@ using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public sealed class QueryContext

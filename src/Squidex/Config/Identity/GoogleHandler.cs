@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Identity
 {
     public sealed class GoogleHandler : OAuthEvents

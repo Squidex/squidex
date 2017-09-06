@@ -9,8 +9,6 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
-// ReSharper disable InvertIf
-
 namespace Squidex
 {
     public class Program

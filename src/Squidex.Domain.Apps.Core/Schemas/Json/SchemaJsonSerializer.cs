@@ -12,8 +12,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-// ReSharper disable UseObjectOrCollectionInitializer
-
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class SchemaJsonSerializer

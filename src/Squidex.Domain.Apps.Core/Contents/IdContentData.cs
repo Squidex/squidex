@@ -15,8 +15,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class IdContentData : ContentData<long>, IEquatable<IdContentData>

@@ -12,10 +12,6 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Infrastructure;
 
-// ReSharper disable ConvertIfStatementToSwitchStatement
-// ReSharper disable RedundantIfElseBlock
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("DateTime")]

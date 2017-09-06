@@ -10,9 +10,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events;
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class AggregateHandler : IAggregateHandler

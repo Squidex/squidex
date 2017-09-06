@@ -9,8 +9,6 @@
 using System;
 using Squidex.Infrastructure.CQRS.Commands;
 
-// ReSharper disable MemberCanBeProtected.Global
-
 namespace Squidex.Domain.Apps.Write.Webhooks.Commands
 {
     public abstract class WebhookAggregateCommand : AppCommand, IAggregateCommand

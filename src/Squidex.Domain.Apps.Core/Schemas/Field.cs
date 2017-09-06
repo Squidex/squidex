@@ -14,10 +14,6 @@ using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-// ReSharper disable ConvertIfStatementToReturnStatement
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class Field : CloneableBase

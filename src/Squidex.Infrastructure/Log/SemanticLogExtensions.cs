@@ -9,8 +9,6 @@
 using System;
 using System.Diagnostics;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Log
 {
     public static class SemanticLogExtensions

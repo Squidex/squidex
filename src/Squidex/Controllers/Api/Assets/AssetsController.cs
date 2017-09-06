@@ -26,8 +26,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-// ReSharper disable PossibleNullReferenceException
-
 namespace Squidex.Controllers.Api.Assets
 {
     /// <summary>

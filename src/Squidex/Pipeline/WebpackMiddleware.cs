@@ -11,8 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-// ReSharper disable LoopCanBeConvertedToQuery
-
 namespace Squidex.Pipeline
 {
     public sealed class WebpackMiddleware

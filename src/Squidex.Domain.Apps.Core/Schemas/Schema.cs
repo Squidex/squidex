@@ -14,9 +14,6 @@ using Microsoft.OData.Edm;
 using NJsonSchema;
 using Squidex.Infrastructure;
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class Schema : CloneableBase

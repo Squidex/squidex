@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public abstract class ContentData<T> : Dictionary<T, ContentFieldData>, IEquatable<ContentData<T>>

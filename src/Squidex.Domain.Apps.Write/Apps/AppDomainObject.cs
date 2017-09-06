@@ -18,8 +18,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppDomainObject : DomainObjectBase

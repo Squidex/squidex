@@ -13,8 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Http;
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-
 namespace Squidex.Domain.Apps.Read.Webhooks
 {
     public class WebhookSender

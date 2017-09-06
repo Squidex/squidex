@@ -18,8 +18,6 @@ using Squidex.Domain.Apps.Write.Webhooks;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline.CommandMiddlewares;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Local
-
 namespace Squidex.Config.Domain
 {
     public class WriteModule : Module

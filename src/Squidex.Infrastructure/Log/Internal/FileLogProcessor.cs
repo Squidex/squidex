@@ -12,8 +12,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Log.Internal
 {
     public class FileLogProcessor : DisposableObjectBase

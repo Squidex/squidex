@@ -13,8 +13,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core
 {
     public sealed class LanguagesConfig : IFieldPartitioning

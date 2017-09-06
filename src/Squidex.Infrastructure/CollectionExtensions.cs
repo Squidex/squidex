@@ -10,9 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// ReSharper disable InvertIf
-// ReSharper disable LoopCanBeConvertedToQuery
-
 namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions

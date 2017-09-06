@@ -11,8 +11,6 @@ using FakeItEasy;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-// ReSharper disable ConvertToLambdaExpression
-
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public class DefaultDomainObjectFactoryTests

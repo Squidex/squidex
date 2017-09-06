@@ -10,9 +10,6 @@ using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable InvertIf
-// ReSharper disable UnusedParameter.Global
-
 namespace Squidex.Domain.Apps.Events.Schemas.Utils
 {
     public static class SchemaEventDispatcher

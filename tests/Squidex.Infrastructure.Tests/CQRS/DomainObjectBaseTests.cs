@@ -11,8 +11,6 @@ using System.Linq;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Infrastructure.CQRS
 {
     public class DomainObjectBaseTests

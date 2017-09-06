@@ -16,8 +16,6 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Swagger
 {
     public class ScopesProcessor : IOperationProcessor

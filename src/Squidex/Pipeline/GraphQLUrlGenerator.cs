@@ -15,8 +15,6 @@ using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure.Assets;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Pipeline
 {
     public sealed class GraphQLUrlGenerator : IGraphQLUrlGenerator

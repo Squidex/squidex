@@ -13,8 +13,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer

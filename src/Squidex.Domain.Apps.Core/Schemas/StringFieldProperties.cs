@@ -11,8 +11,6 @@ using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-// ReSharper disable ObjectCreationAsStatement
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("StringField")]

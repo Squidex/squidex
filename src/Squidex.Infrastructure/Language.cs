@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Infrastructure
 {
     public sealed partial class Language

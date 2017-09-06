@@ -16,8 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Xunit;
 
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>

@@ -13,9 +13,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable RedundantIfElseBlock
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public static class FindExtensions

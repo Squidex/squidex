@@ -25,8 +25,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
-// ReSharper disable SpecifyACultureInStringConversionExplicitly
-
 namespace Squidex.Domain.Apps.Read.Contents
 {
     public class ODataQueryTests

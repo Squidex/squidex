@@ -10,9 +10,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-// ReSharper disable RedundantJumpStatement
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Timers
 {
     public sealed class CompletionTimer

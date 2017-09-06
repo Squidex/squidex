@@ -21,8 +21,6 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Controllers.Api.Users
 {
     /// <summary>

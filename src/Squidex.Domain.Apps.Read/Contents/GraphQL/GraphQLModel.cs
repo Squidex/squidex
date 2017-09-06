@@ -23,11 +23,6 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
 
-// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-// ReSharper disable ConvertClosureToMethodGroup
-// ReSharper disable InvertIf
-// ReSharper disable ParameterHidesMember
-
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphQLContext

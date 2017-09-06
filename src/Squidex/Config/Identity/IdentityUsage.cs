@@ -19,9 +19,6 @@ using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Identity
 {
     public static class IdentityUsage

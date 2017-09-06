@@ -11,8 +11,6 @@ using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Squidex.Domain.Apps.Core.Contents;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public sealed class ContentDataProperty : PropertyDescriptor

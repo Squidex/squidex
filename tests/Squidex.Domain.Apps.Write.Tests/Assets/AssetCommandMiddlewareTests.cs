@@ -17,9 +17,6 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Domain.Apps.Write.Assets
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject>

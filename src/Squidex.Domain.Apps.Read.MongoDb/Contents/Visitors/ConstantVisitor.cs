@@ -12,9 +12,6 @@ using Microsoft.OData.UriParser;
 using NodaTime;
 using NodaTime.Text;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public sealed class ConstantVisitor : QueryNodeVisitor<object>

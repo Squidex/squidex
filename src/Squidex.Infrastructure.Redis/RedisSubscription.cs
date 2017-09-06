@@ -12,8 +12,6 @@ using System.Reactive.Subjects;
 using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure
 {
     internal sealed class RedisSubscription

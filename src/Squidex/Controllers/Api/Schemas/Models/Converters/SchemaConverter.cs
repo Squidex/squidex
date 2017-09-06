@@ -14,8 +14,6 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
     public static class SchemaConverter

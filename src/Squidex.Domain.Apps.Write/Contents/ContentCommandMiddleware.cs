@@ -25,8 +25,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
 
-// ReSharper disable ConvertToLambdaExpression
-
 namespace Squidex.Domain.Apps.Write.Contents
 {
     public class ContentCommandMiddleware : ICommandMiddleware

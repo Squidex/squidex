@@ -10,9 +10,6 @@ using System.Threading;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
-// ReSharper disable MethodSupportsCancellation
-// ReSharper disable AccessToModifiedClosure
-
 namespace Squidex.Infrastructure.Timers
 {
     public class CompletionTimerTests

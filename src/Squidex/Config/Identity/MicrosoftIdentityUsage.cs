@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Identity
 {
     public static class MicrosoftIdentityUsage

@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>

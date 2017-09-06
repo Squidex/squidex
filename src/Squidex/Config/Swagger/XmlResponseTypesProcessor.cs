@@ -15,8 +15,6 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Pipeline.Swagger;
 
-// ReSharper disable UseObjectOrCollectionInitializer
-
 namespace Squidex.Config.Swagger
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor

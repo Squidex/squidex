@@ -16,10 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-// ReSharper disable MethodSupportsCancellation
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Webhooks
 {
     public sealed class WebhookDequeuer : DisposableObjectBase, IExternalSystem

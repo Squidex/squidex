@@ -8,8 +8,6 @@
 
 using System.IO;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure
 {
     public static class FileExtensions

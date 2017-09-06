@@ -9,8 +9,6 @@
 using System;
 using Newtonsoft.Json;
 
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public class EventDataFormatter

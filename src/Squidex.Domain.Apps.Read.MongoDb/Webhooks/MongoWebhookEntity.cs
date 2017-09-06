@@ -14,8 +14,6 @@ using Squidex.Domain.Apps.Read.Webhooks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable CollectionNeverUpdated.Global
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
 {
     public class MongoWebhookEntity : MongoEntity, IWebhookEntity

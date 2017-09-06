@@ -16,10 +16,6 @@ using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable ConvertIfStatementToSwitchStatement
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class DateTimeField : Field<DateTimeFieldProperties>

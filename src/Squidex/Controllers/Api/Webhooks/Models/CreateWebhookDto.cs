@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-// ReSharper disable CollectionNeverUpdated.Global
-
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
     public sealed class CreateWebhookDto

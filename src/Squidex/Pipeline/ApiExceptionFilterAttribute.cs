@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Controllers.Api;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Pipeline
 {
     public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter

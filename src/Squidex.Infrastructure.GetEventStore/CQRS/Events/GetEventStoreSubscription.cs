@@ -18,8 +18,6 @@ using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.CQRS.Events
 {
     internal sealed class GetEventStoreSubscription : DisposableObjectBase, IEventSubscription
