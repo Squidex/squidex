@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (string.IsNullOrWhiteSpace(ContributorId))
             {
-                errors.Add(new ValidationError("Contributor id not assigned", nameof (ContributorId)));
+                errors.Add(new ValidationError("Contributor id not assigned", nameof(ContributorId)));
             }
         }
     }

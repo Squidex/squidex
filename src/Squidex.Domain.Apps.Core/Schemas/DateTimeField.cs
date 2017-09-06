@@ -22,7 +22,6 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("DateTimeField")]
     public sealed class DateTimeField : Field<DateTimeFieldProperties>
     {
         public DateTimeField(long id, string name, Partitioning partitioning)

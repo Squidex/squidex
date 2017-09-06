@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                 new CreateSchemaField { Name = "field2", Properties = new StringFieldProperties() }
             };
 
-            sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields  }));
+            sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
 
             var @event = (SchemaCreated)sut.GetUncomittedEvents().Single().Payload;
 

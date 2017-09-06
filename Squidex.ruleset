@@ -1,18 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Squidex Rules" Description="Squidex Rules" ToolsVersion="14.0">
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpacingRules">
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="SA1002" Action="Error" />
-	<Rule Id="SA1003" Action="Error" />
-	<Rule Id="SA1008" Action="None" />
-	<Rule Id="SA1009" Action="None" />
-	<Rule Id="SA1012" Action="Error" />
-	<Rule Id="SA1013" Action="Error" />
-	<Rule Id="SA1025" Action="Error" />
-	<Rule Id="SA1026" Action="Error" />
-	<Rule Id="SA1028" Action="Error" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.ReadabilityRules">
+    <Rule Id="SA1003" Action="Error" />
+    <Rule Id="SA1008" Action="None" />
+    <Rule Id="SA1009" Action="None" />
+    <Rule Id="SA1012" Action="Error" />
+    <Rule Id="SA1013" Action="Error" />
+    <Rule Id="SA1025" Action="Error" />
+    <Rule Id="SA1026" Action="Error" />
+    <Rule Id="SA1028" Action="Error" />
+    <Rule Id="SA1000" Action="Error" />
+    <Rule Id="SA1001" Action="Error" />
     <Rule Id="SA1101" Action="None" />
+    <Rule Id="SA1004" Action="Error" />
+    <Rule Id="SA1107" Action="None" />
+    <Rule Id="SA1010" Action="Error" />
+    <Rule Id="SA1111" Action="None" />
     <Rule Id="SA1116" Action="None" />
     <Rule Id="SA1117" Action="None" />
     <Rule Id="SA1118" Action="None" />
@@ -21,8 +25,6 @@
     <Rule Id="SA1127" Action="None" />
     <Rule Id="SA1128" Action="Error" />
     <Rule Id="SA1129" Action="Error" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.OrderingRules">
     <Rule Id="SA1200" Action="None" />
     <Rule Id="SA1201" Action="None" />
     <Rule Id="SA1202" Action="None" />
@@ -31,37 +33,37 @@
     <Rule Id="SA1208" Action="Error" />
     <Rule Id="SA1210" Action="Error" />
     <Rule Id="SA1214" Action="Error" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.NamingRules">
     <Rule Id="SA1306" Action="Error" />
-	<Rule Id="SA1311" Action="Error" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.MaintainabilityRules">
+    <Rule Id="SA1311" Action="Error" />
     <Rule Id="SA1400" Action="Error" />
-	<Rule Id="SA1401" Action="Error" />
-	<Rule Id="SA1402" Action="None" />
-	<Rule Id="SA1407" Action="Error" />
-	<Rule Id="SA1408" Action="None" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.LayoutRules">
+    <Rule Id="SA1401" Action="Error" />
+    <Rule Id="SA1402" Action="None" />
+    <Rule Id="SA1407" Action="Error" />
+    <Rule Id="SA1408" Action="None" />
     <Rule Id="SA1502" Action="Error" />
-	<Rule Id="SA1504" Action="Error" />
-	<Rule Id="SA1505" Action="Error" />
-	<Rule Id="SA1507" Action="Error" />
-	<Rule Id="SA1508" Action="Error" />
+    <Rule Id="SA1504" Action="Error" />
+    <Rule Id="SA1505" Action="Error" />
+    <Rule Id="SA1507" Action="Error" />
+    <Rule Id="SA1508" Action="Error" />
     <Rule Id="SA1518" Action="Error" />
     <Rule Id="SA1512" Action="None" />
     <Rule Id="SA1513" Action="Error" />
     <Rule Id="SA1515" Action="None" />
     <Rule Id="SA1516" Action="None" />
-  </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.DocumentationRules">
     <Rule Id="SA1600" Action="None" />
     <Rule Id="SA1612" Action="None" />
     <Rule Id="SA1615" Action="None" />
     <Rule Id="SA1623" Action="None" />
-    <Rule Id="SA1633" Action="None" />
+    <Rule Id="SA1633" Action="Error" />
     <Rule Id="SA1649" Action="Error" />
     <Rule Id="SA1652" Action="None" />
+    <Rule Id="SA1634" Action="Error" />
+    <Rule Id="SA1635" Action="Error" />
+    <Rule Id="SA1636" Action="Error" />
+    <Rule Id="SA1637" Action="Error" />
+    <Rule Id="SA1638" Action="Error" />
+    <Rule Id="SA1639" Action="None" />
+    <Rule Id="SA1640" Action="Error" />
+    <Rule Id="SA1641" Action="Error" />
   </Rules>
 </RuleSet>

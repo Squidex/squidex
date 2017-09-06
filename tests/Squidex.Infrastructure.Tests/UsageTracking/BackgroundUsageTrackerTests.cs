@@ -76,7 +76,8 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_fill_missing_days()
         {
-            DateTime dateFrom = DateTime.Today, dateTo = DateTime.Today.AddDays(7);
+            var dateFrom = DateTime.Today;
+            var dateTo = DateTime.Today.AddDays(7);
 
             IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
             {
