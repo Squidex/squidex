@@ -15,16 +15,16 @@ namespace Squidex.Infrastructure.Assets
 {
     public abstract class AssetStoreTests<T> : IDisposable where T : IAssetStore
     {
-        private readonly T sut;
+        private readonly Lazy<T> sut;
 
         protected AssetStoreTests()
         {
-            sut = CreateStore();
+            sut = new Lazy<T>(CreateStore);
         }
 
         protected T Sut
         {
-            get { return sut; }
+            get { return sut.Value; }
         }
 
         public abstract T CreateStore();

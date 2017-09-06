@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks
 
         private static string CreateContentEventName(string eventType)
         {
-            return eventType.StartsWith(ContentPrefix) ? eventType.Substring(ContentPrefix.Length) : eventType;
+            return eventType.StartsWith(ContentPrefix, StringComparison.Ordinal) ? eventType.Substring(ContentPrefix.Length) : eventType;
         }
     }
 }

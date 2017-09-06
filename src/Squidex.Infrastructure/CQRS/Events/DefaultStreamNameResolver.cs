@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
 
-            if (typeName.EndsWith(Suffix))
+            if (typeName.EndsWith(Suffix, StringComparison.Ordinal))
             {
                 typeName = typeName.Substring(0, typeName.Length - Suffix.Length);
             }

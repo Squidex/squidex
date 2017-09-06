@@ -15,6 +15,8 @@ using Squidex.Domain.Apps.Read.Webhooks.Repositories;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+
 namespace Squidex.Domain.Apps.Read.Webhooks
 {
     public class WebhookDequeuerTests

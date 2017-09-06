@@ -14,6 +14,8 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+
 namespace Squidex.Domain.Users
 {
     public class AssetUserPictureStoreTests

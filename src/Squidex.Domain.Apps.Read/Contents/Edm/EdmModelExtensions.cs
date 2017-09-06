@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Read.Contents.Edm
 
             var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
 
-            if (query.StartsWith("?"))
+            if (query.StartsWith("?", StringComparison.Ordinal))
             {
                 query = query.Substring(1);
             }

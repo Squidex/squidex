@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+#pragma warning disable RECS0026 // Possible unassigned object created by 'new'
+
 namespace Squidex.Infrastructure
 {
     public static class ValidationExtensions

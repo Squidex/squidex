@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure
 
             foreach (var item in collection)
             {
-                if (item != null)
+                if (!Equals(item, null))
                 {
                     hashCode = (hashCode * 23) + comparer.GetHashCode(item);
                 }
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure
         {
             Guard.NotNull(comparer, nameof(comparer));
 
-            var hashCodes = collection.Where(x => x != null).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
+            var hashCodes = collection.Where(x => !Equals(x, null)).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
 
             var hashCode = 17;
 
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure
             {
                 hashCode = (hashCode * 23) + keyComparer.GetHashCode(kvp.Key);
 
-                if (kvp.Value != null)
+                if (!Equals(kvp.Value, null))
                 {
                     hashCode = (hashCode * 23) + valueComparer.GetHashCode(kvp.Value);
                 }

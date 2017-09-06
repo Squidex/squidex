@@ -37,7 +37,7 @@
     <Rule Id="SA1311" Action="Error" />
     <Rule Id="SA1400" Action="Error" />
     <Rule Id="SA1401" Action="Error" />
-    <Rule Id="SA1402" Action="None" />
+    <Rul Id="SA1402" Action="None" />
     <Rule Id="SA1407" Action="Error" />
     <Rule Id="SA1408" Action="None" />
     <Rule Id="SA1502" Action="Error" />
@@ -60,5 +60,22 @@
     <Rule Id="SA1635" Action="None" />
     <Rule Id="SA1652" Action="None" />
     <Rule Id="SA1404" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="RefactoringEssentials" RuleNamespace="RefactoringEssentials">
+    <Rule Id="RECS0061" Action="Error" />
+    <Rule Id="RECS0017" Action="Error" />
+    <Rule Id="RECS0060" Action="Error" />
+    <Rule Id="RECS0062" Action="Error" />
+    <Rule Id="RECS0063" Action="Error" />
+    <Rule Id="RECS0064" Action="Error" />
+    <Rule Id="RECS0133" Action="Error" />
+    <Rule Id="REVB0145" Action="None" />
+    <Rule Id="RECS0002" Action="Error" />
+    <Rule Id="RECS0154" Action="None" />
+    <Rule Id="RECS0146" Action="Error" />
+    <Rule Id="RECS0026" Action="Error" />
+  </Rules>
+  <Rules AnalyzerId="Roslyn.Core" RuleNamespace="Roslyn.Core">
+	<Rule Id="AD0001" Action="None" />
   </Rules>
 </RuleSet>
