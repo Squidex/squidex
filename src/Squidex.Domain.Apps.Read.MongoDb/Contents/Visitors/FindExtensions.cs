@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity>  cursor, ODataUriParser query, Schema schema)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, Schema schema)
         {
             return cursor.Sort(SortBuilder.BuildSort(query, schema));
         }

@@ -15,21 +15,21 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.TestData;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Xunit;
-using NodaTime.Extensions;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Infrastructure;
+using Xunit;
 
-// ReSharper disable SimilarAnonymousTypeNearby
+#pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
 
 namespace Squidex.Domain.Apps.Read.Contents
 {

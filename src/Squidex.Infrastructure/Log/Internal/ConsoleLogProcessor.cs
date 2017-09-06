@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.Log.Internal
 {
     public class ConsoleLogProcessor : DisposableObjectBase
     {
-        private readonly IConsole console;
         private const int MaxQueuedMessages = 1024;
+        private readonly IConsole console;
         private readonly BlockingCollection<LogMessageEntry> messageQueue = new BlockingCollection<LogMessageEntry>(MaxQueuedMessages);
         private readonly Task outputTask;
 

@@ -22,8 +22,7 @@ namespace Squidex.Pipeline
     {
         private static readonly List<Func<Exception, IActionResult>> Handlers = new List<Func<Exception, IActionResult>>();
 
-        private static void AddHandler<T>(Func<T, IActionResult> handler)
-            where T : Exception
+        private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
             Handlers.Add(ex => ex is T typed ? handler(typed) : null);
         }

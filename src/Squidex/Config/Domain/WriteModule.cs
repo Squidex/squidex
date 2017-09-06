@@ -37,7 +37,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithTimestampHandler>()
+            builder.RegisterType<EnrichWithTimestampCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 

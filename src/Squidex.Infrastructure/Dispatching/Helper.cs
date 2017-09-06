@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Dispatching
         {
             return string.Equals(method.Name, name, StringComparison.OrdinalIgnoreCase);
         }
-        
+
         public static bool HasMatchingReturnType(this MethodInfo method, Type type)
         {
             return method.ReturnType == type;

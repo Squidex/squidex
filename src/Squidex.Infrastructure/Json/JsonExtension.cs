@@ -18,10 +18,12 @@ namespace Squidex.Infrastructure.Json
             {
                 return true;
             }
+
             if (token.Type == JTokenType.Null)
             {
                 return true;
             }
+
             if (token is JValue value)
             {
                 return value.Value == null;

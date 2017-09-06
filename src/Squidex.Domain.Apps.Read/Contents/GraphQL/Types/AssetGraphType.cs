@@ -150,7 +150,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             if (context.CanGenerateAssetSourceUrl)
             {
-
                 AddField(new FieldType
                 {
                     Name = "sourceUrl",

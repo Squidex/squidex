@@ -31,8 +31,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {
-        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private const int MaxLength = 1024 * 1024;
+        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private NamedContentData contentData;
 
         [BsonId]

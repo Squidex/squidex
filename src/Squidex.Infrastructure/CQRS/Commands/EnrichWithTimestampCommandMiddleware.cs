@@ -12,11 +12,11 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public sealed class EnrichWithTimestampHandler : ICommandMiddleware
+    public sealed class EnrichWithTimestampCommandMiddleware : ICommandMiddleware
     {
         private readonly IClock clock;
 
-        public EnrichWithTimestampHandler(IClock clock)
+        public EnrichWithTimestampCommandMiddleware(IClock clock)
         {
             Guard.NotNull(clock, nameof(clock));
 

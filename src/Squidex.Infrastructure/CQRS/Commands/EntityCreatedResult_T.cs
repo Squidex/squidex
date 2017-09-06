@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Infrastructure.CQRS.Commands
 {
     public sealed class EntityCreatedResult<T> : EntitySavedResult

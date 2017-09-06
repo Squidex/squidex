@@ -10,7 +10,8 @@ using System;
 
 namespace Squidex.Infrastructure.CQRS.Commands
 {
-    public delegate T DomainObjectFactoryFunction<out T>(Guid id) where T : IAggregate;
+    public delegate T DomainObjectFactoryFunction<out T>(Guid id)
+        where T : IAggregate;
 
     public class DefaultDomainObjectFactory : IDomainObjectFactory
     {

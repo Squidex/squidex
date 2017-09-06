@@ -26,8 +26,8 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
         protected static readonly ProjectionDefinitionBuilder<TEntity> Project = Builders<TEntity>.Projection;
 
-        private Lazy<IMongoCollection<TEntity>> mongoCollection;
         private readonly IMongoDatabase mongoDatabase;
+        private Lazy<IMongoCollection<TEntity>> mongoCollection;
 
         protected IMongoCollection<TEntity> Collection
         {

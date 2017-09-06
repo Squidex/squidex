@@ -34,8 +34,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        protected static TResult Merge<TResult>(TResult source, TResult target)
-            where TResult : ContentData<T>
+        protected static TResult Merge<TResult>(TResult source, TResult target) where TResult : ContentData<T>
         {
             if (ReferenceEquals(target, source))
             {
@@ -55,8 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return target;
         }
 
-        protected static TResult Clean<TResult>(TResult source, TResult target)
-            where TResult : ContentData<T>
+        protected static TResult Clean<TResult>(TResult source, TResult target) where TResult : ContentData<T>
         {
             foreach (var fieldValue in source.ValidValues)
             {

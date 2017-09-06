@@ -25,8 +25,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
     public partial class MongoWebhookRepository : MongoRepositoryBase<MongoWebhookEntity>, IWebhookRepository, IEventConsumer
     {
         private static readonly List<IWebhookEntity> EmptyWebhooks = new List<IWebhookEntity>();
-        private Dictionary<Guid, List<IWebhookEntity>> inMemoryWebhooks;
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
+        private Dictionary<Guid, List<IWebhookEntity>> inMemoryWebhooks;
 
         public MongoWebhookRepository(IMongoDatabase database)
             : base(database)

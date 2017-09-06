@@ -18,8 +18,7 @@ namespace Squidex.Infrastructure.Caching
 {
     public class InvalidatingMemoryCacheTests
     {
-        internal sealed class MyOptions<T> : IOptions<T>
-            where T : class, new()
+        internal sealed class MyOptions<T> : IOptions<T> where T : class, new()
         {
             public MyOptions(T value)
             {

@@ -5,6 +5,9 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+
+#pragma warning disable SA1401 // Fields must be private
+
 namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class Usage

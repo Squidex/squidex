@@ -12,8 +12,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class CloneableBase
     {
-        protected T Clone<T>(Action<T> updater)
-            where T : CloneableBase
+        protected T Clone<T>(Action<T> updater) where T : CloneableBase
         {
             var clone = (T)MemberwiseClone();
 

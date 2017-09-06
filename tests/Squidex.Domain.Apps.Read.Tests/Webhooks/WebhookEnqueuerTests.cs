@@ -70,7 +70,6 @@ namespace Squidex.Domain.Apps.Read.Webhooks
         [Fact]
         public async Task Should_update_repositories_on_successful_requests()
         {
-
             var @event = Envelope.Create(new ContentCreated { AppId = appId, SchemaId = schemaId });
 
             var webhook1 = CreateWebhook(1);

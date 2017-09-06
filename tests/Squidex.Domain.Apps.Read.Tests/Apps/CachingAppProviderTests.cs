@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Read.Apps
 
             await ProvideAppByIdAsync(appV1);
 
-            sut.On(Envelope.Create(new AppLanguageAdded {AppId = appId }).To<IEvent>()).Wait();
+            sut.On(Envelope.Create(new AppLanguageAdded { AppId = appId }).To<IEvent>()).Wait();
 
             await ProvideAppByIdAsync(appV2);
 

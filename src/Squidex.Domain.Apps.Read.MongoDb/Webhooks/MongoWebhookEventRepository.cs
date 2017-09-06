@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero });
         }
 
-        public Task QueryPendingAsync(Func<IWebhookEventEntity, Task> callback, CancellationToken cancellationToken = new CancellationToken())
+        public Task QueryPendingAsync(Func<IWebhookEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
         {
             var now = clock.GetCurrentInstant();
 

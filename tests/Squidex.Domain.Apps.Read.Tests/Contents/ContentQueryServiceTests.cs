@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.OData.UriParser;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Read.Apps;
@@ -19,8 +21,6 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Xunit;
-using System.Collections.Generic;
-using Microsoft.OData.UriParser;
 
 namespace Squidex.Domain.Apps.Read.Contents
 {

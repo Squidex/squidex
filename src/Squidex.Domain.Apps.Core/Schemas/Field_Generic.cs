@@ -13,8 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class Field<T> : Field
-        where T : FieldProperties
+    public abstract class Field<T> : Field where T : FieldProperties
     {
         private T properties;
 
