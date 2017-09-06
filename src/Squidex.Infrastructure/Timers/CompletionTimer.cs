@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Timers
             Guard.NotNull(callback, nameof(callback));
             Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
 
-            runTask = RunInternal(delayInMs, initialDelay, callback);
+            runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }
 
         public Task StopAsync()
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Timers
             }
         }
 
-        private async Task RunInternal(int delay, int initialDelay, Func<CancellationToken, Task> callback)
+        private async Task RunInternalAsync(int delay, int initialDelay, Func<CancellationToken, Task> callback)
         {
             try
             {

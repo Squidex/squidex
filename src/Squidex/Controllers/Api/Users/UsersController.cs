@@ -29,7 +29,7 @@ namespace Squidex.Controllers.Api.Users
     /// Readonly API to retrieve information about squidex users.
     /// </summary>
     [ApiExceptionFilter]
-    [SwaggerTag("Users")]
+    [SwaggerTag(nameof(Users))]
     public sealed class UsersController : Controller
     {
         private static readonly byte[] AvatarBytes;

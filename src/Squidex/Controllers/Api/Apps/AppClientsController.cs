@@ -25,7 +25,7 @@ namespace Squidex.Controllers.Api.Apps
     [MustBeAppOwner]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Apps")]
+    [SwaggerTag(nameof(Apps))]
     public sealed class AppClientsController : ControllerBase
     {
         public AppClientsController(ICommandBus commandBus)

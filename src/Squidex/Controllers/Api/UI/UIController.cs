@@ -21,7 +21,7 @@ namespace Squidex.Controllers.Api.UI
     /// Manages ui settings and configs.
     /// </summary>
     [ApiExceptionFilter]
-    [SwaggerTag("UI")]
+    [SwaggerTag(nameof(UI))]
     public sealed class UIController : Controller
     {
         private readonly MyUIOptions uiOptions;

@@ -24,7 +24,7 @@ namespace Squidex.Controllers.Api.History
     [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("History")]
+    [SwaggerTag(nameof(History))]
     public sealed class HistoryController : ControllerBase
     {
         private readonly IHistoryEventRepository historyEventRepository;

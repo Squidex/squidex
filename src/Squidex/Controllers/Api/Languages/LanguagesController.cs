@@ -21,7 +21,7 @@ namespace Squidex.Controllers.Api.Languages
     /// </summary>
     [Authorize]
     [ApiExceptionFilter]
-    [SwaggerTag("Languages")]
+    [SwaggerTag(nameof(Languages))]
     public sealed class LanguagesController : Controller
     {
         /// <summary>

@@ -26,7 +26,7 @@ namespace Squidex.Controllers.Api.Apps
     [MustBeAppOwner]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Apps")]
+    [SwaggerTag(nameof(Apps))]
     public sealed class AppContributorsController : ControllerBase
     {
         private readonly IAppPlansProvider appPlansProvider;

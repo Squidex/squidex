@@ -96,7 +96,7 @@ namespace Squidex.Controllers.ContentApi
 
                     if (item.Data != null)
                     {
-                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, null, !isFrontendClient);
+                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
                     }
 
                     return itemModel;
@@ -120,7 +120,7 @@ namespace Squidex.Controllers.ContentApi
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, null, !isFrontendClient);
+                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
             }
 
             Response.Headers["ETag"] = new StringValues(content.Content.Version.ToString());

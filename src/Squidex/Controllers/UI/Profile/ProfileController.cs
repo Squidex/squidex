@@ -76,7 +76,7 @@ namespace Squidex.Controllers.UI.Profile
 
         [HttpGet]
         [Route("/account/profile/login-add-callback/")]
-        public Task<IActionResult> AddLoginCallback(string remoteError = null)
+        public Task<IActionResult> AddLoginCallback()
         {
             return MakeChangeAsync(async user =>
             {

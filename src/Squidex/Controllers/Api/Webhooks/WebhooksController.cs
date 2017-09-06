@@ -27,7 +27,7 @@ namespace Squidex.Controllers.Api.Webhooks
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Webhooks")]
+    [SwaggerTag(nameof(Webhooks))]
     [MustBeAppDeveloper]
     public sealed class WebhooksController : ControllerBase
     {

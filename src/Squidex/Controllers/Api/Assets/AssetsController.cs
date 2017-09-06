@@ -35,7 +35,7 @@ namespace Squidex.Controllers.Api.Assets
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Assets")]
+    [SwaggerTag(nameof(Assets))]
     public sealed class AssetsController : ControllerBase
     {
         private readonly IAssetRepository assetRepository;

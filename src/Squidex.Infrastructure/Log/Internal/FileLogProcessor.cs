@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
                         if (i == Retries)
                         {
-                            Console.WriteLine("Failed to write to log file '{0}': {1}", path, ex);
+                            Console.WriteLine($"Failed to write to log file '{path}': {ex}");
                         }
                     }
                 }

@@ -18,7 +18,7 @@ namespace Squidex.Controllers.Api.Ping
     [MustBeAppReader]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Ping")]
+    [SwaggerTag(nameof(Ping))]
     public sealed class PingController : Controller
     {
         /// <summary>

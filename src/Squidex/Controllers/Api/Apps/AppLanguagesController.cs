@@ -28,7 +28,7 @@ namespace Squidex.Controllers.Api.Apps
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Apps")]
+    [SwaggerTag(nameof(Apps))]
     public sealed class AppLanguagesController : ControllerBase
     {
         public AppLanguagesController(ICommandBus commandBus)
