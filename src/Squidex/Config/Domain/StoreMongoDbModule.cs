@@ -181,7 +181,6 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-
             builder.Register(c =>
                 new CompoundEventConsumer(
                     c.Resolve<MongoSchemaRepository>(),

@@ -23,7 +23,10 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public override JsValue Value
         {
-            get { return value ?? (value = JsonMapper.Map(contentValue, contentField.Engine)); }
+            get
+            {
+                return value ?? (value = JsonMapper.Map(contentValue, contentField.Engine));
+            }
             set
             {
                 if (!Equals(this.value, value))

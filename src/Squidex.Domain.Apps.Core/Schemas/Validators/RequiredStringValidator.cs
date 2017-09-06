@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
                 return TaskHelper.Done;
             }
 
-            var valueAsString = (string) value;
+            var valueAsString = (string)value;
 
             if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
             {

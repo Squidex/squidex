@@ -29,7 +29,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Instant? MaxValue
         {
-            get { return maxValue; }
+            get
+            {
+                return maxValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -40,7 +43,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Instant? MinValue
         {
-            get { return minValue; }
+            get
+            {
+                return minValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -51,7 +57,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Instant? DefaultValue
         {
-            get { return defaultValue; }
+            get
+            {
+                return defaultValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -62,7 +71,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public DateTimeCalculatedDefaultValue? CalculatedDefaultValue
         {
-            get { return calculatedDefaultValue; }
+            get
+            {
+                return calculatedDefaultValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -73,7 +85,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public DateTimeFieldEditor Editor
         {
-            get { return editor; }
+            get
+            {
+                return editor;
+            }
             set
             {
                 ThrowIfFrozen();

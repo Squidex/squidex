@@ -22,10 +22,10 @@ namespace Benchmarks.Tests
 {
     public sealed class HandleEvents : IBenchmark
     {
+        private const int NumEvents = 5000;
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private const int NumEvents = 5000;
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
         private IEventStore eventStore;
@@ -81,7 +81,7 @@ namespace Benchmarks.Tests
             {
                 var eventData = formatter.ToEventData(new Envelope<IEvent>(new MyEvent { EventNumber = eventId + 1 }), Guid.NewGuid());
 
-                eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventId - 1, new [] { eventData }).Wait();
+                eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventId - 1, new[] { eventData }).Wait();
             }
 
             eventConsumer.WaitAndVerify();

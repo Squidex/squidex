@@ -113,7 +113,6 @@ namespace Squidex.Domain.Apps.Core.Contents
                 }
                 else
                 {
-
                     result[field.Name] = fieldValue.Value;
                 }
             }

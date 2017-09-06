@@ -99,7 +99,6 @@ namespace Squidex.Controllers.Api.Assets
                                 await destinationStream.CopyToAsync(bodyStream);
                             }
                         }
-
                     }
                 }
 

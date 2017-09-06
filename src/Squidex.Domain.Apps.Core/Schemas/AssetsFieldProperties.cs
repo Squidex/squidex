@@ -20,7 +20,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MinItems
         {
-            get { return minItems; }
+            get
+            {
+                return minItems;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -31,7 +34,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems
         {
-            get { return maxItems; }
+            get
+            {
+                return maxItems;
+            }
             set
             {
                 ThrowIfFrozen();

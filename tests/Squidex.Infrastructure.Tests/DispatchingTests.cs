@@ -19,11 +19,21 @@ namespace Squidex.Infrastructure
 {
     public sealed class DispatchingTests
     {
-        private interface IMyEvent { }
+        private interface IMyEvent
+        {
+        }
 
-        private class MyEventA : IMyEvent { }
-        private class MyEventB : IMyEvent { }
-        private class MyUnknown : IMyEvent { }
+        private class MyEventA : IMyEvent
+        {
+        }
+
+        private class MyEventB : IMyEvent
+        {
+        }
+
+        private class MyUnknown : IMyEvent
+        {
+        }
 
         private class MyAsyncFuncConsumer
         {

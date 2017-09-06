@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
-    public sealed class RangeValidator<T> : IValidator where T : struct, IComparable<T>
+    public sealed class RangeValidator<T> : IValidator
+        where T : struct, IComparable<T>
     {
         private readonly T? min;
         private readonly T? max;

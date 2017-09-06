@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class HandledHandler : ICommandMiddleware
         {
-            public ICommand LastCommand;
+            public ICommand LastCommand { get; set; }
 
             public Task HandleAsync(CommandContext context, Func<Task> next)
             {
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class NonHandledHandler : ICommandMiddleware
         {
-            public ICommand LastCommand;
+            public ICommand LastCommand { get; private set; }
 
             public Task HandleAsync(CommandContext context, Func<Task> next)
             {
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class ThrowHandledHandler : ICommandMiddleware
         {
-            public ICommand LastCommand;
+            public ICommand LastCommand { get; private set; }
 
             public Task HandleAsync(CommandContext context, Func<Task> next)
             {

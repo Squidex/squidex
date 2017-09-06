@@ -105,7 +105,7 @@ namespace Squidex.Config.Domain
                 {
                     var fieldRegistry = c.Resolve<FieldRegistry>();
 
-                    return (id => new SchemaDomainObject(id, -1, fieldRegistry));
+                    return id => new SchemaDomainObject(id, -1, fieldRegistry);
                 })
                 .AsSelf()
                 .SingleInstance();

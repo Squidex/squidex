@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public class CollectionExtensionTests
+    public class CollectionExtensionsTests
     {
         private readonly Dictionary<int, int> valueDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();

@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         public void Should_ignore_empty_filters()
         {
             A.CallTo(() => consumer1.EventsFilter).Returns("filter1");
-            A.CallTo(() => consumer2.EventsFilter).Returns("");
+            A.CallTo(() => consumer2.EventsFilter).Returns(string.Empty);
 
             var sut = new CompoundEventConsumer("my", consumer1, consumer2);
 

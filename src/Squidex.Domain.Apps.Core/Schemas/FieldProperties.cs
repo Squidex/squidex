@@ -20,7 +20,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsRequired
         {
-            get { return isRequired; }
+            get
+            {
+                return isRequired;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -31,7 +34,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsListField
         {
-            get { return isListField; }
+            get
+            {
+                return isListField;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -42,7 +48,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Placeholder
         {
-            get { return placeholder; }
+            get
+            {
+                return placeholder;
+            }
             set
             {
                 ThrowIfFrozen();

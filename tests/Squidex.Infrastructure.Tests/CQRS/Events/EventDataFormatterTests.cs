@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class EventStoreFormatterTests
+    public class EventDataFormatterTests
     {
         public sealed class MyEvent : IEvent
         {
@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
 
-        public EventStoreFormatterTests()
+        public EventDataFormatterTests()
         {
             serializerSettings.Converters.Add(new PropertiesBagConverter());
 

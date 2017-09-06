@@ -22,12 +22,12 @@ using EventStore.ClientAPI.Projections;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    internal sealed class EventStoreSubscription : DisposableObjectBase, IEventSubscription
+    internal sealed class GetEventStoreSubscription : DisposableObjectBase, IEventSubscription
     {
         private const int ReconnectWindowMax = 5;
         private const int ReconnectWaitMs = 1000;
         private static readonly TimeSpan TimeBetweenReconnects = TimeSpan.FromMinutes(5);
-        private static readonly ConcurrentDictionary<string, bool> subscriptionsCreated = new ConcurrentDictionary<string, bool>();
+        private static readonly ConcurrentDictionary<string, bool> SubscriptionsCreated = new ConcurrentDictionary<string, bool>();
         private readonly IEventStoreConnection connection;
         private readonly string streamFilter;
         private readonly string streamName;
@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private EventStoreCatchUpSubscription internalSubscription;
         private long? position;
 
-        public EventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
+        public GetEventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
         {
             this.prefix = prefix;
             this.position = ParsePosition(position);
@@ -247,7 +247,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private async Task CreateProjectionAsync()
         {
-            if (subscriptionsCreated.TryAdd(streamName, true))
+            if (SubscriptionsCreated.TryAdd(streamName, true))
             {
                 var projectsManager = await ConnectToProjections();
 

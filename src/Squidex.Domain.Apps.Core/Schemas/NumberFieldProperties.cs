@@ -24,7 +24,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public double? MaxValue
         {
-            get { return maxValue; }
+            get
+            {
+                return maxValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -35,7 +38,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public double? MinValue
         {
-            get { return minValue; }
+            get
+            {
+                return minValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -46,7 +52,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public double? DefaultValue
         {
-            get { return defaultValue; }
+            get
+            {
+                return defaultValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -57,7 +66,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public ImmutableList<double> AllowedValues
         {
-            get { return allowedValues; }
+            get
+            {
+                return allowedValues;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -68,7 +80,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public NumberFieldEditor Editor
         {
-            get { return editor; }
+            get
+            {
+                return editor;
+            }
             set
             {
                 ThrowIfFrozen();

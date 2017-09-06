@@ -66,11 +66,11 @@ namespace Squidex.Config.Identity
 
                 Task.Run(async () =>
                 {
-                    if ((userManager.SupportsQueryableUsers && !userManager.Users.Any()))
+                    if (userManager.SupportsQueryableUsers && !userManager.Users.Any())
                     {
                         try
                         {
-                            var user =  await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
+                            var user = await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
 
                             await userManager.AddToRoleAsync(user, SquidexRoles.Administrator);
                         }

@@ -12,23 +12,23 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class MyValidatableValid : IValidatable
+    public class GuardTests
     {
-        public void Validate(IList<ValidationError> errors)
+        private sealed class MyValidatableValid : IValidatable
         {
+            public void Validate(IList<ValidationError> errors)
+            {
+            }
         }
-    }
 
-    public sealed class MyValidatableInvalid : IValidatable
-    {
-        public void Validate(IList<ValidationError> errors)
+        private sealed class MyValidatableInvalid : IValidatable
         {
-            errors.Add(new ValidationError("error", "error"));
+            public void Validate(IList<ValidationError> errors)
+            {
+                errors.Add(new ValidationError("error", "error"));
+            }
         }
-    }
 
-    public class GuardTest
-    {
         [Theory]
         [InlineData("")]
         [InlineData(" ")]

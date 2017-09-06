@@ -23,7 +23,10 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public override JsValue Value
         {
-            get { return value; }
+            get
+            {
+                return value;
+            }
             set
             {
                 if (!Equals(this.value, value))

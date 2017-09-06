@@ -45,18 +45,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 case JTokenType.Boolean:
                     return new JsValue((bool)value);
                 case JTokenType.Object:
-                {
-                    var obj = (JObject)value;
-
-                    var target = new ObjectInstance(engine);
-
-                    foreach (var property in obj)
-                    {
-                        target.FastAddProperty(property.Key, Map(property.Value, engine), false, true, true);
-                    }
-
-                    return target;
-                }
+                    return FromObject(value, engine);
                 case JTokenType.Array:
                 {
                     var arr = (JArray)value;
@@ -73,6 +62,20 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
 
             throw new ArgumentException("Invalid json type", nameof(value));
+        }
+
+        private static JsValue FromObject(JToken value, Engine engine)
+        {
+            var obj = (JObject)value;
+
+            var target = new ObjectInstance(engine);
+
+            foreach (var property in obj)
+            {
+                target.FastAddProperty(property.Key, Map(property.Value, engine), false, true, true);
+            }
+
+            return target;
         }
 
         public static JToken Map(JsValue value)

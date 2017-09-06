@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public IEventSubscription CreateSubscription(string streamFilter = null, string position = null)
         {
-            return new EventStoreSubscription(connection, streamFilter, position, prefix, projectionHost);
+            return new GetEventStoreSubscription(connection, streamFilter, position, prefix, projectionHost);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)

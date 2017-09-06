@@ -20,13 +20,13 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public class PropertiesBagTest
+    public class PropertiesBagTests
     {
         private readonly CultureInfo c = CultureInfo.InvariantCulture;
         private readonly PropertiesBag bag = new PropertiesBag();
         private readonly dynamic dynamicBag;
 
-        public PropertiesBagTest()
+        public PropertiesBagTests()
         {
             dynamicBag = bag;
         }
@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure
             serializerSettings.Converters.Add(new PropertiesBagConverter());
 
             var content = JsonConvert.SerializeObject(bag, serializerSettings);
-            var output  = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
+            var output = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
 
             Assert.Equal(bag.Count, output.Count);
         }
@@ -277,7 +277,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_convert_from_guid_value()
         {
-            var id = new Guid();
+            var id = Guid.NewGuid();
 
             bag.Set("Key", id);
 
@@ -287,7 +287,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_convert_from_guid_string()
         {
-            var id = new Guid();
+            var id = Guid.NewGuid();
 
             bag.Set("Key", id.ToString());
 

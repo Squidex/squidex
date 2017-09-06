@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Infrastructure;
-using System.Collections.Generic;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {

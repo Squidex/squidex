@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Log
 
             appenders.Add(new TimestampLogAppender(() => now));
 
-            Log.LogFatal(w => {});
+            Log.LogFatal(w => { /* Do Nothing */ });
 
             var expected =
                 LogTest(w => w

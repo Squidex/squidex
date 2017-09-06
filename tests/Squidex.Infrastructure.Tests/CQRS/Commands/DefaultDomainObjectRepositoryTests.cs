@@ -56,7 +56,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 get { return appliedEvents; }
             }
 
-            public MyDomainObject(Guid id, int version) : base(id, version)
+            public MyDomainObject(Guid id, int version)
+                : base(id, version)
             {
             }
 

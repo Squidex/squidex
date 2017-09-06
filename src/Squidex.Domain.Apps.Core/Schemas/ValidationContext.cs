@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset)
             : this(checkContent, checkAsset, false)
         {
-
         }
 
         private ValidationContext(

@@ -23,11 +23,11 @@ namespace Benchmarks.Tests
 {
     public sealed class HandleEventsWithManyWriters : IBenchmark
     {
+        private const int NumCommits = 200;
+        private const int NumStreams = 10;
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private const int NumCommits = 200;
-        private const int NumStreams = 10;
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
         private IEventStore eventStore;

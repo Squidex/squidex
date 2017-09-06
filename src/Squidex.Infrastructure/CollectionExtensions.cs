@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
             {
                 if (item != null)
                 {
-                    hashCode = hashCode * 23 + comparer.GetHashCode(item);
+                    hashCode = (hashCode * 23) + comparer.GetHashCode(item);
                 }
             }
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure
 
             foreach (var code in hashCodes)
             {
-                hashCode = hashCode * 23 + code;
+                hashCode = (hashCode * 23) + code;
             }
 
             return hashCode;
@@ -69,11 +69,11 @@ namespace Squidex.Infrastructure
 
             foreach (var kvp in dictionary.OrderBy(x => x.Key))
             {
-                hashCode = hashCode * 23 + keyComparer.GetHashCode(kvp.Key);
+                hashCode = (hashCode * 23) + keyComparer.GetHashCode(kvp.Key);
 
                 if (kvp.Value != null)
                 {
-                    hashCode = hashCode * 23 + valueComparer.GetHashCode(kvp.Value);
+                    hashCode = (hashCode * 23) + valueComparer.GetHashCode(kvp.Value);
                 }
             }
 
@@ -102,12 +102,14 @@ namespace Squidex.Infrastructure
             return dictionary.GetOrAdd(key, _ => default(TValue));
         }
 
-        public static TValue GetOrNew<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TValue : class, new()
+        public static TValue GetOrNew<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
+            where TValue : class, new()
         {
             return dictionary.GetOrCreate(key, _ => new TValue());
         }
 
-        public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : class, new()
+        public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+            where TValue : class, new()
         {
             return dictionary.GetOrAdd(key, _ => new TValue());
         }

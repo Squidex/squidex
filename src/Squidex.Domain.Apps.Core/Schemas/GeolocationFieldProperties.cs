@@ -19,7 +19,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public GeolocationFieldEditor Editor
         {
-            get { return editor; }
+            get
+            {
+                return editor;
+            }
             set
             {
                 ThrowIfFrozen();

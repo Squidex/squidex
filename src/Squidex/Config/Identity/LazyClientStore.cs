@@ -58,7 +58,6 @@ namespace Squidex.Config.Identity
             if (appClient == null)
             {
                 return null;
-
             }
 
             client = CreateClientFromApp(clientId, appClient);

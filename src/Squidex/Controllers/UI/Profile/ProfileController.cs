@@ -114,7 +114,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/password-change")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password),
+            return MakeChangeAsync(user => userManager.ChangePasswordAsync(user, model.OldPassword, model.Password),
                 "Password changed successfully.");
         }
 

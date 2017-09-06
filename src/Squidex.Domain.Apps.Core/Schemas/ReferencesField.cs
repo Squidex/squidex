@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 referenceIds = EmptyIds;
             }
 
-            return referenceIds.Union(new [] { Properties.SchemaId });
+            return referenceIds.Union(new[] { Properties.SchemaId });
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)

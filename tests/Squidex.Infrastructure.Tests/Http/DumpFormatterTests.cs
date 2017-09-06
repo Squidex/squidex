@@ -13,6 +13,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using Xunit;
 
+#pragma warning disable SA1122 // Use string.Empty for empty strings
+
 namespace Squidex.Infrastructure.Http
 {
     public class DumpFormatterTests
@@ -41,7 +43,7 @@ namespace Squidex.Infrastructure.Http
         [Fact]
         public void Should_format_dump_without_content()
         {
-            var httpRequest  = CreateRequest();
+            var httpRequest = CreateRequest();
             var httpResponse = CreateResponse();
 
             var dump = DumpFormatter.BuildDump(httpRequest, httpResponse, null, null, TimeSpan.FromMinutes(1), false);
@@ -67,7 +69,7 @@ namespace Squidex.Infrastructure.Http
         [Fact]
         public void Should_format_dump_with_content_without_timeout()
         {
-            var httpRequest  = CreateRequest(new StringContent("Hello Squidex", Encoding.UTF8, "text/plain"));
+            var httpRequest = CreateRequest(new StringContent("Hello Squidex", Encoding.UTF8, "text/plain"));
             var httpResponse = CreateResponse(new StringContent("Hello Back", Encoding.UTF8, "text/plain"));
 
             var dump = DumpFormatter.BuildDump(httpRequest, httpResponse, "Hello Squidex", "Hello Back", TimeSpan.FromMinutes(1), false);
