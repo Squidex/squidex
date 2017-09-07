@@ -88,7 +88,7 @@ namespace Squidex.Controllers.UI.Profile
 
         [HttpPost]
         [Route("/account/profile/update")]
-        public Task<IActionResult> Profile(ChangeProfileModel model)
+        public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
             return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName),
                 "Account updated successfully.");

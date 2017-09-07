@@ -157,16 +157,6 @@ namespace Squidex.Domain.Users.MongoDb
             claims.Foreach(RemoveClaim);
         }
 
-        public void SetClaim(string type, string value)
-        {
-            SetClaim(new Claim(type, value));
-        }
-
-        public void SetClaim(Claim claim)
-        {
-            ReplaceClaim(claim, claim);
-        }
-
         public string GetToken(string loginProider, string name)
         {
             return Tokens.FirstOrDefault(t => t.LoginProvider == loginProider && t.Name == name)?.Value;
@@ -180,6 +170,13 @@ namespace Squidex.Domain.Users.MongoDb
         public void RemoveToken(string loginProvider, string name)
         {
             Tokens.RemoveAll(t => t.LoginProvider == loginProvider && t.Name == name);
+        }
+
+        public void SetClaim(string type, string value)
+        {
+            Claims.RemoveAll(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase));
+
+            AddClaim(new Claim(type, value));
         }
 
         public void ReplaceClaim(Claim existingClaim, Claim newClaim)
