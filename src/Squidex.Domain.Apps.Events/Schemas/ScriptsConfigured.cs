@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("ScriptsConfiguredEvent")]
+    [EventType(nameof(ScriptsConfigured))]
     public sealed class ScriptsConfigured : SchemaEvent
     {
         public string ScriptQuery { get; set; }

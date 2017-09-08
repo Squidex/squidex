@@ -21,11 +21,21 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
-    public sealed class AppApiFilter : IAsyncAuthorizationFilter
+    public sealed class AppApiFilter : IAsyncAuthorizationFilter, IFilterContainer
     {
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IUsageTracker usageTracker;
+
+        IFilterMetadata IFilterContainer.FilterDefinition { get; set; }
+
+        public AppApiAttribute FilterDefinition
+        {
+            get
+            {
+                return (AppApiAttribute)((IFilterContainer)this).FilterDefinition;
+            }
+        }
 
         public AppApiFilter(IAppProvider appProvider, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
         {
@@ -46,6 +56,12 @@ namespace Squidex.Pipeline
                 if (app == null)
                 {
                     context.Result = new NotFoundResult();
+                    return;
+                }
+
+                if (!FilterDefinition.CheckPermissions)
+                {
+                    context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
                     return;
                 }
 

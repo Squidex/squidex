@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [TypeName("AssetCreatedEvent")]
+    [EventType(nameof(AssetCreated))]
     public sealed class AssetCreated : AssetEvent
     {
         public string FileName { get; set; }

@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [TypeName("ContentDeletedEvent")]
+    [EventType(nameof(ContentDeleted))]
     public sealed class ContentDeleted : ContentEvent
     {
     }

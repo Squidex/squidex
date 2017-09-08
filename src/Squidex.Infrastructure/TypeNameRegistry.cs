@@ -31,6 +31,31 @@ namespace Squidex.Infrastructure
             return this;
         }
 
+        public TypeNameRegistry MapObsolete(Type type, string name)
+        {
+            Guard.NotNull(type, nameof(type));
+            Guard.NotNull(name, nameof(name));
+
+            lock (namesByType)
+            {
+                try
+                {
+                    typesByName.Add(name, type);
+                }
+                catch (ArgumentException)
+                {
+                    if (typesByName[name] != type)
+                    {
+                        var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+
+                        throw new ArgumentException(message, nameof(type));
+                    }
+                }
+            }
+
+            return this;
+        }
+
         public TypeNameRegistry Map(Type type, string name)
         {
             Guard.NotNull(type, nameof(type));

@@ -78,6 +78,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             Add<GeolocationFieldProperties>(
                 (id, name, partitioning, properties) =>
                     new GeolocationField(id, name, partitioning, (GeolocationFieldProperties)properties));
+
+            typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "DateTime");
+            typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "References");
         }
 
         private void Add<TFieldProperties>(FactoryFunction fieldFactory)

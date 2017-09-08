@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("AssetsField")]
+    [TypeName(nameof(AssetsField))]
     public sealed class AssetsFieldProperties : FieldProperties
     {
         private int? minItems;

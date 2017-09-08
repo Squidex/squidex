@@ -17,6 +17,7 @@ using Squidex.Pipeline;
 namespace Squidex.Controllers.ContentApi
 {
     [ApiExceptionFilter]
+    [AppApi(false)]
     [SwaggerIgnore]
     public sealed class ContentSwaggerController : ControllerBase
     {
@@ -35,9 +36,9 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(0)]
         public IActionResult Docs(string app)
         {
-            ViewBag.Specification = $"~/content/{app}/swagger/v1/swagger.json";
+            var vm = new DocsVM { Specification = $"~/content/{app}/swagger/v1/swagger.json" };
 
-            return View("Docs");
+            return View(nameof(Docs), vm);
         }
 
         [HttpGet]

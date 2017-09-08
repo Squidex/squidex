@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("BooleanField")]
+    [TypeName(nameof(BooleanField))]
     public sealed class BooleanFieldProperties : FieldProperties
     {
         private BooleanFieldEditor editor;

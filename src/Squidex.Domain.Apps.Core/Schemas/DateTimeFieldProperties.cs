@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("DateTime")]
+    [TypeName(nameof(DateTimeField))]
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         private DateTimeFieldEditor editor;

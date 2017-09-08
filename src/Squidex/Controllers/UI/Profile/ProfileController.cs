@@ -155,7 +155,7 @@ namespace Squidex.Controllers.UI.Profile
 
             if (!ModelState.IsValid)
             {
-                return View("Profile", await GetProfileVM(user, model));
+                return View(nameof(Profile), await GetProfileVM(user, model));
             }
 
             string errorMessage;
@@ -177,7 +177,7 @@ namespace Squidex.Controllers.UI.Profile
                 errorMessage = "An unexpected exception occurred.";
             }
 
-            return View("Profile", await GetProfileVM(user, model, errorMessage));
+            return View(nameof(Profile), await GetProfileVM(user, model, errorMessage));
         }
 
         private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)

@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [TypeName("ContentPublishedEvent")]
+    [EventType(nameof(ContentPublished))]
     public sealed class ContentPublished : ContentEvent
     {
     }

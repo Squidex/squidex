@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("FieldEnabledEvent")]
+    [EventType(nameof(FieldEnabled))]
     public sealed class FieldEnabled : FieldEvent
     {
     }

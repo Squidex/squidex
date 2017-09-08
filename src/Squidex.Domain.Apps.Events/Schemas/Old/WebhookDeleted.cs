@@ -7,11 +7,11 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas.Old
 {
-    [TypeName("WebhookDeletedEvent")]
+    [EventType(nameof(WebhookDeleted))]
     [Obsolete]
     public sealed class WebhookDeleted : SchemaEvent
     {

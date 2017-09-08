@@ -7,11 +7,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("SchemaFieldsReorderedEvent")]
+    [EventType(nameof(SchemaFieldsReordered))]
     public sealed class SchemaFieldsReordered : SchemaEvent
     {
         public List<long> FieldIds { get; set; }

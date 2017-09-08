@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Webhooks
 {
-    [TypeName("WebhookUpdatedEvent")]
+    [EventType(nameof(WebhookUpdated))]
     public sealed class WebhookUpdated : WebhookEditEvent
     {
     }

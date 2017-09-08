@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("References")]
+    [TypeName(nameof(ReferencesField))]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
         private int? minItems;

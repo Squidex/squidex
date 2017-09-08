@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppClientAttachedEvent")]
+    [EventType(nameof(AppClientAttached))]
     public sealed class AppClientAttached : AppEvent
     {
         public string Id { get; set; }

@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Events.Schemas.SchemaCreatedField>;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("SchemaCreatedEvent")]
+    [EventType(nameof(SchemaCreated))]
     public sealed class SchemaCreated : SchemaEvent
     {
         public string Name { get; set; }

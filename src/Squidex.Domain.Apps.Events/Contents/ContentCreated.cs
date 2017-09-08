@@ -7,11 +7,11 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [TypeName("ContentCreatedEvent")]
+    [EventType(nameof(ContentCreated))]
     public sealed class ContentCreated : ContentEvent
     {
         public NamedContentData Data { get; set; }

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("StringField")]
+    [TypeName(nameof(StringField))]
     public sealed class StringFieldProperties : FieldProperties
     {
         private int? minLength;

@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  FieldDeleted.cs
+//  DocsVM.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.CQRS.Events;
-
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Controllers
 {
-    [EventType(nameof(FieldDeleted))]
-    public sealed class FieldDeleted : FieldEvent
+    public sealed class DocsVM
     {
+        public string Specification { get; set; }
     }
 }
