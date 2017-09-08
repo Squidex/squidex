@@ -10,7 +10,7 @@ namespace Squidex.Shared.Identity
 {
     public static class SquidexRoles
     {
-        public static readonly string Administrator = "administrator";
+        public static readonly string Administrator = "ADMINISTRATOR";
 
         public static readonly string AppOwner = "app:owner";
 

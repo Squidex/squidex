@@ -26,7 +26,8 @@ import {
     ContentItemComponent,
     ContentsPageComponent,
     ReferencesEditorComponent,
-    SchemasPageComponent
+    SchemasPageComponent,
+    SearchFormComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -115,7 +116,8 @@ const routes: Routes = [
         ContentPageComponent,
         ContentsPageComponent,
         ReferencesEditorComponent,
-        SchemasPageComponent
+        SchemasPageComponent,
+        SearchFormComponent
     ]
 })
 export class SqxFeatureContentModule { }

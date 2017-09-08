@@ -28,6 +28,7 @@ import {
     FieldDto,
     ImmutableArray,
     MessageBus,
+    ModalView,
     Pager,
     SchemaDetailsDto
 } from 'shared';
@@ -42,6 +43,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     private contentUpdatedSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
+
+    public searchModal = new ModalView();
 
     public contentItems: ImmutableArray<ContentDto>;
     public contentFields: FieldDto[];
