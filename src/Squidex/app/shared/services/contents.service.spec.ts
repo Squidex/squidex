@@ -51,6 +51,15 @@ describe('ContentDto', () => {
         expect(content_2.lastModified).toEqual(now);
         expect(content_2.lastModifiedBy).toEqual('me');
     });
+
+    it('should update data property when setting data', () => {
+        const newData = {};
+
+        const content_1 = new ContentDto('1', true, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_2 = content_1.setData(newData);
+
+        expect(content_2.data).toBe(newData);
+    });
 });
 
 describe('ContentsService', () => {
@@ -268,6 +277,27 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
                 new Version('11')));
+    }));
+
+    it('should make get request to get versioned content data',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const response = {};
+
+        let data: any | null = null;
+
+        contentsService.getVersionData('my-app', 'my-schema', 'content1', version).subscribe(result => {
+            data = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/1');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(response);
+
+        expect(data).toBe(response);
     }));
 
     it('should make put request to update content',

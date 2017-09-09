@@ -13,7 +13,8 @@ import { Observable, Subscription } from 'rxjs';
 import {
     ContentCreated,
     ContentDeleted,
-    ContentUpdated
+    ContentUpdated,
+    ContentVersionSelected
 } from './../messages';
 
 import {
@@ -38,6 +39,7 @@ import {
 })
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
+    private contentVersionSelectedSubscription: Subscription;
     private version = new Version('');
     private content: ContentDto;
 
@@ -63,6 +65,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     }
 
     public ngOnDestroy() {
+        this.contentVersionSelectedSubscription.unsubscribe();
         this.contentDeletedSubscription.unsubscribe();
     }
 
@@ -70,6 +73,12 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         const routeData = allData(this.route);
 
         this.languages = routeData['appLanguages'];
+
+        this.contentVersionSelectedSubscription =
+            this.messageBus.of(ContentVersionSelected)
+                .subscribe(message => {
+                    this.loadVersion(message.version);
+                });
 
         this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
@@ -143,6 +152,22 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             }
         } else {
             this.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+        }
+    }
+
+    private loadVersion(version: number) {
+        if (!this.isNewMode && this.content) {
+            this.appNameOnce()
+                .switchMap(app => this.contentsService.getVersionData(app, this.schema.name, this.contentId!, new Version(version.toString())))
+                .subscribe(dto => {
+                    this.content = this.content.setData(dto);
+
+                    this.emitContentUpdated(this.content);
+                    this.notifyInfo('Content version loaded successfully.');
+                    this.populateContentForm();
+                }, error => {
+                    this.notifyError(error);
+                });
         }
     }
 

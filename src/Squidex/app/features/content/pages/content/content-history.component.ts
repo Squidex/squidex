@@ -21,6 +21,8 @@ import {
     UsersProviderService
 } from 'shared';
 
+import { ContentVersionSelected } from './../messages';
+
 const REPLACEMENT_TEMP = '$TEMP$';
 
 @Component({
@@ -74,6 +76,10 @@ export class ContentHistoryComponent extends AppComponentBase {
                 return Observable.of(`${parts[1]}-client`);
             }
         }
+    }
+
+    public loadVersion(version: number) {
+        this.messageBus.emit(new ContentVersionSelected(version));
     }
 
     public format(message: string): Observable<string> {

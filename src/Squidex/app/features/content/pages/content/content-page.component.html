@@ -38,6 +38,10 @@
 
         <div class="panel-main">
             <div class="panel-content panel-content-scroll">
+                <div class="panel-alert panel-alert-danger">
+                    You have not created the subscription. Therefore you cannot change the plan.
+                </div>
+
                 <div *ngFor="let field of schema.fields">
                     <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
                 </div>

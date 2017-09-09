@@ -30,7 +30,6 @@ export class ContentDeleted {
 
 export class ContentVersionSelected {
     constructor(
-        public readonly id: string,
         public readonly version: number
     ) {
     }

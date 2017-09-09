@@ -41,6 +41,19 @@ export class ContentDto {
     ) {
     }
 
+    public setData(data: any): ContentDto {
+        return new ContentDto(
+            this.id,
+            this.isPublished,
+            this.isDeleted,
+            this.createdBy,
+            this.lastModifiedBy,
+            this.created,
+            this.lastModified,
+            data,
+            this.version);
+    }
+
     public publish(user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
@@ -202,6 +215,13 @@ export class ContentsService {
                     this.localCache.remove(`content.${id}`);
                 })
                 .pretifyError('Failed to delete content. Please reload.');
+    }
+
+    public getVersionData(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
+
+        return HTTP.getVersioned(this.http, url, version)
+                .pretifyError('Failed to load data. Please reload.');
     }
 
     public publishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {

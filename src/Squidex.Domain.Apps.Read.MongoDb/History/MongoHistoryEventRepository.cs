@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
         {
             var historyEventEntities =
                 await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
-                    .SortByDescending(x => x.Created).ThenBy(x => x.Version).Limit(count)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count)
                     .ToListAsync();
 
             return historyEventEntities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
