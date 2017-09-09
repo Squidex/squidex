@@ -31,6 +31,7 @@ export class ContentDto {
     constructor(
         public readonly id: string,
         public readonly isPublished: boolean,
+        public readonly isDeleted: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
@@ -44,6 +45,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             true,
+            this.isDeleted,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
@@ -54,6 +56,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             false,
+            this.isDeleted,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
@@ -64,6 +67,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             this.isPublished,
+            this.isDeleted,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             data,
@@ -117,6 +121,7 @@ export class ContentsService {
                         return new ContentDto(
                             item.id,
                             item.isPublished,
+                            item.isDeleted === true,
                             item.createdBy,
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
@@ -136,6 +141,7 @@ export class ContentsService {
                     return new ContentDto(
                         response.id,
                         response.isPublished,
+                        response.isDeleted === true,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),
@@ -164,7 +170,7 @@ export class ContentsService {
                 .map(response => {
                     return new ContentDto(
                         response.id,
-                        response.isPublished,
+                        response.isPublished, false,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),

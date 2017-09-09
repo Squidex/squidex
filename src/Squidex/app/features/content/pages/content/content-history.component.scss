@@ -10,6 +10,20 @@
     &-main {
         @include flex-grow(1);
     }
+   
+    &-load {
+        & {
+            font-size: .9rem;
+            font-weight: normal;
+            cursor: pointer;
+            color: $color-theme-blue !important;
+        }
+
+        &:focus,
+        &:hover {
+            text-decoration: underline !important;
+        }
+    }
 
     &-left {
         min-width: 2.8rem;

@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
 
         [BsonRequired]
         [BsonElement]
-        public int SessionEventIndex { get; set; }
+        public long Version { get; set; }
 
         [BsonRequired]
         [BsonElement]

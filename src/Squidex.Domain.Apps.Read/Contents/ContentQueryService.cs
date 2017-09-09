@@ -156,6 +156,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             public Guid Id { get; set; }
             public Guid AppId { get; set; }
             public long Version { get; set; }
+            public bool IsDeleted { get; set; }
             public bool IsPublished { get; set; }
             public Instant Created { get; set; }
             public Instant LastModified { get; set; }

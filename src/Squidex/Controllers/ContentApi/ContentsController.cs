@@ -209,6 +209,21 @@ namespace Squidex.Controllers.ContentApi
         }
 
         [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/restore")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> RestoreContent(string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new RestoreContent { ContentId = id, User = User };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [MustBeAppEditor]
         [HttpDelete]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]

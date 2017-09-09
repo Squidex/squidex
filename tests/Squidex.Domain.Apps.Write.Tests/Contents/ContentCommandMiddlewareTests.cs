@@ -229,6 +229,21 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<delete-script>", "delete content")).MustHaveHappened();
         }
 
+        [Fact]
+        public async Task Restore_should_update_domain_object()
+        {
+            CreateContent();
+
+            content.Delete(new DeleteContent());
+
+            var command = CreateContextForCommand(new RestoreContent { ContentId = contentId, User = user });
+
+            await TestUpdate(content, async _ =>
+            {
+                await sut.HandleAsync(command);
+            });
+        }
+
         private void CreateContent()
         {
             content.Create(new CreateContent { Data = data });

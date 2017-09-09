@@ -22,7 +22,7 @@ describe('ContentDto', () => {
     it('should update data property and user info when updating', () => {
         const now = DateTime.now();
 
-        const content_1 = new ContentDto('1', false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_1 = new ContentDto('1', false, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
         const content_2 = content_1.update({ data: 2 }, 'me', now);
 
         expect(content_2.data).toEqual({ data: 2 });
@@ -33,7 +33,7 @@ describe('ContentDto', () => {
     it('should update isPublished property and user info when publishing', () => {
         const now = DateTime.now();
 
-        const content_1 = new ContentDto('1', false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_1 = new ContentDto('1', false, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
         const content_2 = content_1.publish('me', now);
 
         expect(content_2.isPublished).toBeTruthy();
@@ -44,7 +44,7 @@ describe('ContentDto', () => {
     it('should update isPublished property and user info when unpublishing', () => {
         const now = DateTime.now();
 
-        const content_1 = new ContentDto('1', true, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
+        const content_1 = new ContentDto('1', true, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, null);
         const content_2 = content_1.unpublish('me', now);
 
         expect(content_2.isPublished).toBeFalsy();
@@ -115,12 +115,12 @@ describe('ContentsService', () => {
 
         expect(contents).toEqual(
             new ContentsDto(10, [
-                new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+                new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
                     {},
                     new Version('11')),
-                new ContentDto('id2', true, 'Created2', 'LastModifiedBy2',
+                new ContentDto('id2', true, false, 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
                     {},
@@ -205,7 +205,7 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+            new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
@@ -263,7 +263,7 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', true, 'Created1', 'LastModifiedBy1',
+            new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},

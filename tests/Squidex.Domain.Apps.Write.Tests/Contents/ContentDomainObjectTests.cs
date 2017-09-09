@@ -303,6 +303,31 @@ namespace Squidex.Domain.Apps.Write.Contents
                 );
         }
 
+        [Fact]
+        public void Restore_should_throw_exception_if_not_deleted()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Delete(CreateContentCommand(new DeleteContent()));
+            });
+        }
+
+        [Fact]
+        public void Restore_should_update_properties_create_events()
+        {
+            CreateContent();
+            DeleteContent();
+
+            sut.Restore(CreateContentCommand(new RestoreContent()));
+
+            Assert.False(sut.IsDeleted);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentRestored())
+                );
+        }
+
         private void CreateContent()
         {
             sut.Create(CreateContentCommand(new CreateContent { Data = data }));

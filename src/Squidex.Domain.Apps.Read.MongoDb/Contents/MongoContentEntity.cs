@@ -48,6 +48,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         public bool IsPublished { get; set; }
 
         [BsonRequired]
+        [BsonElement("dl")]
+        public bool IsDeleted { get; set; }
+
+        [BsonRequired]
         [BsonElement("dt")]
         public string DataText { get; set; }
 

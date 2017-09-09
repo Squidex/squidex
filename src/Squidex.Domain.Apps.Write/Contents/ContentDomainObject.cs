@@ -72,6 +72,11 @@ namespace Squidex.Domain.Apps.Write.Contents
             isDeleted = true;
         }
 
+        protected void On(ContentRestored @event)
+        {
+            isDeleted = false;
+        }
+
         public ContentDomainObject Create(CreateContent command)
         {
             Guard.Valid(command, nameof(command), () => "Cannot create content");
@@ -95,6 +100,17 @@ namespace Squidex.Domain.Apps.Write.Contents
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+
+            return this;
+        }
+
+        public ContentDomainObject Restore(RestoreContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentRestored()));
 
             return this;
         }
@@ -156,6 +172,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             if (isCreated)
             {
                 throw new DomainException("Content has already been created.");
+            }
+        }
+
+        private void VerifyDeleted()
+        {
+            if (!isDeleted)
+            {
+                throw new DomainException("Content has not been deleted.");
             }
         }
 

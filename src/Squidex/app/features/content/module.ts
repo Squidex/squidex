@@ -11,7 +11,6 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
-    HistoryComponent,
     ResolveAppLanguagesGuard,
     ResolveContentGuard,
     ResolvePublishedSchemaGuard,
@@ -22,6 +21,7 @@ import {
 import {
     AssetsEditorComponent,
     ContentFieldComponent,
+    ContentHistoryComponent,
     ContentPageComponent,
     ContentItemComponent,
     ContentsPageComponent,
@@ -76,7 +76,7 @@ const routes: Routes = [
                         children: [
                              {
                                 path: 'history',
-                                component: HistoryComponent,
+                                component: ContentHistoryComponent,
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
@@ -112,6 +112,7 @@ const routes: Routes = [
     declarations: [
         AssetsEditorComponent,
         ContentFieldComponent,
+        ContentHistoryComponent,
         ContentItemComponent,
         ContentPageComponent,
         ContentsPageComponent,

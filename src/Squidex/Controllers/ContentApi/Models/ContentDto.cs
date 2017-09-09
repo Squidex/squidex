@@ -52,14 +52,24 @@ namespace Squidex.Controllers.ContentApi.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// Indicates if the content element is publihed.
+        /// Indicates if the content element is published.
         /// </summary>
         public bool? IsPublished { get; set; }
+
+        /// <summary>
+        /// Indicates if the content element is deleted.
+        /// </summary>
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
+
+        public bool ShouldSerializeIsDeleted()
+        {
+            return IsDeleted;
+        }
 
         public static ContentDto Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {

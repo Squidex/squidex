@@ -150,6 +150,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             });
         }
 
+        protected Task On(RestoreContent command, CommandContext context)
+        {
+            return handler.UpdateAsync<ContentDomainObject>(context, content =>
+            {
+                content.Restore(command);
+            });
+        }
+
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (!await this.DispatchActionAsync(context.Command, context))

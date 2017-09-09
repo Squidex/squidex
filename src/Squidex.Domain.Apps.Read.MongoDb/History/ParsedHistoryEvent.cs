@@ -44,6 +44,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
             get { return inner.LastModified; }
         }
 
+        public long Version
+        {
+            get { return inner.Version; }
+        }
+
         public string Channel
         {
             get { return inner.Channel; }

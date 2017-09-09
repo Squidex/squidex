@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
-//  IContentEntity.cs
+//  ContentRestored.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Domain.Apps.Read.Contents
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public interface IContentEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    [EventType(nameof(ContentRestored))]
+    public sealed class ContentRestored : ContentEvent
     {
-        bool IsPublished { get; }
-
-        bool IsDeleted { get; }
-
-        NamedContentData Data { get; }
     }
 }

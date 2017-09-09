@@ -67,7 +67,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
-                Filter.Eq(x => x.SchemaId, schemaId)
+                Filter.Eq(x => x.SchemaId, schemaId),
+                Filter.Eq(x => x.IsDeleted, false)
             };
 
             if (!nonPublished)
