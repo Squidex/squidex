@@ -31,12 +31,17 @@ namespace Squidex.Controllers.ContentApi
     public sealed class ContentsController : ControllerBase
     {
         private readonly IContentQueryService contentQuery;
+        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IGraphQLService graphQl;
 
-        public ContentsController(ICommandBus commandBus, IContentQueryService contentQuery, IGraphQLService graphQl)
+        public ContentsController(ICommandBus commandBus,
+            IContentQueryService contentQuery,
+            IContentVersionLoader contentVersionLoader,
+            IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
+            this.contentVersionLoader = contentVersionLoader;
 
             this.graphQl = graphQl;
         }
@@ -120,6 +125,21 @@ namespace Squidex.Controllers.ContentApi
             }
 
             Response.Headers["ETag"] = new StringValues(content.Content.Version.ToString());
+
+            return Ok(response);
+        }
+
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/{version}")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
+        {
+            var contentData = await contentVersionLoader.LoadAsync(App.Id, id, version);
+
+            var response = contentData;
+
+            Response.Headers["ETag"] = new StringValues(version.ToString());
 
             return Ok(response);
         }
