@@ -43,6 +43,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
+        public List<string> ContributorIds { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public List<MongoAppEntityLanguage> Languages { get; set; } = new List<MongoAppEntityLanguage>();
 
         [BsonRequired]

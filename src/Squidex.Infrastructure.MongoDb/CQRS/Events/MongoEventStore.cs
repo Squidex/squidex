@@ -48,10 +48,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             return new MongoCollectionSettings { ReadPreference = ReadPreference.Primary, WriteConcern = WriteConcern.WMajority };
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true });
+            return Task.WhenAll(
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true }));
         }
 
         public IEventSubscription CreateSubscription(string streamFilter = null, string position = null)

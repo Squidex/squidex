@@ -37,11 +37,12 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
             return "WebhookEvents";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoWebhookEventEntity> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoWebhookEventEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt).Descending(x => x.IsSending));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Created));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero });
+            return Task.WhenAll(
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt).Descending(x => x.IsSending)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Created)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero }));
         }
 
         public Task QueryPendingAsync(Func<IWebhookEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
