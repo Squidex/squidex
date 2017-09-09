@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
@@ -38,14 +39,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             return Collection.CreateAsync(@event, headers, a =>
             {
                 SimpleMapper.Map(@event, a);
-            });
-        }
-
-        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, a =>
-            {
-                a.Contributors.Remove(@event.ContributorId);
             });
         }
 
@@ -114,6 +107,15 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             });
         }
 
+        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.Contributors.Remove(@event.ContributorId);
+                a.ContributorIds = a.Contributors.Keys.ToList();
+            });
+        }
+
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, a =>
@@ -121,6 +123,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
                 var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
 
                 SimpleMapper.Map(@event, contributor);
+
+                a.ContributorIds = a.Contributors.Keys.ToList();
             });
         }
     }

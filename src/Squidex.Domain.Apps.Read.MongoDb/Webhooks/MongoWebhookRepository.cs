@@ -36,10 +36,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
             return "Projections_SchemaWebhooks";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoWebhookEntity> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoWebhookEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaIds));
+            return Task.WhenAll(
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaIds)));
         }
 
         public async Task<IReadOnlyList<IWebhookEntity>> QueryByAppAsync(Guid appId)
