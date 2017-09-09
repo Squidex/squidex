@@ -49,7 +49,7 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
     }
 
     public invalidate(params?: { force: boolean, resize: boolean }) {
-        this.isInit = this.isInit || (params && params.force);
+        this.isInit = this.isInit || (params && params.force) === true;
 
         if (!this.isInit) {
             return;

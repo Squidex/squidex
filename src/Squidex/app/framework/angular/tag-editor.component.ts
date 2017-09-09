@@ -8,18 +8,24 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
+import { Types } from './../utils/types';
+
 const KEY_ENTER = 13;
-const NOOP = () => { /* NOOP */ };
 
 export interface Converter {
     convert(input: string): any;
 
-    isValid(input: string): boolean;
+    isValidInput(input: string): boolean;
+    isValidValue(value: any): boolean;
 }
 
 export class IntConverter implements Converter {
-    public isValid(input: string): boolean {
+    public isValidInput(input: string): boolean {
         return !!parseInt(input, 10) || input === '0';
+    }
+
+    public isValidValue(value: any): boolean {
+        return Types.isNumber(value);
     }
 
     public convert(input: string): any {
@@ -28,8 +34,12 @@ export class IntConverter implements Converter {
 }
 
 export class FloatConverter implements Converter {
-    public isValid(input: string): boolean {
+    public isValidInput(input: string): boolean {
         return !!parseFloat(input) || input === '0';
+    }
+
+    public isValidValue(value: any): boolean {
+        return Types.isNumber(value);
     }
 
     public convert(input: string): any {
@@ -37,9 +47,13 @@ export class FloatConverter implements Converter {
     }
 }
 
-export class NoopConverter implements Converter {
-    public isValid(input: string): boolean {
+export class StringConverter implements Converter {
+    public isValidInput(input: string): boolean {
         return input.trim().length > 0;
+    }
+
+    public isValidValue(value: any): boolean {
+        return Types.isString(value);
     }
 
     public convert(input: string): any {
@@ -58,11 +72,11 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class TagEditorComponent implements ControlValueAccessor {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private onChange = (v: any) => { /* NOOP */ };
+    private onTouched = () => { /* NOOP */ };
 
     @Input()
-    public converter: Converter = new NoopConverter();
+    public converter: Converter = new StringConverter();
 
     @Input()
     public useDefaultValue = true;
@@ -74,10 +88,10 @@ export class TagEditorComponent implements ControlValueAccessor {
 
     public addInput = new FormControl();
 
-    public writeValue(value: any) {
-        this.addInput.setValue('');
+    public writeValue(value: any[]) {
+        this.resetForm();
 
-        if (Array.isArray(value)) {
+        if (this.converter && Types.isArrayOf(value, v => this.converter.isValidValue(v))) {
             this.items = value;
         } else {
             this.items = [];
@@ -93,11 +107,11 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.onChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.onTouched = fn;
     }
 
     public remove(index: number) {
@@ -105,18 +119,22 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public markTouched() {
-        this.touchedCallback();
+        this.onTouched();
+    }
+
+    private resetForm() {
+        this.addInput.reset();
     }
 
     public onKeyDown(event: KeyboardEvent) {
         if (event.keyCode === KEY_ENTER) {
             const value = <string>this.addInput.value;
 
-            if (this.converter.isValid(value)) {
+            if (this.converter.isValidInput(value)) {
                 const converted = this.converter.convert(value);
 
                 this.updateItems([...this.items, converted]);
-                this.addInput.reset();
+                this.resetForm();
                 return false;
             }
         }
@@ -128,9 +146,9 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.items = items;
 
         if (items.length === 0 && this.useDefaultValue) {
-            this.changeCallback(undefined);
+            this.onChange(undefined);
         } else {
-            this.changeCallback(this.items);
+            this.onChange(this.items);
         }
     }
 }

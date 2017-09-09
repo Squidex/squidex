@@ -31,7 +31,7 @@ export class LocalCacheService {
         }
     }
 
-    public get<T>(key: string, now?: number): T {
+    public get<T>(key: string, now?: number): T | undefined {
         const entry = this.entries[key];
 
         if (entry) {

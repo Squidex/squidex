@@ -7,6 +7,7 @@
 
 import { Directive, HostListener, Input } from '@angular/core';
 
+import { Types } from './../utils/types';
 import { DialogService, Notification } from './../services/dialog.service';
 
 @Directive({
@@ -48,7 +49,7 @@ export class CopyDirective {
             console.log('Copy failed');
         }
 
-        if (currentFocus && typeof currentFocus.focus === 'function') {
+        if (currentFocus && Types.isFunction(currentFocus.focus)) {
             currentFocus.focus();
         }
 

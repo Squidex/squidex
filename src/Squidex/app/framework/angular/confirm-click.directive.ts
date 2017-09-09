@@ -10,11 +10,13 @@ import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from 
 import { DialogService } from './../services/dialog.service';
 
 class DelayEventEmitter<T> extends EventEmitter<T> {
-    private delayedNexts: any[] = [];
+    private delayedNexts: any[] | null = [];
 
     public delayEmit() {
-        for (let callback of this.delayedNexts) {
-            callback();
+        if (this.delayedNexts) {
+            for (let callback of this.delayedNexts) {
+                callback();
+            }
         }
     }
 
@@ -23,7 +25,9 @@ class DelayEventEmitter<T> extends EventEmitter<T> {
     }
 
     public subscribe(generatorOrNext?: any, error?: any, complete?: any): any {
-        this.delayedNexts.push(generatorOrNext);
+        if (this.delayedNexts) {
+            this.delayedNexts.push(generatorOrNext);
+        }
 
         return super.subscribe(generatorOrNext, error, complete);
     }

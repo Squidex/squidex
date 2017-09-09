@@ -26,7 +26,7 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
     public eventsItems = ImmutableArray.empty<WebhookEventDto>();
     public eventsPager = new Pager(0);
 
-    public selectedEventId: string;
+    public selectedEventId: string | null = null;
 
     constructor(dialogs: DialogService, appsStore: AppsStoreService,
         private readonly webhooksService: WebhooksService

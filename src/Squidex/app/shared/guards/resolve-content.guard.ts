@@ -14,14 +14,14 @@ import { allParams } from 'framework';
 import { ContentDto, ContentsService } from './../services/contents.service';
 
 @Injectable()
-export class ResolveContentGuard implements Resolve<ContentDto> {
+export class ResolveContentGuard implements Resolve<ContentDto | null> {
     constructor(
         private readonly contentsService: ContentsService,
         private readonly router: Router
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ContentDto> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ContentDto | null> {
         const params = allParams(route);
 
         const appName = params['appName'];

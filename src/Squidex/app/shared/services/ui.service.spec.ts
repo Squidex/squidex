@@ -74,6 +74,7 @@ describe('UIService', () => {
 
         req.error(new ErrorEvent('500'));
 
-        expect(settings.regexSuggestions).toEqual([]);
+        expect(settings).toBeDefined();
+        expect(settings!.regexSuggestions).toEqual([]);
     }));
 });

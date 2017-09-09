@@ -49,10 +49,10 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
         this.authenticationSubscription =
             this.authService.userChanges.filter(user => !!user)
                 .subscribe(user => {
-                    this.profileId = user.id;
-                    this.profileDisplayName = user.displayName;
+                    this.profileId = user!.id;
+                    this.profileDisplayName = user!.displayName;
 
-                    this.isAdmin = user.isAdmin;
+                    this.isAdmin = user!.isAdmin;
                 });
     }
 

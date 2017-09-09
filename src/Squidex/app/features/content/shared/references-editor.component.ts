@@ -19,10 +19,9 @@ import {
     FieldDto,
     ImmutableArray,
     SchemaDetailsDto,
-    SchemasService
+    SchemasService,
+    Types
 } from 'shared';
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true
@@ -35,8 +34,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor, OnInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private onChange = (v: any) => { /* NOOP */ };
+    private onTouched = () => { /* NOOP */ };
 
     @Input()
     public schemaId: string;
@@ -73,10 +72,10 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             });
     }
 
-    public writeValue(value: any) {
+    public writeValue(value: string[]) {
         this.contentItems = ImmutableArray.empty<ContentDto>();
 
-        if (value && value.length > 0) {
+        if (Types.isArrayOfString(value) && value.length > 0) {
             const contentIds: string[] = value;
 
             this.appNameOnce()
@@ -92,11 +91,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.onChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.onTouched = fn;
     }
 
     public canDrop() {
@@ -138,8 +137,8 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             ids = null;
         }
 
-        this.touchedCallback();
-        this.changeCallback(ids);
+        this.onTouched();
+        this.onChange(ids);
     }
 
     private loadFields() {

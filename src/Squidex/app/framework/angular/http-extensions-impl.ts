@@ -78,7 +78,7 @@ export module HTTP {
         }
     }
 
-    function handleVersion(httpRequest: Observable<HttpResponse<any>>, version: Version): Observable<any> {
+    function handleVersion(httpRequest: Observable<HttpResponse<any>>, version?: Version): Observable<any> {
         return httpRequest.do((response: HttpResponse<any>) => {
                 if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
                     const etag = response.headers.get('etag');

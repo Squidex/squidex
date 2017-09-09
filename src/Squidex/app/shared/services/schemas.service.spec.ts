@@ -27,12 +27,12 @@ import {
 } from './../';
 
 describe('SchemaDto', () => {
-    const properties = new SchemaPropertiesDto('Name', null);
+    const properties = new SchemaPropertiesDto('Name');
 
     it('should update isPublished property and user info when publishing', () => {
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'));
         const schema_2 = schema_1.publish('me', now);
 
         expect(schema_2.isPublished).toBeTruthy();
@@ -43,7 +43,7 @@ describe('SchemaDto', () => {
     it('should update isPublished property and user info when unpublishing', () => {
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_1 = new SchemaDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'));
         const schema_2 = schema_1.unpublish('me', now);
 
         expect(schema_2.isPublished).toBeFalsy();
@@ -52,11 +52,11 @@ describe('SchemaDto', () => {
     });
 
     it('should update properties property and user info when updating', () => {
-        const newProperties = new SchemaPropertiesDto('New Name', null);
+        const newProperties = new SchemaPropertiesDto('New Name');
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null);
+        const schema_1 = new SchemaDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'));
         const schema_2 = schema_1.update(newProperties, 'me', now);
 
         expect(schema_2.properties).toEqual(newProperties);
@@ -76,7 +76,7 @@ describe('SchemaDto', () => {
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), []);
         const schema_2 = schema_1.configureScripts(newScripts, 'me', now);
 
         expect(schema_2.scriptQuery).toEqual('<script-query>');
@@ -91,12 +91,12 @@ describe('SchemaDto', () => {
 });
 
 describe('SchemaDetailsDto', () => {
-    const properties = new SchemaPropertiesDto('Name', null);
+    const properties = new SchemaPropertiesDto('Name');
 
     it('should update isPublished property and user info when publishing', () => {
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), []);
         const schema_2 = schema_1.publish('me', now);
 
         expect(schema_2.isPublished).toBeTruthy();
@@ -107,7 +107,7 @@ describe('SchemaDetailsDto', () => {
     it('should update isPublished property and user info when unpublishing', () => {
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, true, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), []);
         const schema_2 = schema_1.unpublish('me', now);
 
         expect(schema_2.isPublished).toBeFalsy();
@@ -116,11 +116,11 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should update properties property and user info when updating', () => {
-        const newProperties = new SchemaPropertiesDto('New Name', null);
+        const newProperties = new SchemaPropertiesDto('New Name');
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, []);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), []);
         const schema_2 = schema_1.update(newProperties, 'me', now);
 
         expect(schema_2.properties).toEqual(newProperties);
@@ -134,7 +134,7 @@ describe('SchemaDetailsDto', () => {
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1]);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), [field1]);
         const schema_2 = schema_1.addField(field2, 'me', now);
 
         expect(schema_2.fields).toEqual([field1, field2]);
@@ -148,7 +148,7 @@ describe('SchemaDetailsDto', () => {
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2]);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), [field1, field2]);
         const schema_2 = schema_1.removeField(field1, 'me', now);
 
         expect(schema_2.fields).toEqual([field2]);
@@ -162,7 +162,7 @@ describe('SchemaDetailsDto', () => {
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1, field2]);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), [field1, field2]);
         const schema_2 = schema_1.replaceFields([field2, field1], 'me', now);
 
         expect(schema_2.fields).toEqual([field2, field1]);
@@ -177,7 +177,7 @@ describe('SchemaDetailsDto', () => {
 
         const now = DateTime.now();
 
-        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), null, [field1_0, field2_1]);
+        const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, 'other', 'other', DateTime.now(), DateTime.now(), new Version('1'), [field1_0, field2_1]);
         const schema_2 = schema_1.updateField(field2_2, 'me', now);
 
         expect(schema_2.fields).toEqual([field1_0, field2_2]);
@@ -461,7 +461,7 @@ describe('SchemasService', () => {
         req.flush({ id: '1' });
 
         expect(schema).toEqual(
-            new SchemaDetailsDto('1', dto.name, new SchemaPropertiesDto(null, null), false, user, user, now, now, version, []));
+            new SchemaDetailsDto('1', dto.name, new SchemaPropertiesDto(), false, user, user, now, now, version, []));
     }));
 
     it('should make post request to add field',

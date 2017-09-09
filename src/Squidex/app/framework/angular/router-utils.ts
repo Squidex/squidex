@@ -8,7 +8,7 @@
 import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params } from '@angular/router';
 
 export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
-    let snapshot: ActivatedRouteSnapshot = value['snapshot'] || value;
+    let snapshot: ActivatedRouteSnapshot | null = value['snapshot'] || value;
 
     const result: { [key: string]: any } = { };
 
@@ -25,7 +25,7 @@ export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
     return result;
 }
 export function allParams(value: ActivatedRouteSnapshot | ActivatedRoute): Params {
-    let snapshot: ActivatedRouteSnapshot = value['snapshot'] || value;
+    let snapshot: ActivatedRouteSnapshot | null = value['snapshot'] || value;
 
     const result: { [key: string]: any } = { };
 

@@ -12,8 +12,6 @@ import * as moment from 'moment';
 
 let Pikaday = require('pikaday/pikaday');
 
-const NOOP = () => { /* NOOP */ };
-
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true
 };
@@ -31,8 +29,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     private timeValue: any | null = null;
     private dateValue: any | null = null;
     private suppressEvents = false;
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private onChange = (v: any) => { /* NOOP */ };
+    private onTouched = () => { /* NOOP */ };
 
     @Input()
     public mode: string;
@@ -116,11 +114,11 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.onChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.onTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -140,7 +138,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public touched() {
-        this.touchedCallback();
+        this.onTouched();
     }
 
     public writeNow() {
@@ -159,14 +157,14 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
 
         this.dateValue = null;
 
-        this.changeCallback(null);
-        this.touchedCallback();
+        this.onChange(null);
+        this.onTouched();
 
         return false;
     }
 
     private updateValue() {
-        let result: string | null;
+        let result: string | null = null;
 
         if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
             result = 'Invalid DateTime';
@@ -184,7 +182,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             }
         }
 
-        this.changeCallback(result);
+        this.onChange(result);
     }
 
     private updateControls() {

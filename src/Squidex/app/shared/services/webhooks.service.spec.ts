@@ -67,14 +67,14 @@ describe('WebhooksService', () => {
 
         let webhooks: WebhookDto[] | null = null;
 
-        webhooksService.getWebhooks('my-app', version).subscribe(result => {
+        webhooksService.getWebhooks('my-app').subscribe(result => {
             webhooks = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([
             {

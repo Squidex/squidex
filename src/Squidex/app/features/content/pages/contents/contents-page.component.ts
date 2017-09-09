@@ -123,7 +123,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appNameOnce()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.contentItems = this.contentItems.replaceBy('id', content.publish(this.authService.user.token));
+                this.contentItems = this.contentItems.replaceBy('id', content.publish(this.authService.user!.token));
             }, error => {
                 this.notifyError(error);
             });
@@ -133,7 +133,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appNameOnce()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.authService.user.token));
+                this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.authService.user!.token));
             }, error => {
                 this.notifyError(error);
             });

@@ -14,14 +14,14 @@ import { allParams } from 'framework';
 import { UserDto, UserManagementService } from './../services/users.service';
 
 @Injectable()
-export class ResolveUserGuard implements Resolve<UserDto> {
+export class ResolveUserGuard implements Resolve<UserDto | null> {
     constructor(
         private readonly userManagementService: UserManagementService,
         private readonly router: Router
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<UserDto> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<UserDto | null> {
         const params = allParams(route);
 
         const userId = params['userId'];

@@ -18,7 +18,7 @@ import {
 } from './../';
 
 describe('AuthInterceptor', () => {
-    let authService: IMock<AuthService> = null;
+    let authService: IMock<AuthService>;
 
     beforeEach(() => {
         authService = Mock.ofType(AuthService);

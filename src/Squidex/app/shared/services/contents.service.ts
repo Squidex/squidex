@@ -176,7 +176,7 @@ export class ContentsService {
                 .pretifyError('Failed to load content. Please reload.');
     }
 
-    public postContent(appName: string, schemaName: string, dto: any, publish: boolean, version?: Version): Observable<ContentDto> {
+    public postContent(appName: string, schemaName: string, dto: any, publish: boolean, version: Version): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
@@ -197,7 +197,7 @@ export class ContentsService {
                 .pretifyError('Failed to create content. Please reload.');
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, version?: Version): Observable<any> {
+    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
@@ -207,8 +207,8 @@ export class ContentsService {
                 .pretifyError('Failed to update content. Please reload.');
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/coentent/${appName}/${schemaName}/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
@@ -217,21 +217,21 @@ export class ContentsService {
                 .pretifyError('Failed to delete content. Please reload.');
     }
 
-    public getVersionData(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
+    public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
         return HTTP.getVersioned(this.http, url, version)
                 .pretifyError('Failed to load data. Please reload.');
     }
 
-    public publishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
+    public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
                 .pretifyError('Failed to publish content. Please reload.');
     }
 
-    public unpublishContent(appName: string, schemaName: string, id: string, version?: Version): Observable<any> {
+    public unpublishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)

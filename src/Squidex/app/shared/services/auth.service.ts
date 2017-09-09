@@ -39,7 +39,7 @@ export class Profile {
     }
 
     public get authToken(): string {
-        return `${this.user.token_type} ${this.user.access_token}`;
+        return `${this.user!.token_type} ${this.user.access_token}`;
     }
 
     public get token(): string {
@@ -56,7 +56,7 @@ export class Profile {
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly user$ = new ReplaySubject<Profile | null>(1);
-    private currentUser: Profile = null;
+    private currentUser: Profile | null = null;
 
     public get user(): Profile | null {
         return this.currentUser;
@@ -150,7 +150,7 @@ export class AuthService {
 
     public loginSilent(): Observable<Profile> {
         const observable: Observable<Profile> =
-            Observable.create((observer: Observer<Profile>) => {
+            Observable.create((observer: Observer<Profile | null>) => {
                 this.userManager.signinSilent()
                     .then(x => {
                         observer.next(this.createProfile(x));
@@ -169,13 +169,17 @@ export class AuthService {
                 .concat(Observable.throw(new Error('Retry limit exceeded.'))));
     }
 
-    private createProfile(user: User) {
-        return user ? new Profile(user) : null;
+    private createProfile(user: User): Profile {
+        return new Profile(user);
     }
 
-    private checkState(promise: Promise<User>) {
+    private checkState(promise: Promise<User | null>) {
         promise.then(user => {
-            this.user$.next(this.createProfile(user));
+            if (user) {
+                this.user$.next(this.createProfile(user));
+            } else {
+                this.user$.next(null);
+            }
 
             return true;
         }, err => {

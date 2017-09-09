@@ -111,10 +111,10 @@ export class WebhooksService {
     ) {
     }
 
-    public getWebhooks(appName: string, version?: Version): Observable<WebhookDto[]> {
+    public getWebhooks(appName: string): Observable<WebhookDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks`);
 
-        return HTTP.getVersioned(this.http, url, version)
+        return HTTP.getVersioned(this.http, url)
                 .map(response => {
                     const items: any[] = response;
 
@@ -147,7 +147,7 @@ export class WebhooksService {
                 .pretifyError('Failed to load webhooks. Please reload.');
     }
 
-    public postWebhook(appName: string, dto: CreateWebhookDto, user: string, now?: DateTime, version?: Version): Observable<WebhookDto> {
+    public postWebhook(appName: string, dto: CreateWebhookDto, user: string, now: DateTime, version: Version): Observable<WebhookDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
@@ -167,14 +167,14 @@ export class WebhooksService {
                 .pretifyError('Failed to create webhook. Please reload.');
     }
 
-    public putWebhook(appName: string, id: string, dto: UpdateWebhookDto, version?: Version): Observable<any> {
+    public putWebhook(appName: string, id: string, dto: UpdateWebhookDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .pretifyError('Failed to update webhook. Please reload.');
     }
 
-    public deleteWebhook(appName: string, id: string, version?: Version): Observable<any> {
+    public deleteWebhook(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)

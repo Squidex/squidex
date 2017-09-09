@@ -14,14 +14,14 @@ import { allParams } from 'framework';
 import { AppLanguageDto, AppLanguagesService } from './../services/app-languages.service';
 
 @Injectable()
-export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[]> {
+export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[] | null> {
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
         private readonly router: Router
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppLanguageDto[]> {
+    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppLanguageDto[] | null> {
         const params = allParams(route);
 
         const appName = params['appName'];

@@ -24,7 +24,7 @@ describe('AssetDto', () => {
     it('should update name property and user info when renaming', () => {
         const now = DateTime.now();
 
-        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, null);
+        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, new Version('1'));
         const asset_2 = asset_1.rename('new-name.png', 'me', now);
 
         expect(asset_2.fileName).toEqual('new-name.png');
@@ -35,9 +35,9 @@ describe('AssetDto', () => {
     it('should update file properties when uploading', () => {
         const now = DateTime.now();
 
-        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, null);
+        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, new Version('1'));
 
-        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, null);
+        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, new Version('1'));
         const asset_2 = asset_1.update(update, 'me', now);
 
         expect(asset_2.fileSize).toEqual(2);
@@ -48,6 +48,7 @@ describe('AssetDto', () => {
         expect(asset_2.pixelHeight).toEqual(2);
         expect(asset_2.lastModified).toEqual(now);
         expect(asset_2.lastModifiedBy).toEqual('me');
+        expect(asset_2.version).toEqual(update);
     });
 });
 
@@ -160,7 +161,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto | null = null;
 
-        assetsService.getAsset('my-app', '123').subscribe(result => {
+        assetsService.getAsset('my-app', '123', version).subscribe(result => {
             asset = result;
         });
 
@@ -211,14 +212,14 @@ describe('AssetsService', () => {
 
         let asset: AssetDto | null = null;
 
-        assetsService.getAsset('my-app', '123').subscribe(result => {
+        assetsService.getAsset('my-app', '123', version).subscribe(result => {
             asset = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({}, { status: 404, statusText: '404' });
 
@@ -246,7 +247,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?mimeTypes=image/png,image/png&take=17&skip=13');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({ total: 10, items: [] });
     }));
@@ -259,7 +260,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?ids=12,23&take=17&skip=13');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({ total: 10, items: [] });
     }));
@@ -276,7 +277,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
             id: 'id1',
