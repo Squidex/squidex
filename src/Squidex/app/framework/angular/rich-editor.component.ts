@@ -25,8 +25,8 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
     private value: string;
     private isDisabled = false;
@@ -56,11 +56,11 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -78,12 +78,12 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                         if (this.value !== value) {
                             this.value = value;
 
-                            self.onChange(value);
+                            self.callChange(value);
                         }
                     });
 
                     self.tinyEditor.on('blur', () => {
-                        self.onTouched();
+                        self.callTouched();
                     });
 
                     setTimeout(() => {

@@ -19,43 +19,43 @@ import {
 } from './../';
 
 describe('ContentDto', () => {
-    it('should update data property and user info when updating', () => {
-        const now = DateTime.now();
+    const creation = DateTime.today();
+    const creator = 'not-me';
+    const modified = DateTime.now();
+    const modifier = 'me';
+    const version = new Version('1');
 
-        const content_1 = new ContentDto('1', false, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, new Version('1'));
-        const content_2 = content_1.update({ data: 2 }, 'me', now);
+    it('should update data property and user info when updating', () => {
+        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.update({ data: 2 }, modifier, modified);
 
         expect(content_2.data).toEqual({ data: 2 });
-        expect(content_2.lastModified).toEqual(now);
-        expect(content_2.lastModifiedBy).toEqual('me');
+        expect(content_2.lastModified).toEqual(modified);
+        expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update isPublished property and user info when publishing', () => {
-        const now = DateTime.now();
-
-        const content_1 = new ContentDto('1', false, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, new Version('1'));
-        const content_2 = content_1.publish('me', now);
+        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.publish(modifier, modified);
 
         expect(content_2.isPublished).toBeTruthy();
-        expect(content_2.lastModified).toEqual(now);
-        expect(content_2.lastModifiedBy).toEqual('me');
+        expect(content_2.lastModified).toEqual(modified);
+        expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update isPublished property and user info when unpublishing', () => {
-        const now = DateTime.now();
-
-        const content_1 = new ContentDto('1', true, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, new Version('1'));
-        const content_2 = content_1.unpublish('me', now);
+        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.unpublish(modifier, modified);
 
         expect(content_2.isPublished).toBeFalsy();
-        expect(content_2.lastModified).toEqual(now);
-        expect(content_2.lastModifiedBy).toEqual('me');
+        expect(content_2.lastModified).toEqual(modified);
+        expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update data property when setting data', () => {
         const newData = {};
 
-        const content_1 = new ContentDto('1', true, false, 'other', 'other', DateTime.now(), DateTime.now(), { data: 1 }, new Version('1'));
+        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.setData(newData);
 
         expect(content_2.data).toBe(newData);

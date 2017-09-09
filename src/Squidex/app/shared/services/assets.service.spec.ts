@@ -21,24 +21,26 @@ import {
 } from './../';
 
 describe('AssetDto', () => {
-    it('should update name property and user info when renaming', () => {
-        const now = DateTime.now();
+    const creation = DateTime.today();
+    const creator = 'not-me';
+    const modified = DateTime.now();
+    const modifier = 'me';
+    const version = new Version('2');
 
-        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, new Version('1'));
-        const asset_2 = asset_1.rename('new-name.png', 'me', now);
+    it('should update name property and user info when renaming', () => {
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
+        const asset_2 = asset_1.rename('new-name.png', modifier, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
-        expect(asset_2.lastModified).toEqual(now);
-        expect(asset_2.lastModifiedBy).toEqual('me');
+        expect(asset_2.lastModified).toEqual(modified);
+        expect(asset_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update file properties when uploading', () => {
-        const now = DateTime.now();
+        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, new Version('2'));
 
-        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, new Version('1'));
-
-        const asset_1 = new AssetDto('1', 'other', 'other', DateTime.today(), DateTime.today(), 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, new Version('1'));
-        const asset_2 = asset_1.update(update, 'me', now);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
+        const asset_2 = asset_1.update(update, modifier, modified);
 
         expect(asset_2.fileSize).toEqual(2);
         expect(asset_2.fileVersion).toEqual(2);
@@ -46,8 +48,8 @@ describe('AssetDto', () => {
         expect(asset_2.isImage).toBeTruthy();
         expect(asset_2.pixelWidth).toEqual(2);
         expect(asset_2.pixelHeight).toEqual(2);
-        expect(asset_2.lastModified).toEqual(now);
-        expect(asset_2.lastModifiedBy).toEqual('me');
+        expect(asset_2.lastModified).toEqual(modified);
+        expect(asset_2.lastModifiedBy).toEqual(modifier);
         expect(asset_2.version).toEqual(update);
     });
 });

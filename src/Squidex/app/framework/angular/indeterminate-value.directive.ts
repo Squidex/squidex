@@ -19,8 +19,8 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR]
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     constructor(
         private readonly renderer: Renderer,
@@ -30,12 +30,12 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
 
     @HostListener('change', ['$event.target.value'])
     public onChange(value: any) {
-        this.onChange(value);
+        this.callChange(value);
     }
 
     @HostListener('blur')
     public onTouched() {
-        this.onTouched();
+        this.callTouched();
     }
 
     public writeValue(value: boolean | number | undefined) {
@@ -51,10 +51,10 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 }

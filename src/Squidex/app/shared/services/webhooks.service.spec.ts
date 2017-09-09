@@ -23,21 +23,25 @@ import {
 } from './../';
 
 describe('WebhookDto', () => {
-    const now = DateTime.now();
-    const user = 'me';
+    const creation = DateTime.today();
+    const creator = 'not-me';
+    const modified = DateTime.now();
+    const modifier = 'me';
     const version = new Version('1');
 
     it('should update url and schemas', () => {
-        const webhook_1 = new WebhookDto('id1', 'token1', user, user, now, now, version, [], 'http://squidex.io/hook', 1, 2, 3, 4);
+        const webhook_1 = new WebhookDto('id1', 'token1', creator, creator, creation, creation, version, [], 'http://squidex.io/hook', 1, 2, 3, 4);
         const webhook_2 =
             webhook_1.update(new UpdateWebhookDto('http://squidex.io/hook2',
             [
                 new WebhookSchemaDto('1', true, true, true, true, true),
                 new WebhookSchemaDto('2', true, true, true, true, true)
-            ]), user, now);
+            ]), modifier, modified);
 
         expect(webhook_2.url).toEqual('http://squidex.io/hook2');
         expect(webhook_2.schemas.length).toEqual(2);
+        expect(webhook_2.lastModified).toEqual(modified);
+        expect(webhook_2.lastModifiedBy).toEqual(modifier);
     });
 });
 

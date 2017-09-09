@@ -34,8 +34,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor, OnInit {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public schemaId: string;
@@ -91,11 +91,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public canDrop() {
@@ -137,8 +137,8 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             ids = null;
         }
 
-        this.onTouched();
-        this.onChange(ids);
+        this.callTouched();
+        this.callChange(ids);
     }
 
     private loadFields() {

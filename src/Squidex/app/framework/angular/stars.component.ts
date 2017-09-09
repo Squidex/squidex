@@ -21,8 +21,8 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR]
 })
 export class StarsComponent implements ControlValueAccessor {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private maximumStarsValue = 5;
 
     @Input()
@@ -53,7 +53,7 @@ export class StarsComponent implements ControlValueAccessor {
 
     public writeValue(value: number | null | undefined) {
         if (Types.isNumber(value)) {
-            this.value = this.stars = value!;
+            this.value = this.stars = value || 0;
         } else {
             this.value = null;
             this.stars = 0;
@@ -65,11 +65,11 @@ export class StarsComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public setPreview(value: number) {
@@ -97,8 +97,8 @@ export class StarsComponent implements ControlValueAccessor {
             this.value = null;
             this.stars = 0;
 
-            this.onChange(this.value);
-            this.onTouched();
+            this.callChange(this.value);
+            this.callTouched();
         }
 
         return false;
@@ -112,8 +112,8 @@ export class StarsComponent implements ControlValueAccessor {
         if (this.value !== value) {
             this.value = this.stars = value;
 
-            this.onChange(this.value);
-            this.onTouched();
+            this.callChange(this.value);
+            this.callTouched();
         }
 
         return false;

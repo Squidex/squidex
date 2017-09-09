@@ -26,8 +26,8 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR]
 })
 export class DropdownComponent implements AfterContentInit, ControlValueAccessor {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public items: any[] = [];
@@ -68,11 +68,11 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -94,7 +94,7 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
 
     public open() {
         this.dropdown.show();
-        this.onTouched();
+        this.callTouched();
     }
 
     public selectIndexAndClose(selectedIndex: number) {
@@ -131,7 +131,7 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
             this.selectedIndex = selectedIndex;
             this.selectedItem = value;
 
-            this.onChange(value);
+            this.callChange(value);
         }
     }
 }

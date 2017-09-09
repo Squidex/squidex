@@ -72,8 +72,8 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class TagEditorComponent implements ControlValueAccessor {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public converter: Converter = new StringConverter();
@@ -107,11 +107,11 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public remove(index: number) {
@@ -119,7 +119,7 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public markTouched() {
-        this.onTouched();
+        this.callTouched();
     }
 
     private resetForm() {
@@ -146,9 +146,9 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.items = items;
 
         if (items.length === 0 && this.useDefaultValue) {
-            this.onChange(undefined);
+            this.callChange(undefined);
         } else {
-            this.onChange(this.items);
+            this.callChange(this.items);
         }
     }
 }

@@ -31,8 +31,8 @@ interface Geolocation {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class GeolocationEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
@@ -111,11 +111,11 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public updateValueByInput() {
@@ -210,8 +210,8 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         }
 
         if (fireEvent) {
-            this.onChange(this.value);
-            this.onTouched();
+            this.callChange(this.value);
+            this.callTouched();
         }
     }
 }

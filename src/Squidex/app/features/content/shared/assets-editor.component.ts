@@ -35,8 +35,8 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
@@ -83,11 +83,11 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public addFiles(files: FileList) {
@@ -142,7 +142,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
             ids = null;
         }
 
-        this.onTouched();
-        this.onChange(ids);
+        this.callTouched();
+        this.callChange(ids);
     }
 }

@@ -30,8 +30,8 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public source: AutocompleteSource;
@@ -78,11 +78,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public ngOnDestroy() {
@@ -134,7 +134,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public blur() {
         this.reset();
-        this.onTouched();
+        this.callTouched();
     }
 
     public selectItem(selection: any | null = null) {
@@ -153,7 +153,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 } else {
                     this.queryInput.setValue(selection.toString(), { emitEvent: false });
                 }
-                this.onChange(selection);
+                this.callChange(selection);
             } finally {
                 this.reset();
             }

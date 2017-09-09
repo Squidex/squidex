@@ -26,8 +26,8 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class JscriptEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
@@ -58,11 +58,11 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -82,7 +82,7 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
 
             this.aceEditor.on('blur', () => {
                 this.changeValue();
-                this.onTouched();
+                this.callTouched();
             });
 
             this.aceEditor.on('change', () => {
@@ -95,7 +95,7 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
         const newValue = this.aceEditor.getValue();
 
         if (this.value !== newValue) {
-            this.onChange(newValue);
+            this.callChange(newValue);
         }
 
         this.value = newValue;

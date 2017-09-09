@@ -21,8 +21,8 @@ export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_SLIDER_CONTROL_VALUE_ACCESSOR]
 })
 export class SliderComponent implements ControlValueAccessor {
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private mouseMoveSubscription: Function | null = null;
     private mouseUpSubscription: Function | null = null;
     private centerStartOffset = 0;
@@ -61,11 +61,11 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public onBarMouseClick(event: MouseEvent): boolean {
@@ -157,14 +157,14 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     private updateTouched() {
-        this.onTouched();
+        this.callTouched();
     }
 
     private updateValue() {
         if (this.lastValue !== this.value) {
             this.lastValue = this.value;
 
-            this.onChange(this.value);
+            this.callChange(this.value);
         }
     }
 

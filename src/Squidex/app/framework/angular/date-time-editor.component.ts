@@ -10,6 +10,8 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/f
 import { Subscription } from 'rxjs';
 import * as moment from 'moment';
 
+import { Types } from './../utils/types';
+
 let Pikaday = require('pikaday/pikaday');
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -29,8 +31,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     private timeValue: any | null = null;
     private dateValue: any | null = null;
     private suppressEvents = false;
-    private onChange = (v: any) => { /* NOOP */ };
-    private onTouched = () => { /* NOOP */ };
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public mode: string;
@@ -84,8 +86,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             });
     }
 
-    public writeValue(value: any) {
-        if (!value || value.length === 0) {
+    public writeValue(value: string) {
+        if (!Types.isString(value) || value.length === 0) {
             this.timeValue = null;
             this.dateValue = null;
         } else {
@@ -114,11 +116,11 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public registerOnChange(fn: any) {
-        this.onChange = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.onTouched = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -138,7 +140,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public touched() {
-        this.onTouched();
+        this.callTouched();
     }
 
     public writeNow() {
@@ -157,8 +159,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
 
         this.dateValue = null;
 
-        this.onChange(null);
-        this.onTouched();
+        this.callChange(null);
+        this.callTouched();
 
         return false;
     }
@@ -182,7 +184,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             }
         }
 
-        this.onChange(result);
+        this.callChange(result);
     }
 
     private updateControls() {

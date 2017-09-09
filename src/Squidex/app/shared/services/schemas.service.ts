@@ -797,7 +797,7 @@ export class SchemasService {
                         user,
                         now,
                         now,
-                        version || new Version('0'),
+                        version,
                         dto.fields || [],
                         response.scriptQuery,
                         response.scriptCreate,
