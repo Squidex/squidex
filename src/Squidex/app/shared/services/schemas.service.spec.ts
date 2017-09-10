@@ -70,8 +70,7 @@ describe('SchemaDto', () => {
                 '<script-create>',
                 '<script-update>',
                 '<script-delete>',
-                '<script-publish>',
-                '<script-unpublish>');
+                '<script-change>');
 
         const schema_1 = new SchemaDetailsDto('1', 'name', properties, false, creator, creator, creation, creation, version, []);
         const schema_2 = schema_1.configureScripts(newScripts, modifier, modified);
@@ -80,8 +79,7 @@ describe('SchemaDto', () => {
         expect(schema_2.scriptCreate).toEqual('<script-create>');
         expect(schema_2.scriptUpdate).toEqual('<script-update>');
         expect(schema_2.scriptDelete).toEqual('<script-delete>');
-        expect(schema_2.scriptPublish).toEqual('<script-publish>');
-        expect(schema_2.scriptUnpublish).toEqual('<script-unpublish>');
+        expect(schema_2.scriptChange).toEqual('<script-change>');
         expect(schema_2.lastModified).toEqual(modifier);
         expect(schema_2.lastModifiedBy).toEqual(modified);
     });
@@ -380,8 +378,7 @@ describe('SchemasService', () => {
             scriptCreate: '<script-create>',
             scriptUpdate: '<script-update>',
             scriptDelete: '<script-delete>',
-            scriptPublish: '<script-publish>',
-            scriptUnpublish: '<script-unpublish>'
+            scriptChange: '<script-change>'
         });
 
         expect(schema).toEqual(
@@ -403,8 +400,7 @@ describe('SchemasService', () => {
                 '<script-create>',
                 '<script-update>',
                 '<script-delete>',
-                '<script-publish>',
-                '<script-unpublish>'));
+                '<script-change>'));
     }));
 
     it('should provide entry from cache if not found',

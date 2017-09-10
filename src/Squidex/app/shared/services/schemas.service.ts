@@ -126,8 +126,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptCreate?: string,
         public readonly scriptUpdate?: string,
         public readonly scriptDelete?: string,
-        public readonly scriptPublish?: string,
-        public readonly scriptUnpublish?: string
+        public readonly scriptChange?: string
     ) {
         super(id, name, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
     }
@@ -146,8 +145,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public unpublish(user: string, now?: DateTime): SchemaDetailsDto {
@@ -164,8 +162,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public configureScripts(scripts: UpdateSchemaScriptsDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -182,8 +179,7 @@ export class SchemaDetailsDto extends SchemaDto {
             scripts.scriptCreate,
             scripts.scriptUpdate,
             scripts.scriptDelete,
-            scripts.scriptPublish,
-            scripts.scriptUnpublish);
+            scripts.scriptChange);
     }
 
     public update(properties: SchemaPropertiesDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -200,8 +196,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public addField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -218,8 +213,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public updateField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -236,8 +230,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public replaceFields(fields: FieldDto[], user: string, now?: DateTime): SchemaDetailsDto {
@@ -254,8 +247,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 
     public removeField(field: FieldDto, user: string, now?: DateTime): SchemaDetailsDto {
@@ -272,8 +264,7 @@ export class SchemaDetailsDto extends SchemaDto {
             this.scriptCreate,
             this.scriptUpdate,
             this.scriptDelete,
-            this.scriptPublish,
-            this.scriptUnpublish);
+            this.scriptChange);
     }
 }
 
@@ -688,8 +679,7 @@ export class UpdateSchemaScriptsDto {
         public readonly scriptCreate?: string,
         public readonly scriptUpdate?: string,
         public readonly scriptDelete?: string,
-        public readonly scriptPublish?: string,
-        public readonly scriptUnpublish?: string
+        public readonly scriptChange?: string
     ) {
     }
 }
@@ -764,8 +754,7 @@ export class SchemasService {
                         response.scriptCreate,
                         response.scriptUpdate,
                         response.scriptDelete,
-                        response.scriptPublish,
-                        response.scriptUnpublish);
+                        response.scriptChange);
                 })
                 .catch(error => {
                     if (error instanceof HttpErrorResponse && error.status === 404) {
@@ -803,8 +792,7 @@ export class SchemasService {
                         response.scriptCreate,
                         response.scriptUpdate,
                         response.scriptDelete,
-                        response.scriptPublish,
-                        response.scriptUnpublish);
+                        response.scriptChange);
                 })
                 .do(schema => {
                     this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);

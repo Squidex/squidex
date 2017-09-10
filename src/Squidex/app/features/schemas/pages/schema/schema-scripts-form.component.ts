@@ -41,8 +41,7 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
         'Create',
         'Update',
         'Delete',
-        'Publish',
-        'Unpublish'
+        'Change'
     ];
 
     public editFormSubmitted = false;
@@ -52,8 +51,7 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
             scriptCreate: '',
             scriptUpdate: '',
             scriptDelete: '',
-            scriptPublish: '',
-            scriptUnpublish: ''
+            scriptChange: ''
         });
 
     constructor(dialogs: DialogService,
@@ -84,8 +82,7 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
                     this.editForm.controls['scriptCreate'].value,
                     this.editForm.controls['scriptUpdate'].value,
                     this.editForm.controls['scriptDelete'].value,
-                    this.editForm.controls['scriptPublish'].value,
-                    this.editForm.controls['scriptUnpublish'].value);
+                    this.editForm.controls['scriptChange'].value);
 
             this.schemas.putSchemaScripts(this.appName, this.schema.name, requestDto, this.schema.version)
                 .subscribe(dto => {
