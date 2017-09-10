@@ -160,7 +160,7 @@ export class ContentsService {
                         return new ContentDto(
                             item.id,
                             item.isPublished,
-                            item.isDeleted === true,
+                            item.isArchived === true,
                             item.createdBy,
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),

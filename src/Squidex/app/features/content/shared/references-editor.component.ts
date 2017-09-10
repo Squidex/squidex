@@ -148,6 +148,10 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             this.contentFields = [this.schema.fields[0]];
         }
 
+        if (this.contentFields.length === 0) {
+            this.contentFields = [<any>{}];
+        }
+
         if (this.contentFields.length > 0) {
             this.columnWidth = 100 / this.contentFields.length;
         } else {

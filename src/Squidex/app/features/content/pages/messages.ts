@@ -21,7 +21,7 @@ export class ContentUpdated {
     }
 }
 
-export class ContentDeleted {
+export class ContentRemoved {
     constructor(
         public readonly content: ContentDto
     ) {

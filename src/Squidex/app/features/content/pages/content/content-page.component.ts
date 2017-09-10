@@ -12,7 +12,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
-    ContentDeleted,
+    ContentRemoved,
     ContentUpdated,
     ContentVersionSelected
 } from './../messages';
@@ -40,10 +40,10 @@ import {
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
-    private content: ContentDto;
 
     public schema: SchemaDetailsDto;
 
+    public content: ContentDto;
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
@@ -78,7 +78,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 });
 
         this.contentDeletedSubscription =
-            this.messageBus.of(ContentDeleted)
+            this.messageBus.of(ContentRemoved)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.router.navigate(['../'], { relativeTo: this.route });
@@ -231,6 +231,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 } else {
                     fieldForm.controls['iv'].setValue(fieldValue['iv']);
                 }
+            }
+
+            if (this.content.isArchived) {
+                this.contentForm.disable();
             }
         }
     }

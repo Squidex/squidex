@@ -28,6 +28,9 @@ export class SearchFormComponent implements OnChanges {
     @Output()
     public archivedChanged = new EventEmitter<boolean>();
 
+    @Input()
+    public canArchive = true;
+
     public searchForm =
         this.formBuilder.group({
             odataOrderBy: '',

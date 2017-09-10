@@ -21,7 +21,13 @@
                 </form>
                 
                 <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="searchInput" position="right">
-                    <sqx-search-form (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" [query]="contentsFilter.value"></sqx-search-form>
+                    <sqx-search-form
+                        [canArchive]="!isReadOnly"
+                        (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
+                        [query]="contentsFilter.value"
+                        (archivedChanged)="updateArchive($event)"
+                        [archived]="isArchive">
+                    </sqx-search-form>
                 </div>
                 
                 <span *ngIf="!isReadOnly && languages.length > 1">
@@ -33,12 +39,16 @@
                 </button>
             </div>
 
-            <h3 class="panel-title" *ngIf="!isReadOnly">
+            <h3 class="panel-title" *ngIf="!isReadOnly && !isArchive">
                 Contents
+            </h3>
+            
+            <h3 class="panel-title" *ngIf="isArchive">
+                Archive
             </h3>
 
             <h3 class="panel-title" *ngIf="isReadOnly">
-                References
+                Refs
             </h3>
         </div>
 
@@ -82,6 +92,8 @@
                             [schema]="schema"
                             (unpublishing)="unpublishContent(content)"
                             (publishing)="publishContent(content)"
+                            (archiving)="archiveContent(content)"
+                            (restoring)="restoreContent(content)"
                             (deleting)="deleteContent(content)"></tr>
                         <tr class="spacer"></tr>
                     </ng-template>
