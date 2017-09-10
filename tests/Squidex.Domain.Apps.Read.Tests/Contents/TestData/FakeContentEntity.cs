@@ -31,6 +31,8 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
 
         public bool IsPublished { get; set; }
 
+        public bool IsArchived { get; set; }
+
         public NamedContentData Data { get; set; }
     }
 }

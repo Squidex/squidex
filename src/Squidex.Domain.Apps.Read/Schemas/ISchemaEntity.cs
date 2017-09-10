@@ -26,9 +26,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
         string ScriptDelete { get; }
 
-        string ScriptPublish { get; }
-
-        string ScriptUnpublish { get; }
+        string ScriptChange { get; }
 
         Schema SchemaDef { get; }
     }

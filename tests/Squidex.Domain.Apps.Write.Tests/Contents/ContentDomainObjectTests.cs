@@ -268,6 +268,79 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
+        public void Archive_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Archive(CreateContentCommand(new ArchiveContent()));
+            });
+        }
+
+        [Fact]
+        public void Archive_should_throw_exception_if_content_is_deleted()
+        {
+            CreateContent();
+            DeleteContent();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Archive(CreateContentCommand(new ArchiveContent()));
+            });
+        }
+
+        [Fact]
+        public void Archive_should_refresh_properties_and_create_events()
+        {
+            CreateContent();
+
+            sut.Archive(CreateContentCommand(new ArchiveContent()));
+
+            Assert.True(sut.IsArchived);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentArchived())
+                );
+        }
+
+        [Fact]
+        public void Restore_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Restore(CreateContentCommand(new RestoreContent()));
+            });
+        }
+
+        [Fact]
+        public void Restore_should_throw_exception_if_content_is_deleted()
+        {
+            CreateContent();
+            DeleteContent();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.Restore(CreateContentCommand(new RestoreContent()));
+            });
+        }
+
+        [Fact]
+        public void Restore_should_refresh_properties_and_create_events()
+        {
+            CreateContent();
+            ArchiveContent();
+
+            sut.Restore(CreateContentCommand(new RestoreContent()));
+
+            Assert.False(sut.IsArchived);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentRestored())
+                );
+        }
+
+        [Fact]
         public void Delete_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
@@ -303,31 +376,6 @@ namespace Squidex.Domain.Apps.Write.Contents
                 );
         }
 
-        [Fact]
-        public void Restore_should_throw_exception_if_not_deleted()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Delete(CreateContentCommand(new DeleteContent()));
-            });
-        }
-
-        [Fact]
-        public void Restore_should_update_properties_create_events()
-        {
-            CreateContent();
-            DeleteContent();
-
-            sut.Restore(CreateContentCommand(new RestoreContent()));
-
-            Assert.False(sut.IsDeleted);
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentRestored())
-                );
-        }
-
         private void CreateContent()
         {
             sut.Create(CreateContentCommand(new CreateContent { Data = data }));
@@ -345,6 +393,13 @@ namespace Squidex.Domain.Apps.Write.Contents
         private void PublishContent()
         {
             sut.Publish(CreateContentCommand(new PublishContent()));
+
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void ArchiveContent()
+        {
+            sut.Archive(CreateContentCommand(new ArchiveContent()));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

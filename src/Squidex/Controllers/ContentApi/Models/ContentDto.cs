@@ -19,18 +19,18 @@ namespace Squidex.Controllers.ContentApi.Models
     public sealed class ContentDto
     {
         /// <summary>
-        /// The if of the content element.
+        /// The if of the content item.
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The user that has created the content element.
+        /// The user that has created the content item.
         /// </summary>
         [Required]
         public RefToken CreatedBy { get; set; }
 
         /// <summary>
-        /// The user that has updated the content element.
+        /// The user that has updated the content item.
         /// </summary>
         [Required]
         public RefToken LastModifiedBy { get; set; }
@@ -42,34 +42,29 @@ namespace Squidex.Controllers.ContentApi.Models
         public object Data { get; set; }
 
         /// <summary>
-        /// The date and time when the content element has been created.
+        /// The date and time when the content item has been created.
         /// </summary>
         public Instant Created { get; set; }
 
         /// <summary>
-        /// The date and time when the content element has been modified last.
+        /// The date and time when the content item has been modified last.
         /// </summary>
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// Indicates if the content element is published.
+        /// Indicates if the content item is published.
         /// </summary>
         public bool? IsPublished { get; set; }
 
         /// <summary>
-        /// Indicates if the content element is deleted.
+        /// Indicates if the content item is archived.
         /// </summary>
-        public bool IsDeleted { get; set; }
+        public bool IsArchived { get; set; }
 
         /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
-
-        public bool ShouldSerializeIsDeleted()
-        {
-            return IsDeleted;
-        }
 
         public static ContentDto Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {

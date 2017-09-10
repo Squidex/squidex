@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("dl")]
-        public bool IsDeleted { get; set; }
+        public bool IsArchived { get; set; }
 
         [BsonRequired]
         [BsonElement("dt")]

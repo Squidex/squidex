@@ -25,8 +25,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public string Name { get; set; }
 
-        public string ScriptUnpublish { get; set; }
-
         [BsonRequired]
         [BsonElement]
         public string Schema { get; set; }
@@ -73,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         [BsonIgnoreIfNull]
         [BsonElement]
-        public string ScriptPublish { get; set; }
+        public string ScriptChange { get; set; }
 
         Schema ISchemaEntity.SchemaDef
         {

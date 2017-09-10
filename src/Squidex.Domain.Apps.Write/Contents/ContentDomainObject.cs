@@ -23,11 +23,17 @@ namespace Squidex.Domain.Apps.Write.Contents
         private bool isDeleted;
         private bool isCreated;
         private bool isPublished;
+        private bool isArchived;
         private NamedContentData data;
 
         public bool IsDeleted
         {
             get { return isDeleted; }
+        }
+
+        public bool IsArchived
+        {
+            get { return isArchived; }
         }
 
         public bool IsPublished
@@ -67,14 +73,19 @@ namespace Squidex.Domain.Apps.Write.Contents
             isPublished = false;
         }
 
-        protected void On(ContentDeleted @event)
+        protected void On(ContentArchived @event)
         {
-            isDeleted = true;
+            isArchived = true;
         }
 
         protected void On(ContentRestored @event)
         {
-            isDeleted = false;
+            isArchived = false;
+        }
+
+        protected void On(ContentDeleted @event)
+        {
+            isDeleted = true;
         }
 
         public ContentDomainObject Create(CreateContent command)
@@ -108,9 +119,20 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             Guard.NotNull(command, nameof(command));
 
-            VerifyDeleted();
+            VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentRestored()));
+
+            return this;
+        }
+
+        public ContentDomainObject Archive(ArchiveContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentArchived()));
 
             return this;
         }

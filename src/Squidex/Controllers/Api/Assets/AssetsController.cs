@@ -133,7 +133,7 @@ namespace Squidex.Controllers.Api.Assets
         {
             var entity = await assetRepository.FindAssetAsync(id);
 
-            if (entity == null || entity.IsDeleted)
+            if (entity == null)
             {
                 return NotFound();
             }

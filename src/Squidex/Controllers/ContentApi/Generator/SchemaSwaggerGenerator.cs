@@ -92,9 +92,10 @@ namespace Squidex.Controllers.ContentApi.Generator
                 GenerateSchemaGetOperation(),
                 GenerateSchemaUpdateOperation(),
                 GenerateSchemaPatchOperation(),
-                GenerateSchemaRestoreOperation(),
                 GenerateSchemaPublishOperation(),
                 GenerateSchemaUnpublishOperation(),
+                GenerateSchemaArchiveOperation(),
+                GenerateSchemaRestoreOperation(),
                 GenerateSchemaDeleteOperation()
             };
 
@@ -161,7 +162,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("201", $"{schemaName} element updated.", dataSchema);
+                operation.AddResponse("201", $"{schemaName} item updated.", dataSchema);
             });
         }
 
@@ -175,7 +176,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 operation.AddBodyParameter("data", contentSchema, SchemaBodyDescription);
 
-                operation.AddResponse("201", $"{schemaName} element patched.", dataSchema);
+                operation.AddResponse("201", $"{schemaName} item patched.", dataSchema);
             });
         }
 
@@ -187,7 +188,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Publish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} element published.");
+                operation.AddResponse("204", $"{schemaName} item published.");
             });
         }
 
@@ -199,7 +200,19 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Unpublish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} element unpublished.");
+                operation.AddResponse("204", $"{schemaName} item unpublished.");
+            });
+        }
+
+        private SwaggerOperations GenerateSchemaArchiveOperation()
+        {
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive", operation =>
+            {
+                operation.OperationId = $"Archive{schemaKey}Content";
+                operation.Summary = $"Archive a {schemaName} content.";
+                operation.Security = EditorSecurity;
+
+                operation.AddResponse("204", $"{schemaName} item restored.");
             });
         }
 
@@ -211,7 +224,7 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.Summary = $"Restore a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} element restored.");
+                operation.AddResponse("204", $"{schemaName} item restored.");
             });
         }
 

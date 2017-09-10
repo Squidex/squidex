@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Read.Contents
     {
         bool IsPublished { get; }
 
-        bool IsDeleted { get; }
+        bool IsArchived { get; }
 
         NamedContentData Data { get; }
     }
