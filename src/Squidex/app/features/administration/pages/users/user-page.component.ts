@@ -32,7 +32,6 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     public currentUserId: string;
     public userFormSubmitted = false;
     public userForm: FormGroup;
-    public userId: string;
     public userFormError? = '';
 
     public isCurrentUser = false;
@@ -86,7 +85,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                         this.resetUserForm(error.displayMessage);
                     });
             } else {
-                this.userManagementService.putUser(this.userId, requestDto)
+                this.userManagementService.putUser(this.user.id, requestDto)
                     .subscribe(() => {
                         this.user =
                             this.user.update(
@@ -119,7 +118,6 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         const input = this.user || {};
 
         this.isNewMode = !this.user;
-        this.userId = input['id'];
         this.userForm =
             this.formBuilder.group({
                 email: [input['email'],
@@ -143,7 +141,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                     ]]
             });
 
-        this.isCurrentUser = this.userId === this.currentUserId;
+        this.isCurrentUser = this.user && this.user.id === this.currentUserId;
 
         this.resetUserForm();
     }

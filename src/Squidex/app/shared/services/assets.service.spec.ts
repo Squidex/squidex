@@ -50,7 +50,6 @@ describe('AssetDto', () => {
         expect(asset_2.pixelHeight).toEqual(2);
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
-        expect(asset_2.version).toEqual(update);
     });
 });
 
@@ -221,7 +220,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({}, { status: 404, statusText: '404' });
 
@@ -249,7 +248,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?mimeTypes=image/png,image/png&take=17&skip=13');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({ total: 10, items: [] });
     }));
@@ -262,7 +261,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?ids=12,23&take=17&skip=13');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({ total: 10, items: [] });
     }));
@@ -279,7 +278,7 @@ describe('AssetsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
             id: 'id1',

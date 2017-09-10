@@ -40,15 +40,12 @@ import {
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
-    private version = new Version('');
     private content: ContentDto;
 
     public schema: SchemaDetailsDto;
 
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
-    public contentData: any = null;
-    public contentId: string | null = null;
 
     public isNewMode = true;
 
@@ -83,7 +80,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         this.contentDeletedSubscription =
             this.messageBus.of(ContentDeleted)
                 .subscribe(message => {
-                    if (message.content.id === this.contentId) {
+                    if (this.content && message.content.id === this.content.id) {
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }
                 });
@@ -124,7 +121,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
             if (this.isNewMode) {
                 this.appNameOnce()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, requestDto, publish, this.version))
+                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, requestDto, publish))
                     .subscribe(dto => {
                         this.content = dto;
 
@@ -137,7 +134,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                     });
             } else {
                 this.appNameOnce()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.contentId!, requestDto, this.version))
+                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.content.id, requestDto, this.content.version))
                     .subscribe(dto => {
                         this.content = this.content.update(dto, this.authService.user!.token);
 
@@ -158,7 +155,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     private loadVersion(version: number) {
         if (!this.isNewMode && this.content) {
             this.appNameOnce()
-                .switchMap(app => this.contentsService.getVersionData(app, this.schema.name, this.contentId!, new Version(version.toString())))
+                .switchMap(app => this.contentsService.getVersionData(app, this.schema.name, this.content.id, new Version(version.toString())))
                 .subscribe(dto => {
                     this.content = this.content.setData(dto);
 
@@ -220,28 +217,20 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     private populateContentForm() {
         this.contentForm.markAsPristine();
 
-        if (!this.content) {
-            this.contentData = null;
-            this.contentId = null;
-            this.isNewMode = true;
-            return;
-        }
+        this.isNewMode = !this.content;
 
-        this.contentData = this.content.data;
-        this.contentId = this.content.id;
-        this.version = this.content.version;
-        this.isNewMode = false;
+        if (!this.isNewMode) {
+            for (const field of this.schema.fields) {
+                const fieldValue = this.content.data[field.name] || {};
+                const fieldForm = <FormGroup>this.contentForm.get(field.name);
 
-        for (const field of this.schema.fields) {
-            const fieldValue = this.content.data[field.name] || {};
-            const fieldForm = <FormGroup>this.contentForm.get(field.name);
-
-             if (field.partitioning === 'language') {
-                for (let language of this.languages) {
-                    fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
+                if (field.partitioning === 'language') {
+                    for (let language of this.languages) {
+                        fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
+                    }
+                } else {
+                    fieldForm.controls['iv'].setValue(fieldValue['iv']);
                 }
-            } else {
-                fieldForm.controls['iv'].setValue(fieldValue['iv']);
             }
         }
     }

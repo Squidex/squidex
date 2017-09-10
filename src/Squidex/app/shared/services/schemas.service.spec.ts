@@ -39,8 +39,8 @@ describe('SchemaDto', () => {
         const schema_2 = schema_1.publish(modifier, modified);
 
         expect(schema_2.isPublished).toBeTruthy();
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update isPublished property and user info when unpublishing', () => {
@@ -48,8 +48,8 @@ describe('SchemaDto', () => {
         const schema_2 = schema_1.unpublish(modifier, modified);
 
         expect(schema_2.isPublished).toBeFalsy();
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update properties property and user info when updating', () => {
@@ -59,8 +59,8 @@ describe('SchemaDto', () => {
         const schema_2 = schema_1.update(newProperties, modifier, modified);
 
         expect(schema_2.properties).toEqual(newProperties);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update scripts properties and user info when configure scripts', () => {
@@ -80,8 +80,8 @@ describe('SchemaDto', () => {
         expect(schema_2.scriptUpdate).toEqual('<script-update>');
         expect(schema_2.scriptDelete).toEqual('<script-delete>');
         expect(schema_2.scriptChange).toEqual('<script-change>');
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 });
 
@@ -98,8 +98,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.publish(modifier, modified);
 
         expect(schema_2.isPublished).toBeTruthy();
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update isPublished property and user info when unpublishing', () => {
@@ -107,8 +107,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.unpublish(modifier, modified);
 
         expect(schema_2.isPublished).toBeFalsy();
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update properties property and user info when updating', () => {
@@ -118,8 +118,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.update(newProperties, modifier, modified);
 
         expect(schema_2.properties).toEqual(newProperties);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update fields property and user info when adding field', () => {
@@ -130,8 +130,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.addField(field2, modifier, modified);
 
         expect(schema_2.fields).toEqual([field1, field2]);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update fields property and user info when removing field', () => {
@@ -142,8 +142,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.removeField(field1, modifier, modified);
 
         expect(schema_2.fields).toEqual([field2]);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update fields property and user info when replacing fields', () => {
@@ -154,8 +154,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.replaceFields([field2, field1], modifier, modified);
 
         expect(schema_2.fields).toEqual([field2, field1]);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 
     it('should update fields property and user info when updating field', () => {
@@ -167,8 +167,8 @@ describe('SchemaDetailsDto', () => {
         const schema_2 = schema_1.updateField(field2_2, modifier, modified);
 
         expect(schema_2.fields).toEqual([field1_0, field2_2]);
-        expect(schema_2.lastModified).toEqual(modifier);
-        expect(schema_2.lastModifiedBy).toEqual(modified);
+        expect(schema_2.lastModified).toEqual(modified);
+        expect(schema_2.lastModifiedBy).toEqual(modifier);
     });
 });
 

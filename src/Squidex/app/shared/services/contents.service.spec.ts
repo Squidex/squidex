@@ -52,6 +52,24 @@ describe('ContentDto', () => {
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
+    it('should update isArchived property and user info when archiving', () => {
+        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.archive(modifier, modified);
+
+        expect(content_2.isArchived).toBeTruthy();
+        expect(content_2.lastModified).toEqual(modified);
+        expect(content_2.lastModifiedBy).toEqual(modifier);
+    });
+
+    it('should update isArchived property and user info when restoring', () => {
+        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.restore(modifier, modified);
+
+        expect(content_2.isArchived).toBeFalsy();
+        expect(content_2.lastModified).toEqual(modified);
+        expect(content_2.lastModifiedBy).toEqual(modifier);
+    });
+
     it('should update data property when setting data', () => {
         const newData = {};
 
@@ -87,11 +105,11 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto | null = null;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13).subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, true).subscribe(result => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&archived=true');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -251,14 +269,14 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.postContent('my-app', 'my-schema', dto, true, version).subscribe(result => {
+        contentsService.postContent('my-app', 'my-schema', dto, true).subscribe(result => {
             content = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?publish=true');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
             id: 'id1',
@@ -334,6 +352,32 @@ describe('ContentsService', () => {
         contentsService.unpublishContent('my-app', 'my-schema', 'content1', version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/unpublish');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to archive content',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        contentsService.archiveContent('my-app', 'my-schema', 'content1', version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/archive');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to restore content',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        contentsService.restoreContent('my-app', 'my-schema', 'content1', version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/restore');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);

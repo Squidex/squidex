@@ -153,7 +153,7 @@ export class AssetsService {
                 .pretifyError('Failed to load assets. Please reload.');
     }
 
-    public uploadFile(appName: string, file: File, user: string, now?: DateTime): Observable<number | AssetDto> {
+    public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), {
@@ -238,13 +238,12 @@ export class AssetsService {
     public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | AssetReplacedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
-        const headers = new HttpHeaders();
-
-        if (version) {
-            headers.set('If-Match', version.value);
-        }
-
-        const req = new HttpRequest('PUT', url, getFormData(file), { headers, reportProgress: true });
+        const req = new HttpRequest('PUT', url, getFormData(file), {
+            headers: new HttpHeaders({
+                'If-Match': version.value
+            }),
+            reportProgress: true
+        });
 
         return this.http.request(req)
                 .map(event => {

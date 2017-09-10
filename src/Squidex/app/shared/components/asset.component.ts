@@ -16,6 +16,7 @@ import {
     AssetReplacedDto,
     AssetsService,
     AuthService,
+    DateTime,
     DialogService,
     fadeAnimation,
     ModalView,
@@ -83,7 +84,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
         if (initFile) {
             this.appNameOnce()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.authService.user!.token))
+                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.authService.user!.token, DateTime.now()))
                 .subscribe(dto => {
                     if (dto instanceof AssetDto) {
                         this.emitLoaded(dto);

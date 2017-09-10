@@ -31,7 +31,7 @@ export class ContentDto {
     constructor(
         public readonly id: string,
         public readonly isPublished: boolean,
-        public readonly isDeleted: boolean,
+        public readonly isArchived: boolean,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
@@ -45,7 +45,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             this.isPublished,
-            this.isDeleted,
+            this.isArchived,
             this.createdBy,
             this.lastModifiedBy,
             this.created,
@@ -58,7 +58,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             true,
-            this.isDeleted,
+            this.isArchived,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
@@ -69,7 +69,29 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             false,
-            this.isDeleted,
+            this.isArchived,
+            this.createdBy, user,
+            this.created, now || DateTime.now(),
+            this.data,
+            this.version);
+    }
+
+    public archive(user: string, now?: DateTime): ContentDto {
+        return new ContentDto(
+            this.id,
+            this.isPublished,
+            true,
+            this.createdBy, user,
+            this.created, now || DateTime.now(),
+            this.data,
+            this.version);
+    }
+
+    public restore(user: string, now?: DateTime): ContentDto {
+        return new ContentDto(
+            this.id,
+            this.isPublished,
+            false,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
@@ -80,7 +102,7 @@ export class ContentDto {
         return new ContentDto(
             this.id,
             this.isPublished,
-            this.isDeleted,
+            this.isArchived,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             data,
@@ -97,7 +119,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[], archived = false): Observable<ContentsDto> {
         const queryParts: string[] = [];
 
         if (query && query.length > 0) {
@@ -120,6 +142,10 @@ export class ContentsService {
 
         if (ids && ids.length > 0) {
             queryParts.push(`ids=${ids.join(',')}`);
+        }
+
+        if (archived) {
+            queryParts.push('archived=true');
         }
 
         const fullQuery = queryParts.join('&');
@@ -154,7 +180,7 @@ export class ContentsService {
                     return new ContentDto(
                         response.id,
                         response.isPublished,
-                        response.isDeleted === true,
+                        response.isArchived === true,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),
@@ -176,10 +202,10 @@ export class ContentsService {
                 .pretifyError('Failed to load content. Please reload.');
     }
 
-    public postContent(appName: string, schemaName: string, dto: any, publish: boolean, version: Version): Observable<ContentDto> {
+    public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
-        return HTTP.postVersioned(this.http, url, dto, version)
+        return HTTP.postVersioned(this.http, url, dto)
                 .map(response => {
                     return new ContentDto(
                         response.id,
@@ -208,7 +234,7 @@ export class ContentsService {
     }
 
     public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/coentent/${appName}/${schemaName}/${id}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
@@ -236,5 +262,19 @@ export class ContentsService {
 
         return HTTP.putVersioned(this.http, url, {}, version)
                 .pretifyError('Failed to unpublish content. Please reload.');
+    }
+
+    public archiveContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/archive`);
+
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to archive content. Please reload.');
+    }
+
+    public restoreContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/restore`);
+
+        return HTTP.putVersioned(this.http, url, {}, version)
+                .pretifyError('Failed to restore content. Please reload.');
     }
 }
