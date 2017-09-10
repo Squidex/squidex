@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var contents = new List<IContentEntity> { content };
 
-            A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, null, "?$top=30&$skip=5"))
+            A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, false, null, "?$top=30&$skip=5"))
                 .Returns((schema, 0L, (IReadOnlyList<IContentEntity>)contents));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
@@ -442,7 +442,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
                 .Returns((schema, content));
 
-            A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
+            A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, false, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId)), null))
                 .Returns((schema, 0L, (IReadOnlyList<IContentEntity>)refContents));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
