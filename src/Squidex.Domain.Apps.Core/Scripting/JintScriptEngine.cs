@@ -49,6 +49,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 EnableDisallow(engine);
                 EnableReject(engine, operationName);
 
+                engine.SetValue("operation", new Action(() =>
+                {
+                    var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
+
+                    if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                    {
+                        data.TryUpdate(out result);
+                    }
+                }));
+
                 engine.SetValue("replace", new Action(() =>
                 {
                     var dataInstance = engine.GetValue("ctx").AsObject().Get("data");
@@ -133,6 +143,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
             if (context.User != null)
             {
                 contextInstance.FastAddProperty("user", new JintUser(engine, context.User), false, true, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.Operation))
+            {
+                contextInstance.FastAddProperty("operation", context.Operation, false, true, false);
             }
 
             engine.SetValue("ctx", contextInstance);

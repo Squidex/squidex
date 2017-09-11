@@ -32,7 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
     }
 
-    private makeRequest(req: HttpRequest<any>, next: HttpHandler, user: Profile, renew = false): Observable<HttpEvent<any>> {
+    private makeRequest(req: HttpRequest<any>, next: HttpHandler, user: Profile | null, renew = false): Observable<HttpEvent<any>> {
         const token = user ? user.authToken : '';
 
         const authReq = req.clone({

@@ -8,11 +8,11 @@
 import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
+import { Types } from './../utils/types';
+
 import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var SimpleMDE: any;
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true
@@ -25,10 +25,10 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private simplemde: any;
-    private value: any;
+    private value: string;
     private isDisabled = false;
 
     @ViewChild('editor')
@@ -48,11 +48,11 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
     }
 
-    public writeValue(value: any) {
-        this.value = value;
+    public writeValue(value: string) {
+        this.value = Types.isString(value) ? value : '';
 
         if (this.simplemde) {
-            this.simplemde.value(this.value || '');
+            this.simplemde.value(this.value);
         }
     }
 
@@ -65,11 +65,11 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -84,12 +84,12 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                 if (this.value !== value) {
                     this.value = value;
 
-                    this.changeCallback(value);
+                    this.callChange(value);
                 }
             });
 
             this.simplemde.codemirror.on('blur', () => {
-                this.touchedCallback();
+                this.callTouched();
             });
 
             this.simplemde.codemirror.on('refresh', () => {

@@ -189,8 +189,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                 ScriptCreate = "<script-create>",
                 ScriptUpdate = "<script-update>",
                 ScriptDelete = "<script-delete>",
-                ScriptPublish = "<script-publish>",
-                ScriptUnpublish = "<script-unpublish>"
+                ScriptChange = "<script-change>"
             }));
 
             sut.GetUncomittedEvents()
@@ -201,8 +200,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                         ScriptCreate = "<script-create>",
                         ScriptUpdate = "<script-update>",
                         ScriptDelete = "<script-delete>",
-                        ScriptPublish = "<script-publish>",
-                        ScriptUnpublish = "<script-unpublish>"
+                        ScriptChange = "<script-change>"
                     })
                 );
         }

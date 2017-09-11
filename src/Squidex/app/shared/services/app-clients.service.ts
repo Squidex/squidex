@@ -84,7 +84,7 @@ export class AppClientsService {
                 .pretifyError('Failed to load clients. Please reload.');
     }
 
-    public postClient(appName: string, dto: CreateAppClientDto, version?: Version): Observable<AppClientDto> {
+    public postClient(appName: string, dto: CreateAppClientDto, version: Version): Observable<AppClientDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
@@ -98,14 +98,14 @@ export class AppClientsService {
                 .pretifyError('Failed to add client. Please reload.');
     }
 
-    public updateClient(appName: string, id: string, dto: UpdateAppClientDto, version?: Version): Observable<any> {
+    public updateClient(appName: string, id: string, dto: UpdateAppClientDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .pretifyError('Failed to revoke client. Please reload.');
     }
 
-    public deleteClient(appName: string, id: string, version?: Version): Observable<any> {
+    public deleteClient(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)

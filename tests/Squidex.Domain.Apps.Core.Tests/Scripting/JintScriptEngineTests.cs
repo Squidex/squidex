@@ -81,6 +81,29 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         [Fact]
+        public void Should_fetch_operation_name()
+        {
+            var content = new NamedContentData();
+
+            var expected =
+                new NamedContentData()
+                    .AddField("operation",
+                        new ContentFieldData()
+                            .AddValue("iv", "MyOperation"));
+
+            var context = new ScriptContext { Data = content, Operation = "MyOperation" };
+
+            var result = scriptEngine.ExecuteAndTransform(context, @"
+                var data = ctx.data;
+
+                data.operation = { iv: ctx.operation };
+
+                replace(data)", "update");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void Should_transform_content_and_return_with_transform()
         {
             var content =

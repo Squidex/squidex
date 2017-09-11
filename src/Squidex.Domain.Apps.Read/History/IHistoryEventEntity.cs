@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Read.History
 
         string Message { get; }
 
+        long Version { get; }
+
         RefToken Actor { get; }
     }
 }

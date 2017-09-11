@@ -146,7 +146,7 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                 };
             });
 
-        this.profileDisplayName = this.authService.user.displayName;
+        this.profileDisplayName = this.authService.user!.displayName;
     }
 
     public showForum() {

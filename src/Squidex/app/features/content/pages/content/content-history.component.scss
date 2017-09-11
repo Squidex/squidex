@@ -1,0 +1,39 @@
+@import '_vars';
+@import '_mixins';
+
+.event {
+    & {
+        @include flex-box;
+        margin-bottom: 1rem;
+    }
+
+    &-main {
+        @include flex-grow(1);
+    }
+   
+    &-load {
+        & {
+            font-size: .9rem;
+            font-weight: normal;
+            cursor: pointer;
+            color: $color-theme-blue !important;
+        }
+
+        &:focus,
+        &:hover {
+            text-decoration: underline !important;
+        }
+    }
+
+    &-left {
+        min-width: 2.8rem;
+        max-width: 2.8rem;
+        margin-top: .3rem;
+    }
+
+    &-created {
+        font-size: .65rem;
+        font-weight: normal;
+        color: $color-text-decent;
+    }
+}

@@ -8,16 +8,21 @@
 import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
+import { Types } from './../utils/types';
+
 import { ResourceLoaderService } from './../services/resource-loader.service';
 import { ValidatorsEx } from './validators';
-
-const NOOP = () => { /* NOOP */ };
 
 declare var L: any;
 
 export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true
 };
+
+interface Geolocation {
+    latitude: number;
+    longitude: number;
+}
 
 @Component({
     selector: 'sqx-geolocation-editor',
@@ -26,11 +31,11 @@ export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class GeolocationEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private marker: any;
     private map: any;
-    private value: any;
+    private value: Geolocation | null = null;
 
     public get hasValue() {
         return !!this.value;
@@ -59,8 +64,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     ) {
     }
 
-    public writeValue(value: any) {
-        this.value = value;
+    public writeValue(value: Geolocation) {
+        if (Types.isObject(value) && Types.isNumber(value.latitude) && Types.isNumber(value.longitude)) {
+            this.value = value;
+        } else {
+            this.value = null;
+        }
 
         if (this.marker) {
             this.updateMarker(true, false);
@@ -102,11 +111,11 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public updateValueByInput() {
@@ -201,8 +210,8 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         }
 
         if (fireEvent) {
-            this.changeCallback(this.value);
-            this.touchedCallback();
+            this.callChange(this.value);
+            this.callTouched();
         }
     }
 }

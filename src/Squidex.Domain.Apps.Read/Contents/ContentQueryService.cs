@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             return (schema, content);
         }
 
-        public async Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, HashSet<Guid> ids, string query)
+        public async Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids, string query)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
@@ -85,8 +85,8 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var isFrontendClient = user.IsInClient("squidex-frontend");
 
-            var taskForItems = contentRepository.QueryAsync(app, schema, isFrontendClient, ids, parsedQuery);
-            var taskForCount = contentRepository.CountAsync(app, schema, isFrontendClient, ids, parsedQuery);
+            var taskForItems = contentRepository.QueryAsync(app, schema, isFrontendClient, archived, ids, parsedQuery);
+            var taskForCount = contentRepository.CountAsync(app, schema, isFrontendClient, archived, ids, parsedQuery);
 
             await Task.WhenAll(taskForItems, taskForCount);
 
@@ -156,6 +156,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             public Guid Id { get; set; }
             public Guid AppId { get; set; }
             public long Version { get; set; }
+            public bool IsArchived { get; set; }
             public bool IsPublished { get; set; }
             public Instant Created { get; set; }
             public Instant LastModified { get; set; }

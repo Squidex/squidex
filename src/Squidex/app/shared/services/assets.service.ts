@@ -153,7 +153,7 @@ export class AssetsService {
                 .pretifyError('Failed to load assets. Please reload.');
     }
 
-    public uploadFile(appName: string, file: File, user: string, now?: DateTime): Observable<number | AssetDto> {
+    public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), {
@@ -163,7 +163,7 @@ export class AssetsService {
         return this.http.request(req)
                 .map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
-                        const percentDone = Math.round(100 * event.loaded / event.total);
+                        const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
                     } else if (event instanceof HttpResponse) {
@@ -235,7 +235,7 @@ export class AssetsService {
                 .pretifyError('Failed to load assets. Please reload.');
     }
 
-    public replaceFile(appName: string, id: string, file: File, version?: Version): Observable<number | AssetReplacedDto> {
+    public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | AssetReplacedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
         const req = new HttpRequest('PUT', url, getFormData(file), {
@@ -248,7 +248,7 @@ export class AssetsService {
         return this.http.request(req)
                 .map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
-                        const percentDone = Math.round(100 * event.loaded / event.total);
+                        const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
                     } else if (event instanceof HttpResponse) {
@@ -269,7 +269,7 @@ export class AssetsService {
                 .pretifyError('Failed to replace asset. Please reload.');
     }
 
-    public deleteAsset(appName: string, id: string, version?: Version): Observable<any> {
+    public deleteAsset(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
@@ -279,7 +279,7 @@ export class AssetsService {
                 .pretifyError('Failed to delete asset. Please reload.');
     }
 
-    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version?: Version): Observable<any> {
+    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)

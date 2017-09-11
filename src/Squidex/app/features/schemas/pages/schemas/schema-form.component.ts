@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import {
     ApiUrlConfig,
     AuthService,
+    DateTime,
     fadeAnimation,
     SchemaDetailsDto,
     SchemasService,
@@ -89,7 +90,7 @@ export class SchemaFormComponent {
 
             const me = this.authService.user!.token;
 
-            this.schemas.postSchema(this.appName, requestDto, me, undefined, schemaVersion)
+            this.schemas.postSchema(this.appName, requestDto, me, DateTime.now(), schemaVersion)
                 .subscribe(dto => {
                     this.emitCreated(dto);
                     this.resetCreateForm();

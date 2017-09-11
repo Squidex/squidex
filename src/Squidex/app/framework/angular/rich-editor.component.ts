@@ -8,11 +8,11 @@
 import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
+import { Types } from './../utils/types';
+
 import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var tinymce: any;
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
@@ -25,10 +25,10 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
-    private value: any;
+    private value: string;
     private isDisabled = false;
 
     @ViewChild('editor')
@@ -39,11 +39,11 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     ) {
     }
 
-    public writeValue(value: any) {
-        this.value = value;
+    public writeValue(value: string) {
+        this.value = Types.isString(value) ? value : '';
 
         if (this.tinyEditor) {
-            this.tinyEditor.setContent(value || '');
+            this.tinyEditor.setContent(this.value);
         }
     }
 
@@ -56,11 +56,11 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -78,12 +78,12 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                         if (this.value !== value) {
                             this.value = value;
 
-                            self.changeCallback(value);
+                            self.callChange(value);
                         }
                     });
 
                     self.tinyEditor.on('blur', () => {
-                        self.touchedCallback();
+                        self.callTouched();
                     });
 
                     setTimeout(() => {

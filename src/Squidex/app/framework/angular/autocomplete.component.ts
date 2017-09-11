@@ -17,7 +17,6 @@ const KEY_ENTER = 13;
 const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
@@ -31,8 +30,8 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public source: AutocompleteSource;
@@ -57,7 +56,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public writeValue(value: any) {
         if (!value) {
-            this.resetValue();
+            this.resetForm();
         } else {
             const item = this.items.find(i => i === value);
 
@@ -79,11 +78,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public ngOnDestroy() {
@@ -119,7 +118,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 this.down();
                 return false;
             case KEY_ESCAPE:
-                this.resetValue();
+                this.resetForm();
                 this.reset();
                 return false;
             case KEY_ENTER:
@@ -135,7 +134,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public blur() {
         this.reset();
-        this.touchedCallback();
+        this.callTouched();
     }
 
     public selectItem(selection: any | null = null) {
@@ -154,7 +153,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 } else {
                     this.queryInput.setValue(selection.toString(), { emitEvent: false });
                 }
-                this.changeCallback(selection);
+                this.callChange(selection);
             } finally {
                 this.reset();
             }
@@ -181,7 +180,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.selectIndex(this.selectedIndex + 1);
     }
 
-    private resetValue() {
+    private resetForm() {
         this.queryInput.setValue('');
     }
 

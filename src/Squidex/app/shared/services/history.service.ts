@@ -22,6 +22,7 @@ export class HistoryEventDto {
         public readonly eventId: string,
         public readonly actor: string,
         public readonly message: string,
+        public readonly version: number,
         public readonly created: DateTime
     ) {
     }
@@ -47,6 +48,7 @@ export class HistoryService {
                             item.eventId,
                             item.actor,
                             item.message,
+                            item.version,
                             DateTime.parseISO_UTC(item.created));
                     });
                 })

@@ -16,6 +16,7 @@ import {
     AssetReplacedDto,
     AssetsService,
     AuthService,
+    DateTime,
     DialogService,
     fadeAnimation,
     ModalView,
@@ -83,7 +84,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
         if (initFile) {
             this.appNameOnce()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.authService.user.token))
+                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.authService.user!.token, DateTime.now()))
                 .subscribe(dto => {
                     if (dto instanceof AssetDto) {
                         this.emitLoaded(dto);
@@ -104,7 +105,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                 .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.assetVersion))
                 .subscribe(dto => {
                     if (dto instanceof AssetReplacedDto) {
-                        this.updateAsset(this.asset.update(dto, this.authService.user.token), true);
+                        this.updateAsset(this.asset.update(dto, this.authService.user!.token), true);
                     } else {
                         this.setProgress(dto);
                     }
@@ -126,7 +127,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
             this.appNameOnce()
                 .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.assetVersion))
                 .subscribe(() => {
-                    this.updateAsset(this.asset.rename(requestDto.fileName, this.authService.user.token), true);
+                    this.updateAsset(this.asset.rename(requestDto.fileName, this.authService.user!.token), true);
                     this.resetRenameForm();
                 }, error => {
                     this.notifyError(error);

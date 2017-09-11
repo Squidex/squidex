@@ -75,7 +75,7 @@ export class AppLanguagesService {
                 .pretifyError('Failed to load languages. Please reload.');
     }
 
-    public postLanguages(appName: string, dto: AddAppLanguageDto, version?: Version): Observable<AppLanguageDto> {
+    public postLanguages(appName: string, dto: AddAppLanguageDto, version: Version): Observable<AppLanguageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
@@ -90,14 +90,14 @@ export class AppLanguagesService {
                 .pretifyError('Failed to add language. Please reload.');
     }
 
-    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version?: Version): Observable<any> {
+    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .pretifyError('Failed to change language. Please reload.');
     }
 
-    public deleteLanguage(appName: string, languageCode: string, version?: Version): Observable<any> {
+    public deleteLanguage(appName: string, languageCode: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return HTTP.deleteVersioned(this.http, url, version)

@@ -8,7 +8,7 @@
 import { Directive, forwardRef, ElementRef, HostListener, Renderer } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
-const NOOP = () => { /* NOOP */ };
+import { Types } from './../utils/types';
 
 export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IndeterminateValueDirective), multi: true
@@ -19,8 +19,8 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR]
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     constructor(
         private readonly renderer: Renderer,
@@ -30,16 +30,16 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
 
     @HostListener('change', ['$event.target.value'])
     public onChange(value: any) {
-        this.changeCallback(value);
+        this.callChange(value);
     }
 
     @HostListener('blur')
     public onTouched() {
-        this.touchedCallback();
+        this.callTouched();
     }
 
-    public writeValue(value: any) {
-        if (value === undefined || value === null) {
+    public writeValue(value: boolean | number | undefined) {
+        if (!Types.isBoolean(value)) {
             this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', true);
         } else {
             this.renderer.setElementProperty(this.element.nativeElement, 'checked', value);
@@ -51,10 +51,10 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 }

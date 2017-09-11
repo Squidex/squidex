@@ -55,6 +55,10 @@ namespace Squidex.Config.Domain
                 .As<IScriptEngine>()
                 .SingleInstance();
 
+            builder.RegisterType<ContentVersionLoader>()
+                .As<IContentVersionLoader>()
+                .SingleInstance();
+
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();

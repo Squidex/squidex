@@ -9,11 +9,11 @@ import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@an
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 
+import { Types } from './../utils/types';
+
 import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var ace: any;
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JscriptEditorComponent), multi: true
@@ -26,11 +26,11 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class JscriptEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private valueChanged = new Subject();
     private aceEditor: any;
-    private oldValue: string;
+    private value: string;
     private isDisabled = false;
 
     @ViewChild('editor')
@@ -41,11 +41,11 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     ) {
     }
 
-    public writeValue(value: any) {
-        this.oldValue = value;
+    public writeValue(value: string) {
+        this.value = Types.isString(value) ? value : '';
 
         if (this.aceEditor) {
-            this.setValue(value);
+            this.setValue(this.value);
         }
     }
 
@@ -58,11 +58,11 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -78,11 +78,11 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
             this.aceEditor.setReadOnly(this.isDisabled);
             this.aceEditor.setFontSize(14);
 
-            this.setValue(this.oldValue);
+            this.setValue(this.value);
 
             this.aceEditor.on('blur', () => {
                 this.changeValue();
-                this.touchedCallback();
+                this.callTouched();
             });
 
             this.aceEditor.on('change', () => {
@@ -94,11 +94,11 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     private changeValue() {
         const newValue = this.aceEditor.getValue();
 
-        if (this.oldValue !== newValue) {
-            this.changeCallback(newValue);
+        if (this.value !== newValue) {
+            this.callChange(newValue);
         }
 
-        this.oldValue = newValue;
+        this.value = newValue;
     }
 
     private setValue(value: string) {

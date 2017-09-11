@@ -18,8 +18,6 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
 
         public string ScriptDelete { get; set; }
 
-        public string ScriptPublish { get; set; }
-
-        public string ScriptUnpublish { get; set; }
+        public string ScriptChange { get; set; }
     }
 }

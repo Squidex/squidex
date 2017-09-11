@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using MongoDB.Driver;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
@@ -58,10 +59,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 
         protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
-            {
-                a.IsDeleted = true;
-            });
+            return Collection.DeleteOneAsync(x => x.Id == @event.AssetId);
         }
     }
 }

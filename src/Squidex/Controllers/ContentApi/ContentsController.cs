@@ -31,12 +31,17 @@ namespace Squidex.Controllers.ContentApi
     public sealed class ContentsController : ControllerBase
     {
         private readonly IContentQueryService contentQuery;
+        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IGraphQLService graphQl;
 
-        public ContentsController(ICommandBus commandBus, IContentQueryService contentQuery, IGraphQLService graphQl)
+        public ContentsController(ICommandBus commandBus,
+            IContentQueryService contentQuery,
+            IContentVersionLoader contentVersionLoader,
+            IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
+            this.contentVersionLoader = contentVersionLoader;
 
             this.graphQl = graphQl;
         }
@@ -64,7 +69,7 @@ namespace Squidex.Controllers.ContentApi
         [HttpGet]
         [Route("content/{app}/{name}")]
         [ApiCosts(2)]
-        public async Task<IActionResult> GetContents(string name, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetContents(string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
             var idsList = new HashSet<Guid>();
 
@@ -81,7 +86,7 @@ namespace Squidex.Controllers.ContentApi
 
             var isFrontendClient = User.IsFrontendClient();
 
-            var contents = await contentQuery.QueryWithCountAsync(App, name, User, idsList, Request.QueryString.ToString());
+            var contents = await contentQuery.QueryWithCountAsync(App, name, User, archived, idsList, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {
@@ -120,6 +125,21 @@ namespace Squidex.Controllers.ContentApi
             }
 
             Response.Headers["ETag"] = new StringValues(content.Content.Version.ToString());
+
+            return Ok(response);
+        }
+
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/{version}")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
+        {
+            var contentData = await contentVersionLoader.LoadAsync(App.Id, id, version);
+
+            var response = contentData;
+
+            Response.Headers["ETag"] = new StringValues(version.ToString());
 
             return Ok(response);
         }
@@ -202,6 +222,36 @@ namespace Squidex.Controllers.ContentApi
             await contentQuery.FindSchemaAsync(App, name);
 
             var command = new UnpublishContent { ContentId = id, User = User };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/archive")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> ArchiveContent(string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new ArchiveContent { ContentId = id, User = User };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/restore")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> RestoreContent(string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new RestoreContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 

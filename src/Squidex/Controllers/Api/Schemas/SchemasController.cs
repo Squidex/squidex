@@ -125,7 +125,7 @@ namespace Squidex.Controllers.Api.Schemas
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = command.Name, Version = result.Version };
+            var response = new EntityCreatedDto { Id = command.SchemaId.ToString(), Version = result.Version };
 
             return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, response);
         }

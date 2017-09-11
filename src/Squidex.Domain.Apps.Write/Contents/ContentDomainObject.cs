@@ -23,11 +23,17 @@ namespace Squidex.Domain.Apps.Write.Contents
         private bool isDeleted;
         private bool isCreated;
         private bool isPublished;
+        private bool isArchived;
         private NamedContentData data;
 
         public bool IsDeleted
         {
             get { return isDeleted; }
+        }
+
+        public bool IsArchived
+        {
+            get { return isArchived; }
         }
 
         public bool IsPublished
@@ -67,6 +73,16 @@ namespace Squidex.Domain.Apps.Write.Contents
             isPublished = false;
         }
 
+        protected void On(ContentArchived @event)
+        {
+            isArchived = true;
+        }
+
+        protected void On(ContentRestored @event)
+        {
+            isArchived = false;
+        }
+
         protected void On(ContentDeleted @event)
         {
             isDeleted = true;
@@ -95,6 +111,28 @@ namespace Squidex.Domain.Apps.Write.Contents
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+
+            return this;
+        }
+
+        public ContentDomainObject Restore(RestoreContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentRestored()));
+
+            return this;
+        }
+
+        public ContentDomainObject Archive(ArchiveContent command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ContentArchived()));
 
             return this;
         }
@@ -156,6 +194,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             if (isCreated)
             {
                 throw new DomainException("Content has already been created.");
+            }
+        }
+
+        private void VerifyDeleted()
+        {
+            if (!isDeleted)
+            {
+                throw new DomainException("Content has not been deleted.");
             }
         }
 

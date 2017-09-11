@@ -16,8 +16,8 @@ import { RootViewService } from './../services/root-view.service';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnDestroy {
-    private subscription: Subscription | null;
-    private clickHandler: Function | null;
+    private subscription: Subscription | null = null;
+    private clickHandler: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')

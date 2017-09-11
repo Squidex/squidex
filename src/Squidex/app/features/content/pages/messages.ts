@@ -21,9 +21,16 @@ export class ContentUpdated {
     }
 }
 
-export class ContentDeleted {
+export class ContentRemoved {
     constructor(
         public readonly content: ContentDto
+    ) {
+    }
+}
+
+export class ContentVersionSelected {
+    constructor(
+        public readonly version: number
     ) {
     }
 }

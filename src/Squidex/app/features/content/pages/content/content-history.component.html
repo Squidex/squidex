@@ -1,0 +1,29 @@
+<sqx-panel panelWidth="16rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <h3 class="panel-title">Activity</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink>
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-blank">
+            <div *ngFor="let event of events | async" class="event">
+                <div class="event-left">
+                    <img class="user-picture" [attr.title]="event.actor | sqxUserNameRef:'I'" [attr.src]="event.actor | sqxUserPictureRef" />
+                </div>
+                <div class="event-main">
+                    <div class="event-message">
+                        <span class="event-actor user-ref">{{event.actor | sqxUserNameRef:'I'}}</span> <span [innerHTML]="format(event.message) | async"></span>
+                    </div>
+                    <div class="event-created">{{event.created | sqxFromNow}}</div>
+
+                    <a class="event-load" (click)="loadVersion(event.version)">Load this Version</a>
+                </div>
+            </div>            
+        </div>
+    </div>
+</sqx-panel>

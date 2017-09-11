@@ -85,7 +85,7 @@ export class PlansService {
                 .pretifyError('Failed to load plans. Please reload.');
     }
 
-    public putPlan(appName: string, dto: ChangePlanDto, version?: Version): Observable<PlanChangedDto> {
+    public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<PlanChangedDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
         return HTTP.putVersioned(this.http, url, dto, version)

@@ -12,7 +12,6 @@ const KEY_ENTER = 13;
 const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
-const NOOP = () => { /* NOOP */ };
 
 import { ModalView } from './../utils/modal-view';
 
@@ -27,8 +26,8 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR]
 })
 export class DropdownComponent implements AfterContentInit, ControlValueAccessor {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public items: any[] = [];
@@ -69,11 +68,11 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -95,7 +94,7 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
 
     public open() {
         this.dropdown.show();
-        this.touchedCallback();
+        this.callTouched();
     }
 
     public selectIndexAndClose(selectedIndex: number) {
@@ -132,7 +131,7 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
             this.selectedIndex = selectedIndex;
             this.selectedItem = value;
 
-            this.changeCallback(value);
+            this.callChange(value);
         }
     }
 }

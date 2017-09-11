@@ -20,7 +20,16 @@ export class SearchFormComponent implements OnChanges {
     public query = '';
 
     @Output()
-    public queryChanged = new EventEmitter();
+    public queryChanged = new EventEmitter<string>();
+
+    @Input()
+    public archived = false;
+
+    @Output()
+    public archivedChanged = new EventEmitter<boolean>();
+
+    @Input()
+    public canArchive = true;
 
     public searchForm =
         this.formBuilder.group({

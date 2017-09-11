@@ -21,8 +21,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
 
         public string ScriptDelete { get; set; }
 
-        public string ScriptPublish { get; set; }
-
-        public string ScriptUnpublish { get; set; }
+        public string ScriptChange { get; set; }
     }
 }

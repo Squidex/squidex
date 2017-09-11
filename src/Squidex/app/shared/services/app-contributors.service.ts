@@ -63,14 +63,14 @@ export class AppContributorsService {
                 .pretifyError('Failed to load contributors. Please reload.');
     }
 
-    public postContributor(appName: string, dto: AppContributorDto, version?: Version): Observable<any> {
+    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
                 .pretifyError('Failed to add contributors. Please reload.');
     }
 
-    public deleteContributor(appName: string, contributorId: string, version?: Version): Observable<any> {
+    public deleteContributor(appName: string, contributorId: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
 
         return HTTP.deleteVersioned(this.http, url, version)

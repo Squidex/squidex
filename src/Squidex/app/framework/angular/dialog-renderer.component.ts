@@ -32,7 +32,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
     private notificationsSubscription: Subscription;
 
     public dialogView = new ModalView(false, true);
-    public dialogRequest: DialogRequest;
+    public dialogRequest: DialogRequest | null = null;
 
     public notifications: Notification[] = [];
 

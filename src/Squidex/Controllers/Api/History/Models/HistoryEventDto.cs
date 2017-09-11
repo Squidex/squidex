@@ -35,5 +35,10 @@ namespace Squidex.Controllers.Api.History.Models
         /// The time when the event happened.
         /// </summary>
         public Instant Created { get; set; }
+
+        /// <summary>
+        /// The version identifier.
+        /// </summary>
+        public long Version { get; set; }
     }
 }

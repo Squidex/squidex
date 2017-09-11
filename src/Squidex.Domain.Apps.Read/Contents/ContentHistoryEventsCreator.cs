@@ -20,19 +20,22 @@ namespace Squidex.Domain.Apps.Read.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created content element.");
+                "created content item.");
 
             AddEventMessage<ContentUpdated>(
-                "updated content element.");
+                "updated content item.");
 
             AddEventMessage<ContentDeleted>(
-                "deleted content element.");
+                "deleted content item.");
+
+            AddEventMessage<ContentRestored>(
+                "restored content item.");
 
             AddEventMessage<ContentPublished>(
-                "published content element.");
+                "published content item.");
 
             AddEventMessage<ContentUnpublished>(
-                "unpublished content element.");
+                "unpublished content item.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

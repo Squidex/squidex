@@ -19,10 +19,9 @@ import {
     AssetUpdated,
     DialogService,
     ImmutableArray,
-    MessageBus
+    MessageBus,
+    Types
 } from 'shared';
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
@@ -36,8 +35,8 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
@@ -65,10 +64,10 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         this.assetUpdatedSubscription.unsubscribe();
     }
 
-    public writeValue(value: any) {
+    public writeValue(value: string[]) {
         this.oldAssets = ImmutableArray.empty<AssetDto>();
 
-        if (value && value.length > 0) {
+        if (Types.isArrayOfString(value) && value.length > 0) {
             const assetIds: string[] = value;
 
             this.appNameOnce()
@@ -84,11 +83,11 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public addFiles(files: FileList) {
@@ -143,7 +142,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
             ids = null;
         }
 
-        this.touchedCallback();
-        this.changeCallback(ids);
+        this.callTouched();
+        this.callChange(ids);
     }
 }

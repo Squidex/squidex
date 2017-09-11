@@ -91,7 +91,7 @@ export class WebhookComponent implements OnInit {
                     } else {
                         return null;
                     }
-                }).filter(w => !!w)).sortByStringAsc(x => x.schema.name);
+                }).filter(w => w !== null).map(w => w!)).sortByStringAsc(x => x.schema.name);
 
         this.schemasToAdd =
             ImmutableArray.of(

@@ -91,7 +91,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.webhooksService.putWebhook(app, webhook.id, requestDto, webhook.version))
             .subscribe(dto => {
-                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.authService.user.token));
+                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.authService.user!.token));
 
                 this.notifyInfo('Webhook saved.');
             }, error => {

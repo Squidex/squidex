@@ -21,5 +21,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         public NamedContentData Data { get; set; }
 
         public NamedContentData OldData { get; set; }
+
+        public string Operation { get; set; }
     }
 }

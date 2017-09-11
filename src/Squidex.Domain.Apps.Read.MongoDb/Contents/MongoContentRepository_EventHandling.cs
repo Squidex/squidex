@@ -62,6 +62,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaId).Descending(x => x.LastModified));
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsPublished));
+                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsArchived));
                 await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
             });
         }
@@ -114,17 +115,25 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
+        protected Task On(ContentArchived @event, EnvelopeHeaders headers)
         {
-            return ForAppIdAsync(@event.AppId.Id, async collection =>
+            return ForAppIdAsync(@event.AppId.Id, collection =>
             {
-                await collection.UpdateManyAsync(
-                    Filter.And(
-                        Filter.AnyEq(x => x.ReferencedIds, @event.ContentId),
-                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.ContentId)),
-                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.ContentId));
+                return collection.UpdateAsync(@event, headers, x =>
+                {
+                    x.IsArchived = true;
+                });
+            });
+        }
 
-                await collection.DeleteOneAsync(x => x.Id == headers.AggregateId());
+        protected Task On(ContentRestored @event, EnvelopeHeaders headers)
+        {
+            return ForAppIdAsync(@event.AppId.Id, collection =>
+            {
+                return collection.UpdateAsync(@event, headers, x =>
+                {
+                    x.IsArchived = false;
+                });
             });
         }
 
@@ -137,6 +146,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                         Filter.AnyEq(x => x.ReferencedIds, @event.AssetId),
                         Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.AssetId)),
                     Update.AddToSet(x => x.ReferencedIdsDeleted, @event.AssetId));
+            });
+        }
+
+        protected Task On(ContentDeleted @event, EnvelopeHeaders headers)
+        {
+            return ForAppIdAsync(@event.AppId.Id, async collection =>
+            {
+                await collection.UpdateManyAsync(
+                    Filter.And(
+                        Filter.AnyEq(x => x.ReferencedIds, @event.ContentId),
+                        Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.ContentId)),
+                    Update.AddToSet(x => x.ReferencedIdsDeleted, @event.ContentId));
+
+                await collection.DeleteOneAsync(x => x.Id == @event.ContentId);
             });
         }
 

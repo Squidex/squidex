@@ -31,13 +31,8 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public string ScriptDelete { get; set; }
 
         /// <summary>
-        /// The script that is executed when publishing a content.
+        /// The script that is executed when change a content status.
         /// </summary>
-        public string ScriptPublish { get; set; }
-
-        /// <summary>
-        /// The script that is executed when unpublishing a content.
-        /// </summary>
-        public string ScriptUnpublish { get; set; }
+        public string ScriptChange { get; set; }
     }
 }

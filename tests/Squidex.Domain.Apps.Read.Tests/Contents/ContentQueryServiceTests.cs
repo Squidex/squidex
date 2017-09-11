@@ -122,9 +122,9 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
                 .Returns(schema);
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, false, ids, A<ODataUriParser>.Ignored))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, false, true, ids, A<ODataUriParser>.Ignored))
                 .Returns(new List<IContentEntity> { content });
-            A.CallTo(() => contentRepository.CountAsync(app, schema, false, ids, A<ODataUriParser>.Ignored))
+            A.CallTo(() => contentRepository.CountAsync(app, schema, false, true, ids, A<ODataUriParser>.Ignored))
                 .Returns(123);
 
             A.CallTo(() => schema.ScriptQuery)
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
                 .Returns(transformedData);
 
-            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, ids, null);
+            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, true, ids, null);
 
             Assert.Equal(123, result.Total);
             Assert.Equal(schema, result.Schema);

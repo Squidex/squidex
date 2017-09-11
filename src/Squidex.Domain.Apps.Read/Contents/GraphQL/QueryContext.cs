@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
         {
-            var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, null, query).ConfigureAwait(false)).Items;
+            var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, false, null, query).ConfigureAwait(false)).Items;
 
             foreach (var content in contents)
             {
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             if (notLoadedContents.Count > 0)
             {
-                var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, notLoadedContents, null).ConfigureAwait(false)).Items;
+                var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, false, notLoadedContents, null).ConfigureAwait(false)).Items;
 
                 foreach (var content in contents)
                 {

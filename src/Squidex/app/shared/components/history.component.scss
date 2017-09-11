@@ -7,10 +7,6 @@
         margin-bottom: 1rem;
     }
 
-    &-message {
-        font-size: .9rem;
-    }
-
     &-main {
         @include flex-grow(1);
     }

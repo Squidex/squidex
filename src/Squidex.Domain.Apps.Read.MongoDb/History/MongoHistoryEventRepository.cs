@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Events;
@@ -25,7 +24,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
     {
         private readonly List<IHistoryEventsCreator> creators;
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
-        private int sessionEventCount;
 
         public string Name
         {
@@ -64,7 +62,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.Channel)
                         .Descending(x => x.Created)
-                        .Descending(x => x.SessionEventIndex)),
+                        .Descending(x => x.Version)),
                 collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
         }
 
@@ -72,7 +70,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
         {
             var historyEventEntities =
                 await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
-                    .SortByDescending(x => x.Created).ThenByDescending(x => x.SessionEventIndex).Limit(count)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count)
                     .ToListAsync();
 
             return historyEventEntities.Select(x => (IHistoryEventEntity)new ParsedHistoryEvent(x, texts)).ToList();
@@ -90,7 +88,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
                     {
                         entity.Id = Guid.NewGuid();
 
-                        entity.SessionEventIndex = Interlocked.Increment(ref sessionEventCount);
+                        entity.Version = @event.Headers.EventStreamNumber();
 
                         entity.Channel = message.Channel;
                         entity.Message = message.Message;
