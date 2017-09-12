@@ -88,13 +88,15 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The url to the the {schemaName} content."
             });
 
-            if (schema.SchemaDef.Fields.Any(x => !x.IsHidden))
+            var dataType = new ContentDataGraphType(schema.SchemaDef, context);
+
+            if (dataType.Fields.Any())
             {
                 AddField(new FieldType
                 {
                     Name = "data",
                     Resolver = Resolver(x => x.Data),
-                    ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema.SchemaDef, context)),
+                    ResolvedType = new NonNullGraphType(dataType),
                     Description = $"The data of the {schemaName} content."
                 });
             }
