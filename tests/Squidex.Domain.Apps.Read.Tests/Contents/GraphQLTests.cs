@@ -86,6 +86,24 @@ namespace Squidex.Domain.Apps.Read.Contents
             sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task Should_return_empty_object_for_empty_query(string query)
+        {
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                }
+            };
+
+            AssertJson(expected, new { data = result.Data });
+        }
+
         [Fact]
         public async Task Should_return_multiple_assets_when_querying_assets()
         {

@@ -78,6 +78,11 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
+            if (string.IsNullOrWhiteSpace(query.Query))
+            {
+                return (new object(), new object[0]);
+            }
+
             var modelContext = await GetModelAsync(app);
             var queryContext = new QueryContext(app, assetRepository, contentQuery, urlGenerator, user);
 

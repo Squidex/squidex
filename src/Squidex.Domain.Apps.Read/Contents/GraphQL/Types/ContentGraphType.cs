@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -87,13 +88,16 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The url to the the {schemaName} content."
             });
 
-            AddField(new FieldType
+            if (schema.SchemaDef.Fields.Any(x => !x.IsHidden))
             {
-                Name = "data",
-                Resolver = Resolver(x => x.Data),
-                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema.SchemaDef, context)),
-                Description = $"The data of the {schemaName} content."
-            });
+                AddField(new FieldType
+                {
+                    Name = "data",
+                    Resolver = Resolver(x => x.Data),
+                    ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema.SchemaDef, context)),
+                    Description = $"The data of the {schemaName} content."
+                });
+            }
 
             Description = $"The structure of a {schemaName} content type.";
         }
