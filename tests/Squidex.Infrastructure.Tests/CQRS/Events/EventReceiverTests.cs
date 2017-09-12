@@ -127,9 +127,9 @@ namespace Squidex.Infrastructure.CQRS.Events
             A.CallTo(() => eventConsumer.Name).Returns(consumerName);
             A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(consumerInfo);
 
-            A.CallTo(() => formatter.Parse(eventData1)).Returns(envelope1);
-            A.CallTo(() => formatter.Parse(eventData2)).Returns(envelope2);
-            A.CallTo(() => formatter.Parse(eventData3)).Returns(envelope3);
+            A.CallTo(() => formatter.Parse(eventData1, true)).Returns(envelope1);
+            A.CallTo(() => formatter.Parse(eventData2, true)).Returns(envelope2);
+            A.CallTo(() => formatter.Parse(eventData3, true)).Returns(envelope3);
 
             sut = new EventReceiver(formatter, eventStore, eventConsumerInfoRepository, log);
         }
@@ -183,7 +183,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             consumerInfo.Position = "2";
 
-            A.CallTo(() => formatter.Parse(eventData2)).Throws(new InvalidOperationException());
+            A.CallTo(() => formatter.Parse(eventData2, true)).Throws(new InvalidOperationException());
 
             sut.Subscribe(eventConsumer);
             sut.Refresh();

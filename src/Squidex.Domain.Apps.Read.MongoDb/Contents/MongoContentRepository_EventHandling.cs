@@ -9,7 +9,6 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -17,8 +16,6 @@ using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-
-#pragma warning disable CS0612 // Type or member is obsolete
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
@@ -95,39 +92,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             });
         }
 
-        protected Task On(ContentPublished @event, EnvelopeHeaders headers)
-        {
-            return ForAppIdAsync(@event.AppId.Id, collection =>
-            {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.Status = Status.Published;
-                });
-            });
-        }
-
-        protected Task On(ContentUnpublished @event, EnvelopeHeaders headers)
-        {
-            return ForAppIdAsync(@event.AppId.Id, collection =>
-            {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.Status = Status.Draft;
-                });
-            });
-        }
-
-        protected Task On(ContentArchived @event, EnvelopeHeaders headers)
-        {
-            return ForAppIdAsync(@event.AppId.Id, collection =>
-            {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.Status = Status.Archived;
-                });
-            });
-        }
-
         protected Task On(ContentStatusChanged @event, EnvelopeHeaders headers)
         {
             return ForAppIdAsync(@event.AppId.Id, collection =>
@@ -135,17 +99,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 return collection.UpdateAsync(@event, headers, x =>
                 {
                     x.Status = @event.Status;
-                });
-            });
-        }
-
-        protected Task On(ContentRestored @event, EnvelopeHeaders headers)
-        {
-            return ForAppIdAsync(@event.AppId.Id, collection =>
-            {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.Status = Status.Draft;
                 });
             });
         }

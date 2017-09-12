@@ -13,8 +13,13 @@ namespace Squidex.Domain.Apps.Events.Schemas.Old
 {
     [EventType(nameof(WebhookDeleted))]
     [Obsolete]
-    public sealed class WebhookDeleted : SchemaEvent
+    public sealed class WebhookDeleted : SchemaEvent, IMigratedEvent
     {
         public Guid Id { get; set; }
+
+        public IEvent Migrate()
+        {
+            return new NoopEvent();
+        }
     }
 }

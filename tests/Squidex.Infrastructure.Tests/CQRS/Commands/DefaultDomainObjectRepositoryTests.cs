@@ -96,9 +96,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(events);
 
-            A.CallTo(() => formatter.Parse(eventData1))
+            A.CallTo(() => formatter.Parse(eventData1, true))
                 .Returns(new Envelope<IEvent>(event1));
-            A.CallTo(() => formatter.Parse(eventData2))
+            A.CallTo(() => formatter.Parse(eventData2, true))
                 .Returns(new Envelope<IEvent>(event2));
 
             await sut.LoadAsync(domainObject);
@@ -124,9 +124,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(events);
 
-            A.CallTo(() => formatter.Parse(eventData1))
+            A.CallTo(() => formatter.Parse(eventData1, true))
                 .Returns(new Envelope<IEvent>(event1));
-            A.CallTo(() => formatter.Parse(eventData2))
+            A.CallTo(() => formatter.Parse(eventData2, true))
                 .Returns(new Envelope<IEvent>(event2));
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.LoadAsync(domainObject, 200));
@@ -143,9 +143,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var eventData1 = new EventData();
             var eventData2 = new EventData();
 
-            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId))
+            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId, true))
                 .Returns(eventData1);
-            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId))
+            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId, true))
                 .Returns(eventData2);
 
             A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2)))
@@ -170,9 +170,9 @@ namespace Squidex.Infrastructure.CQRS.Commands
             var eventData1 = new EventData();
             var eventData2 = new EventData();
 
-            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId))
+            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event1), commitId, true))
                 .Returns(eventData1);
-            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId))
+            A.CallTo(() => formatter.ToEventData(A<Envelope<IEvent>>.That.Matches(e => e.Payload == event2), commitId, true))
                 .Returns(eventData2);
 
             A.CallTo(() => eventStore.AppendEventsAsync(commitId, streamName, 123, A<ICollection<EventData>>.That.Matches(e => e.Count == 2)))

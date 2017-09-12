@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(events);
 
-            A.CallTo(() => formatter.Parse(eventData1))
+            A.CallTo(() => formatter.Parse(eventData1, true))
                 .Returns(new Envelope<IEvent>(event1));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(appId, id, 0));
@@ -100,9 +100,9 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(events);
 
-            A.CallTo(() => formatter.Parse(eventData1))
+            A.CallTo(() => formatter.Parse(eventData1, true))
                 .Returns(new Envelope<IEvent>(event1));
-            A.CallTo(() => formatter.Parse(eventData2))
+            A.CallTo(() => formatter.Parse(eventData2, true))
                 .Returns(new Envelope<IEvent>(event2));
 
             var data = await sut.LoadAsync(appId, id, 3);
@@ -131,11 +131,11 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(events);
 
-            A.CallTo(() => formatter.Parse(eventData1))
+            A.CallTo(() => formatter.Parse(eventData1, true))
                 .Returns(new Envelope<IEvent>(event1));
-            A.CallTo(() => formatter.Parse(eventData2))
+            A.CallTo(() => formatter.Parse(eventData2, true))
                 .Returns(new Envelope<IEvent>(event2));
-            A.CallTo(() => formatter.Parse(eventData3))
+            A.CallTo(() => formatter.Parse(eventData3, true))
                 .Returns(new Envelope<IEvent>(event3));
 
             var data = await sut.LoadAsync(appId, id, 1);

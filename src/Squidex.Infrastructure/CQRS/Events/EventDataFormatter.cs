@@ -25,21 +25,33 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
         }
 
-        public virtual Envelope<IEvent> Parse(EventData eventData)
+        public virtual Envelope<IEvent> Parse(EventData eventData, bool migrate = true)
         {
             var headers = ReadJson<PropertiesBag>(eventData.Metadata);
 
             var eventType = typeNameRegistry.GetType(eventData.Type);
-            var eventContent = ReadJson<IEvent>(eventData.Payload, eventType);
+            var eventPayload = ReadJson<IEvent>(eventData.Payload, eventType);
 
-            var envelope = new Envelope<IEvent>(eventContent, headers);
+            if (migrate && eventPayload is IMigratedEvent migratedEvent)
+            {
+                eventPayload = migratedEvent.Migrate();
+            }
+
+            var envelope = new Envelope<IEvent>(eventPayload, headers);
 
             return envelope;
         }
 
-        public virtual EventData ToEventData(Envelope<IEvent> envelope, Guid commitId)
+        public virtual EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true)
         {
-            var eventType = typeNameRegistry.GetName(envelope.Payload.GetType());
+            var eventPayload = envelope.Payload;
+
+            if (migrate && eventPayload is IMigratedEvent migratedEvent)
+            {
+                eventPayload = migratedEvent.Migrate();
+            }
+
+            var eventType = typeNameRegistry.GetName(eventPayload.GetType());
 
             envelope.SetCommitId(commitId);
 
