@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Webhooks;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -115,12 +116,11 @@ namespace Squidex.Domain.Apps.Read.Webhooks
         private static bool Matchs(WebhookSchema webhookSchema, SchemaEvent @event)
         {
             return
-               (@event.SchemaId.Id == webhookSchema.SchemaId) &&
-               (@event is ContentCreated && webhookSchema.SendCreate ||
-                @event is ContentUpdated && webhookSchema.SendUpdate ||
-                @event is ContentDeleted && webhookSchema.SendDelete ||
-                @event is ContentPublished && webhookSchema.SendPublish ||
-                @event is ContentUnpublished && webhookSchema.SendUnpublish);
+                (@event.SchemaId.Id == webhookSchema.SchemaId) &&
+                (webhookSchema.SendCreate && @event is ContentCreated ||
+                 webhookSchema.SendUpdate && @event is ContentUpdated ||
+                 webhookSchema.SendDelete && @event is ContentDeleted ||
+                 webhookSchema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
         }
 
         private string CreatePayload(Envelope<IEvent> @event, string eventType)

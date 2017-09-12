@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Read.Contents
@@ -37,17 +38,20 @@ namespace Squidex.Domain.Apps.Read.Contents
         private readonly Guid contentId = Guid.NewGuid();
         private readonly NamedContentData data = new NamedContentData();
         private readonly NamedContentData transformedData = new NamedContentData();
-        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
+        private readonly ClaimsPrincipal user;
+        private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = A.Fake<EdmModelBuilder>();
         private readonly ContentQueryService sut;
 
         public ContentQueryServiceTests()
         {
+            user = new ClaimsPrincipal(identity);
+
             A.CallTo(() => app.Id).Returns(appId);
 
             A.CallTo(() => content.Id).Returns(contentId);
             A.CallTo(() => content.Data).Returns(data);
-            A.CallTo(() => content.IsPublished).Returns(true);
+            A.CallTo(() => content.Status).Returns(Status.Published);
 
             sut = new ContentQueryService(contentRepository, schemas, scriptEngine, modelBuilder);
         }
@@ -116,15 +120,43 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_return_contents_from_repository_and_transform()
+        public async Task Should_return_non_archived_contents_from_repository_and_transform()
         {
+            await TestManyRequest(true, false, Status.Draft, Status.Published);
+        }
+
+        [Fact]
+        public async Task Should_return_archived_contents_from_repository_and_transform()
+        {
+            await TestManyRequest(true, true, Status.Archived);
+        }
+
+        [Fact]
+        public async Task Should_return_draft_contents_from_repository_and_transform()
+        {
+            await TestManyRequest(false, false, Status.Published);
+        }
+
+        [Fact]
+        public async Task Should_return_draft_contents_from_repository_and_transform_when_requesting_archive_as_non_frontend()
+        {
+            await TestManyRequest(false, true, Status.Published);
+        }
+
+        private async Task TestManyRequest(bool isFrontend, bool archive, params Status[] status)
+        {
+            if (isFrontend)
+            {
+                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "squidex-frontend"));
+            }
+
             var ids = new HashSet<Guid>();
 
             A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
                 .Returns(schema);
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, false, true, ids, A<ODataUriParser>.Ignored))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids, A<ODataUriParser>.Ignored))
                 .Returns(new List<IContentEntity> { content });
-            A.CallTo(() => contentRepository.CountAsync(app, schema, false, true, ids, A<ODataUriParser>.Ignored))
+            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids, A<ODataUriParser>.Ignored))
                 .Returns(123);
 
             A.CallTo(() => schema.ScriptQuery)
@@ -133,7 +165,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
                 .Returns(transformedData);
 
-            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, true, ids, null);
+            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, ids, null);
 
             Assert.Equal(123, result.Total);
             Assert.Equal(schema, result.Schema);

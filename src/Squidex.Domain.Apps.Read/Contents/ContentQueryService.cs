@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var content = await contentRepository.FindContentAsync(app, schema, id);
 
-            if (content == null || (!content.IsPublished && !isFrontendClient))
+            if (content == null || (content.Status != Status.Published && !isFrontendClient))
             {
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
             }
@@ -83,10 +83,27 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var parsedQuery = ParseQuery(app, query, schema);
 
-            var isFrontendClient = user.IsInClient("squidex-frontend");
+            var status = new List<Status>();
 
-            var taskForItems = contentRepository.QueryAsync(app, schema, isFrontendClient, archived, ids, parsedQuery);
-            var taskForCount = contentRepository.CountAsync(app, schema, isFrontendClient, archived, ids, parsedQuery);
+            if (user.IsInClient("squidex-frontend"))
+            {
+                if (archived)
+                {
+                    status.Add(Status.Archived);
+                }
+                else
+                {
+                    status.Add(Status.Draft);
+                    status.Add(Status.Published);
+                }
+            }
+            else
+            {
+                status.Add(Status.Published);
+            }
+
+            var taskForItems = contentRepository.QueryAsync(app, schema, status.ToArray(), ids, parsedQuery);
+            var taskForCount = contentRepository.CountAsync(app, schema, status.ToArray(), ids, parsedQuery);
 
             await Task.WhenAll(taskForItems, taskForCount);
 
@@ -155,14 +172,18 @@ namespace Squidex.Domain.Apps.Read.Contents
         {
             public Guid Id { get; set; }
             public Guid AppId { get; set; }
+
             public long Version { get; set; }
-            public bool IsArchived { get; set; }
-            public bool IsPublished { get; set; }
+
             public Instant Created { get; set; }
             public Instant LastModified { get; set; }
+
             public RefToken CreatedBy { get; set; }
             public RefToken LastModifiedBy { get; set; }
+
             public NamedContentData Data { get; set; }
+
+            public Status Status { get; set; }
         }
     }
 }

@@ -206,7 +206,7 @@ namespace Squidex.Controllers.ContentApi
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new PublishContent { ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Published, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
@@ -221,7 +221,7 @@ namespace Squidex.Controllers.ContentApi
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new UnpublishContent { ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
@@ -236,7 +236,7 @@ namespace Squidex.Controllers.ContentApi
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new ArchiveContent { ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Archived, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
@@ -251,7 +251,7 @@ namespace Squidex.Controllers.ContentApi
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new RestoreContent { ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 

@@ -1,14 +1,19 @@
 ﻿// ==========================================================================
-//  ArchiveContent.cs
+//  ContentArchived.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Write.Contents.Commands
+using System;
+using Squidex.Infrastructure.CQRS.Events;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class ArchiveContent : ContentCommand
+    [EventType(nameof(ContentArchived))]
+    [Obsolete]
+    public sealed class ContentArchived : ContentEvent
     {
     }
 }

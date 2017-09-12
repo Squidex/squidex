@@ -52,14 +52,9 @@ namespace Squidex.Controllers.ContentApi.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// Indicates if the content item is published.
+        /// Gets the status of the content.
         /// </summary>
-        public bool? IsPublished { get; set; }
-
-        /// <summary>
-        /// Indicates if the content item is archived.
-        /// </summary>
-        public bool IsArchived { get; set; }
+        public Status Status { get; set; }
 
         /// <summary>
         /// The version of the content.
@@ -79,7 +74,7 @@ namespace Squidex.Controllers.ContentApi.Models
                 CreatedBy = command.Actor,
                 LastModified = now,
                 LastModifiedBy = command.Actor,
-                IsPublished = command.Publish
+                Status = command.Publish ? Status.Published : Status.Draft
             };
 
             return response;

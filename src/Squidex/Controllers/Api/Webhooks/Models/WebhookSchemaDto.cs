@@ -36,10 +36,5 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// True, when to send a message for published events.
         /// </summary>
         public bool SendPublish { get; set; }
-
-        /// <summary>
-        /// True, when to send a message for unpublished events.
-        /// </summary>
-        public bool SendUnpublish { get; set; }
     }
 }

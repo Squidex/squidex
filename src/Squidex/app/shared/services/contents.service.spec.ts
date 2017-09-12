@@ -26,7 +26,7 @@ describe('ContentDto', () => {
     const version = new Version('1');
 
     it('should update data property and user info when updating', () => {
-        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.update({ data: 2 }, modifier, modified);
 
         expect(content_2.data).toEqual({ data: 2 });
@@ -34,38 +34,38 @@ describe('ContentDto', () => {
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
-    it('should update isPublished property and user info when publishing', () => {
-        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+    it('should update status property and user info when publishing', () => {
+        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.publish(modifier, modified);
 
-        expect(content_2.isPublished).toBeTruthy();
+        expect(content_2.status).toEqual('Published');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
-    it('should update isPublished property and user info when unpublishing', () => {
-        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
+    it('should update status property and user info when unpublishing', () => {
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.unpublish(modifier, modified);
 
-        expect(content_2.isPublished).toBeFalsy();
+        expect(content_2.status).toEqual('Draft');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
-    it('should update isArchived property and user info when archiving', () => {
-        const content_1 = new ContentDto('1', false, false, creator, creator, creation, creation, { data: 1 }, version);
+    it('should update status property and user info when archiving', () => {
+        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.archive(modifier, modified);
 
-        expect(content_2.isArchived).toBeTruthy();
+        expect(content_2.status).toEqual('Archived');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
 
-    it('should update isArchived property and user info when restoring', () => {
-        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
+    it('should update status property and user info when restoring', () => {
+        const content_1 = new ContentDto('1', 'Archived', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.restore(modifier, modified);
 
-        expect(content_2.isArchived).toBeFalsy();
+        expect(content_2.status).toEqual('Draft');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
     });
@@ -73,7 +73,7 @@ describe('ContentDto', () => {
     it('should update data property when setting data', () => {
         const newData = {};
 
-        const content_1 = new ContentDto('1', true, false, creator, creator, creation, creation, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
         const content_2 = content_1.setData(newData);
 
         expect(content_2.data).toBe(newData);
@@ -119,7 +119,7 @@ describe('ContentsService', () => {
             items: [
                 {
                     id: 'id1',
-                    isPublished: true,
+                    status: 'Published',
                     created: '2016-12-12T10:10',
                     createdBy: 'Created1',
                     lastModified: '2017-12-12T10:10',
@@ -129,7 +129,7 @@ describe('ContentsService', () => {
                 },
                 {
                     id: 'id2',
-                    isPublished: true,
+                    status: 'Published',
                     created: '2016-10-12T10:10',
                     createdBy: 'Created2',
                     lastModified: '2017-10-12T10:10',
@@ -142,12 +142,12 @@ describe('ContentsService', () => {
 
         expect(contents).toEqual(
             new ContentsDto(10, [
-                new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
+                new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
                     {},
                     new Version('11')),
-                new ContentDto('id2', true, false, 'Created2', 'LastModifiedBy2',
+                new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
                     {},
@@ -222,7 +222,7 @@ describe('ContentsService', () => {
 
         req.flush({
             id: 'id1',
-            isPublished: true,
+            status: 'Published',
             created: '2016-12-12T10:10',
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
@@ -232,7 +232,7 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
+            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
@@ -280,7 +280,7 @@ describe('ContentsService', () => {
 
         req.flush({
             id: 'id1',
-            isPublished: true,
+            status: 'Published',
             created: '2016-12-12T10:10',
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
@@ -290,7 +290,7 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', true, false, 'Created1', 'LastModifiedBy1',
+            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},

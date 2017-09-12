@@ -21,7 +21,5 @@ namespace Squidex.Domain.Apps.Core.Webhooks
         public bool SendDelete { get; set; }
 
         public bool SendPublish { get; set; }
-
-        public bool SendUnpublish { get; set; }
     }
 }

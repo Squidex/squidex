@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             this.database = database;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, bool nonPublished, bool archived, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
             var collection = GetCollection(app.Id);
 
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 cursor =
                     collection
-                        .Find(odataQuery, ids, schema.Id, schema.SchemaDef, nonPublished, archived)
+                        .Find(odataQuery, ids, schema.Id, schema.SchemaDef, status)
                         .Take(odataQuery)
                         .Skip(odataQuery)
                         .Sort(odataQuery, schema.SchemaDef);
@@ -104,14 +105,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return entities;
         }
 
-        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, bool nonPublished, bool archived, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, ODataUriParser odataQuery)
         {
             var collection = GetCollection(app.Id);
 
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
-                cursor = collection.Find(odataQuery, ids, schema.Id, schema.SchemaDef, nonPublished, archived);
+                cursor = collection.Find(odataQuery, ids, schema.Id, schema.SchemaDef, status);
             }
             catch (NotSupportedException)
             {

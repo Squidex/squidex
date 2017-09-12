@@ -58,8 +58,7 @@ export class WebhookSchemaDto {
         public readonly sendCreate: boolean,
         public readonly sendUpdate: boolean,
         public readonly sendDelete: boolean,
-        public readonly sendPublish: boolean,
-        public readonly sendUnpublish: boolean
+        public readonly sendPublish: boolean
     ) {
     }
 }
@@ -125,8 +124,7 @@ export class WebhooksService {
                                 schema.sendCreate,
                                 schema.sendUpdate,
                                 schema.sendDelete,
-                                schema.sendPublish,
-                                schema.sendUnpublish));
+                                schema.sendPublish));
 
                         return new WebhookDto(
                             item.id,

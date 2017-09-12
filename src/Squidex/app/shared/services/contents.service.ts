@@ -30,8 +30,7 @@ export class ContentsDto {
 export class ContentDto {
     constructor(
         public readonly id: string,
-        public readonly isPublished: boolean,
-        public readonly isArchived: boolean,
+        public readonly status: string,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
@@ -44,8 +43,7 @@ export class ContentDto {
     public setData(data: any): ContentDto {
         return new ContentDto(
             this.id,
-            this.isPublished,
-            this.isArchived,
+            this.status,
             this.createdBy,
             this.lastModifiedBy,
             this.created,
@@ -55,43 +53,25 @@ export class ContentDto {
     }
 
     public publish(user: string, now?: DateTime): ContentDto {
-        return new ContentDto(
-            this.id,
-            true,
-            this.isArchived,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.data,
-            this.version);
+        return this.changeStatus('Published', user, now);
     }
 
     public unpublish(user: string, now?: DateTime): ContentDto {
-        return new ContentDto(
-            this.id,
-            false,
-            this.isArchived,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.data,
-            this.version);
+        return this.changeStatus('Draft', user, now);
     }
 
     public archive(user: string, now?: DateTime): ContentDto {
-        return new ContentDto(
-            this.id,
-            this.isPublished,
-            true,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.data,
-            this.version);
+        return this.changeStatus('Archived', user, now);
     }
 
     public restore(user: string, now?: DateTime): ContentDto {
+        return this.changeStatus('Draft', user, now);
+    }
+
+    private changeStatus(status: string, user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
-            this.isPublished,
-            false,
+            status,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
@@ -101,8 +81,7 @@ export class ContentDto {
     public update(data: any, user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
-            this.isPublished,
-            this.isArchived,
+            this.status,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             data,
@@ -159,8 +138,7 @@ export class ContentsService {
                     return new ContentsDto(response.total, items.map(item => {
                         return new ContentDto(
                             item.id,
-                            item.isPublished,
-                            item.isArchived === true,
+                            item.status,
                             item.createdBy,
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
@@ -179,8 +157,7 @@ export class ContentsService {
                 .map(response => {
                     return new ContentDto(
                         response.id,
-                        response.isPublished,
-                        response.isArchived === true,
+                        response.status,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),
@@ -209,7 +186,7 @@ export class ContentsService {
                 .map(response => {
                     return new ContentDto(
                         response.id,
-                        response.isPublished, false,
+                        response.status,
                         response.createdBy,
                         response.lastModifiedBy,
                         DateTime.parseISO_UTC(response.created),

@@ -111,55 +111,16 @@ namespace Squidex.Domain.Apps.Write.Contents
             });
         }
 
-        protected Task On(PublishContent command, CommandContext context)
+        protected Task On(ChangeContentStatus command, CommandContext context)
         {
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, "Publish");
+                var scriptContext = CreateScriptContext(content, command, command.Status.ToString());
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "publish content");
+                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "change content status");
 
-                content.Publish(command);
-            });
-        }
-
-        protected Task On(UnpublishContent command, CommandContext context)
-        {
-            return handler.UpdateAsync<ContentDomainObject>(context, async content =>
-            {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, "Unpublish");
-
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "unpublish content");
-
-                content.Unpublish(command);
-            });
-        }
-
-        protected Task On(ArchiveContent command, CommandContext context)
-        {
-            return handler.UpdateAsync<ContentDomainObject>(context, async content =>
-            {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, "Archive");
-
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "archive content");
-
-                content.Archive(command);
-            });
-        }
-
-        protected Task On(RestoreContent command, CommandContext context)
-        {
-            return handler.UpdateAsync<ContentDomainObject>(context, async content =>
-            {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, "Restore");
-
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "restore content");
-
-                content.Restore(command);
+                content.ChangeStatus(command);
             });
         }
 

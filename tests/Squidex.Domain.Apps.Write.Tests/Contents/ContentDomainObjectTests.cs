@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateContentEvent(new ContentCreated { Data = data }),
-                    CreateContentEvent(new ContentPublished())
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
                 );
         }
 
@@ -195,148 +195,38 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
-        public void Publish_should_throw_exception_if_not_created()
+        public void ChangeStatus_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.Publish(CreateContentCommand(new PublishContent()));
+                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
             });
         }
 
         [Fact]
-        public void Publish_should_throw_exception_if_content_is_deleted()
+        public void ChangeStatus_should_throw_exception_if_content_is_deleted()
         {
             CreateContent();
             DeleteContent();
 
             Assert.Throws<DomainException>(() =>
             {
-                sut.Publish(CreateContentCommand(new PublishContent()));
+                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
             });
         }
 
         [Fact]
-        public void Publish_should_refresh_properties_and_create_events()
+        public void ChangeStatus_should_refresh_properties_and_create_events()
         {
             CreateContent();
 
-            sut.Publish(CreateContentCommand(new PublishContent()));
+            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
 
-            Assert.True(sut.IsPublished);
+            Assert.Equal(Status.Published, sut.Status);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentPublished())
-                );
-        }
-
-        [Fact]
-        public void Unpublish_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Unpublish(CreateContentCommand(new UnpublishContent()));
-            });
-        }
-
-        [Fact]
-        public void Unpublish_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Unpublish(CreateContentCommand(new UnpublishContent()));
-            });
-        }
-
-        [Fact]
-        public void Unpublish_should_refresh_properties_and_create_events()
-        {
-            CreateContent();
-            PublishContent();
-
-            sut.Unpublish(CreateContentCommand(new UnpublishContent()));
-
-            Assert.False(sut.IsPublished);
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentUnpublished())
-                );
-        }
-
-        [Fact]
-        public void Archive_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Archive(CreateContentCommand(new ArchiveContent()));
-            });
-        }
-
-        [Fact]
-        public void Archive_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Archive(CreateContentCommand(new ArchiveContent()));
-            });
-        }
-
-        [Fact]
-        public void Archive_should_refresh_properties_and_create_events()
-        {
-            CreateContent();
-
-            sut.Archive(CreateContentCommand(new ArchiveContent()));
-
-            Assert.True(sut.IsArchived);
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentArchived())
-                );
-        }
-
-        [Fact]
-        public void Restore_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Restore(CreateContentCommand(new RestoreContent()));
-            });
-        }
-
-        [Fact]
-        public void Restore_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Restore(CreateContentCommand(new RestoreContent()));
-            });
-        }
-
-        [Fact]
-        public void Restore_should_refresh_properties_and_create_events()
-        {
-            CreateContent();
-            ArchiveContent();
-
-            sut.Restore(CreateContentCommand(new RestoreContent()));
-
-            Assert.False(sut.IsArchived);
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentRestored())
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
                 );
         }
 
@@ -390,16 +280,9 @@ namespace Squidex.Domain.Apps.Write.Contents
             ((IAggregate)sut).ClearUncommittedEvents();
         }
 
-        private void PublishContent()
+        private void ChangeStatus(Status status)
         {
-            sut.Publish(CreateContentCommand(new PublishContent()));
-
-            ((IAggregate)sut).ClearUncommittedEvents();
-        }
-
-        private void ArchiveContent()
-        {
-            sut.Archive(CreateContentCommand(new ArchiveContent()));
+            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = status }));
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

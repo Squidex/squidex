@@ -233,7 +233,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 }
             }
 
-            if (this.content.isArchived) {
+            if (this.content.status === 'Archived') {
                 this.contentForm.disable();
             }
         }

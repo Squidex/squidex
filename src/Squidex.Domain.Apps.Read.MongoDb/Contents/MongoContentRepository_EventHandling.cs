@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -16,6 +17,8 @@ using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
+
+#pragma warning disable CS0612 // Type or member is obsolete
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
@@ -61,8 +64,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.SchemaId).Descending(x => x.LastModified));
                 await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
-                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsPublished));
-                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsArchived));
+                await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Status));
                 await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
             });
         }
@@ -99,7 +101,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.IsPublished = true;
+                    x.Status = Status.Published;
                 });
             });
         }
@@ -110,7 +112,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.IsPublished = false;
+                    x.Status = Status.Draft;
                 });
             });
         }
@@ -121,7 +123,18 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.IsArchived = true;
+                    x.Status = Status.Archived;
+                });
+            });
+        }
+
+        protected Task On(ContentStatusChanged @event, EnvelopeHeaders headers)
+        {
+            return ForAppIdAsync(@event.AppId.Id, collection =>
+            {
+                return collection.UpdateAsync(@event, headers, x =>
+                {
+                    x.Status = @event.Status;
                 });
             });
         }
@@ -132,7 +145,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 return collection.UpdateAsync(@event, headers, x =>
                 {
-                    x.IsArchived = false;
+                    x.Status = Status.Draft;
                 });
             });
         }

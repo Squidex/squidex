@@ -1,14 +1,19 @@
 ﻿// ==========================================================================
-//  UnpublishContent.cs
+//  ContentPublished.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Write.Contents.Commands
+using System;
+using Squidex.Infrastructure.CQRS.Events;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class UnpublishContent : ContentCommand
+    [EventType(nameof(ContentPublished))]
+    [Obsolete]
+    public sealed class ContentPublished : ContentEvent
     {
     }
 }

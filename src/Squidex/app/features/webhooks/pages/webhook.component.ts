@@ -22,8 +22,7 @@ export interface WebhookSchemaForm {
     sendCreate: boolean;
     sendUpdate: boolean;
     sendDelete: boolean;
-    sendPublish: boolean;
-    sendUnpublish: boolean;
+    sendPublish: boolean
 }
 
 @Component({
@@ -85,8 +84,7 @@ export class WebhookComponent implements OnInit {
                             sendCreate: webhookSchema.sendCreate,
                             sendUpdate: webhookSchema.sendUpdate,
                             sendDelete: webhookSchema.sendDelete,
-                            sendPublish: webhookSchema.sendPublish,
-                            sendUnpublish: webhookSchema.sendUnpublish
+                            sendPublish: webhookSchema.sendPublish
                         });
                     } else {
                         return null;
@@ -117,8 +115,7 @@ export class WebhookComponent implements OnInit {
                     sendCreate: false,
                     sendUpdate: false,
                     sendDelete: false,
-                    sendPublish: false,
-                    sendUnpublish: false
+                    sendPublish: false
                 })).sortByStringAsc(x => x.schema.name);
 
         this.schemasToAdd = this.schemasToAdd.remove(this.schemaToAdd).sortByStringAsc(x => x.name);
@@ -135,8 +132,7 @@ export class WebhookComponent implements OnInit {
                         schema.sendCreate,
                         schema.sendUpdate,
                         schema.sendDelete,
-                        schema.sendPublish,
-                        schema.sendUnpublish)));
+                        schema.sendPublish)));
 
         this.emitUpdating(requestDto);
     }
@@ -163,8 +159,6 @@ export class WebhookComponent implements OnInit {
         schemaForm.sendUpdate = value;
         schemaForm.sendDelete = value;
         schemaForm.sendPublish = value;
-        schemaForm.sendUnpublish = value;
-
         return schemaForm;
     }
 
@@ -173,8 +167,7 @@ export class WebhookComponent implements OnInit {
             schemaForm.sendCreate &&
             schemaForm.sendUpdate &&
             schemaForm.sendDelete &&
-            schemaForm.sendPublish &&
-            schemaForm.sendUnpublish;
+            schemaForm.sendPublish;
 
         return schemaForm;
     }

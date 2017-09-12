@@ -12,6 +12,8 @@ using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
+#pragma warning disable CS0612 // Type or member is obsolete
+
 namespace Squidex.Domain.Apps.Read.Contents
 {
     public sealed class ContentHistoryEventsCreator : HistoryEventsCreatorBase
@@ -36,6 +38,9 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             AddEventMessage<ContentUnpublished>(
                 "unpublished content item.");
+
+            AddEventMessage<ContentStatusChanged>(
+                "change status of content item to {[Status]}.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

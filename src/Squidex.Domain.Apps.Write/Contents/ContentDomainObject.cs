@@ -22,8 +22,7 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private bool isDeleted;
         private bool isCreated;
-        private bool isPublished;
-        private bool isArchived;
+        private Status status;
         private NamedContentData data;
 
         public bool IsDeleted
@@ -31,14 +30,9 @@ namespace Squidex.Domain.Apps.Write.Contents
             get { return isDeleted; }
         }
 
-        public bool IsArchived
+        public Status Status
         {
-            get { return isArchived; }
-        }
-
-        public bool IsPublished
-        {
-            get { return isPublished; }
+            get { return status; }
         }
 
         public NamedContentData Data
@@ -63,24 +57,9 @@ namespace Squidex.Domain.Apps.Write.Contents
             data = @event.Data;
         }
 
-        protected void On(ContentPublished @event)
+        protected void On(ContentStatusChanged @event)
         {
-            isPublished = true;
-        }
-
-        protected void On(ContentUnpublished @event)
-        {
-            isPublished = false;
-        }
-
-        protected void On(ContentArchived @event)
-        {
-            isArchived = true;
-        }
-
-        protected void On(ContentRestored @event)
-        {
-            isArchived = false;
+            status = @event.Status;
         }
 
         protected void On(ContentDeleted @event)
@@ -98,7 +77,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published }));
             }
 
             return this;
@@ -115,46 +94,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             return this;
         }
 
-        public ContentDomainObject Restore(RestoreContent command)
+        public ContentDomainObject ChangeStatus(ChangeContentStatus command)
         {
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
+            VerifyCanChangeStatus(command.Status);
 
-            RaiseEvent(SimpleMapper.Map(command, new ContentRestored()));
-
-            return this;
-        }
-
-        public ContentDomainObject Archive(ArchiveContent command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentArchived()));
-
-            return this;
-        }
-
-        public ContentDomainObject Publish(PublishContent command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
-
-            return this;
-        }
-
-        public ContentDomainObject Unpublish(UnpublishContent command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentUnpublished()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
 
             return this;
         }
@@ -187,6 +134,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             }
 
             return this;
+        }
+
+        private void VerifyCanChangeStatus(Status newStatus)
+        {
+            if (!StatusFlow.Exists(newStatus) && !StatusFlow.CanChange(status, newStatus))
+            {
+                throw new DomainException($"Content cannot be changed from status {status} to {newStatus}.");
+            }
         }
 
         private void VerifyNotCreated()

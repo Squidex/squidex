@@ -176,75 +176,21 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
-        public async Task Publish_should_publish_domain_object()
+        public async Task ChangeStatus_should_publish_domain_object()
         {
             A.CallTo(() => schema.ScriptChange)
                 .Returns("<change-script>");
 
             CreateContent();
 
-            var context = CreateContextForCommand(new PublishContent { ContentId = contentId, User = user });
+            var context = CreateContextForCommand(new ChangeContentStatus { ContentId = contentId, User = user, Status = Status.Published });
 
             await TestUpdate(content, async _ =>
             {
                 await sut.HandleAsync(context);
             });
 
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "publish content")).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Unpublish_should_unpublish_domain_object()
-        {
-            A.CallTo(() => schema.ScriptChange)
-                .Returns("<change-script>");
-
-            CreateContent();
-
-            var context = CreateContextForCommand(new UnpublishContent { ContentId = contentId, User = user });
-
-            await TestUpdate(content, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "unpublish content")).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Archive_should_archive_domain_object()
-        {
-            A.CallTo(() => schema.ScriptChange)
-                .Returns("<change-script>");
-
-            CreateContent();
-
-            var context = CreateContextForCommand(new ArchiveContent { ContentId = contentId, User = user });
-
-            await TestUpdate(content, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "archive content")).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Restore_should_restore_domain_object()
-        {
-            A.CallTo(() => schema.ScriptChange)
-                .Returns("<change-script>");
-
-            CreateContent();
-
-            var context = CreateContextForCommand(new RestoreContent { ContentId = contentId, User = user });
-
-            await TestUpdate(content, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "restore content")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "change content status")).MustHaveHappened();
         }
 
         [Fact]

@@ -55,7 +55,6 @@
                 <col style="width: 40px" />
                 <col style="width: 40px" />
                 <col style="width: 40px" />
-                <col style="width: 40px" />
             </colgroup>
 
             <tr>
@@ -66,19 +65,16 @@
                     All
                 </th>
                 <th class="text-center" title="Created">
-                    Cr
+                    C
                 </th>
                 <th class="text-center" title="Updated">
-                    Up
+                    U
                 </th>
                 <th class="text-center" title="Deleted">
-                    Dl
+                    D
                 </th>
                 <th class="text-center" title="Published">
-                    Pu
-                </th>
-                <th class="text-center" title="Unpublished">
-                    Up
+                    P
                 </th>
                 <th></th>
             </tr>
@@ -101,9 +97,6 @@
                 </td>
                 <td class="text-center" title="Published">
                     <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
-                </td>
-                <td class="text-center" title="Unpublished">
-                    <input type="checkbox" [ngModel]="schema.sendUnpublish" (ngModelChange)="toggle(schema, 'sendUnpublish')" />
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-link btn-secondary"

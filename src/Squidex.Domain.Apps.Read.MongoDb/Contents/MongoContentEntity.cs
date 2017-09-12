@@ -36,20 +36,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         public Guid Id { get; set; }
 
         [BsonRequired]
+        [BsonElement("st")]
+        [BsonRepresentation(BsonType.String)]
+        public Status Status { get; set; }
+
+        [BsonRequired]
         [BsonElement("ct")]
         public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement("mt")]
         public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("pu")]
-        public bool IsPublished { get; set; }
-
-        [BsonRequired]
-        [BsonElement("dl")]
-        public bool IsArchived { get; set; }
 
         [BsonRequired]
         [BsonElement("dt")]

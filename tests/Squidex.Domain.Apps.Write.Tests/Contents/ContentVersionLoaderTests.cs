@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             var eventData2 = new EventData();
 
             var event1 = new ContentCreated { Data = new NamedContentData(), AppId = new NamedId<Guid>(appId, "my-app") };
-            var event2 = new ContentPublished();
+            var event2 = new ContentStatusChanged();
 
             var events = new List<StoredEvent>
             {
