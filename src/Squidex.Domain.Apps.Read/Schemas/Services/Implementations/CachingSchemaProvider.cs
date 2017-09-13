@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
 
             if (!Cache.TryGetValue(cacheKey, out ISchemaEntity result))
             {
-                result = await repository.FindSchemaAsync(id, provideDeleted);
+                result = await repository.FindSchemaAsync(id);
 
                 Cache.Set(cacheKey, result, CacheDuration);
 

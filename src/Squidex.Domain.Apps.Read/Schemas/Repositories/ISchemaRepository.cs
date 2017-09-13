@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Read.Schemas.Repositories
 
         Task<ISchemaEntity> FindSchemaAsync(Guid appId, string name);
 
-        Task<ISchemaEntity> FindSchemaAsync(Guid schemaId, bool provideDeleted = false);
+        Task<ISchemaEntity> FindSchemaAsync(Guid schemaId);
     }
 }

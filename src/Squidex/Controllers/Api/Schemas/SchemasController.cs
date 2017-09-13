@@ -89,7 +89,7 @@ namespace Squidex.Controllers.Api.Schemas
                 entity = await schemaRepository.FindSchemaAsync(AppId, name);
             }
 
-            if (entity == null)
+            if (entity == null || entity.IsDeleted)
             {
                 return NotFound();
             }

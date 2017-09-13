@@ -64,13 +64,13 @@ namespace Squidex.Domain.Apps.Read.Schemas
         [Fact]
         public async Task Should_also_retrieve_schema_by_name_if_retrieved_by_id_before()
         {
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false))
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
                 .Returns(schemaV1);
 
             await ProvideSchemaById(schemaV1);
             await ProvideSchemaByName(schemaV1);
 
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false)).MustHaveHappened();
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).MustHaveHappened();
             A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name)).MustNotHaveHappened();
         }
 
@@ -83,16 +83,16 @@ namespace Squidex.Domain.Apps.Read.Schemas
             await ProvideSchemaByName(schemaV1);
             await ProvideSchemaById(schemaV1);
 
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false)).MustNotHaveHappened();
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).MustNotHaveHappened();
             A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_clear_cache_for_id_after_update_event()
         {
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false))
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
                 .Returns(schemaV2);
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false))
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
                 .Returns(schemaV1).Once();
 
             await ProvideSchemaById(schemaV1);
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
             await ProvideSchemaById(schemaV2);
 
-            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id, false)).MustHaveHappened(Repeated.Exactly.Times(2));
+            A.CallTo(() => repository.FindSchemaAsync(schemaId.Id)).MustHaveHappened(Repeated.Exactly.Times(2));
         }
 
         [Fact]
