@@ -4,7 +4,7 @@
     <sqx-panel panelWidth="53rem">
         <div class="panel-header">
             <div class="panel-title-row">
-                <div class="float-right" *ngIf="!content || !content.isArchived">
+                <div class="float-right" *ngIf="!content || content.status !== 'Archived'">
                     <span *ngIf="isNewMode">
                         <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
                             Save as Draft
@@ -26,10 +26,10 @@
                 <h3 class="panel-title" *ngIf="isNewMode">
                     New Content
                 </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && !content.isArchived">
+                <h3 class="panel-title" *ngIf="!isNewMode && content.status !== 'Archived'">
                     Edit Content
                 </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && content.isArchived">
+                <h3 class="panel-title" *ngIf="!isNewMode && content.status === 'Archived'">
                     Show Content
                 </h3>
             </div>
