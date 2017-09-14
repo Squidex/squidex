@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
 
-        public void Execute(ScriptContext context, string script, string operationName)
+        public void Execute(ScriptContext context, string script)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -30,13 +30,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 var engine = CreateScriptEngine(context);
 
                 EnableDisallow(engine);
-                EnableReject(engine, operationName);
+                EnableReject(engine);
 
-                Execute(engine, script, operationName);
+                Execute(engine, script);
             }
         }
 
-        public NamedContentData ExecuteAndTransform(ScriptContext context, string script, string operationName)
+        public NamedContentData ExecuteAndTransform(ScriptContext context, string script)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 var engine = CreateScriptEngine(context);
 
                 EnableDisallow(engine);
-                EnableReject(engine, operationName);
+                EnableReject(engine);
 
                 engine.SetValue("operation", new Action(() =>
                 {
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     }
                 }));
 
-                Execute(engine, script, operationName);
+                Execute(engine, script);
             }
 
             return result;
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return result;
         }
 
-        private static void Execute(Engine engine, string script, string operationName)
+        private static void Execute(Engine engine, string script)
         {
             try
             {
@@ -116,11 +116,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (ParserException ex)
             {
-                throw new ValidationException($"Failed to {operationName} with javascript syntaxs error.", new ValidationError(ex.Message));
+                throw new ValidationException($"Failed to execute script with javascript syntaxs error.", new ValidationError(ex.Message));
             }
             catch (JavaScriptException ex)
             {
-                throw new ValidationException($"Failed to {operationName} with javascript error.", new ValidationError(ex.Message));
+                throw new ValidationException($"Failed to execute script with javascript error.", new ValidationError(ex.Message));
             }
         }
 
@@ -165,15 +165,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }));
         }
 
-        private static void EnableReject(Engine engine, string operationName)
+        private static void EnableReject(Engine engine)
         {
-            Guard.NotNullOrEmpty(operationName, nameof(operationName));
-
             engine.SetValue("reject", new Action<string>(message =>
             {
                 var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
 
-                throw new ValidationException($"Script rejected to {operationName}.", errors);
+                throw new ValidationException($"Script rejected the operation.", errors);
             }));
         }
     }

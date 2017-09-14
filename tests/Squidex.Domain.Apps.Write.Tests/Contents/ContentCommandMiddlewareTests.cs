@@ -56,16 +56,22 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
             A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
+
             A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(app);
 
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            A.CallTo(() => schema.ScriptCreate).Returns("<create-script>");
+            A.CallTo(() => schema.ScriptChange).Returns("<change-script>");
+            A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
+            A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
+
             A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(schema);
         }
 
         [Fact]
         public async Task Create_should_throw_exception_if_data_is_not_valid()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(invalidData);
 
             var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = invalidData, User = user });
@@ -79,10 +85,8 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Create_should_create_content()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(data);
-            A.CallTo(() => schema.ScriptCreate)
-                .Returns("<create-script>");
 
             var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data, User = user });
 
@@ -93,13 +97,33 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             Assert.Equal(data, context.Result<EntityCreatedResult<NamedContentData>>().IdOrValue);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>", "create content")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>")).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Create_should_also_invoke_publish_script_when_publishing()
+        {
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .Returns(data);
+
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = data, User = user, Publish = true });
+
+            await TestCreate(content, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            Assert.Equal(data, context.Result<EntityCreatedResult<NamedContentData>>().IdOrValue);
+
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>")).MustHaveHappened();
         }
 
         [Fact]
         public async Task Update_should_throw_exception_if_data_is_not_valid()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(invalidData);
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored)).Returns(invalidData);
 
             CreateContent();
 
@@ -114,10 +138,8 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(data);
-            A.CallTo(() => schema.ScriptUpdate)
-                .Returns("<update-script>");
 
             CreateContent();
 
@@ -130,13 +152,13 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             Assert.Equal(data, context.Result<ContentDataChangedResult>().Data);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>", "update content")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>")).MustHaveHappened();
         }
 
         [Fact]
         public async Task Patch_should_throw_exception_if_data_is_not_valid()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(invalidData);
 
             CreateContent();
@@ -152,14 +174,12 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Patch_should_update_domain_object()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(data);
-            A.CallTo(() => schema.ScriptUpdate)
-                .Returns("<update-script>");
 
             var patch = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(patch);
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored)).Returns(patch);
 
             CreateContent();
 
@@ -172,15 +192,12 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             Assert.NotNull(context.Result<ContentDataChangedResult>().Data);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>", "patch content")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>")).MustHaveHappened();
         }
 
         [Fact]
         public async Task ChangeStatus_should_publish_domain_object()
         {
-            A.CallTo(() => schema.ScriptChange)
-                .Returns("<change-script>");
-
             CreateContent();
 
             var context = CreateContextForCommand(new ChangeContentStatus { ContentId = contentId, User = user, Status = Status.Published });
@@ -190,15 +207,12 @@ namespace Squidex.Domain.Apps.Write.Contents
                 await sut.HandleAsync(context);
             });
 
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>", "change content status")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>")).MustHaveHappened();
         }
 
         [Fact]
         public async Task Delete_should_update_domain_object()
         {
-            A.CallTo(() => schema.ScriptDelete)
-                .Returns("<delete-script>");
-
             CreateContent();
 
             var command = CreateContextForCommand(new DeleteContent { ContentId = contentId, User = user });
@@ -208,7 +222,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 await sut.HandleAsync(command);
             });
 
-            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<delete-script>", "delete content")).MustHaveHappened();
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<delete-script>")).MustHaveHappened();
         }
 
         private void CreateContent()

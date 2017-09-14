@@ -20,33 +20,33 @@ namespace Squidex.Domain.Apps.Core.Scripting
         [Fact]
         public void Should_throw_validation_exception_when_calling_reject()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject()", "update"));
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject('Not valid')", "update"));
+            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject()"));
+            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject('Not valid')"));
         }
 
         [Fact]
         public void Should_throw_security_exception_when_calling_reject()
         {
-            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow()", "Update"));
-            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow('Not allowed')", "update"));
+            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow()"));
+            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow('Not allowed')"));
         }
 
         [Fact]
         public void Should_catch_script_syntax_errors()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "x => x", "update"));
+            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "x => x"));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "throw 'Error';", "update"));
+            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "throw 'Error';"));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors_on_execute_and_transform()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(new ScriptContext(), "throw 'Error';", "update"));
+            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(new ScriptContext(), "throw 'Error';"));
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(context, "x => x", "update"));
+            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(context, "x => x"));
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.ExecuteAndTransform(context, "var x = 0;", "update");
+            var result = scriptEngine.ExecuteAndTransform(context, "var x = 0;");
 
             Assert.Same(content, result);
         }
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 data.operation = { iv: ctx.operation };
 
-                replace(data)", "update");
+                replace(data)");
 
             Assert.Equal(expected, result);
         }
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 data.number1.iv = data.number1.iv + 1;
                 data.number2 = { 'iv': 10 };
 
-                replace(data);", "update");
+                replace(data);");
 
             Assert.Equal(expected, result);
         }

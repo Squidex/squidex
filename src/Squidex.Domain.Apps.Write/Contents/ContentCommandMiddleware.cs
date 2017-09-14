@@ -64,9 +64,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             await handler.CreateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptCreate, "create content");
+                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptCreate, "Create");
+
+                if (command.Publish)
+                {
+                    ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptChange, "Published");
+                }
+
                 command.Data.Enrich(schemaAndApp.SchemaEntity.SchemaDef, schemaAndApp.AppEntity.PartitionResolver);
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to create content", false);
@@ -82,9 +87,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             await handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "update content");
+                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptUpdate, "Update");
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to update content", false);
 
@@ -99,9 +103,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             await handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, command.Data);
 
-                command.Data = scriptEngine.ExecuteAndTransform(scriptContext, schemaAndApp.SchemaEntity.ScriptUpdate, "patch content");
+                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptUpdate, "Patch");
 
                 await ValidateAsync(schemaAndApp, command, () => "Failed to patch content", true);
 
@@ -116,9 +119,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, command.Status.ToString());
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptChange, "change content status");
+                ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptChange, command.Status);
 
                 content.ChangeStatus(command);
             });
@@ -129,9 +131,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
                 var schemaAndApp = await ResolveSchemaAndAppAsync(command);
-                var scriptContext = CreateScriptContext(content, command, "Delete");
 
-                scriptEngine.Execute(scriptContext, schemaAndApp.SchemaEntity.ScriptDelete, "delete content");
+                ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptDelete, "Delete");
 
                 content.Delete(command);
             });
@@ -179,14 +180,18 @@ namespace Squidex.Domain.Apps.Write.Contents
             }
         }
 
-        private static ScriptContext CreateScriptContext(ContentDomainObject content, ContentCommand command, string operation)
+        private void ExecuteScriptAndTransform(ContentDataCommand command, ContentDomainObject content, string script, object operation)
         {
-            return new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation };
+            var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString(), Data = command.Data };
+
+            command.Data = scriptEngine.ExecuteAndTransform(ctx, script);
         }
 
-        private static ScriptContext CreateScriptContext(ContentDomainObject content, ContentCommand command, NamedContentData data)
+        private void ExecuteScript(ContentCommand command, ContentDomainObject content, string script, object operation)
         {
-            return new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Data = data };
+            var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString() };
+
+            scriptEngine.Execute(ctx, script);
         }
 
         private async Task<(ISchemaEntity SchemaEntity, IAppEntity AppEntity)> ResolveSchemaAndAppAsync(SchemaCommand command)
