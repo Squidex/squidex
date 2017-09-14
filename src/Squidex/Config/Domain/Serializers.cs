@@ -15,6 +15,7 @@ using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Config.Domain
 {
@@ -51,6 +52,7 @@ namespace Squidex.Config.Domain
         static Serializers()
         {
             TypeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
+            TypeNameRegistry.Map(typeof(NoopEvent).GetTypeInfo().Assembly);
         }
 
         private static JsonSerializerSettings CreateSettings()
