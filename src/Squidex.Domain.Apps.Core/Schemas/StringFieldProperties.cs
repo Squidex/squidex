@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -125,6 +126,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override JToken GetDefaultValue()
         {
             return DefaultValue;
+        }
+
+        public override bool ShouldApplyDefaultValue(JToken value)
+        {
+            return value.IsNull() || (value is JValue jValue && Equals(jValue.Value, string.Empty));
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

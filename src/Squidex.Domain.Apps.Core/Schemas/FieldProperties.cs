@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -61,6 +62,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         public abstract JToken GetDefaultValue();
+
+        public virtual bool ShouldApplyDefaultValue(JToken value)
+        {
+            return value.IsNull();
+        }
 
         public void Validate(IList<ValidationError> errors)
         {
