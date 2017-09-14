@@ -34,19 +34,16 @@ namespace Squidex.Controllers.UI.Profile
         private readonly IUserPictureStore userPictureStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IOptions<MyIdentityOptions> identityOptions;
-        private readonly IOptions<IdentityCookieOptions> identityCookieOptions;
 
         public ProfileController(
             SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserPictureStore userPictureStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
-            IOptions<MyIdentityOptions> identityOptions,
-            IOptions<IdentityCookieOptions> identityCookieOptions)
+            IOptions<MyIdentityOptions> identityOptions)
         {
             this.signInManager = signInManager;
             this.identityOptions = identityOptions;
-            this.identityCookieOptions = identityCookieOptions;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -65,7 +62,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/login-add/")]
         public async Task<IActionResult> AddLogin(string provider)
         {
-            await HttpContext.Authentication.SignOutAsync(identityCookieOptions.Value.ExternalCookieAuthenticationScheme);
+            await HttpContext.Authentication.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var properties =
                 signInManager.ConfigureExternalAuthenticationProperties(provider,
