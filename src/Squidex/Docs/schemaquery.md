@@ -8,4 +8,4 @@ We support the following query options.
 * **$filter**: The $filter query option allows clients to filter a collection of resources that are addressed by a request URL.
 * **$orderby**: The $orderby query option allows clients to request resources in a particular order.
 
-Read more about it at: https://docs.squidex.io/04-guides/01-api.html
+Read more about it at: https://docs.squidex.io/04-guides/02-api.html
