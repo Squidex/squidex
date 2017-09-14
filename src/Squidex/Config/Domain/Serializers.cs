@@ -14,8 +14,8 @@ using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Config.Domain
 {
