@@ -6,12 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Webhooks
 {
-    [EventType(nameof(WebhookUpdated), 2)]
+    [EventType(nameof(WebhookDeleted), 2)]
     public sealed class WebhookDeleted : WebhookEvent
     {
     }

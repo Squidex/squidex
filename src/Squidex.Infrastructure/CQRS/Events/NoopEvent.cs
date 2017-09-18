@@ -8,6 +8,7 @@
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
+    [TypeName(nameof(NoopEvent))]
     public sealed class NoopEvent : IEvent
     {
     }

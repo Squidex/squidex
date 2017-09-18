@@ -156,6 +156,16 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
+    public showField(field: FieldDto) {
+        this.appNameOnce()
+            .switchMap(app => this.schemasService.showField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+            .subscribe(() => {
+                this.updateSchema(this.schema.updateField(field.show(), this.authService.user!.token));
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
     public hideField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.hideField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
