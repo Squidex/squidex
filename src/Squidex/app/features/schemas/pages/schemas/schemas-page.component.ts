@@ -22,7 +22,11 @@ import {
     SchemasService
 } from 'shared';
 
-import { SchemaDeleted, SchemaUpdated } from './../messages';
+import {
+    SchemaCreated,
+    SchemaDeleted,
+    SchemaUpdated
+} from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -96,10 +100,15 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public onSchemaCreated(dto: SchemaDto) {
-        this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
+    public onSchemaCreated(schema: SchemaDto) {
+        this.updateSchemas(this.schemas.push(schema), this.schemaQuery);
+        this.emitSchemaCreated(schema);
 
         this.addSchemaDialog.hide();
+    }
+
+    private emitSchemaCreated(schema: SchemaDto) {
+        this.messageBus.emit(new SchemaCreated(schema));
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {
