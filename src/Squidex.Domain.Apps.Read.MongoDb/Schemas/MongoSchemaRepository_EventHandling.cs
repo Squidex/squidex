@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas.Old;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Domain.Apps.Events.Schemas.Old;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
