@@ -6,9 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
@@ -18,14 +20,30 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 
         public static FilterDefinition<MongoContentEntity> Build(ODataUriParser query, Schema schema)
         {
-            var search = query.ParseSearch();
+            SearchClause search;
+            try
+            {
+                search = query.ParseSearch();
+            }
+            catch (ODataException ex)
+            {
+                throw new ValidationException("Query $search clause not valid", new ValidationError(ex.Message));
+            }
 
             if (search != null)
             {
                 return Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString());
             }
 
-            var filter = query.ParseFilter();
+            FilterClause filter;
+            try
+            {
+                filter = query.ParseFilter();
+            }
+            catch (ODataException ex)
+            {
+                throw new ValidationException("Query $filter clause not valid", new ValidationError(ex.Message));
+            }
 
             if (filter != null)
             {
