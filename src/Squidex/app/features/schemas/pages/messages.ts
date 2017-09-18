@@ -14,6 +14,13 @@ export class SchemaUpdated {
     }
 }
 
+export class SchemaCreated {
+    constructor(
+        public readonly schema: SchemaDto
+    ) {
+    }
+}
+
 export class SchemaDeleted {
     constructor(
         public readonly schema: SchemaDto

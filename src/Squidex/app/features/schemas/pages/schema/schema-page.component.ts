@@ -5,9 +5,10 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     AddFieldDto,
@@ -20,6 +21,7 @@ import {
     FieldDto,
     fieldTypes,
     HistoryChannelUpdated,
+    ImmutableArray,
     MessageBus,
     ModalView,
     SchemaDetailsDto,
@@ -31,7 +33,11 @@ import {
     ValidatorsEx
 } from 'shared';
 
-import { SchemaDeleted, SchemaUpdated } from './../messages';
+import {
+    SchemaCreated,
+    SchemaDeleted,
+    SchemaUpdated
+} from './../messages';
 
 @Component({
     selector: 'sqx-schema-page',
@@ -41,12 +47,14 @@ import { SchemaDeleted, SchemaUpdated } from './../messages';
         fadeAnimation
     ]
 })
-export class SchemaPageComponent extends AppComponentBase implements OnInit {
+export class SchemaPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private schemaCreatedSubscription: Subscription;
+
     public fieldTypes = fieldTypes;
 
     public schemaExport: any;
     public schema: SchemaDetailsDto;
-    public schemas: SchemaDto[];
+    public schemas: ImmutableArray<SchemaDto>;
 
     public exportSchemaDialog = new ModalView();
 
@@ -85,7 +93,19 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         super(dialogs, apps);
     }
 
+    public ngOnDestroy() {
+        this.schemaCreatedSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
+        this.schemaCreatedSubscription =
+            this.messageBus.of(SchemaCreated)
+                .subscribe(message => {
+                    if (this.schemas) {
+                        this.schemas = this.schemas.push(message.schema);
+                    }
+                });
+
         this.route.data.map(p => p['schema'])
             .subscribe((schema: SchemaDetailsDto) => {
                 this.schema = schema;
@@ -100,7 +120,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.getSchemas(app))
             .subscribe(dtos => {
-                this.schemas = dtos;
+                this.schemas = ImmutableArray.of(dtos);
             }, error => {
                 this.notifyError(error);
             });
@@ -212,7 +232,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
             .subscribe(() => {
-                this.emitSchemaDeleted(this.schema);
+                this.onSchemaRemoved(this.schema);
                 this.back();
             }, error => {
                 this.notifyError(error);
@@ -258,6 +278,12 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
         this.configureScriptsDialog.hide();
     }
 
+    private onSchemaRemoved(schema: SchemaDto) {
+        this.schemas = this.schemas.removeAll(s => s.id === schema.id);
+
+        this.emitSchemaDeleted(schema);
+    }
+
     private resetFieldForm() {
         this.addFieldForm.enable();
         this.addFieldForm.reset({ type: 'String' });
@@ -266,6 +292,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnInit {
 
     private updateSchema(schema: SchemaDetailsDto) {
         this.schema = schema;
+        this.schemas = this.schemas.replaceBy('id', schema);
 
         this.emitSchemaUpdated(schema);
         this.notify();
