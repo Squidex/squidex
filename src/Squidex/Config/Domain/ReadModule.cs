@@ -56,7 +56,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<CachingGraphQLService>()
                 .As<IGraphQLService>()
-                .As<IEventConsumer>()
                 .AsSelf()
                 .InstancePerDependency();
 

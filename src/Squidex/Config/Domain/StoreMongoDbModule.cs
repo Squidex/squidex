@@ -160,7 +160,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoAssetStatsRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAssetStatsRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -168,7 +167,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<MongoAssetRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAssetRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -178,6 +176,14 @@ namespace Squidex.Config.Domain
                 .As<IWebhookRepository>()
                 .As<IEventConsumer>()
                 .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoAssetRepository>(),
+                    c.Resolve<MongoAssetStatsRepository>()))
+                .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
 
