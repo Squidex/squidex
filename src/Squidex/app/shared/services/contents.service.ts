@@ -69,6 +69,16 @@ export class ContentDto {
         return this.changeStatus('Draft', user, now);
     }
 
+    public replaceVersion(version: Version): ContentDto {
+        return new ContentDto(
+            this.id,
+            this.status,
+            this.createdBy, this.lastModifiedBy,
+            this.created, this.lastModified,
+            this.data,
+            version);
+    }
+
     private changeStatus(status: string, user: string, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,

@@ -34,3 +34,17 @@ export class ContentVersionSelected {
     ) {
     }
 }
+
+export class ContentPublished {
+    constructor(
+        public readonly content: ContentDto
+    ) {
+    }
+}
+
+export class ContentUnpublished {
+    constructor(
+        public readonly content: ContentDto
+    ) {
+    }
+}

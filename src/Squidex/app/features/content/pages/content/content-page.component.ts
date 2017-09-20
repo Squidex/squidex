@@ -12,7 +12,9 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
+    ContentPublished,
     ContentRemoved,
+    ContentUnpublished,
     ContentUpdated,
     ContentVersionSelected
 } from './../messages';
@@ -38,6 +40,8 @@ import {
     templateUrl: './content-page.component.html'
 })
 export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
+    private contentPublishedSubscription: Subscription;
+    private contentUnpublishedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
 
@@ -63,6 +67,8 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
+        this.contentUnpublishedSubscription.unsubscribe();
+        this.contentPublishedSubscription.unsubscribe();
         this.contentDeletedSubscription.unsubscribe();
     }
 
@@ -75,6 +81,22 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             this.messageBus.of(ContentVersionSelected)
                 .subscribe(message => {
                     this.loadVersion(message.version);
+                });
+
+        this.contentPublishedSubscription =
+            this.messageBus.of(ContentPublished)
+                .subscribe(message => {
+                    if (this.content && message.content.id === this.content.id) {
+                        this.content = this.content.replaceVersion(message.content.version);
+                    }
+                });
+
+        this.contentUnpublishedSubscription =
+            this.messageBus.of(ContentUnpublished)
+                .subscribe(message => {
+                    if (this.content && message.content.id === this.content.id) {
+                        this.content = this.content.replaceVersion(message.content.version);
+                    }
                 });
 
         this.contentDeletedSubscription =

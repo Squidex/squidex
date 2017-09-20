@@ -79,6 +79,13 @@ describe('ContentDto', () => {
 
         expect(content_2.data).toBe(newData);
     });
+
+    it('should replace version', () => {
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
+        const content_2 = content_1.replaceVersion(new Version('2'));
+
+        expect(content_2.version).toEqual(new Version('2'));
+    });
 });
 
 describe('ContentsService', () => {

@@ -12,7 +12,9 @@ import { Subscription } from 'rxjs';
 
 import {
     ContentCreated,
+    ContentPublished,
     ContentRemoved,
+    ContentUnpublished,
     ContentUpdated
 } from './../messages';
 
@@ -118,6 +120,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.replaceBy('id', content.publish(this.authService.user!.token));
+
+                this.emitContentPublished(content);
             }, error => {
                 this.notifyError(error);
             });
@@ -128,6 +132,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
                 this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.authService.user!.token));
+
+                this.emitContentUnpublished(content);
             }, error => {
                 this.notifyError(error);
             });
@@ -214,6 +220,14 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public selectLanguage(language: AppLanguageDto) {
         this.languageSelected = language;
+    }
+
+    private emitContentPublished(content: ContentDto) {
+        this.messageBus.emit(new ContentPublished(content));
+    }
+
+    private emitContentUnpublished(content: ContentDto) {
+        this.messageBus.emit(new ContentUnpublished(content));
     }
 
     private emitContentRemoved(content: ContentDto) {
