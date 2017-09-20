@@ -65,6 +65,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
+        public Task ClearAsync(IEnumerable<string> currentConsumerNames)
+        {
+            return Collection.DeleteManyAsync(Filter.Not(Filter.In(NameField, currentConsumerNames)));
+        }
+
         public Task StartAsync(string consumerName)
         {
             var filter = Filter.Eq(NameField, consumerName);

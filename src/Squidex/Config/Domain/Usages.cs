@@ -18,6 +18,8 @@ namespace Squidex.Config.Domain
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
+            app.ApplicationServices.GetService<EventConsumerCleaner>().CleanAsync().Wait();
+
             var catchConsumers = app.ApplicationServices.GetServices<IEventConsumer>();
 
             foreach (var catchConsumer in catchConsumers)
