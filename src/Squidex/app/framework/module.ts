@@ -6,12 +6,13 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
+    AnalyticsService,
     AutocompleteComponent,
     CanDeactivateGuard,
     ClipboardService,
@@ -185,6 +186,7 @@ export class SqxFrameworkModule {
         return {
             ngModule: SqxFrameworkModule,
             providers: [
+                AnalyticsService,
                 CanDeactivateGuard,
                 ClipboardService,
                 DialogService,

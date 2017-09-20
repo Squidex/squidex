@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Version
@@ -57,7 +58,8 @@ export class ChangePlanDto {
 export class PlansService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -91,6 +93,9 @@ export class PlansService {
         return HTTP.putVersioned(this.http, url, dto, version)
                 .map(response => {
                     return new PlanChangedDto(response.redirectUri);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('Plan', 'Changed', appName);
                 })
                 .pretifyError('Failed to change plan. Please reload.');
     }

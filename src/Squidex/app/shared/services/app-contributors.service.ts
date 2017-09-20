@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Version
@@ -41,7 +42,8 @@ export class AppContributorsDto {
 export class AppContributorsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -67,6 +69,9 @@ export class AppContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Contributor', 'Configured', appName);
+                })
                 .pretifyError('Failed to add contributors. Please reload.');
     }
 
@@ -74,6 +79,9 @@ export class AppContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Contributor', 'Deleted', appName);
+                })
                 .pretifyError('Failed to delete contributors. Please reload.');
     }
 }

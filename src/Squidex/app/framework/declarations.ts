@@ -51,6 +51,7 @@ export * from './angular/user-report.component';
 export * from './angular/validators';
 export * from './configurations';
 
+export * from './services/analytics.service';
 export * from './services/clipboard.service';
 export * from './services/dialog.service';
 export * from './services/local-store.service';
@@ -60,8 +61,6 @@ export * from './services/resource-loader.service';
 export * from './services/root-view.service';
 export * from './services/shortcut.service';
 export * from './services/title.service';
-
-export * from './plattform';
 
 export * from './utils/date-helper';
 export * from './utils/date-time';

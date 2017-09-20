@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
     HTTP
@@ -39,7 +40,8 @@ export class CreateAppDto {
 export class AppsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -70,6 +72,9 @@ export class AppsService {
                     now = now || DateTime.now();
 
                     return new AppDto(response.id, dto.name, 'Owner', now, now);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('App', 'Created', dto.name);
                 })
                 .pretifyError('Failed to create app. Please reload.');
     }

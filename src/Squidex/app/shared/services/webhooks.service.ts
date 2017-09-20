@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
     HTTP,
@@ -106,7 +107,8 @@ export class UpdateWebhookDto {
 export class WebhooksService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -162,6 +164,9 @@ export class WebhooksService {
                         dto.url,
                         0, 0, 0, 0);
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Webhook', 'Created', appName);
+                })
                 .pretifyError('Failed to create webhook. Please reload.');
     }
 
@@ -169,6 +174,9 @@ export class WebhooksService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Webhook', 'Updated', appName);
+                })
                 .pretifyError('Failed to update webhook. Please reload.');
     }
 
@@ -176,6 +184,9 @@ export class WebhooksService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Webhook', 'Deleted', appName);
+                })
                 .pretifyError('Failed to delete webhook. Please reload.');
     }
 
@@ -206,6 +217,9 @@ export class WebhooksService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/webhooks/events/${id}`);
 
         return HTTP.putVersioned(this.http, url, {})
+                .do(() => {
+                    this.analytics.trackEvent('Webhook', 'EventEnqueued', appName);
+                })
                 .pretifyError('Failed to enqueue webhook event. Please reload.');
     }
 }

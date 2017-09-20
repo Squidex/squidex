@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
     LocalCacheService,
@@ -689,6 +690,7 @@ export class SchemasService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService,
         private readonly localCache: LocalCacheService
     ) {
     }
@@ -795,6 +797,8 @@ export class SchemasService {
                         response.scriptChange);
                 })
                 .do(schema => {
+                    this.analytics.trackEvent('Schema', 'Created', appName);
+
                     this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
                     this.localCache.set(`schema.${appName}.${schema.name}`, schema, 5000);
                 })
@@ -815,6 +819,9 @@ export class SchemasService {
                         dto.partitioning,
                         dto.properties);
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldCreated', appName);
+                })
                 .pretifyError('Failed to add field. Please reload.');
     }
 
@@ -825,6 +832,9 @@ export class SchemasService {
                 .do(() => {
                     this.localCache.remove(`schema.${appName}.${schemaName}`);
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Deleted', appName);
+                })
                 .pretifyError('Failed to delete schema. Please reload.');
     }
 
@@ -832,6 +842,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
+                })
                 .pretifyError('Failed to update schema scripts. Please reload.');
     }
 
@@ -839,6 +852,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Updated', appName);
+                })
                 .pretifyError('Failed to update schema. Please reload.');
     }
 
@@ -846,6 +862,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/ordering`);
 
         return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
+                })
                 .pretifyError('Failed to reorder fields. Please reload.');
     }
 
@@ -853,6 +872,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Published', appName);
+                })
                 .pretifyError('Failed to publish schema. Please reload.');
     }
 
@@ -860,6 +882,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Unpublished', appName);
+                })
                 .pretifyError('Failed to unpublish schema. Please reload.');
     }
 
@@ -867,6 +892,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
+                })
                 .pretifyError('Failed to update field. Please reload.');
     }
 
@@ -874,6 +902,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
+                })
                 .pretifyError('Failed to enable field. Please reload.');
     }
 
@@ -881,6 +912,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
+                })
                 .pretifyError('Failed to disable field. Please reload.');
     }
 
@@ -888,6 +922,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/lock`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldLocked', appName);
+                })
                 .pretifyError('Failed to lock field. Please reload.');
     }
 
@@ -895,6 +932,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldShown', appName);
+                })
                 .pretifyError('Failed to show field. Please reload.');
     }
 
@@ -902,6 +942,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldHidden', appName);
+                })
                 .pretifyError('Failed to hide field. Please reload.');
     }
 
@@ -909,6 +952,9 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
+                })
                 .pretifyError('Failed to delete field. Please reload.');
     }
 }

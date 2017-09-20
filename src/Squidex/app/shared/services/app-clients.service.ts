@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Version
@@ -62,7 +63,8 @@ export class AccessTokenDto {
 export class AppClientsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -95,6 +97,9 @@ export class AppClientsService {
                         response.secret,
                         response.isReader);
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Client', 'Created', appName);
+                })
                 .pretifyError('Failed to add client. Please reload.');
     }
 
@@ -102,6 +107,9 @@ export class AppClientsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Client', 'Updated', appName);
+                })
                 .pretifyError('Failed to revoke client. Please reload.');
     }
 
@@ -109,6 +117,9 @@ export class AppClientsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Client', 'Deleted', appName);
+                })
                 .pretifyError('Failed to revoke client. Please reload.');
     }
 

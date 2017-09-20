@@ -10,13 +10,13 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AddAppLanguageDto,
+    AnalyticsService,
     ApiUrlConfig,
     AppLanguageDto,
     AppLanguagesService,
     UpdateAppLanguageDto,
     Version
 } from './../';
-
 
 describe('AppLanguageDto', () => {
     it('should update properties when updating', () => {
@@ -39,7 +39,8 @@ describe('AppLanguagesService', () => {
             ],
             providers: [
                 AppLanguagesService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
         });
     });

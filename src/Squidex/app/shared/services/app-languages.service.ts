@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Version
@@ -52,7 +53,8 @@ export class UpdateAppLanguageDto {
 export class AppLanguagesService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -87,6 +89,9 @@ export class AppLanguagesService {
                         response.isOptional === true,
                         response.fallback || []);
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Language', 'Added', appName);
+                })
                 .pretifyError('Failed to add language. Please reload.');
     }
 
@@ -94,6 +99,9 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Language', 'Updated', appName);
+                })
                 .pretifyError('Failed to change language. Please reload.');
     }
 
@@ -101,6 +109,9 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Language', 'Deleted', appName);
+                })
                 .pretifyError('Failed to add language. Please reload.');
     }
 }

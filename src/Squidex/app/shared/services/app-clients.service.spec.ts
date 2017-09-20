@@ -10,6 +10,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AccessTokenDto,
+    AnalyticsService,
     ApiUrlConfig,
     AppClientDto,
     AppClientsService,
@@ -44,7 +45,8 @@ describe('AppClientsService', () => {
             ],
             providers: [
                 AppClientsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
         });
     });

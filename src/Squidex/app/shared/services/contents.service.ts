@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
     LocalCacheService,
@@ -94,6 +95,7 @@ export class ContentsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService,
         private readonly localCache: LocalCacheService
     ) {
     }
@@ -179,6 +181,13 @@ export class ContentsService {
                 .pretifyError('Failed to load content. Please reload.');
     }
 
+    public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
+
+        return HTTP.getVersioned(this.http, url, version)
+                .pretifyError('Failed to load data. Please reload.');
+    }
+
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
@@ -195,6 +204,8 @@ export class ContentsService {
                         new Version(response.version.toString()));
                 })
                 .do(content => {
+                    this.analytics.trackEvent('Content', 'Created', appName);
+
                     this.localCache.set(`content.${content.id}`, content, 5000);
                 })
                 .pretifyError('Failed to create content. Please reload.');
@@ -205,6 +216,8 @@ export class ContentsService {
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .do(() => {
+                    this.analytics.trackEvent('Content', 'Updated', appName);
+
                     this.localCache.set(`content.${id}`, dto, 5000);
                 })
                 .pretifyError('Failed to update content. Please reload.');
@@ -215,22 +228,20 @@ export class ContentsService {
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
+                    this.analytics.trackEvent('Content', 'Deleted', appName);
+
                     this.localCache.remove(`content.${id}`);
                 })
                 .pretifyError('Failed to delete content. Please reload.');
-    }
-
-    public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
-
-        return HTTP.getVersioned(this.http, url, version)
-                .pretifyError('Failed to load data. Please reload.');
     }
 
     public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Published', appName);
+                })
                 .pretifyError('Failed to publish content. Please reload.');
     }
 
@@ -238,6 +249,9 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Unpublished', appName);
+                })
                 .pretifyError('Failed to unpublish content. Please reload.');
     }
 
@@ -245,6 +259,9 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/archive`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Archived', appName);
+                })
                 .pretifyError('Failed to archive content. Please reload.');
     }
 
@@ -252,6 +269,9 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/restore`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Restored', appName);
+                })
                 .pretifyError('Failed to restore content. Please reload.');
     }
 }

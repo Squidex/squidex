@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
     LocalCacheService,
@@ -102,6 +103,7 @@ export class AssetsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService,
         private readonly localCache: LocalCacheService
     ) {
     }
@@ -193,6 +195,8 @@ export class AssetsService {
                     }
                 })
                 .do(dto => {
+                    this.analytics.trackEvent('Asset', 'Uploaded', appName);
+
                     if (dto instanceof AssetDto) {
                         this.localCache.set(`asset.${dto.id}`, dto, 5000);
                     }
@@ -266,6 +270,9 @@ export class AssetsService {
                         return dto;
                     }
                 })
+                .do(() => {
+                    this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                })
                 .pretifyError('Failed to replace asset. Please reload.');
     }
 
@@ -274,6 +281,8 @@ export class AssetsService {
 
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
+                    this.analytics.trackEvent('Analytics', 'Deleted', appName);
+
                     this.localCache.remove(`asset.${id}`);
                 })
                 .pretifyError('Failed to delete asset. Please reload.');
@@ -283,6 +292,9 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .do(() => {
+                    this.analytics.trackEvent('Analytics', 'Updated', appName);
+                })
                 .pretifyError('Failed to delete asset. Please reload.');
     }
 }

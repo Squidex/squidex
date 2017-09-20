@@ -10,6 +10,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AddFieldDto,
+    AnalyticsService,
     ApiUrlConfig,
     CreateSchemaDto,
     createProperties,
@@ -185,7 +186,8 @@ describe('SchemasService', () => {
             providers: [
                 LocalCacheService,
                 SchemasService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
         });
     });

@@ -9,6 +9,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     ContentDto,
     ContentsDto,
@@ -91,7 +92,8 @@ describe('ContentsService', () => {
             providers: [
                 ContentsService,
                 LocalCacheService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
         });
     });
