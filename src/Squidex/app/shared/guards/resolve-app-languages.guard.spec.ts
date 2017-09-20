@@ -82,7 +82,7 @@ describe('ResolveAppLanguagesGuard', () => {
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {
-                expect(result).toBe(languages);
+                expect(result).toBe(languages.languages);
 
                 done();
             });
