@@ -13,6 +13,7 @@ import {
     allParams,
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     DialogService,
     HistoryChannelUpdated,
     HistoryEventDto,
@@ -55,13 +56,13 @@ export class ContentHistoryComponent extends AppComponentBase {
             .switchMap(() => this.appNameOnce())
             .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
-    constructor(appsStore: AppsStoreService, dialogs: DialogService,
+    constructor(appsStore: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly users: UsersProviderService,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(dialogs, appsStore);
+        super(dialogs, appsStore, authService);
     }
 
     private userName(userId: string): Observable<string> {

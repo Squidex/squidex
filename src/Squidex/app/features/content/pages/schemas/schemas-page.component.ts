@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     DialogService,
     SchemaDto,
     SchemasService
@@ -52,10 +53,10 @@ export class SchemasPageComponent extends AppComponentBase {
                 });
             });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {

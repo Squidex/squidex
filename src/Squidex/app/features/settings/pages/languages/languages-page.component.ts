@@ -12,15 +12,16 @@ import {
     AddAppLanguageDto,
     AppComponentBase,
     AppLanguageDto,
+    AppLanguagesDto,
     AppLanguagesService,
     AppsStoreService,
+    AuthService,
     DialogService,
     HistoryChannelUpdated,
     ImmutableArray,
     MessageBus,
     LanguageDto,
-    LanguagesService,
-    Version
+    LanguagesService
 } from 'shared';
 
 @Component({
@@ -29,11 +30,9 @@ import {
     templateUrl: './languages-page.component.html'
 })
 export class LanguagesPageComponent extends AppComponentBase implements OnInit {
-    private version = new Version();
-
     public allLanguages: LanguageDto[] = [];
     public newLanguages: LanguageDto[] = [];
-    public appLanguages = ImmutableArray.empty<AppLanguageDto>();
+    public appLanguages: AppLanguagesDto;
 
     public addLanguageForm =
         this.formBuilder.group({
@@ -42,13 +41,13 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             ]
         });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly appLanguagesService: AppLanguagesService,
         private readonly languagesService: LanguagesService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -58,9 +57,9 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     public load() {
         this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.getLanguages(app, this.version).retry(2))
-            .subscribe(dtos => {
-                this.updateLanguages(ImmutableArray.of(dtos));
+            .switchMap(app => this.appLanguagesService.getLanguages(app).retry(2))
+            .subscribe(dto => {
+                this.updateLanguages(dto);
             }, error => {
                 this.notifyError(error);
             });
@@ -68,9 +67,9 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     public removeLanguage(language: AppLanguageDto) {
         this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code, this.version))
+            .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code, this.appLanguages.version))
             .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.remove(language));
+                this.updateLanguages(this.appLanguages.removeLanguage(language, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -80,9 +79,9 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
         const requestDto = new AddAppLanguageDto(this.addLanguageForm.controls['language'].value.iso2Code);
 
         this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.postLanguages(app, requestDto, this.version))
+            .switchMap(app => this.appLanguagesService.postLanguages(app, requestDto, this.appLanguages.version))
             .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.push(dto));
+                this.updateLanguages(this.appLanguages.addLanguage(dto.payload, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -90,13 +89,9 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
     public updateLanguage(language: AppLanguageDto) {
         this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.version))
+            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.appLanguages.version))
             .subscribe(dto => {
-                this.updateLanguages(
-                    this.appLanguages.replaceAll(
-                        l => l.iso2Code === language.iso2Code,
-                        l => language),
-                    language.isMaster ? language.iso2Code : undefined);
+                this.updateLanguages(this.appLanguages.updateLanguage(language, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -113,26 +108,27 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    private updateLanguages(languages: ImmutableArray<AppLanguageDto>, masterId?: string) {
+    private updateLanguages(appLanguages: AppLanguagesDto, masterId?: string) {
         this.addLanguageForm.reset();
 
         this.appLanguages =
-            languages.map(l => {
-                const isMaster = masterId ? l.iso2Code === masterId : l.isMaster;
+            new AppLanguagesDto(
+                appLanguages.languages.map(l => {
+                    const isMaster = masterId ? l.iso2Code === masterId : l.isMaster;
 
-                return new AppLanguageDto(
-                    l.iso2Code,
-                    l.englishName, isMaster,
-                    l.isOptional,
-                    l.fallback.filter(f => !!languages.find(l2 => l2.iso2Code === f))
-                );
-            }).sort((a, b) => {
-                if (a.isMaster === b.isMaster) {
-                    return a.iso2Code.localeCompare(b.iso2Code);
-                } else {
-                    return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
-                }
-            });
+                    return new AppLanguageDto(
+                        l.iso2Code,
+                        l.englishName, isMaster,
+                        l.isOptional,
+                        l.fallback.filter(f => !!appLanguages.languages.find(l2 => l2.iso2Code === f))
+                    );
+                }).sort((a, b) => {
+                    if (a.isMaster === b.isMaster) {
+                        return a.iso2Code.localeCompare(b.iso2Code);
+                    } else {
+                        return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
+                    }
+                }), appLanguages.version);
 
         this.updateNewLanguages();
 
@@ -140,8 +136,10 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     private updateNewLanguages() {
-        this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.find(l => l.iso2Code === x.iso2Code));
-        this.addLanguageForm.controls['language'].setValue(this.newLanguages[0]);
+        if (this.appLanguages) {
+            this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.languages.find(l => l.iso2Code === x.iso2Code));
+            this.addLanguageForm.controls['language'].setValue(this.newLanguages[0]);
+        }
     }
 }
 

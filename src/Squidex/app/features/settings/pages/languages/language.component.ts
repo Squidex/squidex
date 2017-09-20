@@ -9,11 +9,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } 
 import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-import {
-    AppLanguageDto,
-    fadeAnimation,
-    ImmutableArray
-} from 'shared';
+import { AppLanguageDto, fadeAnimation } from 'shared';
 
 @Component({
     selector: 'sqx-language',
@@ -30,7 +26,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public language: AppLanguageDto;
 
     @Input()
-    public allLanguages: ImmutableArray<AppLanguageDto>;
+    public allLanguages: AppLanguageDto[];
 
     @Output()
     public removing = new EventEmitter<AppLanguageDto>();
@@ -38,7 +34,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     @Output()
     public saving = new EventEmitter<AppLanguageDto>();
 
-    public otherLanguages: ImmutableArray<AppLanguageDto>;
+    public otherLanguages: AppLanguageDto[];
     public otherLanguage: AppLanguageDto;
 
     public fallbackLanguages: AppLanguageDto[] = [];
@@ -92,7 +88,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public removeFallbackLanguage(language: AppLanguageDto) {
         this.fallbackLanguages.splice(this.fallbackLanguages.indexOf(language), 1);
 
-        this.otherLanguages = this.otherLanguages.push(language);
+        this.otherLanguages = [...this.otherLanguages, language];
         this.otherLanguage = this.otherLanguages.values[0];
     }
 
@@ -142,7 +138,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
 
             this.fallbackLanguages =
                 this.allLanguages.filter(l =>
-                    this.language.fallback.indexOf(l.iso2Code) >= 0).values;
+                    this.language.fallback.indexOf(l.iso2Code) >= 0);
         }
     }
 }

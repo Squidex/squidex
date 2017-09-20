@@ -29,6 +29,7 @@ describe('WebhookDto', () => {
     const modified = DateTime.now();
     const modifier = 'me';
     const version = new Version('1');
+    const newVersion = new Version('2');
 
     it('should update url and schemas', () => {
         const webhook_1 = new WebhookDto('id1', 'token1', creator, creator, creation, creation, version, [], 'http://squidex.io/hook', 1, 2, 3, 4);
@@ -37,12 +38,13 @@ describe('WebhookDto', () => {
             [
                 new WebhookSchemaDto('1', true, true, true, true),
                 new WebhookSchemaDto('2', true, true, true, true)
-            ]), modifier, modified);
+            ]), modifier, newVersion, modified);
 
         expect(webhook_2.url).toEqual('http://squidex.io/hook2');
         expect(webhook_2.schemas.length).toEqual(2);
         expect(webhook_2.lastModified).toEqual(modified);
         expect(webhook_2.lastModifiedBy).toEqual(modifier);
+        expect(webhook_2.version).toEqual(newVersion);
     });
 });
 
@@ -132,16 +134,20 @@ describe('WebhooksService', () => {
 
         let webhook: WebhookDto | null = null;
 
-        webhooksService.postWebhook('my-app', dto, user, now, version).subscribe(result => {
+        webhooksService.postWebhook('my-app', dto, user, now).subscribe(result => {
             webhook = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/webhooks');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' });
+        req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' }, {
+            headers: {
+                etag: '1'
+            }
+        });
 
         expect(webhook).toEqual(
             new WebhookDto('id1', 'token1', user, user, now, now, version, [], 'http://squidex.io/hook', 0, 0, 0, 0));

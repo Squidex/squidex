@@ -17,7 +17,8 @@ import {
     DateTime,
     LocalCacheService,
     HTTP,
-    Version
+    Version,
+    Versioned
 } from 'framework';
 
 export class ContentsDto {
@@ -53,50 +54,40 @@ export class ContentDto {
             this.version);
     }
 
-    public publish(user: string, now?: DateTime): ContentDto {
-        return this.changeStatus('Published', user, now);
+    public publish(user: string, version: Version, now?: DateTime): ContentDto {
+        return this.changeStatus('Published', user, version, now);
     }
 
-    public unpublish(user: string, now?: DateTime): ContentDto {
-        return this.changeStatus('Draft', user, now);
+    public unpublish(user: string, version: Version, now?: DateTime): ContentDto {
+        return this.changeStatus('Draft', user, version, now);
     }
 
-    public archive(user: string, now?: DateTime): ContentDto {
-        return this.changeStatus('Archived', user, now);
+    public archive(user: string, version: Version, now?: DateTime): ContentDto {
+        return this.changeStatus('Archived', user, version, now);
     }
 
-    public restore(user: string, now?: DateTime): ContentDto {
-        return this.changeStatus('Draft', user, now);
+    public restore(user: string, version: Version, now?: DateTime): ContentDto {
+        return this.changeStatus('Draft', user, version, now);
     }
 
-    public replaceVersion(version: Version): ContentDto {
-        return new ContentDto(
-            this.id,
-            this.status,
-            this.createdBy, this.lastModifiedBy,
-            this.created, this.lastModified,
-            this.data,
-            version);
-    }
-
-    private changeStatus(status: string, user: string, now?: DateTime): ContentDto {
+    private changeStatus(status: string, user: string, version: Version, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
             status,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             this.data,
-            this.version);
+            version);
     }
 
-    public update(data: any, user: string, now?: DateTime): ContentDto {
+    public update(data: any, user: string, version: Version, now?: DateTime): ContentDto {
         return new ContentDto(
             this.id,
             this.status,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             data,
-            this.version);
+            version);
     }
 }
 
@@ -143,11 +134,13 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response.items;
+                    const body = response.payload.body;
 
-                    return new ContentsDto(response.total, items.map(item => {
+                    const items: any[] = body.items;
+
+                    return new ContentsDto(body.total, items.map(item => {
                         return new ContentDto(
                             item.id,
                             item.status,
@@ -162,20 +155,22 @@ export class ContentsService {
                 .pretifyError('Failed to load contents. Please reload.');
     }
 
-    public getContent(appName: string, schemaName: string, id: string, version?: Version): Observable<ContentDto> {
+    public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return HTTP.getVersioned(this.http, url, version)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
+                    const body = response.payload.body;
+
                     return new ContentDto(
-                        response.id,
-                        response.status,
-                        response.createdBy,
-                        response.lastModifiedBy,
-                        DateTime.parseISO_UTC(response.created),
-                        DateTime.parseISO_UTC(response.lastModified),
-                        response.data,
-                        new Version(response.version.toString()));
+                        body.id,
+                        body.status,
+                        body.createdBy,
+                        body.lastModifiedBy,
+                        DateTime.parseISO_UTC(body.created),
+                        DateTime.parseISO_UTC(body.lastModified),
+                        body.data,
+                        response.version);
                 })
                 .catch(error => {
                     if (error instanceof HttpErrorResponse && error.status === 404) {
@@ -194,24 +189,29 @@ export class ContentsService {
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
-        return HTTP.getVersioned(this.http, url, version)
+        return HTTP.getVersioned<any>(this.http, url)
+                .map(response => {
+                    return response.payload.body;
+                })
                 .pretifyError('Failed to load data. Please reload.');
     }
 
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
-        return HTTP.postVersioned(this.http, url, dto)
+        return HTTP.postVersioned<any>(this.http, url, dto)
                 .map(response => {
+                    const body = response.payload.body;
+
                     return new ContentDto(
-                        response.id,
-                        response.status,
-                        response.createdBy,
-                        response.lastModifiedBy,
-                        DateTime.parseISO_UTC(response.created),
-                        DateTime.parseISO_UTC(response.lastModified),
-                        response.data,
-                        new Version(response.version.toString()));
+                        body.id,
+                        body.status,
+                        body.createdBy,
+                        body.lastModifiedBy,
+                        DateTime.parseISO_UTC(body.created),
+                        DateTime.parseISO_UTC(body.lastModified),
+                        body.data,
+                        response.version);
                 })
                 .do(content => {
                     this.analytics.trackEvent('Content', 'Created', appName);
@@ -221,10 +221,15 @@ export class ContentsService {
                 .pretifyError('Failed to create content. Please reload.');
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<any> {
+    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
+                .map(response => {
+                    const body = response.payload.body;
+
+                    return new Versioned(response.version, body);
+                })
                 .do(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
 
@@ -233,7 +238,7 @@ export class ContentsService {
                 .pretifyError('Failed to update content. Please reload.');
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
@@ -245,7 +250,7 @@ export class ContentsService {
                 .pretifyError('Failed to delete content. Please reload.');
     }
 
-    public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
@@ -255,7 +260,7 @@ export class ContentsService {
                 .pretifyError('Failed to publish content. Please reload.');
     }
 
-    public unpublishContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public unpublishContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
@@ -265,7 +270,7 @@ export class ContentsService {
                 .pretifyError('Failed to unpublish content. Please reload.');
     }
 
-    public archiveContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public archiveContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/archive`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
@@ -275,7 +280,7 @@ export class ContentsService {
                 .pretifyError('Failed to archive content. Please reload.');
     }
 
-    public restoreContent(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public restoreContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/restore`);
 
         return HTTP.putVersioned(this.http, url, {}, version)

@@ -30,7 +30,8 @@ import {
     SchemasService,
     UpdateFieldDto,
     UpdateSchemaScriptsDto,
-    ValidatorsEx
+    ValidatorsEx,
+    Version
 } from 'shared';
 
 import {
@@ -82,15 +83,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -129,8 +129,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public publish() {
         this.appNameOnce()
             .switchMap(app => this.schemasService.publishSchema(app, this.schema.name, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.publish(this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.publish(this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -139,8 +139,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public unpublish() {
         this.appNameOnce()
             .switchMap(app => this.schemasService.unpublishSchema(app, this.schema.name, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.unpublish(this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.unpublish(this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -149,8 +149,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public enableField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.enableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.enable(), this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field.enable(), this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -159,8 +159,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public disableField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.disableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.disable(), this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field.disable(), this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -169,8 +169,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public lockField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.lockField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.lock(), this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field.lock(), this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -179,8 +179,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public showField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.showField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.show(), this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field.show(), this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -189,8 +189,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public hideField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.hideField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field.hide(), this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field.hide(), this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -199,8 +199,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public deleteField(field: FieldDto) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.deleteField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.removeField(field, this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.removeField(field, this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -209,8 +209,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     public sortFields(fields: FieldDto[]) {
         this.appNameOnce()
             .switchMap(app => this.schemasService.putFieldOrdering(app, this.schema.name, fields.map(t => t.fieldId), this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.replaceFields(fields, this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.replaceFields(fields, this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -221,8 +221,8 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
         this.appNameOnce()
             .switchMap(app => this.schemasService.putField(app, this.schema.name, field.fieldId, requestDto, this.schema.version)).retry(2)
-            .subscribe(() => {
-                this.updateSchema(this.schema.updateField(field, this.authService.user!.token));
+            .subscribe(dto => {
+                this.updateSchema(this.schema.updateField(field, this.userToken, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -253,7 +253,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             this.appNameOnce()
                 .switchMap(app => this.schemasService.postField(app, this.schema.name, requestDto, this.schema.version))
                 .subscribe(dto => {
-                    this.updateSchema(this.schema.addField(dto, this.authService.user!.token));
+                    this.updateSchema(this.schema.addField(dto.payload, this.userToken, dto.version));
                     this.resetFieldForm();
                 }, error => {
                     this.notifyError(error);
@@ -266,14 +266,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         this.resetFieldForm();
     }
 
-    public onSchemaSaved(properties: SchemaPropertiesDto) {
-        this.updateSchema(this.schema.update(properties, this.authService.user!.token));
+    public onSchemaSaved(properties: SchemaPropertiesDto, version: Version) {
+        this.updateSchema(this.schema.update(properties, this.userToken, version));
 
         this.editSchemaDialog.hide();
     }
 
-    public onSchemaScriptsSaved(scripts: UpdateSchemaScriptsDto) {
-        this.updateSchema(this.schema.configureScripts(scripts, this.authService.user!.token));
+    public onSchemaScriptsSaved(scripts: UpdateSchemaScriptsDto, version: Version) {
+        this.updateSchema(this.schema.configureScripts(scripts, this.userToken, version));
 
         this.configureScriptsDialog.hide();
     }

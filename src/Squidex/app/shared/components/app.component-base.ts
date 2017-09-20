@@ -7,15 +7,24 @@
 
 import { Observable } from 'rxjs';
 
-import { AppsStoreService, DialogService } from './../declarations-base';
+import {
+    AppsStoreService,
+    AuthService,
+    DialogService
+} from './../declarations-base';
 
 import { ComponentBase } from './component-base';
 
 export abstract class AppComponentBase extends ComponentBase {
     private appName$: Observable<string>;
 
+    public get userToken(): string {
+        return this.authService.user!.token;
+    }
+
     constructor(dialogs: DialogService,
-        private readonly appsStore: AppsStoreService
+        protected readonly appsStore: AppsStoreService,
+        protected readonly authService: AuthService
     ) {
         super(dialogs);
 

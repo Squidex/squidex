@@ -27,7 +27,7 @@
                 </colgroup>
 
                 <tbody>
-                    <ng-template ngFor let-contributor [ngForOf]="appContributors">
+                    <ng-template ngFor let-contributor [ngForOf]="appContributors?.contributors">
                         <tr>
                             <td>
                                 <img class="user-picture" [attr.title]="contributor.contributorId | sqxUserName" [attr.src]="contributor.contributorId | sqxUserPicture" />
@@ -54,7 +54,7 @@
                 </tbody>
             </table>
             
-            <div class="table-items-footer">
+            <div class="table-items-footer" *ngIf="appContributors">
                 <form [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
                     <div class="row no-gutters">
                         <div class="col">

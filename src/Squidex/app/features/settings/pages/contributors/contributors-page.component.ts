@@ -19,10 +19,8 @@ import {
     AutocompleteSource,
     DialogService,
     HistoryChannelUpdated,
-    ImmutableArray,
     MessageBus,
-    UsersService,
-    Version
+    UsersService
 } from 'shared';
 
 export class UsersDataSource implements AutocompleteSource {
@@ -38,7 +36,7 @@ export class UsersDataSource implements AutocompleteSource {
                 const results: any[] = [];
 
                 for (let user of users) {
-                    if (!this.component.appContributors || !this.component.appContributors.find(t => t.contributorId === user.id)) {
+                    if (!this.component.appContributors || !this.component.appContributors.contributors.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -53,9 +51,7 @@ export class UsersDataSource implements AutocompleteSource {
     templateUrl: './contributors-page.component.html'
 })
 export class ContributorsPageComponent extends AppComponentBase implements OnInit {
-    private version = new Version();
-
-    public appContributors = ImmutableArray.empty<AppContributorDto>();
+    public appContributors: AppContributorsDto;
 
     public currentUserId: string;
 
@@ -70,7 +66,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     ];
 
     public get canAddContributor() {
-        return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.length < this.maxContributors);
+        return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.contributors.length < this.maxContributors);
     }
 
     public addContributorForm =
@@ -81,13 +77,12 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
                 ]]
         });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, usersService: UsersService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, usersService: UsersService, authService: AuthService,
         private readonly appContributorsService: AppContributorsService,
         private readonly messageBus: MessageBus,
-        private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
 
         this.usersDataSource = new UsersDataSource(usersService, this);
     }
@@ -100,7 +95,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     public load() {
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.getContributors(app, this.version).retry(2))
+            .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
             .subscribe(dto => {
                 this.updateContributorsFromDto(dto);
             }, error => {
@@ -110,9 +105,9 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
 
     public removeContributor(contributor: AppContributorDto) {
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId, this.version))
-            .subscribe(() => {
-                this.updateContributors(this.appContributors.remove(contributor));
+            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId, this.appContributors.version))
+            .subscribe(dto => {
+                this.updateContributors(this.appContributors.removeContributor(contributor, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -122,9 +117,9 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         const requestDto = contributor.changePermission(permission);
 
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
-            .subscribe(() => {
-                this.updateContributors(this.appContributors.replace(contributor, requestDto));
+            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.appContributors.version))
+            .subscribe(dto => {
+                this.updateContributors(this.appContributors.updateContributor(contributor, dto.version));
             }, error => {
                 this.notifyError(error);
             });
@@ -134,9 +129,9 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
 
         this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.version))
-            .subscribe(() => {
-                this.updateContributors(this.appContributors.push(requestDto));
+            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.appContributors.version))
+            .subscribe(dto => {
+                this.updateContributors(this.appContributors.addContributor(requestDto, dto.version));
                 this.resetContributorForm();
             }, error => {
                 this.notifyError(error);
@@ -148,14 +143,14 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
         this.addContributorForm.reset();
     }
 
-    private updateContributorsFromDto(dto: AppContributorsDto) {
-        this.updateContributors(ImmutableArray.of(dto.contributors));
+    private updateContributorsFromDto(appContributors: AppContributorsDto) {
+        this.updateContributors(appContributors);
 
-        this.maxContributors = dto.maxContributors;
+        this.maxContributors = appContributors.maxContributors;
     }
 
-    private updateContributors(contributors: ImmutableArray<AppContributorDto>) {
-        this.appContributors = contributors;
+    private updateContributors(appContributors: AppContributorsDto) {
+        this.appContributors = appContributors;
 
         this.messageBus.emit(new HistoryChannelUpdated());
     }

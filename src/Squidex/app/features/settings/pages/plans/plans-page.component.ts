@@ -17,8 +17,7 @@ import {
     AuthService,
     ChangePlanDto,
     DialogService,
-    PlansService,
-    Version
+    PlansService
 } from 'shared';
 
 @Component({
@@ -29,7 +28,6 @@ import {
 export class PlansPageComponent extends AppComponentBase implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
     private overridePlanId: string;
-    private version = new Version();
 
     public portalUrl = this.apiUrl.buildUrl('/identity-server/account/portal');
 
@@ -38,13 +36,12 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly plansService: PlansService,
         private readonly route: ActivatedRoute,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -62,14 +59,10 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public load(showInfo = false) {
         this.appNameOnce()
-            .switchMap(app => this.plansService.getPlans(app, this.version).retry(2))
+            .switchMap(app => this.plansService.getPlans(app).retry(2))
             .subscribe(dto => {
                 if (this.overridePlanId) {
-                    this.plans = new AppPlansDto(
-                        this.overridePlanId,
-                        dto.planOwner,
-                        dto.hasPortal,
-                        dto.plans);
+                    this.plans = dto.changePlanId(this.overridePlanId);
                 } else {
                     this.plans = dto;
                 }
@@ -88,16 +81,12 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
         this.isDisabled = true;
 
         this.appNameOnce()
-            .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.version))
+            .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.plans.version))
             .subscribe(dto => {
-                if (dto.redirectUri && dto.redirectUri.length > 0) {
-                    window.location.href = dto.redirectUri;
+                if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
+                    window.location.href = dto.payload.redirectUri;
                 } else {
-                    this.plans =
-                        new AppPlansDto(planId,
-                            this.plans.planOwner,
-                            this.plans.hasPortal,
-                            this.plans.plans);
+                    this.plans = this.plans.changePlanId(planId, dto.version);
                     this.isDisabled = false;
                 }
             }, error => {

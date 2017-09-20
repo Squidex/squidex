@@ -13,13 +13,13 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
-            <div *ngFor="let language of appLanguages">
-                <sqx-language [language]="language" [allLanguages]="appLanguages"
+            <div *ngFor="let language of appLanguages?.languages">
+                <sqx-language [language]="language" [allLanguages]="appLanguages.languages"
                     (saving)="updateLanguage($event)" 
                     (removing)="removeLanguage($event)"></sqx-language>
             </div>
 
-            <div class="table-items-footer">
+            <div class="table-items-footer" *ngIf="appLanguages">
                 <form [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()">
                     <div class="row no-gutters">
                         <div class="col">

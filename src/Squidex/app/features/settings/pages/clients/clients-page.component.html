@@ -13,18 +13,18 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
-            <div class="table-items-row table-items-row-empty" *ngIf="appClients && appClients.length === 0">
+            <div class="table-items-row table-items-row-empty" *ngIf="appClients && appClients.clients.length === 0">
                 No client created yet.
             </div>
 
-            <div *ngFor="let client of appClients">
+            <div *ngFor="let client of appClients?.clients">
                 <sqx-client [client]="client" [appName]="appName() | async"
                     (changing)="changeClient(client, $event)"
                     (renaming)="renameClient(client, $event)" 
                     (revoking)="revokeClient(client)"></sqx-client>
             </div>
 
-            <div class="table-items-footer">
+            <div class="table-items-footer" *ngIf="appClients">
                 <form [formGroup]="addClientForm" (ngSubmit)="attachClient()">
                     <div class="row no-gutters">
                         <div class="col">

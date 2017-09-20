@@ -15,8 +15,7 @@ import {
     fadeAnimation,
     SchemaDetailsDto,
     SchemasService,
-    ValidatorsEx,
-    Version
+    ValidatorsEx
 } from 'shared';
 
 const FALLBACK_NAME = 'my-schema';
@@ -83,14 +82,12 @@ export class SchemaFormComponent {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const schemaVersion = new Version();
             const schemaName = this.createForm.controls['name'].value;
-
-            const requestDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
+            const schemaDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
 
             const me = this.authService.user!.token;
 
-            this.schemas.postSchema(this.appName, requestDto, me, DateTime.now(), schemaVersion)
+            this.schemas.postSchema(this.appName, schemaDto, me, DateTime.now())
                 .subscribe(dto => {
                     this.emitCreated(dto);
                     this.resetCreateForm();

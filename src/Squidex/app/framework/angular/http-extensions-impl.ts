@@ -10,6 +10,14 @@ import { Observable } from 'rxjs';
 
 import { Version } from './../utils/version';
 
+export class Versioned<T> {
+    constructor(
+        public readonly version: Version,
+        public readonly payload: T
+    ) {
+    }
+}
+
 export class ErrorDto {
     public get displayMessage(): string {
         let result = this.message;
@@ -46,28 +54,28 @@ export class ErrorDto {
 }
 
 export module HTTP {
-    export function getVersioned(http: HttpClient, url: string, version?: Version): Observable<any> {
+    export function getVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
-        return handleVersion(http.get(url, { observe: 'response', headers }), version);
+        return handleVersion(http.get<T>(url, { observe: 'response', headers }), version);
     }
 
-    export function postVersioned(http: HttpClient, url: string, body: any, version?: Version): Observable<any> {
+    export function postVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
-        return handleVersion(http.post(url, body, { observe: 'response', headers }), version);
+        return handleVersion(http.post<T>(url, body, { observe: 'response', headers }), version);
     }
 
-    export function putVersioned(http: HttpClient, url: string, body: any, version?: Version): Observable<any> {
+    export function putVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
-        return handleVersion(http.put(url, body, { observe: 'response', headers }), version);
+        return handleVersion(http.put<T>(url, body, { observe: 'response', headers }), version);
     }
 
-    export function deleteVersioned(http: HttpClient, url: string, version?: Version): Observable<any> {
+    export function deleteVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
-        return handleVersion(http.delete(url, { observe: 'response', headers }), version);
+        return handleVersion(http.delete<T>(url, { observe: 'response', headers }), version);
     }
 
     function createHeaders(version?: Version): HttpHeaders {
@@ -78,16 +86,12 @@ export module HTTP {
         }
     }
 
-    function handleVersion(httpRequest: Observable<HttpResponse<any>>, version?: Version): Observable<any> {
-        return httpRequest.do((response: HttpResponse<any>) => {
-                if (version && response.status.toString().indexOf('2') === 0 && response.headers) {
-                    const etag = response.headers.get('etag');
+    function handleVersion<T>(httpRequest: Observable<HttpResponse<T>>, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+        return httpRequest.map((response: HttpResponse<T>) => {
+            const etag = response.headers.get('etag') || '';
 
-                    if (etag) {
-                        version.update(etag);
-                    }
-                }
-            }).map((response: HttpResponse<any>) => response.body);
+            return new Versioned(new Version(etag), response);
+        });
     }
 }
 
@@ -105,7 +109,7 @@ export function pretifyError(message: string): Observable<any> {
                     result = new ErrorDto(response.status, errorDto.message, errorDto.details);
                 }
             } catch (e) {
-                /* Ignore */
+                result = new ErrorDto(500, 'Failed to make the request.');
             }
         }
 

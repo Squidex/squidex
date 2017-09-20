@@ -10,6 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     DialogService,
     ImmutableArray,
     Pager,
@@ -28,10 +29,10 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
 
     public selectedEventId: string | null = null;
 
-    constructor(dialogs: DialogService, appsStore: AppsStoreService,
+    constructor(dialogs: DialogService, appsStore: AppsStoreService, authService: AuthService,
         private readonly webhooksService: WebhooksService
     ) {
-        super(dialogs, appsStore);
+        super(dialogs, appsStore, authService);
     }
 
     public ngOnInit() {
@@ -56,7 +57,7 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
     public enqueueEvent(event: WebhookEventDto) {
         this.appNameOnce()
             .switchMap(app => this.webhooksService.enqueueEvent(app, event.id))
-            .subscribe(dtos => {
+            .subscribe(() => {
                 this.notifyInfo('Events enqueued. Will be send in a few seconds.');
             }, error => {
                 this.notifyError(error);

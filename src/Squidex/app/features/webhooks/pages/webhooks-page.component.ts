@@ -18,7 +18,6 @@ import {
     ImmutableArray,
     SchemaDto,
     SchemasService,
-    Version,
     WebhookDto,
     WebhooksService,
     UpdateWebhookDto
@@ -46,13 +45,12 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         return this.addWebhookForm.controls['url'].value && this.addWebhookForm.controls['url'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly schemasService: SchemasService,
         private readonly webhooksService: WebhooksService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -91,7 +89,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         this.appNameOnce()
             .switchMap(app => this.webhooksService.putWebhook(app, webhook.id, requestDto, webhook.version))
             .subscribe(dto => {
-                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.authService.user!.token));
+                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.userToken, dto.version));
 
                 this.notifyInfo('Webhook saved.');
             }, error => {
@@ -107,10 +105,10 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
 
             const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value, []);
 
-            const me = this.authService.user!.token;
+            const me = this.userToken;
 
             this.appNameOnce()
-                .switchMap(app => this.webhooksService.postWebhook(app, requestDto, me, DateTime.now(), new Version()))
+                .switchMap(app => this.webhooksService.postWebhook(app, requestDto, me, DateTime.now()))
                 .subscribe(dto => {
                     this.webhooks = this.webhooks.push(dto);
 

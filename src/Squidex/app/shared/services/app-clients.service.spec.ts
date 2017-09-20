@@ -13,11 +13,44 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     AppClientDto,
+    AppClientsDto,
     AppClientsService,
     CreateAppClientDto,
     UpdateAppClientDto,
     Version
 } from './../';
+
+describe('AppClientsDto', () => {
+    const client1 = new AppClientDto('1', '1', '1', false);
+    const client2 = new AppClientDto('2', '2', '1', false);
+    const client2_new = new AppClientDto('2', '2 New', '1 New', false);
+    const version = new Version('1');
+    const newVersion = new Version('2');
+
+    it('should update clients when adding client', () => {
+        const clients_1 = new AppClientsDto([client1], version);
+        const clients_2 = clients_1.addClient(client2, newVersion);
+
+        expect(clients_2.clients).toEqual([client1, client2]);
+        expect(clients_2.version).toEqual(newVersion);
+    });
+
+    it('should update clients when removing client', () => {
+        const clients_1 = new AppClientsDto([client1, client2], version);
+        const clients_2 = clients_1.removeClient(client1, newVersion);
+
+        expect(clients_2.clients).toEqual([client2]);
+        expect(clients_2.version).toEqual(newVersion);
+    });
+
+    it('should update clients when updating client', () => {
+        const clients_1 = new AppClientsDto([client1, client2], version);
+        const clients_2 = clients_1.updateClient(client2_new, newVersion);
+
+        expect(clients_2.clients).toEqual([client1, client2_new]);
+        expect(clients_2.version).toEqual(newVersion);
+    });
+});
 
 describe('AppClientDto', () => {
     it('should update name property when renaming', () => {
@@ -58,16 +91,16 @@ describe('AppClientsService', () => {
     it('should make get request to get app clients',
         inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-        let clients: AppClientDto[] | null = null;
+        let clients: AppClientsDto | null = null;
 
-        appClientsService.getClients('my-app', version).subscribe(result => {
+        appClientsService.getClients('my-app').subscribe(result => {
             clients = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([
             {
@@ -82,13 +115,17 @@ describe('AppClientsService', () => {
                 secret: 'secret2',
                 isReader: true
             }
-        ]);
+        ], {
+            headers: {
+                etag: '2'
+            }
+        });
 
         expect(clients).toEqual(
-            [
+            new AppClientsDto([
                 new AppClientDto('client1', 'Client 1', 'secret1', true),
                 new AppClientDto('client2', 'Client 2', 'secret2', true)
-            ]);
+            ], new Version('2')));
     }));
 
     it('should make post request to create client',
@@ -99,7 +136,7 @@ describe('AppClientsService', () => {
         let client: AppClientDto | null = null;
 
         appClientsService.postClient('my-app', dto, version).subscribe(result => {
-            client = result;
+            client = result.payload;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');

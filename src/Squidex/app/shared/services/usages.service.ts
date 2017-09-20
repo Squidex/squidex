@@ -62,9 +62,11 @@ export class UsagesService {
     public getMonthCalls(app: string): Observable<CurrentCallsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/month`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    return new CurrentCallsDto(response.count, response.maxAllowed);
+                    const body = response.payload.body;
+
+                    return new CurrentCallsDto(body.count, body.maxAllowed);
                 })
                 .pretifyError('Failed to load monthly api calls. Please reload.');
     }
@@ -72,9 +74,11 @@ export class UsagesService {
     public getTodayStorage(app: string): Observable<CurrentStorageDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/today`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    return new CurrentStorageDto(response.size, response.maxAllowed);
+                    const body = response.payload.body;
+
+                    return new CurrentStorageDto(body.size, body.maxAllowed);
                 })
                 .pretifyError('Failed to load todays storage size. Please reload.');
     }
@@ -82,9 +86,11 @@ export class UsagesService {
     public getCallsUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<CallsUsageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new CallsUsageDto(
@@ -99,9 +105,11 @@ export class UsagesService {
     public getStorageUsages(app: string, fromDate: DateTime, toDate: DateTime): Observable<StorageUsageDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate.toUTCStringFormat('YYYY-MM-DD')}/${toDate.toUTCStringFormat('YYYY-MM-DD')}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new StorageUsageDto(

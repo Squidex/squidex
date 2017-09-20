@@ -18,7 +18,8 @@ import {
     DateTime,
     LocalCacheService,
     UpdateAssetDto,
-    Version
+    Version,
+    Versioned
 } from './../';
 
 describe('AssetDto', () => {
@@ -26,22 +27,24 @@ describe('AssetDto', () => {
     const creator = 'not-me';
     const modified = DateTime.now();
     const modifier = 'me';
-    const version = new Version('2');
+    const version = new Version('1');
+    const newVersion = new Version('2');
 
     it('should update name property and user info when renaming', () => {
         const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
-        const asset_2 = asset_1.rename('new-name.png', modifier, modified);
+        const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
+        expect(asset_2.version).toEqual(newVersion);
     });
 
     it('should update file properties when uploading', () => {
-        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2, new Version('2'));
+        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
 
         const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
-        const asset_2 = asset_1.update(update, modifier, modified);
+        const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
         expect(asset_2.fileSize).toEqual(2);
         expect(asset_2.fileVersion).toEqual(2);
@@ -51,6 +54,7 @@ describe('AssetDto', () => {
         expect(asset_2.pixelHeight).toEqual(2);
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
+        expect(asset_2.version).toEqual(newVersion);
     });
 });
 
@@ -164,7 +168,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto | null = null;
 
-        assetsService.getAsset('my-app', '123', version).subscribe(result => {
+        assetsService.getAsset('my-app', '123').subscribe(result => {
             asset = result;
         });
 
@@ -186,8 +190,11 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048,
-            version: 11
+            pixelHeight: 2048
+        }, {
+            headers: {
+                etag: '2'
+            }
         });
 
         expect(asset).toEqual(
@@ -203,7 +210,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
-                new Version('11')));
+                new Version('2')));
     }));
 
     it('should provide entry from cache if not found',
@@ -215,7 +222,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto | null = null;
 
-        assetsService.getAsset('my-app', '123', version).subscribe(result => {
+        assetsService.getAsset('my-app', '123').subscribe(result => {
             asset = result;
         });
 
@@ -291,8 +298,11 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048,
-            version: 11
+            pixelHeight: 2048
+        }, {
+            headers: {
+                etag: '2'
+            }
         });
 
         expect(asset).toEqual(
@@ -309,7 +319,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
-                new Version('11')));
+                new Version('2')));
     }));
 
     it('should make put request to replace asset content',
@@ -318,7 +328,7 @@ describe('AssetsService', () => {
         let asset: AssetReplacedDto | null = null;
 
         assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
-            asset = <AssetReplacedDto>result;
+            asset = (<Versioned<AssetReplacedDto>>result).payload;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
@@ -332,8 +342,7 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048,
-            version: 11
+            pixelHeight: 2048
         });
 
         expect(asset).toEqual(
@@ -342,8 +351,7 @@ describe('AssetsService', () => {
                 'image/png',
                 true,
                 1024,
-                2048,
-                new Version('11')));
+                2048));
     }));
 
     it('should make put request to update asset',

@@ -10,6 +10,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angu
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     ContentDto,
     DialogService,
     fadeAnimation,
@@ -66,8 +67,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
     public values: any[] = [];
 
-    constructor(apps: AppsStoreService, dialogs: DialogService) {
-        super(dialogs, apps);
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService) {
+        super(dialogs, apps, authService);
     }
 
     public ngOnChanges() {

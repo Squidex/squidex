@@ -15,7 +15,8 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
-    Version
+    Version,
+    Versioned
 } from 'framework';
 
 export class AppPlansDto {
@@ -23,8 +24,18 @@ export class AppPlansDto {
         public readonly currentPlanId: string,
         public readonly planOwner: string,
         public readonly hasPortal: boolean,
-        public readonly plans: PlanDto[]
+        public readonly plans: PlanDto[],
+        public readonly version: Version
     ) {
+    }
+
+    public changePlanId(planId: string, version?: Version): AppPlansDto {
+        return new AppPlansDto(
+            planId,
+            this.planOwner,
+            this.hasPortal,
+            this.plans,
+            version || this.version);
     }
 }
 
@@ -63,17 +74,19 @@ export class PlansService {
     ) {
     }
 
-    public getPlans(appName: string, version?: Version): Observable<AppPlansDto> {
+    public getPlans(appName: string): Observable<AppPlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
-        return HTTP.getVersioned(this.http, url, version)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response.plans;
+                    const body = response.payload.body;
+
+                    const items: any[] = body.plans;
 
                     return new AppPlansDto(
-                        response.currentPlanId,
-                        response.planOwner,
-                        response.hasPortal,
+                        body.currentPlanId,
+                        body.planOwner,
+                        body.hasPortal,
                         items.map(item => {
                             return new PlanDto(
                                 item.id,
@@ -82,17 +95,20 @@ export class PlansService {
                                 item.maxApiCalls,
                                 item.maxAssetSize,
                                 item.maxContributors);
-                        }));
+                        }),
+                        response.version);
                 })
                 .pretifyError('Failed to load plans. Please reload.');
     }
 
-    public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<PlanChangedDto> {
+    public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
+        return HTTP.putVersioned<any>(this.http, url, dto, version)
                 .map(response => {
-                    return new PlanChangedDto(response.redirectUri);
+                    const body = response.payload.body;
+
+                    return new Versioned(response.version, new PlanChangedDto(body.redirectUri));
                 })
                 .do(() => {
                     this.analytics.trackEvent('Plan', 'Changed', appName);

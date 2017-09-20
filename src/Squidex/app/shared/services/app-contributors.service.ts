@@ -15,8 +15,36 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
-    Version
+    Version,
+    Versioned
 } from 'framework';
+
+export class AppContributorsDto {
+    constructor(
+        public readonly contributors: AppContributorDto[],
+        public readonly maxContributors: number,
+        public readonly version: Version
+    ) {
+    }
+
+    public addContributor(contributor: AppContributorDto, version: Version) {
+        return new AppContributorsDto([...this.contributors, contributor], this.maxContributors, version);
+    }
+
+    public updateContributor(contributor: AppContributorDto, version: Version) {
+        return new AppContributorsDto(
+            this.contributors.map(c => c.contributorId === contributor.contributorId ? contributor : c),
+            this.maxContributors,
+            version);
+    }
+
+    public removeContributor(contributor: AppContributorDto, version: Version) {
+        return new AppContributorsDto(
+            this.contributors.filter(c => c.contributorId !== contributor.contributorId),
+            this.maxContributors,
+            version);
+    }
+}
 
 export class AppContributorDto {
     constructor(
@@ -30,14 +58,6 @@ export class AppContributorDto {
     }
 }
 
-export class AppContributorsDto {
-    constructor(
-        public readonly contributors: AppContributorDto[],
-        public readonly maxContributors: number
-    ) {
-    }
-}
-
 @Injectable()
 export class AppContributorsService {
     constructor(
@@ -47,12 +67,14 @@ export class AppContributorsService {
     ) {
     }
 
-    public getContributors(appName: string, version?: Version): Observable<AppContributorsDto> {
+    public getContributors(appName: string): Observable<AppContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return HTTP.getVersioned(this.http, url, version)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response.contributors;
+                    const body = response.payload.body;
+
+                    const items: any[] = body.contributors;
 
                     return new AppContributorsDto(
                         items.map(item => {
@@ -60,12 +82,12 @@ export class AppContributorsService {
                                 item.contributorId,
                                 item.permission);
                         }),
-                        response.maxContributors);
+                        body.maxContributors, response.version);
                 })
                 .pretifyError('Failed to load contributors. Please reload.');
     }
 
-    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<any> {
+    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
@@ -75,7 +97,7 @@ export class AppContributorsService {
                 .pretifyError('Failed to add contributors. Please reload.');
     }
 
-    public deleteContributor(appName: string, contributorId: string, version: Version): Observable<any> {
+    public deleteContributor(appName: string, contributorId: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
 
         return HTTP.deleteVersioned(this.http, url, version)

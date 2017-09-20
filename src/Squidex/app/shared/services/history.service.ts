@@ -39,9 +39,11 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<HistoryEventDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new HistoryEventDto(

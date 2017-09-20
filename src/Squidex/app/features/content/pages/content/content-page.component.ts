@@ -55,14 +55,13 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     public languages: AppLanguageDto[] = [];
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -87,7 +86,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             this.messageBus.of(ContentPublished)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
-                        this.content = this.content.replaceVersion(message.content.version);
+                        this.content = this.content.publish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
                     }
                 });
 
@@ -95,7 +94,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             this.messageBus.of(ContentUnpublished)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
-                        this.content = this.content.replaceVersion(message.content.version);
+                        this.content = this.content.unpublish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
                     }
                 });
 
@@ -158,7 +157,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 this.appNameOnce()
                     .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.content.id, requestDto, this.content.version))
                     .subscribe(dto => {
-                        this.content = this.content.update(dto, this.authService.user!.token);
+                        this.content = this.content.update(dto.payload, this.userToken, dto.version);
 
                         this.emitContentUpdated(this.content);
                         this.notifyInfo('Content saved successfully.');

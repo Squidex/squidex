@@ -73,9 +73,11 @@ export class UsersService {
     public getUsers(query?: string): Observable<UserDto[]> {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new UserDto(
@@ -92,14 +94,16 @@ export class UsersService {
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
+                    const body = response.payload.body;
+
                     return new UserDto(
-                        response.id,
-                        response.email,
-                        response.displayName,
-                        response.pictureUrl,
-                        response.isLocked);
+                        body.id,
+                        body.email,
+                        body.displayName,
+                        body.pictureUrl,
+                        body.isLocked);
                 })
                 .pretifyError('Failed to load user. Please reload.');
     }
@@ -116,9 +120,11 @@ export class UserManagementService {
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response.items;
+                    const body = response.payload.body;
+
+                    const items: any[] = body.items;
 
                     const users = items.map(item => {
                         return new UserDto(
@@ -129,7 +135,7 @@ export class UserManagementService {
                             item.isLocked);
                     });
 
-                    return new UsersDto(response.total, users);
+                    return new UsersDto(body.total, users);
                 })
                 .pretifyError('Failed to load users. Please reload.');
     }
@@ -137,14 +143,16 @@ export class UserManagementService {
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
+                    const body = response.payload.body;
+
                     return new UserDto(
-                        response.id,
-                        response.email,
-                        response.displayName,
-                        response.pictureUrl,
-                        response.isLocked);
+                        body.id,
+                        body.email,
+                        body.displayName,
+                        body.pictureUrl,
+                        body.isLocked);
                 })
                 .pretifyError('Failed to load user. Please reload.');
     }
@@ -152,9 +160,11 @@ export class UserManagementService {
     public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
-        return HTTP.postVersioned(this.http, url, dto)
+        return HTTP.postVersioned<any>(this.http, url, dto)
                 .map(response => {
-                    return new UserDto(response.id, dto.email, dto.displayName, response.pictureUrl, false);
+                    const body = response.payload.body;
+
+                    return new UserDto(body.id, dto.email, dto.displayName, body.pictureUrl, false);
                 })
                 .pretifyError('Failed to create user. Please reload.');
     }

@@ -60,11 +60,10 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
     public callsCurrent = 0;
     public callsMax = 0;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly usagesService: UsagesService
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {

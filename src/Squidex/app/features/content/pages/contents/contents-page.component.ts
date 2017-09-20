@@ -63,13 +63,12 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public columnWidth: number;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -92,7 +91,7 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentUpdatedSubscription =
             this.messageBus.of(ContentUpdated)
                 .subscribe(message => {
-                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy));
+                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
                 });
 
         this.route.params.map(p => <string> p['language'])
@@ -118,8 +117,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public publishContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                this.contentItems = this.contentItems.replaceBy('id', content.publish(this.authService.user!.token));
+            .subscribe(dto => {
+                content = content.publish(this.userToken, dto.version);
+
+                this.contentItems = this.contentItems.replaceBy('id', content);
 
                 this.emitContentPublished(content);
             }, error => {
@@ -130,8 +131,10 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public unpublishContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.authService.user!.token));
+            .subscribe(dto => {
+                content = content.unpublish(this.userToken, dto.version);
+
+                this.contentItems = this.contentItems.replaceBy('id', content);
 
                 this.emitContentUnpublished(content);
             }, error => {
@@ -142,8 +145,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public archiveContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.archiveContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                content = content.archive(this.authService.user!.token);
+            .subscribe(dto => {
+                content = content.archive(this.userToken, dto.version);
 
                 this.removeContent(content);
             }, error => {
@@ -154,8 +157,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public restoreContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.restoreContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                content = content.restore(this.authService.user!.token);
+            .subscribe(dto => {
+                content = content.restore(this.userToken, dto.version);
 
                 this.removeContent(content);
             }, error => {

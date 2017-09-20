@@ -13,6 +13,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     ContentDto,
     ContentsService,
     DialogService,
@@ -53,11 +54,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     public isDisabled = false;
     public isInvalidSchema = false;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {

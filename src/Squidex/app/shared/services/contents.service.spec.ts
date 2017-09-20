@@ -25,50 +25,56 @@ describe('ContentDto', () => {
     const modified = DateTime.now();
     const modifier = 'me';
     const version = new Version('1');
+    const newVersion = new Version('2');
 
     it('should update data property and user info when updating', () => {
         const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.update({ data: 2 }, modifier, modified);
+        const content_2 = content_1.update({ data: 2 }, modifier, newVersion, modified);
 
         expect(content_2.data).toEqual({ data: 2 });
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
+        expect(content_2.version).toEqual(newVersion);
     });
 
     it('should update status property and user info when publishing', () => {
         const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.publish(modifier, modified);
+        const content_2 = content_1.publish(modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Published');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
+        expect(content_2.version).toEqual(newVersion);
     });
 
     it('should update status property and user info when unpublishing', () => {
         const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.unpublish(modifier, modified);
+        const content_2 = content_1.unpublish(modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Draft');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
+        expect(content_2.version).toEqual(newVersion);
     });
 
     it('should update status property and user info when archiving', () => {
         const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.archive(modifier, modified);
+        const content_2 = content_1.archive(modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Archived');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
+        expect(content_2.version).toEqual(newVersion);
     });
 
     it('should update status property and user info when restoring', () => {
         const content_1 = new ContentDto('1', 'Archived', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.restore(modifier, modified);
+        const content_2 = content_1.restore(modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Draft');
         expect(content_2.lastModified).toEqual(modified);
         expect(content_2.lastModifiedBy).toEqual(modifier);
+        expect(content_2.version).toEqual(newVersion);
     });
 
     it('should update data property when setting data', () => {
@@ -78,13 +84,6 @@ describe('ContentDto', () => {
         const content_2 = content_1.setData(newData);
 
         expect(content_2.data).toBe(newData);
-    });
-
-    it('should replace version', () => {
-        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, { data: 1 }, version);
-        const content_2 = content_1.replaceVersion(new Version('2'));
-
-        expect(content_2.version).toEqual(new Version('2'));
     });
 });
 
@@ -220,14 +219,14 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.getContent('my-app', 'my-schema', '1', version).subscribe(result => {
+        contentsService.getContent('my-app', 'my-schema', '1').subscribe(result => {
             content = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
             id: 'id1',
@@ -236,8 +235,11 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
-            version: 11,
             data: {}
+        }, {
+            headers: {
+                etag: '2'
+            }
         });
 
         expect(content).toEqual(
@@ -245,7 +247,7 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
-                new Version('11')));
+                new Version('2')));
     }));
 
     it('should provide entry from cache if not found',
@@ -257,14 +259,14 @@ describe('ContentsService', () => {
 
         let content: ContentDto | null = null;
 
-        contentsService.getContent('my-app', 'my-schema', '1', version).subscribe(result => {
+        contentsService.getContent('my-app', 'my-schema', '1').subscribe(result => {
             content = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({}, { status: 404, statusText: '404' });
 
@@ -294,8 +296,11 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
-            version: 11,
             data: {}
+        }, {
+            headers: {
+                etag: '2'
+            }
         });
 
         expect(content).toEqual(
@@ -303,7 +308,7 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
-                new Version('11')));
+                new Version('2')));
     }));
 
     it('should make get request to get versioned content data',
@@ -320,7 +325,7 @@ describe('ContentsService', () => {
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/1');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush(response);
 
