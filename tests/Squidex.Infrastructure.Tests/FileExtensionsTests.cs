@@ -34,5 +34,23 @@ namespace Squidex.Infrastructure
 
             Assert.Equal("blob", actual);
         }
+
+        [Theory]
+        [InlineData(-1, "")]
+        [InlineData(-2, "")]
+        [InlineData(0, "0 bytes")]
+        [InlineData(50, "50 bytes")]
+        [InlineData(1024, "1 kB")]
+        [InlineData(870400, "850 kB")]
+        [InlineData(1572864, "1.5 MB")]
+        [InlineData(4294967296, "4 GB")]
+        [InlineData(3408486046105, "3.1 TB")]
+        [InlineData(3490289711212134, "3174.4 TB")]
+        public void Should_calculate_file_size(long bytes, string expected)
+        {
+            var actual = bytes.ToReadableSize();
+
+            Assert.Equal(expected, actual);
+        }
     }
 }

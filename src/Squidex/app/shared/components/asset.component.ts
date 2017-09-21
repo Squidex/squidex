@@ -92,6 +92,7 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                     }
                 }, error => {
                     this.notifyError(error);
+                    this.emitFailed(error);
                 });
         } else {
             this.updateAsset(this.asset, false);
@@ -109,8 +110,8 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                         this.setProgress(dto);
                     }
                 }, error => {
+                    this.notifyError(error);
                     this.setProgress();
-                    this.emitFailed(error);
                 });
         }
     }

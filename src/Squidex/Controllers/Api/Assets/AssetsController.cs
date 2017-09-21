@@ -264,7 +264,7 @@ namespace Squidex.Controllers.Api.Assets
 
             if (formFile.Length > assetsConfig.MaxSize)
             {
-                var error = new ValidationError($"File size cannot be longer than ${assetsConfig.MaxSize}.");
+                var error = new ValidationError($"File size cannot be longer than {assetsConfig.MaxSize.ToReadableSize()}.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }
