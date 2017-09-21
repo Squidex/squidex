@@ -1,0 +1,46 @@
+@import '_mixins';
+@import '_vars';
+
+$color: $color-theme-blue;
+
+$size-arrow: 10px;
+
+// sass-lint:disable class-name-format
+
+.onboarding-tooltip {
+    & {
+        @include box-shadow(0, 2px, 20px, .3);
+        max-width: 20rem;
+        background: $color-dark-foreground;
+        border: 1px solid $color;
+        position: relative;
+    }
+
+    .content {
+        padding: 1.6rem 1.6rem 2.5rem;
+    }
+
+    .hide-this {
+        @include absolute(.1rem, .1rem, auto, auto);
+    }
+
+    .hide-all {
+        @include absolute(auto, .1rem, .1rem, auto);
+    }
+
+    &.topRight {
+        & {
+            margin-right: -$size-arrow - 1;
+        }
+
+        .arrow1 {
+            @include caret-top($color, $size-arrow);
+            @include absolute(-$size-arrow * 2, $size-arrow * .5, auto, auto);
+        }
+
+        .arrow2 {
+            @include caret-top($color-dark-foreground, $size-arrow);
+            @include absolute(-$size-arrow * 2 + 1, $size-arrow * .5, auto, auto);
+        }
+    }
+}

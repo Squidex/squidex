@@ -1,0 +1,16 @@
+<div *sqxModalView="tooltipModal;onRoot:true" closeAlways="true" [sqxModalTarget]="for" [position]="position" [offset]="4" [auto]="false">
+    <div class="onboarding-tooltip" [ngClass]="position">
+        <div class="arrow1"></div>
+        <div class="arrow2"></div>
+            
+        <div class="content">{{text}}</div>
+
+        <a (click)="hideThis()" class="hide-this btn-link btn-default btn-sm">
+            <i class="icon-close"></i>
+        </a>
+
+        <button (click)="hideAll()" class="hide-all btn-link btn-primary btn-sm">
+            Hide all Tooltips
+        </button>
+    </div>
+</div>

@@ -5,14 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer } from '@angular/core';
 
 import { MathHelper } from './../utils/math-helper';
 
 @Directive({
     selector: '[sqxImageSource]'
 })
-export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
+export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, AfterViewInit {
+    private parentResizeListener: Function;
+
     private size: any;
     private loadRetries = 0;
     private loadQuery: string | null = null;
@@ -43,14 +45,19 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
         this.resize(this.parent);
     }
 
+    public ngOnDestroy() {
+        this.parentResizeListener();
+    }
+
     public ngOnInit() {
         if (this.parent === null) {
             this.parent = this.element.nativeElement.parentElement;
         }
 
-        this.renderer.listen(this.parent, 'resize', () => {
-            this.resize(this.parent);
-        });
+        this.parentResizeListener =
+            this.renderer.listen(this.parent, 'resize', () => {
+                this.resize(this.parent);
+            });
     }
 
     @HostListener('load')
