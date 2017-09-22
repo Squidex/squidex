@@ -36,6 +36,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
     public ngOnDestroy() {
         this.stopListening();
+
+        this.modalView.hide();
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -49,7 +51,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         if (this.modalView) {
-            this.subscription = this.modalView.isOpen.subscribe(isOpen => {
+            this.subscription =
+                this.modalView.isOpen.subscribe(isOpen => {
                     if (isOpen === (this.renderedView !== null)) {
                         return;
                     }

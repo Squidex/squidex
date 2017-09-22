@@ -20,15 +20,15 @@
                     </a>
                 </form>
 
-                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="topRight" after="6000"
-                    text="Click this icon to show the advanced search menu and to show the archive!">
+                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="6000">
+                    Click this icon to show the advanced search menu and to show the archive!
                 </sqx-onboarding-tooltip>
 
-                <sqx-onboarding-tooltip id="contentFind" [for]="findInput" position="topRight" after="120000"
-                    text="Search for content using full text search over all fields and languages!">
+                <sqx-onboarding-tooltip id="contentFind" [for]="findInput" position="bottomRight" after="120000">
+                    Search for content using full text search over all fields and languages!
                 </sqx-onboarding-tooltip>
                 
-                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="searchInput" position="topRight">
+                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="searchInput">
                     <sqx-search-form
                         [canArchive]="!isReadOnly"
                         (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 

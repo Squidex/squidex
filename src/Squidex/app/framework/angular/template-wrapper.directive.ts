@@ -27,6 +27,12 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     ) {
     }
 
+    public ngOnDestroy() {
+        if (this.view) {
+            this.view.destroy();
+        }
+    }
+
     public ngOnInit() {
         this.view = this.viewContainer.createEmbeddedView(this.templateRef, {
             '\$implicit': this.item,
@@ -41,12 +47,6 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
             } else if (changes.index) {
                 this.view.context.index = this.index;
             }
-        }
-    }
-
-    public ngOnDestroy() {
-        if (this.view) {
-            this.view.destroy();
         }
     }
 }

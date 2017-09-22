@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { ResourceLoaderService } from './../services/resource-loader.service';
 import { UserReportConfig } from './../configurations';
@@ -14,7 +14,9 @@ import { UserReportConfig } from './../configurations';
     selector: 'sqx-user-report',
     template: ''
 })
-export class UserReportComponent implements OnInit {
+export class UserReportComponent implements OnDestroy, OnInit {
+    private loadingTimer: any;
+
     constructor(config: UserReportConfig,
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -22,9 +24,14 @@ export class UserReportComponent implements OnInit {
         window['_urq'].push(['initSite', config.siteId]);
     }
 
+    public ngOnDestroy() {
+        clearTimeout(this.loadingTimer);
+    }
+
     public ngOnInit() {
-        setTimeout(() => {
-            this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
-        }, 4000);
+        this.loadingTimer =
+            setTimeout(() => {
+                this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
+            }, 4000);
     }
 }

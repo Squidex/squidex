@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{appName}}</span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
+        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" @fade>
             <a class="dropdown-item all-apps" routerLink="/app">
                 <span class="all-apps-text">All Apps</span> 
                 <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
@@ -23,7 +23,7 @@
     </li>
 </ul>
 
-<div class="modal" *sqxModalView="modalDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="modalDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">

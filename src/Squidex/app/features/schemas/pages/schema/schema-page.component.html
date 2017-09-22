@@ -8,7 +8,7 @@
                     JSON Preview
                 </button>
 
-                <div class="btn-group" data-toggle="buttons">
+                <div class="btn-group" data-toggle="buttons" #buttonPublish>
                     <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
                         Published
                     </button>
@@ -18,10 +18,10 @@
                 </div>
 
                <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-link btn-decent" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #optionsButton>
+                    <button type="button" class="btn btn-link btn-decent" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
-                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="topRight" [@fade]>
+                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="buttonOptions" @fade>
                         <a class="dropdown-item" (click)="configureScriptsDialog.show()">
                             Scripts
                         </a>
@@ -30,6 +30,14 @@
                         </a>
                     </div>
                 </div>
+
+                <sqx-onboarding-tooltip id="history" [for]="buttonOptions" position="bottomRight" after="60000">
+                    Open the context menu to delete the schema or to create some scripts for content changes.
+                </sqx-onboarding-tooltip>
+
+                <sqx-onboarding-tooltip id="history" [for]="buttonPublish" position="bottomRight" after="240000">
+                    Note, that you have to publish the schema before you can add content to it.
+                </sqx-onboarding-tooltip>
             </div>
 
             <h3 class="panel-title">
@@ -76,7 +84,7 @@
                     <div class="row no-gutters mt-3">
                         <div class="col">
                             <div class="form-check">
-                                <label class="form-check-label pull-left">
+                                <label class="form-check-label">
                                     <input class="form-check-input" type="checkbox" formControlName="isLocalizable"> Localizable
                                 </label>
                             </div>
@@ -96,17 +104,25 @@
             </div>
         </div>
         <div class="panel-sidebar">
-            <a class="panel-link" routerLink="history" routerLinkActive="active">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory>
                 <i class="icon-time"></i>
             </a>
-            <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
                 <i class="icon-help"></i>
             </a>
+
+            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000">
+                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+            </sqx-onboarding-tooltip>
+            
+            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
+                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
+            </sqx-onboarding-tooltip>
         </div>
     </div>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -125,7 +141,7 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="exportSchemaDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="exportSchemaDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -144,7 +160,7 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

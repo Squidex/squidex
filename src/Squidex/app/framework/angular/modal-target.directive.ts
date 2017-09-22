@@ -6,7 +6,16 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+
+const POSITION_TOPLEFT = 'topLeft';
+const POSITION_TOPRIGHT = 'topRight';
+const POSITION_BOTTOMLEFT = 'bottomLeft';
+const POSITION_BOTTOMRIGHT = 'bottomRight';
+const POSITION_LEFTTOP = 'leftTop';
+const POSITION_LEFTBOTTOM = 'leftBottom';
+const POSITION_RIGHTTOP = 'rightTop';
+const POSITION_RIGHTBOTTOM = 'rightBottom';
+const POSITION_FULL = 'full';
 
 @Directive({
     selector: '[sqxModalTarget]'
@@ -14,7 +23,7 @@ import { Observable, Subscription } from 'rxjs';
 export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
     private elementResizeListener: Function;
     private targetResizeListener: Function;
-    private timer: Subscription;
+    private renderTimer: any;
     private targetElement: any;
 
     @Input('sqxModalTarget')
@@ -24,15 +33,27 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
     public offset = 2;
 
     @Input()
-    public position = 'topLeft';
+    public position = POSITION_BOTTOMRIGHT;
 
     @Input()
-    public auto = true;
+    public autoPosition = true;
 
     constructor(
         private readonly renderer: Renderer,
         private readonly element: ElementRef
     ) {
+    }
+
+    public ngOnDestroy() {
+        if (this.targetResizeListener) {
+            this.targetResizeListener();
+        }
+
+        if (this.elementResizeListener) {
+            this.elementResizeListener();
+        }
+
+        clearInterval(this.renderTimer);
     }
 
     public ngOnInit() {
@@ -49,29 +70,15 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
                     this.updatePosition();
                 });
 
-            this.timer =
-                Observable.timer(100, 100).subscribe(() => {
+            this.renderTimer =
+                setInterval(() => {
                     this.updatePosition();
-                });
-        }
-    }
-
-    public ngOnDestroy() {
-        if (this.targetResizeListener) {
-            this.targetResizeListener();
-        }
-
-        if (this.elementResizeListener) {
-            this.elementResizeListener();
-        }
-
-        if (this.timer) {
-            this.timer.unsubscribe();
+                }, 100);
         }
     }
 
     public ngAfterViewInit() {
-        const modalRef  = this.element.nativeElement;
+        const modalRef = this.element.nativeElement;
 
         this.renderer.setElementStyle(modalRef, 'position', 'fixed');
         this.renderer.setElementStyle(modalRef, 'z-index', '1000000');
@@ -83,59 +90,115 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
         const viewportHeight = document.documentElement.clientHeight;
         const viewportWidth = document.documentElement.clientWidth;
 
-        const modalRef  = this.element.nativeElement;
+        const modalRef = this.element.nativeElement;
         const modalRect = this.element.nativeElement.getBoundingClientRect();
 
         const targetRect: ClientRect = this.targetElement.getBoundingClientRect();
 
-        let top = 0, left = 0;
+        const fix = this.autoPosition;
 
-        if (this.position === 'topLeft' || this.position === 'topRight') {
-            top = targetRect.bottom + this.offset;
+        let t = 0
+        let l = 0;
 
-            if (this.auto && top + modalRect.height > viewportHeight) {
-                const t = targetRect.top - modalRect.height - this.offset;
-
-                if (t > 0) {
-                    top = t;
+        switch (this.position) {
+            case POSITION_LEFTTOP:
+            case POSITION_RIGHTTOP:
+                {
+                    t = targetRect.top;
+                    break;
                 }
-            }
-        } else {
-            top = targetRect.top - modalRect.height - this.offset;
-
-            if (this.auto && top < 0) {
-                const t = targetRect.bottom + this.offset;
-
-                if (t + modalRect.height > viewportHeight) {
-                    top = t;
+            case POSITION_LEFTBOTTOM:
+            case POSITION_RIGHTBOTTOM:
+                {
+                    t = targetRect.bottom - modalRect.height;
+                    break;
                 }
-            }
+            case POSITION_BOTTOMLEFT:
+            case POSITION_BOTTOMRIGHT:
+                {
+                    t = targetRect.bottom + this.offset;
+
+                    if (fix && t + modalRect.height > viewportHeight) {
+                        const candidate = targetRect.top - modalRect.height - this.offset;
+
+                        if (candidate > 0) {
+                            t = candidate;
+                        }
+                    }
+                    break;
+                }
+            case POSITION_TOPLEFT:
+            case POSITION_TOPRIGHT:
+                {
+                    t = targetRect.top - modalRect.height - this.offset;
+
+                    if (fix && t < 0) {
+                        const candidate = targetRect.bottom + this.offset;
+
+                        if (candidate + modalRect.height > viewportHeight) {
+                            t = candidate;
+                        }
+                    }
+                    break;
+                }
         }
 
-        if (this.position === 'topLeft' || this.position === 'bottomLeft') {
-            left = targetRect.left + this.offset;
-
-            if (this.auto && left + modalRect.width > viewportWidth) {
-                const l = targetRect.right - modalRect.width - this.offset;
-
-                if (l > 0) {
-                    left = l;
+        switch (this.position) {
+            case POSITION_TOPLEFT:
+            case POSITION_BOTTOMLEFT:
+                {
+                    l = targetRect.left;
+                    break;
                 }
-            }
-        } else {
-            left = targetRect.right - modalRect.width - this.offset;
-
-            if (this.auto && left < 0) {
-                const l = targetRect.left + this.offset;
-
-                if (l + modalRect.width > viewportWidth) {
-                    left = l;
+            case POSITION_TOPRIGHT:
+            case POSITION_BOTTOMRIGHT:
+                {
+                    l = targetRect.right - modalRect.width
+                    break;
                 }
-            }
+            case POSITION_RIGHTTOP:
+            case POSITION_RIGHTBOTTOM:
+                {
+                    l = targetRect.right + this.offset;
+
+                    if (fix && l + modalRect.width > viewportWidth) {
+                        const candidate = targetRect.right - modalRect.width - this.offset;
+
+                        if (candidate > 0) {
+                            l = candidate;
+                        }
+                    }
+                    break;
+                }
+            case POSITION_LEFTTOP:
+            case POSITION_LEFTBOTTOM:
+                {
+                    l = targetRect.left - modalRect.width - this.offset;
+
+                    if (this.autoPosition && l < 0) {
+                        const candidate = targetRect.right + this.offset;
+
+                        if (candidate + modalRect.width > viewportWidth) {
+                            l = candidate;
+                        }
+                    }
+                    break;
+                }
         }
 
-        this.renderer.setElementStyle(modalRef, 'top', top + 'px');
-        this.renderer.setElementStyle(modalRef, 'left', left + 'px');
+        if (this.position === POSITION_FULL) {
+            t = targetRect.top - this.offset;
+            l = targetRect.left - this.offset;
+
+            const w = targetRect.width + 2 * this.offset;
+            const h = targetRect.height + 2 * this.offset;
+
+            this.renderer.setElementStyle(modalRef, 'width', `${w}px`);
+            this.renderer.setElementStyle(modalRef, 'height', `${h}px`);
+        }
+
+        this.renderer.setElementStyle(modalRef, 'top', `${t}px`);
+        this.renderer.setElementStyle(modalRef, 'left', `${l}px`);
         this.renderer.setElementStyle(modalRef, 'right', 'auto');
         this.renderer.setElementStyle(modalRef, 'bottom', 'auto');
         this.renderer.setElementStyle(modalRef, 'margin', '0');

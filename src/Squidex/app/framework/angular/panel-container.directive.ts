@@ -28,12 +28,12 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         this.invalidate();
     }
 
-    public ngAfterViewInit() {
-        this.invalidate({ force: true, resize: true });
-    }
-
     public ngOnDestroy() {
         this.isInit = true;
+    }
+
+    public ngAfterViewInit() {
+        this.invalidate({ force: true, resize: true });
     }
 
     public push(panel: PanelComponent) {

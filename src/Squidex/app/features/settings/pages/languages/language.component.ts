@@ -54,6 +54,10 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.isMasterSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.isMasterSubscription =
             this.editForm.controls['isMaster'].valueChanges
@@ -63,10 +67,6 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                 });
 
         this.resetEditForm();
-    }
-
-    public ngOnDestroy() {
-        this.isMasterSubscription.unsubscribe();
     }
 
     public ngOnChanges() {

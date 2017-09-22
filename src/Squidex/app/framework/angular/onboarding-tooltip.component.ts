@@ -11,10 +11,15 @@ import { ModalView } from './../utils/modal-view';
 
 import { OnboardingService } from './../services/onboarding.service';
 
+import { fadeAnimation } from './animations';
+
 @Component({
     selector: 'sqx-onboarding-tooltip',
     styleUrls: ['./onboarding-tooltip.component.scss'],
-    templateUrl: './onboarding-tooltip.component.html'
+    templateUrl: './onboarding-tooltip.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private showTimer: any;
@@ -30,13 +35,10 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     public id: string;
 
     @Input()
-    public position = 'left';
-
-    @Input()
     public after = 1000;
 
     @Input()
-    public text: string;
+    public position = 'left';
 
     constructor(
         private readonly onboardingService: OnboardingService,
@@ -45,15 +47,10 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        if (this.showTimer) {
-            clearTimeout(this.showTimer);
-            this.showTimer = null;
-        }
+        clearTimeout(this.showTimer);
+        clearTimeout(this.closeTimer);
 
-        if (this.closeTimer) {
-            clearTimeout(this.closeTimer);
-            this.closeTimer = null;
-        }
+        this.tooltipModal.hide();
 
         if (this.forClickListener) {
             this.forClickListener();
@@ -64,12 +61,14 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     public ngOnInit() {
         if (this.for && this.id) {
             this.showTimer = setTimeout(() => {
-                if (this.onboardingService.shouldShow(this.id)) {
+                if (this.onboardingService.shouldShow(this.id) || true) {
                     this.tooltipModal.show();
 
                     this.closeTimer = setTimeout(() => {
                         this.hideThis();
                     }, 10000);
+
+                    this.onboardingService.disable(this.id);
                 }
             }, this.after);
 
@@ -84,14 +83,12 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
 
     public hideThis() {
         this.onboardingService.disable(this.id);
-        this.tooltipModal.hide();
 
         this.ngOnDestroy();
     }
 
     public hideAll() {
         this.onboardingService.disableAll();
-        this.tooltipModal.hide();
 
         this.ngOnDestroy();
     }

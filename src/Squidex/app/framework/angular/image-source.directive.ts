@@ -15,6 +15,7 @@ import { MathHelper } from './../utils/math-helper';
 export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, AfterViewInit {
     private parentResizeListener: Function;
 
+    private loadingTimer: any;
     private size: any;
     private loadRetries = 0;
     private loadQuery: string | null = null;
@@ -34,18 +35,9 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
     ) {
     }
 
-    public ngOnChanges() {
-        this.loadQuery = null;
-        this.loadRetries = 0;
-
-        this.setImageSource();
-    }
-
-    public ngAfterViewInit() {
-        this.resize(this.parent);
-    }
-
     public ngOnDestroy() {
+        clearTimeout(this.loadingTimer);
+
         this.parentResizeListener();
     }
 
@@ -58,6 +50,17 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
             this.renderer.listen(this.parent, 'resize', () => {
                 this.resize(this.parent);
             });
+    }
+
+    public ngAfterViewInit() {
+        this.resize(this.parent);
+    }
+
+    public ngOnChanges() {
+        this.loadQuery = null;
+        this.loadRetries = 0;
+
+        this.setImageSource();
     }
 
     @HostListener('load')
@@ -105,11 +108,12 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
         this.loadRetries++;
 
         if (this.loadRetries <= 10) {
-            setTimeout(() => {
-                this.loadQuery = MathHelper.guid();
+            this.loadingTimer =
+                setTimeout(() => {
+                    this.loadQuery = MathHelper.guid();
 
-                this.setImageSource();
-            }, this.loadRetries * 1000);
+                    this.setImageSource();
+                }, this.loadRetries * 1000);
         }
     }
 }

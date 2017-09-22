@@ -21,7 +21,7 @@
 </div>
 
 <div class="notification-container notification-container-{{position}}">
-    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" [@fade]>
+    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" @fade>
         <button type="button" class="close" data-dismiss="alert" (close)="close(notification)">&times;</button>
 
         {{notification.message}}

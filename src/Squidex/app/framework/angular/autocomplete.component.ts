@@ -54,37 +54,6 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public queryInput = new FormControl();
 
-    public writeValue(value: any) {
-        if (!value) {
-            this.resetForm();
-        } else {
-            const item = this.items.find(i => i === value);
-
-            if (item) {
-                this.queryInput.setValue(value.title || '');
-            }
-        }
-
-        this.reset();
-    }
-
-    public setDisabledState(isDisabled: boolean): void {
-        if (isDisabled) {
-            this.reset();
-            this.queryInput.disable();
-        } else {
-            this.queryInput.enable();
-        }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
     public ngOnDestroy() {
         this.subscription.unsubscribe();
     }
@@ -130,6 +99,37 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         }
 
         return true;
+    }
+
+    public writeValue(value: any) {
+        if (!value) {
+            this.resetForm();
+        } else {
+            const item = this.items.find(i => i === value);
+
+            if (item) {
+                this.queryInput.setValue(value.title || '');
+            }
+        }
+
+        this.reset();
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        if (isDisabled) {
+            this.reset();
+            this.queryInput.disable();
+        } else {
+            this.queryInput.enable();
+        }
+    }
+
+    public registerOnChange(fn: any) {
+        this.callChange = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.callTouched = fn;
     }
 
     public blur() {

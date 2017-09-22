@@ -234,16 +234,10 @@
           box-shadow: inset $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
 }
 
-@mixin box-shadow-raw($shadow) {
-  -webkit-box-shadow: $shadow;
-     -moz-box-shadow: $shadow;
-          box-shadow: $shadow;
-}
-
-@mixin box-shadow-raw($shadow1, $shadow2) {
-  -webkit-box-shadow: $shadow1, $shadow2;
-     -moz-box-shadow: $shadow1, $shadow2;
-          box-shadow: $shadow1, $shadow2;
+@mixin box-shadow-raw($shadows...) {
+  -webkit-box-shadow: $shadows;
+     -moz-box-shadow: $shadows;
+          box-shadow: $shadows;
 }
 
 @mixin border-radius-clip() {

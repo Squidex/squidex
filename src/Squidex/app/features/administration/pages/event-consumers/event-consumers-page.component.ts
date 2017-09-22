@@ -39,6 +39,10 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
         super(dialogs);
     }
 
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.load(false, true);
 
@@ -46,10 +50,6 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
             Observable.timer(4000, 4000).subscribe(() => {
                 this.load();
             });
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
     }
 
     public load(showInfo = false, showError = false) {
