@@ -17,7 +17,7 @@ import { RootViewService } from './../services/root-view.service';
 })
 export class ModalViewDirective implements OnChanges, OnDestroy {
     private subscription: Subscription | null = null;
-    private clickHandler: Function | null = null;
+    private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
@@ -36,6 +36,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
     public ngOnDestroy() {
         this.stopListening();
+
+        this.modalView.hide();
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -49,7 +51,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         if (this.modalView) {
-            this.subscription = this.modalView.isOpen.subscribe(isOpen => {
+            this.subscription =
+                this.modalView.isOpen.subscribe(isOpen => {
                     if (isOpen === (this.renderedView !== null)) {
                         return;
                     }
@@ -81,7 +84,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private startListening() {
-        this.clickHandler =
+        this.documentClickListener =
             this.renderer.listenGlobal('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null) {
                     return;
@@ -109,9 +112,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private stopListening() {
-        if (this.clickHandler) {
-            this.clickHandler();
-            this.clickHandler = null;
+        if (this.documentClickListener) {
+            this.documentClickListener();
+            this.documentClickListener = null;
         }
     }
 }

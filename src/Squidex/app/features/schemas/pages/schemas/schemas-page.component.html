@@ -12,14 +12,14 @@
 
         <div class="panel-header-row">
             <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
-            <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+            <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
             <button class="btn btn-success subheader-button" (click)="addSchemaDialog.show()" title="New Schema (CTRL + SHIFT + G)">
                 <i class="icon-plus"></i>          
             </button>
             
             <div class="search-form">
-                <input class="form-control form-control-dark" #findInput [formControl]="schemasFilter" placeholder="Search for schemas..." />
+                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas..." />
 
                 <i class="icon-search"></i>
             </div>
@@ -53,7 +53,7 @@
     </div>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="addSchemaDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="addSchemaDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">

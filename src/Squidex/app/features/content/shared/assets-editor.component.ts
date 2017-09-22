@@ -51,6 +51,10 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         super(dialogs, apps, authService);
     }
 
+    public ngOnDestroy() {
+        this.assetUpdatedSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.assetUpdatedSubscription =
             this.messageBus.of(AssetUpdated)
@@ -59,10 +63,6 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
                         this.oldAssets = this.oldAssets.replaceBy('id', event.assetDto);
                     }
                 });
-    }
-
-    public ngOnDestroy() {
-        this.assetUpdatedSubscription.unsubscribe();
     }
 
     public writeValue(value: string[]) {

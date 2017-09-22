@@ -1,6 +1,6 @@
 <div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" [dragData]="asset">
     <div class="card-block">
-        <div class="file-preview" *ngIf="asset && progress == 0" [@fade]>
+        <div class="file-preview" *ngIf="asset && progress == 0" @fade>
             <span class="file-type" *ngIf="asset.fileType">
                 {{asset.fileType}}
             </span>
@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="renameDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="renameDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">

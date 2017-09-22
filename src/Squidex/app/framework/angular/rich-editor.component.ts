@@ -28,6 +28,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
+    private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
 
@@ -39,28 +40,10 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     ) {
     }
 
-    public writeValue(value: string) {
-        this.value = Types.isString(value) ? value : '';
+    public ngOnDestroy() {
+        clearTimeout(this.tinyInitTimer);
 
-        if (this.tinyEditor) {
-            this.tinyEditor.setContent(this.value);
-        }
-    }
-
-    public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
-        if (this.tinyEditor) {
-            this.tinyEditor.setMode(isDisabled ? 'readonly' : 'design');
-        }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
+        tinymce.remove(this.editor);
     }
 
     public ngAfterViewInit() {
@@ -86,16 +69,37 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                         self.callTouched();
                     });
 
-                    setTimeout(() => {
-                        self.tinyEditor.setContent(this.value || '');
-                    }, 500);
+                    this.tinyInitTimer =
+                        setTimeout(() => {
+                            self.tinyEditor.setContent(this.value || '');
+                        }, 500);
                 },
                 removed_menuitems: 'newdocument', plugins: 'code', target: this.editor.nativeElement
             });
         });
     }
 
-    public ngOnDestroy() {
-        tinymce.remove(this.editor);
+    public writeValue(value: string) {
+        this.value = Types.isString(value) ? value : '';
+
+        if (this.tinyEditor) {
+            this.tinyEditor.setContent(this.value);
+        }
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
+
+        if (this.tinyEditor) {
+            this.tinyEditor.setMode(isDisabled ? 'readonly' : 'design');
+        }
+    }
+
+    public registerOnChange(fn: any) {
+        this.callChange = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.callTouched = fn;
     }
 }

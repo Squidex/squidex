@@ -46,12 +46,16 @@
                 </div>
             </div>
             <div class="panel-sidebar">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" *ngIf="!isNewMode">
+                <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
                     <i class="icon-time"></i>
                 </a>
                 <a class="panel-link" routerLink="assets" routerLinkActive="active">
                     <i class="icon-media"></i>
                 </a>
+
+                <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
+                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+                </sqx-onboarding-tooltip>
             </div>
         </div>
     </sqx-panel>

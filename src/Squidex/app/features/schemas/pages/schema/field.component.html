@@ -26,7 +26,7 @@
                         <button type="button" class="btn btn-link btn-decent" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
                             <i class="icon-dots"></i>
                         </button>
-                        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
+                        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" @fade>
                             <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
                                 Enable
                             </a>

@@ -130,29 +130,40 @@
             box-sizing: border-box;
 }
 
-@mixin caret-top() {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    content: '';
-    border-bottom: .3em solid;
-    border-right: .3em solid transparent;
-    border-left: .3em solid transparent;
+@mixin caret-top($color, $size: .6rem) {
+    @include caret;
+    border: $size solid transparent;
+    border-bottom-color: $color;
 }
 
-@mixin caret-bottom() {
+@mixin caret-left($color, $size: .6rem) {
+    @include caret;
+    border: $size solid transparent;
+    border-right-color: $color;
+}
+
+@mixin caret-right($color, $size: .6rem) {
+    @include caret;
+    border: $size solid transparent;
+    border-left-color: $color;
+}
+
+@mixin caret-bottom($color, $size: .6rem) {
+    @include caret;
+    border: $size solid transparent;
+    border-top-color: $color;
+}
+
+@mixin caret() {
     display: inline-block;
-    width: 0;
-    height: 0;
+      width: 0;
+     height: 0;
     content: '';
-    border-top: .3em solid;
-    border-right: .3em solid transparent;
-    border-left: .3em solid transparent;
 }
  
 @mixin circle($size) {
     @include border-radius($size * .5);
-    width: $size;
+     width: $size;
     height: $size;
 }
 
@@ -223,16 +234,10 @@
           box-shadow: inset $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
 }
 
-@mixin box-shadow-raw($shadow) {
-  -webkit-box-shadow: $shadow;
-     -moz-box-shadow: $shadow;
-          box-shadow: $shadow;
-}
-
-@mixin box-shadow-raw($shadow1, $shadow2) {
-  -webkit-box-shadow: $shadow1, $shadow2;
-     -moz-box-shadow: $shadow1, $shadow2;
-          box-shadow: $shadow1, $shadow2;
+@mixin box-shadow-raw($shadows...) {
+  -webkit-box-shadow: $shadows;
+     -moz-box-shadow: $shadows;
+          box-shadow: $shadows;
 }
 
 @mixin border-radius-clip() {

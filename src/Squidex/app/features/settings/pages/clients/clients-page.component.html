@@ -43,12 +43,20 @@
             </div>
         </div>
         <div class="panel-sidebar">
-            <a class="panel-link" routerLink="history" routerLinkActive="active">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory>
                 <i class="icon-time"></i>
             </a>
-            <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
                 <i class="icon-help"></i>
             </a>
+
+            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000">
+                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+            </sqx-onboarding-tooltip>
+            
+            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
+                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
+            </sqx-onboarding-tooltip>
         </div>
     </div>
 </sqx-panel>

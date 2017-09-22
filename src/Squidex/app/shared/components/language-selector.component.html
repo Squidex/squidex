@@ -8,7 +8,7 @@
     <button type="button" class="btn btn-secondary dropdown-toggle" [attr.title]="selectedLanguage.englishName" (click)="dropdown.toggle(); $event.stopPropagation()" #button>
         {{selectedLanguage.iso2Code}}
     </button>
-    <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="button" position="right" [@fade]>
+    <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="button" @fade>
         <div class="dropdown-item" *ngFor="let language of languages" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
             <strong class="iso-code">{{language.iso2Code}}</strong> &nbsp; &nbsp; ({{language.englishName}})
         </div>

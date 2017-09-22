@@ -23,8 +23,8 @@ export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
 export class SliderComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
-    private mouseMoveSubscription: Function | null = null;
-    private mouseUpSubscription: Function | null = null;
+    private windowMouseMoveListener: Function | null = null;
+    private windowMouseUpListener: Function | null = null;
     private centerStartOffset = 0;
     private startValue: number;
     private lastValue: number;
@@ -69,7 +69,7 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     public onBarMouseClick(event: MouseEvent): boolean {
-        if (this.mouseMoveSubscription) {
+        if (this.windowMouseMoveListener) {
             return true;
         }
 
@@ -89,12 +89,12 @@ export class SliderComponent implements ControlValueAccessor {
 
         this.startValue = this.value;
 
-        this.mouseMoveSubscription =
+        this.windowMouseMoveListener =
             this.renderer.listenGlobal('window', 'mousemove', (e: MouseEvent) => {
                 this.onMouseMove(e);
             });
 
-        this.mouseUpSubscription =
+        this.windowMouseUpListener =
             this.renderer.listenGlobal('window', 'mouseup', () => {
                 this.onMouseUp();
             });
@@ -175,14 +175,14 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     private releaseMouseHandlers() {
-        if (this.mouseMoveSubscription) {
-            this.mouseMoveSubscription();
-            this.mouseMoveSubscription = null;
+        if (this.windowMouseMoveListener) {
+            this.windowMouseMoveListener();
+            this.windowMouseMoveListener = null;
         }
 
-        if (this.mouseUpSubscription) {
-            this.mouseUpSubscription();
-            this.mouseUpSubscription = null;
+        if (this.windowMouseUpListener) {
+            this.windowMouseUpListener();
+            this.windowMouseUpListener = null;
         }
 
         this.isDragging = false;

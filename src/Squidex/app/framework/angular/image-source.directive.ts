@@ -5,14 +5,17 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer } from '@angular/core';
 
 import { MathHelper } from './../utils/math-helper';
 
 @Directive({
     selector: '[sqxImageSource]'
 })
-export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
+export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, AfterViewInit {
+    private parentResizeListener: Function;
+
+    private loadingTimer: any;
     private size: any;
     private loadRetries = 0;
     private loadQuery: string | null = null;
@@ -32,15 +35,10 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
     ) {
     }
 
-    public ngOnChanges() {
-        this.loadQuery = null;
-        this.loadRetries = 0;
+    public ngOnDestroy() {
+        clearTimeout(this.loadingTimer);
 
-        this.setImageSource();
-    }
-
-    public ngAfterViewInit() {
-        this.resize(this.parent);
+        this.parentResizeListener();
     }
 
     public ngOnInit() {
@@ -48,9 +46,21 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
             this.parent = this.element.nativeElement.parentElement;
         }
 
-        this.renderer.listen(this.parent, 'resize', () => {
-            this.resize(this.parent);
-        });
+        this.parentResizeListener =
+            this.renderer.listen(this.parent, 'resize', () => {
+                this.resize(this.parent);
+            });
+    }
+
+    public ngAfterViewInit() {
+        this.resize(this.parent);
+    }
+
+    public ngOnChanges() {
+        this.loadQuery = null;
+        this.loadRetries = 0;
+
+        this.setImageSource();
     }
 
     @HostListener('load')
@@ -98,11 +108,12 @@ export class ImageSourceDirective implements OnChanges, OnInit, AfterViewInit {
         this.loadRetries++;
 
         if (this.loadRetries <= 10) {
-            setTimeout(() => {
-                this.loadQuery = MathHelper.guid();
+            this.loadingTimer =
+                setTimeout(() => {
+                    this.loadQuery = MathHelper.guid();
 
-                this.setImageSource();
-            }, this.loadRetries * 1000);
+                    this.setImageSource();
+                }, this.loadRetries * 1000);
         }
     }
 }

@@ -46,6 +46,10 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
         super(dialogs, apps, authService);
     }
 
+    public ngOnDestroy() {
+        this.assetUpdatedSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         this.assetUpdatedSubscription =
             this.messageBus.of(AssetUpdated)
@@ -56,10 +60,6 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
                 });
 
         this.load();
-    }
-
-    public ngOnDestroy() {
-        this.assetUpdatedSubscription.unsubscribe();
     }
 
     public search() {
