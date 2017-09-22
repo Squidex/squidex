@@ -24,7 +24,7 @@ import { fadeAnimation } from './animations';
 export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private showTimer: any;
     private closeTimer: any;
-    private forClickListener: Function;
+    private forMouseDownListener: Function;
 
     public tooltipModal = new ModalView();
 
@@ -52,9 +52,9 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
 
         this.tooltipModal.hide();
 
-        if (this.forClickListener) {
-            this.forClickListener();
-            this.forClickListener = null;
+        if (this.forMouseDownListener) {
+            this.forMouseDownListener();
+            this.forMouseDownListener = null;
         }
     }
 
@@ -72,7 +72,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
                 }
             }, this.after);
 
-            this.forClickListener =
+            this.forMouseDownListener =
                 this.renderer.listen(this.for, 'mousedown', () => {
                     this.onboardingService.disable(this.id);
 
