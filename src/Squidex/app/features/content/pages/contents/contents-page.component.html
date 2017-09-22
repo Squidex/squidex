@@ -9,22 +9,22 @@
                 </button>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control form-control-expandable" #findInput [formControl]="contentsFilter" placeholder="Search for content" #searchInput />
+                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" #searchInput />
 
                     <a class="expand-search" (click)="searchModal.toggle()" #archive>
                         <i class="icon-caret-down"></i>
                     </a>
                 </form>
 
-                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="6000">
+                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
                     Click this icon to show the advanced search menu and to show the archive!
                 </sqx-onboarding-tooltip>
 
-                <sqx-onboarding-tooltip id="contentFind" [for]="findInput" position="bottomRight" after="120000">
+                <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
                     Search for content using full text search over all fields and languages!
                 </sqx-onboarding-tooltip>
                 

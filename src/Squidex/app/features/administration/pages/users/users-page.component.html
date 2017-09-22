@@ -9,14 +9,14 @@
                 </button>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" #findInput [formControl]="usersFilter" placeholder="Search for user" />
+                    <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
                 </form>
 
-                <button class="btn btn-success" #newButton routerLink="new" title="New User (CTRL + M)">
+                <button class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + M)">
                     <i class="icon-plus"></i> New
                 </button>
             </div>

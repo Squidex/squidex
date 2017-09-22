@@ -61,7 +61,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     public ngOnInit() {
         if (this.for && this.id) {
             this.showTimer = setTimeout(() => {
-                if (this.onboardingService.shouldShow(this.id) || true) {
+                if (this.onboardingService.shouldShow(this.id)) {
                     this.tooltipModal.show();
 
                     this.closeTimer = setTimeout(() => {

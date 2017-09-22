@@ -7,7 +7,11 @@
 
     <div [formGroup]="fieldForm">
         <div *ngIf="field.partitioning === 'language' && languages.length > 1">
-            <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages" #languages></sqx-language-selector>
+
+            <sqx-onboarding-tooltip id="languages" [for]="languages" position="topRight" after="120000">
+                Please remember to check all languages when you see validation errors.
+            </sqx-onboarding-tooltip>
         </div>
 
         <div *ngFor="let partition of fieldPartitions">
