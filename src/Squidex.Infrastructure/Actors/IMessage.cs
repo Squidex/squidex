@@ -1,16 +1,14 @@
-// ==========================================================================
-//  IEventSubscription.cs
+﻿// ==========================================================================
+//  IMessage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.Actors;
-
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.Actors
 {
-    public interface IEventSubscription : IActor
+    public interface IMessage
     {
     }
 }

@@ -12,15 +12,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
+using Squidex.Infrastructure.Actors;
+using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
+using Squidex.Infrastructure.Tasks;
+
+#pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    internal sealed class GetEventStoreSubscription : DisposableObjectBase, IEventSubscription
+    internal sealed class GetEventStoreSubscription : Actor, IEventSubscription
     {
         private const int ReconnectWindowMax = 5;
         private const int ReconnectWaitMs = 1000;
@@ -31,13 +35,26 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly string streamName;
         private readonly string prefix;
         private readonly string projectionHost;
-        private readonly ReaderWriterLockSlim connectionLock = new ReaderWriterLockSlim();
         private readonly Queue<DateTime> reconnectTimes = new Queue<DateTime>();
-        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
-        private Func<StoredEvent, Task> publishNext;
-        private Func<Exception, Task> publishError;
-        private EventStoreCatchUpSubscription internalSubscription;
+        private EventStoreCatchUpSubscription subscription;
         private long? position;
+        private IActor parent;
+
+        private sealed class ConnectMessage : IMessage
+        {
+        }
+
+        private sealed class ConnectionFailedMessage : IMessage
+        {
+            public Exception Exception;
+        }
+
+        private sealed class ReceiveESEventMessage : IMessage
+        {
+            public ResolvedEvent Event;
+
+            public EventStoreCatchUpSubscription Subscription;
+        }
 
         public GetEventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
         {
@@ -50,170 +67,93 @@ namespace Squidex.Infrastructure.CQRS.Events
             streamName = $"by-{prefix.Simplify()}-{streamFilter.Simplify()}";
         }
 
-        protected override void DisposeObject(bool disposing)
+        protected override Task OnStop()
         {
-            if (disposing)
-            {
-                disposeToken.Cancel();
+            subscription?.Stop();
 
-                try
-                {
-                    connectionLock.EnterWriteLock();
-
-                    internalSubscription?.Stop();
-                    internalSubscription = null;
-                }
-                finally
-                {
-                    connectionLock.ExitWriteLock();
-                }
-            }
+            return TaskHelper.Done;
         }
 
-        public async Task SubscribeAsync(Func<StoredEvent, Task> onNext, Func<Exception, Task> onError = null)
+        protected override async Task OnError(Exception exception)
         {
-            Guard.NotNull(onNext, nameof(onNext));
-
-            if (publishNext != null)
+            if (parent != null)
             {
-                throw new InvalidOperationException("An handler has already been registered.");
+                await parent.SendAsync(exception);
             }
 
-            publishNext = onNext;
-            publishError = onError;
-
-            await CreateProjectionAsync();
-
-            try
-            {
-                connectionLock.EnterWriteLock();
-
-                internalSubscription = SubscribeToEventStore();
-            }
-            finally
-            {
-                connectionLock.ExitWriteLock();
-            }
+            await StopAsync();
         }
 
-        private EventStoreCatchUpSubscription SubscribeToEventStore()
+        protected override async Task OnMessage(IMessage message)
         {
-            return connection.SubscribeToStreamFrom(streamName, position, CatchUpSubscriptionSettings.Default, HandleEvent, null, HandleError);
-        }
-
-        private void HandleEvent(EventStoreCatchUpSubscription subscription, ResolvedEvent resolved)
-        {
-            if (!CanHandleSubscriptionEvent(subscription))
+            switch (message)
             {
-                return;
-            }
-
-            try
-            {
-                connectionLock.EnterReadLock();
-
-                if (CanHandleSubscriptionEvent(subscription))
-                {
-                    var storedEvent = Formatter.Read(resolved);
-
-                    PublishAsync(storedEvent).Wait();
-
-                    position = resolved.OriginalEventNumber;
-                }
-            }
-            finally
-            {
-                connectionLock.ExitReadLock();
-            }
-        }
-
-        private void HandleError(EventStoreCatchUpSubscription subscription, SubscriptionDropReason reason, Exception ex)
-        {
-            if (!CanHandleSubscriptionEvent(subscription))
-            {
-                return;
-            }
-
-            try
-            {
-                connectionLock.EnterUpgradeableReadLock();
-
-                if (CanHandleSubscriptionEvent(subscription))
-                {
-                    if (reason == SubscriptionDropReason.ConnectionClosed)
+                case SubscribeMessage subscribe when parent == null:
                     {
-                        var utcNow = DateTime.UtcNow;
+                        parent = subscribe.Parent;
 
-                        if (CanReconnect(utcNow))
+                        await CreateProjectionAsync();
+
+                        break;
+                    }
+
+                case ConnectionFailedMessage connectionFailed when parent != null && subscription == null:
+                    {
+                        subscription.Stop();
+                        subscription = null;
+
+                        if (CanReconnect(DateTime.UtcNow))
                         {
-                            RegisterReconnectTime(utcNow);
-
-                            try
+                            Task.Delay(ReconnectWaitMs).ContinueWith(t =>
                             {
-                                connectionLock.EnterWriteLock();
-
-                                internalSubscription.Stop();
-                                internalSubscription = null;
-
-                                internalSubscription = SubscribeToEventStore();
-                            }
-                            finally
-                            {
-                                connectionLock.ExitWriteLock();
-                            }
-
-                            DelayForReconnect().Wait();
-
-                            if (!CanHandleSubscriptionEvent(subscription))
-                            {
-                                return;
-                            }
-
-                            try
-                            {
-                                connectionLock.EnterWriteLock();
-
-                                if (CanHandleSubscriptionEvent(subscription))
-                                {
-                                    internalSubscription = SubscribeToEventStore();
-                                }
-                            }
-                            finally
-                            {
-                                connectionLock.ExitWriteLock();
-                            }
-
-                            return;
+                                SendAsync(new ConnectMessage());
+                            }).Forget();
                         }
+                        else
+                        {
+                            await SendAsync(connectionFailed.Exception);
+                        }
+
+                        break;
                     }
 
-                    if (reason != SubscriptionDropReason.UserInitiated)
+                case ConnectMessage connect when parent != null && subscription == null:
                     {
-                        var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
+                        subscription = connection.SubscribeToStreamFrom(streamName, position, CatchUpSubscriptionSettings.Default, HandleEvent, null, HandleError);
 
-                        publishError?.Invoke(exception);
+                        break;
                     }
-                }
+
+                case ReceiveESEventMessage receiveEvent when receiveEvent.Subscription == subscription && parent != null:
+                    {
+                        var storedEvent = Formatter.Read(receiveEvent.Event);
+
+                        await parent.SendAsync(new ReceiveEventMessage { Event = storedEvent });
+
+                        position = receiveEvent.Event.OriginalEventNumber;
+
+                        break;
+                    }
             }
-            finally
+        }
+
+        private void HandleEvent(EventStoreCatchUpSubscription s, ResolvedEvent resolved)
+        {
+            SendAsync(new ReceiveESEventMessage { Event = resolved, Subscription = s }).Forget();
+        }
+
+        private void HandleError(EventStoreCatchUpSubscription s, SubscriptionDropReason reason, Exception ex)
+        {
+            if (reason == SubscriptionDropReason.ConnectionClosed)
             {
-                connectionLock.ExitUpgradeableReadLock();
+                SendAsync(new ConnectionFailedMessage { Exception = ex });
             }
-        }
+            else if (reason != SubscriptionDropReason.UserInitiated)
+            {
+                var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
-        private bool CanHandleSubscriptionEvent(EventStoreCatchUpSubscription subscription)
-        {
-            return !disposeToken.IsCancellationRequested && subscription == internalSubscription;
-        }
-
-        private bool CanReconnect(DateTime utcNow)
-        {
-            return reconnectTimes.Count < ReconnectWindowMax && (reconnectTimes.Count == 0 || (utcNow - reconnectTimes.Peek()) > TimeBetweenReconnects);
-        }
-
-        private async Task PublishAsync(StoredEvent storedEvent)
-        {
-            await publishNext(storedEvent).ConfigureAwait(false);
+                SendAsync(ex).Forget();
+            }
         }
 
         private static long? ParsePosition(string position)
@@ -221,7 +161,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
         }
 
-        private void RegisterReconnectTime(DateTime utcNow)
+        private bool CanReconnect(DateTime utcNow)
         {
             reconnectTimes.Enqueue(utcNow);
 
@@ -229,18 +169,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             {
                 reconnectTimes.Dequeue();
             }
-        }
 
-        private async Task DelayForReconnect()
-        {
-            try
-            {
-                await Task.Delay(ReconnectWaitMs, disposeToken.Token).ConfigureAwait(false);
-            }
-            catch (TaskCanceledException)
-            {
-                // Just ignore.
-            }
+            return reconnectTimes.Count < ReconnectWindowMax && (reconnectTimes.Count == 0 || (utcNow - reconnectTimes.Peek()) > TimeBetweenReconnects);
         }
 
         private async Task CreateProjectionAsync()
@@ -263,9 +193,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     await projectsManager.CreateContinuousAsync($"${streamName}", projectionConfig, connection.Settings.DefaultUserCredentials);
                 }
-                catch (ProjectionCommandConflictException)
+                catch (Exception ex) when (!(ex is ProjectionCommandConflictException))
                 {
-                    // Projection already exists.
+                    throw;
                 }
             }
         }
