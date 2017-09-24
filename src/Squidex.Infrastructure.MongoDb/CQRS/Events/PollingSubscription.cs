@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                     {
                         if (receiveEvent.Subscription == subscription)
                         {
-                            await parent.SendAsync(new ReceiveEventMessage { Event = receiveEvent.Event });
+                            await parent.SendAsync(new ReceiveEventMessage { Event = receiveEvent.Event, Source = this });
 
                             position = receiveEvent.Event.EventPosition;
                         }

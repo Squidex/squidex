@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                         {
                             var storedEvent = Formatter.Read(receiveEvent.Event);
 
-                            await parent.SendAsync(new ReceiveEventMessage { Event = storedEvent });
+                            await parent.SendAsync(new ReceiveEventMessage { Event = storedEvent, Source = this });
 
                             position = receiveEvent.Event.OriginalEventNumber;
                         }

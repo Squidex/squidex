@@ -92,7 +92,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                 case ReceiveEventMessage receiveEvent:
                     {
-                        await DispatchConsumerAsync(ParseEvent(receiveEvent.Event));
+                        if (receiveEvent.Source == eventSubscription)
+                        {
+                            await DispatchConsumerAsync(ParseEvent(receiveEvent.Event));
+                            await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, receiveEvent.Event.EventPosition, false);
+                        }
 
                         break;
                     }
