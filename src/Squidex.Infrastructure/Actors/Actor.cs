@@ -19,8 +19,6 @@ namespace Squidex.Infrastructure.Actors
     public abstract class Actor : IActor, IDisposable
     {
         private readonly ActionBlock<IMessage> block;
-        private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
-        private volatile bool isStopped;
 
         private sealed class StopMessage : IMessage
         {
@@ -43,10 +41,7 @@ namespace Squidex.Infrastructure.Actors
 
         public async Task StopAsync()
         {
-            isStopped = true;
-
             await block.SendAsync(new StopMessage());
-
             await block.Completion;
         }
 
