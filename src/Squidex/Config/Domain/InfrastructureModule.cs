@@ -136,6 +136,10 @@ namespace Squidex.Config.Domain
                 .As<IMemoryCache>()
                 .SingleInstance();
 
+            builder.RegisterType<DefaultRemoteActorChannel>()
+                .As<IRemoteActorChannel>()
+                .SingleInstance();
+
             builder.RegisterType<RemoteActors>()
                 .As<IActors>()
                 .AsSelf()
