@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Actors
 
         protected Actor()
         {
-            block = new ActionBlock<IMessage>(Handle, new ExecutionDataflowBlockOptions { BoundedCapacity = 100 });
+            block = new ActionBlock<IMessage>(Handle, new ExecutionDataflowBlockOptions { BoundedCapacity = 10 });
         }
 
         public void Dispose()
