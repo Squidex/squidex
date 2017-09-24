@@ -41,7 +41,6 @@ namespace Benchmarks.Tests
             mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
 
             eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
-            eventStore.Warmup();
         }
 
         public long Run()

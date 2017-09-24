@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==========================================================================
+//  DefaultRemoteActorChannel.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

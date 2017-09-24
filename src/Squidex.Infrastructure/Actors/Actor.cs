@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.Actors
     public abstract class Actor : IActor, IDisposable
     {
         private readonly ActionBlock<IMessage> block;
+        private bool isStopped;
 
         private sealed class StopMessage : IMessage
         {
@@ -30,7 +31,7 @@ namespace Squidex.Infrastructure.Actors
 
         protected Actor()
         {
-            block = new ActionBlock<IMessage>(Handle, new ExecutionDataflowBlockOptions { BoundedCapacity = 10 });
+            block = new ActionBlock<IMessage>(Handle, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, BoundedCapacity = 10 });
         }
 
         public void Dispose()
@@ -75,28 +76,43 @@ namespace Squidex.Infrastructure.Actors
 
         private async Task Handle(IMessage message)
         {
-            try
+            if (isStopped)
             {
-                if (message is StopMessage)
+                return;
+            }
+
+            switch (message)
+            {
+                case StopMessage stopMessage:
                 {
+                    isStopped = true;
+
                     block.Complete();
 
                     await OnStop();
+
+                    break;
                 }
-                else if (message is ErrorMessage errorMessage)
+
+                case ErrorMessage errorMessage:
                 {
                     await OnError(errorMessage.Exception);
+
+                    break;
                 }
-                else
+
+                default:
                 {
-                    await OnMessage(message);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!(message is ErrorMessage))
-                {
-                    await block.SendAsync(new ErrorMessage { Exception = ex });
+                    try
+                    {
+                        await OnMessage(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        await OnError(ex);
+                    }
+
+                    break;
                 }
             }
         }

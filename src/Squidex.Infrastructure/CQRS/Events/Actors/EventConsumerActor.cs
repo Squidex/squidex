@@ -48,6 +48,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
             this.eventConsumer = eventConsumer;
+
+            SendAsync(new StartConsumerMessage());
         }
 
         protected override async Task OnStop()
@@ -67,21 +69,21 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             switch (message)
             {
-                case StopReceiverMessage stopReceiver:
+                case StopConsumerMessage stopConsumer:
                     {
-                        await StopAsync(stopReceiver.Exception);
+                        await StopAsync(stopConsumer.Exception);
 
                         break;
                     }
 
-                case StartReceiverMessage startReceiver:
+                case StartConsumerMessage startConsumer:
                     {
                         await StartAsync();
 
                         break;
                     }
 
-                case ResetReceiverMessage resetReceiver:
+                case ResetConsumerMessage resetConsumer:
                     {
                         await StopAsync();
                         await ResetAsync();

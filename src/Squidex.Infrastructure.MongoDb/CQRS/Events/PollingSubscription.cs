@@ -22,24 +22,20 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private readonly IEventNotifier eventNotifier;
         private readonly MongoEventStore eventStore;
-        private CancellationTokenSource cancelPolling;
-        private Timer pollTimer;
+        private readonly CancellationTokenSource pollStop = new CancellationTokenSource();
         private Regex streamRegex;
-        private Guid subscription;
         private string streamFilter;
         private string position;
+        private bool isPolling;
         private IDisposable pollSubscription;
         private IActor parent;
 
-        private sealed class PollMessage : IMessage
+        private sealed class StartPollMessage : IMessage
         {
         }
 
-        private sealed class ReceiveMongoEventMessage : IMessage
+        private sealed class StopPollMessage : IMessage
         {
-            public StoredEvent Event;
-
-            public Guid Subscription;
         }
 
         public PollingSubscription(MongoEventStore eventStore, IEventNotifier eventNotifier)
@@ -50,9 +46,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         protected override Task OnStop()
         {
-            cancelPolling?.Cancel();
-
-            pollTimer?.Dispose();
+            pollStop?.Cancel();
             pollSubscription?.Dispose();
 
             parent = null;
@@ -86,57 +80,54 @@ namespace Squidex.Infrastructure.CQRS.Events
                         {
                             if (streamRegex.IsMatch(streamName))
                             {
-                                SendAsync(new PollMessage()).Forget();
+                                SendAsync(new StartPollMessage()).Forget();
                             }
                         });
 
-                        pollTimer = new Timer(d =>
-                        {
-                            SendAsync(new PollMessage()).Forget();
-                        });
-
-                        pollTimer.Change(0, 5000);
+                        SendAsync(new StartPollMessage()).Forget();
 
                         break;
                     }
 
-                case PollMessage poll when parent != null:
+                case StartPollMessage poll when parent != null:
                     {
-                        cancelPolling?.Cancel();
-                        cancelPolling = new CancellationTokenSource();
-
-                        subscription = Guid.NewGuid();
-
-                        PollAsync(subscription, cancelPolling.Token).Forget();
-
-                        break;
-                    }
-
-                case ReceiveMongoEventMessage receiveEvent when parent != null:
-                    {
-                        if (receiveEvent.Subscription == subscription)
+                        if (!isPolling)
                         {
-                            await parent.SendAsync(new ReceiveEventMessage { Event = receiveEvent.Event, Source = this });
+                            isPolling = true;
 
-                            position = receiveEvent.Event.EventPosition;
+                            PollAsync().Forget();
                         }
+
+                        break;
+                    }
+
+                case StopPollMessage poll when parent != null:
+                    {
+                        isPolling = false;
+
+                        Task.Delay(5000).ContinueWith(t => SendAsync(new StartPollMessage())).Forget();
+
+                        break;
+                    }
+
+                case ReceiveEventMessage receiveEvent when parent != null:
+                    {
+                        await parent.SendAsync(receiveEvent);
+
+                        position = receiveEvent.Event.EventPosition;
 
                         break;
                     }
             }
         }
 
-        private async Task PollAsync(Guid subscriptionId, CancellationToken ct)
+        private async Task PollAsync()
         {
             try
             {
-                await eventStore.GetEventsAsync(async e =>
-                {
-                    if (ct.IsCancellationRequested == true)
-                    {
-                        await SendAsync(new ReceiveMongoEventMessage { Event = e, Subscription = subscriptionId });
-                    }
-                }, ct, streamFilter, position);
+                await eventStore.GetEventsAsync(e => SendAsync(new ReceiveEventMessage { Event = e, Source = this }), pollStop.Token, streamFilter, position);
+
+                await SendAsync(new StopPollMessage());
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {

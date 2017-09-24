@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors;
 
 namespace Squidex.Config.Domain
 {
@@ -35,7 +36,7 @@ namespace Squidex.Config.Domain
 
             if (consumeEvents)
             {
-                builder.RegisterType<EventReceiver>()
+                builder.RegisterType<EventConsumerActor>()
                     .AsSelf()
                     .InstancePerDependency();
             }

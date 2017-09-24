@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==========================================================================
+//  RemoteActors.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;

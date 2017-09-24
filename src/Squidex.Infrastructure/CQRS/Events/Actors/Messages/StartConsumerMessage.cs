@@ -1,20 +1,17 @@
 ﻿// ==========================================================================
-//  IRemoteActorChannel.cs
+//  StartConsumerMessage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure.Actors;
 
-namespace Squidex.Infrastructure.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Actors.Messages
 {
-    public interface IRemoteActorChannel
+    [TypeName(nameof(StartConsumerMessage))]
+    public sealed class StartConsumerMessage : IMessage
     {
-        Task SendAsync(string recipient, IMessage message);
-
-        void Subscribe(string recipient, Action<IMessage> handler);
     }
 }

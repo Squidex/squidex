@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
@@ -31,7 +32,7 @@ namespace Benchmarks.Tests
         private IEventStore eventStore;
         private IEventNotifier eventNotifier;
         private IEventConsumerInfoRepository eventConsumerInfos;
-        private EventReceiver eventReceiver;
+        private EventConsumerActor eventConsumerActor;
         private MyEventConsumer eventConsumer;
 
         public string Id
@@ -67,10 +68,9 @@ namespace Benchmarks.Tests
             eventNotifier = new DefaultEventNotifier(new InMemoryPubSub());
 
             eventStore = new MongoEventStore(mongoDatabase, eventNotifier);
-            eventStore.Warmup();
 
-            eventReceiver = new EventReceiver(formatter, eventStore, eventConsumerInfos, log);
-            eventReceiver.Subscribe(eventConsumer);
+            eventConsumerActor = new EventConsumerActor(formatter, eventStore, eventConsumerInfos, log);
+            eventConsumerActor.Subscribe(eventConsumer);
         }
 
         public long Run()
@@ -98,7 +98,7 @@ namespace Benchmarks.Tests
         {
             mongoClient.DropDatabase(mongoDatabase.DatabaseNamespace.DatabaseName);
 
-            eventReceiver.Dispose();
+            eventConsumerActor.Dispose();
         }
 
         public void Cleanup()
