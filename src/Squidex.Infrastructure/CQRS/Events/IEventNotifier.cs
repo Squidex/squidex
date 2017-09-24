@@ -12,8 +12,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventNotifier
     {
-        void NotifyEventsStored();
+        void NotifyEventsStored(string streamName);
 
-        IDisposable Subscribe(Action handler);
+        IDisposable Subscribe(Action<string> handler);
     }
 }

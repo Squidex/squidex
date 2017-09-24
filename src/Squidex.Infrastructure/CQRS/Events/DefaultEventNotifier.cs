@@ -14,23 +14,23 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private static readonly string ChannelName = typeof(DefaultEventNotifier).Name;
 
-        private readonly IPubSub invalidator;
+        private readonly IPubSub pubsub;
 
-        public DefaultEventNotifier(IPubSub invalidator)
+        public DefaultEventNotifier(IPubSub pubsub)
         {
-            Guard.NotNull(invalidator, nameof(invalidator));
+            Guard.NotNull(pubsub, nameof(pubsub));
 
-            this.invalidator = invalidator;
+            this.pubsub = pubsub;
         }
 
-        public void NotifyEventsStored()
+        public void NotifyEventsStored(string streamName)
         {
-            invalidator.Publish(ChannelName, string.Empty, true);
+            pubsub.Publish(ChannelName, streamName, true);
         }
 
-        public IDisposable Subscribe(Action handler)
+        public IDisposable Subscribe(Action<string> handler)
         {
-            return invalidator.Subscribe(ChannelName, x => handler());
+            return pubsub.Subscribe(ChannelName, x => handler?.Invoke(x));
         }
     }
 }

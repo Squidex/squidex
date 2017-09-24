@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Infrastructure.Timers;
 
 #pragma warning disable SA1401 // Fields must be private
 
@@ -22,11 +22,12 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private readonly IEventNotifier eventNotifier;
         private readonly MongoEventStore eventStore;
-        private readonly string streamFilter;
-        private CancellationTokenSource ct;
+        private CancellationTokenSource cancelPolling;
         private Timer pollTimer;
+        private Regex streamRegex;
+        private Guid subscription;
+        private string streamFilter;
         private string position;
-        private bool isStopped;
         private IDisposable pollSubscription;
         private IActor parent;
 
@@ -34,17 +35,22 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
         }
 
-        public PollingSubscription(MongoEventStore eventStore, IEventNotifier eventNotifier, string streamFilter, string position)
+        private sealed class ReceiveMongoEventMessage : IMessage
         {
-            this.position = position;
+            public StoredEvent Event;
+
+            public Guid Subscription;
+        }
+
+        public PollingSubscription(MongoEventStore eventStore, IEventNotifier eventNotifier)
+        {
             this.eventStore = eventStore;
             this.eventNotifier = eventNotifier;
-            this.streamFilter = streamFilter;
         }
 
         protected override Task OnStop()
         {
-            ct?.Cancel();
+            cancelPolling?.Cancel();
 
             pollTimer?.Dispose();
             pollSubscription?.Dispose();
@@ -71,10 +77,17 @@ namespace Squidex.Infrastructure.CQRS.Events
                 case SubscribeMessage subscribe when parent == null:
                     {
                         parent = subscribe.Parent;
+                        position = subscribe.Position;
 
-                        pollSubscription = eventNotifier.Subscribe(() =>
+                        streamFilter = subscribe.StreamFilter;
+                        streamRegex = new Regex(streamFilter);
+
+                        pollSubscription = eventNotifier.Subscribe(streamName =>
                         {
-                            SendAsync(new PollMessage()).Forget();
+                            if (streamRegex.IsMatch(streamName))
+                            {
+                                SendAsync(new PollMessage()).Forget();
+                            }
                         });
 
                         pollTimer = new Timer(d =>
@@ -89,30 +102,41 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 case PollMessage poll when parent != null:
                     {
-                        ct?.Cancel();
-                        ct = new CancellationTokenSource();
+                        cancelPolling?.Cancel();
+                        cancelPolling = new CancellationTokenSource();
 
-                        PollAsync().Forget();
+                        subscription = Guid.NewGuid();
+
+                        PollAsync(subscription, cancelPolling.Token).Forget();
 
                         break;
                     }
 
-                case ReceiveEventMessage receiveEvent when parent != null:
+                case ReceiveMongoEventMessage receiveEvent when parent != null:
                     {
-                        await parent.SendAsync(receiveEvent);
+                        if (receiveEvent.Subscription == subscription)
+                        {
+                            await parent.SendAsync(new ReceiveEventMessage { Event = receiveEvent.Event });
 
-                        position = receiveEvent.Event.EventPosition;
+                            position = receiveEvent.Event.EventPosition;
+                        }
 
                         break;
                     }
             }
         }
 
-        private async Task PollAsync()
+        private async Task PollAsync(Guid subscriptionId, CancellationToken ct)
         {
             try
             {
-                await eventStore.GetEventsAsync(e => SendAsync(new ReceiveEventMessage { Event = e }), ct.Token, streamFilter, position);
+                await eventStore.GetEventsAsync(async e =>
+                {
+                    if (ct.IsCancellationRequested == true)
+                    {
+                        await SendAsync(new ReceiveMongoEventMessage { Event = e, Subscription = subscriptionId });
+                    }
+                }, ct, streamFilter, position);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {

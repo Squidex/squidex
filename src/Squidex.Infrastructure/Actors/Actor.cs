@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Infrastructure.Tasks;

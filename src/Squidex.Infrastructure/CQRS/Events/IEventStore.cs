@@ -20,6 +20,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events);
 
-        IEventSubscription CreateSubscription(string streamFilter = null, string position = null);
+        IEventSubscription CreateSubscription();
     }
 }

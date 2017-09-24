@@ -31,12 +31,12 @@ namespace Squidex.Infrastructure.CQRS.Events
         private static readonly TimeSpan TimeBetweenReconnects = TimeSpan.FromMinutes(5);
         private static readonly ConcurrentDictionary<string, bool> SubscriptionsCreated = new ConcurrentDictionary<string, bool>();
         private readonly IEventStoreConnection connection;
-        private readonly string streamFilter;
-        private readonly string streamName;
         private readonly string prefix;
         private readonly string projectionHost;
         private readonly Queue<DateTime> reconnectTimes = new Queue<DateTime>();
         private EventStoreCatchUpSubscription subscription;
+        private string streamFilter;
+        private string streamName;
         private long? position;
         private IActor parent;
 
@@ -56,15 +56,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             public EventStoreCatchUpSubscription Subscription;
         }
 
-        public GetEventStoreSubscription(IEventStoreConnection connection, string streamFilter, string position, string prefix, string projectionHost)
+        public GetEventStoreSubscription(IEventStoreConnection connection, string prefix, string projectionHost)
         {
             this.prefix = prefix;
-            this.position = ParsePosition(position);
             this.connection = connection;
-            this.streamFilter = streamFilter;
             this.projectionHost = projectionHost;
-
-            streamName = $"by-{prefix.Simplify()}-{streamFilter.Simplify()}";
         }
 
         protected override Task OnStop()
@@ -91,6 +87,10 @@ namespace Squidex.Infrastructure.CQRS.Events
                 case SubscribeMessage subscribe when parent == null:
                     {
                         parent = subscribe.Parent;
+                        position = ParsePosition(subscribe.Position);
+
+                        streamFilter = subscribe.StreamFilter;
+                        streamName = $"by-{prefix.Simplify()}-{streamFilter.Simplify()}";
 
                         await CreateProjectionAsync();
 
@@ -104,10 +104,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                         if (CanReconnect(DateTime.UtcNow))
                         {
-                            Task.Delay(ReconnectWaitMs).ContinueWith(t =>
-                            {
-                                SendAsync(new ConnectMessage());
-                            }).Forget();
+                            Task.Delay(ReconnectWaitMs).ContinueWith(t => SendAsync(new ConnectMessage())).Forget();
                         }
                         else
                         {
@@ -124,13 +121,16 @@ namespace Squidex.Infrastructure.CQRS.Events
                         break;
                     }
 
-                case ReceiveESEventMessage receiveEvent when receiveEvent.Subscription == subscription && parent != null:
+                case ReceiveESEventMessage receiveEvent when parent != null:
                     {
-                        var storedEvent = Formatter.Read(receiveEvent.Event);
+                        if (receiveEvent.Subscription == subscription)
+                        {
+                            var storedEvent = Formatter.Read(receiveEvent.Event);
 
-                        await parent.SendAsync(new ReceiveEventMessage { Event = storedEvent });
+                            await parent.SendAsync(new ReceiveEventMessage { Event = storedEvent });
 
-                        position = receiveEvent.Event.OriginalEventNumber;
+                            position = receiveEvent.Event.OriginalEventNumber;
+                        }
 
                         break;
                     }
@@ -144,11 +144,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private void HandleError(EventStoreCatchUpSubscription s, SubscriptionDropReason reason, Exception ex)
         {
-            if (reason == SubscriptionDropReason.ConnectionClosed)
+            if (reason == SubscriptionDropReason.ConnectionClosed && subscription == s)
             {
                 SendAsync(new ConnectionFailedMessage { Exception = ex });
             }
-            else if (reason != SubscriptionDropReason.UserInitiated)
+            else if (reason != SubscriptionDropReason.UserInitiated && subscription == s)
             {
                 var exception = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 

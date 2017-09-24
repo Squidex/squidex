@@ -13,7 +13,7 @@ using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events.Receivers
+namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
     public sealed class EventConsumerActor : Actor
     {
@@ -105,8 +105,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Receivers
 
             position = (await eventConsumerInfoRepository.FindAsync(eventConsumer.Name)).Position;
 
-            eventSubscription = eventStore.CreateSubscription(eventConsumer.EventsFilter, position);
-            eventSubscription.SendAsync(new SubscribeMessage { Parent = this }).Forget();
+            eventSubscription = eventStore.CreateSubscription();
+            eventSubscription.SendAsync(new SubscribeMessage { Parent = this, StreamFilter = eventConsumer.EventsFilter, Position = position }).Forget();
         }
 
         private async Task StopAsync(Exception exception = null)

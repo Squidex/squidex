@@ -55,9 +55,9 @@ namespace Squidex.Infrastructure.CQRS.Events
                 collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true }));
         }
 
-        public IEventSubscription CreateSubscription(string streamFilter = null, string position = null)
+        public IEventSubscription CreateSubscription()
         {
-            return new PollingSubscription(this, notifier, streamFilter, position);
+            return new PollingSubscription(this, notifier);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)
@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     await Collection.InsertOneAsync(commit);
 
-                    notifier.NotifyEventsStored();
+                    notifier.NotifyEventsStored(streamName);
 
                     return;
                 }
