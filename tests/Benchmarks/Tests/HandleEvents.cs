@@ -67,7 +67,7 @@ namespace Benchmarks.Tests
             eventStore = new MongoEventStore(mongoDatabase, eventNotifier);
 
             eventConsumerActor = new EventConsumerActor(formatter, eventStore, eventConsumerInfos, log);
-            eventConsumerActor.Subscribe(eventConsumer);
+            eventConsumerActor.SubscribeAsync(eventConsumer);
         }
 
         public long Run()

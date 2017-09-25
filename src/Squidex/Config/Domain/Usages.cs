@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
 
                 if (actor != null)
                 {
-                    actor.Subscribe(consumer);
+                    actor.SubscribeAsync(consumer);
 
                     app.ApplicationServices.GetService<RemoteActors>().Connect(consumer.Name, actor);
                 }

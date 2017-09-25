@@ -44,11 +44,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             this.eventConsumerInfoRepository = eventConsumerInfoRepository;
         }
 
-        public void Subscribe(IEventConsumer eventConsumer)
+        public Task SubscribeAsync(IEventConsumer eventConsumer)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            SendAsync(new SetupConsumerMessage { EventConsumer = eventConsumer });
+            return SendAsync(new SetupConsumerMessage { EventConsumer = eventConsumer });
         }
 
         protected override async Task OnStop()
