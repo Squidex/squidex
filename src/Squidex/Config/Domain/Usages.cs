@@ -28,9 +28,12 @@ namespace Squidex.Config.Domain
             {
                 var actor = app.ApplicationServices.GetService<EventConsumerActor>();
 
-                actor?.Subscribe(consumer);
+                if (actor != null)
+                {
+                    actor.Subscribe(consumer);
 
-                app.ApplicationServices.GetService<RemoteActors>().Connect(consumer.Name, actor);
+                    app.ApplicationServices.GetService<RemoteActors>().Connect(consumer.Name, actor);
+                }
             }
 
             return app;

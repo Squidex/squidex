@@ -553,5 +553,21 @@ namespace Squidex.Domain.Apps.Core.Contents
             Assert.Equal(1, cleanedValue.Count);
             Assert.Equal(id1.ToString(), cleanedValue[0]);
         }
+
+        [Fact]
+        public void Should_be_equal_fields_when_they_have_same_value()
+        {
+            var lhs =
+                new ContentFieldData()
+                    .AddValue("iv", 2);
+
+            var rhs =
+                new ContentFieldData()
+                    .AddValue("iv", 2);
+
+            Assert.True(lhs.Equals(rhs));
+            Assert.True(lhs.Equals((object)rhs));
+            Assert.Equal(lhs.GetHashCode(), rhs.GetHashCode());
+        }
     }
 }

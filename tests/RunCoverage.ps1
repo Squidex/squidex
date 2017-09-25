@@ -1,64 +1,81 @@
+Param(
+	[switch]$infrastructure,
+	[switch]$appsCore,
+	[switch]$appsRead,
+	[switch]$appsWrite,
+	[switch]$users,
+	[switch]$all
+)
+
 $ErrorActionPreference = "Stop"
 
-$reportsFolder = ".\_test-output"
-$userProfile = $env:USERPROFILE
-$workingFolder = Get-Location
+$folderReports = ".\_test-output"
+$folderHome = $env:USERPROFILE
+$folderWorking = Get-Location
 
-Write-Host "Clear up '$reportsFolder' folder"
-
-if (Test-Path $reportsFolder) {
-    Remove-Item $reportsFolder -recurse
+if (Test-Path $folderReports) {
+    Remove-Item $folderReports -recurse
 }
 
-Write-Host "Create new '$reportsFolder' folder"
+Write-Host "Recreated '$folderReports' folder"
 
-New-Item -ItemType directory -Path $reportsFolder
+New-Item -ItemType directory -Path $folderReports
 
-&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
--register:user `
--target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
--filter:"+[Squidex*]*" `
--skipautoprops `
--output:"$workingFolder\$reportsFolder\Infrastructure.xml" `
--oldStyle
+if ($all -Or $infrastructure) {
+	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
+	-filter:"+[Squidex*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
+	-oldStyle
+}
 
-&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
--register:user `
--target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
--filter:"+[Squidex*]*" `
--skipautoprops `
--output:"$workingFolder\$reportsFolder\Core.xml" `
--oldStyle
+if ($all -Or $appsCore) {
+	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
+	-filter:"+[Squidex*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Core.xml" `
+	-oldStyle
+}
 
-&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
--register:user `
--target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Read.Tests\Squidex.Domain.Apps.Read.Tests.csproj" `
--filter:"+[Squidex*]*" `
--skipautoprops `
--output:"$workingFolder\$reportsFolder\Read.xml" `
--oldStyle
+if ($all -Or $appsRead) {
+	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Read.Tests\Squidex.Domain.Apps.Read.Tests.csproj" `
+	-filter:"+[Squidex*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Read.xml" `
+	-oldStyle
+}
 
-&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
--register:user `
--target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Apps.Write.Tests\Squidex.Domain.Apps.Write.Tests.csproj" `
--filter:"+[Squidex*]*" `
--skipautoprops `
--output:"$workingFolder\$reportsFolder\Write.xml" `
--oldStyle
+if ($all -Or $appsWrite) {
+	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Write.Tests\Squidex.Domain.Apps.Write.Tests.csproj" `
+	-filter:"+[Squidex*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Write.xml" `
+	-oldStyle
+}
 
-&"$userProfile\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
--register:user `
--target:"C:\Program Files\dotnet\dotnet.exe" `
--targetargs:"test $workingFolder\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
--filter:"+[Squidex*]*" `
--skipautoprops `
--output:"$workingFolder\$reportsFolder\Users.xml" `
--oldStyle
+if ($all -Or $users) {
+	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
+	-filter:"+[Squidex*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Users.xml" `
+	-oldStyle
+}
 
-&"$userProfile\.nuget\packages\ReportGenerator\2.5.11\tools\ReportGenerator.exe" `
--reports:"$workingFolder\$reportsFolder\*.xml" `
--targetdir:"$workingFolder\$reportsFolder\Output"
+&"$folderHome\.nuget\packages\ReportGenerator\2.5.11\tools\ReportGenerator.exe" `
+-reports:"$folderWorking\$folderReports\*.xml" `
+-targetdir:"$folderWorking\$folderReports\Output"

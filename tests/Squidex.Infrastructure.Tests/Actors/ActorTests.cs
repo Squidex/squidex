@@ -112,11 +112,25 @@ namespace Squidex.Infrastructure.Actors
         {
             sut.SendAsync(new SuccessMessage { Counter = 1 }).Forget();
 
-            sut.StopAsync().Forget();
+            await sut.StopAsync();
 
             sut.SendAsync(new SuccessMessage { Counter = 2 }).Forget();
             sut.SendAsync(new SuccessMessage { Counter = 3 }).Forget();
             sut.SendAsync(new InvalidOperationException()).Forget();
+
+            sut.Invokes.ShouldBeEquivalentTo(new List<object>
+            {
+                new SuccessMessage { Counter = 1 },
+                true
+            });
+        }
+
+        [Fact]
+        public async Task Should_call_stop_on_dispose()
+        {
+            sut.SendAsync(new SuccessMessage { Counter = 1 }).Forget();
+
+            sut.Dispose();
 
             await sut.StopAsync();
 
