@@ -45,7 +45,7 @@
                                 confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
                                 Lock
                             </a>
-                            <a class="dropdown-item dropdown-item-delete" (sqxConfirmClick)="deleting.emit()" [class.disabled]="field.isLocked"
+                            <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
                                 (sqxConfirmClick)="deleting.emit()"
                                 confirmTitle="Delete field" 
                                 confirmText="Do you really want to delete the field?">

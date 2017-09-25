@@ -120,6 +120,12 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
+        public async Task Should_return_contents_with_ids_from_repository_and_transform()
+        {
+            await TestManyIdRequest(true, false, new HashSet<Guid> { Guid.NewGuid() }, Status.Draft, Status.Published);
+        }
+
+        [Fact]
         public async Task Should_return_non_archived_contents_from_repository_and_transform()
         {
             await TestManyRequest(true, false, Status.Draft, Status.Published);
@@ -145,32 +151,69 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         private async Task TestManyRequest(bool isFrontend, bool archive, params Status[] status)
         {
-            if (isFrontend)
-            {
-                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "squidex-frontend"));
-            }
+            SetupClaims(isFrontend);
 
-            var ids = new HashSet<Guid>();
+            SetupFakeWithOdataQuery(status);
+            SetupFakeWithScripting();
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
-                .Returns(schema);
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids, A<ODataUriParser>.Ignored))
-                .Returns(new List<IContentEntity> { content });
-            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids, A<ODataUriParser>.Ignored))
-                .Returns(123);
-
-            A.CallTo(() => schema.ScriptQuery)
-                .Returns("<script-query>");
-
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
-                .Returns(transformedData);
-
-            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, ids, null);
+            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, string.Empty);
 
             Assert.Equal(123, result.Total);
             Assert.Equal(schema, result.Schema);
             Assert.Equal(data, result.Items[0].Data);
             Assert.Equal(content.Id, result.Items[0].Id);
+        }
+
+        private async Task TestManyIdRequest(bool isFrontend, bool archive, HashSet<Guid> ids, params Status[] status)
+        {
+            SetupClaims(isFrontend);
+
+            SetupFakeWithIdQuery(status, ids);
+            SetupFakeWithScripting();
+
+            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, ids);
+
+            Assert.Equal(123, result.Total);
+            Assert.Equal(schema, result.Schema);
+            Assert.Equal(data, result.Items[0].Data);
+            Assert.Equal(content.Id, result.Items[0].Id);
+        }
+
+        private void SetupClaims(bool isFrontend)
+        {
+            if (isFrontend)
+            {
+                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "squidex-frontend"));
+            }
+        }
+
+        private void SetupFakeWithIdQuery(Status[] status, HashSet<Guid> ids)
+        {
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+                .Returns(schema);
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
+                .Returns(new List<IContentEntity> { content });
+            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
+                .Returns(123);
+        }
+
+        private void SetupFakeWithOdataQuery(Status[] status)
+        {
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+                .Returns(schema);
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
+                .Returns(new List<IContentEntity> { content });
+            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
+                .Returns(123);
+        }
+
+        private void SetupFakeWithScripting()
+        {
+            A.CallTo(() => schema.ScriptQuery)
+                .Returns("<script-query>");
+
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
+                .Returns(transformedData);
         }
     }
 }

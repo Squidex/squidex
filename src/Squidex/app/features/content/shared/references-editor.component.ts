@@ -82,7 +82,7 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             this.appNameOnce()
                 .switchMap(app => this.contentsService.getContents(app, this.schemaId, 10000, 0, undefined, contentIds))
                 .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(dtos.items);
+                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(c => !!c));
                 });
         }
     }

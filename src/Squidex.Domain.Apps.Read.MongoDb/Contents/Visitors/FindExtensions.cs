@@ -57,25 +57,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             return cursor;
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, Status[] status)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
         {
-            var filter = BuildQuery(query, ids, schemaId, schema, status);
+            var filter = BuildQuery(query, schemaId, schema, status);
 
             return cursor.Find(filter);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, Status[] status)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.SchemaId, schemaId),
                 Filter.In(x => x.Status, status)
             };
-
-            if (ids != null && ids.Count > 0)
-            {
-                filters.Add(Filter.In(x => x.Id, ids));
-            }
 
             var filter = FilterBuilder.Build(query, schema);
 

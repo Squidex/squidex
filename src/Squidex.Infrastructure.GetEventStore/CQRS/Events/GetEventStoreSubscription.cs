@@ -94,6 +94,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                         await CreateProjectionAsync();
 
+                        SendAsync(new ConnectMessage()).Forget();
+
                         break;
                     }
 
@@ -193,9 +195,12 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     await projectsManager.CreateContinuousAsync($"${streamName}", projectionConfig, connection.Settings.DefaultUserCredentials);
                 }
-                catch (Exception ex) when (!(ex is ProjectionCommandConflictException))
+                catch (Exception ex)
                 {
-                    throw;
+                    if (!(ex is ProjectionCommandConflictException))
+                    {
+                        throw;
+                    }
                 }
             }
         }

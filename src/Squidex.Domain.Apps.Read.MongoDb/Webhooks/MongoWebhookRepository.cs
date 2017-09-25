@@ -46,7 +46,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
 
         public async Task<IReadOnlyList<IWebhookEntity>> QueryByAppAsync(Guid appId)
         {
-            var entities = await Collection.Find(x => x.AppId == appId).ToListAsync();
+            var entities =
+                await Collection.Find(x => x.AppId == appId)
+                    .ToListAsync();
 
             return entities.OfType<IWebhookEntity>().ToList();
         }
@@ -97,7 +99,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
                     {
                         inMemoryWebhooks = new Dictionary<Guid, List<IWebhookEntity>>();
 
-                        var webhooks = await Collection.Find(new BsonDocument()).ToListAsync();
+                        var webhooks =
+                            await Collection.Find(new BsonDocument())
+                                .ToListAsync();
 
                         foreach (var webhook in webhooks)
                         {

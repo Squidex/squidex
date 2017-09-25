@@ -70,7 +70,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
         {
             await EnsureWebooksLoadedAsync();
 
-            var webhooks = await Collection.Find(t => t.SchemaIds.Contains(@event.SchemaId.Id)).ToListAsync();
+            var webhooks =
+                await Collection.Find(t => t.SchemaIds.Contains(@event.SchemaId.Id))
+                    .ToListAsync();
 
             foreach (var webhook in webhooks)
             {

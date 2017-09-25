@@ -54,16 +54,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
 
         public async Task<IReadOnlyList<IWebhookEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)
         {
-            var entities = await Collection.Find(x => x.AppId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
+            var webhookEventEntities =
+                await Collection.Find(x => x.AppId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created)
+                    .ToListAsync();
 
-            return entities;
+            return webhookEventEntities;
         }
 
         public async Task<IWebhookEventEntity> FindAsync(Guid id)
         {
-            var entity = await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var webhookEventEntity =
+                await Collection.Find(x => x.Id == id)
+                    .FirstOrDefaultAsync();
 
-            return entity;
+            return webhookEventEntity;
         }
 
         public async Task<int> CountByAppAsync(Guid appId)

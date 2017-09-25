@@ -38,7 +38,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Utils
 
         public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IMongoEntity, new()
         {
-            var entity = await collection.Find(t => t.Id == headers.AggregateId()).FirstOrDefaultAsync();
+            var entity =
+                await collection.Find(t => t.Id == headers.AggregateId())
+                    .FirstOrDefaultAsync();
 
             if (entity == null)
             {
@@ -50,7 +52,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Utils
 
         public static async Task<bool> TryUpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IMongoEntity, new()
         {
-            var entity = await collection.Find(t => t.Id == headers.AggregateId()).FirstOrDefaultAsync();
+            var entity =
+                await collection.Find(t => t.Id == headers.AggregateId())
+                    .FirstOrDefaultAsync();
 
             if (entity != null)
             {

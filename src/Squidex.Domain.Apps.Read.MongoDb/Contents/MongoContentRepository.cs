@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             this.database = database;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
             var collection = GetCollection(app.Id);
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 cursor =
                     collection
-                        .Find(odataQuery, ids, schema.Id, schema.SchemaDef, status)
+                        .Find(odataQuery, schema.Id, schema.SchemaDef, status)
                         .Take(odataQuery)
                         .Skip(odataQuery)
                         .Sort(odataQuery, schema.SchemaDef);
@@ -95,24 +95,24 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 throw new ValidationException("This odata operation is not supported");
             }
 
-            var entities = await cursor.ToListAsync();
+            var contentEntities = await cursor.ToListAsync();
 
-            foreach (var entity in entities)
+            foreach (var entity in contentEntities)
             {
                 entity.ParseData(schema.SchemaDef);
             }
 
-            return entities;
+            return contentEntities;
         }
 
-        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, ODataUriParser odataQuery)
+        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
             var collection = GetCollection(app.Id);
 
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
-                cursor = collection.Find(odataQuery, ids, schema.Id, schema.SchemaDef, status);
+                cursor = collection.Find(odataQuery, schema.Id, schema.SchemaDef, status);
             }
             catch (NotSupportedException)
             {
@@ -124,6 +124,33 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
 
             return cursor.CountAsync();
+        }
+
+        public async Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
+        {
+            var collection = GetCollection(app.Id);
+
+            var contentsCount =
+                await collection.Find(x => ids.Contains(x.Id))
+                    .CountAsync();
+
+            return contentsCount;
+        }
+
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
+        {
+            var collection = GetCollection(app.Id);
+
+            var contentEntities =
+                await collection.Find(x => ids.Contains(x.Id))
+                    .ToListAsync();
+
+            foreach (var entity in contentEntities)
+            {
+                entity.ParseData(schema.SchemaDef);
+            }
+
+            return contentEntities.OfType<IContentEntity>().ToList();
         }
 
         public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds)
