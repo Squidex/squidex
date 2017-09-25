@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -44,6 +45,13 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Webhooks
         }
 
         public async Task<IReadOnlyList<IWebhookEntity>> QueryByAppAsync(Guid appId)
+        {
+            var entities = await Collection.Find(x => x.AppId == appId).ToListAsync();
+
+            return entities.OfType<IWebhookEntity>().ToList();
+        }
+
+        public async Task<IReadOnlyList<IWebhookEntity>> QueryCachedByAppAsync(Guid appId)
         {
             await EnsureWebooksLoadedAsync();
 

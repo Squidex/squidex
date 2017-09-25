@@ -17,5 +17,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks.Repositories
         Task TraceSentAsync(Guid webhookId, WebhookResult result, TimeSpan elapsed);
 
         Task<IReadOnlyList<IWebhookEntity>> QueryByAppAsync(Guid appId);
+
+        Task<IReadOnlyList<IWebhookEntity>> QueryCachedByAppAsync(Guid appId);
     }
 }

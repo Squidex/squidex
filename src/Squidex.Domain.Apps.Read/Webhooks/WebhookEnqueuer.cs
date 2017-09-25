@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Read.Webhooks
             {
                 var eventType = typeNameRegistry.GetName(@event.Payload.GetType());
 
-                var webhooks = await webhookRepository.QueryByAppAsync(contentEvent.AppId.Id);
+                var webhooks = await webhookRepository.QueryCachedByAppAsync(contentEvent.AppId.Id);
 
                 var matchingWebhooks = webhooks.Where(w => w.Schemas.Any(s => Matchs(s, contentEvent))).ToList();
 
