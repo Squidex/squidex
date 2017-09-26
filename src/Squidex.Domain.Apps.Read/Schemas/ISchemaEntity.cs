@@ -15,9 +15,19 @@ namespace Squidex.Domain.Apps.Read.Schemas
         string Name { get; }
 
         bool IsPublished { get; }
-        
+
         bool IsDeleted { get; }
 
-        Schema Schema { get; }
+        string ScriptQuery { get; }
+
+        string ScriptCreate { get; }
+
+        string ScriptUpdate { get; }
+
+        string ScriptDelete { get; }
+
+        string ScriptChange { get; }
+
+        Schema SchemaDef { get; }
     }
 }

@@ -7,7 +7,13 @@
 
     <div [formGroup]="fieldForm">
         <div *ngIf="field.partitioning === 'language' && languages.length > 1">
-            <sqx-language-selector size="sm" class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            <div class="languages-buttons" #buttonLanguages>
+                <sqx-language-selector size="sm" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            </div>
+
+            <sqx-onboarding-tooltip id="languages" [for]="buttonLanguages" position="topRight" after="120000">
+                Please remember to check all languages when you see validation errors.
+            </sqx-onboarding-tooltip>
         </div>
 
         <div *ngFor="let partition of fieldPartitions">
@@ -44,7 +50,7 @@
                                 <input class="form-control" type="text" [formControlName]="partition">
                             </div>
                             <div *ngSwitchCase="'TextArea'">
-                                <textarea class="form-control" [formControlName]="partition"></textarea>
+                                <textarea class="form-control" [formControlName]="partition" rows="5"></textarea>
                             </div>
                             <div *ngSwitchCase="'RichText'">
                                 <sqx-rich-editor [formControlName]="partition"></sqx-rich-editor>

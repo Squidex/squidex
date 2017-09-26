@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("FieldDeletedEvent")]
-    public class FieldDeleted : FieldEvent
+    [EventType(nameof(FieldDeleted))]
+    public sealed class FieldDeleted : FieldEvent
     {
     }
 }

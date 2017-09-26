@@ -29,11 +29,11 @@ namespace Squidex.Controllers.Api.Schemas
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Schemas")]
-    public class SchemasController : ControllerBase
+    [SwaggerTag(nameof(Schemas))]
+    public sealed class SchemasController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
-        
+
         public SchemasController(ICommandBus commandBus, ISchemaRepository schemaRepository)
             : base(commandBus)
         {
@@ -89,7 +89,7 @@ namespace Squidex.Controllers.Api.Schemas
                 entity = await schemaRepository.FindSchemaAsync(AppId, name);
             }
 
-            if (entity == null)
+            if (entity == null || entity.IsDeleted)
             {
                 return NotFound();
             }
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The schema object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => Schema created.  
+        /// 201 => Schema created.
         /// 400 => Schema name or properties are not valid.
         /// 409 => Schema name already in use.
         /// </returns>
@@ -122,9 +122,12 @@ namespace Squidex.Controllers.Api.Schemas
         {
             var command = request.ToCommand();
 
-            await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command);
 
-            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, new EntityCreatedDto { Id = command.Name });
+            var result = context.Result<EntityCreatedResult<Guid>>();
+            var response = new EntityCreatedDto { Id = command.SchemaId.ToString(), Version = result.Version };
+
+            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, response);
         }
 
         /// <summary>
@@ -147,6 +150,30 @@ namespace Squidex.Controllers.Api.Schemas
             var properties = SimpleMapper.Map(request, new SchemaProperties());
 
             await CommandBus.PublishAsync(new UpdateSchema { Properties = properties });
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Update the scripts of a schema.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The schema scripts object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Schema has been updated.
+        /// 400 => Schema properties are not valid.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [MustBeAppDeveloper]
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/scripts/")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] ConfigureScriptsDto request)
+        {
+            var command = SimpleMapper.Map(request, new ConfigureScripts());
+
+            await CommandBus.PublishAsync(command);
 
             return NoContent();
         }

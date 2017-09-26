@@ -10,9 +10,6 @@ using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable InvertIf
-// ReSharper disable UnusedParameter.Global
-
 namespace Squidex.Domain.Apps.Events.Schemas.Utils
 {
     public static class SchemaEventDispatcher
@@ -44,6 +41,11 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
                         field = field.Disable();
                     }
 
+                    if (eventField.IsLocked)
+                    {
+                        field = field.Lock();
+                    }
+
                     schema = schema.AddOrUpdateField(field);
 
                     fieldId++;
@@ -66,6 +68,11 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
         public static Schema Dispatch(FieldUpdated @event, Schema schema)
         {
             return schema.UpdateField(@event.FieldId.Id, @event.Properties);
+        }
+
+        public static Schema Dispatch(FieldLocked @event, Schema schema)
+        {
+            return schema.LockField(@event.FieldId.Id);
         }
 
         public static Schema Dispatch(FieldHidden @event, Schema schema)

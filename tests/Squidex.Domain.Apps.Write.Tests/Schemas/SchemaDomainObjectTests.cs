@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,8 +15,6 @@ using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Xunit;
-
-// ReSharper disable ConvertToConstant.Local
 
 namespace Squidex.Domain.Apps.Write.Schemas
 {
@@ -103,7 +100,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                 new CreateSchemaField { Name = "field2", Properties = new StringFieldProperties() }
             };
 
-            sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields  }));
+            sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
 
             var @event = (SchemaCreated)sut.GetUncomittedEvents().Single().Payload;
 
@@ -157,6 +154,54 @@ namespace Squidex.Domain.Apps.Write.Schemas
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new SchemaUpdated { Properties = properties })
+                );
+        }
+
+        [Fact]
+        public void ConfigureScripts_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ConfigureScripts(CreateCommand(new ConfigureScripts()));
+            });
+        }
+
+        [Fact]
+        public void ConfigureScripts_should_throw_exception_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ConfigureScripts(CreateCommand(new ConfigureScripts()));
+            });
+        }
+
+        [Fact]
+        public void ConfigureScripts_should_create_events()
+        {
+            CreateSchema();
+
+            sut.ConfigureScripts(CreateCommand(new ConfigureScripts
+            {
+                ScriptQuery = "<script-query>",
+                ScriptCreate = "<script-create>",
+                ScriptUpdate = "<script-update>",
+                ScriptDelete = "<script-delete>",
+                ScriptChange = "<script-change>"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new ScriptsConfigured
+                    {
+                        ScriptQuery = "<script-query>",
+                        ScriptCreate = "<script-create>",
+                        ScriptUpdate = "<script-update>",
+                        ScriptDelete = "<script-delete>",
+                        ScriptChange = "<script-change>"
+                    })
                 );
         }
 
@@ -247,7 +292,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaPublished())
                 );
         }
-    
+
         [Fact]
         public void Unpublish_should_throw_exception_if_not_created()
         {
@@ -284,7 +329,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaUnpublished())
                 );
         }
-    
+
         [Fact]
         public void Delete_should_throw_exception_if_not_created()
         {
@@ -320,7 +365,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new SchemaDeleted())
                 );
         }
-        
+
         [Fact]
         public void AddField_should_throw_exception_if_not_created()
         {
@@ -376,7 +421,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldAdded { Name = fieldName, FieldId = fieldId, Properties = properties })
                 );
         }
-        
+
         [Fact]
         public void UpdateField_should_throw_exception_if_not_created()
         {
@@ -437,6 +482,54 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
+        public void LockField_should_throw_exception_if_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_throw_exception_if_field_is_not_found()
+        {
+            CreateSchema();
+
+            Assert.Throws<DomainObjectNotFoundException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 2 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_throw_exception_if_schema_is_deleted()
+        {
+            CreateSchema();
+            DeleteSchema();
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+            });
+        }
+
+        [Fact]
+        public void LockField_should_update_schema_and_create_events()
+        {
+            CreateSchema();
+            CreateField();
+
+            sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
+
+            Assert.False(sut.Schema.FieldsById[1].IsDisabled);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldLocked { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
         public void HideField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
@@ -483,7 +576,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldHidden { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void ShowField_should_throw_exception_if_not_created()
         {
@@ -532,7 +625,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldShown { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void DisableField_should_throw_exception_if_not_created()
         {
@@ -580,7 +673,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldDisabled { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void EnableField_should_throw_exception_if_not_created()
         {
@@ -629,7 +722,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     CreateEvent(new FieldEnabled { FieldId = fieldId })
                 );
         }
-        
+
         [Fact]
         public void DeleteField_should_throw_exception_if_not_created()
         {
@@ -664,100 +757,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldDeleted { FieldId = fieldId })
-                );
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook { Url = new Uri("https://cloud.squidex.io") }));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook()));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_throw_exception_if_schema_is_deleted()
-        {
-            CreateSchema();
-            DeleteSchema();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.AddWebhook(CreateCommand(new AddWebhook { Url = new Uri("https://cloud.squidex.io") }));
-            });
-        }
-
-        [Fact]
-        public void AddWebhook_should_update_schema_and_create_events()
-        {
-            var command = new AddWebhook { Url = new Uri("https://cloud.squidex.io") };
-
-            CreateSchema();
-
-            sut.AddWebhook(CreateCommand(command));
-            
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = command.Id, Url = command.Url, SharedSecret = command.SharedSecret })
-                );
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook()));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_webhook_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = Guid.NewGuid() }));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_throw_exception_if_schema_is_deleted()
-        {
-            CreateSchema();
-            DeleteSchema();
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = Guid.NewGuid() }));
-            });
-        }
-
-        [Fact]
-        public void DeleteWebhook_should_update_schema_and_create_events()
-        {
-            var createCommand = new AddWebhook { Url = new Uri("https://cloud.squidex.io") };
-
-            CreateSchema();
-
-            sut.AddWebhook(CreateCommand(createCommand));
-            sut.DeleteWebhook(CreateCommand(new DeleteWebhook { Id = createCommand.Id }));
-
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateEvent(new WebhookAdded { Id = createCommand.Id, Url = createCommand.Url, SharedSecret = createCommand.SharedSecret }),
-                    CreateEvent(new WebhookDeleted { Id = createCommand.Id })
                 );
         }
 

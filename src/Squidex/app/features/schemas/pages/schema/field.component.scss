@@ -7,6 +7,17 @@ $field-header: #e7ebef;
     cursor: default;
 }
 
+.col {
+    &-tags,
+    &-options {
+        white-space: nowrap;
+    }
+
+    &-options {
+        max-width: 140px;
+    }
+}
+
 .field {
     &-icon {
         margin-right: 1rem;
@@ -21,7 +32,13 @@ $field-header: #e7ebef;
     }
 
     &-hidden {
-        color: $color-subtext;
+        color: $color-text-decent;
+    }
+
+    &-partitioning {
+        color: $color-text-decent;
+        font-weight: normal;
+        font-size: .85rem;
     }
 
     .tag {

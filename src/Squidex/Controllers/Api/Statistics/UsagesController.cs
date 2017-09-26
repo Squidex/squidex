@@ -26,17 +26,17 @@ namespace Squidex.Controllers.Api.Statistics
     [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Statistics")]
-    public class UsagesController : ControllerBase
+    [SwaggerTag(nameof(Statistics))]
+    public sealed class UsagesController : ControllerBase
     {
         private readonly IUsageTracker usageTracker;
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IAssetStatsRepository assetStatsRepository;
 
         public UsagesController(
-            ICommandBus commandBus, 
+            ICommandBus commandBus,
             IUsageTracker usageTracker,
-            IAppPlansProvider appPlanProvider, 
+            IAppPlansProvider appPlanProvider,
             IAssetStatsRepository assetStatsRepository)
             : base(commandBus)
         {

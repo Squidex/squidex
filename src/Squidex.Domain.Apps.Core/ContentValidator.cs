@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            
+
             this.schema = schema;
             this.context = context;
             this.partitionResolver = partitionResolver;
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core
             {
                 var fieldName = fieldData.Key;
 
-                if (!schema.FieldsByName.TryGetValue(fieldData.Key, out Field field))
+                if (!schema.FieldsByName.TryGetValue(fieldData.Key, out var field))
                 {
                     errors.AddError("<FIELD> is not a known field", fieldName);
                 }

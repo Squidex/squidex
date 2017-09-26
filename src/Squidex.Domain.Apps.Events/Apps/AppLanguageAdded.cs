@@ -7,10 +7,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppLanguageAddedEvent")]
+    [EventType(nameof(AppLanguageAdded))]
     public sealed class AppLanguageAdded : AppEvent
     {
         public Language Language { get; set; }

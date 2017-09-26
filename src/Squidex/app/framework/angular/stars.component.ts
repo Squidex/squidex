@@ -8,7 +8,7 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-const NOOP = () => { /* NOOP */ };
+import { Types } from './../utils/types';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true
@@ -21,30 +21,15 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR]
 })
 export class StarsComponent implements ControlValueAccessor {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private maximumStarsValue = 5;
 
-    public isDisabled = false;
-
-    public stars: number;
-    public starsArray: number[] = [1, 2, 3, 4, 5];
-
-    public value: number | null = 1;
-
-    public get maximumStars() {
-        return this.maximumStarsValue;
-    }
-
     @Input()
-    public set maximumStars(value: any) {
-        value = value || 5;
+    public set maximumStars(value: number) {
+        const maxStars: number = Types.isNumber(value) ? value : 5;
 
-        if (!(typeof value === 'number')) {
-            value = 5;
-        }
-
-        if (this.maximumStarsValue !== value) {
+        if (this.maximumStarsValue !== maxStars) {
             this.maximumStarsValue = value;
 
             this.starsArray = [];
@@ -55,8 +40,24 @@ export class StarsComponent implements ControlValueAccessor {
         }
     }
 
-    public writeValue(value: any) {
-        this.value = this.stars = value;
+    public get maximumStars() {
+        return this.maximumStarsValue;
+    }
+
+    public isDisabled = false;
+
+    public stars: number;
+    public starsArray: number[] = [1, 2, 3, 4, 5];
+
+    public value: number | null = 1;
+
+    public writeValue(value: number | null | undefined) {
+        if (Types.isNumber(value)) {
+            this.value = this.stars = value || 0;
+        } else {
+            this.value = null;
+            this.stars = 0;
+        }
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -64,11 +65,11 @@ export class StarsComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public setPreview(value: number) {
@@ -89,15 +90,15 @@ export class StarsComponent implements ControlValueAccessor {
 
     public reset() {
         if (this.isDisabled) {
-            return;
+            return false;
         }
 
         if (this.value !== null) {
             this.value = null;
             this.stars = 0;
 
-            this.changeCallback(this.value);
-            this.touchedCallback();
+            this.callChange(this.value);
+            this.callTouched();
         }
 
         return false;
@@ -105,14 +106,14 @@ export class StarsComponent implements ControlValueAccessor {
 
     public setValue(value: number) {
         if (this.isDisabled) {
-            return;
+            return false;
         }
 
         if (this.value !== value) {
             this.value = this.stars = value;
 
-            this.changeCallback(this.value);
-            this.touchedCallback();
+            this.callChange(this.value);
+            this.callTouched();
         }
 
         return false;

@@ -86,7 +86,7 @@ describe('ResolvePublishedSchemaGuard', () => {
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {
-                expect(result).toBeFalsy();
+                expect(result).toBe(schema);
                 expect(router.lastNavigation).toEqual(['/404']);
 
                 done();

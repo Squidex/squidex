@@ -13,8 +13,6 @@ import { ResourceLoaderService } from './../services/resource-loader.service';
 
 declare var ace: any;
 
-const NOOP = () => { /* NOOP */ };
-
 export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JsonEditorComponent), multi: true
 };
@@ -26,12 +24,12 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
     private valueChanged = new Subject();
     private aceEditor: any;
-    private oldValue: any;
-    private oldValueString: string;
+    private value: any;
+    private valueString: string;
     private isDisabled = false;
 
     @ViewChild('editor')
@@ -43,8 +41,13 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public writeValue(value: any) {
-        this.oldValue = value;
-        this.oldValueString = JSON.stringify(value);
+        this.value = value;
+
+        try {
+            this.valueString = JSON.stringify(value);
+        } catch (e) {
+            this.valueString = '';
+        }
 
         if (this.aceEditor) {
             this.setValue(value);
@@ -60,11 +63,11 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {
@@ -80,11 +83,11 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
             this.aceEditor.setReadOnly(this.isDisabled);
             this.aceEditor.setFontSize(14);
 
-            this.setValue(this.oldValue);
+            this.setValue(this.value);
 
             this.aceEditor.on('blur', () => {
                 this.changeValue();
-                this.touchedCallback();
+                this.callTouched();
             });
 
             this.aceEditor.on('change', () => {
@@ -108,12 +111,12 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
 
         const newValueString = JSON.stringify(newValue);
 
-        if (this.oldValueString !== newValueString) {
-            this.changeCallback(newValue);
+        if (this.valueString !== newValueString) {
+            this.callChange(newValue);
         }
 
-        this.oldValue = newValue;
-        this.oldValueString = newValueString;
+        this.value = newValue;
+        this.valueString = newValueString;
     }
 
     private setValue(value: any) {

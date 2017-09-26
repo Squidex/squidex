@@ -13,14 +13,14 @@
                 </div>
 
                 <div class="client-header">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
+                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
                         <div class="form-group mr-1">
                             <sqx-control-errors for="name"></sqx-control-errors>
                             
                             <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                         </div>
 
-                        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid">Save</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
 
                         <button class="btn btn-link btn-decent btn-cancel" (click)="cancelRename()">
                             <i class="icon-close"></i>
@@ -39,7 +39,10 @@
                 <div class="client-expires">Access tokens expire after 30 days</div>
             </td>
             <td class="client-delete">
-                <button type="button" class="btn btn-link btn-danger" (click)="revoking.emit()">
+                <button type="button" class="btn btn-link btn-danger"
+                    (sqxConfirmClick)="revoking.emit()"
+                    confirmTitle="Revoke client" 
+                    confirmText="Do you really want to revoke the client?">
                     <i class="icon-bin2"></i>
                 </button>
             </td>
@@ -47,7 +50,7 @@
         <tr>
             <td>Client Id:</td>
             <td>
-                <input readonly class="form-control" [attr.value]="clientId" #inputName />
+                <input readonly class="form-control" value="{{appName}}:{{client.id}}" #inputName />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
@@ -58,7 +61,7 @@
         <tr>
             <td>Client Secret:</td>
             <td>
-                <input readonly class="form-control" [attr.value]="clientSecret" #inputSecret />
+                <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
@@ -66,10 +69,20 @@
                 </button>
             </td>
         </tr>
+        <tr>
+            <td></td>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" [ngModel]="client.isReader" (ngModelChange)="changing.emit($event)" /> Reading only
+                    </label>
+                </div>
+            </td>
+        </tr>
     </table>
 </div>
 
-<div class="modal" *sqxModalView="tokenDialog;onRoot:true" [@fade]>
+<div class="modal" *sqxModalView="tokenDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">

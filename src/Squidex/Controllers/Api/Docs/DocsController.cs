@@ -20,9 +20,9 @@ namespace Squidex.Controllers.Api.Docs
         [ApiCosts(0)]
         public IActionResult Docs()
         {
-            ViewBag.Specification = "~/swagger/v1/swagger.json";
+            var vm = new DocsVM { Specification = "~/swagger/v1/swagger.json" };
 
-            return View("Docs");
+            return View(nameof(Docs), vm);
         }
     }
 }

@@ -26,7 +26,7 @@
 .subtext {
     margin-top: .5rem;
     margin-bottom: .8rem;
-    color: $color-subtext;
+    color: $color-text-decent;
 }
 
 .card {
@@ -50,13 +50,13 @@
     }
 
     &-text {
-        color: $color-empty;
+        color: $color-text-decent;
         font-weight: normal;
         font-size: .9rem;
     }
 
     &-more {
-        color: $color-empty;
+        color: $color-text-decent;
         font-weight: normal;
         font-size: .8rem;
         margin-top: .4rem;
@@ -96,7 +96,7 @@
     }
 
     &-label {
-        color: $color-subtext;
+        color: $color-text-decent;
     }
 
     &-value {

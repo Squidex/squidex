@@ -20,8 +20,6 @@ namespace Squidex.Domain.Apps.Read.Assets
 
         bool IsImage { get; }
 
-        bool IsDeleted { get; }
-
         int? PixelWidth { get; }
 
         int? PixelHeight { get; }

@@ -7,8 +7,10 @@
 // ==========================================================================
 
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
@@ -49,6 +51,33 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public string GenerateSourceUrl(string id, long version, string suffix)
+        {
+            var file = GetFile(id, version, suffix);
+
+            return file.FullName;
+        }
+
+        public async Task UploadTemporaryAsync(string name, Stream stream)
+        {
+            var file = GetFile(name);
+
+            using (var fileStream = file.OpenWrite())
+            {
+                await stream.CopyToAsync(fileStream);
+            }
+        }
+
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        {
+            var file = GetFile(id, version, suffix);
+
+            using (var fileStream = file.OpenWrite())
+            {
+                await stream.CopyToAsync(fileStream);
+            }
+        }
+
         public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
         {
             var file = GetFile(id, version, suffix);
@@ -66,13 +95,35 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public Task CopyTemporaryAsync(string name, string id, long version, string suffix)
         {
-            var file = GetFile(id, version, suffix);
-
-            using (var fileStream = file.OpenWrite())
+            try
             {
-                await stream.CopyToAsync(fileStream);
+                var file = GetFile(name);
+
+                file.CopyTo(GetPath(id, version, suffix));
+
+                return TaskHelper.Done;
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+            }
+        }
+
+        public Task DeleteTemporaryAsync(string name)
+        {
+            try
+            {
+                var file = GetFile(name);
+
+                file.Delete();
+
+                return TaskHelper.Done;
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new AssetNotFoundException($"Asset {name} not found.", ex);
             }
         }
 
@@ -80,14 +131,24 @@ namespace Squidex.Infrastructure.Assets
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            var path = Path.Combine(directory.FullName, $"{id}_{version}");
+            return GetFile(GetPath(id, version, suffix));
+        }
 
-            if (!string.IsNullOrWhiteSpace(suffix))
-            {
-                path += "_" + suffix;
-            }
+        private FileInfo GetFile(string name)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
 
-            return new FileInfo(path);
+            return new FileInfo(GetPath(name));
+        }
+
+        private string GetPath(string name)
+        {
+            return Path.Combine(directory.FullName, name);
+        }
+
+        private string GetPath(string id, long version, string suffix)
+        {
+            return Path.Combine(directory.FullName, string.Join("_", new[] { id, version.ToString(), suffix }.Where(x => !string.IsNullOrWhiteSpace(x))));
         }
     }
 }

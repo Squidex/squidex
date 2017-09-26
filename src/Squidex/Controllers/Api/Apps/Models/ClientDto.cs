@@ -10,16 +10,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class ClientDto
+    public sealed class ClientDto
     {
         /// <summary>
-        /// The client id. 
+        /// The client id.
         /// </summary>
         [Required]
         public string Id { get; set; }
 
         /// <summary>
-        /// The client secret. 
+        /// The client secret.
         /// </summary>
         [Required]
         public string Secret { get; set; }
@@ -29,5 +29,11 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// </summary>
         [Required]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Determines if the client is a reader.
+        /// </summary>
+        [Required]
+        public bool IsReader { get; set; }
     }
 }

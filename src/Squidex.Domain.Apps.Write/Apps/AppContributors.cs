@@ -12,8 +12,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppContributors
@@ -55,7 +53,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         private void ThrowIfFound(string contributorId, PermissionLevel permission, Func<string> message)
         {
-            if (contributors.TryGetValue(contributorId, out PermissionLevel currentPermission) && currentPermission == permission)
+            if (contributors.TryGetValue(contributorId, out var currentPermission) && currentPermission == permission)
             {
                 var error = new ValidationError("Contributor is already part of the app with same permissions", "ContributorId");
 

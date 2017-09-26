@@ -13,10 +13,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable InvertIf
-// ReSharper disable SwitchStatementMissingSomeCases
-// ReSharper disable ConvertIfStatementToSwitchStatement
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public class FilterVisitor : QueryNodeVisitor<FilterDefinition<MongoContentEntity>>
@@ -62,12 +58,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 
                 return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
+
             if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
             {
                 var value = BuildRegex(valueNode, v => "^" + v);
 
                 return Filter.Regex(BuildFieldDefinition(fieldNode), value);
             }
+
             if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
             {
                 var value = BuildRegex(valueNode, v => v);
@@ -84,6 +82,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 return Filter.And(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
             }
+
             if (nodeIn.OperatorKind == BinaryOperatorKind.Or)
             {
                 return Filter.Or(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
@@ -92,7 +91,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
             {
                 var regexFilter = Visit(functionNode);
-                
+
                 var value = BuildValue(nodeIn.Right);
 
                 if (value is bool booleanRight)
@@ -110,24 +109,33 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
                 {
-                    return Filter.Ne(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var field = BuildFieldDefinition(nodeIn.Left);
+
+                    return Filter.Or(
+                        Filter.Not(Filter.Exists(field)),
+                        Filter.Ne(field, BuildValue(nodeIn.Right)));
                 }
+
                 if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
                 {
                     return Filter.Eq(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
                 }
+
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
                 {
                     return Filter.Lt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
                 }
+
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
                 {
                     return Filter.Lte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
                 }
+
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
                 {
                     return Filter.Gt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
                 }
+
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
                 {
                     return Filter.Gte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));

@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("SchemaDeletedEvent")]
-    public class SchemaDeleted : SchemaEvent
+    [EventType(nameof(SchemaDeleted))]
+    public sealed class SchemaDeleted : SchemaEvent
     {
     }
 }

@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public class SchemaPropertiesDto
+    public sealed class SchemaPropertiesDto
     {
         /// <summary>
         /// Optional label for the editor.

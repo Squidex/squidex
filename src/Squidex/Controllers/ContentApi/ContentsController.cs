@@ -15,10 +15,9 @@ using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
-using Squidex.Domain.Apps.Read.Contents.Repositories;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -26,59 +25,58 @@ using Squidex.Pipeline;
 
 namespace Squidex.Controllers.ContentApi
 {
-    [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerIgnore]
-    public class ContentsController : ControllerBase
+    public sealed class ContentsController : ControllerBase
     {
-        private readonly ISchemaProvider schemas;
-        private readonly IContentRepository contentRepository;
-        private readonly IGraphQLInvoker graphQL;
+        private readonly IContentQueryService contentQuery;
+        private readonly IContentVersionLoader contentVersionLoader;
+        private readonly IGraphQLService graphQl;
 
-        public ContentsController(
-            ICommandBus commandBus, 
-            ISchemaProvider schemas,
-            IContentRepository contentRepository,
-            IGraphQLInvoker graphQL) 
+        public ContentsController(ICommandBus commandBus,
+            IContentQueryService contentQuery,
+            IContentVersionLoader contentVersionLoader,
+            IGraphQLService graphQl)
             : base(commandBus)
         {
-            this.graphQL = graphQL;
-            this.schemas = schemas;
-            this.contentRepository = contentRepository;
+            this.contentQuery = contentQuery;
+            this.contentVersionLoader = contentVersionLoader;
+
+            this.graphQl = graphQl;
         }
 
+        [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/graphql")]
-        [ApiCosts(2)]
-        public async Task<IActionResult> GetGraphQL([FromQuery] GraphQLQuery query)
-        {
-            var result = await graphQL.QueryAsync(App, query);
-
-            return Ok(result);
-        }
-
         [HttpPost]
         [Route("content/{app}/graphql")]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL([FromBody] GraphQLQuery query)
         {
-            var result = await graphQL.QueryAsync(App, query);
+            var result = await graphQl.QueryAsync(App, User, query);
 
-            return Ok(result);
+            if (result.Errors?.Length > 0)
+            {
+                return BadRequest(new { result.Data, result.Errors });
+            }
+            else
+            {
+                return Ok(new { result.Data });
+            }
         }
 
+        [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}")]
         [ApiCosts(2)]
-        public async Task<IActionResult> GetContents(string name, [FromQuery] bool nonPublished = false, [FromQuery] bool hidden = false, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetContents(string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
-            var schemaEntity = await FindSchemaAsync(name);
-
-            var idsList = new HashSet<Guid>();
+            HashSet<Guid> idsList = null;
 
             if (!string.IsNullOrWhiteSpace(ids))
             {
+                idsList = new HashSet<Guid>();
+
                 foreach (var id in ids.Split(','))
                 {
                     if (Guid.TryParse(id, out var guid))
@@ -88,23 +86,23 @@ namespace Squidex.Controllers.ContentApi
                 }
             }
 
-            var query = Request.QueryString.ToString();
+            var isFrontendClient = User.IsFrontendClient();
 
-            var taskForItems = contentRepository.QueryAsync(App, schemaEntity.Id, nonPublished, idsList, query);
-            var taskForCount = contentRepository.CountAsync(App, schemaEntity.Id, nonPublished, idsList, query);
-
-            await Task.WhenAll(taskForItems, taskForCount);
+            var contents =
+                idsList != null ?
+                    await contentQuery.QueryWithCountAsync(App, name, User, archived, idsList) :
+                    await contentQuery.QueryWithCountAsync(App, name, User, archived, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Take(200).Select(x =>
+                Total = contents.Total,
+                Items = contents.Items.Take(200).Select(item =>
                 {
-                    var itemModel = SimpleMapper.Map(x, new ContentDto());
+                    var itemModel = SimpleMapper.Map(item, new ContentDto());
 
-                    if (x.Data != null)
+                    if (item.Data != null)
                     {
-                        itemModel.Data = x.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig);
+                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
                     }
 
                     return itemModel;
@@ -114,126 +112,170 @@ namespace Squidex.Controllers.ContentApi
             return Ok(response);
         }
 
+        [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContent(string name, Guid id, bool hidden = false)
+        public async Task<IActionResult> GetContent(string name, Guid id)
         {
-            var schemaEntity = await FindSchemaAsync(name);
+            var content = await contentQuery.FindContentAsync(App, name, User, id);
 
-            if (schemaEntity == null)
+            var response = SimpleMapper.Map(content.Content, new ContentDto());
+
+            if (content.Content.Data != null)
             {
-                return NotFound();
+                var isFrontendClient = User.IsFrontendClient();
+
+                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
             }
 
-            var entity = await contentRepository.FindContentAsync(App, schemaEntity.Id, id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var response = SimpleMapper.Map(entity, new ContentDto());
-
-            if (entity.Data != null)
-            {
-                response.Data = entity.Data.ToApiModel(schemaEntity.Schema, App.LanguagesConfig, null, hidden);
-            }
-
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = new StringValues(content.Content.Version.ToString());
 
             return Ok(response);
         }
 
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/{version}")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
+        {
+            var contentData = await contentVersionLoader.LoadAsync(App.Id, id, version);
+
+            var response = contentData;
+
+            Response.Headers["ETag"] = new StringValues(version.ToString());
+
+            return Ok(response);
+        }
+
+        [MustBeAppEditor]
         [HttpPost]
         [Route("content/{app}/{name}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent([FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new CreateContent { ContentId = Guid.NewGuid(), User = User, Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<NamedContentData>>();
             var response = ContentDto.Create(command, result);
 
-            return CreatedAtAction(nameof(GetContent), new { id = response.Id }, response);
+            return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
         }
 
+        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string name, Guid id, [FromBody] NamedContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
+            await contentQuery.FindSchemaAsync(App, name);
 
-            await CommandBus.PublishAsync(command);
+            var command = new UpdateContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
-            return NoContent();
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<ContentDataChangedResult>();
+            var response = result.Data;
+
+            return Ok(response);
         }
 
+        [MustBeAppEditor]
         [HttpPatch]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string name, Guid id, [FromBody] NamedContentData request)
         {
-            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
+            await contentQuery.FindSchemaAsync(App, name);
 
-            await CommandBus.PublishAsync(command);
+            var command = new PatchContent { ContentId = id, User = User, Data = request.ToCleaned() };
 
-            return NoContent();
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<ContentDataChangedResult>();
+            var response = result.Data;
+
+            return Ok(response);
         }
 
+        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PublishContent(Guid id)
+        public async Task<IActionResult> PublishContent(string name, Guid id)
         {
-            var command = new PublishContent { ContentId = id };
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new ChangeContentStatus { Status = Status.Published, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
             return NoContent();
         }
 
+        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish")]
         [ApiCosts(1)]
-        public async Task<IActionResult> UnpublishContent(Guid id)
+        public async Task<IActionResult> UnpublishContent(string name, Guid id)
         {
-            var command = new UnpublishContent { ContentId = id };
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
             return NoContent();
         }
 
+        [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/archive")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> ArchiveContent(string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new ChangeContentStatus { Status = Status.Archived, ContentId = id, User = User };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/restore")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> RestoreContent(string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        [MustBeAppEditor]
         [HttpDelete]
         [Route("content/{app}/{name}/{id}")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(Guid id)
+        public async Task<IActionResult> DeleteContent(string name, Guid id)
         {
-            var command = new DeleteContent { ContentId = id };
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new DeleteContent { ContentId = id, User = User };
 
             await CommandBus.PublishAsync(command);
 
             return NoContent();
-        }
-
-        private async Task<ISchemaEntity> FindSchemaAsync(string name)
-        {
-            ISchemaEntity schemaEntity;
-
-            if (Guid.TryParse(name, out var schemaId))
-            {
-                schemaEntity = await schemas.FindSchemaByIdAsync(schemaId);
-            }
-            else
-            {
-                schemaEntity = await schemas.FindSchemaByNameAsync(AppId, name);
-            }
-
-            return schemaEntity;
         }
     }
 }

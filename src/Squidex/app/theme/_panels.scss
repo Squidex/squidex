@@ -94,14 +94,16 @@
             overflow-y: scroll;
         }
 
-        & .flex-column {
-            margin-left: -$panel-padding;
-            margin-right: -$panel-padding;
-        }
+        & .nav-panel {
+            & {
+                margin-left: -$panel-padding;
+                margin-right: -$panel-padding;
+            }
 
-        & .nav-link {
-            padding-left: $panel-padding;
-            padding-right: $panel-padding;
+            & .nav-link {
+                padding-left: $panel-padding;
+                padding-right: $panel-padding;
+            }
         }
     }
 
@@ -225,7 +227,7 @@
 .sidebar {
     & {
         @include fixed($size-navbar-height, auto, 0, 0);
-        @include box-shadow-colored(2px, 0, 0, $color-dark1-border2);
+        @include box-shadow(2px, 0, 1px, .1);
         min-width: $size-sidebar-width;
         max-width: $size-sidebar-width;
         border-right: 1px solid $color-dark1-border1;

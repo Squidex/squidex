@@ -20,7 +20,7 @@ export class LocalStoreService {
         this.store = store;
     }
 
-    public get(key: string): any {
+    public get(key: string): string | null {
         try {
             return this.store.getItem(key);
         } catch (e) {
@@ -28,7 +28,7 @@ export class LocalStoreService {
         }
     }
 
-    public set(key: string, value: any) {
+    public set(key: string, value: string) {
         try {
             this.store.setItem(key, value);
         } catch (e) {

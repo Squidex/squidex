@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
     public class SchemaDomainObject : DomainObjectBase
     {
         private readonly FieldRegistry registry;
-        private readonly HashSet<Guid> webhookIds = new HashSet<Guid>();
         private bool isDeleted;
         private long totalFields;
         private Schema schema;
@@ -55,12 +54,17 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         protected void On(SchemaCreated @event)
         {
-            totalFields += @event?.Fields.Count ?? 0;
+            totalFields += @event.Fields?.Count ?? 0;
 
             schema = SchemaEventDispatcher.Dispatch(@event, registry);
         }
 
         protected void On(FieldUpdated @event)
+        {
+            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+        }
+
+        protected void On(FieldLocked @event)
         {
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
@@ -110,16 +114,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             schema = SchemaEventDispatcher.Dispatch(@event, schema);
         }
 
-        protected void On(WebhookAdded @event)
-        {
-            webhookIds.Add(@event.Id);
-        }
-
-        protected void On(WebhookDeleted @event)
-        {
-            webhookIds.Remove(@event.Id);
-        }
-
         protected void On(SchemaDeleted @event)
         {
             isDeleted = true;
@@ -146,29 +140,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             }
 
             RaiseEvent(@event);
-
-            return this;
-        }
-
-        public SchemaDomainObject DeleteWebhook(DeleteWebhook command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-            VerifyWebhookExists(command.Id);
-
-            RaiseEvent(SimpleMapper.Map(command, new WebhookDeleted()));
-
-            return this;
-        }
-
-        public SchemaDomainObject AddWebhook(AddWebhook command)
-        {
-            Guard.Valid(command, nameof(command), () => "Cannot add webhook");
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new WebhookAdded()));
 
             return this;
         }
@@ -217,12 +188,23 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return this;
         }
 
+        public SchemaDomainObject LockField(LockField command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(command, new FieldLocked());
+
+            return this;
+        }
+
         public SchemaDomainObject HideField(HideField command)
         {
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
-            
+
             RaiseEvent(command, new FieldHidden());
 
             return this;
@@ -233,7 +215,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
-            
+
             RaiseEvent(command, new FieldShown());
 
             return this;
@@ -255,7 +237,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
-            
+
             RaiseEvent(command, new FieldEnabled());
 
             return this;
@@ -266,7 +248,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
-            
+
             RaiseEvent(command, new FieldDeleted());
 
             return this;
@@ -294,6 +276,17 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return this;
         }
 
+        public SchemaDomainObject ConfigureScripts(ConfigureScripts command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            VerifyCreatedAndNotDeleted();
+
+            RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
+
+            return this;
+        }
+
         public SchemaDomainObject Delete(DeleteSchema command)
         {
             VerifyCreatedAndNotDeleted();
@@ -307,7 +300,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             SimpleMapper.Map(fieldCommand, @event);
 
-            if (schema.FieldsById.TryGetValue(fieldCommand.FieldId, out Field field))
+            if (schema.FieldsById.TryGetValue(fieldCommand.FieldId, out var field))
             {
                 @event.FieldId = new NamedId<long>(field.Id, field.Name);
             }
@@ -317,14 +310,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             }
 
             RaiseEvent(@event);
-        }
-
-        private void VerifyWebhookExists(Guid id)
-        {
-            if (!webhookIds.Contains(id))
-            {
-                throw new DomainObjectNotFoundException(id.ToString(), "Webhooks", typeof(Schema));
-            }
         }
 
         private void VerifyNotCreated()

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-// ReSharper disable StaticMemberInGenericType
+#pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Infrastructure.Reflection
 {
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Reflection
                 this.targetType = targetType;
             }
 
-            public override void Map(object source, object destination, CultureInfo culture)
+            public override void MapProperty(object source, object destination, CultureInfo culture)
             {
                 var value = GetValue(source);
 
@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Reflection
                 this.dstAccessor = dstAccessor;
             }
 
-            public virtual void Map(object source, object destination, CultureInfo culture)
+            public virtual void MapProperty(object source, object destination, CultureInfo culture)
             {
                 var value = GetValue(source);
 
@@ -141,11 +141,11 @@ namespace Squidex.Infrastructure.Reflection
                 Mappers = newMappers.ToArray();
             }
 
-            public static TDestination Map(TSource source, TDestination destination, CultureInfo culture)
+            public static TDestination MapClass(TSource source, TDestination destination, CultureInfo culture)
             {
                 foreach (var mapper in Mappers)
                 {
-                    mapper.Map(source, destination, culture);
+                    mapper.MapProperty(source, destination, culture);
                 }
 
                 return destination;
@@ -174,7 +174,7 @@ namespace Squidex.Infrastructure.Reflection
             Guard.NotNull(culture, nameof(culture));
             Guard.NotNull(destination, nameof(destination));
 
-            return ClassMapper<TSource, TDestination>.Map(source, destination, culture);
+            return ClassMapper<TSource, TDestination>.MapClass(source, destination, culture);
         }
     }
 }

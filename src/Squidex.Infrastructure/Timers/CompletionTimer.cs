@@ -7,65 +7,84 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Timers
 {
-    public sealed class CompletionTimer : DisposableObjectBase
+    public sealed class CompletionTimer
     {
-        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
+        private const int OneCallNotExecuted = 0;
+        private const int OneCallExecuted = 1;
+        private const int OneCallRequested = 2;
+        private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
         private readonly Task runTask;
-        private CancellationTokenSource delayToken;
-        
-        public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback)
+        private int oneCallState;
+        private CancellationTokenSource wakeupToken;
+
+        public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
             Guard.NotNull(callback, nameof(callback));
             Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
 
-            runTask = RunInternal(delayInMs, callback);
+            runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }
 
-        private async Task RunInternal(int delay, Func<CancellationToken, Task> callback)
+        public Task StopAsync()
         {
-            while (!disposeToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await callback(disposeToken.Token).ConfigureAwait(false);
+            stopToken.Cancel();
 
-                    delayToken = new CancellationTokenSource();
-
-                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(disposeToken.Token, delayToken.Token))
-                    {
-                        await Task.Delay(delay, cts.Token).ConfigureAwait(false);
-                    }
-                }
-                catch (TaskCanceledException)
-                {
-                    Debug.WriteLine("Task in TriggerTimer has been cancelled.");
-                }
-            }
+            return runTask;
         }
-        
-        protected override void DisposeObject(bool disposing)
-        {
-            if (disposing)
-            {
-                disposeToken.Cancel();
 
-                runTask.Wait();
+        public void SkipCurrentDelay()
+        {
+            if (!stopToken.IsCancellationRequested)
+            {
+                Interlocked.CompareExchange(ref oneCallState, OneCallRequested, OneCallNotExecuted);
+
+                wakeupToken?.Cancel();
             }
         }
 
-        public void Wakeup()
+        private async Task RunInternalAsync(int delay, int initialDelay, Func<CancellationToken, Task> callback)
         {
-            ThrowIfDisposed();
+            try
+            {
+                if (initialDelay > 0)
+                {
+                    await WaitAsync(initialDelay).ConfigureAwait(false);
+                }
 
-            delayToken?.Cancel();
+                while (oneCallState == OneCallRequested || !stopToken.IsCancellationRequested)
+                {
+                    await callback(stopToken.Token).ConfigureAwait(false);
+
+                    oneCallState = OneCallExecuted;
+
+                    await WaitAsync(delay).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        private async Task WaitAsync(int intervall)
+        {
+            try
+            {
+                wakeupToken = new CancellationTokenSource();
+
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(stopToken.Token, wakeupToken.Token))
+                {
+                    await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
         }
     }
 }

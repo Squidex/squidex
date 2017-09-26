@@ -13,13 +13,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public class SchemaDto
+    public sealed class SchemaDto
     {
         /// <summary>
         /// The id of the schema.
         /// </summary>
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// The name of the schema. Unique within the app.
         /// </summary>

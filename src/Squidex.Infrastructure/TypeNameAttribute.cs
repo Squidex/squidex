@@ -11,7 +11,7 @@ using System;
 namespace Squidex.Infrastructure
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class TypeNameAttribute : Attribute
+    public class TypeNameAttribute : Attribute
     {
         public string TypeName { get; }
 

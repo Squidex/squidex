@@ -6,11 +6,11 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
-    Notification,
-    NotificationService,
+    ComponentBase,
+    DialogService,
     SchemaPropertiesDto,
     SchemasService,
     Version
@@ -21,7 +21,7 @@ import {
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html'
 })
-export class SchemaEditFormComponent implements OnInit {
+export class SchemaEditFormComponent extends ComponentBase implements OnInit {
     @Output()
     public saved = new EventEmitter<SchemaPropertiesDto>();
 
@@ -41,7 +41,7 @@ export class SchemaEditFormComponent implements OnInit {
     public appName: string;
 
     public editFormSubmitted = false;
-    public editForm: FormGroup =
+    public editForm =
         this.formBuilder.group({
             label: ['',
                 [
@@ -53,11 +53,11 @@ export class SchemaEditFormComponent implements OnInit {
                 ]]
         });
 
-    constructor(
+    constructor(dialogs: DialogService,
         private readonly schemas: SchemasService,
-        private readonly formBuilder: FormBuilder,
-        private readonly notifications: NotificationService
+        private readonly formBuilder: FormBuilder
     ) {
+        super(dialogs);
     }
 
     public ngOnInit() {
@@ -65,8 +65,8 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public cancel() {
-        this.reset();
-        this.cancelled.emit();
+        this.emitCancelled();
+        this.resetEditForm();
     }
 
     public saveSchema() {
@@ -75,27 +75,35 @@ export class SchemaEditFormComponent implements OnInit {
         if (this.editForm.valid) {
             this.editForm.disable();
 
-            const enable = () => {
-                this.editForm.enable();
-                this.editFormSubmitted = false;
-            };
-
             const requestDto = this.editForm.value;
 
             this.schemas.putSchema(this.appName, this.name, requestDto, this.version)
                 .subscribe(dto => {
-                    this.reset();
-                    this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
+                    this.emitSaved(requestDto);
+                    this.resetEditForm();
                 }, error => {
-                    enable();
-                    this.notifications.notify(Notification.error(error.displayMessage));
+                    this.notifyError(error);
+                    this.enableEditForm();
                 });
         }
     }
 
-    private reset() {
+    private emitCancelled() {
+        this.cancelled.emit();
+    }
+
+    private emitSaved(requestDto: any) {
+        this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
+    }
+
+    private enableEditForm() {
+        this.editForm.enable();
         this.editFormSubmitted = false;
+    }
+
+    private resetEditForm() {
         this.editForm.reset();
         this.editForm.enable();
+        this.editFormSubmitted = false;
     }
 }

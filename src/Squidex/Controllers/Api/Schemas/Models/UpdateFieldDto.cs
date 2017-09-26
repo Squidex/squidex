@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public class UpdateFieldDto
+    public sealed class UpdateFieldDto
     {
         /// <summary>
         /// The field properties.

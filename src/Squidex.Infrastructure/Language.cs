@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Infrastructure
 {
     public sealed partial class Language
@@ -111,7 +109,7 @@ namespace Squidex.Infrastructure
                 input = match.Groups[0].Value;
             }
 
-            if (TryGetLanguage(input.ToLowerInvariant(), out Language result))
+            if (TryGetLanguage(input.ToLowerInvariant(), out var result))
             {
                 return result;
             }

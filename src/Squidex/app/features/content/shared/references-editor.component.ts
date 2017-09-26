@@ -13,16 +13,16 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     ContentDto,
     ContentsService,
+    DialogService,
     FieldDto,
     ImmutableArray,
-    NotificationService,
     SchemaDetailsDto,
-    SchemasService
+    SchemasService,
+    Types
 } from 'shared';
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true
@@ -35,8 +35,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
 export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor, OnInit {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public schemaId: string;
@@ -54,11 +54,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     public isDisabled = false;
     public isInvalidSchema = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -73,16 +73,16 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             });
     }
 
-    public writeValue(value: any) {
+    public writeValue(value: string[]) {
         this.contentItems = ImmutableArray.empty<ContentDto>();
 
-        if (value && value.length > 0) {
+        if (Types.isArrayOfString(value) && value.length > 0) {
             const contentIds: string[] = value;
 
             this.appNameOnce()
                 .switchMap(app => this.contentsService.getContents(app, this.schemaId, 10000, 0, undefined, contentIds))
                 .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(dtos.items);
+                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(c => !!c));
                 });
         }
     }
@@ -92,11 +92,11 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public canDrop() {
@@ -138,8 +138,8 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
             ids = null;
         }
 
-        this.touchedCallback();
-        this.changeCallback(ids);
+        this.callTouched();
+        this.callChange(ids);
     }
 
     private loadFields() {
@@ -147,6 +147,10 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
 
         if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
             this.contentFields = [this.schema.fields[0]];
+        }
+
+        if (this.contentFields.length === 0) {
+            this.contentFields = [<any>{}];
         }
 
         if (this.contentFields.length > 0) {

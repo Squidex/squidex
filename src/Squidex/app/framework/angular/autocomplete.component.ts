@@ -17,7 +17,6 @@ const KEY_ENTER = 13;
 const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
@@ -31,8 +30,8 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public source: AutocompleteSource;
@@ -55,11 +54,58 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public queryInput = new FormControl();
 
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
+    public ngOnInit() {
+        this.subscription =
+            this.queryInput.valueChanges
+                .map(query => <string>query)
+                .map(query => query ? query.trim() : query)
+                .distinctUntilChanged()
+                .debounceTime(200)
+                .do(query => {
+                    if (!query) {
+                        this.reset();
+                    }
+                })
+                .filter(query => !!query && !!this.source)
+                .switchMap(query => this.source.find(query)).catch(error => Observable.of([]))
+                .subscribe(items => {
+                    this.reset();
+                    this.items = items || [];
+                });
+    }
+
+    public onKeyDown(event: KeyboardEvent) {
+        switch (event.keyCode) {
+            case KEY_UP:
+                this.up();
+                return false;
+            case KEY_DOWN:
+                this.down();
+                return false;
+            case KEY_ESCAPE:
+                this.resetForm();
+                this.reset();
+                return false;
+            case KEY_ENTER:
+                if (this.items.length > 0) {
+                    this.selectItem();
+                    return false;
+                }
+                break;
+        }
+
+        return true;
+    }
+
     public writeValue(value: any) {
         if (!value) {
-            this.resetValue();
+            this.resetForm();
         } else {
-            let item = this.items.find(i => i === value);
+            const item = this.items.find(i => i === value);
 
             if (item) {
                 this.queryInput.setValue(value.title || '');
@@ -79,61 +125,16 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.subscription =
-            this.queryInput.valueChanges
-                .map(query => <string>query)
-                .map(query => query ? query.trim() : query)
-                .distinctUntilChanged()
-                .debounceTime(200)
-                .do(query => {
-                    if (!query) {
-                        this.reset();
-                    }
-                })
-                .filter(query => !!query && !!this.source)
-                .switchMap(query => this.source.find(query)).catch(_ => Observable.of([]))
-                .subscribe(items => {
-                    this.reset();
-                    this.items = items || [];
-                });
-    }
-
-    public onKeyDown(event: KeyboardEvent) {
-        switch (event.keyCode) {
-            case KEY_UP:
-                this.up();
-                return false;
-            case KEY_DOWN:
-                this.down();
-                return false;
-            case KEY_ESCAPE:
-                this.resetValue();
-                this.reset();
-                return false;
-            case KEY_ENTER:
-                if (this.items.length > 0) {
-                    this.selectItem();
-                    return false;
-                }
-                break;
-        }
+        this.callTouched = fn;
     }
 
     public blur() {
         this.reset();
-        this.touchedCallback();
+        this.callTouched();
     }
 
     public selectItem(selection: any | null = null) {
@@ -152,7 +153,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 } else {
                     this.queryInput.setValue(selection.toString(), { emitEvent: false });
                 }
-                this.changeCallback(selection);
+                this.callChange(selection);
             } finally {
                 this.reset();
             }
@@ -179,7 +180,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.selectIndex(this.selectedIndex + 1);
     }
 
-    private resetValue() {
+    private resetForm() {
         this.queryInput.setValue('');
     }
 

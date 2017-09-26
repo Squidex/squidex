@@ -7,17 +7,26 @@
 
 import { Observable } from 'rxjs';
 
-import { AppsStoreService, NotificationService } from './../declarations-base';
+import {
+    AppsStoreService,
+    AuthService,
+    DialogService
+} from './../declarations-base';
 
 import { ComponentBase } from './component-base';
 
 export abstract class AppComponentBase extends ComponentBase {
     private appName$: Observable<string>;
 
-    constructor(notifications: NotificationService,
-        private readonly appsStore: AppsStoreService
+    public get userToken(): string {
+        return this.authService.user!.token;
+    }
+
+    constructor(dialogs: DialogService,
+        protected readonly appsStore: AppsStoreService,
+        protected readonly authService: AuthService
     ) {
-        super(notifications);
+        super(dialogs);
 
         this.appName$ = this.appsStore.selectedApp.filter(a => !!a).map(a => a!.name);
     }

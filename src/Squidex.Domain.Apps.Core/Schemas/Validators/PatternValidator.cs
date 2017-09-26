@@ -11,9 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public class PatternValidator : IValidator

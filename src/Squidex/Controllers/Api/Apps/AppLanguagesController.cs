@@ -28,8 +28,8 @@ namespace Squidex.Controllers.Api.Apps
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Apps")]
-    public class AppLanguagesController : ControllerBase
+    [SwaggerTag(nameof(Apps))]
+    public sealed class AppLanguagesController : ControllerBase
     {
         public AppLanguagesController(ICommandBus commandBus)
             : base(commandBus)
@@ -44,14 +44,14 @@ namespace Squidex.Controllers.Api.Apps
         /// 200 => Language configuration returned.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppEditor]
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(LanguageDto[]), 200)]
+        [ProducesResponseType(typeof(AppLanguageDto[]), 200)]
         public IActionResult GetLanguages(string app)
         {
-            var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x => 
-                SimpleMapper.Map(x.Language, 
+            var response = App.LanguagesConfig.OfType<LanguageConfig>().Select(x =>
+                SimpleMapper.Map(x.Language,
                     new AppLanguageDto
                     {
                         IsMaster = x == App.LanguagesConfig.Master,
@@ -107,7 +107,7 @@ namespace Squidex.Controllers.Api.Apps
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
         {
             await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateLanguage { Language = language }));
-          
+
             return NoContent();
         }
 

@@ -9,8 +9,6 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-
 namespace Squidex.Infrastructure.Log.Adapter
 {
     internal sealed class SemanticLogLogger : ILogger

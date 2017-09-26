@@ -10,26 +10,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Generator;
-using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
-
-// ReSharper disable UseObjectOrCollectionInitializer
 
 namespace Squidex.Controllers.ContentApi
 {
     [ApiExceptionFilter]
+    [AppApi(false)]
     [SwaggerIgnore]
-    public class ContentSwaggerController : Controller
+    public sealed class ContentSwaggerController : ControllerBase
     {
         private readonly ISchemaRepository schemaRepository;
-        private readonly IAppProvider appProvider;
         private readonly SchemasSwaggerGenerator schemasSwaggerGenerator;
 
-        public ContentSwaggerController(ISchemaRepository schemaRepository, IAppProvider appProvider, SchemasSwaggerGenerator schemasSwaggerGenerator)
+        public ContentSwaggerController(ICommandBus commandBus, ISchemaRepository schemaRepository, SchemasSwaggerGenerator schemasSwaggerGenerator)
+            : base(commandBus)
         {
-            this.appProvider = appProvider;
-
             this.schemaRepository = schemaRepository;
             this.schemasSwaggerGenerator = schemasSwaggerGenerator;
         }
@@ -39,9 +36,9 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(0)]
         public IActionResult Docs(string app)
         {
-            ViewBag.Specification = $"~/content/{app}/swagger/v1/swagger.json";
+            var vm = new DocsVM { Specification = $"~/content/{app}/swagger/v1/swagger.json" };
 
-            return View("Docs");
+            return View(nameof(Docs), vm);
         }
 
         [HttpGet]
@@ -49,16 +46,9 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(0)]
         public async Task<IActionResult> GetSwagger(string app)
         {
-            var appEntity = await appProvider.FindAppByNameAsync(app);
+            var schemas = await schemaRepository.QueryAllAsync(App.Id);
 
-            if (appEntity == null)
-            {
-                return NotFound();
-            }
-           
-            var schemas = await schemaRepository.QueryAllAsync(appEntity.Id);
-            
-            var swaggerDocument = await schemasSwaggerGenerator.Generate(appEntity, schemas);
+            var swaggerDocument = await schemasSwaggerGenerator.Generate(App, schemas);
 
             return Content(swaggerDocument.ToJson(), "application/json");
         }

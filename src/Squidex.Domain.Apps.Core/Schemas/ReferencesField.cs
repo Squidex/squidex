@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 referenceIds = EmptyIds;
             }
 
-            return referenceIds.Union(new [] { Properties.SchemaId });
+            return referenceIds.Union(new[] { Properties.SchemaId });
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected override IEdmTypeReference CreateEdmType()
         {
-            return null;
+            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
         }
     }
 }

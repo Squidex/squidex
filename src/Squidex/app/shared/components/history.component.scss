@@ -7,10 +7,6 @@
         margin-bottom: 1rem;
     }
 
-    &-message {
-        font-size: .9rem;
-    }
-
     &-main {
         @include flex-grow(1);
     }
@@ -24,6 +20,6 @@
     &-created {
         font-size: .65rem;
         font-weight: normal;
-        color: $color-empty;
+        color: $color-text-decent;
     }
 }

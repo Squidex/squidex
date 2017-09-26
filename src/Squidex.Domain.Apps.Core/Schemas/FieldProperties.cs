@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -20,7 +21,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsRequired
         {
-            get { return isRequired; }
+            get
+            {
+                return isRequired;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -31,7 +35,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsListField
         {
-            get { return isListField; }
+            get
+            {
+                return isListField;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -42,7 +49,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Placeholder
         {
-            get { return placeholder; }
+            get
+            {
+                return placeholder;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -52,6 +62,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         public abstract JToken GetDefaultValue();
+
+        public virtual bool ShouldApplyDefaultValue(JToken value)
+        {
+            return value.IsNull();
+        }
 
         public void Validate(IList<ValidationError> errors)
         {

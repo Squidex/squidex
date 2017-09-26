@@ -30,7 +30,7 @@ describe('GraphQlService', () => {
     it('should make get request to get history events',
         inject([GraphQlService, HttpTestingController], (graphQlService: GraphQlService, httpMock: HttpTestingController) => {
 
-        let graphQlResult = null;
+        let graphQlResult: any = null;
 
         graphQlService.query('my-app', { }).subscribe(result => {
             graphQlResult = result;

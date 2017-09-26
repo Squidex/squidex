@@ -52,6 +52,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
+        public override object ConvertValue(JToken value)
+        {
+            return value.ToString();
+        }
+
         protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             jsonProperty.Type = JsonObjectType.String;
@@ -68,11 +73,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         protected override IEdmTypeReference CreateEdmType()
         {
             return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
-        }
-
-        public override object ConvertValue(JToken value)
-        {
-            return value.ToString();
         }
     }
 }

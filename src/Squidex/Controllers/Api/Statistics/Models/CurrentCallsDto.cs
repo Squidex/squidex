@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Statistics.Models
 {
-    public class CurrentCallsDto
+    public sealed class CurrentCallsDto
     {
         /// <summary>
         /// The number of calls.

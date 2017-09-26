@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("FieldShownEvent")]
-    public class FieldShown : FieldEvent
+    [EventType(nameof(FieldShown))]
+    public sealed class FieldShown : FieldEvent
     {
     }
 }

@@ -5,6 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
+import { Injectable } from '@angular/core';
+
+@Injectable()
 export class ResourceLoaderService {
     private cache: { [path: string]: Promise<any> } = {};
 

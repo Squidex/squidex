@@ -42,10 +42,9 @@ namespace Squidex.Config.Swagger
 
         private static SwaggerSettings ConfigureIdentity(this SwaggerSettings settings, MyUrlsOptions urlOptions)
         {
-            settings.DocumentProcessors.Add(
-                new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
+            settings.DocumentProcessors.Add(new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
-            settings.OperationProcessors.Add(new OperationSecurityScopeProcessor(Constants.SecurityDefinition));
+            settings.OperationProcessors.Add(new ScopesProcessor());
 
             return settings;
         }

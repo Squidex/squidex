@@ -12,7 +12,9 @@ import { Subscription } from 'rxjs';
 
 import {
     ContentCreated,
-    ContentDeleted,
+    ContentPublished,
+    ContentRemoved,
+    ContentUnpublished,
     ContentUpdated
 } from './../messages';
 
@@ -24,14 +26,13 @@ import {
     AuthService,
     ContentDto,
     ContentsService,
-    DateTime,
+    DialogService,
     FieldDto,
     ImmutableArray,
     MessageBus,
-    NotificationService,
+    ModalView,
     Pager,
-    SchemaDetailsDto,
-    Version
+    SchemaDetailsDto
 } from 'shared';
 
 @Component({
@@ -45,6 +46,8 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public schema: SchemaDetailsDto;
 
+    public searchModal = new ModalView();
+
     public contentItems: ImmutableArray<ContentDto>;
     public contentFields: FieldDto[];
     public contentsFilter = new FormControl();
@@ -56,16 +59,16 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public languageParameter: string;
 
     public isReadOnly = false;
+    public isArchive = false;
 
     public columnWidth: number;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly contentsService: ContentsService,
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -81,14 +84,14 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.contentCreatedSubscription =
             this.messageBus.of(ContentCreated)
                 .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(this.createContent(message.id, message.data, message.version, message.isPublished));
+                    this.contentItems = this.contentItems.pushFront(message.content);
                     this.contentsPager = this.contentsPager.incrementCount();
                 });
 
         this.contentUpdatedSubscription =
             this.messageBus.of(ContentUpdated)
                 .subscribe(message => {
-                    this.updateContents(message.id, undefined, message.data, message.version);
+                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
                 });
 
         this.route.params.map(p => <string> p['language'])
@@ -100,34 +103,26 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             .subscribe(schema => {
                 this.schema = schema;
 
-                this.reset();
+                this.resetContents();
                 this.load();
             });
 
         this.isReadOnly = routeData['isReadOnly'];
     }
 
-    public search() {
-        this.contentsQuery = this.contentsFilter.value;
-        this.contentsPager = new Pager(0);
-
-        this.load();
-    }
-
-    private reset() {
-        this.contentItems = ImmutableArray.empty<ContentDto>();
-        this.contentsQuery = '';
-        this.contentsFilter.setValue('');
-        this.contentsPager = new Pager(0);
-
-        this.loadFields();
+    public dropData(content: ContentDto) {
+        return { content, schemaId: this.schema.id };
     }
 
     public publishContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                this.updateContents(content.id, true, content.data, content.version.value);
+            .subscribe(dto => {
+                content = content.publish(this.userToken, dto.version);
+
+                this.contentItems = this.contentItems.replaceBy('id', content);
+
+                this.emitContentPublished(content);
             }, error => {
                 this.notifyError(error);
             });
@@ -136,8 +131,36 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     public unpublishContent(content: ContentDto) {
         this.appNameOnce()
             .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
-            .subscribe(() => {
-                this.updateContents(content.id, false, content.data, content.version.value);
+            .subscribe(dto => {
+                content = content.unpublish(this.userToken, dto.version);
+
+                this.contentItems = this.contentItems.replaceBy('id', content);
+
+                this.emitContentUnpublished(content);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public archiveContent(content: ContentDto) {
+        this.appNameOnce()
+            .switchMap(app => this.contentsService.archiveContent(app, this.schema.name, content.id, content.version))
+            .subscribe(dto => {
+                content = content.archive(this.userToken, dto.version);
+
+                this.removeContent(content);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public restoreContent(content: ContentDto) {
+        this.appNameOnce()
+            .switchMap(app => this.contentsService.restoreContent(app, this.schema.name, content.id, content.version))
+            .subscribe(dto => {
+                content = content.restore(this.userToken, dto.version);
+
+                this.removeContent(content);
             }, error => {
                 this.notifyError(error);
             });
@@ -147,36 +170,15 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.appNameOnce()
             .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
             .subscribe(() => {
-                this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
-                this.contentsPager = this.contentsPager.decrementCount();
-
-                this.messageBus.publish(new ContentDeleted(content.id));
+                this.removeContent(content);
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public selectLanguage(language: AppLanguageDto) {
-        this.languageSelected = language;
-    }
-
-    private loadFields() {
-        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
-            this.contentFields = [this.schema.fields[0]];
-        }
-
-        if (this.contentFields.length > 0) {
-            this.columnWidth = 100 / this.contentFields.length;
-        } else {
-            this.columnWidth = 100;
-        }
-    }
-
     public load(showInfo = false) {
         this.appNameOnce()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery))
+            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, null, this.isArchive))
             .subscribe(dtos => {
                 this.contentItems = ImmutableArray.of(dtos.items);
                 this.contentsPager = this.contentsPager.setCount(dtos.total);
@@ -189,8 +191,22 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
             });
     }
 
-    public dropData(content: ContentDto) {
-        return { content, schemaId: this.schema.id };
+    public updateArchive(isArchive: boolean) {
+        this.contentsQuery = this.contentsFilter.value;
+        this.contentsPager = new Pager(0);
+
+        this.isArchive = isArchive;
+
+        this.searchModal.hide();
+
+        this.load();
+    }
+
+    public search() {
+        this.contentsQuery = this.contentsFilter.value;
+        this.contentsPager = new Pager(0);
+
+        this.load();
     }
 
     public goNext() {
@@ -205,39 +221,54 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
         this.load();
     }
 
-    private updateContents(id: string, p: boolean | undefined, data: any, version: string) {
-        this.contentItems = this.contentItems.replaceAll(x => x.id === id, c => this.updateContent(c, p === undefined ? c.isPublished : p, data, version));
+    public selectLanguage(language: AppLanguageDto) {
+        this.languageSelected = language;
     }
 
-    private createContent(id: string, data: any, version: string, isPublished: boolean): ContentDto {
-        const me = `subject:${this.authService.user!.id}`;
-
-        const newContent =
-            new ContentDto(
-                id,
-                isPublished,
-                me, me,
-                DateTime.now(),
-                DateTime.now(),
-                data,
-                new Version(version));
-
-        return newContent;
+    private emitContentPublished(content: ContentDto) {
+        this.messageBus.emit(new ContentPublished(content));
     }
 
-    private updateContent(content: ContentDto, isPublished: boolean, data: any, version: string): ContentDto {
-        const me = `subject:${this.authService.user!.id}`;
+    private emitContentUnpublished(content: ContentDto) {
+        this.messageBus.emit(new ContentUnpublished(content));
+    }
 
-        const newContent =
-            new ContentDto(
-                content.id,
-                isPublished,
-                content.createdBy, me,
-                content.created, DateTime.now(),
-                data,
-                new Version(version));
+    private emitContentRemoved(content: ContentDto) {
+        this.messageBus.emit(new ContentRemoved(content));
+    }
 
-        return newContent;
+    private resetContents() {
+        this.contentItems = ImmutableArray.empty<ContentDto>();
+        this.contentsQuery = '';
+        this.contentsFilter.setValue('');
+        this.contentsPager = new Pager(0);
+
+        this.loadFields();
+    }
+
+    private removeContent(content: ContentDto) {
+        this.contentItems = this.contentItems.removeAll(x => x.id === content.id);
+        this.contentsPager = this.contentsPager.decrementCount();
+
+        this.emitContentRemoved(content);
+    }
+
+    private loadFields() {
+        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
+
+        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
+            this.contentFields = [this.schema.fields[0]];
+        }
+
+        if (this.contentFields.length === 0) {
+            this.contentFields = [<any>{}];
+        }
+
+        if (this.contentFields.length > 0) {
+            this.columnWidth = 100 / this.contentFields.length;
+        } else {
+            this.columnWidth = 100;
+        }
     }
 }
 

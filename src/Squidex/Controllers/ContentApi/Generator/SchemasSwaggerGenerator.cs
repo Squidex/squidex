@@ -20,11 +20,6 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
-using Squidex.Shared.Identity;
-
-// ReSharper disable InvertIf
-// ReSharper disable SuggestBaseTypeForParameter
-// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace Squidex.Controllers.ContentApi.Generator
 {
@@ -55,34 +50,17 @@ namespace Squidex.Controllers.ContentApi.Generator
             swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
 
             GenerateSchemasOperations(schemas, app);
-            GenerateSecurityRequirements();
 
             await GenerateDefaultErrorsAsync();
 
             return document;
         }
 
-        private void GenerateSecurityRequirements()
-        {
-            var securityRequirements = new List<SwaggerSecurityRequirement>
-            {
-                new SwaggerSecurityRequirement
-                {
-                    { Constants.SecurityDefinition, new List<string> { SquidexRoles.AppOwner, SquidexRoles.AppDeveloper, SquidexRoles.AppEditor } }
-                }
-            };
-
-            foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
-            {
-                operation.Security = securityRequirements;
-            }
-        }
-
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
         {
             var appBasePath = $"/content/{app.Name}";
 
-            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.Schema))
+            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
             {
                 new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
             }

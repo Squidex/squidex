@@ -29,12 +29,12 @@ export class DisplayNamePipe implements PipeTransform {
         const parts = s.split('.');
 
         for (let i = 0, n = parts.length; i < n; ++i) {
-            let k = parts[i];
+            const k = parts[i];
 
             if (k in o) {
                 o = o[k];
             } else {
-                return;
+                return undefined;
             }
         }
 

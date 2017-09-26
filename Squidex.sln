@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
 EndProject
@@ -57,6 +57,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.Tests", "tests\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj", "{42184546-E3CB-4D4F-9495-43979B9C63B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.GetEventStore", "src\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj", "{EF75E488-1324-4E18-A1BD-D3A05AE67B1F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Azure", "src\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj", "{7931187E-A1E6-4F89-8BC8-20A1E445579F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{360C300D-0F7E-439D-A437-714C959E3CAD}"
+	ProjectSection(SolutionItems) = preProject
+		stylecop.json = stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -280,6 +287,18 @@ Global
 		{EF75E488-1324-4E18-A1BD-D3A05AE67B1F}.Release|x64.Build.0 = Release|Any CPU
 		{EF75E488-1324-4E18-A1BD-D3A05AE67B1F}.Release|x86.ActiveCfg = Release|Any CPU
 		{EF75E488-1324-4E18-A1BD-D3A05AE67B1F}.Release|x86.Build.0 = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Debug|x86.Build.0 = Debug|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|x64.Build.0 = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|x86.ActiveCfg = Release|Any CPU
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -308,5 +327,9 @@ Global
 		{27CF800D-890F-4882-BF05-44EC3233537D} = {C0D540F0-9158-4528-BFD8-BEAE6EAE45EA}
 		{42184546-E3CB-4D4F-9495-43979B9C63B9} = {C0D540F0-9158-4528-BFD8-BEAE6EAE45EA}
 		{EF75E488-1324-4E18-A1BD-D3A05AE67B1F} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+		{7931187E-A1E6-4F89-8BC8-20A1E445579F} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}
 	EndGlobalSection
 EndGlobal

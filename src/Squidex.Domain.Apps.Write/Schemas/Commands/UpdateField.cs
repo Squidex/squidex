@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class UpdateField : FieldCommand, IValidatable
+    public sealed class UpdateField : FieldCommand, IValidatable
     {
         public FieldProperties Properties { get; set; }
 

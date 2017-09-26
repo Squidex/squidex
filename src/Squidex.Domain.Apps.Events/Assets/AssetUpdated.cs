@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Events.Assets
 {
     [TypeName("AssetUpdated")]
-    public class AssetUpdated : AssetEvent
+    public sealed class AssetUpdated : AssetEvent
     {
         public string MimeType { get; set; }
 

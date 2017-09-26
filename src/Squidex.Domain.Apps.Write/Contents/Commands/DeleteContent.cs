@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
-    public class DeleteContent : ContentCommand
+    public sealed class DeleteContent : ContentCommand
     {
     }
 }

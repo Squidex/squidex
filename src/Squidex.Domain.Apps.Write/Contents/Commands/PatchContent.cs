@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
-    public class PatchContent : ContentDataCommand
+    public sealed class PatchContent : ContentDataCommand
     {
     }
 }

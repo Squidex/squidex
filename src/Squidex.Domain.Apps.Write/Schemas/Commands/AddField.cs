@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class AddField : FieldCommand, IValidatable
+    public sealed class AddField : FieldCommand, IValidatable
     {
         public string Name { get; set; }
 

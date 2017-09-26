@@ -12,9 +12,6 @@ using Microsoft.OData.UriParser;
 using NodaTime;
 using NodaTime.Text;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public sealed class ConstantVisitor : QueryNodeVisitor<object>
@@ -45,9 +42,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             {
                 var value = Visit(nodeIn.Source);
 
-                if (value is DateTimeOffset)
+                if (value is DateTimeOffset dateTimeOffset)
                 {
-                    return Instant.FromDateTimeOffset((DateTimeOffset)value);
+                    return Instant.FromDateTimeOffset(dateTimeOffset);
                 }
 
                 return InstantPattern.General.Parse(Visit(nodeIn.Source).ToString()).Value;

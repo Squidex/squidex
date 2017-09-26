@@ -5,12 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Directive, ElementRef, Input, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, Renderer } from '@angular/core';
 
 @Directive({
     selector: '[sqxFocusOnInit]'
 })
-export class FocusOnInitDirective implements OnInit {
+export class FocusOnInitDirective implements AfterViewInit {
     @Input()
     public select: boolean;
 
@@ -20,13 +20,11 @@ export class FocusOnInitDirective implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        setTimeout(() => {
-            this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
+    public ngAfterViewInit() {
+        this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
 
-            if (this.select) {
-                this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
-            }
-        });
+        if (this.select) {
+            this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
+        }
     }
 }

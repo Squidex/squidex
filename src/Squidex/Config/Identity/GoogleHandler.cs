@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Identity
 {
     public sealed class GoogleHandler : OAuthEvents
@@ -40,7 +38,7 @@ namespace Squidex.Config.Identity
             {
                 pictureUrl = context.User?["image"]?.Value<string>("url");
 
-                if (pictureUrl != null && pictureUrl.EndsWith("?sz=50"))
+                if (pictureUrl != null && pictureUrl.EndsWith("?sz=50", System.StringComparison.Ordinal))
                 {
                     pictureUrl = pictureUrl.Substring(0, pictureUrl.Length - 6);
                 }

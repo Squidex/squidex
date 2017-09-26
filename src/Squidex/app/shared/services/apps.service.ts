@@ -12,10 +12,10 @@ import { Observable } from 'rxjs';
 import 'framework/angular/http-extensions';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    HTTP,
-    EntityCreatedDto
+    HTTP
 } from 'framework';
 
 export class AppDto {
@@ -40,16 +40,19 @@ export class CreateAppDto {
 export class AppsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
     public getApps(): Observable<AppDto[]> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new AppDto(
@@ -63,12 +66,19 @@ export class AppsService {
                 .pretifyError('Failed to load apps. Please reload.');
     }
 
-    public postApp(dto: CreateAppDto): Observable<EntityCreatedDto> {
+    public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return HTTP.postVersioned(this.http, url, dto)
+        return HTTP.postVersioned<any>(this.http, url, dto)
                 .map(response => {
-                    return new EntityCreatedDto(response.id);
+                    const body = response.payload.body;
+
+                    now = now || DateTime.now();
+
+                    return new AppDto(body.id, dto.name, 'Owner', now, now);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('App', 'Created', dto.name);
                 })
                 .pretifyError('Failed to create app. Please reload.');
     }

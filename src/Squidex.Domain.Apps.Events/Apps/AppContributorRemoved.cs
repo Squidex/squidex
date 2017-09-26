@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppContributorRemovedEvent")]
-    public class AppContributorRemoved : AppEvent
+    [EventType(nameof(AppContributorRemoved))]
+    public sealed class AppContributorRemoved : AppEvent
     {
         public string ContributorId { get; set; }
     }

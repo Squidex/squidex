@@ -12,7 +12,7 @@ using NSwag.Annotations;
 namespace Squidex.Controllers.UI.Error
 {
     [SwaggerIgnore]
-    public class ErrorController : Controller
+    public sealed class ErrorController : Controller
     {
         [Route("error")]
         public IActionResult Error()

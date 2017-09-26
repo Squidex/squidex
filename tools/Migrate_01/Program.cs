@@ -17,10 +17,10 @@ namespace Migrate_01
         public static void Main(string[] args)
         {
             Console.WriteLine("Migrate EventStore");
-            
+
             var mongoClient = new MongoClient(GetMongoConnectionValue());
             var mongoDatabase = mongoClient.GetDatabase(GetMongoDatabaseValue());
-            
+
             var collection = mongoDatabase.GetCollection<BsonDocument>("Events");
 
             Console.Write("Migrate Indices.....");

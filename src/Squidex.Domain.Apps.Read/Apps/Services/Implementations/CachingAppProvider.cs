@@ -18,8 +18,6 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
     public class CachingAppProvider : CachingProviderBase, IAppProvider, IEventConsumer
@@ -100,6 +98,7 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
             }
 
             if (@event.Payload is AppClientAttached ||
+                @event.Payload is AppClientChanged ||
                 @event.Payload is AppClientRenamed ||
                 @event.Payload is AppClientRevoked ||
                 @event.Payload is AppPlanChanged ||

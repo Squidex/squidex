@@ -61,11 +61,6 @@ export class AppsStoreService {
 
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(dto)
-            .map(created => {
-                now = now || DateTime.now();
-
-                return new AppDto(created.id, dto.name, 'Owner', now, now);
-            })
             .do(app => {
                 this.apps$.first().subscribe(apps => {
                     this.apps$.next(apps.concat([app]));

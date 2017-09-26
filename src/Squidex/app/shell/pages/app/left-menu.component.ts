@@ -15,7 +15,7 @@ import { AppsStoreService } from 'shared';
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html'
 })
-export class LeftMenuComponent implements OnInit, OnDestroy {
+export class LeftMenuComponent implements OnDestroy, OnInit {
     private appSubscription: Subscription;
 
     public permission: string | null = null;

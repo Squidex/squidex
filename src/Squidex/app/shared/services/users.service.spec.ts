@@ -12,12 +12,35 @@ import {
     ApiUrlConfig,
     CreateUserDto,
     UpdateUserDto,
-    UserCreatedDto,
     UserDto,
     UserManagementService,
     UsersDto,
     UsersService
 } from './../';
+
+describe('UserDto', () => {
+    it('should update email and display name property when unlocking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_2 = user_1.update('qaisar@squidex.io', 'Qaisar');
+
+        expect(user_2.email).toEqual('qaisar@squidex.io');
+        expect(user_2.displayName).toEqual('Qaisar');
+    });
+
+    it('should update isLocked property when locking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', false);
+        const user_2 = user_1.lock();
+
+        expect(user_2.isLocked).toBeTruthy();
+    });
+
+    it('should update isLocked property when unlocking', () => {
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_2 = user_1.unlock();
+
+        expect(user_2.isLocked).toBeFalsy();
+    });
+});
 
 describe('UsersService', () => {
     beforeEach(() => {
@@ -280,7 +303,7 @@ describe('UserManagementService', () => {
 
         req.flush({ id: '123', pictureUrl: 'path/to/image1' });
 
-        expect(user).toEqual(new UserCreatedDto('123', 'path/to/image1'));
+        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, 'path/to/image1', false));
     }));
 
     it('should make put request to update user',

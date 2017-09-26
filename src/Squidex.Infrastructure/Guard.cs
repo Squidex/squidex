@@ -13,8 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure
 {
     public static class Guard

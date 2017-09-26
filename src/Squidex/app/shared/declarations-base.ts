@@ -31,12 +31,12 @@ export * from './services/history.service';
 export * from './services/languages.service';
 export * from './services/plans.service';
 export * from './services/schemas.service';
+export * from './services/ui.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';
 export * from './services/users.service';
 export * from './services/webhooks.service';
 
-export * from './utils/file-helper';
 export * from './utils/messages';
 
 export * from 'framework';

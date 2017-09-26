@@ -13,7 +13,7 @@ import { ShortcutService } from './../services/shortcut.service';
     selector: 'sqx-shortcut',
     template: ''
 })
-export class ShortcutComponent implements OnInit, OnDestroy {
+export class ShortcutComponent implements OnDestroy, OnInit {
     @Input()
     public keys: string;
 

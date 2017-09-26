@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         Task<IEventConsumerInfo> FindAsync(string consumerName);
 
+        Task ClearAsync(IEnumerable<string> currentConsumerNames);
+
         Task CreateAsync(string consumerName);
 
         Task StartAsync(string consumerName);

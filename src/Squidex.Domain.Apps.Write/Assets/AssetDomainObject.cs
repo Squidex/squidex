@@ -15,8 +15,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 
-// ReSharper disable UnusedParameter.Local
-
 namespace Squidex.Domain.Apps.Write.Assets
 {
     public class AssetDomainObject : DomainObjectBase
@@ -36,7 +34,7 @@ namespace Squidex.Domain.Apps.Write.Assets
             get { return fileVersion; }
         }
 
-        public AssetDomainObject(Guid id, int version) 
+        public AssetDomainObject(Guid id, int version)
             : base(id, version)
         {
         }

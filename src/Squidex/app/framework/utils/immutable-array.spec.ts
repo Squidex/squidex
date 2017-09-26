@@ -112,6 +112,13 @@ describe('ImmutableArray', () => {
         expect(array_2.values).toEqual([1, 4, 3, 8]);
     });
 
+    it('should replace by field', () => {
+        const array_1 = ImmutableArray.of([{ id: 1, v: 1 }, { id: 2, v: 2 }]);
+        const array_2 = array_1.replaceBy('id', { id: 1, v: 11 });
+
+        expect(array_2.values).toEqual([{ id: 1, v: 11 }, { id: 2, v: 2 }]);
+    });
+
     it('should return original if nothing has been replace', () => {
         const array_1 = ImmutableArray.of([1, 2, 3, 4]);
         const array_2 = array_1.replaceAll((i: number) => i % 200 === 0, i => i);
@@ -152,6 +159,34 @@ describe('ImmutableArray', () => {
         const array_2 = array_1.sort((x, y) => x - y);
 
         expect(array_2.values).toEqual([1, 2, 3, 4]);
+    });
+
+    it('should sort ascending by numbers', () => {
+        const array_1 = ImmutableArray.of([{ id: 3 }, { id: 2 }, { id: 1 }]);
+        const array_2 = array_1.sortByNumberAsc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    });
+
+    it('should sort descending by numbers', () => {
+        const array_1 = ImmutableArray.of([{ id: 1 }, { id: 2 }, { id: 3 }]);
+        const array_2 = array_1.sortByNumberDesc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: 3 }, { id: 2 }, { id: 1 }]);
+    });
+
+    it('should sort ascending by string', () => {
+        const array_1 = ImmutableArray.of([{ id: '3' }, { id: '2' }, { id: '1' }]);
+        const array_2 = array_1.sortByStringAsc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }]);
+    });
+
+    it('should sort descending by string', () => {
+        const array_1 = ImmutableArray.of([{ id: '1' }, { id: '2' }, { id: '3' }]);
+        const array_2 = array_1.sortByStringDesc(x => x.id);
+
+        expect(array_2.values).toEqual([{ id: '3' }, { id: '2' }, { id: '1' }]);
     });
 
     it('should provide mutable values', () => {

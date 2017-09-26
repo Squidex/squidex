@@ -12,9 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.RabbitMq;
-
-// ReSharper disable InvertIf
 
 namespace Squidex.Config.Domain
 {

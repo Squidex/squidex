@@ -40,8 +40,6 @@ namespace Squidex.Domain.Apps.Core
 
         public static async Task ValidateAsync(this Field field, JToken value, ValidationContext context, Action<string> addError)
         {
-            Guard.NotNull(value, nameof(value));
-
             try
             {
                 var typedValue = value.IsNull() ? null : field.ConvertValue(value);

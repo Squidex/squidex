@@ -15,9 +15,9 @@ namespace Squidex.Infrastructure.CQRS.Events
         public Guid EventId { get; set; }
 
         public string Payload { get; set; }
-        
+
         public string Metadata { get; set; }
-        
+
         public string Type { get; set; }
     }
 }

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Commands;
 
-#pragma warning disable IDE0019
+#pragma warning disable IDE0019 // Use pattern matching
 
 namespace Squidex.Domain.Apps.Write.TestHelpers
 {
@@ -34,18 +34,26 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
                 IsUpdated = false;
             }
 
-            public Task CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IAggregate
+            public async Task<V> CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IAggregate
             {
                 IsCreated = true;
 
-                return creator(domainObject as V);
+                var @do = domainObject as V;
+
+                await creator(domainObject as V);
+
+                return @do;
             }
 
-            public Task UpdateAsync<V>(CommandContext context, Func<V, Task> updater) where V : class, IAggregate
+            public async Task<V> UpdateAsync<V>(CommandContext context, Func<V, Task> updater) where V : class, IAggregate
             {
                 IsUpdated = true;
 
-                return updater(domainObject as V);
+                var @do = domainObject as V;
+
+                await updater(domainObject as V);
+
+                return @do;
             }
         }
 
@@ -152,5 +160,4 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
     }
 }
 
-
-#pragma warning restore IDE0019
+#pragma warning restore IDE0019 // Use pattern matching

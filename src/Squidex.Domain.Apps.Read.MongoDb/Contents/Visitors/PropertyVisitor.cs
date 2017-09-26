@@ -13,9 +13,6 @@ using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
 
-// ReSharper disable InvertIf
-// ReSharper disable RedundantIfElseBlock
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
     public sealed class PropertyVisitor : QueryNodeVisitor<ImmutableList<string>>
@@ -28,7 +25,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 
             if (propertyNames.Length == 3)
             {
-                if (!schema.FieldsByName.TryGetValue(propertyNames[1], out Field field))
+                var edmName = propertyNames[1].UnescapeEdmField();
+
+                if (!schema.FieldsByName.TryGetValue(edmName, out var field))
                 {
                     throw new NotSupportedException();
                 }

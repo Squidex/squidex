@@ -1,0 +1,19 @@
+<div *sqxModalView="tooltipModal;onRoot:true" closeAlways="true" @fade>
+
+    <div class="onboarding-rect" [sqxModalTarget]="for" [offset]="4" [autoPosition]="false" position="full"></div>
+    <div class="onboarding-help" [sqxModalTarget]="for" [offset]="4" [autoPosition]="false" [position]="position">
+        <div class="onboarding-text">
+            <ng-content></ng-content>
+        </div>
+
+        <div class="onboarding-buttons clearfix">
+            <button (click)="hideAll()" class="btn btn-link btn-primary btn-sm float-left">
+                Stop Tour
+            </button>
+
+            <button (click)="hideThis()" class="btn btn-link btn-success btn-sm float-right">
+                Got It
+            </button>
+        </div>
+    </div>
+</div>

@@ -15,5 +15,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         string Name { get; }
 
         string Secret { get; }
+
+        bool IsReader { get; }
     }
 }

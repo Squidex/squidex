@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppClientRenamedEvent")]
+    [EventType(nameof(AppClientRenamed))]
     public sealed class AppClientRenamed : AppEvent
     {
         public string Id { get; set; }

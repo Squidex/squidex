@@ -34,6 +34,10 @@ export class CurrencyConfig {
     }
 }
 
+export class AnalyticsIdConfig {
+    constructor(public value: string) { }
+}
+
 export class DecimalSeparatorConfig {
     constructor(public readonly value: string) { }
 }

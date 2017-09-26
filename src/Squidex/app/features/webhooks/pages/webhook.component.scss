@@ -1,0 +1,13 @@
+@import '_vars';
+@import '_mixins';
+
+.schemas-control {
+    width: 18rem;
+}
+
+.webhook-section {
+    border-top: 1px solid $color-border;
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    padding: 1rem 1.25rem 0;
+}

@@ -8,24 +8,22 @@
 
 using System;
 using System.IO;
-using System.Threading.Tasks;
-using Moq;
+using FakeItEasy;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class FolderAssetStoreTests : IDisposable
+    public class FolderAssetStoreTests : AssetStoreTests<FolderAssetStore>
     {
-        private readonly FolderAssetStore sut;
         private readonly string testFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
-        public FolderAssetStoreTests()
+        public override FolderAssetStore CreateStore()
         {
-            sut = new FolderAssetStore(testFolder, new Mock<ISemanticLog>().Object);
+            return new FolderAssetStore(testFolder, A.Dummy<ISemanticLog>());
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (Directory.Exists(testFolder))
             {
@@ -34,42 +32,27 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public void Should_throw_when_creating_directory_failed()
+        {
+            Assert.Throws<ConfigurationException>(() => new FolderAssetStore(CreateInvalidPath(), A.Dummy<ISemanticLog>()).Connect());
+        }
+
+        [Fact]
         public void Should_create_directory_when_connecting()
         {
-            sut.Connect();
+            Sut.Connect();
 
             Assert.True(Directory.Exists(testFolder));
         }
 
         [Fact]
-        public void Should_throw_when_creating_directory_failed()
+        public void Should_calculate_source_url()
         {
-            Assert.Throws<ConfigurationException>(() => new FolderAssetStore(CreateInvalidPath(), new Mock<ISemanticLog>().Object).Connect());
-        }
+            Sut.Connect();
 
-        [Fact]
-        public Task Should_throw_exception_if_asset_not_found()
-        {
-            sut.Connect();
+            var id = Guid.NewGuid().ToString();
 
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(Guid.NewGuid().ToString(), 1, "suffix", new MemoryStream()));
-        }
-
-        [Fact]
-        public async Task Should_read_and_write_file()
-        {
-            sut.Connect();
-
-            var assetId = Guid.NewGuid().ToString();
-            var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
-
-            await sut.UploadAsync(assetId, 1, "suffix", assetData);
-
-            var readData = new MemoryStream();
-
-            await sut.DownloadAsync(assetId, 1, "suffix", readData);
-
-            Assert.Equal(assetData.ToArray(), readData.ToArray());
+            Assert.Equal(Path.Combine(testFolder, $"{id}_1"), Sut.GenerateSourceUrl(id, 1, null));
         }
 
         private static string CreateInvalidPath()

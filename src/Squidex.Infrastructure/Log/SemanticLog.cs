@@ -19,8 +19,8 @@ namespace Squidex.Infrastructure.Log
         private readonly Func<IObjectWriter> writerFactory;
 
         public SemanticLog(
-            IEnumerable<ILogChannel> channels, 
-            IEnumerable<ILogAppender> appenders, 
+            IEnumerable<ILogChannel> channels,
+            IEnumerable<ILogAppender> appenders,
             Func<IObjectWriter> writerFactory)
         {
             Guard.NotNull(channels, nameof(channels));

@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public async Task Should_add_errors_if_asset_are_not_valid()
         {
             var assetId = Guid.NewGuid();
-            
+
             var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);
 
             await sut.ValidateAsync(CreateValue(assetId), errors, ValidationTestExtensions.InvalidContext(assetId));

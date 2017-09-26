@@ -21,6 +21,12 @@ namespace Squidex.Controllers.Api.Assets.Models
         public Guid Id { get; set; }
 
         /// <summary>
+        /// The file type.
+        /// </summary>
+        [Required]
+        public string FileType { get; set; }
+
+        /// <summary>
         /// The file name.
         /// </summary>
         [Required]

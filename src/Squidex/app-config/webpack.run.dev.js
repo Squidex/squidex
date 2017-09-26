@@ -15,8 +15,6 @@ module.exports = webpackMerge(runConfig, {
      */
     devtool: 'cheap-module-source-map',
 
-    //debug: true,
-
     output: {
         filename: '[name].js',
         // Set the public path, because we are running the website from another port (5000)

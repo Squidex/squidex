@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Fact]
         public void Should_add_error_if_pattern_is_not_valid_regex()
         {
-            var sut = new StringFieldProperties { Pattern = "[0-9{1}"};
+            var sut = new StringFieldProperties { Pattern = "[0-9{1}" };
 
             sut.Validate(errors);
 

@@ -11,7 +11,6 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
-    HistoryComponent,
     ResolveAppLanguagesGuard,
     ResolveContentGuard,
     ResolvePublishedSchemaGuard,
@@ -22,11 +21,13 @@ import {
 import {
     AssetsEditorComponent,
     ContentFieldComponent,
+    ContentHistoryComponent,
     ContentPageComponent,
     ContentItemComponent,
     ContentsPageComponent,
     ReferencesEditorComponent,
-    SchemasPageComponent
+    SchemasPageComponent,
+    SearchFormComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -75,7 +76,7 @@ const routes: Routes = [
                         children: [
                              {
                                 path: 'history',
-                                component: HistoryComponent,
+                                component: ContentHistoryComponent,
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
@@ -111,11 +112,13 @@ const routes: Routes = [
     declarations: [
         AssetsEditorComponent,
         ContentFieldComponent,
+        ContentHistoryComponent,
         ContentItemComponent,
         ContentPageComponent,
         ContentsPageComponent,
         ReferencesEditorComponent,
-        SchemasPageComponent
+        SchemasPageComponent,
+        SearchFormComponent
     ]
 })
 export class SqxFeatureContentModule { }

@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core
             object partitioning1a = new Partitioning("partitioning1");
             object partitioning1b = new Partitioning("partitioning1");
             object partitioning2a = new Partitioning("partitioning2");
-            
+
             Assert.True(partitioning1a.Equals(partitioning1b));
 
             Assert.False(partitioning1a.Equals(partitioning2a));

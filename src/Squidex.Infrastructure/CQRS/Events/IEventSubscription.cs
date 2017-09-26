@@ -6,13 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure.Actors;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface IEventSubscription : IDisposable
+    public interface IEventSubscription : IActor
     {
-        Task SubscribeAsync(Func<StoredEvent, Task> onNext, Func<Exception, Task> onError = null);
     }
 }

@@ -30,6 +30,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public bool IsHidden { get; set; }
 
         /// <summary>
+        /// Defines if the field is locked.
+        /// </summary>
+        public bool IsLocked { get; set; }
+
+        /// <summary>
         /// Defines if the field is disabled.
         /// </summary>
         public bool IsDisabled { get; set; }

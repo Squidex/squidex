@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Users.Models
 {
-    public class UserCreatedDto
+    public sealed class UserCreatedDto
     {
         [Required]
         public string Id { get; set; }

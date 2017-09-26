@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
@@ -32,7 +32,7 @@ export class AppFormComponent {
 
     public createFormError? = '';
     public createFormSubmitted = false;
-    public createForm: FormGroup =
+    public createForm =
         this.formBuilder.group({
             name: ['',
                 [
@@ -54,8 +54,8 @@ export class AppFormComponent {
     }
 
     public cancel() {
-        this.reset();
-        this.cancelled.emit();
+        this.emitCancelled();
+        this.resetCreateForm();
     }
 
     public createApp() {
@@ -66,23 +66,31 @@ export class AppFormComponent {
 
             const request = new CreateAppDto(this.createForm.controls['name'].value);
 
-            const enable = (message?: string) => {
-                this.createForm.enable();
-                this.createFormSubmitted = false;
-                this.createFormError = message;
-            };
-
             this.appsStore.createApp(request)
                 .subscribe(dto => {
-                    this.reset();
-                    this.created.emit(dto);
+                    this.resetCreateForm();
+                    this.emitCreated(dto);
                 }, error => {
-                    enable(error.displayMessage);
+                    this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private reset() {
+    private emitCancelled() {
+        this.cancelled.emit();
+    }
+
+    private emitCreated(app: AppDto) {
+        this.created.emit(app);
+    }
+
+    private enableCreateForm(message: string) {
+        this.createForm.enable();
+        this.createFormSubmitted = false;
+        this.createFormError = message;
+    }
+
+    private resetCreateForm() {
         this.createFormError = '';
         this.createForm.enable();
         this.createFormSubmitted = false;

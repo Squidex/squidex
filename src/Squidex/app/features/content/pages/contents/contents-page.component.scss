@@ -1,16 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
-.languages-buttons {
-    margin-right: 2rem;
-}
-
 .content {
     cursor: pointer;
-}
-
-.btn-group {
-    margin-left: 1rem;
 }
 
 .icon-plus {
@@ -18,5 +10,21 @@
 }
 
 .form-control {
-    width: 15rem;
+    width: 20rem;
+}
+
+.form-inline {
+    position: relative;
+}
+
+.form-control-expandable {
+    padding-right: 1.5rem;
+}
+
+.expand-search {
+    @include absolute(8px, 8px, auto, auto);
+    color: $color-border-dark !important;
+    font-size: .9rem;
+    font-weight: normal;
+    cursor: pointer !important;
 }

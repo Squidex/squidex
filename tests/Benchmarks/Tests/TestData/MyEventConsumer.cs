@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Benchmarks.Tests.TestData
 {
     public sealed class MyEventConsumer : IEventConsumer

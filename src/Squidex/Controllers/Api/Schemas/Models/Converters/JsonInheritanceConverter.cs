@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
+#pragma warning disable SA1306 // Field names must begin with lower-case letter
 
 namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
@@ -40,7 +40,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
                 return IsWriting = false;
             }
         }
-        
+
         public override bool CanRead
         {
             get

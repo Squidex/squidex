@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Read.Contents.JsonSchema
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(dataSchema, nameof(dataSchema));
-            
+
             var schemaName = schema.Properties.Label.WithFallback(schema.Name);
-            
+
             var contentSchema = new JsonSchema4
             {
                 Properties =

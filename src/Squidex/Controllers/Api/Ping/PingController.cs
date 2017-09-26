@@ -15,11 +15,11 @@ namespace Squidex.Controllers.Api.Ping
     /// <summary>
     /// Makes a ping request.
     /// </summary>
-    [MustBeAppEditor]
+    [MustBeAppReader]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Ping")]
-    public class PingController : Controller
+    [SwaggerTag(nameof(Ping))]
+    public sealed class PingController : Controller
     {
         /// <summary>
         /// Get ping status.

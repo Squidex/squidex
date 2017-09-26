@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class ConsoleLogProcessor : IDisposable
+    public class ConsoleLogProcessor : DisposableObjectBase
     {
-        private readonly IConsole console;
         private const int MaxQueuedMessages = 1024;
+        private readonly IConsole console;
         private readonly BlockingCollection<LogMessageEntry> messageQueue = new BlockingCollection<LogMessageEntry>(MaxQueuedMessages);
         private readonly Task outputTask;
 
@@ -54,19 +54,23 @@ namespace Squidex.Infrastructure.Log.Internal
             processor.ProcessLogQueue();
         }
 
-        public void Dispose()
+        protected override void DisposeObject(bool disposing)
         {
-            messageQueue.CompleteAdding();
+            if (disposing)
+            {
+                messageQueue.CompleteAdding();
+                messageQueue.Dispose();
 
-            try
-            {
-                outputTask.Wait(1500);
-            }
-            catch (TaskCanceledException)
-            {
-            }
-            catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is TaskCanceledException)
-            {
+                try
+                {
+                    outputTask.Wait(1500);
+                }
+                catch (TaskCanceledException)
+                {
+                }
+                catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is TaskCanceledException)
+                {
+                }
             }
         }
     }

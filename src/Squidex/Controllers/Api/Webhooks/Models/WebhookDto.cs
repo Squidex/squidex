@@ -9,10 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Webhooks.Models
 {
-    public class WebhookDto
+    public sealed class WebhookDto
     {
         /// <summary>
         /// The id of the webhook.
@@ -20,9 +22,31 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The id of the schema.
+        /// The user that has created the webhook.
         /// </summary>
-        public Guid SchemaId { get; set; }
+        [Required]
+        public RefToken CreatedBy { get; set; }
+
+        /// <summary>
+        /// The user that has updated the webhook.
+        /// </summary>
+        [Required]
+        public RefToken LastModifiedBy { get; set; }
+
+        /// <summary>
+        /// The date and time when the webhook has been created.
+        /// </summary>
+        public Instant Created { get; set; }
+
+        /// <summary>
+        /// The date and time when the webhook has been modified last.
+        /// </summary>
+        public Instant LastModified { get; set; }
+
+        /// <summary>
+        /// The version of the webhook.
+        /// </summary>
+        public int Version { get; set; }
 
         /// <summary>
         /// The number of succceeded calls.
@@ -40,7 +64,7 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public long TotalTimedout { get; set; }
 
         /// <summary>
-        /// The average request time in milliseconds.
+        /// The average response time in milliseconds.
         /// </summary>
         public long AverageRequestTimeMs { get; set; }
 
@@ -57,9 +81,9 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public string SharedSecret { get; set; }
 
         /// <summary>
-        /// The last invokation dumps.
+        /// The schema settings.
         /// </summary>
         [Required]
-        public List<string> LastDumps { get; set; }
+        public List<WebhookSchemaDto> Schemas { get; set; }
     }
 }

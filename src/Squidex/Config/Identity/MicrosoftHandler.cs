@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Shared.Identity;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Identity
 {
     public sealed class MicrosoftHandler : OAuthEvents

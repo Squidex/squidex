@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Plans.Models
 {
-    public class ChangePlanDto
+    public sealed class ChangePlanDto
     {
         /// <summary>
         /// The new plan id.

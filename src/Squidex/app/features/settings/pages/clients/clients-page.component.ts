@@ -6,21 +6,21 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppClientDto,
+    AppClientsDto,
     AppClientsService,
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     CreateAppClientDto,
+    DialogService,
     HistoryChannelUpdated,
-    ImmutableArray,
     MessageBus,
-    NotificationService,
     UpdateAppClientDto,
-    ValidatorsEx,
-    Version
+    ValidatorsEx
 } from 'shared';
 
 @Component({
@@ -29,12 +29,10 @@ import {
     templateUrl: './clients-page.component.html'
 })
 export class ClientsPageComponent extends AppComponentBase implements OnInit {
-    private version = new Version();
-
-    public appClients: ImmutableArray<AppClientDto>;
+    public appClients: AppClientsDto;
 
     public addClientFormSubmitted = false;
-    public addClientForm: FormGroup =
+    public addClientForm =
         this.formBuilder.group({
             name: ['',
                 [
@@ -47,12 +45,12 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
         return this.addClientForm.controls['name'].value && this.addClientForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly appClientsService: AppClientsService,
         private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -61,9 +59,9 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public load() {
         this.appNameOnce()
-            .switchMap(app => this.appClientsService.getClients(app, this.version).retry(2))
+            .switchMap(app => this.appClientsService.getClients(app).retry(2))
             .subscribe(dtos => {
-                this.updateClients(ImmutableArray.of(dtos));
+                this.updateClients(dtos);
             }, error => {
                 this.notifyError(error);
             });
@@ -71,58 +69,71 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
 
     public revokeClient(client: AppClientDto) {
         this.appNameOnce()
-            .switchMap(app => this.appClientsService.deleteClient(app, client.id, this.version))
-            .subscribe(() => {
-                this.updateClients(this.appClients.remove(client));
+            .switchMap(app => this.appClientsService.deleteClient(app, client.id, this.appClients.version))
+            .subscribe(dto => {
+                this.updateClients(this.appClients.removeClient(client, dto.version));
             }, error => {
                 this.notifyError(error);
             });
     }
 
     public renameClient(client: AppClientDto, name: string) {
-        const request = new UpdateAppClientDto(name);
+        const requestDto = new UpdateAppClientDto(name);
 
         this.appNameOnce()
-            .switchMap(app => this.appClientsService.updateClient(app, client.id, request, this.version))
-            .subscribe(() => {
-                this.updateClients(this.appClients.replace(client, rename(client, name)));
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.appClients.version))
+            .subscribe(dto => {
+                this.updateClients(this.appClients.updateClient(client.rename(name), dto.version));
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public resetClientForm() {
-        this.addClientFormSubmitted = false;
-        this.addClientForm.enable();
-        this.addClientForm.reset();
+    public changeClient(client: AppClientDto, isReader: boolean) {
+        const requestDto = new UpdateAppClientDto(undefined, isReader);
+
+        this.appNameOnce()
+            .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.appClients.version))
+            .subscribe(dto => {
+                this.updateClients(this.appClients.updateClient(client.change(isReader), dto.version));
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public attachClient() {
+        this.addClientFormSubmitted = true;
+
         if (this.addClientForm.valid) {
-            this.addClientFormSubmitted = true;
             this.addClientForm.disable();
 
             const requestDto = new CreateAppClientDto(this.addClientForm.controls['name'].value);
 
             this.appNameOnce()
-                .switchMap(app => this.appClientsService.postClient(app, requestDto, this.version))
+                .switchMap(app => this.appClientsService.postClient(app, requestDto, this.appClients.version))
                 .subscribe(dto => {
-                    this.updateClients(this.appClients.push(dto));
-                    this.resetClientForm();
+                    this.updateClients(this.appClients.addClient(dto.payload, dto.version));
                 }, error => {
                     this.notifyError(error);
+                }, () => {
                     this.resetClientForm();
                 });
         }
     }
 
-    private updateClients(clients: ImmutableArray<AppClientDto>) {
-        this.appClients = clients;
+    public cancelAttachClient() {
+        this.resetClientForm();
+    }
 
-        this.messageBus.publish(new HistoryChannelUpdated());
+    private resetClientForm() {
+        this.addClientFormSubmitted = false;
+        this.addClientForm.enable();
+        this.addClientForm.reset();
+    }
+
+    private updateClients(appClients: AppClientsDto) {
+        this.appClients = appClients;
+
+        this.messageBus.emit(new HistoryChannelUpdated());
     }
 }
-
-function rename(client: AppClientDto, name: string): AppClientDto {
-    return new AppClientDto(client.id, name, client.secret);
-};

@@ -15,9 +15,7 @@ namespace Squidex.Domain.Apps.Read.Apps.Services
     {
         bool HasPortal { get; }
 
-        Task ChangePlanAsync(string userId, Guid appId, string appName, string planId);
-
-        Task<bool> HasPaymentOptionsAsync(string userId);
+        Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId);
 
         Task<string> GetPortalLinkAsync(string userId);
     }

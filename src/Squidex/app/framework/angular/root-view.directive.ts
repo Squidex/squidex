@@ -13,7 +13,7 @@ import { RootViewService } from './../services/root-view.service';
     selector: '[sqxRootView]'
 })
 export class RootViewDirective {
-    constructor(viewContainer: ViewContainerRef, rootViewService: RootViewService) {
+    constructor(public viewContainer: ViewContainerRef, rootViewService: RootViewService) {
         rootViewService.init(viewContainer);
     }
 }

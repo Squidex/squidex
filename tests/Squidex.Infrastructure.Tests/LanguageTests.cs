@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure
         public void Should_parse_valid_languages(string input, string languageCode)
         {
             var language = Language.ParseOrNull(input);
-            
+
             Assert.Equal(language, Language.GetLanguage(languageCode));
         }
 

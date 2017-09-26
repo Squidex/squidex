@@ -6,39 +6,49 @@
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
                     <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{displayName}}</span>
-                    <span class="field-hints">{{field.properties.hints}}</span>
+                    <span class="field-partitioning" *ngIf="field.partitioning === 'language'">localizable</span>
                 </span>
             </div>
-            <div class="col col-3">
+            <div class="col col-tags">
                 <div class="float-right">
-                    <span class="tag tag-success" *ngIf="!field.isDisabled">Enabled</span>
-                    <span class="tag tag-danger" *ngIf="field.isDisabled">Disabled</span>
+                    <span class="badge badge-pill badge-danger" *ngIf="field.isLocked">Locked</span>
+                    <span class="badge badge-pill badge-success" *ngIf="!field.isDisabled">Enabled</span>
+                    <span class="badge badge-pill badge-danger" *ngIf="field.isDisabled">Disabled</span>
                 </div>
             </div>
-            <div class="col col-3">
+            <div class="col col-options">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
-                        <i class="icon-settings2"></i>
+                        <i class="icon-settings"></i>
                     </button>
 
                     <div class="dropdown dropdown-options">
                         <button type="button" class="btn btn-link btn-decent" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
                             <i class="icon-dots"></i>
                         </button>
-                        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" position="right" [@fade]>
-                            <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled">
+                        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" @fade>
+                            <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
                                 Enable
                             </a>
-                            <a class="dropdown-item" (click)="disabling.emit()" *ngIf="!field.isDisabled">
+                            <a class="dropdown-item" (click)="disabling.emit()" *ngIf="!field.isDisabled" [class.disabled]="field.isLocked">
                                 Disable
                             </a>
-                            <a class="dropdown-item" (click)="hiding.emit()" *ngIf="!field.isHidden">
+                            <a class="dropdown-item" (click)="hiding.emit()" *ngIf="!field.isHidden" [class.disabled]="field.isLocked">
                                 Hide
                             </a>
-                            <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden">
+                            <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
                                 Show
+                            </a>                           
+                            <a class="dropdown-item" *ngIf="!field.isLocked" 
+                                (sqxConfirmClick)="locking.emit()"
+                                confirmTitle="Lock field" 
+                                confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
+                                Lock
                             </a>
-                            <a class="dropdown-item dropdown-item-delete" (click)="deleting.emit()">
+                            <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
+                                (sqxConfirmClick)="deleting.emit()"
+                                confirmTitle="Delete field" 
+                                confirmText="Do you really want to delete the field?">
                                 Delete
                             </a>
                         </div>
@@ -48,10 +58,10 @@
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="isEditing" (dragstart)="alert('ff');">
-        <form [formGroup]="editForm" (ngSubmit)="save()">
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <form [formGroup]="editForm" (ngSubmit)="save()" [attr.disabled]="field.isLocked">
             <div class="table-items-row-details-tabs clearfix">
-                <ul class="nav nav-inline nav-field-tabs">
+                <ul class="nav nav-tabs2">
                     <li class="nav-item">
                         <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
                     </li>
@@ -64,8 +74,8 @@
                 </ul>
 
                 <div class="float-right">
-                    <button type="reset" class="btn btn-link" (click)="cancel()" [disabled]="editFormSubmitted">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button [disabled]="editFormSubmitted || field.isLocked" type="reset" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                    <button [disabled]="editFormSubmitted || field.isLocked" type="submit" class="btn btn-primary ml-1">Save</button>
                 </div>
             </div>
 

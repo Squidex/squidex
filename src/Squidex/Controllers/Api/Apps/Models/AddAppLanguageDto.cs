@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class AddAppLanguageDto
+    public sealed class AddAppLanguageDto
     {
         /// <summary>
         /// The language to add.

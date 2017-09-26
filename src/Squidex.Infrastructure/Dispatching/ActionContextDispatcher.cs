@@ -1,5 +1,5 @@
 // ==========================================================================
-//  ActionContextDispatcher.cs
+//  FuncDispatcher.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -15,29 +14,58 @@ namespace Squidex.Infrastructure.Dispatching
 {
     public sealed class ActionContextDispatcher<TTarget, TIn, TContext>
     {
-        private static readonly Dictionary<Type, Action<TTarget, object, TContext>> Handlers;
+        public delegate void ActionContextDelegate<in T>(TTarget target, T input, TContext context) where T : TIn;
 
-        static ActionContextDispatcher()
+        public static readonly Func<TTarget, TIn, TContext, bool> On = CreateHandler();
+
+        public static Func<TTarget, TIn, TContext, bool> CreateHandler(string methodName = "On")
         {
-            Handlers =
+            Guard.NotNullOrEmpty(methodName, nameof(methodName));
+
+            var handlers =
                 typeof(TTarget)
-                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Where(Helper.HasRightName)
-                    .Where(Helper.HasRightParameters<TIn, TContext>)
-                    .Select(ActionContextDispatcherFactory.CreateActionHandler<TTarget, TContext>)
-                    .ToDictionary(h => h.Item1, h => h.Item2);
+                    .GetMethods(
+                        BindingFlags.Public |
+                        BindingFlags.NonPublic |
+                        BindingFlags.Instance)
+                    .Where(m =>
+                        m.HasMatchingName(methodName) &&
+                        m.HasMatchingParameters<TIn, TContext>() &&
+                        m.HasMatchingReturnType(typeof(void)))
+                    .Select(m =>
+                    {
+                        var inputType = m.GetParameters()[0].ParameterType;
+
+                        var handler =
+                            typeof(ActionContextDispatcher<TTarget, TIn, TContext>)
+                                .GetMethod(nameof(Factory),
+                                    BindingFlags.Static |
+                                    BindingFlags.NonPublic)
+                                .MakeGenericMethod(inputType)
+                                .Invoke(null, new object[] { m });
+
+                        return (inputType, handler);
+                    })
+                    .ToDictionary(m => m.Item1, h => (ActionContextDelegate<TIn>)h.Item2);
+
+            return (target, input, context) =>
+            {
+                if (handlers.TryGetValue(input.GetType(), out var handler))
+                {
+                    handler(target, input, context);
+
+                    return true;
+                }
+
+                return false;
+            };
         }
 
-        public static bool Dispatch(TTarget target, TIn input, TContext context)
+        private static ActionContextDelegate<TIn> Factory<T>(MethodInfo methodInfo) where T : TIn
         {
-            if (!Handlers.TryGetValue(input.GetType(), out Action<TTarget, object, TContext> handler))
-            {
-                return false;
-            }
+            var handler = (ActionContextDelegate<T>)methodInfo.CreateDelegate(typeof(ActionContextDelegate<T>));
 
-            handler(target, input, context);
-
-            return true;
+            return (target, input, context) => handler(target, (T)input, context);
         }
     }
 }

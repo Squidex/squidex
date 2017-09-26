@@ -3,10 +3,12 @@
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <span class="user">
                 <img class="user-picture" [attr.src]="profileId | sqxUserIdPicture" />
+                
+                <span>{{profileDisplayName}}</span>
             </span>
         </span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" [@fade]>
+        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" @fade>
             <a class="dropdown-item" routerLink="/app/administration" *ngIf="isAdmin">
                 Administration
             </a>

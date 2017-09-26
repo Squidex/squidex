@@ -50,7 +50,7 @@ $toggle-button-size: $toggle-height - .3rem;
         }
 
         &.disabled {
-            background: $color-disabled;
+            background: $color-input-disabled;
             border: 0;
             cursor: not-allowed;
         }

@@ -10,10 +10,13 @@
             <div class="col col-4">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster || allLanguages.length > 1">
-                        <i class="icon-settings2"></i>
+                        <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-link btn-danger" (click)="removing.emit(language)" [class.invisible]="language.isMaster">
+                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="language.isMaster"
+                        (sqxConfirmClick)="removing.emit(language)"
+                        confirmTitle="Remove language" 
+                        confirmText="Do you really want to remove the language?">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
@@ -39,20 +42,20 @@
                             <div class="fallback-language" *ngFor="let language of fallbackLanguages; let i = index" dnd-sortable [sortableIndex]="i">
                                 {{language.englishName}}
 
-                                <button type="button" class="btn btn-link btn-sm float-right" (click)="removeFallbackLanguage(language)">
-                                    <i class="icon-bin2"></i>
+                                <button type="button" class="btn btn-link btn-secondary btn-sm float-right" (click)="removeFallbackLanguage(language)">
+                                    <i class="icon-close"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <form class="form-inline fallback-form" [formGroup]="addLanguageForm" (ngSubmit)="addLanguage()" *ngIf="otherLanguages.length > 0">
+                        <form class="form-inline fallback-form" (ngSubmit)="addLanguage()" *ngIf="otherLanguages.length > 0">
                             <div class="form-group mr-1">
-                                <select class="form-control fallback-select" formControlName="language">
-                                    <option *ngFor="let language of otherLanguages" [ngValue]="language">{{language.englishName}}</option>
+                                <select class="form-control fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
+                                    <option *ngFor="let otherLanguage of otherLanguages" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>
                                 </select>
                             </div>
 
-                            <button type="submit" class="btn btn-success" [disabled]="!addLanguageForm.valid">Add Language</button>
+                            <button type="submit" class="btn btn-success">Add Language</button>
                         </form>
                     </div>
                 </div>

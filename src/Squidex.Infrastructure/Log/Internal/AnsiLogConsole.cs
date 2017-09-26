@@ -8,8 +8,6 @@
 
 using System;
 
-// ReSharper disable SwitchStatementMissingSomeCases
-
 namespace Squidex.Infrastructure.Log.Internal
 {
     public class AnsiLogConsole : IConsole

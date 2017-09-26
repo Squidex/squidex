@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Core
         private sealed class InvariantItem : IFieldPartitionItem
         {
             public string Key { get; } = "iv";
+
             public string Name { get; } = "Invariant";
 
             public bool IsOptional { get; } = false;

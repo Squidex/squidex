@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -15,23 +13,48 @@ namespace Squidex.Infrastructure.Dispatching
 {
     public sealed class FuncDispatcher<TTarget, TIn, TOut>
     {
-        private static readonly Dictionary<Type, Func<TTarget, object, TOut>> Handlers;
+        public delegate TOut FuncDelegate<in T>(TTarget target, T input) where T : TIn;
 
-        static FuncDispatcher()
+        public static readonly FuncDelegate<TIn> On = CreateHandler();
+
+        public static FuncDelegate<TIn> CreateHandler(string methodName = "On")
         {
-            Handlers =
+            Guard.NotNullOrEmpty(methodName, nameof(methodName));
+
+            var handlers =
                 typeof(TTarget)
-                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Where(Helper.HasRightName)
-                    .Where(Helper.HasRightParameters<TIn>)
-                    .Where(Helper.HasRightReturnType<TOut>)
-                    .Select(FuncDispatcherFactory.CreateFuncHandler<TTarget, TOut>)
-                    .ToDictionary(h => h.Item1, h => h.Item2);
+                    .GetMethods(
+                        BindingFlags.Public |
+                        BindingFlags.NonPublic |
+                        BindingFlags.Instance)
+                    .Where(m =>
+                        m.HasMatchingName(methodName) &&
+                        m.HasMatchingParameters<TIn>() &&
+                        m.HasMatchingReturnType(typeof(TOut)))
+                    .Select(m =>
+                    {
+                        var inputType = m.GetParameters()[0].ParameterType;
+
+                        var handler =
+                            typeof(FuncDispatcher<TTarget, TIn, TOut>)
+                                .GetMethod(nameof(Factory),
+                                    BindingFlags.Static |
+                                    BindingFlags.NonPublic)
+                                .MakeGenericMethod(inputType)
+                                .Invoke(null, new object[] { m });
+
+                        return (inputType, handler);
+                    })
+                    .ToDictionary(m => m.Item1, h => (FuncDelegate<TIn>)h.Item2);
+
+            return (target, input) => handlers.TryGetValue(input.GetType(), out var handler) ? handler(target, input) : default(TOut);
         }
 
-        public static TOut Dispatch(TTarget target, TIn item)
+        private static FuncDelegate<TIn> Factory<T>(MethodInfo methodInfo) where T : TIn
         {
-            return Handlers.TryGetValue(item.GetType(), out Func<TTarget, object, TOut> handler) ? handler(target, item) : default(TOut);
+            var handler = (FuncDelegate<T>)methodInfo.CreateDelegate(typeof(FuncDelegate<T>));
+
+            return (target, input) => handler(target, (T)input);
         }
     }
 }

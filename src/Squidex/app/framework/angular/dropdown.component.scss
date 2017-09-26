@@ -30,7 +30,9 @@ $color-input-disabled: #eef1f4;
 
     .icon-caret-down {
         @include absolute(30%, .4rem, auto, auto);
+        cursor: pointer;
         font-size: .9rem;
         font-weight: normal;
+        pointer-events: none;
     }
 }

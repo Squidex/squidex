@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("SchemaUpdatedEvent")]
-    public class SchemaUpdated : SchemaEvent
+    [EventType(nameof(SchemaUpdated))]
+    public sealed class SchemaUpdated : SchemaEvent
     {
         public SchemaProperties Properties { get; set; }
     }

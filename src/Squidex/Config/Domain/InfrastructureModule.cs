@@ -18,6 +18,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Caching;
@@ -26,8 +27,6 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
-
-// ReSharper disable UnusedAutoPropertyAccessor.Local
 
 namespace Squidex.Config.Domain
 {
@@ -125,12 +124,29 @@ namespace Squidex.Config.Domain
                 .As<IEventNotifier>()
                 .SingleInstance();
 
-            builder.RegisterType<DefaultNameResolver>()
+            builder.RegisterType<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>()
                 .SingleInstance();
 
             builder.RegisterType<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>()
+                .SingleInstance();
+
+            builder.Register(c => new InvalidatingMemoryCache(new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>()), c.Resolve<IPubSub>()))
+                .As<IMemoryCache>()
+                .SingleInstance();
+
+            builder.RegisterType<DefaultRemoteActorChannel>()
+                .As<IRemoteActorChannel>()
+                .SingleInstance();
+
+            builder.RegisterType<RemoteActors>()
+                .As<IActors>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<EventConsumerCleaner>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<EventDataFormatter>()
@@ -143,10 +159,6 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
-                .SingleInstance();
-
-            builder.Register(c => new InvalidatingMemoryCache(new MemoryCache(c.Resolve<IOptions<MemoryCacheOptions>>()), c.Resolve<IPubSub>()))
-                .As<IMemoryCache>()
                 .SingleInstance();
         }
     }

@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Users.Models
 {
-    public class UsersDto
+    public sealed class UsersDto
     {
         /// <summary>
         /// The total number of users.

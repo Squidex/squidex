@@ -11,10 +11,8 @@ using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable RedundantIfElseBlock
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {
@@ -22,7 +20,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity>  cursor, ODataUriParser query, Schema schema)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, Schema schema)
         {
             return cursor.Sort(SortBuilder.BuildSort(query, schema));
         }
@@ -59,29 +57,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             return cursor;
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, bool nonPublished)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
         {
-            var filter = BuildQuery(query, ids, schemaId, schema, nonPublished);
+            var filter = BuildQuery(query, schemaId, schema, status);
 
             return cursor.Find(filter);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, HashSet<Guid> ids, Guid schemaId, Schema schema, bool nonPublished)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
-                Filter.Eq(x => x.SchemaId, schemaId)
+                Filter.Eq(x => x.SchemaId, schemaId),
+                Filter.In(x => x.Status, status)
             };
-
-            if (!nonPublished)
-            {
-                filters.Add(Filter.Eq(x => x.IsPublished, true));
-            }
-
-            if (ids != null && ids.Count > 0)
-            {
-                filters.Add(Filter.In(x => x.Id, ids));
-            }
 
             var filter = FilterBuilder.Build(query, schema);
 

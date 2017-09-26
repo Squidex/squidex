@@ -6,20 +6,20 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     AuthService,
     ComponentBase,
+    DialogService,
     MessageBus,
-    NotificationService,
     UserDto,
     UserManagementService,
     ValidatorsEx
 } from 'shared';
 
-import { UserCreated, UserUpdated } from './messages';
+import { UserCreated, UserUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-user-page',
@@ -27,16 +27,17 @@ import { UserCreated, UserUpdated } from './messages';
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ComponentBase implements OnInit {
+    private user: UserDto;
+
     public currentUserId: string;
     public userFormSubmitted = false;
     public userForm: FormGroup;
-    public userId: string;
     public userFormError? = '';
 
     public isCurrentUser = false;
     public isNewMode = false;
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
@@ -44,7 +45,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
         private readonly router: Router,
         private readonly userManagementService: UserManagementService
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnInit() {
@@ -52,7 +53,9 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
         this.route.data.map(p => p['user'])
             .subscribe((user: UserDto) => {
-                this.populateForm(user);
+                this.user = user;
+
+                this.setupAndPopulateForm();
             });
     }
 
@@ -64,58 +67,57 @@ export class UserPageComponent extends ComponentBase implements OnInit {
 
             const requestDto = this.userForm.value;
 
-            const enable = (message?: string) => {
-                this.userForm.enable();
-                this.userForm.controls['password'].reset();
-                this.userForm.controls['passwordConfirm'].reset();
-                this.userFormSubmitted = false;
-                this.userFormError = message;
-            };
-
-            const back = () => {
-                this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
-            };
-
             if (this.isNewMode) {
                 this.userManagementService.postUser(requestDto)
                     .subscribe(created => {
-                        this.messageBus.publish(
-                            new UserCreated(
+                        this.user =
+                            new UserDto(
                                 created.id,
                                 requestDto.email,
                                 requestDto.displayName,
-                                created.pictureUrl!));
+                                created.pictureUrl!,
+                                false);
 
+                        this.emitUserCreated(this.user);
                         this.notifyInfo('User created successfully.');
-                        back();
+                        this.back();
                     }, error => {
-                        enable(error.displayMessage);
+                        this.resetUserForm(error.displayMessage);
                     });
             } else {
-                this.userManagementService.putUser(this.userId, requestDto)
+                this.userManagementService.putUser(this.user.id, requestDto)
                     .subscribe(() => {
-                        this.messageBus.publish(
-                            new UserUpdated(
-                                this.userId,
+                        this.user =
+                            this.user.update(
                                 requestDto.email,
-                                requestDto.displayName));
+                                requestDto.displayMessage);
 
+                        this.emitUserUpdated(this.user);
                         this.notifyInfo('User saved successfully.');
-                        enable();
+                        this.resetUserForm();
                     }, error => {
-                        enable(error.displayMessage);
+                        this.resetUserForm(error.displayMessage);
                     });
             }
         }
     }
 
-    private populateForm(user: UserDto) {
-        const input = user || {};
+    private back() {
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+    }
 
-        this.isNewMode = !user;
-        this.userId = input['id'];
-        this.userFormError = '';
-        this.userFormSubmitted = false;
+    private emitUserCreated(user: UserDto) {
+        this.messageBus.emit(new UserCreated(user));
+    }
+
+    private emitUserUpdated(user: UserDto) {
+        this.messageBus.emit(new UserUpdated(user));
+    }
+
+    private setupAndPopulateForm() {
+        const input = this.user || {};
+
+        this.isNewMode = !this.user;
         this.userForm =
             this.formBuilder.group({
                 email: [input['email'],
@@ -128,18 +130,28 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                     [
                         Validators.required,
                         Validators.maxLength(100)
+                    ]],
+                password: ['',
+                    [
+                        this.isNewMode ? Validators.required : Validators.nullValidator
+                    ]],
+                passwordConfirm: ['',
+                    [
+                        ValidatorsEx.match('password', 'Passwords must be the same.')
                     ]]
             });
 
-        if (user) {
-            this.userForm.addControl('password', new FormControl(''));
-        } else {
-            this.userForm.addControl('password', new FormControl('', Validators.required));
-        }
+        this.isCurrentUser = this.user && this.user.id === this.currentUserId;
 
-        this.userForm.addControl('passwordConfirm', new FormControl('', ValidatorsEx.match('password', 'Passwords must be the same.')));
+        this.resetUserForm();
+    }
 
-        this.isCurrentUser = this.userId === this.currentUserId;
+    private resetUserForm(message: string = '') {
+        this.userForm.enable();
+        this.userForm.controls['password'].reset();
+        this.userForm.controls['passwordConfirm'].reset();
+        this.userFormSubmitted = false;
+        this.userFormError = message;
     }
 }
 

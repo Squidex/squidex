@@ -18,6 +18,7 @@ using NSwag.Annotations;
 using Squidex.Controllers.Api.Assets.Models;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -30,11 +31,10 @@ namespace Squidex.Controllers.Api.Assets
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [MustBeAppEditor]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Assets")]
-    public class AssetsController : ControllerBase
+    [SwaggerTag(nameof(Assets))]
+    public sealed class AssetsController : ControllerBase
     {
         private readonly IAssetRepository assetRepository;
         private readonly IAssetStatsRepository assetStatsRepository;
@@ -42,11 +42,11 @@ namespace Squidex.Controllers.Api.Assets
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
-            ICommandBus commandBus, 
+            ICommandBus commandBus,
             IAssetRepository assetRepository,
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
-            IOptions<AssetConfig> assetsConfig) 
+            IOptions<AssetConfig> assetsConfig)
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
@@ -71,6 +71,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <remarks>
         /// Get all assets for the app. Mime types can be comma-separated, e.g. application/json,text/html.
         /// </remarks>
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
@@ -108,7 +109,7 @@ namespace Squidex.Controllers.Api.Assets
             var response = new AssetsDto
             {
                 Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto())).ToArray()
+                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
 
             return Ok(response);
@@ -123,6 +124,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
@@ -131,12 +133,12 @@ namespace Squidex.Controllers.Api.Assets
         {
             var entity = await assetRepository.FindAssetAsync(id);
 
-            if (entity == null || entity.IsDeleted)
+            if (entity == null)
             {
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new AssetDto());
+            var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
 
             Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
 
@@ -156,6 +158,7 @@ namespace Squidex.Controllers.Api.Assets
         /// <remarks>
         /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and must be defined correctly.
         /// </remarks>
+        [MustBeAppEditor]
         [HttpPost]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
@@ -184,6 +187,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 404 => Asset or app not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
+        [MustBeAppEditor]
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content")]
         [ProducesResponseType(typeof(AssetReplacedDto), 201)]
@@ -196,7 +200,7 @@ namespace Squidex.Controllers.Api.Assets
             var command = new UpdateAsset { File = assetFile, AssetId = id };
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntitySavedResult>();
+            var result = context.Result<AssetSavedResult>();
             var response = AssetReplacedDto.Create(command, result);
 
             return StatusCode(201, response);
@@ -213,6 +217,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 400 => Asset name not valid.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppReader]
         [HttpPut]
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
@@ -235,6 +240,7 @@ namespace Squidex.Controllers.Api.Assets
         /// 204 => Asset has been deleted.
         /// 404 => Asset or app not found.
         /// </returns>
+        [MustBeAppEditor]
         [HttpDelete]
         [Route("apps/{app}/assets/{id}/")]
         [ApiCosts(1)]
@@ -258,7 +264,7 @@ namespace Squidex.Controllers.Api.Assets
 
             if (formFile.Length > assetsConfig.MaxSize)
             {
-                var error = new ValidationError($"File size cannot be longer than ${assetsConfig.MaxSize}.");
+                var error = new ValidationError($"File size cannot be longer than {assetsConfig.MaxSize.ToReadableSize()}.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }

@@ -8,7 +8,7 @@
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig, MathHelper } from 'framework';
 
 import { UserDto, UsersProviderService } from './../declarations-base';
 
@@ -191,5 +191,65 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
                 return Observable.of('/images/client.png');
             }
         });
+    }
+}
+
+@Pipe({
+    name: 'sqxAssetUrl',
+    pure: true
+})
+export class AssetUrlPipe implements PipeTransform {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
+    public transform(asset: { id: any }): string {
+        return this.apiUrl.buildUrl(`api/assets/${asset.id}?q=${MathHelper.guid()}`);
+    }
+}
+
+@Pipe({
+    name: 'sqxAssetPreviewUrl',
+    pure: true
+})
+export class AssetPreviewUrlPipe implements PipeTransform {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
+    public transform(asset: { id: any, fileVersion: number }): string {
+        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.fileVersion}`);
+    }
+}
+
+@Pipe({
+    name: 'sqxFileIcon',
+    pure: true
+})
+export class FileIconPipe implements PipeTransform {
+    public transform(asset: { mimeType: string, fileType: string }): string {
+        const knownTypes = [
+            'doc',
+            'docx',
+            'pdf',
+            'ppt',
+            'pptx',
+            'video',
+            'xls',
+            'xlsx'
+        ];
+
+        let mimeIcon: string;
+        let mimeParts = asset.mimeType.split('/');
+
+        if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
+            mimeIcon = 'video';
+        } else {
+            mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
+        }
+
+        return `/images/asset_${mimeIcon}.png`;
     }
 }

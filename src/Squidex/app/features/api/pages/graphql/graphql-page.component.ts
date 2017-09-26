@@ -6,6 +6,7 @@
  */
 
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -17,9 +18,10 @@ const GraphiQL = require('graphiql');
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
+    DialogService,
     GraphQlService,
-    LocalStoreService,
-    NotificationService
+    LocalStoreService
 } from 'shared';
 
 @Component({
@@ -32,11 +34,11 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly graphQlService: GraphQlService,
         private readonly localStoreService: LocalStoreService
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -56,7 +58,7 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
 
     private request(params: any) {
         return this.appNameOnce()
-            .switchMap(app => this.graphQlService.query(app, params))
+            .switchMap(app => this.graphQlService.query(app, params).catch(response => Observable.of(response.error)))
             .toPromise();
     }
 }

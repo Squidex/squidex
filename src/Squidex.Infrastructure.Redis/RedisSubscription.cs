@@ -12,9 +12,7 @@ using System.Reactive.Subjects;
 using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
-// ReSharper disable InvertIf
-
-namespace Squidex.Infrastructure.Redis
+namespace Squidex.Infrastructure
 {
     internal sealed class RedisSubscription
     {
@@ -67,7 +65,7 @@ namespace Squidex.Infrastructure.Redis
                     return;
                 }
 
-                if (!Guid.TryParse(parts[0], out Guid sender))
+                if (!Guid.TryParse(parts[0], out var sender))
                 {
                     return;
                 }

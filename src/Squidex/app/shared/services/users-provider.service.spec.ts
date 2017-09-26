@@ -27,7 +27,7 @@ describe('UsersProviderService', () => {
         usersProviderService = new UsersProviderService(usersService.object, authService.object);
     });
 
-    it('Should return users service when user not cached', () => {
+    it('should return users service when user not cached', () => {
         const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         usersService.setup(x => x.getUser('123'))
@@ -44,7 +44,7 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('Should return provide user from cache', () => {
+    it('should return provide user from cache', () => {
         const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         usersService.setup(x => x.getUser('123'))
@@ -63,7 +63,7 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('Should return me when user is current user', () => {
+    it('should return me when user is current user', () => {
         const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
 
         authService.setup(x => x.user)
@@ -83,7 +83,7 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('Should return invalid user when not found', () => {
+    it('should return invalid user when not found', () => {
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
 

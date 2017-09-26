@@ -23,15 +23,15 @@ using Squidex.Domain.Apps.Read.MongoDb.Assets;
 using Squidex.Domain.Apps.Read.MongoDb.Contents;
 using Squidex.Domain.Apps.Read.MongoDb.History;
 using Squidex.Domain.Apps.Read.MongoDb.Schemas;
+using Squidex.Domain.Apps.Read.MongoDb.Webhooks;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Webhooks.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb.EventStore;
-using Squidex.Infrastructure.MongoDb.UsageTracker;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
 
@@ -90,57 +90,26 @@ namespace Squidex.Config.Domain
                 .As<IUserStore<IUser>>()
                 .As<IUserFactory>()
                 .As<IUserResolver>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoRoleStore>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IRoleStore<IRole>>()
                 .As<IRoleFactory>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoPersistedGrantStore>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IPersistedGrantStore>()
+                .As<IExternalSystem>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<MongoUsageStore>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IUsageStore>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoEventConsumerInfoRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<IEventConsumerInfoRepository>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoContentRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoContentDatabaseRegistration))
-                .As<IContentRepository>()
-                .As<IEventConsumer>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoAppRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<IAppRepository>()
-                .As<IExternalSystem>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoAssetStatsRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<IAssetStatsRepository>()
-                .As<IEventConsumer>()
-                .As<IExternalSystem>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<MongoAssetRepository>()
-                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<IAssetRepository>()
-                .As<IEventConsumer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -153,10 +122,30 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<MongoSchemaWebhookRepository>()
+            builder.RegisterType<MongoEventConsumerInfoRepository>()
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
-                .As<ISchemaWebhookRepository>()
+                .As<IEventConsumerInfoRepository>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoContentRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoContentDatabaseRegistration))
+                .As<IContentRepository>()
                 .As<IEventConsumer>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoWebhookEventRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IWebhookEventRepository>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoAppRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAppRepository>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .SingleInstance();
@@ -168,10 +157,40 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.RegisterType<MongoAssetStatsRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAssetStatsRepository>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoAssetRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IAssetRepository>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<MongoWebhookRepository>()
+                .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
+                .As<IWebhookRepository>()
+                .As<IEventConsumer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.Register(c =>
                 new CompoundEventConsumer(
-                    c.Resolve<MongoSchemaRepository>(), 
-                    c.Resolve<CachingGraphQLInvoker>(),
+                    c.Resolve<MongoAssetRepository>(),
+                    c.Resolve<MongoAssetStatsRepository>()))
+                .As<IEventConsumer>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoSchemaRepository>(),
+                    c.Resolve<CachingGraphQLService>(),
                     c.Resolve<CachingSchemaProvider>()))
                 .As<IEventConsumer>()
                 .AsSelf()

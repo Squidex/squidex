@@ -23,8 +23,23 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
 
             for (var i = 0; i < source.Length; i++)
             {
-                ((object)source[i]).ShouldBeEquivalentTo(others[i], o => o.IncludingAllDeclaredProperties());
+                var lhs = source[i];
+                var rhs = others[i];
+
+                lhs.ShouldBeSameEvent(rhs);
             }
+        }
+
+        public static void ShouldBeSameEvent(this IEvent lhs, IEvent rhs)
+        {
+            lhs.Should().BeOfType(rhs.GetType());
+
+            ((object)lhs).ShouldBeEquivalentTo(rhs, o => o.IncludingAllDeclaredProperties());
+        }
+
+        public static void ShouldBeSameEventType(this IEvent lhs, IEvent rhs)
+        {
+            lhs.Should().BeOfType(rhs.GetType());
         }
     }
 }

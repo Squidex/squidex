@@ -1,3 +1,13 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Sebastian Stehle. All rights reserved
+ */
+
+export interface IdField {
+    id: string;
+}
 
 function freeze<T>(items: T[]): T[] {
     for (let item of items) {
@@ -61,6 +71,66 @@ export class ImmutableArray<T> implements Iterable<T> {
         clone.sort(compareFn);
 
         return new ImmutableArray<T>(clone);
+    }
+
+    public sortByStringAsc(filter: (a: T) => string): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return -1;
+            }
+            if (av > bv) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByStringDesc(filter: (a: T) => string): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return 1;
+            }
+            if (av > bv) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByNumberAsc(filter: (a: T) => number): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return -1;
+            }
+            if (av > bv) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    public sortByNumberDesc(filter: (a: T) => number): ImmutableArray<T> {
+        return this.sort((a, b) => {
+            const av = filter(a);
+            const bv = filter(b);
+
+            if (av < bv) {
+                return 1;
+            }
+            if (av > bv) {
+                return -1;
+            }
+            return 0;
+        });
     }
 
     public pushFront(...items: T[]): ImmutableArray<T> {
@@ -151,5 +221,9 @@ export class ImmutableArray<T> implements Iterable<T> {
         }
 
         return hasChange ? new ImmutableArray<T>(copy) : this;
+    }
+
+    public replaceBy(field: string, newValue: T, replacer?: (o: T, n: T) => T) {
+        return this.replaceAll(x => x[field] === newValue[field], o => replacer ? replacer(o, newValue) : newValue);
     }
 }

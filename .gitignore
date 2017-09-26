@@ -4,6 +4,8 @@
 *.vs
 *.log
 
+.vscode
+
 # Build results
 build/
 bin/
@@ -21,3 +23,4 @@ node_modules/
 
 /src/Squidex/appsettings.Development.json
 /src/Squidex/Assets
+/src/Squidex/Properties/launchSettings.json

@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class ReferencesValue
     {
-        private readonly List<Guid> EmptyReferencedIds = new List<Guid>();
+        private static readonly List<Guid> EmptyReferencedIds = new List<Guid>();
 
         public IReadOnlyList<Guid> ContentIds { get; }
 

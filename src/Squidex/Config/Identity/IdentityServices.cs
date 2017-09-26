@@ -15,6 +15,7 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
@@ -46,7 +47,7 @@ namespace Squidex.Config.Identity
                 {
                     throw new ConfigurationException("Configure KeyStore Redis configuration with 'identity:keysStore:redis:configuration'.");
                 }
-                
+
                 var connectionMultiplexer = Singletons<ConnectionMultiplexer>.GetOrAdd(redisConfiguration, s => ConnectionMultiplexer.Connect(s));
 
                 dataProtection.PersistKeysToRedis(connectionMultiplexer);
@@ -81,7 +82,7 @@ namespace Squidex.Config.Identity
                 var certData = new byte[certStream.Length];
 
                 certStream.Read(certData, 0, certData.Length);
-                certificate = new X509Certificate2(certData, "password", 
+                certificate = new X509Certificate2(certData, "password",
                     X509KeyStorageFlags.MachineKeySet |
                     X509KeyStorageFlags.PersistKeySet |
                     X509KeyStorageFlags.Exportable);
@@ -91,6 +92,8 @@ namespace Squidex.Config.Identity
                 GetApiResources());
             services.AddSingleton(
                 GetIdentityResources());
+            services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
+                UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,
                 LazyClientStore>();
             services.AddSingleton<IResourceStore,
@@ -98,7 +101,7 @@ namespace Squidex.Config.Identity
 
             services.AddIdentityServer(options =>
                 {
-                    options.UserInteraction.ErrorUrl = "/account/error/";
+                    options.UserInteraction.ErrorUrl = "/error/";
                 })
                 .AddAspNetIdentity<IUser>()
                 .AddInMemoryApiResources(GetApiResources())
@@ -121,6 +124,7 @@ namespace Squidex.Config.Identity
             {
                 UserClaims = new List<string>
                 {
+                    JwtClaimTypes.Email,
                     JwtClaimTypes.Role
                 }
             };
@@ -130,7 +134,7 @@ namespace Squidex.Config.Identity
         {
             yield return new IdentityResources.OpenId();
             yield return new IdentityResources.Profile();
-            yield return new IdentityResources.Profile();
+            yield return new IdentityResources.Email();
             yield return new IdentityResource(Constants.RoleScope,
                 new[]
                 {
