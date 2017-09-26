@@ -14,6 +14,29 @@ import {
     EventConsumersService
 } from './../';
 
+describe('EventConsumerDto', () => {
+    it('should update isStopped property when starting', () => {
+        const consumer_1 = new EventConsumerDto('consumer', true, false, 'error', 'position');
+        const consumer_2 = consumer_1.start();
+
+        expect(consumer_2.isStopped).toBeFalsy();
+    });
+
+    it('should update isStopped property when starting', () => {
+        const consumer_1 = new EventConsumerDto('consumer', false, false, 'error', 'position');
+        const consumer_2 = consumer_1.stop();
+
+        expect(consumer_2.isStopped).toBeTruthy();
+    });
+
+    it('should update isResetting property when resetting', () => {
+        const consumer_1 = new EventConsumerDto('consumer', false, false, 'error', 'position');
+        const consumer_2 = consumer_1.reset();
+
+        expect(consumer_2.isResetting).toBeTruthy();
+    });
+});
+
 describe('EventConsumersService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({

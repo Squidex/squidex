@@ -6,16 +6,8 @@
  */
 
 export class Version {
-    public get value() {
-        return this.currentValue;
-    }
-
     constructor(
-        private currentValue: string = ''
+        public readonly value?: string
     ) {
-    }
-
-    public update(newValue: string) {
-        this.currentValue = newValue;
     }
 }

@@ -14,10 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
-// ReSharper disable ImplicitlyCapturedClosure
-// ReSharper disable InvertIf
-// ReSharper disable ReturnTypeCanBeEnumerable.Local
-
 namespace Squidex.Domain.Users
 {
     public static class UserManagerExtensions
@@ -87,7 +83,8 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                user.UpdateEmail(email);
+                await DoChecked(() => userManager.SetEmailAsync(user, email), "Cannot update email.");
+                await DoChecked(() => userManager.SetUserNameAsync(user, email), "Cannot update email.");
             }
 
             if (!string.IsNullOrWhiteSpace(displayName))

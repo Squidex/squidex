@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("FieldAddedEvent")]
-    public class FieldAdded : FieldEvent
+    [EventType(nameof(FieldAdded))]
+    public sealed class FieldAdded : FieldEvent
     {
         public string Name { get; set; }
 

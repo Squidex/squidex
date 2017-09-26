@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class DeleteSchema : SchemaAggregateCommand
+    public sealed class DeleteSchema : SchemaAggregateCommand
     {
     }
 }

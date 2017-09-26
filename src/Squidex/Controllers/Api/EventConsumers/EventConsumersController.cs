@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.EventConsumers.Models;
+using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -23,10 +25,13 @@ namespace Squidex.Controllers.Api.EventConsumers
     public sealed class EventConsumersController : Controller
     {
         private readonly IEventConsumerInfoRepository eventConsumerRepository;
+        private readonly IActors actors;
 
-        public EventConsumersController(IEventConsumerInfoRepository eventConsumerRepository)
+        public EventConsumersController(IEventConsumerInfoRepository eventConsumerRepository, IActors actors)
         {
             this.eventConsumerRepository = eventConsumerRepository;
+
+            this.actors = actors;
         }
 
         [HttpGet]
@@ -46,7 +51,12 @@ namespace Squidex.Controllers.Api.EventConsumers
         [ApiCosts(0)]
         public async Task<IActionResult> Start(string name)
         {
-            await eventConsumerRepository.StartAsync(name);
+            var actor = actors.Get(name);
+
+            if (actor != null)
+            {
+                await actor.SendAsync(new StartConsumerMessage());
+            }
 
             return NoContent();
         }
@@ -56,7 +66,12 @@ namespace Squidex.Controllers.Api.EventConsumers
         [ApiCosts(0)]
         public async Task<IActionResult> Stop(string name)
         {
-            await eventConsumerRepository.StopAsync(name);
+            var actor = actors.Get(name);
+
+            if (actor != null)
+            {
+                await actor.SendAsync(new StopConsumerMessage());
+            }
 
             return NoContent();
         }
@@ -66,7 +81,12 @@ namespace Squidex.Controllers.Api.EventConsumers
         [ApiCosts(0)]
         public async Task<IActionResult> Reset(string name)
         {
-            await eventConsumerRepository.ResetAsync(name);
+            var actor = actors.Get(name);
+
+            if (actor != null)
+            {
+                await actor.SendAsync(new ResetConsumerMessage());
+            }
 
             return NoContent();
         }

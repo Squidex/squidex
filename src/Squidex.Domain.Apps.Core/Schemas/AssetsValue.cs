@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class AssetsValue
     {
-        private readonly List<Guid> EmptyAssetIds = new List<Guid>();
+        private static readonly List<Guid> EmptyAssetIds = new List<Guid>();
 
         public IReadOnlyList<Guid> AssetIds { get; }
 

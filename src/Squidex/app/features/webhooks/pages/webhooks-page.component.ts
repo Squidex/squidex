@@ -6,22 +6,22 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     CreateWebhookDto,
+    DateTime,
+    DialogService,
     ImmutableArray,
-    NotificationService,
     SchemaDto,
     SchemasService,
-    Version,
     WebhookDto,
-    WebhooksService
+    WebhooksService,
+    UpdateWebhookDto
 } from 'shared';
-
-interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; showDetails: boolean; };
 
 @Component({
     selector: 'sqx-webhooks-page',
@@ -29,19 +29,12 @@ interface WebhookWithSchema { webhook: WebhookDto; schema: SchemaDto; showDetail
     templateUrl: './webhooks-page.component.html'
 })
 export class WebhooksPageComponent extends AppComponentBase implements OnInit {
-    private readonly version = new Version();
-
-    public webhooks: ImmutableArray<WebhookWithSchema>;
-
+    public webhooks: ImmutableArray<WebhookDto>;
     public schemas: SchemaDto[];
 
     public addWebhookFormSubmitted = false;
-    public addWebhookForm: FormGroup =
+    public addWebhookForm =
         this.formBuilder.group({
-            schemaId: ['',
-                [
-                    Validators.required
-                ]],
             url: ['',
                 [
                     Validators.required
@@ -52,12 +45,12 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
         return this.addWebhookForm.controls['url'].value && this.addWebhookForm.controls['url'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly schemasService: SchemasService,
         private readonly webhooksService: WebhooksService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -72,12 +65,7 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                         (s, w) => { return { webhooks: w, schemas: s }; }))
             .subscribe(dtos => {
                 this.schemas = dtos.schemas;
-
-                this.webhooks =
-                    ImmutableArray.of(
-                        dtos.webhooks.map(w => {
-                            return { webhook: w, schema: dtos.schemas.find(s => s.id === w.schemaId), showDetails: false };
-                        }).filter(w => !!w.schema));
+                this.webhooks = ImmutableArray.of(dtos.webhooks);
 
                 if (showInfo) {
                     this.notifyInfo('Webhooks reloaded.');
@@ -86,46 +74,63 @@ export class WebhooksPageComponent extends AppComponentBase implements OnInit {
                 this.notifyError(error);
             });
     }
-    public resetWebhookForm() {
-        this.addWebhookFormSubmitted = false;
-        this.addWebhookForm.enable();
-        this.addWebhookForm.reset();
-    }
 
-    public addWebhook() {
-        if (this.addWebhookForm.valid) {
-            this.addWebhookFormSubmitted = true;
-            this.addWebhookForm.disable();
-
-            const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value);
-            const schemaId = this.addWebhookForm.controls['schemaId'].value;
-            const schema = this.schemas.find(s => s.id === schemaId);
-
-            this.appNameOnce()
-                .switchMap(app => this.webhooksService.postWebhook(app, schema.name, requestDto, this.version))
-                .subscribe(dto => {
-                    const webhook = new WebhookDto(dto.id, schemaId, dto.sharedSecret, requestDto.url, 0, 0, 0, 0, []);
-
-                    this.webhooks = this.webhooks.push({ schema, webhook, showDetails: false });
-                    this.resetWebhookForm();
-                }, error => {
-                    this.notifyError(error);
-                    this.resetWebhookForm();
-                });
-        }
-    }
-
-    public toggleDetails(webhook: WebhookWithSchema) {
-        this.webhooks = this.webhooks.replace(webhook, { webhook: webhook.webhook, schema: webhook.schema, showDetails: !webhook.showDetails });
-    }
-
-    public deleteWebhook(webhook: WebhookWithSchema) {
+    public deleteWebhook(webhook: WebhookDto) {
         this.appNameOnce()
-            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.schema.name, webhook.webhook.id, this.version))
+            .switchMap(app => this.webhooksService.deleteWebhook(app, webhook.id, webhook.version))
             .subscribe(dto => {
                 this.webhooks = this.webhooks.remove(webhook);
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public updateWebhook(webhook: WebhookDto, requestDto: UpdateWebhookDto) {
+        this.appNameOnce()
+            .switchMap(app => this.webhooksService.putWebhook(app, webhook.id, requestDto, webhook.version))
+            .subscribe(dto => {
+                this.webhooks = this.webhooks.replace(webhook, webhook.update(requestDto, this.userToken, dto.version));
+
+                this.notifyInfo('Webhook saved.');
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public addWebhook() {
+        this.addWebhookFormSubmitted = true;
+
+        if (this.addWebhookForm.valid) {
+            this.addWebhookForm.disable();
+
+            const requestDto = new CreateWebhookDto(this.addWebhookForm.controls['url'].value, []);
+
+            const me = this.userToken;
+
+            this.appNameOnce()
+                .switchMap(app => this.webhooksService.postWebhook(app, requestDto, me, DateTime.now()))
+                .subscribe(dto => {
+                    this.webhooks = this.webhooks.push(dto);
+
+                    this.resetWebhookForm();
+                }, error => {
+                    this.notifyError(error);
+                    this.enableWebhookForm();
+                });
+        }
+    }
+
+    public cancelAddWebhook() {
+        this.resetWebhookForm();
+    }
+
+    private enableWebhookForm() {
+        this.addWebhookForm.enable();
+    }
+
+    private resetWebhookForm() {
+        this.addWebhookFormSubmitted = false;
+        this.addWebhookForm.enable();
+        this.addWebhookForm.reset();
     }
 }

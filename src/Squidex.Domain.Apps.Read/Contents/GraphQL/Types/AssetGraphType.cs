@@ -10,12 +10,13 @@ using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Read.Assets;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class AssetGraphType : ObjectGraphType<IAssetEntity>
     {
-        public AssetGraphType()
+        public AssetGraphType(IGraphQLContext context)
         {
             Name = "AssetDto";
 
@@ -77,10 +78,34 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "url",
+                Resolver = context.ResolveAssetUrl(),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = "The url to the asset."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "thumbnailUrl",
+                Resolver = context.ResolveAssetThumbnailUrl(),
+                ResolvedType = new StringGraphType(),
+                Description = "The thumbnail url to the asset."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "fileName",
                 Resolver = Resolver(x => x.FileName),
                 ResolvedType = new NonNullGraphType(new StringGraphType()),
                 Description = "The file name."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "fileType",
+                Resolver = Resolver(x => x.FileName.FileType()),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = "The file type."
             });
 
             AddField(new FieldType
@@ -122,6 +147,17 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = new IntGraphType(),
                 Description = "The height of the image in pixels if the asset is an image."
             });
+
+            if (context.CanGenerateAssetSourceUrl)
+            {
+                AddField(new FieldType
+                {
+                    Name = "sourceUrl",
+                    Resolver = context.ResolveAssetSourceUrl(),
+                    ResolvedType = new StringGraphType(),
+                    Description = "The source url of the asset."
+                });
+            }
 
             Description = "An asset";
         }

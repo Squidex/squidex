@@ -30,12 +30,6 @@ namespace Squidex.Domain.Apps.Read.Apps
         }
 
         [Fact]
-        public async Task Should_return_true_for_payment_option_check()
-        {
-            Assert.True(await sut.HasPaymentOptionsAsync(null));
-        }
-
-        [Fact]
         public async Task Should_not_return_portal_link()
         {
             Assert.Equal(string.Empty, await sut.GetPortalLinkAsync(null));

@@ -21,10 +21,12 @@ using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.Webhooks;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
-
-// ReSharper disable UnusedAutoPropertyAccessor.Local
+using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
 {
@@ -44,6 +46,24 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.Register(c => new GraphQLUrlGenerator(
+                    c.Resolve<IOptions<MyUrlsOptions>>(),
+                    c.Resolve<IAssetStore>(),
+                    Configuration.GetValue<bool>("assetStore:exposeSourceUrl")))
+                .As<IGraphQLUrlGenerator>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<CachingGraphQLService>()
+                .As<IGraphQLService>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<ContentQueryService>()
+                .As<IContentQueryService>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.RegisterType<CachingAppProvider>()
                 .As<IAppProvider>()
                 .AsSelf()
@@ -54,11 +74,6 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<NoopAppPlanBillingManager>()
-                .As<IAppPlanBillingManager>()
-                .AsSelf()
-                .SingleInstance();
-
             builder.RegisterType<CachingSchemaProvider>()
                 .As<ISchemaProvider>()
                 .AsSelf()
@@ -66,33 +81,46 @@ namespace Squidex.Config.Domain
 
             builder.RegisterType<AssetUserPictureStore>()
                 .As<IUserPictureStore>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>()
+                .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<WebhookInvoker>()
+            builder.RegisterType<NoopAppPlanBillingManager>()
+                .As<IAppPlanBillingManager>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookDequeuer>()
+                .As<IExternalSystem>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookEnqueuer>()
                 .As<IEventConsumer>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<WebhookSender>()
                 .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<EdmModelBuilder>()
                 .AsSelf()
                 .SingleInstance();
-
-            builder.RegisterType<CachingGraphQLInvoker>()
-                .As<IGraphQLInvoker>()
-                .AsSelf()
-                .InstancePerDependency();
         }
     }
 }

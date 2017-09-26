@@ -70,7 +70,7 @@ describe('AppsStoreService', () => {
             result1 = x;
         }).unsubscribe();
 
-        store.createApp(new CreateAppDto('new-name'), now).subscribe(x => { /* Do Nothing */ });
+        store.createApp(new CreateAppDto('new-name'), now).subscribe();
 
         store.apps.subscribe(x => {
             result2 = x;

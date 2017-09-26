@@ -12,7 +12,7 @@ import { RootViewDirective } from './../';
 describe('RootViewDirective', () => {
     it('should call init of service in ctor', () => {
         let viewRef = {};
-        let viewRefPassed = null;
+        let viewRefPassed: any = null;
 
         const service = {
             init: (ref: any) => {

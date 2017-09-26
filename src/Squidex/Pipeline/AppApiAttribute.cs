@@ -12,9 +12,12 @@ namespace Squidex.Pipeline
 {
     public sealed class AppApiAttribute : ServiceFilterAttribute
     {
-        public AppApiAttribute()
+        public bool CheckPermissions { get; }
+
+        public AppApiAttribute(bool checkPermissions = true)
             : base(typeof(AppApiFilter))
         {
+            CheckPermissions = checkPermissions;
         }
     }
 }

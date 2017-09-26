@@ -12,14 +12,17 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("GeolocationField")]
+    [TypeName(nameof(GeolocationField))]
     public sealed class GeolocationFieldProperties : FieldProperties
     {
         private GeolocationFieldEditor editor;
 
         public GeolocationFieldEditor Editor
         {
-            get { return editor; }
+            get
+            {
+                return editor;
+            }
             set
             {
                 ThrowIfFrozen();

@@ -6,26 +6,26 @@
  */
 
 import {
+    DialogService,
     ErrorDto,
-    Notification,
-    NotificationService
+    Notification
 } from './../declarations-base';
 
 export abstract class ComponentBase {
     constructor(
-        private readonly notifications: NotificationService
+        public readonly dialogs: DialogService
     ) {
     }
 
     protected notifyError(error: string | ErrorDto) {
         if (error instanceof ErrorDto) {
-            this.notifications.notify(Notification.error(error.displayMessage));
+            this.dialogs.notify(Notification.error(error.displayMessage));
         } else {
-            this.notifications.notify(Notification.error(error));
+            this.dialogs.notify(Notification.error(error));
         }
     }
 
     protected notifyInfo(error: string) {
-        this.notifications.notify(Notification.info(error));
+        this.dialogs.notify(Notification.info(error));
     }
 }

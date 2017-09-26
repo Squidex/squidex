@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public class RemoveContributor : AppAggregateCommand, IValidatable
+    public sealed class RemoveContributor : AppAggregateCommand, IValidatable
     {
         public string ContributorId { get; set; }
 

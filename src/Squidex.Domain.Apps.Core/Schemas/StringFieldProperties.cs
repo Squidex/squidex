@@ -10,12 +10,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
-
-// ReSharper disable ObjectCreationAsStatement
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("StringField")]
+    [TypeName(nameof(StringField))]
     public sealed class StringFieldProperties : FieldProperties
     {
         private int? minLength;
@@ -28,7 +27,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MinLength
         {
-            get { return minLength; }
+            get
+            {
+                return minLength;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -39,7 +41,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxLength
         {
-            get { return maxLength; }
+            get
+            {
+                return maxLength;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -50,7 +55,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string DefaultValue
         {
-            get { return defaultValue; }
+            get
+            {
+                return defaultValue;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -61,7 +69,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Pattern
         {
-            get { return pattern; }
+            get
+            {
+                return pattern;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -72,7 +83,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string PatternMessage
         {
-            get { return patternMessage; }
+            get
+            {
+                return patternMessage;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -83,7 +97,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public ImmutableList<string> AllowedValues
         {
-            get { return allowedValues; }
+            get
+            {
+                return allowedValues;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -94,7 +111,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public StringFieldEditor Editor
         {
-            get { return editor; }
+            get
+            {
+                return editor;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -106,6 +126,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override JToken GetDefaultValue()
         {
             return DefaultValue;
+        }
+
+        public override bool ShouldApplyDefaultValue(JToken value)
+        {
+            return value.IsNull() || (value is JValue jValue && Equals(jValue.Value, string.Empty));
         }
 
         protected override IEnumerable<ValidationError> ValidateCore()

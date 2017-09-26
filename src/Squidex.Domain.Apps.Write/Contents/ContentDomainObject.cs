@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private bool isDeleted;
         private bool isCreated;
-        private bool isPublished;
+        private Status status;
         private NamedContentData data;
 
         public bool IsDeleted
@@ -30,12 +30,17 @@ namespace Squidex.Domain.Apps.Write.Contents
             get { return isDeleted; }
         }
 
-        public bool IsPublished
+        public Status Status
         {
-            get { return isPublished; }
+            get { return status; }
         }
 
-        public ContentDomainObject(Guid id, int version) 
+        public NamedContentData Data
+        {
+            get { return data; }
+        }
+
+        public ContentDomainObject(Guid id, int version)
             : base(id, version)
         {
         }
@@ -52,14 +57,9 @@ namespace Squidex.Domain.Apps.Write.Contents
             data = @event.Data;
         }
 
-        protected void On(ContentPublished @event)
+        protected void On(ContentStatusChanged @event)
         {
-            isPublished = true;
-        }
-
-        protected void On(ContentUnpublished @event)
-        {
-            isPublished = false;
+            status = @event.Status;
         }
 
         protected void On(ContentDeleted @event)
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published }));
             }
 
             return this;
@@ -94,24 +94,14 @@ namespace Squidex.Domain.Apps.Write.Contents
             return this;
         }
 
-        public ContentDomainObject Publish(PublishContent command)
+        public ContentDomainObject ChangeStatus(ChangeContentStatus command)
         {
             Guard.NotNull(command, nameof(command));
 
             VerifyCreatedAndNotDeleted();
+            VerifyCanChangeStatus(command.Status);
 
-            RaiseEvent(SimpleMapper.Map(command, new ContentPublished()));
-
-            return this;
-        }
-
-        public ContentDomainObject Unpublish(UnpublishContent command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentUnpublished()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
 
             return this;
         }
@@ -122,7 +112,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             VerifyCreatedAndNotDeleted();
 
-            if (!command.Data.Equals(data))
+            if (!command.Data.Equals(Data))
             {
                 RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
             }
@@ -136,9 +126,9 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             VerifyCreatedAndNotDeleted();
 
-            var newData = data.MergeInto(command.Data);
+            var newData = Data.MergeInto(command.Data);
 
-            if (!newData.Equals(data))
+            if (!newData.Equals(Data))
             {
                 RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = newData }));
             }
@@ -146,11 +136,27 @@ namespace Squidex.Domain.Apps.Write.Contents
             return this;
         }
 
+        private void VerifyCanChangeStatus(Status newStatus)
+        {
+            if (!StatusFlow.Exists(newStatus) && !StatusFlow.CanChange(status, newStatus))
+            {
+                throw new DomainException($"Content cannot be changed from status {status} to {newStatus}.");
+            }
+        }
+
         private void VerifyNotCreated()
         {
             if (isCreated)
             {
                 throw new DomainException("Content has already been created.");
+            }
+        }
+
+        private void VerifyDeleted()
+        {
+            if (!isDeleted)
+            {
+                throw new DomainException("Content has not been deleted.");
             }
         }
 

@@ -356,7 +356,7 @@ namespace Squidex.Infrastructure
 
                     var lower = char.ToLowerInvariant(character);
 
-                    if (LowerCaseDiacritics.TryGetValue(character, out string replacement))
+                    if (LowerCaseDiacritics.TryGetValue(character, out var replacement))
                     {
                         if (singleCharDiactric)
                         {
@@ -381,6 +381,21 @@ namespace Squidex.Infrastructure
             }
 
             return result.ToString().Trim(separator);
+        }
+
+        public static string BuildFullUrl(this string baseUrl, string path, bool trailingSlash = false)
+        {
+            var url = $"{baseUrl.TrimEnd('/')}/{path.Trim('/')}";
+
+            if (trailingSlash &&
+                url.IndexOf("#", StringComparison.OrdinalIgnoreCase) < 0 &&
+                url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
+                url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                url = url + "/";
+            }
+
+            return url;
         }
     }
 }

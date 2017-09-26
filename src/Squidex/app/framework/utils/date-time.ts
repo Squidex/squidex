@@ -73,11 +73,11 @@ export class DateTime {
     }
 
     public static tomorrow(): DateTime {
-        return DateTime.now().addDays(1).date;
+        return DateTime.today().addDays(1);
     }
 
     public static yesterday(): DateTime {
-        return DateTime.now().addDays(-1).date;
+        return DateTime.today().addDays(-1);
     }
 
     public static parseMSDate(value: string): DateTime {
@@ -118,7 +118,7 @@ export class DateTime {
         const parsedMoment = moment.utc(value, format);
 
         if (parsedMoment.isValid()) {
-            return new DateTime(new Date(parsedMoment.valueOf()));
+            return new DateTime(parsedMoment.toDate());
         } else {
             throw `${value} is not a valid date time string`;
         }
@@ -153,9 +153,9 @@ export class DateTime {
     }
 
     public firstOfWeek(): DateTime {
-        const weekStart = new Date(this.value.valueOf() - (this.weekDay - 1) * 86400000);
+        const date = this.date;
 
-        return new DateTime(weekStart);
+        return date.addDays(-date.value.getUTCDay() + 1);
     }
 
     public firstOfMonth(): DateTime {
@@ -167,7 +167,7 @@ export class DateTime {
     public addYears(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setFullYear(clone.getUTCFullYear() + value, clone.getUTCMonth(), clone.getUTCDay());
+        clone.setUTCFullYear(clone.getUTCFullYear() + value, clone.getUTCMonth(), clone.getUTCDay());
 
         return new DateTime(clone);
     }
@@ -175,7 +175,7 @@ export class DateTime {
     public addMonths(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setMonth(clone.getUTCMonth() + value, clone.getUTCDate());
+        clone.setUTCMonth(clone.getUTCMonth() + value, clone.getUTCDate());
 
         return new DateTime(clone);
     }
@@ -183,7 +183,7 @@ export class DateTime {
     public addDays(value: number): DateTime {
         const clone = this.cloneDate();
 
-        clone.setDate(clone.getUTCDate() + value);
+        clone.setUTCDate(clone.getUTCDate() + value);
 
         return new DateTime(clone);
     }
@@ -226,6 +226,10 @@ export class DateTime {
 
     public toStringFormat(format: string): string {
         return moment(this.value).format(format);
+    }
+
+    public toUTCStringFormat(format: string): string {
+        return moment.utc(this.value).format(format);
     }
 
     public toFromNow(): string {

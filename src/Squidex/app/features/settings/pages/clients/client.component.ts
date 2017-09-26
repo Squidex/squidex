@@ -6,15 +6,16 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
     AppClientDto,
     AppClientsService,
+    ComponentBase,
+    DialogService,
     fadeAnimation,
-    ModalView,
-    NotificationService
+    ModalView
 } from 'shared';
 
 const ESCAPE_KEY = 27;
@@ -27,53 +28,43 @@ const ESCAPE_KEY = 27;
         fadeAnimation
     ]
 })
-export class ClientComponent {
-    public isRenaming = false;
-
-    public token: AccessTokenDto;
-
+export class ClientComponent extends ComponentBase {
     @Output()
     public renaming = new EventEmitter<string>();
 
     @Output()
     public revoking = new EventEmitter();
 
-    @Input()
-    public client: AppClientDto;
+    @Output()
+    public changing = new EventEmitter<boolean>();
 
     @Input()
     public appName: string;
 
+    @Input()
+    public client: AppClientDto;
+
+    public isRenaming = false;
+
+    public token: AccessTokenDto;
     public tokenDialog = new ModalView();
 
-    public get clientName(): string {
-        return this.client.name || this.client.id;
-    }
-
-    public get clientId(): string {
-        return this.appName + ':' + this.client.id;
-    }
-
-    public get clientSecret(): string {
-        return this.client.secret;
-    }
-
-    public renameForm: FormGroup =
+    public renameForm =
         this.formBuilder.group({
             name: ['',
                 Validators.required
             ]
         });
 
-    constructor(
-        private readonly appClientsService: AppClientsService,
-        private readonly formBuilder: FormBuilder,
-        private readonly notifications: NotificationService
-    ) {
+    public get hasNewName() {
+        return this.renameForm.controls['name'].value !== this.client.name;
     }
 
-    public resetForm() {
-        this.renameForm.controls['name'].setValue(this.clientName);
+    constructor(dialogs: DialogService,
+        private readonly appClientsService: AppClientsService,
+        private readonly formBuilder: FormBuilder
+    ) {
+        super(dialogs);
     }
 
     public cancelRename() {
@@ -81,7 +72,7 @@ export class ClientComponent {
     }
 
     public startRename() {
-        this.resetForm();
+        this.renameForm.controls['name'].setValue(this.client.name);
 
         this.isRenaming = true;
     }
@@ -92,25 +83,13 @@ export class ClientComponent {
         }
     }
 
-    public rename() {
-        try {
-            const newName = this.renameForm.controls['name'].value;
-
-            if (newName !== this.clientName) {
-                this.renaming.emit(newName);
-            }
-        } finally {
-            this.isRenaming = false;
-        }
-    }
-
     public createToken(client: AppClientDto) {
         this.appClientsService.createToken(this.appName, client)
             .subscribe(dto => {
                 this.token = dto;
                 this.tokenDialog.show();
             }, error => {
-                this.notifications.notify(error);
+                this.notifyError(error);
             });
     }
 }

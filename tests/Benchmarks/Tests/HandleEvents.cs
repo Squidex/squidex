@@ -8,31 +8,28 @@
 
 using System;
 using Benchmarks.Tests.TestData;
-using Benchmarks.Utils;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.MongoDb.EventStore;
-
-// ReSharper disable InvertIf
 
 namespace Benchmarks.Tests
 {
     public sealed class HandleEvents : IBenchmark
     {
+        private const int NumEvents = 5000;
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private const int NumEvents = 5000;
         private IMongoClient mongoClient;
         private IMongoDatabase mongoDatabase;
         private IEventStore eventStore;
         private IEventNotifier eventNotifier;
         private IEventConsumerInfoRepository eventConsumerInfos;
-        private EventReceiver eventReceiver;
+        private EventConsumerActor eventConsumerActor;
         private MyEventConsumer eventConsumer;
 
         public string Id
@@ -68,10 +65,9 @@ namespace Benchmarks.Tests
             eventNotifier = new DefaultEventNotifier(new InMemoryPubSub());
 
             eventStore = new MongoEventStore(mongoDatabase, eventNotifier);
-            eventStore.Warmup();
 
-            eventReceiver = new EventReceiver(formatter, eventStore, eventConsumerInfos, log);
-            eventReceiver.Subscribe(eventConsumer);
+            eventConsumerActor = new EventConsumerActor(formatter, eventStore, eventConsumerInfos, log);
+            eventConsumerActor.SubscribeAsync(eventConsumer);
         }
 
         public long Run()
@@ -82,7 +78,7 @@ namespace Benchmarks.Tests
             {
                 var eventData = formatter.ToEventData(new Envelope<IEvent>(new MyEvent { EventNumber = eventId + 1 }), Guid.NewGuid());
 
-                eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventId - 1, new [] { eventData }).Wait();
+                eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventId - 1, new[] { eventData }).Wait();
             }
 
             eventConsumer.WaitAndVerify();
@@ -94,7 +90,7 @@ namespace Benchmarks.Tests
         {
             mongoClient.DropDatabase(mongoDatabase.DatabaseNamespace.DatabaseName);
 
-            eventReceiver.Dispose();
+            eventConsumerActor.Dispose();
         }
 
         public void Cleanup()

@@ -27,10 +27,6 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-// ReSharper disable InvertIf
-// ReSharper disable RedundantIfElseBlock
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Controllers.UI.Account
 {
     [SwaggerIgnore]
@@ -46,7 +42,7 @@ namespace Squidex.Controllers.UI.Account
 
         public AccountController(
             SignInManager<IUser> signInManager,
-            UserManager<IUser> userManager, 
+            UserManager<IUser> userManager,
             IUserFactory userFactory,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
@@ -82,12 +78,19 @@ namespace Squidex.Controllers.UI.Account
         {
             throw new SecurityException("User is not allowed to login.");
         }
-        
+
+        [HttpGet]
+        [Route("account/lockedout")]
+        public IActionResult LockedOut()
+        {
+            return View();
+        }
+
         [HttpGet]
         [Route("account/accessdenied")]
         public IActionResult AccessDenied()
         {
-            return View("AccessDenied");
+            return View();
         }
 
         [HttpGet]
@@ -102,7 +105,7 @@ namespace Squidex.Controllers.UI.Account
         public async Task<IActionResult> Logout(string logoutId)
         {
             var context = await interactions.GetLogoutContextAsync(logoutId);
-            
+
             await signInManager.SignOutAsync();
 
             var logoutUrl = context.PostLogoutRedirectUri;
@@ -181,14 +184,14 @@ namespace Squidex.Controllers.UI.Account
                 ReturnUrl = returnUrl
             };
 
-            return View("Login", vm);
+            return View(nameof(Login), vm);
         }
 
         [HttpPost]
         [Route("account/external/")]
         public IActionResult External(string provider, string returnUrl = null)
         {
-            var properties = 
+            var properties =
                 signInManager.ConfigureExternalAuthenticationProperties(provider,
                     Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
 
@@ -197,7 +200,7 @@ namespace Squidex.Controllers.UI.Account
 
         [HttpGet]
         [Route("account/external-callback/")]
-        public async Task<IActionResult> ExternalCallback(string returnUrl = null, string remoteError = null)
+        public async Task<IActionResult> ExternalCallback(string returnUrl = null)
         {
             var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
@@ -210,7 +213,7 @@ namespace Squidex.Controllers.UI.Account
 
             if (!result.Succeeded && result.IsLockedOut)
             {
-                return View("LockedOut");
+                return View(nameof(LockedOut));
             }
 
             var isLoggedIn = result.Succeeded;
@@ -239,6 +242,11 @@ namespace Squidex.Controllers.UI.Account
                         await MakeAdminAsync(user, isFirst) &&
                         await LockAsync(user, isFirst) &&
                         await LoginAsync(externalLogin);
+
+                    if (user.IsLocked)
+                    {
+                        return View(nameof(LockedOut));
+                    }
                 }
             }
 
@@ -307,7 +315,7 @@ namespace Squidex.Controllers.UI.Account
                 user.SetClaim(SquidexClaimTypes.SquidexDisplayName, email);
             }
 
-            foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix)))
+            foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal)))
             {
                 user.AddClaim(squidexClaim);
             }

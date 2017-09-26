@@ -1,14 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <AssemblyName>Squidex</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572</NoWarn>
-    <OutputType>Exe</OutputType>
     <PackageId>Squidex</PackageId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <RuntimeFrameworkVersion>1.1.2</RuntimeFrameworkVersion>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
@@ -19,7 +18,7 @@
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />
     <None Remove="Assets\**" />
-	  <None Update="dockerfile">
+	<None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
@@ -29,6 +28,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
@@ -43,8 +43,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="1.0.0-rc1-final" />
-    <PackageReference Include="Autofac" Version="4.6.0" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.1.0" />
+    <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.0-alpha-1" />
     <PackageReference Include="IdentityServer4" Version="1.5.2" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="1.2.1" />
@@ -62,22 +62,27 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration.Tools" Version="1.1.0-preview4-final" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.2" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.2.0" />
+    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.2" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="NJsonSchema" Version="9.4.2" />
+    <PackageReference Include="NJsonSchema" Version="9.5.0" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.3.3" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.5.1" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="ReportGenerator" Version="2.5.10" />
-    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.4" />
+    <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
+    <PackageReference Include="ReportGenerator" Version="2.5.11" />
+    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
@@ -86,4 +91,9 @@
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-</Project>
+    
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  
+ </Project>

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
@@ -20,22 +21,30 @@ namespace Squidex.Infrastructure.CQRS.Events
             var handler1Handled = 0;
             var handler2Handled = 0;
 
-            sut.Subscribe(() =>
+            var streamNames = new List<string>();
+
+            sut.Subscribe(x =>
             {
+                streamNames.Add(x);
+
                 handler1Handled++;
             });
 
-            sut.NotifyEventsStored();
+            sut.NotifyEventsStored("a");
 
-            sut.Subscribe(() =>
+            sut.Subscribe(x =>
             {
+                streamNames.Add(x);
+
                 handler2Handled++;
             });
 
-            sut.NotifyEventsStored();
+            sut.NotifyEventsStored("b");
 
             Assert.Equal(2, handler1Handled);
             Assert.Equal(1, handler2Handled);
+
+            Assert.Equal(streamNames.ToArray(), new[] { "a", "b", "b" });
         }
     }
 }

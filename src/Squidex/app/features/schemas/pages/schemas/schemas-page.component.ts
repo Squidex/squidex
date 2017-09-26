@@ -14,18 +14,20 @@ import {
     AppComponentBase,
     AppsStoreService,
     AuthService,
-    DateTime,
+    DialogService,
     fadeAnimation,
     ImmutableArray,
     MessageBus,
     ModalView,
-    NotificationService,
     SchemaDto,
-    SchemasService,
-    Version
+    SchemasService
 } from 'shared';
 
-import { SchemaDeleted, SchemaUpdated } from './../messages';
+import {
+    SchemaCreated,
+    SchemaDeleted,
+    SchemaUpdated
+} from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -46,13 +48,12 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     public schemasFilter = new FormControl();
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly schemasService: SchemasService,
-        private readonly authService: AuthService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -78,13 +79,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
         this.schemaUpdatedSubscription =
             this.messageBus.of(SchemaUpdated)
                 .subscribe(m => {
-                    this.updateSchemas(this.schemas.replaceAll(s => s.name === m.name, s => updateSchema(s, this.authService, m)));
+                    this.updateSchemas(this.schemas.replaceBy('id', m.schema));
                 });
 
         this.schemaDeletedSubscription =
             this.messageBus.of(SchemaDeleted)
                 .subscribe(m => {
-                    this.updateSchemas(this.schemas.filter(s => s.name !== m.name));
+                    this.updateSchemas(this.schemas.filter(s => s.id !== m.schema.id));
                 });
 
         this.load();
@@ -100,10 +101,15 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
     }
 
-    public onSchemaCreated(dto: SchemaDto) {
-        this.updateSchemas(this.schemas.push(dto), this.schemaQuery);
+    public onSchemaCreated(schema: SchemaDto) {
+        this.updateSchemas(this.schemas.push(schema), this.schemaQuery);
+        this.emitSchemaCreated(schema);
 
         this.addSchemaDialog.hide();
+    }
+
+    private emitSchemaCreated(schema: SchemaDto) {
+        this.messageBus.emit(new SchemaCreated(schema));
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {
@@ -115,31 +121,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             schemas = schemas.filter(t => t.name.indexOf(query!) >= 0);
         }
 
-        schemas =
-            schemas.sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
-
-        this.schemasFiltered = schemas;
+        this.schemasFiltered = schemas.sortByStringAsc(x => x.name);
     }
-}
-
-function updateSchema(schema: SchemaDto, authService: AuthService, message: SchemaUpdated): SchemaDto {
-    const me = `subject:${authService.user!.id}`;
-
-    return new SchemaDto(
-        schema.id,
-        schema.name,
-        message.properties,
-        message.isPublished,
-        schema.createdBy, me,
-        schema.created, DateTime.now(),
-        new Version(message.version));
 }
 

@@ -11,10 +11,7 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.GoogleCloud;
 using Squidex.Infrastructure.Log;
-
-// ReSharper disable InvertIf
 
 namespace Squidex.Config.Domain
 {
@@ -64,9 +61,30 @@ namespace Squidex.Config.Domain
                     .As<IExternalSystem>()
                     .SingleInstance();
             }
+            else if (string.Equals(assetStoreType, "AzureBlob", StringComparison.OrdinalIgnoreCase))
+            {
+                var connectionString = Configuration.GetValue<string>("assetStore:azureBlob:connectionString");
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    throw new ConfigurationException("Configure AssetStore AzureBlob connection string with 'assetStore:azureBlob:connectionString'.");
+                }
+
+                var containerName = Configuration.GetValue<string>("assetStore:azureBlob:containerName");
+
+                if (string.IsNullOrWhiteSpace(containerName))
+                {
+                    throw new ConfigurationException("Configure AssetStore AzureBlob container with 'assetStore:azureBlob:containerName'.");
+                }
+
+                builder.Register(c => new AzureBlobAssetStore(connectionString, containerName))
+                    .As<IAssetStore>()
+                    .As<IExternalSystem>()
+                    .SingleInstance();
+            }
             else
             {
-                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: Folder, GoogleCloud.");
+                throw new ConfigurationException($"Unsupported value '{assetStoreType}' for 'assetStore:type', supported: AzureBlob, Folder, GoogleCloud.");
             }
         }
     }

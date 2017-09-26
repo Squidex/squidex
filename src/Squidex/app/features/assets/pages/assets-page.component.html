@@ -9,10 +9,10 @@
                 </button>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" #findInput [formControl]="assetsFilter" placeholder="Search for assets" />
+                    <input class="form-control" #inputFind [formControl]="assetsFilter" placeholder="Search for assets" />
                 </form>
             </div>
 

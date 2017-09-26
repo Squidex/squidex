@@ -10,11 +10,12 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angu
 import {
     AppComponentBase,
     AppsStoreService,
+    AuthService,
     ContentDto,
+    DialogService,
     fadeAnimation,
     FieldDto,
     ModalView,
-    NotificationService,
     SchemaDto
 } from 'shared';
 
@@ -29,13 +30,17 @@ import {
     ]
 })
 export class ContentItemComponent extends AppComponentBase implements OnInit, OnChanges {
-    public dropdown = new ModalView(false, true);
-
     @Output()
     public publishing = new EventEmitter<ContentDto>();
 
     @Output()
     public unpublishing = new EventEmitter<ContentDto>();
+
+    @Output()
+    public archiving = new EventEmitter<ContentDto>();
+
+    @Output()
+    public restoring = new EventEmitter<ContentDto>();
 
     @Output()
     public deleting = new EventEmitter<ContentDto>();
@@ -58,10 +63,12 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
     @Input('sqxContent')
     public content: ContentDto;
 
+    public dropdown = new ModalView(false, true);
+
     public values: any[] = [];
 
-    constructor(apps: AppsStoreService, notifications: NotificationService) {
-        super(notifications, apps);
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService) {
+        super(dialogs, apps, authService);
     }
 
     public ngOnChanges() {

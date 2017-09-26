@@ -17,18 +17,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
         private readonly IDomainObjectRepository domainObjectRepository;
         private readonly IDomainObjectFactory domainObjectFactory;
 
-        public IDomainObjectRepository Repository
-        {
-            get { return domainObjectRepository; }
-        }
-
-        public IDomainObjectFactory Factory
-        {
-            get { return domainObjectFactory; }
-        }
-
         public AggregateHandler(
-            IDomainObjectFactory domainObjectFactory, 
+            IDomainObjectFactory domainObjectFactory,
             IDomainObjectRepository domainObjectRepository)
         {
             Guard.NotNull(domainObjectFactory, nameof(domainObjectFactory));
@@ -38,47 +28,63 @@ namespace Squidex.Infrastructure.CQRS.Commands
             this.domainObjectRepository = domainObjectRepository;
         }
 
-        public async Task CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate
+        public Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate
         {
             Guard.NotNull(creator, nameof(creator));
-            Guard.NotNull(context, nameof(context));
 
-            var aggregateCommand = GetCommand(context);
-            var aggregate = (T)domainObjectFactory.CreateNew(typeof(T), aggregateCommand.AggregateId);
-
-            await creator(aggregate);
-
-            await SaveAsync(aggregate);
-
-            if (!context.IsHandled)
-            {
-                context.Succeed(new EntityCreatedResult<Guid>(aggregate.Id, aggregate.Version));
-            }
+            return InvokeAsync(context, creator, false);
         }
 
-        public async Task UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IAggregate
+        public Task<T> UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IAggregate
         {
             Guard.NotNull(updater, nameof(updater));
+
+            return InvokeAsync(context, updater, true);
+        }
+
+        private async Task<T> InvokeAsync<T>(CommandContext context, Func<T, Task> handler, bool isUpdate) where T : class, IAggregate
+        {
             Guard.NotNull(context, nameof(context));
 
             var aggregateCommand = GetCommand(context);
-            var aggregate = await domainObjectRepository.GetByIdAsync<T>(aggregateCommand.AggregateId, aggregateCommand.ExpectedVersion);
+            var aggregateObject = domainObjectFactory.CreateNew<T>(aggregateCommand.AggregateId);
 
-            await updater(aggregate);
-
-            await SaveAsync(aggregate);
-
-            if (!context.IsHandled)
+            if (isUpdate)
             {
-                context.Succeed(new EntitySavedResult(aggregate.Version));
+                await domainObjectRepository.LoadAsync(aggregateObject, aggregateCommand.ExpectedVersion);
             }
+
+            await handler(aggregateObject);
+
+            var events = aggregateObject.GetUncomittedEvents();
+
+            foreach (var @event in events)
+            {
+                @event.SetAggregateId(aggregateObject.Id);
+            }
+
+            await domainObjectRepository.SaveAsync(aggregateObject, events, Guid.NewGuid());
+
+            aggregateObject.ClearUncommittedEvents();
+
+            if (!context.IsCompleted)
+            {
+                if (isUpdate)
+                {
+                    context.Complete(new EntitySavedResult(aggregateObject.Version));
+                }
+                else
+                {
+                    context.Complete(EntityCreatedResult.Create(aggregateObject.Id, aggregateObject.Version));
+                }
+            }
+
+            return aggregateObject;
         }
 
         private static IAggregateCommand GetCommand(CommandContext context)
         {
-            var command = context.Command as IAggregateCommand;
-
-            if (command == null)
+            if (!(context.Command is IAggregateCommand command))
             {
                 throw new ArgumentException("Context must have an aggregate command.", nameof(context));
             }
@@ -86,20 +92,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Guard.NotEmpty(command.AggregateId, "context.Command.AggregateId");
 
             return command;
-        }
-
-        private async Task SaveAsync(IAggregate aggregate)
-        {
-            var events = aggregate.GetUncomittedEvents();
-
-            foreach (var @event in events)
-            {
-                @event.SetAggregateId(aggregate.Id);
-            }
-
-            await domainObjectRepository.SaveAsync(aggregate, events, Guid.NewGuid());
-
-            aggregate.ClearUncommittedEvents();
         }
     }
 }

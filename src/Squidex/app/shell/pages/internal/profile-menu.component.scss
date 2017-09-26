@@ -1,12 +1,22 @@
 @import '_vars';
 @import '_mixins';
 
-.nav-link {
-    padding: 0;
+.nav {
+    .nav-item {
+        & {
+            line-height: 2rem;
+        }
+
+        .nav-link {
+            color: $color-dark-foreground;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }
 }
 
-.nav-item {
-    line-height: 2rem;
+.user-picture {
+    margin-right: .5rem;
 }
 
 .dropdown {

@@ -18,7 +18,7 @@ namespace Squidex.Config.Identity
         public override Task CreatingTicket(OAuthCreatingTicketContext context)
         {
             var userLogin = context.User.Value<string>("login");
-            var userName  = context.User.Value<string>("name");
+            var userName = context.User.Value<string>("name");
 
             if (!string.IsNullOrEmpty(userName))
             {

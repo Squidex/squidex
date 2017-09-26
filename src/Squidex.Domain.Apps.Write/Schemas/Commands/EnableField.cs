@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class EnableField : FieldCommand
+    public sealed class EnableField : FieldCommand
     {
     }
 }

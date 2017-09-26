@@ -61,17 +61,17 @@ export class ControlErrorsComponent implements OnChanges {
 
             for (let key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    let message: string = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key];
+                    let message = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key];
 
                     if (!message) {
                         continue;
                     }
 
-                    let properties = this.control.errors[key];
+                    const properties = this.control.errors[key];
 
                     for (let property in properties) {
                         if (properties.hasOwnProperty(property)) {
-                            message = message.replace('{' + property + '}', properties[property]);
+                            message = message.replace(`{${property}}`, properties[property]);
                         }
                     }
 

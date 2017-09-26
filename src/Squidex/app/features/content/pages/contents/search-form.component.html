@@ -1,0 +1,37 @@
+<div class="form-horizontal">
+    <div [formGroup]="searchForm">
+        <div class="form-group row">
+            <label class="col col-2 col-form-label" for="odataSearch">Text</label>
+
+            <div class="col col-10">
+                <input type="input" class="form-control" id="search" (blur)="updateQuery()" formControlName="odataSearch" placeholder="Fulltext search" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col col-2 col-form-label" for="filter">Filter</label>
+
+            <div class="col col-10">
+                <input type="input" class="form-control" id="filter" (blur)="updateQuery()" formControlName="odataFilter" placeholder="data/[MY_FIELD]/iv eq 100" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col col-2 col-form-label" for="orderBy">Order</label>
+                
+            <div class="col col-10">
+                <input type="input" class="form-control" id="orderBy" (blur)="updateQuery()" formControlName="odataOrderBy" placeholder="data/[MY_FIELD]/iv desc" />
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-check" *ngIf="canArchive">
+        <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" [ngModel]="archived" (ngModelChange)="archivedChanged.emit($event)" /> Archived items
+        </label>
+    </div>
+
+    <div class="link">
+        Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" target="_blank">Documentation</a>.
+    </div>
+</div>

@@ -27,7 +27,7 @@ namespace Squidex.Controllers.UI.Profile
 {
     [Authorize]
     [SwaggerIgnore]
-    public class ProfileController : Controller
+    public sealed class ProfileController : Controller
     {
         private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;
@@ -40,7 +40,7 @@ namespace Squidex.Controllers.UI.Profile
             SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserPictureStore userPictureStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator, 
+            IAssetThumbnailGenerator assetThumbnailGenerator,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<IdentityCookieOptions> identityCookieOptions)
         {
@@ -76,7 +76,7 @@ namespace Squidex.Controllers.UI.Profile
 
         [HttpGet]
         [Route("/account/profile/login-add-callback/")]
-        public Task<IActionResult> AddLoginCallback(string remoteError = null)
+        public Task<IActionResult> AddLoginCallback()
         {
             return MakeChangeAsync(async user =>
             {
@@ -88,7 +88,7 @@ namespace Squidex.Controllers.UI.Profile
 
         [HttpPost]
         [Route("/account/profile/update")]
-        public Task<IActionResult> Profile(ChangeProfileModel model)
+        public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
             return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName),
                 "Account updated successfully.");
@@ -106,7 +106,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/password-set")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
-            return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password), 
+            return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password),
                 "Password set successfully.");
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/password-change")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            return MakeChangeAsync(user =>  userManager.ChangePasswordAsync(user, model.OldPassword, model.Password), 
+            return MakeChangeAsync(user => userManager.ChangePasswordAsync(user, model.OldPassword, model.Password),
                 "Password changed successfully.");
         }
 
@@ -155,7 +155,7 @@ namespace Squidex.Controllers.UI.Profile
 
             if (!ModelState.IsValid)
             {
-                return View("Profile", await GetProfileVM(user, model));
+                return View(nameof(Profile), await GetProfileVM(user, model));
             }
 
             string errorMessage;
@@ -177,7 +177,7 @@ namespace Squidex.Controllers.UI.Profile
                 errorMessage = "An unexpected exception occurred.";
             }
 
-            return View("Profile", await GetProfileVM(user, model, errorMessage));
+            return View(nameof(Profile), await GetProfileVM(user, model, errorMessage));
         }
 
         private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)

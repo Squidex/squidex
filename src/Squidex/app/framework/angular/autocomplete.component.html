@@ -5,7 +5,7 @@
         autocorrect="off"
         autocapitalize="off">
 
-    <div *ngIf="items.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container>
+    <div *ngIf="items.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container position="bottomLeft">
         <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === selectedIndex" (mousedown)="selectItem(item)" (mouseover)="selectIndex(i)" [sqxScrollActive]="i === selectedIndex" [container]="container">
             <span *ngIf="!itemTemplate">{{item}}</span>
 

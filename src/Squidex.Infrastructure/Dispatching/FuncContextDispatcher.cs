@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -15,23 +13,48 @@ namespace Squidex.Infrastructure.Dispatching
 {
     public sealed class FuncContextDispatcher<TTarget, TIn, TContext, TOut>
     {
-        private static readonly Dictionary<Type, Func<TTarget, object, TContext, TOut>> Handlers;
+        public delegate TOut FuncContextDelegate<in T>(TTarget target, T input, TContext context) where T : TIn;
 
-        static FuncContextDispatcher()
+        public static readonly FuncContextDelegate<TIn> On = CreateHandler();
+
+        public static FuncContextDelegate<TIn> CreateHandler(string methodName = "On")
         {
-            Handlers =
+            Guard.NotNullOrEmpty(methodName, nameof(methodName));
+
+            var handlers =
                 typeof(TTarget)
-                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Where(Helper.HasRightName)
-                    .Where(Helper.HasRightParameters<TIn, TContext>)
-                    .Where(Helper.HasRightReturnType<TOut>)
-                    .Select(FuncContextDispatcherFactory.CreateFuncHandler<TTarget, TContext, TOut >)
-                    .ToDictionary(h => h.Item1, h => h.Item2);
+                    .GetMethods(
+                        BindingFlags.Public |
+                        BindingFlags.NonPublic |
+                        BindingFlags.Instance)
+                    .Where(m =>
+                        m.HasMatchingName(methodName) &&
+                        m.HasMatchingParameters<TIn, TContext>() &&
+                        m.HasMatchingReturnType(typeof(TOut)))
+                    .Select(m =>
+                    {
+                        var inputType = m.GetParameters()[0].ParameterType;
+
+                        var handler =
+                            typeof(FuncContextDispatcher<TTarget, TIn, TContext, TOut>)
+                                .GetMethod(nameof(Factory),
+                                    BindingFlags.Static |
+                                    BindingFlags.NonPublic)
+                                .MakeGenericMethod(inputType)
+                                .Invoke(null, new object[] { m });
+
+                        return (inputType, handler);
+                    })
+                    .ToDictionary(m => m.Item1, h => (FuncContextDelegate<TIn>)h.Item2);
+
+            return (target, input, context) => handlers.TryGetValue(input.GetType(), out var handler) ? handler(target, input, context) : default(TOut);
         }
 
-        public static TOut Dispatch(TTarget target, TIn item, TContext context)
+        private static FuncContextDelegate<TIn> Factory<T>(MethodInfo methodInfo) where T : TIn
         {
-            return Handlers.TryGetValue(item.GetType(), out Func<TTarget, object, TContext, TOut> handler) ? handler(target, item, context) : default(TOut);
+            var handler = (FuncContextDelegate<T>)methodInfo.CreateDelegate(typeof(FuncContextDelegate<T>));
+
+            return (target, input, context) => handler(target, (T)input, context);
         }
     }
 }

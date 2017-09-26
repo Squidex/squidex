@@ -25,9 +25,6 @@ using Squidex.Config.Web;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 
-// ReSharper disable ConvertClosureToMethodGroup
-// ReSharper disable AccessToModifiedClosure
-
 namespace Squidex
 {
     public class Startup
@@ -76,6 +73,8 @@ namespace Squidex
                 Configuration.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 Configuration.GetSection("identity"));
+            services.Configure<MyUIOptions>(
+                Configuration.GetSection("ui"));
             services.Configure<MyUsageOptions>(
                 Configuration.GetSection("usage"));
 
@@ -97,10 +96,10 @@ namespace Squidex
             {
                 container.Dispose();
             });
-            
+
             return new AutofacServiceProvider(container);
         }
-        
+
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSemanticLog(app.ApplicationServices.GetRequiredService<ISemanticLog>());
@@ -145,7 +144,8 @@ namespace Squidex
 
                 identityApp.UseMyIdentity();
                 identityApp.UseMyIdentityServer();
-                identityApp.UseAdminRole();
+                identityApp.UseMyAdminRole();
+                identityApp.UseMyAdmin();
                 identityApp.UseMyApiProtection();
                 identityApp.UseMyGoogleAuthentication();
                 identityApp.UseMyGithubAuthentication();
@@ -183,8 +183,8 @@ namespace Squidex
             if (Environment.IsDevelopment())
             {
                 app.UseWebpackProxy();
-                
-                app.Use((context, next) => 
+
+                app.Use((context, next) =>
                 {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {
@@ -195,7 +195,7 @@ namespace Squidex
             }
             else
             {
-                app.Use((context, next) => 
+                app.Use((context, next) =>
                 {
                     if (!Path.HasExtension(context.Request.Path.Value))
                     {

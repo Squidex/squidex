@@ -32,7 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
     }
 
-    private makeRequest(req: HttpRequest<any>, next: HttpHandler, user: Profile, renew = false): Observable<HttpEvent<any>> {
+    private makeRequest(req: HttpRequest<any>, next: HttpHandler, user: Profile | null, renew = false): Observable<HttpEvent<any>> {
         const token = user ? user.authToken : '';
 
         const authReq = req.clone({
@@ -45,12 +45,14 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(authReq)
             .catch((error: HttpErrorResponse) => {
                 if (error.status === 401 && renew) {
-                    return this.authService.loginSilent().switchMap(u => this.makeRequest(req, next, u));
-                } else if (error.status === 404 && (!user || user.isExpired)) {
-                    this.authService.logoutRedirect();
+                    return this.authService.loginSilent()
+                        .catch(_ => {
+                            this.authService.logoutRedirect();
 
-                    return Observable.empty<HttpEvent<any>>();
-                }else if (error.status === 401 || error.status === 403) {
+                            return Observable.empty<Profile>();
+                        })
+                        .switchMap(u => this.makeRequest(req, next, u));
+                } else if (error.status === 401 || error.status === 403) {
                     this.authService.logoutRedirect();
 
                     return Observable.empty<HttpEvent<any>>();

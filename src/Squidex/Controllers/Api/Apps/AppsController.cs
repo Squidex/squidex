@@ -27,12 +27,12 @@ namespace Squidex.Controllers.Api.Apps
     /// </summary>
     [Authorize]
     [ApiExceptionFilter]
-    [SwaggerTag("Apps")]
-    public class AppsController : ControllerBase
+    [SwaggerTag(nameof(Apps))]
+    public sealed class AppsController : ControllerBase
     {
         private readonly IAppRepository appRepository;
 
-        public AppsController(ICommandBus commandBus, IAppRepository appRepository) 
+        public AppsController(ICommandBus commandBus, IAppRepository appRepository)
             : base(commandBus)
         {
             this.appRepository = appRepository;
@@ -96,7 +96,7 @@ namespace Squidex.Controllers.Api.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = result.ToString(), Version = result.Version };
+            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
 
             return CreatedAtAction(nameof(GetApps), response);
         }

@@ -13,8 +13,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Core
 {
     public sealed class LanguagesConfig : IFieldPartitioning
@@ -116,7 +114,7 @@ namespace Squidex.Domain.Apps.Core
             {
                 if (languageConfig.Fallback.Contains(language))
                 {
-                    newLanguages = 
+                    newLanguages =
                         newLanguages.SetItem(languageConfig.Language,
                             new LanguageConfig(
                                 languageConfig.Language,

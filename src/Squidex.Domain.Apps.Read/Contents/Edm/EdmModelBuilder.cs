@@ -18,24 +18,24 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.Edm
 {
-    public sealed class EdmModelBuilder : CachingProviderBase
+    public class EdmModelBuilder : CachingProviderBase
     {
-        public EdmModelBuilder(IMemoryCache cache) 
+        public EdmModelBuilder(IMemoryCache cache)
             : base(cache)
         {
         }
 
-        public IEdmModel BuildEdmModel(ISchemaEntity schemaEntity, IAppEntity app)
+        public virtual IEdmModel BuildEdmModel(ISchemaEntity schema, IAppEntity app)
         {
-            Guard.NotNull(schemaEntity, nameof(schemaEntity));
+            Guard.NotNull(schema, nameof(schema));
 
-            var cacheKey = $"{schemaEntity.Id}_{schemaEntity.Version}_{app.Id}_{app.Version}";
+            var cacheKey = $"{schema.Id}_{schema.Version}_{app.Id}_{app.Version}";
 
             var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
 
-                return BuildEdmModel(schemaEntity.Schema, app.PartitionResolver);
+                return BuildEdmModel(schema.SchemaDef, app.PartitionResolver);
             });
 
             return result;

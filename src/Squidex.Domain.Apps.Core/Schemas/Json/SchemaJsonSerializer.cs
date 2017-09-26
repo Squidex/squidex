@@ -12,8 +12,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
-// ReSharper disable UseObjectOrCollectionInitializer
-
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class SchemaJsonSerializer
@@ -35,13 +33,14 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var model = new JsonSchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
 
-            model.Fields = 
+            model.Fields =
                 schema.Fields.Select(x =>
                     new JsonFieldModel
                     {
                         Id = x.Id,
                         Name = x.Name,
                         IsHidden = x.IsHidden,
+                        IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
                         Partitioning = x.Paritioning.Key,
                         Properties = x.RawProperties
@@ -64,6 +63,11 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                     if (fieldModel.IsDisabled)
                     {
                         field = field.Disable();
+                    }
+
+                    if (fieldModel.IsLocked)
+                    {
+                        field = field.Lock();
                     }
 
                     if (fieldModel.IsHidden)

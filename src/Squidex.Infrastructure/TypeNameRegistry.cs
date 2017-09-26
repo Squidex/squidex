@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure
 {
     public sealed class TypeNameRegistry
@@ -28,6 +26,31 @@ namespace Squidex.Infrastructure
             if (typeNameAttribute != null)
             {
                 Map(type, typeNameAttribute.TypeName);
+            }
+
+            return this;
+        }
+
+        public TypeNameRegistry MapObsolete(Type type, string name)
+        {
+            Guard.NotNull(type, nameof(type));
+            Guard.NotNull(name, nameof(name));
+
+            lock (namesByType)
+            {
+                try
+                {
+                    typesByName.Add(name, type);
+                }
+                catch (ArgumentException)
+                {
+                    if (typesByName[name] != type)
+                    {
+                        var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+
+                        throw new ArgumentException(message, nameof(type));
+                    }
+                }
             }
 
             return this;

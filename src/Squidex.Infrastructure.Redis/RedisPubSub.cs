@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
-namespace Squidex.Infrastructure.Redis
+namespace Squidex.Infrastructure
 {
     public class RedisPubSub : IPubSub, IExternalSystem
     {

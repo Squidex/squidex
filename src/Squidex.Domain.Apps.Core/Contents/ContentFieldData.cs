@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class ContentFieldData : Dictionary<string, JToken>, IEquatable<ContentFieldData>
     {
+        private static readonly JTokenEqualityComparer JTokenEqualityComparer = new JTokenEqualityComparer();
+
         public ContentFieldData()
             : base(StringComparer.OrdinalIgnoreCase)
         {
@@ -43,12 +45,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool Equals(ContentFieldData other)
         {
-            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
+            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other, EqualityComparer<string>.Default, JTokenEqualityComparer));
         }
 
         public override int GetHashCode()
         {
-            return this.DictionaryHashCode();
+            return this.DictionaryHashCode(EqualityComparer<string>.Default, JTokenEqualityComparer);
         }
     }
 }

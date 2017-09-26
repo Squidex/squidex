@@ -8,7 +8,7 @@
 import { Pager } from './../';
 
 describe('Pager', () => {
-    it('Should init with default values', () => {
+    it('should init with default values', () => {
         const pager_1 = new Pager(0);
 
         expect(Object.assign({}, pager_1)).toEqual({
@@ -23,7 +23,7 @@ describe('Pager', () => {
         });
     });
 
-    it('Should init with page size and page', () => {
+    it('should init with page size and page', () => {
         const pager_1 = new Pager(23, 2, 10);
 
         expect(Object.assign({}, pager_1)).toEqual({
@@ -38,7 +38,7 @@ describe('Pager', () => {
         });
     });
 
-    it('Should reset page on reset', () => {
+    it('should reset page on reset', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.reset();
 

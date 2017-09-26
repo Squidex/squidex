@@ -5,21 +5,25 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { SchemaPropertiesDto } from 'shared';
+import { SchemaDto } from 'shared';
 
 export class SchemaUpdated {
     constructor(
-        public readonly name: string,
-        public readonly properties: SchemaPropertiesDto,
-        public readonly isPublished: boolean,
-        public readonly version: string
+        public readonly schema: SchemaDto
+    ) {
+    }
+}
+
+export class SchemaCreated {
+    constructor(
+        public readonly schema: SchemaDto
     ) {
     }
 }
 
 export class SchemaDeleted {
     constructor(
-        public readonly name: string
+        public readonly schema: SchemaDto
     ) {
     }
 }

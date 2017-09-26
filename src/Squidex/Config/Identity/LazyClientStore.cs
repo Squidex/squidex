@@ -58,7 +58,6 @@ namespace Squidex.Config.Identity
             if (appClient == null)
             {
                 return null;
-
             }
 
             client = CreateClientFromApp(clientId, appClient);
@@ -115,6 +114,7 @@ namespace Squidex.Config.Identity
                 {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
                     Constants.ApiScope,
                     Constants.ProfileScope,
                     Constants.RoleScope

@@ -8,8 +8,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Moq;
 using Squidex.Infrastructure.Log.Adapter;
 using Xunit;
 
@@ -20,7 +21,7 @@ namespace Squidex.Infrastructure.Log
         private readonly List<ILogAppender> appenders = new List<ILogAppender>();
         private readonly List<ILogChannel> channels = new List<ILogChannel>();
         private readonly Lazy<SemanticLog> log;
-        private readonly Mock<ILogChannel> channel = new Mock<ILogChannel>();
+        private readonly ILogChannel channel = A.Fake<ILogChannel>();
         private string output;
 
         public SemanticLog Log
@@ -30,13 +31,13 @@ namespace Squidex.Infrastructure.Log
 
         public SemanticLogTests()
         {
-            channels.Add(channel.Object);
+            channels.Add(channel);
 
-            channel.Setup(x => x.Log(It.IsAny<SemanticLogLevel>(), It.IsAny<string>())).Callback(
-                new Action<SemanticLogLevel, string>((level, message) =>
+            A.CallTo(() => channel.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored))
+                .Invokes((SemanticLogLevel level, string message) =>
                 {
                     output = message;
-                }));
+                });
 
             log = new Lazy<SemanticLog>(() => new SemanticLog(channels, appenders, () => new JsonLogWriter()));
         }
@@ -48,10 +49,10 @@ namespace Squidex.Infrastructure.Log
 
             appenders.Add(new TimestampLogAppender(() => now));
 
-            Log.LogFatal(w => {});
+            Log.LogFatal(w => { /* Do Nothing */ });
 
-            var expected = 
-                MakeTestCall(w => w
+            var expected =
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("timestamp", now));
 
@@ -66,7 +67,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogFatal(m => { });
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("logValue", 1500));
 
@@ -83,7 +84,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogFatal(m => { });
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteObject("app", a => a
                         .WriteProperty("name", "Squidex.Infrastructure.Tests")
@@ -99,7 +100,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogTrace(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Trace")
                     .WriteProperty("logValue", 1500));
 
@@ -112,7 +113,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogDebug(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Debug")
                     .WriteProperty("logValue", 1500));
 
@@ -125,7 +126,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogInformation(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Information")
                     .WriteProperty("logValue", 1500));
 
@@ -138,7 +139,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogWarning(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Warning")
                     .WriteProperty("logValue", 1500));
 
@@ -153,7 +154,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogWarning(exception);
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Warning")
                     .WriteException(exception));
 
@@ -166,7 +167,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogError(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Error")
                     .WriteProperty("logValue", 1500));
 
@@ -181,7 +182,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogError(exception);
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Error")
                     .WriteException(exception));
 
@@ -194,7 +195,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogFatal(w => w.WriteProperty("logValue", 1500));
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("logValue", 1500));
 
@@ -209,7 +210,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogFatal(exception);
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteException(exception));
 
@@ -222,7 +223,7 @@ namespace Squidex.Infrastructure.Log
             Log.LogFatal((Exception)null);
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal"));
 
             Assert.Equal(expected, output);
@@ -234,12 +235,12 @@ namespace Squidex.Infrastructure.Log
             Log.MeasureTrace(w => w.WriteProperty("message", "My Message")).Dispose();
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Trace")
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55)));
+            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
         }
 
         [Fact]
@@ -248,12 +249,12 @@ namespace Squidex.Infrastructure.Log
             Log.MeasureDebug(w => w.WriteProperty("message", "My Message")).Dispose();
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Debug")
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55)));
+            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
         }
 
         [Fact]
@@ -262,12 +263,12 @@ namespace Squidex.Infrastructure.Log
             Log.MeasureInformation(w => w.WriteProperty("message", "My Message")).Dispose();
 
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Information")
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55)));
+            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
         }
 
         [Fact]
@@ -279,9 +280,9 @@ namespace Squidex.Infrastructure.Log
             var loggerInstance = loggerFactory.CreateLogger<SemanticLogTests>();
 
             loggerInstance.LogCritical(new EventId(123, "EventName"), exception, "Log {0}", 123);
-            
+
             var expected =
-                MakeTestCall(w => w
+                LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
                     .WriteProperty("message", "Log 123")
                     .WriteObject("eventId", e => e
@@ -293,7 +294,34 @@ namespace Squidex.Infrastructure.Log
             Assert.Equal(expected, output);
         }
 
-        private static string MakeTestCall(Action<IObjectWriter> writer)
+        [Fact]
+        public void Should_catch_all_exceptions_from_all_channels_when_exceptions_are_thrown()
+        {
+            var exception1 = new InvalidOperationException();
+            var exception2 = new InvalidOperationException();
+
+            var channel1 = A.Fake<ILogChannel>();
+            var channel2 = A.Fake<ILogChannel>();
+
+            A.CallTo(() => channel1.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception1);
+            A.CallTo(() => channel2.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception2);
+
+            var sut = new SemanticLog(new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), () => new JsonLogWriter());
+
+            try
+            {
+                sut.Log(SemanticLogLevel.Debug, w => w.WriteProperty("should", "throw"));
+
+                Assert.False(true);
+            }
+            catch (AggregateException ex)
+            {
+                Assert.Equal(exception1, ex.InnerExceptions[0]);
+                Assert.Equal(exception2, ex.InnerExceptions[1]);
+            }
+        }
+
+        private static string LogTest(Action<IObjectWriter> writer)
         {
             IObjectWriter sut = new JsonLogWriter();
 

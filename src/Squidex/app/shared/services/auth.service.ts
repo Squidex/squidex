@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable, Observer, ReplaySubject, TimeoutError } from 'rxjs';
 
 import {
     Log,
@@ -39,7 +39,7 @@ export class Profile {
     }
 
     public get authToken(): string {
-        return `${this.user.token_type} ${this.user.access_token}`;
+        return `${this.user!.token_type} ${this.user.access_token}`;
     }
 
     public get token(): string {
@@ -56,7 +56,7 @@ export class Profile {
 export class AuthService {
     private readonly userManager: UserManager;
     private readonly user$ = new ReplaySubject<Profile | null>(1);
-    private currentUser: Profile = null;
+    private currentUser: Profile | null = null;
 
     public get user(): Profile | null {
         return this.currentUser;
@@ -75,7 +75,7 @@ export class AuthService {
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
-                           scope: 'squidex-api openid profile squidex-profile role',
+                           scope: 'squidex-api openid profile email squidex-profile role',
                    response_type: 'id_token token',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),
@@ -101,37 +101,85 @@ export class AuthService {
         this.checkState(this.userManager.getUser());
     }
 
-    public logoutRedirect(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signoutRedirect());
+    public logoutRedirect() {
+       this.userManager.signoutRedirect();
+    }
+
+    public loginRedirect() {
+        this.userManager.signinRedirect();
     }
 
     public logoutRedirectComplete(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signoutRedirectCallback());
+        return Observable.create((observer: Observer<any>) => {
+            this.userManager.signoutRedirectCallback()
+                .then(x => {
+                    observer.next(x);
+                    observer.complete();
+                }, err => {
+                    observer.error(err);
+                    observer.complete();
+                });
+        });
     }
 
     public loginPopup(): Observable<Profile> {
-        return Observable.fromPromise(this.userManager.signinPopup()).map(u => this.createProfile(u));
-    }
-
-    public loginSilent(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signinSilent()).map(u => this.createProfile(u));
-    }
-
-    public loginRedirect(): Observable<any> {
-        return Observable.fromPromise(this.userManager.signinRedirect());
+        return Observable.create((observer: Observer<Profile>) => {
+            this.userManager.signinPopup()
+                .then(x => {
+                    observer.next(this.createProfile(x));
+                    observer.complete();
+                }, err => {
+                    observer.error(err);
+                    observer.complete();
+                });
+        });
     }
 
     public loginRedirectComplete(): Observable<Profile> {
-        return Observable.fromPromise(this.userManager.signinRedirectCallback()).map(u => this.createProfile(u));
+        return Observable.create((observer: Observer<Profile>) => {
+            this.userManager.signinRedirectCallback()
+                .then(x => {
+                    observer.next(this.createProfile(x));
+                    observer.complete();
+                }, err => {
+                    observer.error(err);
+                    observer.complete();
+                });
+        });
     }
 
-    private createProfile(user: User) {
-        return user ? new Profile(user) : null;
+    public loginSilent(): Observable<Profile> {
+        const observable: Observable<Profile> =
+            Observable.create((observer: Observer<Profile | null>) => {
+                this.userManager.signinSilent()
+                    .then(x => {
+                        observer.next(this.createProfile(x));
+                        observer.complete();
+                    }, err => {
+                        observer.error(err);
+                        observer.complete();
+                    });
+            });
+
+        return observable.timeout(2000)
+            .retryWhen(errors => errors
+                .mergeMap(e => e instanceof TimeoutError ? Observable.of(e) : Observable.throw(e))
+                .delay(500)
+                .take(5)
+                .concat(Observable.throw(new Error('Retry limit exceeded.'))));
     }
 
-    private checkState(promise: Promise<User>) {
+    private createProfile(user: User): Profile {
+        return new Profile(user);
+    }
+
+    private checkState(promise: Promise<User | null>) {
         promise.then(user => {
-            this.user$.next(this.createProfile(user));
+            if (user) {
+                this.user$.next(this.createProfile(user));
+            } else {
+                this.user$.next(null);
+            }
 
             return true;
         }, err => {

@@ -8,7 +8,7 @@
 import { Component, ElementRef, forwardRef, Input, Renderer, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-const NOOP = () => { /* NOOP */ };
+import { Types } from './../utils/types';
 
 export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SliderComponent), multi: true
@@ -21,10 +21,10 @@ export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_SLIDER_CONTROL_VALUE_ACCESSOR]
 })
 export class SliderComponent implements ControlValueAccessor {
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
-    private mouseMoveSubscription: Function | null;
-    private mouseUpSubscription: Function | null;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
+    private windowMouseMoveListener: Function | null = null;
+    private windowMouseUpListener: Function | null = null;
     private centerStartOffset = 0;
     private startValue: number;
     private lastValue: number;
@@ -50,8 +50,8 @@ export class SliderComponent implements ControlValueAccessor {
 
     constructor(private readonly renderer: Renderer) { }
 
-    public writeValue(value: any) {
-        this.lastValue = this.value = value;
+    public writeValue(value: number) {
+        this.lastValue = this.value = Types.isNumber(value) ? value : 0;
 
         this.updateThumbPosition();
     }
@@ -61,15 +61,15 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public onBarMouseClick(event: MouseEvent): boolean {
-        if (this.mouseMoveSubscription) {
+        if (this.windowMouseMoveListener) {
             return true;
         }
 
@@ -89,13 +89,13 @@ export class SliderComponent implements ControlValueAccessor {
 
         this.startValue = this.value;
 
-        this.mouseMoveSubscription =
+        this.windowMouseMoveListener =
             this.renderer.listenGlobal('window', 'mousemove', (e: MouseEvent) => {
                 this.onMouseMove(e);
             });
 
-        this.mouseUpSubscription =
-            this.renderer.listenGlobal('window', 'mouseup', (e: MouseEvent) => {
+        this.windowMouseUpListener =
+            this.renderer.listenGlobal('window', 'mouseup', () => {
                 this.onMouseUp();
             });
 
@@ -157,14 +157,14 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     private updateTouched() {
-        this.touchedCallback();
+        this.callTouched();
     }
 
     private updateValue() {
         if (this.lastValue !== this.value) {
             this.lastValue = this.value;
 
-            this.changeCallback(this.value);
+            this.callChange(this.value);
         }
     }
 
@@ -175,14 +175,14 @@ export class SliderComponent implements ControlValueAccessor {
     }
 
     private releaseMouseHandlers() {
-        if (this.mouseMoveSubscription) {
-            this.mouseMoveSubscription();
-            this.mouseMoveSubscription = null;
+        if (this.windowMouseMoveListener) {
+            this.windowMouseMoveListener();
+            this.windowMouseMoveListener = null;
         }
 
-        if (this.mouseUpSubscription) {
-            this.mouseUpSubscription();
-            this.mouseUpSubscription = null;
+        if (this.windowMouseUpListener) {
+            this.windowMouseUpListener();
+            this.windowMouseUpListener = null;
         }
 
         this.isDragging = false;

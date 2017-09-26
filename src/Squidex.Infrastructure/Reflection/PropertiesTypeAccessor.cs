@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Reflection
         private static readonly ConcurrentDictionary<Type, PropertiesTypeAccessor> AccessorCache = new ConcurrentDictionary<Type, PropertiesTypeAccessor>();
         private readonly Dictionary<string, IPropertyAccessor> accessors = new Dictionary<string, IPropertyAccessor>();
         private readonly List<PropertyInfo> properties = new List<PropertyInfo>();
-        
+
         public IEnumerable<PropertyInfo> Properties
         {
             get
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Reflection
         {
             Guard.NotNullOrEmpty(propertyName, nameof(propertyName));
 
-            if (!accessors.TryGetValue(propertyName, out IPropertyAccessor accessor))
+            if (!accessors.TryGetValue(propertyName, out var accessor))
             {
                 throw new ArgumentException("Property does not exist.", nameof(propertyName));
             }

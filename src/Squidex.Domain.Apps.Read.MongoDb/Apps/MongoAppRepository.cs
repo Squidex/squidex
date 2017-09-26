@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
     {
-        public MongoAppRepository(IMongoDatabase database) 
+        public MongoAppRepository(IMongoDatabase database)
             : base(database)
         {
         }
@@ -29,9 +29,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             return "Projections_Apps";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ContributorIds));
         }
 
         protected override MongoCollectionSettings CollectionSettings()
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         public async Task<IReadOnlyList<IAppEntity>> QueryAllAsync(string subjectId)
         {
             var appEntities =
-                await Collection.Find(s => s.Contributors.ContainsKey(subjectId))
+                await Collection.Find(s => s.ContributorIds.Contains(subjectId))
                     .ToListAsync();
 
             return appEntities;

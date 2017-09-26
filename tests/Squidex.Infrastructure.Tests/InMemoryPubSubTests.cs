@@ -45,7 +45,6 @@ namespace Squidex.Infrastructure
 
             Assert.Equal(new[] { "1", "1", "2", "2" }, channel1Events.ToArray());
             Assert.Equal(new[] { "a", "b" }, channel2Events.ToArray());
-
         }
     }
 }

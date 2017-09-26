@@ -9,8 +9,6 @@
 using System.Security.Cryptography;
 using System.Text;
 
-// ReSharper disable ForCanBeConvertedToForeach
-
 namespace Squidex.Infrastructure
 {
     public static class GravatarHelper
@@ -37,7 +35,7 @@ namespace Squidex.Infrastructure
 
                 var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(normalizedEmail));
                 var hashBuilder = new StringBuilder();
-  
+
                 for (var i = 0; i < hashBytes.Length; i++)
                 {
                     hashBuilder.Append(hashBytes[i].ToString("x2"));

@@ -22,17 +22,12 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
-// ReSharper disable CollectionNeverUpdated.Global
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {
-        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private const int MaxLength = 1024 * 1024;
+        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private NamedContentData contentData;
 
         [BsonId]
@@ -41,16 +36,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         public Guid Id { get; set; }
 
         [BsonRequired]
+        [BsonElement("st")]
+        [BsonRepresentation(BsonType.String)]
+        public Status Status { get; set; }
+
+        [BsonRequired]
         [BsonElement("ct")]
         public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement("mt")]
         public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("pu")]
-        public bool IsPublished { get; set; }
 
         [BsonRequired]
         [BsonElement("dt")]
@@ -102,7 +98,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             {
                 var jsonString = DataObject.ToJson(Settings);
 
-                contentData = 
+                contentData =
                     JsonConvert.DeserializeObject<IdContentData>(jsonString)
                         .ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted))
                         .ToNameModel(schema, true);

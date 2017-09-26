@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-// ReSharper disable ObjectCreationAsStatement
+#pragma warning disable RECS0026 // Possible unassigned object created by 'new'
 
 namespace Squidex.Infrastructure
 {

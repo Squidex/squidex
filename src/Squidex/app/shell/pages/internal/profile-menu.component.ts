@@ -23,7 +23,7 @@ import {
         fadeAnimation
     ]
 })
-export class ProfileMenuComponent implements OnInit, OnDestroy {
+export class ProfileMenuComponent implements OnDestroy, OnInit {
     private authenticationSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);
@@ -49,10 +49,10 @@ export class ProfileMenuComponent implements OnInit, OnDestroy {
         this.authenticationSubscription =
             this.authService.userChanges.filter(user => !!user)
                 .subscribe(user => {
-                    this.profileId = user.id;
-                    this.profileDisplayName = user.displayName;
+                    this.profileId = user!.id;
+                    this.profileDisplayName = user!.displayName;
 
-                    this.isAdmin = user.isAdmin;
+                    this.isAdmin = user!.isAdmin;
                 });
     }
 

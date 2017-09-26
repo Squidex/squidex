@@ -9,15 +9,17 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     AppDto,
     AppsService,
     CreateAppDto,
-    DateTime,
-    EntityCreatedDto
+    DateTime
 } from './../';
 
 describe('AppsService', () => {
+    const now = DateTime.now();
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -25,7 +27,8 @@ describe('AppsService', () => {
             ],
             providers: [
                 AppsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
         });
     });
@@ -76,10 +79,10 @@ describe('AppsService', () => {
 
         const dto = new CreateAppDto('new-app');
 
-        let created: EntityCreatedDto | null = null;
+        let app: AppDto | null = null;
 
-        appsService.postApp(dto).subscribe(result => {
-            created = result;
+        appsService.postApp(dto, now).subscribe(result => {
+            app = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps');
@@ -89,6 +92,6 @@ describe('AppsService', () => {
 
         req.flush({ id: '123' });
 
-        expect(created).toEqual(new EntityCreatedDto('123'));
+        expect(app).toEqual(new AppDto('123', dto.name, 'Owner', now, now));
     }));
 });

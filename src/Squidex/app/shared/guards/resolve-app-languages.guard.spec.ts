@@ -8,7 +8,11 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { AppLanguageDto, AppLanguagesService } from 'shared';
+import {
+    AppLanguagesDto,
+    AppLanguagesService,
+    Version
+} from 'shared';
 
 import { ResolveAppLanguagesGuard } from './resolve-app-languages.guard';
 import { RouterMockup } from './router-mockup';
@@ -68,7 +72,7 @@ describe('ResolveAppLanguagesGuard', () => {
     });
 
     it('should return languages if loading succeeded', (done) => {
-        const languages: AppLanguageDto[] = [];
+        const languages = new AppLanguagesDto([], new Version('2'));
 
         appLanguagesService.setup(x => x.getLanguages('my-app'))
             .returns(() => Observable.of(languages));
@@ -78,7 +82,7 @@ describe('ResolveAppLanguagesGuard', () => {
 
         guard.resolve(<any>route, <any>{})
             .subscribe(result => {
-                expect(result).toBe(languages);
+                expect(result).toBe(languages.languages);
 
                 done();
             });

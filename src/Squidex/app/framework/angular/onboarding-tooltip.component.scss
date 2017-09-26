@@ -1,0 +1,28 @@
+@import '_mixins';
+@import '_vars';
+
+$color: #1a2129;
+
+.onboarding {
+    &-help {
+        @include border-radius;
+        background: $color;
+        border: 0;
+        max-width: 20rem;
+        padding: .75rem;
+    }
+
+    &-text {
+        font-size: .9rem;
+        font-weight: normal;
+        color: $color-dark-foreground;
+    }
+
+    &-buttons {
+        margin: .8rem -.5rem 0;
+    }
+
+    &-rect {
+        @include box-shadow-raw(0 0 0 9999px rgba(0, 0, 0, .5));
+    }
+}

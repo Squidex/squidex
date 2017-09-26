@@ -33,7 +33,7 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// The id of the app.
         /// </summary>
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// The timestamp when the app has been created.
         /// </summary>

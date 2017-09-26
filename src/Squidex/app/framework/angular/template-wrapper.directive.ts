@@ -10,7 +10,7 @@ import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, Simple
 @Directive({
     selector: '[sqxTemplateWrapper]'
 })
-export class TemplateWrapperDirective implements OnInit, OnDestroy, OnChanges {
+export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     @Input()
     public item: any;
 
@@ -27,6 +27,12 @@ export class TemplateWrapperDirective implements OnInit, OnDestroy, OnChanges {
     ) {
     }
 
+    public ngOnDestroy() {
+        if (this.view) {
+            this.view.destroy();
+        }
+    }
+
     public ngOnInit() {
         this.view = this.viewContainer.createEmbeddedView(this.templateRef, {
             '\$implicit': this.item,
@@ -41,12 +47,6 @@ export class TemplateWrapperDirective implements OnInit, OnDestroy, OnChanges {
             } else if (changes.index) {
                 this.view.context.index = this.index;
             }
-        }
-    }
-
-    public ngOnDestroy() {
-        if (this.view) {
-            this.view.destroy();
         }
     }
 }

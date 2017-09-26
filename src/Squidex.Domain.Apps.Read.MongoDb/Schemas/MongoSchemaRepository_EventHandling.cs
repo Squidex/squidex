@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Events.Schemas.Old;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
@@ -48,12 +49,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
 
-        protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
-        {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
-        }
-
-        protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
+        protected Task On(FieldLocked @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
@@ -64,6 +60,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         }
 
         protected Task On(FieldShown @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+        }
+
+        protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
+        {
+            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+        }
+
+        protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
         }
@@ -98,14 +104,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
         }
 
-        protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
+        protected Task On(ScriptsConfigured @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => s);
-        }
-
-        protected Task On(WebhookDeleted @event, EnvelopeHeaders headers)
-        {
-            return UpdateSchema(@event, headers, s => s);
+            return Collection.UpdateAsync(@event, headers, e => SimpleMapper.Map(@event, e));
         }
 
         protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
@@ -127,5 +128,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         {
             entity.SerializeSchema(schema, serializer);
         }
+
+#pragma warning disable CS0612 // Type or member is obsolete
+        protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, e => { });
+        }
+
+        protected Task On(WebhookDeleted @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, e => { });
+        }
+#pragma warning restore CS0612 // Type or member is obsolete
     }
 }

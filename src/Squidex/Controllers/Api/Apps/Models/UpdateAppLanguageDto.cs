@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
-    public class UpdateAppLanguageDto
+    public sealed class UpdateAppLanguageDto
     {
         /// <summary>
         /// Set the value to true to make the language the master.

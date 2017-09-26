@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
-// ReSharper disable ConvertIfStatementToReturnStatement
-
 namespace Squidex.Domain.Apps.Read.History
 {
     public abstract class HistoryEventsCreatorBase : IHistoryEventsCreator

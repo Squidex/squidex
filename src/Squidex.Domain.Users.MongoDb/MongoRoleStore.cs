@@ -9,84 +9,101 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.MongoDB;
 using MongoDB.Driver;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Users.MongoDb
 {
-    public sealed class MongoRoleStore : 
-        IRoleStore<IRole>, 
-        IRoleFactory
+    public sealed class MongoRoleStore : MongoRepositoryBase<MongoRole>, IRoleStore<IRole>, IRoleFactory
     {
-        private readonly RoleStore<WrappedIdentityRole> innerStore;
-
         public MongoRoleStore(IMongoDatabase database)
+            : base(database)
         {
-            var rolesCollection = database.GetCollection<WrappedIdentityRole>("Identity_Roles");
+        }
 
-            IndexChecks.EnsureUniqueIndexOnNormalizedRoleName(rolesCollection);
+        protected override string CollectionName()
+        {
+            return "Identity_Roles";
+        }
 
-            innerStore = new RoleStore<WrappedIdentityRole>(rolesCollection);
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoRole> collection)
+        {
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true });
+        }
+
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
         public void Dispose()
         {
-            innerStore.Dispose();
         }
 
         public IRole Create(string name)
         {
-            return new WrappedIdentityRole { Name = name };
+            return new MongoRole { Name = name };
         }
 
         public async Task<IRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByIdAsync(roleId, cancellationToken);
+            return await Collection.Find(x => x.Id == roleId).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            return await innerStore.FindByNameAsync(normalizedRoleName, cancellationToken);
+            return await Collection.Find(x => x.NormalizedName == normalizedRoleName).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<IdentityResult> CreateAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.CreateAsync((WrappedIdentityRole)role, cancellationToken);
+            await Collection.InsertOneAsync((MongoRole)role, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> UpdateAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.UpdateAsync((WrappedIdentityRole)role, cancellationToken);
+            await Collection.ReplaceOneAsync(x => x.Id == ((MongoRole)role).Id, (MongoRole)role, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> DeleteAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> DeleteAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.DeleteAsync((WrappedIdentityRole)role, cancellationToken);
+            await Collection.DeleteOneAsync(x => x.Id == ((MongoRole)role).Id, null, cancellationToken);
+
+            return IdentityResult.Success;
         }
 
         public Task<string> GetRoleIdAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.GetRoleIdAsync((WrappedIdentityRole)role, cancellationToken);
+            return Task.FromResult(((MongoRole)role).Id);
         }
 
         public Task<string> GetRoleNameAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.GetRoleNameAsync((WrappedIdentityRole)role, cancellationToken);
-        }
-
-        public Task SetRoleNameAsync(IRole role, string roleName, CancellationToken cancellationToken)
-        {
-            return innerStore.SetRoleNameAsync((WrappedIdentityRole)role, roleName, cancellationToken);
+            return Task.FromResult(((MongoRole)role).Name);
         }
 
         public Task<string> GetNormalizedRoleNameAsync(IRole role, CancellationToken cancellationToken)
         {
-            return innerStore.GetNormalizedRoleNameAsync((WrappedIdentityRole)role, cancellationToken);
+            return Task.FromResult(((MongoRole)role).NormalizedName);
+        }
+
+        public Task SetRoleNameAsync(IRole role, string roleName, CancellationToken cancellationToken)
+        {
+            ((MongoRole)role).Name = roleName;
+
+            return TaskHelper.Done;
         }
 
         public Task SetNormalizedRoleNameAsync(IRole role, string normalizedName, CancellationToken cancellationToken)
         {
-            return innerStore.SetNormalizedRoleNameAsync((WrappedIdentityRole)role, normalizedName, cancellationToken);
+            ((MongoRole)role).NormalizedName = normalizedName;
+
+            return TaskHelper.Done;
         }
     }
 }

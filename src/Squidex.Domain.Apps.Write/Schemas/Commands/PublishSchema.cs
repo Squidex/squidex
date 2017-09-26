@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class PublishSchema : SchemaAggregateCommand
+    public sealed class PublishSchema : SchemaAggregateCommand
     {
     }
 }

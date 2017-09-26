@@ -16,12 +16,12 @@ namespace Squidex.Infrastructure.Assets
         {
         }
 
-        public AssetNotFoundException(string message) 
+        public AssetNotFoundException(string message)
             : base(message)
         {
         }
 
-        public AssetNotFoundException(string message, Exception inner) 
+        public AssetNotFoundException(string message, Exception inner)
             : base(message, inner)
         {
         }

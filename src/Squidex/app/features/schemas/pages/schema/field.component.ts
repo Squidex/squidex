@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     createProperties,
@@ -25,8 +25,6 @@ import {
     ]
 })
 export class FieldComponent implements OnInit {
-    public dropdown = new ModalView(false, true);
-
     @Input()
     public field: FieldDto;
 
@@ -34,22 +32,27 @@ export class FieldComponent implements OnInit {
     public schemas: SchemaDto[];
 
     @Output()
-    public hiding = new EventEmitter<FieldDto>();
+    public locking = new EventEmitter();
 
     @Output()
-    public showing = new EventEmitter<FieldDto>();
+    public hiding = new EventEmitter();
 
     @Output()
-    public saving= new EventEmitter<FieldDto>();
+    public showing = new EventEmitter();
 
     @Output()
-    public enabling = new EventEmitter<FieldDto>();
+    public saving= new EventEmitter();
 
     @Output()
-    public disabling = new EventEmitter<FieldDto>();
+    public enabling = new EventEmitter();
 
     @Output()
-    public deleting = new EventEmitter<FieldDto>();
+    public disabling = new EventEmitter();
+
+    @Output()
+    public deleting = new EventEmitter();
+
+    public dropdown = new ModalView(false, true);
 
     public isEditing = false;
     public selectedTab = 0;
@@ -59,7 +62,7 @@ export class FieldComponent implements OnInit {
     }
 
     public editFormSubmitted = false;
-    public editForm: FormGroup =
+    public editForm =
         this.formBuilder.group({
             label: ['',
                 [
@@ -79,7 +82,19 @@ export class FieldComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.resetForm();
+        this.resetEditForm();
+    }
+
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
+    }
+
+    public selectTab(tab: number) {
+        this.selectedTab = tab;
+    }
+
+    public cancel() {
+        this.resetEditForm();
     }
 
     public save() {
@@ -92,30 +107,27 @@ export class FieldComponent implements OnInit {
                 new FieldDto(
                     this.field.fieldId,
                     this.field.name,
+                    this.field.isLocked,
                     this.field.isHidden,
                     this.field.isHidden,
                     this.field.partitioning,
                     properties);
 
-            this.saving.emit(field);
+            this.emitSaving(field);
         }
     }
 
-    public cancel() {
-        this.resetForm();
+    private emitSaving(field: FieldDto) {
+        this.saving.emit(field);
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
-    }
-
-    private resetForm() {
+    private resetEditForm() {
         this.editFormSubmitted = false;
         this.editForm.reset(this.field.properties);
+
+        if (this.field.isLocked) {
+            this.editForm.disable();
+        }
 
         this.isEditing = false;
     }

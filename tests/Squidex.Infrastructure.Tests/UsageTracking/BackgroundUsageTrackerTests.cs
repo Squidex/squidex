@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FakeItEasy;
 using FluentAssertions;
-using Moq;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -19,13 +19,13 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public class BackgroundUsageTrackerTests
     {
-        private readonly Mock<IUsageStore> usageStore = new Mock<IUsageStore>();
-        private readonly Mock<ISemanticLog> log = new Mock<ISemanticLog>();
+        private readonly IUsageStore usageStore = A.Fake<IUsageStore>();
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly BackgroundUsageTracker sut;
 
         public BackgroundUsageTrackerTests()
         {
-            sut = new BackgroundUsageTracker(usageStore.Object, log.Object);
+            sut = new BackgroundUsageTracker(usageStore, log);
         }
 
         [Fact]
@@ -65,7 +65,8 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(date.AddDays(7), 17, 22)
             };
 
-            usageStore.Setup(x => x.QueryAsync("key", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31))).Returns(Task.FromResult(originalData));
+            A.CallTo(() => usageStore.QueryAsync("key", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
+                .Returns(originalData);
 
             var result = await sut.GetMonthlyCalls("key", date);
 
@@ -86,7 +87,8 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(dateFrom.AddDays(7), 17, 22)
             };
 
-            usageStore.Setup(x => x.QueryAsync("key", dateFrom, dateTo)).Returns(Task.FromResult(originalData));
+            A.CallTo(() => usageStore.QueryAsync("key", dateFrom, dateTo))
+                .Returns(originalData);
 
             var result = await sut.QueryAsync("key", dateFrom, dateTo);
 
@@ -113,7 +115,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             await Task.Delay(100);
 
-            usageStore.Verify(x => x.TrackUsagesAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<double>(), It.IsAny<long>()), Times.Never());
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<double>.Ignored, A<long>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -121,17 +123,14 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var today = DateTime.Today;
 
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key1", 1.0, 1000))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key1", 1.0, 1000))
+                .Returns(TaskHelper.Done);
 
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key2", 1.5, 5000))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key2", 1.5, 5000))
+                .Returns(TaskHelper.Done);
 
-            usageStore.Setup(x => x.TrackUsagesAsync(today, "key3", 0.9, 15000))
-                .Returns(TaskHelper.Done)
-                .Verifiable();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key3", 0.9, 15000))
+                .Returns(TaskHelper.Done);
 
             await sut.TrackAsync("key1", 1, 1000);
 
@@ -143,10 +142,11 @@ namespace Squidex.Infrastructure.UsageTracking
             await sut.TrackAsync("key3", 0.5, 6000);
 
             sut.Next();
+            sut.Dispose();
 
-            await Task.Delay(100);
-
-            usageStore.VerifyAll();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key1", 1.0, 1000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key2", 1.5, 5000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key3", 0.9, 15000)).MustHaveHappened();
         }
     }
 }

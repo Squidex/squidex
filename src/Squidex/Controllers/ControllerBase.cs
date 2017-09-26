@@ -9,6 +9,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
@@ -20,6 +21,8 @@ namespace Squidex.Controllers
 
         protected ControllerBase(ICommandBus commandBus)
         {
+            Guard.NotNull(commandBus, nameof(commandBus));
+
             CommandBus = commandBus;
         }
 

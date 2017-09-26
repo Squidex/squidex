@@ -9,14 +9,14 @@
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Write.Apps;
 using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
+using Squidex.Domain.Apps.Write.Webhooks;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Pipeline.CommandHandlers;
-
-// ReSharper disable UnusedAutoPropertyAccessor.Local
+using Squidex.Pipeline.CommandMiddlewares;
 
 namespace Squidex.Config.Domain
 {
@@ -31,48 +31,60 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EnrichWithExpectedVersionHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<ETagCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithTimestampHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithTimestampCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithActorHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithActorCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithAppIdHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithAppIdCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<EnrichWithSchemaIdHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<EnrichWithSchemaIdCommandMiddleware>()
+                .As<ICommandMiddleware>()
+                .SingleInstance();
+
+            builder.RegisterType<JintScriptEngine>()
+                .As<IScriptEngine>()
+                .SingleInstance();
+
+            builder.RegisterType<ContentVersionLoader>()
+                .As<IContentVersionLoader>()
                 .SingleInstance();
 
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<AppCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<AppCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<AssetCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<AssetCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<ContentCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<ContentCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<SchemaCommandHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<SchemaCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<SetVersionAsETagHandler>()
-                .As<ICommandHandler>()
+            builder.RegisterType<WebhookCommandMiddleware>()
+                .As<ICommandMiddleware>()
+                .SingleInstance();
+
+            builder.RegisterType<ETagCommandMiddleware>()
+                .As<ICommandMiddleware>()
                 .SingleInstance();
 
             builder.Register<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)))
@@ -87,11 +99,15 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
+            builder.Register<DomainObjectFactoryFunction<WebhookDomainObject>>(c => (id => new WebhookDomainObject(id, -1)))
+                .AsSelf()
+                .SingleInstance();
+
             builder.Register<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
                 {
                     var fieldRegistry = c.Resolve<FieldRegistry>();
 
-                    return (id => new SchemaDomainObject(id, -1, fieldRegistry));
+                    return id => new SchemaDomainObject(id, -1, fieldRegistry);
                 })
                 .AsSelf()
                 .SingleInstance();

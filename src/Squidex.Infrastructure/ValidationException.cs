@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure
             this.errors = errors ?? FallbackErrors;
         }
 
-        public ValidationException(string message, Exception inner, params ValidationError[] errors) 
+        public ValidationException(string message, Exception inner, params ValidationError[] errors)
             : base(message, inner)
         {
             this.errors = errors != null ? errors.ToList() : FallbackErrors;

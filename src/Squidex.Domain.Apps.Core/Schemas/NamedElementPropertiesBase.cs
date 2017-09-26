@@ -19,7 +19,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Label
         {
-            get { return label; }
+            get
+            {
+                return label;
+            }
             set
             {
                 ThrowIfFrozen();
@@ -30,7 +33,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Hints
         {
-            get { return hints; }
+            get
+            {
+                return hints;
+            }
             set
             {
                 ThrowIfFrozen();

@@ -1,0 +1,33 @@
+<form [formGroup]="editForm" (ngSubmit)="saveSchema()">
+    <div class="modal-header">
+        <h4 class="modal-title">Scripts</h4>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancel()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <ul class="nav nav-tabs">
+            <li class="nav-item" *ngFor="let script of scripts">
+                <a class="nav-link" [class.active]="selectedField === 'script' + script" (click)="selectField('script' + script)">{{script}}</a>
+            </li>
+        </ul>
+
+        <div class="form-group">
+            <div *ngFor="let script of scripts">
+                <div *ngIf="selectedField === 'script' + script">
+                    <sqx-jscript-editor name="script" [formControlName]="'script' + script"></sqx-jscript-editor>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="clearfix">
+            <button type="reset" class="float-left btn btn-secondary" (click)="cancel()" [disabled]="editFormSubmitted">Cancel</button>
+            <button type="submit" class="float-right btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+

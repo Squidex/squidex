@@ -12,15 +12,15 @@ import { Subscription } from 'rxjs';
 import {
     AuthService,
     ComponentBase,
+    DialogService,
     ImmutableArray,
     MessageBus,
-    NotificationService,
     Pager,
     UserDto,
     UserManagementService
 } from 'shared';
 
-import { UserCreated, UserUpdated } from './messages';
+import { UserCreated, UserUpdated } from './../messages';
 
 @Component({
     selector: 'sqx-users-page',
@@ -38,12 +38,12 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
     public usersFilter = new FormControl();
     public usersQuery = '';
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly userManagementService: UserManagementService,
         private readonly authService: AuthService,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications);
+        super(dialogs);
     }
 
     public ngOnDestroy() {
@@ -55,19 +55,14 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
         this.userCreatedSubscription =
             this.messageBus.of(UserCreated)
                 .subscribe(message => {
-                    const user = new UserDto(message.id, message.email, message.displayName, message.pictureUrl, false);
-
-                    this.usersItems = this.usersItems.pushFront(user);
+                    this.usersItems = this.usersItems.pushFront(message.user);
                     this.usersPager = this.usersPager.incrementCount();
                 });
 
         this.userUpdatedSubscription =
             this.messageBus.of(UserUpdated)
                 .subscribe(message => {
-                    this.usersItems =
-                        this.usersItems.replaceAll(
-                            u => u.id === message.id,
-                        u => new UserDto(u.id, message.email, message.displayName, u.pictureUrl, u.isLocked));
+                    this.usersItems = this.usersItems.replaceBy('id', message.user);
                 });
 
         this.currentUserId = this.authService.user!.id;
@@ -96,25 +91,19 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
             });
     }
 
-    public lock(id: string) {
-        this.userManagementService.lockUser(id)
+    public lock(user: UserDto) {
+        this.userManagementService.lockUser(user.id)
             .subscribe(() => {
-                this.usersItems =
-                    this.usersItems.replaceAll(
-                        u => u.id === id,
-                        u => new UserDto(u.id, u.email, u.displayName, u.pictureUrl, true));
+                this.usersItems = this.usersItems.replaceBy('id', user.lock());
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public unlock(id: string) {
-        this.userManagementService.unlockUser(id)
+    public unlock(user: UserDto) {
+        this.userManagementService.unlockUser(user.id)
             .subscribe(() => {
-                this.usersItems =
-                    this.usersItems.replaceAll(
-                        u => u.id === id,
-                        u => new UserDto(u.id, u.email, u.displayName, u.pictureUrl, false));
+                this.usersItems = this.usersItems.replaceBy('id', user.unlock());
             }, error => {
                 this.notifyError(error);
             });

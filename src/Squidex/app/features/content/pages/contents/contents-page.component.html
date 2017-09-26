@@ -9,12 +9,34 @@
                 </button>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="findInput.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" #findInput [formControl]="contentsFilter" placeholder="Search for content" />
+                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
+
+                    <a class="expand-search" (click)="searchModal.toggle()" #archive>
+                        <i class="icon-caret-down"></i>
+                    </a>
                 </form>
+
+                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
+                    Click this icon to show the advanced search menu and to show the archive!
+                </sqx-onboarding-tooltip>
+
+                <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
+                    Search for content using full text search over all fields and languages!
+                </sqx-onboarding-tooltip>
+                
+                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="inputFind">
+                    <sqx-search-form
+                        [canArchive]="!isReadOnly"
+                        (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
+                        [query]="contentsFilter.value"
+                        (archivedChanged)="updateArchive($event)"
+                        [archived]="isArchive">
+                    </sqx-search-form>
+                </div>
                 
                 <span *ngIf="!isReadOnly && languages.length > 1">
                     <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
@@ -25,12 +47,16 @@
                 </button>
             </div>
 
-            <h3 class="panel-title" *ngIf="!isReadOnly">
+            <h3 class="panel-title" *ngIf="!isReadOnly && !isArchive">
                 Contents
+            </h3>
+            
+            <h3 class="panel-title" *ngIf="isArchive">
+                Archive
             </h3>
 
             <h3 class="panel-title" *ngIf="isReadOnly">
-                References
+                Refs
             </h3>
         </div>
 
@@ -67,13 +93,15 @@
                 </thead>
 
                 <tbody *ngIf="!isReadOnly">
-                    <ng-template ngFor let-content [ngForOf]="contentItems">
+                    <ng-template ngFor let-content [ngForOf]="contentItems")>
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                             [languageCode]="languageSelected.iso2Code"
                             [schemaFields]="contentFields"
                             [schema]="schema"
                             (unpublishing)="unpublishContent(content)"
                             (publishing)="publishContent(content)"
+                            (archiving)="archiveContent(content)"
+                            (restoring)="restoreContent(content)"
                             (deleting)="deleteContent(content)"></tr>
                         <tr class="spacer"></tr>
                     </ng-template>

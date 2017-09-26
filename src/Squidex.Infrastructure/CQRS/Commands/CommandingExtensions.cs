@@ -29,9 +29,14 @@ namespace Squidex.Infrastructure.CQRS.Commands
             return handler.UpdateAsync<T>(context, x =>
             {
                 updater(x);
-                
+
                 return TaskHelper.Done;
             });
+        }
+
+        public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)
+        {
+            return commandMiddleware.HandleAsync(context, () => TaskHelper.Done);
         }
     }
 }

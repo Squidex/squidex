@@ -13,17 +13,19 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Net.Http.Headers;
 using Squidex.Pipeline;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Config.Web
 {
     public static class WebUsages
     {
         public static void UseMyCors(this IApplicationBuilder app)
         {
-            app.UseCors(builder => builder.AllowAnyOrigin());
-
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
         }
+
         public static void UseMyForwardingRules(this IApplicationBuilder app)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions

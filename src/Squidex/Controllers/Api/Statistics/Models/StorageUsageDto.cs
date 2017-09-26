@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Controllers.Api.Statistics.Models
 {
-    public class StorageUsageDto
+    public sealed class StorageUsageDto
     {
         /// <summary>
         /// The date when the usage was tracked.

@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Assets
 {
-    [TypeName("AssetDeletedEvent")]
+    [EventType(nameof(AssetDeleted))]
     public sealed class AssetDeleted : AssetEvent
     {
         public long DeletedSize { get; set; }

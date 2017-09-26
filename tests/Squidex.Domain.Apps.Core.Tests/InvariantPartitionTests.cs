@@ -11,9 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-// ReSharper disable RedundantCast
-// ReSharper disable UseCollectionCountProperty
-
 namespace Squidex.Domain.Apps.Core
 {
     public sealed class InvariantPartitionTests
@@ -33,7 +30,7 @@ namespace Squidex.Domain.Apps.Core
         public void Should_provide_master()
         {
             var sut = InvariantPartitioning.Instance;
-            
+
             Assert.Equal("iv", sut.Master.Key);
             Assert.Equal("Invariant", sut.Master.Name);
 

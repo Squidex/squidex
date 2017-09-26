@@ -32,9 +32,11 @@ export class LanguagesService {
     public getLanguages(): Observable<LanguageDto[]> {
         const url = this.apiUrl.buildUrl('api/languages');
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new LanguageDto(

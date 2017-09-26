@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.UsageTracking;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Pipeline
 {
     public sealed class AppTrackingMiddleware

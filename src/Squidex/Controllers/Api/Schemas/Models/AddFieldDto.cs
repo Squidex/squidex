@@ -31,4 +31,3 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public FieldPropertiesDto Properties { get; set; }
     }
 }
-

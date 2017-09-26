@@ -16,12 +16,12 @@ namespace Squidex.Infrastructure
         {
         }
 
-        public ConfigurationException(string message) 
+        public ConfigurationException(string message)
             : base(message)
         {
         }
 
-        public ConfigurationException(string message, Exception inner) 
+        public ConfigurationException(string message, Exception inner)
             : base(message, inner)
         {
         }

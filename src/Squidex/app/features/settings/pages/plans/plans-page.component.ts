@@ -5,7 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     ApiUrlConfig,
@@ -14,10 +16,8 @@ import {
     AppsStoreService,
     AuthService,
     ChangePlanDto,
-    FileHelper,
-    NotificationService,
-    PlansService,
-    Version
+    DialogService,
+    PlansService
 } from 'shared';
 
 @Component({
@@ -25,8 +25,9 @@ import {
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html'
 })
-export class PlansPageComponent extends AppComponentBase implements OnInit {
-    private version = new Version();
+export class PlansPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+    private queryParamsSubscription: Subscription;
+    private overridePlanId: string;
 
     public portalUrl = this.apiUrl.buildUrl('/identity-server/account/portal');
 
@@ -35,23 +36,36 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
-        private readonly authService: AuthService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly plansService: PlansService,
+        private readonly route: ActivatedRoute,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
+    }
+
+    public ngOnDestroy() {
+        this.queryParamsSubscription.unsubscribe();
     }
 
     public ngOnInit() {
+        this.queryParamsSubscription =
+            this.route.queryParams.subscribe(params => {
+                this.overridePlanId = params['planId'];
+            });
+
         this.load();
     }
 
     public load(showInfo = false) {
         this.appNameOnce()
-            .switchMap(app => this.plansService.getPlans(app, this.version).retry(2))
+            .switchMap(app => this.plansService.getPlans(app).retry(2))
             .subscribe(dto => {
-                this.plans = dto;
+                if (this.overridePlanId) {
+                    this.plans = dto.changePlanId(this.overridePlanId);
+                } else {
+                    this.plans = dto;
+                }
 
                 this.planOwned = !dto.planOwner || (dto.planOwner === this.authService.user!.id);
 
@@ -67,42 +81,18 @@ export class PlansPageComponent extends AppComponentBase implements OnInit {
         this.isDisabled = true;
 
         this.appNameOnce()
-            .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.version))
+            .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.plans.version))
             .subscribe(dto => {
-                this.plans =
-                    new AppPlansDto(planId,
-                         this.plans.planOwner,
-                         this.plans.hasPortal,
-                         this.plans.hasConfigured,
-                         this.plans.plans);
-                this.isDisabled = false;
+                if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
+                    window.location.href = dto.payload.redirectUri;
+                } else {
+                    this.plans = this.plans.changePlanId(planId, dto.version);
+                    this.isDisabled = false;
+                }
             }, error => {
                 this.notifyError(error);
-
                 this.isDisabled = false;
             });
-    }
-
-    public formatSize(count: number): string {
-        return FileHelper.fileSize(count);
-    }
-
-    public formatCalls(count: number): string | null {
-        if (count > 1000) {
-            count = count / 1000;
-
-            if (count < 10) {
-                count = Math.round(count * 10) / 10;
-            } else {
-                count = Math.round(count);
-            }
-
-            return count + 'k';
-        } else if (count < 0) {
-            return null;
-        } else {
-            return count.toString();
-        }
     }
 }
 

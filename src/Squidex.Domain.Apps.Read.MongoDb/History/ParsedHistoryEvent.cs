@@ -12,8 +12,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
 
-// ReSharper disable LoopCanBeConvertedToQuery
-
 namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     internal sealed class ParsedHistoryEvent : IHistoryEventEntity
@@ -44,6 +42,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
         public Instant LastModified
         {
             get { return inner.LastModified; }
+        }
+
+        public long Version
+        {
+            get { return inner.Version; }
         }
 
         public string Channel

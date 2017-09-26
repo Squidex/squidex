@@ -14,6 +14,7 @@ import { PanelComponent } from './panel.component';
 })
 export class PanelContainerDirective implements AfterViewInit, OnDestroy {
     private readonly panels: PanelComponent[] = [];
+    private containerWidth = 0;
     private isInit = false;
 
     constructor(
@@ -27,12 +28,12 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         this.invalidate();
     }
 
-    public ngAfterViewInit() {
-        this.invalidate(true);
-    }
-
     public ngOnDestroy() {
         this.isInit = true;
+    }
+
+    public ngAfterViewInit() {
+        this.invalidate({ force: true, resize: true });
     }
 
     public push(panel: PanelComponent) {
@@ -47,14 +48,16 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         this.invalidate();
     }
 
-    public invalidate(force = false) {
-        this.isInit = this.isInit || force;
+    public invalidate(params?: { force: boolean, resize: boolean }) {
+        this.isInit = this.isInit || (params && params.force) === true;
 
         if (!this.isInit) {
             return;
         }
 
-        const containerWidth = this.element.nativeElement.getBoundingClientRect().width;
+        if (params && params.resize) {
+            this.containerWidth = this.element.nativeElement.getBoundingClientRect().width;
+        }
 
         let currentPosition = 0;
         let currentLayer = this.panels.length * 10;
@@ -64,10 +67,10 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         for (let panel of this.panels) {
             const panelRoot = panel.panel.nativeElement;
 
-            let width = panelRoot.getBoundingClientRect().width;
+            let width = panel.clientWidth;
 
             if (panel.expand && panel === last) {
-                width = containerWidth - currentPosition;
+                width = this.containerWidth - currentPosition;
 
                 panel.panelWidth = width + 'px';
             }
@@ -82,7 +85,7 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
             currentLayer -= 10;
         }
 
-        const diff = currentPosition - containerWidth;
+        const diff = currentPosition - this.containerWidth;
 
         if (diff > 0) {
             this.element.nativeElement.scrollLeft = diff;

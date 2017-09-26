@@ -17,43 +17,34 @@ namespace Squidex.Infrastructure.CQRS.Commands
     public sealed class DefaultDomainObjectRepository : IDomainObjectRepository
     {
         private readonly IStreamNameResolver nameResolver;
-        private readonly IDomainObjectFactory factory;
         private readonly IEventStore eventStore;
         private readonly EventDataFormatter formatter;
 
-        public DefaultDomainObjectRepository(
-            IDomainObjectFactory factory, 
-            IEventStore eventStore,
-            IStreamNameResolver nameResolver,
-            EventDataFormatter formatter)
+        public DefaultDomainObjectRepository(IEventStore eventStore, IStreamNameResolver nameResolver, EventDataFormatter formatter)
         {
-            Guard.NotNull(factory, nameof(factory));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(nameResolver, nameof(nameResolver));
 
-            this.factory = factory;
             this.formatter = formatter;
             this.eventStore = eventStore;
             this.nameResolver = nameResolver;
         }
 
-        public async Task<TDomainObject> GetByIdAsync<TDomainObject>(Guid id, long? expectedVersion = null) where TDomainObject : class, IAggregate
+        public async Task LoadAsync(IAggregate domainObject, long? expectedVersion = null)
         {
-            var streamName = nameResolver.GetStreamName(typeof(TDomainObject), id);
+            var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id);
 
             var events = await eventStore.GetEventsAsync(streamName);
 
             if (events.Count == 0)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(TDomainObject));
+                throw new DomainObjectNotFoundException(domainObject.Id.ToString(), domainObject.GetType());
             }
-
-            var domainObject = (TDomainObject)factory.CreateNew(typeof(TDomainObject), id);
 
             foreach (var storedEvent in events)
             {
-                var envelope = ParseOrNull(storedEvent);
+                var envelope = ParseKnownEvent(storedEvent);
 
                 if (envelope != null)
                 {
@@ -63,10 +54,8 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             if (expectedVersion != null && domainObject.Version != expectedVersion.Value)
             {
-                throw new DomainObjectVersionException(id.ToString(), typeof(TDomainObject), domainObject.Version, expectedVersion.Value);
+                throw new DomainObjectVersionException(domainObject.Id.ToString(), domainObject.GetType(), domainObject.Version, expectedVersion.Value);
             }
-
-            return domainObject;
         }
 
         public async Task SaveAsync(IAggregate domainObject, ICollection<Envelope<IEvent>> events, Guid commitId)
@@ -90,7 +79,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
             }
         }
 
-        private Envelope<IEvent> ParseOrNull(StoredEvent storedEvent)
+        private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)
         {
             try
             {

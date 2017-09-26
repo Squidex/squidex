@@ -17,13 +17,11 @@ using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
-// ReSharper disable ClassNeverInstantiated.Local
-
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
     public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
     {
-        public MongoAssetRepository(IMongoDatabase database) 
+        public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
         }
@@ -35,7 +33,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Ascending(x => x.IsDeleted).Descending(x => x.LastModified).Ascending(x => x.FileName).Ascending(x => x.MimeType));
+            return collection.Indexes.CreateOneAsync(
+                Index.Ascending(x => x.AppId)
+                    .Ascending(x => x.FileName)
+                    .Ascending(x => x.MimeType)
+                    .Descending(x => x.LastModified));
         }
 
         public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, IList<Guid> assetIds)
@@ -82,8 +84,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.AppId, appId),
-                Filter.Eq(x => x.IsDeleted, false)
+                Filter.Eq(x => x.AppId, appId)
             };
 
             if (ids != null && ids.Count > 0)

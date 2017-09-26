@@ -25,7 +25,7 @@ namespace Squidex.Controllers.Api.Users
     [MustBeAdministrator]
     [ApiExceptionFilter]
     [SwaggerIgnore]
-    public class UserManagementController : Controller
+    public sealed class UserManagementController : Controller
     {
         private readonly UserManager<IUser> userManager;
         private readonly IUserFactory userFactory;

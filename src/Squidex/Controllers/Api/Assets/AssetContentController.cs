@@ -25,8 +25,8 @@ namespace Squidex.Controllers.Api.Assets
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Assets")]
-    public class AssetContentController : ControllerBase
+    [SwaggerTag(nameof(Assets))]
+    public sealed class AssetContentController : ControllerBase
     {
         private readonly IAssetStore assetStorage;
         private readonly IAssetRepository assetRepository;
@@ -99,7 +99,6 @@ namespace Squidex.Controllers.Api.Assets
                                 await destinationStream.CopyToAsync(bodyStream);
                             }
                         }
-
                     }
                 }
 

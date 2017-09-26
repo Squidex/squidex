@@ -17,12 +17,12 @@ import {
     AssetDto,
     AssetsService,
     AssetUpdated,
+    AuthService,
+    DialogService,
     ImmutableArray,
     MessageBus,
-    NotificationService
+    Types
 } from 'shared';
-
-const NOOP = () => { /* NOOP */ };
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
@@ -36,19 +36,23 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
-    private changeCallback: (value: any) => void = NOOP;
-    private touchedCallback: () => void = NOOP;
+    private callChange = (v: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, notifications: NotificationService,
+    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly assetsService: AssetsService,
         private readonly messageBus: MessageBus
     ) {
-        super(notifications, apps);
+        super(dialogs, apps, authService);
+    }
+
+    public ngOnDestroy() {
+        this.assetUpdatedSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -56,22 +60,15 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.sender !== this) {
-                        this.oldAssets =
-                            this.oldAssets.replaceAll(
-                                a => a.id === event.assetDto.id,
-                                a => event.assetDto);
+                        this.oldAssets = this.oldAssets.replaceBy('id', event.assetDto);
                     }
                 });
     }
 
-    public ngOnDestroy() {
-        this.assetUpdatedSubscription.unsubscribe();
-    }
-
-    public writeValue(value: any) {
+    public writeValue(value: string[]) {
         this.oldAssets = ImmutableArray.empty<AssetDto>();
 
-        if (value && value.length > 0) {
+        if (Types.isArrayOfString(value) && value.length > 0) {
             const assetIds: string[] = value;
 
             this.appNameOnce()
@@ -87,11 +84,11 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public registerOnChange(fn: any) {
-        this.changeCallback = fn;
+        this.callChange = fn;
     }
 
     public registerOnTouched(fn: any) {
-        this.touchedCallback = fn;
+        this.callTouched = fn;
     }
 
     public addFiles(files: FileList) {
@@ -132,7 +129,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.publish(new AssetUpdated(asset, this));
+        this.messageBus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {
@@ -146,7 +143,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
             ids = null;
         }
 
-        this.touchedCallback();
-        this.changeCallback(ids);
+        this.callTouched();
+        this.callChange(ids);
     }
 }

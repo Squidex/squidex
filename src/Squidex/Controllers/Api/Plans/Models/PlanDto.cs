@@ -8,7 +8,7 @@
 
 namespace Squidex.Controllers.Api.Plans.Models
 {
-    public class PlanDto
+    public sealed class PlanDto
     {
         /// <summary>
         /// The id of the plan.

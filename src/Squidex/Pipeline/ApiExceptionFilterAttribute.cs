@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Controllers.Api;
 using Squidex.Infrastructure;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Pipeline
 {
     public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter
@@ -24,18 +22,14 @@ namespace Squidex.Pipeline
 
         private static void AddHandler<T>(Func<T, IActionResult> handler) where T : Exception
         {
-            Handlers.Add(ex =>
-            {
-                var typed = ex as T;
-
-                return typed != null ? handler(typed) : null;
-            });
+            Handlers.Add(ex => ex is T typed ? handler(typed) : null);
         }
 
         static ApiExceptionFilterAttribute()
         {
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
             AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
+            AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
         }
@@ -47,24 +41,36 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnDomainObjectVersionException(DomainObjectVersionException ex)
         {
-            return new ObjectResult(new ErrorDto { Message = ex.Message }) { StatusCode = 412 };
+            return ErrorResult(412, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnDomainException(DomainException ex)
         {
-            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message });
+            return ErrorResult(400, new ErrorDto { Message = ex.Message });
+        }
+
+        private static IActionResult OnDomainForbiddenException(DomainForbiddenException ex)
+        {
+            return ErrorResult(403, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnValidationException(ValidationException ex)
         {
-            return new BadRequestObjectResult(new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+            return ErrorResult(400, new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+        }
+
+        private static IActionResult ErrorResult(int statusCode, ErrorDto error)
+        {
+            error.StatusCode = statusCode;
+
+            return new ObjectResult(error) { StatusCode = statusCode };
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (!context.ModelState.IsValid)
             {
-                var errors = 
+                var errors =
                     context.ModelState.SelectMany(m =>
                         {
                             return m.Value.Errors.Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))

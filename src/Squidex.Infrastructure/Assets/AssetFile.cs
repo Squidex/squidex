@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Assets
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
             Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
             Guard.NotNull(openAction, nameof(openAction));
-            Guard.GreaterThan(fileSize, 0, nameof(fileSize));
+            Guard.GreaterEquals(fileSize, 0, nameof(fileSize));
 
             FileName = fileName;
             FileSize = fileSize;

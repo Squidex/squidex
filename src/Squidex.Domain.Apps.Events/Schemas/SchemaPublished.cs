@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [TypeName("SchemaPublishedEvent")]
-    public class SchemaPublished : SchemaEvent
+    [EventType(nameof(SchemaPublished))]
+    public sealed class SchemaPublished : SchemaEvent
     {
     }
 }

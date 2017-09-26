@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("JsonField")]
+    [TypeName(nameof(JsonField))]
     public sealed class JsonFieldProperties : FieldProperties
     {
         public override JToken GetDefaultValue()

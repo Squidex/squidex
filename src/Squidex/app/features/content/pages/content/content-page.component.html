@@ -4,9 +4,9 @@
     <sqx-panel panelWidth="53rem">
         <div class="panel-header">
             <div class="panel-title-row">
-                <div class="float-right">
+                <div class="float-right" *ngIf="!content || content.status !== 'Archived'">
                     <span *ngIf="isNewMode">
-                        <button type="button" class="btn btn-default" (click)="saveAsDraft()" title="CTRL + S">
+                        <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
                             Save as Draft
                         </button>
 
@@ -19,15 +19,18 @@
                             Save
                         </button>
                     </span>
-                </div>
                     
-                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                </div>
                 
                 <h3 class="panel-title" *ngIf="isNewMode">
                     New Content
                 </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode">
+                <h3 class="panel-title" *ngIf="!isNewMode && content.status !== 'Archived'">
                     Edit Content
+                </h3>
+                <h3 class="panel-title" *ngIf="!isNewMode && content.status === 'Archived'">
+                    Show Content
                 </h3>
             </div>
 
@@ -43,35 +46,19 @@
                 </div>
             </div>
             <div class="panel-sidebar">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" *ngIf="!isNewMode">
+                <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
                     <i class="icon-time"></i>
                 </a>
                 <a class="panel-link" routerLink="assets" routerLinkActive="active">
                     <i class="icon-media"></i>
                 </a>
+
+                <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
+                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+                </sqx-onboarding-tooltip>
             </div>
         </div>
     </sqx-panel>
 </form>
 
 <router-outlet></router-outlet>
-
-<div class="modal" *sqxModalView="cancelDialog;onRoot:true" [@fade]>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Unsaved changes</h4>
-            </div>
-
-            <div class="modal-body">
-                You have unsaved changes, do you want to close the current content view?
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" (click)="confirmLeave()">Yes</button>
-                <button type="button" class="btn btn-secondary" (click)="cancelLeave()">No</button>
-            </div>
-        </div>
-    </div>
-</div>

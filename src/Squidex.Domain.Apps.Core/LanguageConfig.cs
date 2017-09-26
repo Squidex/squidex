@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core
             Guard.NotNull(language, nameof(language));
 
             Language = language;
-            
+
             IsOptional = isOptional;
 
             Fallback = fallback ?? ImmutableList<Language>.Empty;

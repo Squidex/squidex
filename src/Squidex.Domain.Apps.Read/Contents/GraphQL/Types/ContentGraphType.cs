@@ -7,29 +7,30 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
-using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
     {
-        private readonly Schema schema;
+        private readonly ISchemaEntity schema;
         private readonly IGraphQLContext context;
 
-        public ContentGraphType(Schema schema, IGraphQLContext context)
+        public ContentGraphType(ISchemaEntity schema, IGraphQLContext context)
         {
-            this.schema = schema;
             this.context = context;
+            this.schema = schema;
 
             Name = $"{schema.Name.ToPascalCase()}Dto";
         }
 
         public void Initialize()
         {
-            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
+            var schemaName = schema.SchemaDef.Properties.Label.WithFallback(schema.Name);
 
             AddField(new FieldType
             {
@@ -81,11 +82,24 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
-                Name = "data",
-                Resolver = Resolver(x => x.Data),
-                ResolvedType = new NonNullGraphType(new ContentDataGraphType(schema, context)),
-                Description = $"The data of the {schemaName} content."
+                Name = "url",
+                Resolver = context.ResolveContentUrl(schema),
+                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                Description = $"The url to the the {schemaName} content."
             });
+
+            var dataType = new ContentDataGraphType(schema.SchemaDef, context);
+
+            if (dataType.Fields.Any())
+            {
+                AddField(new FieldType
+                {
+                    Name = "data",
+                    Resolver = Resolver(x => x.Data),
+                    ResolvedType = new NonNullGraphType(dataType),
+                    Description = $"The data of the {schemaName} content."
+                });
+            }
 
             Description = $"The structure of a {schemaName} content type.";
         }

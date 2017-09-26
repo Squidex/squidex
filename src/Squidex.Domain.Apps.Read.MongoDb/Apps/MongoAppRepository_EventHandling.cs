@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
@@ -41,14 +42,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             });
         }
 
-        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, a =>
-            {
-                a.Contributors.Remove(@event.ContributorId);
-            });
-        }
-
         protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, a =>
@@ -70,6 +63,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             return Collection.UpdateAsync(@event, headers, a =>
             {
                 a.Clients[@event.Id].Name = @event.Name;
+            });
+        }
+
+        protected Task On(AppClientChanged @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.Clients[@event.Id].IsReader = @event.IsReader;
             });
         }
 
@@ -106,6 +107,15 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             });
         }
 
+        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        {
+            return Collection.UpdateAsync(@event, headers, a =>
+            {
+                a.Contributors.Remove(@event.ContributorId);
+                a.ContributorIds = a.Contributors.Keys.ToList();
+            });
+        }
+
         protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, a =>
@@ -113,6 +123,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
                 var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
 
                 SimpleMapper.Map(@event, contributor);
+
+                a.ContributorIds = a.Contributors.Keys.ToList();
             });
         }
     }

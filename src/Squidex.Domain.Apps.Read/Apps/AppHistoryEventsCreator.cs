@@ -13,8 +13,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 
-// ReSharper disable UnusedParameter.Global
-
 namespace Squidex.Domain.Apps.Read.Apps
 {
     public class AppHistoryEventsCreator : HistoryEventsCreatorBase

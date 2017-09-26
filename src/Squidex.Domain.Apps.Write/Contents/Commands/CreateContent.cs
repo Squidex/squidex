@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
-    public class CreateContent : ContentDataCommand
+    public sealed class CreateContent : ContentDataCommand
     {
         public bool Publish { get; set; }
 

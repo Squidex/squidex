@@ -11,8 +11,6 @@ using System.Linq;
 using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
-// ReSharper disable ConvertToConstant.Local
-
 namespace Squidex.Infrastructure.CQRS
 {
     public class DomainObjectBaseTests
@@ -23,7 +21,7 @@ namespace Squidex.Infrastructure.CQRS
 
         private sealed class DO : DomainObjectBase
         {
-            public DO(Guid id, int version) 
+            public DO(Guid id, int version)
                 : base(id, version)
             {
             }
@@ -112,11 +110,11 @@ namespace Squidex.Infrastructure.CQRS
             var user1a = new DO(id1, 1);
 
             object user1b = new DO(id1, 2);
-            object user2  = new DO(id2, 2);
+            object user2a = new DO(id2, 2);
 
             Assert.True(user1a.Equals(user1b));
 
-            Assert.False(user1a.Equals(user2));
+            Assert.False(user1a.Equals(user2a));
         }
 
         [Fact]
@@ -127,7 +125,7 @@ namespace Squidex.Infrastructure.CQRS
 
             var user1a = new DO(id1, 1);
             var user1b = new DO(id1, 2);
-            var user2 =  new DO(id2, 2);
+            var user2 = new DO(id2, 2);
 
             Assert.Equal(user1a.GetHashCode(), user1b.GetHashCode());
 

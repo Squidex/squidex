@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         private readonly IPropertyAccessor internalAccessor;
-        
+
         public PropertyAccessor(Type targetType, PropertyInfo propertyInfo)
         {
             Guard.NotNull(targetType, nameof(targetType));
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Reflection
 
             internalAccessor = (IPropertyAccessor)Activator.CreateInstance(typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType), propertyInfo);
         }
-        
+
         public object Get(object target)
         {
             Guard.NotNull(target, nameof(target));

@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public class ShowField : FieldCommand
+    public sealed class ShowField : FieldCommand
     {
     }
 }

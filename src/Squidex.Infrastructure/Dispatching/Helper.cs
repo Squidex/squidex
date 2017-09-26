@@ -13,24 +13,24 @@ namespace Squidex.Infrastructure.Dispatching
 {
     internal static class Helper
     {
-        public static bool HasRightName(MethodInfo method)
+        public static bool HasMatchingName(this MethodInfo method, string name)
         {
-            return string.Equals(method.Name, "On", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(method.Name, name, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool HasRightReturnType<TOut>(MethodInfo method)
+        public static bool HasMatchingReturnType(this MethodInfo method, Type type)
         {
-            return method.ReturnType == typeof(TOut);
+            return method.ReturnType == type;
         }
 
-        public static bool HasRightParameters<TIn>(MethodInfo method)
+        public static bool HasMatchingParameters<TIn>(this MethodInfo method)
         {
             var parameters = method.GetParameters();
 
             return parameters.Length == 1 && typeof(TIn).IsAssignableFrom(parameters[0].ParameterType);
         }
 
-        public static bool HasRightParameters<TIn, TContext>(MethodInfo method)
+        public static bool HasMatchingParameters<TIn, TContext>(this MethodInfo method)
         {
             var parameters = method.GetParameters();
 

@@ -10,12 +10,12 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ComponentBase,
+    DialogService,
     EventConsumerDto,
     EventConsumersService,
     fadeAnimation,
     ImmutableArray,
-    ModalView,
-    NotificationService
+    ModalView
 } from 'shared';
 
 @Component({
@@ -26,63 +26,69 @@ import {
         fadeAnimation
     ]
 })
-export class EventConsumersPageComponent extends ComponentBase implements OnInit, OnDestroy {
+export class EventConsumersPageComponent extends ComponentBase implements OnDestroy, OnInit {
     private subscription: Subscription;
 
     public eventConsumerErrorDialog = new ModalView();
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(notifications: NotificationService,
+    constructor(dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super(notifications);
-    }
-
-    public ngOnInit() {
-        this.subscription =
-            Observable.timer(0, 4000)
-                .switchMap(_ => this.eventConsumersService.getEventConsumers())
-                .subscribe(dtos => {
-                    this.eventConsumers = ImmutableArray.of(dtos);
-                });
+        super(dialogs);
     }
 
     public ngOnDestroy() {
         this.subscription.unsubscribe();
     }
 
-    public start(name: string) {
-        this.eventConsumersService.startEventConsumer(name)
+    public ngOnInit() {
+        this.load(false, true);
+
+        this.subscription =
+            Observable.timer(4000, 4000).subscribe(() => {
+                this.load();
+            });
+    }
+
+    public load(showInfo = false, showError = false) {
+        this.eventConsumersService.getEventConsumers()
+            .subscribe(dtos => {
+                this.eventConsumers = ImmutableArray.of(dtos);
+
+                if (showInfo) {
+                    this.notifyInfo('Event Consumers reloaded.');
+                }
+            }, error => {
+                if (showError) {
+                    this.notifyError(error);
+                }
+            });
+    }
+
+    public start(consumer: EventConsumerDto) {
+        this.eventConsumersService.startEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, false, e.isResetting, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public stop(name: string) {
-        this.eventConsumersService.stopEventConsumer(name)
+    public stop(consumer: EventConsumerDto) {
+        this.eventConsumersService.stopEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, true, e.isResetting, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
             }, error => {
                 this.notifyError(error);
             });
     }
 
-    public reset(name: string) {
-        this.eventConsumersService.resetEventConsumer(name)
+    public reset(consumer: EventConsumerDto) {
+        this.eventConsumersService.resetEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers =
-                    this.eventConsumers.replaceAll(
-                        e => e.name === name,
-                        e => new EventConsumerDto(name, e.isStopped, true, e.error, e.position));
+                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
             }, error => {
                 this.notifyError(error);
             });

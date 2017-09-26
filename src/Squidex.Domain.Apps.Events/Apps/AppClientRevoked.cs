@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppClientRevokedEvent")]
+    [EventType(nameof(AppClientRevoked))]
     public sealed class AppClientRevoked : AppEvent
     {
         public string Id { get; set; }

@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure.CQRS.Commands
 {
     public interface IDomainObjectFactory
     {
-        IAggregate CreateNew(Type type, Guid id);
+        T CreateNew<T>(Guid id) where T : IAggregate;
     }
 }

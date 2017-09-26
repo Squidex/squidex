@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [TypeName("ContentUpdatedEvent")]
-    public class ContentUpdated : ContentEvent
+    [EventType(nameof(ContentUpdated))]
+    public sealed class ContentUpdated : ContentEvent
     {
         public NamedContentData Data { get; set; }
     }

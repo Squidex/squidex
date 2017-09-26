@@ -110,14 +110,14 @@ describe('DateTime', () => {
     });
 
     it('should calculate valid first of week', () => {
-        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').date.firstOfWeek();
+        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').firstOfWeek();
         const expected = DateTime.parseISO_UTC('2013-10-14T00:00:00');
 
         expect(actual).toEqual(expected);
     });
 
     it('should calculate valid first of month', () => {
-        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').date.firstOfMonth();
+        const actual = DateTime.parseISO_UTC('2013-10-16T12:13:14.125').firstOfMonth();
         const expected = DateTime.parseISO_UTC('2013-10-01');
 
         expect(actual.toISOString()).toEqual(expected.toISOString());

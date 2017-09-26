@@ -53,7 +53,27 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public bool IsDeleted { get; set; }
 
-        Schema ISchemaEntity.Schema
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptQuery { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptCreate { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptUpdate { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptDelete { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string ScriptChange { get; set; }
+
+        Schema ISchemaEntity.SchemaDef
         {
             get { return schema.Value; }
         }

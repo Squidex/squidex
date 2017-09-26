@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Squidex.Controllers.DocsVM
+
+@{
     Layout = null;
 }
 
@@ -31,7 +33,7 @@
     </style>
 </head>
 <body>
-    <redoc spec-url="@Url.Content(ViewBag.Specification)"></redoc>
+    <redoc spec-url="@Url.Content(Model.Specification)"></redoc>
 
     <script src="/scripts/redoc.min.js"></script>
 </body>

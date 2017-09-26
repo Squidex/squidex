@@ -9,18 +9,16 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export class ModalView {
     private readonly isOpen$: BehaviorSubject<boolean>;
-    private readonly isOpenChanges$: Observable<boolean>;
     private static openView: ModalView | null = null;
 
     public get isOpen(): Observable<boolean> {
-        return this.isOpenChanges$;
+        return this.isOpen$;
     }
 
     constructor(isOpen = false,
         public readonly closeAlways: boolean = false
     ) {
         this.isOpen$ = new BehaviorSubject(isOpen);
-        this.isOpenChanges$ = this.isOpen$.distinctUntilChanged();
     }
 
     public show() {

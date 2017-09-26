@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
@@ -32,6 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 if (fieldInfo.ResolveType != null)
                 {
                     var fieldName = field.RawProperties.Label.WithFallback(field.Name);
+
                     var fieldGraphType = new ObjectGraphType
                     {
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
@@ -52,8 +51,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     fieldGraphType.Description = $"The structure of the {fieldName} of a {schemaName} content type.";
 
-                    var fieldResolver =
-                        new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
+                    var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
 
                     AddField(new FieldType
                     {

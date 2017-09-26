@@ -25,8 +25,8 @@ namespace Squidex.Controllers.Api.Apps
     [MustBeAppOwner]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag("Apps")]
-    public class AppClientsController : ControllerBase
+    [SwaggerTag(nameof(Apps))]
+    public sealed class AppClientsController : ControllerBase
     {
         public AppClientsController(ICommandBus commandBus)
             : base(commandBus)
@@ -79,8 +79,8 @@ namespace Squidex.Controllers.Api.Apps
             var command = SimpleMapper.Map(request, new AttachClient());
 
             await CommandBus.PublishAsync(command);
-            
-            var response = SimpleMapper.Map(command, new ClientDto { Name = command .Id });
+
+            var response = SimpleMapper.Map(command, new ClientDto { Name = command.Id });
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);
         }
@@ -103,7 +103,7 @@ namespace Squidex.Controllers.Api.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new RenameClient { Id = clientId }));
+            await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateClient { Id = clientId }));
 
             return NoContent();
         }

@@ -22,6 +22,18 @@ export class EventConsumerDto {
         public readonly position: string
     ) {
     }
+
+    public start(): EventConsumerDto {
+        return new EventConsumerDto(this.name, false, false, this.error, this.position);
+    }
+
+    public stop(): EventConsumerDto {
+        return new EventConsumerDto(this.name, true, false, this.error, this.position);
+    }
+
+    public reset(): EventConsumerDto {
+        return new EventConsumerDto(this.name, this.isStopped, true, this.error, this.position);
+    }
 }
 
 @Injectable()
@@ -35,9 +47,11 @@ export class EventConsumersService {
     public getEventConsumers(): Observable<EventConsumerDto[]> {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
-        return HTTP.getVersioned(this.http, url)
+        return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
-                    const items: any[] = response;
+                    const body = response.payload.body;
+
+                    const items: any[] = body;
 
                     return items.map(item => {
                         return new EventConsumerDto(

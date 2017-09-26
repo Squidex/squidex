@@ -28,9 +28,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
-            var references = value as ReferencesValue;
-
-            if (references == null || references.ContentIds.Count == 0)
+            if (!(value is ReferencesValue references) || references.ContentIds.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {
@@ -51,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             }
 
             var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);
-            
+
             foreach (var invalidId in invalidIds)
             {
                 addError($"<FIELD> contains invalid reference '{invalidId}'");

@@ -12,8 +12,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-// ReSharper disable InvertIf
-
 namespace Squidex.Infrastructure.Log.Internal
 {
     public class FileLogProcessor : DisposableObjectBase
@@ -83,7 +81,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
                         if (i == Retries)
                         {
-                            Console.WriteLine("Failed to write to log file '{0}': {1}", path, ex);
+                            Console.WriteLine($"Failed to write to log file '{path}': {ex}");
                         }
                     }
                 }

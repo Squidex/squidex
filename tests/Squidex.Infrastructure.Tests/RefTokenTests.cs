@@ -11,8 +11,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-// ReSharper disable RedundantCast
-
 namespace Squidex.Infrastructure
 {
     public class RefTokenTests
@@ -89,7 +87,7 @@ namespace Squidex.Infrastructure
             object token1a = RefToken.Parse("client:client1");
             object token1b = RefToken.Parse("client:client1");
             object token2a = RefToken.Parse("client:client2");
-            
+
             Assert.True(token1a.Equals(token1b));
 
             Assert.False(token1a.Equals(token2a));

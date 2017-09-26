@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Controllers.Api.Schemas.Models
 {
     public sealed class SchemaDetailsDto
-    {       
+    {
         /// <summary>
         /// The id of the schema.
         /// </summary>
@@ -32,6 +32,31 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// Indicates if the schema is published.
         /// </summary>
         public bool IsPublished { get; set; }
+
+        /// <summary>
+        /// The script that is executed for each query when querying contents.
+        /// </summary>
+        public string ScriptQuery { get; set; }
+
+        /// <summary>
+        /// The script that is executed when creating a content.
+        /// </summary>
+        public string ScriptCreate { get; set; }
+
+        /// <summary>
+        /// The script that is executed when updating a content.
+        /// </summary>
+        public string ScriptUpdate { get; set; }
+
+        /// <summary>
+        /// The script that is executed when deleting a content.
+        /// </summary>
+        public string ScriptDelete { get; set; }
+
+        /// <summary>
+        /// The script that is executed when changing a content status.
+        /// </summary>
+        public string ScriptChange { get; set; }
 
         /// <summary>
         /// The list of fields.

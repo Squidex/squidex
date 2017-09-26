@@ -38,6 +38,10 @@ module.exports = webpackMerge(commonConfig, {
          */
         new HtmlWebpackPlugin({
             template: 'wwwroot/index.html', hash: true
+        }),
+        
+        new HtmlWebpackPlugin({
+            template: 'wwwroot/theme.html', hash: true, filename: 'theme.html'
         })
     ]
 });

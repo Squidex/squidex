@@ -7,7 +7,8 @@
 
 import { Directive, HostListener, Input } from '@angular/core';
 
-import { Notification, NotificationService } from './../services/notification.service';
+import { Types } from './../utils/types';
+import { DialogService, Notification } from './../services/dialog.service';
 
 @Directive({
     selector: '[sqxCopy]'
@@ -17,7 +18,7 @@ export class CopyDirective {
     public inputElement: any;
 
     constructor(
-        private readonly notifications: NotificationService
+        private readonly dialogs: DialogService
     ) {
     }
 
@@ -43,12 +44,12 @@ export class CopyDirective {
         try {
             document.execCommand('copy');
 
-            this.notifications.notify(Notification.info('Value has been added to your clipboard.'));
+            this.dialogs.notify(Notification.info('Value has been added to your clipboard.'));
         } catch (e) {
             console.log('Copy failed');
         }
 
-        if (currentFocus && typeof currentFocus.focus === 'function') {
+        if (currentFocus && Types.isFunction(currentFocus.focus)) {
             currentFocus.focus();
         }
 

@@ -37,9 +37,9 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
         {
-            var scheme = 
-                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ? 
-                    SwaggerSchema.Http : 
+            var scheme =
+                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?
+                    SwaggerSchema.Http :
                     SwaggerSchema.Https;
 
             var document = new SwaggerDocument
@@ -85,7 +85,7 @@ namespace Squidex.Pipeline.Swagger
             var securityDocs = LoadDocs("security");
             var securityDescription = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
-            var result = 
+            var result =
                 new SwaggerSecurityScheme
                 {
                     TokenUrl = tokenUrl,
@@ -94,9 +94,10 @@ namespace Squidex.Pipeline.Swagger
                     Scopes = new Dictionary<string, string>
                     {
                         { Constants.ApiScope, "Read and write access to the API" },
-                        { SquidexRoles.AppOwner, "You get this scope / role when you are owner of the app you are accessing." },
-                        { SquidexRoles.AppEditor, "You get this scope / role when you are owner of the app you are accessing or when the subject is a client." },
-                        { SquidexRoles.AppDeveloper, "You get this scope / role when you are owner of the app you are accessing." }
+                        { SquidexRoles.AppOwner, "App contributor with Owner permission." },
+                        { SquidexRoles.AppEditor, "Client (writer) or App contributor with Editor permission." },
+                        { SquidexRoles.AppReader, "Client (readonly) or App contributor with Editor permission." },
+                        { SquidexRoles.AppDeveloper, "App contributor with Developer permission." }
                     },
                     Description = securityDescription
                 };

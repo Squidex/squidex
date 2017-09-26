@@ -31,6 +31,6 @@ export class HelpService {
 
                 return result;
             })
-            .catch(err => Observable.of([]));
+            .catch(error => Observable.of([]));
     }
 }

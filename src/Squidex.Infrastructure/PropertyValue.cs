@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure
         {
             result = null;
 
-            if (!Parsers.TryGetValue(binder.Type, out Func<PropertyValue, CultureInfo, object> parser))
+            if (!Parsers.TryGetValue(binder.Type, out var parser))
             {
                 return false;
             }
@@ -67,32 +67,32 @@ namespace Squidex.Infrastructure
 
             return true;
         }
-                
+
         public override string ToString()
         {
             return rawValue?.ToString();
         }
-        
+
         public bool ToBoolean(CultureInfo culture)
         {
             return ToOrParseValue(culture, ParseBoolean);
         }
-        
+
         public bool? ToNullableBoolean(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, ParseBoolean);
         }
-        
+
         public float ToSingle(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => float.Parse(x, culture));
         }
-        
+
         public float? ToNullableSingle(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => float.Parse(x, culture));
         }
-        
+
         public double ToDouble(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => double.Parse(x, culture));
@@ -102,32 +102,32 @@ namespace Squidex.Infrastructure
         {
             return ToNullableOrParseValue(culture, x => double.Parse(x, culture));
         }
-        
+
         public int ToInt32(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => int.Parse(x, culture));
         }
-        
+
         public int? ToNullableInt32(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => int.Parse(x, culture));
         }
-        
+
         public long ToInt64(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => long.Parse(x, culture));
         }
-        
+
         public long? ToNullableInt64(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => long.Parse(x, culture));
         }
-        
+
         public Instant ToInstant(CultureInfo culture)
         {
             return ToOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
         }
-        
+
         public Instant? ToNullableInstant(CultureInfo culture)
         {
             return ToNullableOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
@@ -145,12 +145,12 @@ namespace Squidex.Infrastructure
 
         private T? ToNullableOrParseValue<T>(IFormatProvider culture, Func<string, T> parser) where T : struct
         {
-            return TryParse(culture, parser, out T result) ? result : (T?)null;
+            return TryParse(culture, parser, out var result) ? result : (T?)null;
         }
 
         private T ToOrParseValue<T>(IFormatProvider culture, Func<string, T> parser)
         {
-            return TryParse(culture, parser, out T result) ? result : default(T);
+            return TryParse(culture, parser, out var result) ? result : default(T);
         }
 
         private bool TryParse<T>(IFormatProvider culture, Func<string, T> parser, out T result)

@@ -14,11 +14,12 @@ import { AppComponentBase } from './app.component-base';
 import {
     allParams,
     AppsStoreService,
+    AuthService,
+    DialogService,
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
     MessageBus,
-    NotificationService,
     UsersProviderService
 } from './../declarations-base';
 
@@ -34,13 +35,13 @@ export class HistoryComponent extends AppComponentBase {
         let channelPath = this.route.snapshot.data['channel'];
 
         if (channelPath) {
-            let params = allParams(this.route);
+            const params = allParams(this.route);
 
             for (let key in params) {
                 if (params.hasOwnProperty(key)) {
                     const value = params[key];
 
-                    channelPath = channelPath.replace('{' + key + '}', value);
+                    channelPath = channelPath.replace(`{${key}}`, value);
                 }
             }
         }
@@ -54,13 +55,13 @@ export class HistoryComponent extends AppComponentBase {
             .switchMap(() => this.appNameOnce())
             .switchMap(app => this.historyService.getHistory(app, this.channel).retry(2));
 
-    constructor(appsStore: AppsStoreService, notifications: NotificationService,
+    constructor(appsStore: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly users: UsersProviderService,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
-        super(notifications, appsStore);
+        super(dialogs, appsStore, authService);
     }
 
     private userName(userId: string): Observable<string> {

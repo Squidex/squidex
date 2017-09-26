@@ -33,6 +33,12 @@ namespace Squidex.Controllers.Api.Assets.Models
         public string MimeType { get; set; }
 
         /// <summary>
+        /// The file type.
+        /// </summary>
+        [Required]
+        public string FileType { get; set; }
+
+        /// <summary>
         /// The size of the file in bytes.
         /// </summary>
         public long FileSize { get; set; }

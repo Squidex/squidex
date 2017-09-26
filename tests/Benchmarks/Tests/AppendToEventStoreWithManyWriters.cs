@@ -12,7 +12,6 @@ using Benchmarks.Utils;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb.EventStore;
 
 namespace Benchmarks.Tests
 {
@@ -42,7 +41,6 @@ namespace Benchmarks.Tests
             mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
 
             eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
-            eventStore.Warmup();
         }
 
         public long Run()
@@ -52,16 +50,14 @@ namespace Benchmarks.Tests
 
             Parallel.For(0, numStreams, streamId =>
             {
-                var eventOffset = -1;
                 var streamName = streamId.ToString();
 
                 for (var commitId = 0; commitId < numCommits; commitId++)
                 {
-                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset, new[] { Helper.CreateEventData() }).Wait();
-                    eventOffset++;
+                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, new[] { Helper.CreateEventData() }).Wait();
                 }
             });
-            
+
             return numCommits * numStreams;
         }
 
