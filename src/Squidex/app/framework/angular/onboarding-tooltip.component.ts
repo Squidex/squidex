@@ -8,6 +8,7 @@
 import { Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
 
 import { ModalView } from './../utils/modal-view';
+import { Types } from './../utils/types';
 
 import { OnboardingService } from './../services/onboarding.service';
 
@@ -59,7 +60,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        if (this.for && this.id) {
+        if (this.for && this.id && Types.isFunction(this.for.addEventListener)) {
             this.showTimer = setTimeout(() => {
                 if (this.onboardingService.shouldShow(this.id)) {
                     this.tooltipModal.show();

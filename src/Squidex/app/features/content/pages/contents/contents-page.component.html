@@ -13,7 +13,7 @@
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
                 <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" #searchInput />
+                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
 
                     <a class="expand-search" (click)="searchModal.toggle()" #archive>
                         <i class="icon-caret-down"></i>
@@ -28,7 +28,7 @@
                     Search for content using full text search over all fields and languages!
                 </sqx-onboarding-tooltip>
                 
-                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="searchInput">
+                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="inputFind">
                     <sqx-search-form
                         [canArchive]="!isReadOnly"
                         (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
