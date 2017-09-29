@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             await sut.SendAsync(new ResetConsumerMessage());
             await sut.StopAsync();
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.Message))
+            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
                 .MustHaveHappened();
         }
 
