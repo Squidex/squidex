@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventReceiverActorTests.cs
+//  EventConsumerActorTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
-    public class EventReceiverActorTests
+    public class EventConsumerActorTests
     {
         public sealed class MyEvent : IEvent
         {
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private readonly MyEventConsumerInfo consumerInfo = new MyEventConsumerInfo();
         private readonly string consumerName;
 
-        public EventReceiverActorTests()
+        public EventConsumerActorTests()
         {
             consumerInfo.Position = Guid.NewGuid().ToString();
             consumerName = eventConsumer.GetType().Name;
@@ -203,7 +203,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.Message))
+            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
                 .MustHaveHappened();
         }
 
@@ -228,7 +228,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.Message))
+            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
                 .MustHaveHappened();
         }
 
