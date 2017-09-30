@@ -69,55 +69,55 @@ namespace Squidex.Infrastructure.CQRS.Events
             switch (message)
             {
                 case SubscribeMessage subscribe when parent == null:
+                {
+                    parent = subscribe.Parent;
+                    position = subscribe.Position;
+
+                    streamFilter = subscribe.StreamFilter;
+                    streamRegex = new Regex(streamFilter);
+
+                    pollSubscription = eventNotifier.Subscribe(streamName =>
                     {
-                        parent = subscribe.Parent;
-                        position = subscribe.Position;
-
-                        streamFilter = subscribe.StreamFilter;
-                        streamRegex = new Regex(streamFilter);
-
-                        pollSubscription = eventNotifier.Subscribe(streamName =>
+                        if (streamRegex.IsMatch(streamName))
                         {
-                            if (streamRegex.IsMatch(streamName))
-                            {
-                                SendAsync(new StartPollMessage()).Forget();
-                            }
-                        });
+                            SendAsync(new StartPollMessage()).Forget();
+                        }
+                    });
 
-                        SendAsync(new StartPollMessage()).Forget();
+                    SendAsync(new StartPollMessage()).Forget();
 
-                        break;
-                    }
+                    break;
+                }
 
                 case StartPollMessage poll when parent != null:
+                {
+                    if (!isPolling)
                     {
-                        if (!isPolling)
-                        {
-                            isPolling = true;
+                        isPolling = true;
 
-                            PollAsync().Forget();
-                        }
-
-                        break;
+                        PollAsync().Forget();
                     }
+
+                    break;
+                }
 
                 case StopPollMessage poll when parent != null:
-                    {
-                        isPolling = false;
+                {
+                    isPolling = false;
 
-                        Task.Delay(5000).ContinueWith(t => SendAsync(new StartPollMessage())).Forget();
+                    Task.Delay(5000).ContinueWith(t => SendAsync(new StartPollMessage())).Forget();
 
-                        break;
-                    }
+                    break;
+                }
 
                 case ReceiveEventMessage receiveEvent when parent != null:
-                    {
-                        await parent.SendAsync(receiveEvent);
+                {
+                    await parent.SendAsync(receiveEvent);
 
-                        position = receiveEvent.Event.EventPosition;
+                    position = receiveEvent.Event.EventPosition;
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
 
@@ -129,9 +129,12 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 await SendAsync(new StopPollMessage());
             }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
+            catch (Exception ex)
             {
-                await SendAsync(ex);
+                if (!ex.Is<OperationCanceledException>())
+                {
+                    await SendAsync(ex);
+                }
             }
         }
     }
