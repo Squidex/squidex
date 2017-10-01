@@ -44,9 +44,12 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public IEventSubscription CreateSubscription()
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, prefix, projectionHost);
+            Guard.NotNull(subscriber, nameof(subscriber));
+            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
+
+            return new GetEventStoreSubscription(connection, subscriber, projectionHost, prefix, position, streamFilter);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)

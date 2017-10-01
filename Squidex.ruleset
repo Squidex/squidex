@@ -75,6 +75,7 @@
     <Rule Id="RECS0146" Action="Error" />
     <Rule Id="RECS0026" Action="Error" />
     <Rule Id="RECS0145" Action="None" />
+    <Rule Id="RECS0129" Action="None" />
   </Rules>
   <Rules AnalyzerId="Roslyn.Core" RuleNamespace="Roslyn.Core">
     <Rule Id="AD0001" Action="None" />

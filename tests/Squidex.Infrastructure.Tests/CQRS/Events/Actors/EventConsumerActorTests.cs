@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -24,10 +25,13 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private sealed class MyEventConsumerInfo : IEventConsumerInfo
         {
             public bool IsStopped { get; set; }
+
             public bool IsResetting { get; set; }
 
             public string Name { get; set; }
+
             public string Error { get; set; }
+
             public string Position { get; set; }
         }
 
@@ -36,6 +40,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly IActor sutActor;
+        private readonly IEventSubscriber sutSubscriber;
         private readonly EventDataFormatter formatter = A.Fake<EventDataFormatter>();
         private readonly EventData eventData = new EventData();
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
@@ -48,7 +54,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             consumerInfo.Position = Guid.NewGuid().ToString();
             consumerName = eventConsumer.GetType().Name;
 
-            A.CallTo(() => eventStore.CreateSubscription()).Returns(eventSubscription);
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(eventSubscription);
 
             A.CallTo(() => eventConsumer.Name).Returns(consumerName);
             A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(consumerInfo);
@@ -56,6 +62,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
 
             sut = new EventConsumerActor(formatter, eventStore, eventConsumerInfoRepository, log);
+
+            sutActor = sut;
+            sutSubscriber = sut;
         }
 
         [Fact]
@@ -63,15 +72,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             await SubscribeAsync();
 
-            await sut.StopAsync();
+            sut.Dispose();
 
             A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
                 .MustHaveHappened();
 
             A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
-                .MustHaveHappened();
-
-            A.CallTo(() => eventSubscription.SendAsync(A<SubscribeMessage>.That.Matches(s => s.Parent == sut && s.Position == consumerInfo.Position)))
                 .MustHaveHappened();
         }
 
@@ -80,8 +86,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             await SubscribeAsync();
 
-            await sut.SendAsync(new StopConsumerMessage());
-            await sut.StopAsync();
+            sutActor.Tell(new StopConsumerMessage());
+
+            sut.Dispose();
 
             A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
                 .MustHaveHappened();
@@ -94,9 +101,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             A.CallTo(() => eventSubscription.StopAsync())
                 .MustHaveHappened();
-
-            A.CallTo(() => eventSubscription.SendAsync(A<SubscribeMessage>.That.Matches(s => s.Parent == sut && s.Position == consumerInfo.Position)))
-                .MustHaveHappened();
         }
 
         [Fact]
@@ -104,8 +108,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             await SubscribeAsync();
 
-            await sut.SendAsync(new ResetConsumerMessage());
-            await sut.StopAsync();
+            sutActor.Tell(new ResetConsumerMessage());
+            sut.Dispose();
 
             A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
                 .MustHaveHappened();
@@ -122,9 +126,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             A.CallTo(() => eventConsumer.ClearAsync())
                 .MustHaveHappened();
 
-            A.CallTo(() => eventSubscription.SendAsync(A<SubscribeMessage>.That.Matches(s => s.Parent == sut && s.Position == consumerInfo.Position)))
-                .MustHaveHappened(Repeated.Exactly.Twice);
-
             A.CallTo(() => eventSubscription.StopAsync())
                 .MustHaveHappened();
         }
@@ -136,8 +137,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             await SubscribeAsync();
 
-            await sut.SendAsync(new ReceiveEventMessage { Event = @event, Source = eventSubscription });
-            await sut.StopAsync();
+            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+
+            sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
@@ -153,8 +155,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             await SubscribeAsync();
 
-            await sut.SendAsync(new ReceiveEventMessage { Event = @event });
-            await sut.StopAsync();
+            await sutSubscriber.OnEventAsync(A.Fake<IEventSubscription>(), @event);
+
+            sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
@@ -175,8 +178,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             await SubscribeAsync();
 
-            await sut.SendAsync(new ResetConsumerMessage());
-            await sut.StopAsync();
+            sutActor.Tell(new ResetConsumerMessage());
+            sut.Dispose();
 
             A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
                 .MustHaveHappened();
@@ -194,8 +197,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             await SubscribeAsync();
 
-            await sut.SendAsync(new ReceiveEventMessage { Event = @event, Source = eventSubscription });
-            await sut.StopAsync();
+            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+
+            sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
@@ -219,8 +223,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             await SubscribeAsync();
 
-            await sut.SendAsync(new ReceiveEventMessage { Event = @event, Source = eventSubscription });
-            await sut.StopAsync();
+            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+
+            sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();

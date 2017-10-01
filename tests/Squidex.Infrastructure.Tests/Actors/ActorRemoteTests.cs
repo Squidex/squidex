@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -18,16 +17,21 @@ namespace Squidex.Infrastructure.Actors
     public class ActorRemoteTests
     {
         [TypeName(nameof(SuccessMessage))]
-        public class SuccessMessage : IMessage
+        public class SuccessMessage : object
         {
             public int Counter { get; set; }
         }
 
-        private sealed class MyActor : Actor
+        private sealed class MyActor : Actor, IActor
         {
-            public List<IMessage> Invokes { get; } = new List<IMessage>();
+            public List<object> Invokes { get; } = new List<object>();
 
-            protected override Task OnMessage(IMessage message)
+            public void Tell(object message)
+            {
+                DispatchAsync(message).Forget();
+            }
+
+            protected override Task OnMessage(object message)
             {
                 Invokes.Add(message);
 
@@ -51,25 +55,13 @@ namespace Squidex.Infrastructure.Actors
         }
 
         [Fact]
-        public void Should_throw_exception_when_stopping_remote_actor()
+        public void Should_handle_messages_sequentially()
         {
-            Assert.Throws<NotSupportedException>(() => remoteActor.StopAsync().Forget());
-        }
+            remoteActor.Tell(new SuccessMessage { Counter = 1 });
+            remoteActor.Tell(new SuccessMessage { Counter = 2 });
+            remoteActor.Tell(new SuccessMessage { Counter = 3 });
 
-        [Fact]
-        public void Should_throw_exception_when_sending_exception_to_remote_actor()
-        {
-            Assert.Throws<NotSupportedException>(() => remoteActor.SendAsync(new InvalidOperationException()).Forget());
-        }
-
-        [Fact]
-        public async Task Should_handle_messages_sequentially()
-        {
-            remoteActor.SendAsync(new SuccessMessage { Counter = 1 }).Forget();
-            remoteActor.SendAsync(new SuccessMessage { Counter = 2 }).Forget();
-            remoteActor.SendAsync(new SuccessMessage { Counter = 3 }).Forget();
-
-            await actor.StopAsync();
+            actor.Dispose();
 
             actor.Invokes.ShouldBeEquivalentTo(new List<object>
             {

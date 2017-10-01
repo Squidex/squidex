@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
-    public sealed class EventConsumerActor : Actor
+    public sealed class EventConsumerActor : Actor, IEventSubscriber, IActor
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
@@ -23,8 +23,28 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private readonly ISemanticLog log;
         private IEventSubscription eventSubscription;
         private IEventConsumer eventConsumer;
-        private bool isStarted;
+        private bool isRunning;
         private bool isSetup;
+
+        private sealed class Setup
+        {
+            public IEventConsumer EventConsumer { get; set; }
+        }
+
+        private abstract class SubscriptionMessage
+        {
+            public IEventSubscription Subscription { get; set; }
+        }
+
+        private sealed class SubscriptionEventReceived : SubscriptionMessage
+        {
+            public StoredEvent Event { get; set; }
+        }
+
+        private sealed class SubscriptionFailed : SubscriptionMessage
+        {
+            public Exception Exception { get; set; }
+        }
 
         public EventConsumerActor(
             EventDataFormatter formatter,
@@ -48,7 +68,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            return SendAsync(new SetupConsumerMessage { EventConsumer = eventConsumer });
+            return DispatchAsync(new Setup { EventConsumer = eventConsumer });
         }
 
         protected override async Task OnStop()
@@ -61,30 +81,58 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
         protected override Task OnError(Exception exception)
         {
+            log.LogError(exception, w => w
+                .WriteProperty("action", "HandleEvent")
+                .WriteProperty("state", "Failed")
+                .WriteProperty("eventConsumer", eventConsumer.Name));
+
             return StopAsync(exception);
         }
 
-        protected override async Task OnMessage(IMessage message)
+        Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent @event)
+        {
+            return DispatchAsync(new SubscriptionEventReceived { Subscription = subscription, Event = @event });
+        }
+
+        Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
+        {
+            return DispatchAsync(new SubscriptionFailed { Subscription = subscription, Exception = exception });
+        }
+
+        void IActor.Tell(object message)
+        {
+            DispatchAsync(message).Forget();
+        }
+
+        protected override async Task OnMessage(object message)
         {
             switch (message)
             {
-                case SetupConsumerMessage setupConsumer when !isSetup:
+                case Setup setup when !isSetup:
                     {
-                        await SetupAsync(setupConsumer.EventConsumer);
+                        eventConsumer = setup.EventConsumer;
+
+                        await SetupAsync();
+
+                        isSetup = true;
 
                         break;
                     }
 
-                case StartConsumerMessage startConsumer when isSetup && !isStarted:
+                case StartConsumerMessage startConsumer when isSetup && !isRunning:
                     {
                         await StartAsync();
 
+                        isRunning = true;
+
                         break;
                     }
 
-                case StopConsumerMessage stopConsumer when isSetup && isStarted:
+                case StopConsumerMessage stopConsumer when isSetup && isRunning:
                     {
-                        await StopAsync(stopConsumer.Exception);
+                        await StopAsync();
+
+                        isRunning = false;
 
                         break;
                     }
@@ -95,15 +143,28 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                         await ResetAsync();
                         await StartAsync();
 
+                        isRunning = true;
+
                         break;
                     }
 
-                case ReceiveEventMessage receiveEvent when isSetup:
+                case SubscriptionFailed subscriptionFailed when isSetup:
                     {
-                        if (receiveEvent.Source == eventSubscription)
+                        if (subscriptionFailed.Subscription == eventSubscription)
                         {
-                            await DispatchConsumerAsync(ParseEvent(receiveEvent.Event));
-                            await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, receiveEvent.Event.EventPosition, false);
+                            await FailAsync(subscriptionFailed.Exception);
+                        }
+
+                        break;
+                    }
+
+                case SubscriptionEventReceived eventReceived when isSetup:
+                    {
+                        if (eventReceived.Subscription == eventSubscription)
+                        {
+                            var @event = ParseEvent(eventReceived.Event);
+
+                            await DispatchConsumerAsync(@event, eventReceived.Event.EventPosition);
                         }
 
                         break;
@@ -111,137 +172,89 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private async Task SetupAsync(IEventConsumer consumer)
+        private async Task SetupAsync()
         {
-            eventConsumer = consumer;
-
             await eventConsumerInfoRepository.CreateAsync(eventConsumer.Name);
 
             var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
 
             if (!status.IsStopped)
             {
-                SendAsync(new StartConsumerMessage()).Forget();
+                DispatchAsync(new StartConsumerMessage()).Forget();
             }
-
-            isSetup = true;
         }
 
         private async Task StartAsync()
         {
-            await eventConsumerInfoRepository.StartAsync(eventConsumer.Name);
-
             var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
 
-            var position = status.Position;
+            eventSubscription = eventStore.CreateSubscription(this, streamFilter: eventConsumer.EventsFilter, position: status.Position);
 
-            eventSubscription = eventStore.CreateSubscription();
-            eventSubscription.SendAsync(new SubscribeMessage { Parent = this, StreamFilter = eventConsumer.EventsFilter, Position = position }).Forget();
-
-            isStarted = true;
+            await eventConsumerInfoRepository.StartAsync(eventConsumer.Name);
         }
 
         private async Task StopAsync(Exception exception = null)
         {
-            await eventConsumerInfoRepository.StopAsync(eventConsumer.Name, exception?.ToString());
             await eventSubscription.StopAsync();
-
-            isStarted = false;
+            await eventConsumerInfoRepository.StopAsync(eventConsumer.Name, exception?.ToString());
         }
 
         private async Task ResetAsync()
         {
-            await eventConsumerInfoRepository.ResetAsync(eventConsumer.Name);
-
             var actionId = Guid.NewGuid().ToString();
-            try
-            {
-                log.LogInformation(w => w
-                    .WriteProperty("action", "EventConsumerReset")
-                    .WriteProperty("actionId", actionId)
-                    .WriteProperty("state", "Started")
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
 
+            log.LogInformation(w => w
+                .WriteProperty("action", "EventConsumerReset")
+                .WriteProperty("actionId", actionId)
+                .WriteProperty("state", "Started")
+                .WriteProperty("eventConsumer", eventConsumer.Name));
+
+            using (log.MeasureTrace(w => w
+                .WriteProperty("action", "EventConsumerReset")
+                .WriteProperty("actionId", actionId)
+                .WriteProperty("state", "Completed")
+                .WriteProperty("eventConsumer", eventConsumer.Name)))
+            {
+                await eventConsumerInfoRepository.ResetAsync(eventConsumer.Name);
                 await eventConsumer.ClearAsync();
                 await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, null, true);
-
-                log.LogInformation(w => w
-                    .WriteProperty("action", "EventConsumerReset")
-                    .WriteProperty("actionId", actionId)
-                    .WriteProperty("state", "Completed")
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
-            }
-            catch (Exception ex)
-            {
-                log.LogFatal(ex, w => w
-                    .WriteProperty("action", "EventConsumerReset")
-                    .WriteProperty("actionId", actionId)
-                    .WriteProperty("state", "Completed")
-                    .WriteProperty("eventConsumer", eventConsumer.GetType().Name));
-
-                throw;
             }
         }
 
-        private async Task DispatchConsumerAsync(Envelope<IEvent> @event)
+        private async Task DispatchConsumerAsync(Envelope<IEvent> @event, string position)
         {
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;
-            try
-            {
-                log.LogInformation(w => w
-                    .WriteProperty("action", "HandleEvent")
-                    .WriteProperty("actionId", eventId)
-                    .WriteProperty("state", "Started")
-                    .WriteProperty("eventId", eventId)
-                    .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
 
+            log.LogInformation(w => w
+                .WriteProperty("action", "HandleEvent")
+                .WriteProperty("actionId", eventId)
+                .WriteProperty("state", "Started")
+                .WriteProperty("eventId", eventId)
+                .WriteProperty("eventType", eventType)
+                .WriteProperty("eventConsumer", eventConsumer.Name));
+
+            using (log.MeasureTrace(w => w
+                .WriteProperty("action", "HandleEvent")
+                .WriteProperty("actionId", eventId)
+                .WriteProperty("state", "Completed")
+                .WriteProperty("eventId", eventId)
+                .WriteProperty("eventType", eventType)
+                .WriteProperty("eventConsumer", eventConsumer.Name)))
+            {
                 await eventConsumer.On(@event);
-
-                log.LogInformation(w => w
-                    .WriteProperty("action", "HandleEvent")
-                    .WriteProperty("actionId", eventId)
-                    .WriteProperty("state", "Completed")
-                    .WriteProperty("eventId", eventId)
-                    .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "HandleEvent")
-                    .WriteProperty("actionId", eventId)
-                    .WriteProperty("state", "Started")
-                    .WriteProperty("eventId", eventId)
-                    .WriteProperty("eventType", eventType)
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
-
-                throw;
+                await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, position, false);
             }
         }
 
         private Envelope<IEvent> ParseEvent(StoredEvent message)
         {
-            try
-            {
-                var @event = formatter.Parse(message.Data);
+            var @event = formatter.Parse(message.Data);
 
-                @event.SetEventPosition(message.EventPosition);
-                @event.SetEventStreamNumber(message.EventStreamNumber);
+            @event.SetEventPosition(message.EventPosition);
+            @event.SetEventStreamNumber(message.EventStreamNumber);
 
-                return @event;
-            }
-            catch (Exception ex)
-            {
-                log.LogFatal(ex, w => w
-                    .WriteProperty("action", "ParseEvent")
-                    .WriteProperty("state", "Failed")
-                    .WriteProperty("eventId", message.Data.EventId.ToString())
-                    .WriteProperty("eventPosition", message.EventPosition));
-
-                throw;
-            }
+            return @event;
         }
     }
 }

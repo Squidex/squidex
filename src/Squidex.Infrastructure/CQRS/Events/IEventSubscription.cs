@@ -6,11 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.Actors;
+using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public interface IEventSubscription : IActor
+    public interface IEventSubscription
     {
+        Task StopAsync();
     }
 }
