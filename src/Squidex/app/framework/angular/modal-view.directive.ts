@@ -26,6 +26,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     @Input('sqxModalViewOnRoot')
     public placeOnRoot = false;
 
+    @Input('sqxModalViewCloseAuto')
+    public closeAuto = true;
+
     constructor(
         private readonly templateRef: TemplateRef<any>,
         private readonly renderer: Renderer,
@@ -84,6 +87,10 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private startListening() {
+        if (!this.closeAuto) {
+            return;
+        }
+
         this.documentClickListener =
             this.renderer.listenGlobal('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null) {

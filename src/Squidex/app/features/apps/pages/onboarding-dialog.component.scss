@@ -1,0 +1,78 @@
+@import '_vars';
+@import '_mixins';
+
+$size-width: 825px;
+$size-height: 576px;
+
+$size-image: 476px;
+
+h1 {
+    font-size: 1.6rem;
+}
+
+p {
+    line-height: 1.8rem;
+}
+
+.modal {
+    &-content,
+    &-dialog {
+        min-height: $size-height;
+        max-height: $size-height;
+        min-width: $size-width;
+        max-width: $size-width;
+    }
+
+    &-content {
+        color: $color-dark-foreground;
+        background-color: $color-dark-onboarding;
+        background-image: url('/images/onboarding-background.png');
+        overflow: hidden;
+        position: relative;
+    }
+
+    &-close {
+        text-decoration: underline !important;
+        cursor: pointer;
+        color: $color-dark-foreground;
+    }
+}
+
+.header-focus {
+    color: $color-theme-blue;
+}
+
+.header-left {
+    @include absolute(-70px, auto, auto, 2rem);
+}
+
+.header-right {
+    @include absolute(2rem, 2rem, auto, auto);
+}
+
+.footer {
+    @include absolute(auto, auto, 5rem, 2rem);
+}
+
+.onboarding {
+    &-enter-leave {
+        & {
+            text-align: center;
+            margin: 4rem auto 0;
+            max-width: 28rem;
+            min-width: 28rem;
+        }
+
+        p {
+            margin: 2rem 0;
+        }
+    }
+
+    &-text {
+        padding-left: 2rem;
+    }
+
+    &-step {
+        @include absolute($size-height - $size-image, 0, 0, 0);
+    }
+}

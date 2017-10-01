@@ -37,6 +37,29 @@ export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'):
     );
 }
 
+export function buildSlideAnimation(name = 'slide', timing = '400ms'): AnimationEntryMetadata {
+    return trigger(
+        name, [
+            transition(':enter', [
+                style({ transform: 'translateX(100%)' }),
+                animate(timing, style({ transform: 'translateX(0%)' }))
+            ]),
+            transition(':leave', [
+                style({transform: 'translateX(0%)' }),
+                animate(timing, style({ transform: 'translateX(-100%)' }))
+            ]),
+            state('true',
+                style({ transform: 'translateX(0%)' })
+            ),
+            state('false',
+                style({ transform: 'translateX(-100%)' })
+            ),
+            transition('1 => 0', animate(timing)),
+            transition('0 => 1', animate(timing))
+        ]
+    );
+}
+
 export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationEntryMetadata {
     return trigger(
         name, [
@@ -85,4 +108,5 @@ export function buildHeightAnimation(name = 'height', timing = '200ms'): Animati
 
 export const fadeAnimation = buildFadeAnimation();
 export const heightAnimation = buildHeightAnimation();
+export const slideAnimation = buildSlideAnimation();
 export const slideRightAnimation = buildSlideRightAnimation();

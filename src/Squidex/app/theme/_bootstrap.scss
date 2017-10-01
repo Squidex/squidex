@@ -71,6 +71,12 @@ a {
         @include opacity(.8);
         pointer-events: none;
     }
+
+    &.btn {
+        &:focus {
+            color: inherit;
+        }
+    }
 }
 
 //
