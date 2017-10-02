@@ -195,7 +195,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
         private async Task StopAsync(Exception exception = null)
         {
-            eventSubscription.StopAsync().Forget();
+            eventSubscription?.StopAsync().Forget();
+            eventSubscription = null;
 
             await eventConsumerInfoRepository.StopAsync(eventConsumer.Name, exception?.ToString());
         }
