@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure
                 return aggregateException.InnerExceptions.Count == 1 && Is<T>(aggregateException.InnerExceptions[0]);
             }
 
-            return ex is OperationCanceledException;
+            return ex is T;
         }
     }
 }
