@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             try
             {
-                await store.GetEventsAsync(e => DispatchAsync(e), disposeToken.Token, streamFilter, position);
+                await store.GetEventsAsync(DispatchAsync, disposeToken.Token, streamFilter, position);
 
                 await DispatchAsync(new StopPoll());
             }
