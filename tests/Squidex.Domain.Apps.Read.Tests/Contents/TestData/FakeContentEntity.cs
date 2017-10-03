@@ -16,14 +16,17 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
     public sealed class FakeContentEntity : IContentEntity
     {
         public Guid Id { get; set; }
+
         public Guid AppId { get; set; }
 
         public long Version { get; set; }
 
         public Instant Created { get; set; }
+
         public Instant LastModified { get; set; }
 
         public RefToken CreatedBy { get; set; }
+
         public RefToken LastModifiedBy { get; set; }
 
         public NamedContentData Data { get; set; }
