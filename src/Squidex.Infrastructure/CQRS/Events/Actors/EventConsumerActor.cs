@@ -188,7 +188,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
 
-            eventSubscription = eventStore.CreateSubscription(this, streamFilter: eventConsumer.EventsFilter, position: status.Position);
+            eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, status.Position);
 
             await eventConsumerInfoRepository.StartAsync(eventConsumer.Name);
         }

@@ -42,6 +42,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         public PollingSubscription(MongoEventStore store, IEventNotifier notifier, IEventSubscriber subscriber, string streamFilter, string position)
         {
             this.notifier = notifier;
+            this.position = position;
             this.store = store;
             this.streamFilter = streamFilter;
             this.subscriber = subscriber;
