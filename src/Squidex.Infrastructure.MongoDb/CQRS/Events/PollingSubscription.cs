@@ -86,6 +86,8 @@ namespace Squidex.Infrastructure.CQRS.Events
                         }
                     });
 
+                    DispatchAsync(new StartPoll()).Forget();
+
                     break;
                 }
 
