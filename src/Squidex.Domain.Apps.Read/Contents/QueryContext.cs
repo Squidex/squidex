@@ -12,45 +12,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.Contents.GraphQL
+namespace Squidex.Domain.Apps.Read.Contents
 {
-    public sealed class QueryContext
+    public class QueryContext
     {
         private readonly ConcurrentDictionary<Guid, IContentEntity> cachedContents = new ConcurrentDictionary<Guid, IContentEntity>();
         private readonly ConcurrentDictionary<Guid, IAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IAssetEntity>();
         private readonly IContentQueryService contentQuery;
         private readonly IAssetRepository assetRepository;
-        private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAppEntity app;
         private readonly ClaimsPrincipal user;
-
-        public IGraphQLUrlGenerator UrlGenerator
-        {
-            get { return urlGenerator; }
-        }
 
         public QueryContext(
             IAppEntity app,
             IAssetRepository assetRepository,
             IContentQueryService contentQuery,
-            IGraphQLUrlGenerator urlGenerator,
             ClaimsPrincipal user)
         {
             Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
 
             this.assetRepository = assetRepository;
             this.contentQuery = contentQuery;
-            this.urlGenerator = urlGenerator;
 
             this.user = user;
 
@@ -103,9 +93,9 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return assets;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(Guid schemaId, string query)
+        public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
-            var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, false, query).ConfigureAwait(false)).Items;
+            var contents = (await contentQuery.QueryWithCountAsync(app, schemaIdOrName, user, false, query).ConfigureAwait(false)).Items;
 
             foreach (var content in contents)
             {
@@ -113,13 +103,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             }
 
             return contents;
-        }
-
-        public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(JToken value)
-        {
-            var ids = ParseIds(value);
-
-            return GetReferencedAssetsAsync(ids);
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
@@ -141,13 +124,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             return ids.Select(id => cachedAssets.GetOrDefault(id)).Where(x => x != null).ToList();
         }
 
-        public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, JToken value)
-        {
-            var ids = ParseIds(value);
-
-            return GetReferencedContentsAsync(schemaId, ids);
-        }
-
         public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, ICollection<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
@@ -165,28 +141,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             }
 
             return ids.Select(id => cachedContents.GetOrDefault(id)).Where(x => x != null).ToList();
-        }
-
-        private static ICollection<Guid> ParseIds(JToken value)
-        {
-            try
-            {
-                var result = new List<Guid>();
-
-                if (value is JArray)
-                {
-                    foreach (var id in value)
-                    {
-                        result.Add(Guid.Parse(id.ToString()));
-                    }
-                }
-
-                return result;
-            }
-            catch
-            {
-                return new List<Guid>();
-            }
         }
     }
 }
