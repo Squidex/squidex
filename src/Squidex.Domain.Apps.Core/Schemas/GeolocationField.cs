@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             var schemaReference = schemaResolver("GeolocationDto", geolocationSchema);
 
-            jsonProperty.SchemaReference = schemaReference;
+            jsonProperty.Reference = schemaReference;
         }
 
         protected override IEdmTypeReference CreateEdmType()

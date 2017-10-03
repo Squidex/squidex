@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (Properties.AllowedValues != null)
             {
-                jsonProperty.EnumerationNames = new Collection<string>(Properties.AllowedValues);
+                jsonProperty.EnumerationNames = new Collection<string>(Properties.AllowedValues.ToList());
             }
         }
 

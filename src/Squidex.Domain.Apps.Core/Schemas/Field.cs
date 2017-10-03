@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);
             }
 
-            partitionProperty.SchemaReference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", partitionObject);
+            partitionProperty.Reference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", partitionObject);
 
             schema.Properties.Add(Name, partitionProperty);
         }
