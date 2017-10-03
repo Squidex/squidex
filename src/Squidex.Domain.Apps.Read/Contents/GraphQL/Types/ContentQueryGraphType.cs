@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                     var context = (GraphQLQueryContext)c.UserContext;
                     var contentQuery = BuildODataQuery(c);
 
-                    return context.QueryContentsAsync(schema.Id, contentQuery);
+                    return context.QueryContentsAsync(schema.Id.ToString(), contentQuery);
                 }),
                 Description = $"Query {schemaName} content items."
             });
