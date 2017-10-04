@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Fact]
         public void Should_throw_when_converting_from_invalid_contributor_permission()
         {
-            Assert.Throws<ArgumentException>(() => ((AppContributorPermission) 10).ToAppPermission());
+            Assert.Throws<ArgumentException>(() => ((AppContributorPermission)10).ToAppPermission());
         }
     }
 }
