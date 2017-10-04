@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Events.Apps.Old
 {
-    [EventType(nameof(AppClientUpdated))]
+    [EventType(nameof(AppClientChanged))]
     public sealed class AppClientChanged : AppEvent, IMigratedEvent
     {
         public string Id { get; set; }

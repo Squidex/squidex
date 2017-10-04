@@ -26,13 +26,18 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         [BsonElement]
         public string Name { get; set; }
 
-        [BsonIgnoreIfDefault]
+        [BsonRequired]
         [BsonElement]
         public AppClientPermission Permission { get; set; }
 
         string IAppClientEntity.Name
         {
             get { return !string.IsNullOrWhiteSpace(Name) ? Name : Id; }
+        }
+
+        public MongoAppEntityClient()
+        {
+            Permission = AppClientPermission.Editor;
         }
     }
 }

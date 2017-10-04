@@ -7,6 +7,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Controllers.Api.Apps.Models
 {
@@ -19,8 +22,9 @@ namespace Squidex.Controllers.Api.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Determines if the client is a reader.
+        /// The permissions of the client.
         /// </summary>
-        public bool? IsReader { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AppClientPermission? Permission { get; set; }
     }
 }

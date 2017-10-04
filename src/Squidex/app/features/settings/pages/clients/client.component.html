@@ -73,7 +73,6 @@
             <td>Permission</td>
             <td>
                 <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
-                    <option></option>
                     <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
                 </select>
             </td>
