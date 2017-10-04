@@ -65,11 +65,12 @@ namespace Squidex.Infrastructure.Log.Internal
                 {
                     outputTask.Wait(1500);
                 }
-                catch (TaskCanceledException)
+                catch (Exception ex)
                 {
-                }
-                catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is TaskCanceledException)
-                {
+                    if (!ex.Is<OperationCanceledException>())
+                    {
+                        throw;
+                    }
                 }
             }
         }

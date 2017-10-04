@@ -197,7 +197,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 }
                 catch (Exception ex)
                 {
-                    if (!(ex is ProjectionCommandConflictException))
+                    if (!ex.Is<ProjectionCommandConflictException>())
                     {
                         throw;
                     }
