@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Read.Contents.ComplexQueries
             Guard.NotNullOrEmpty(scripts, nameof(scripts));
             Guard.NotNullOrEmpty(function, nameof(function));
 
-            var queryContent = new JintQueryContext(appEntity, assetRepository, contentQuery, user);
+            var queryContext = new JintQueryContext(appEntity, assetRepository, contentQuery, user);
 
             var engine = new Engine(options => options.TimeoutInterval(Timeout).Strict());
 
@@ -56,6 +56,8 @@ namespace Squidex.Domain.Apps.Read.Contents.ComplexQueries
             {
                 cts.SetResult(JsonMapper.Map(result));
             }));
+
+            queryContext.Setup(engine);
 
             engine.Execute(scripts + Environment.NewLine + Environment.NewLine + function);
 
