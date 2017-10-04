@@ -1,19 +1,17 @@
 ﻿// ==========================================================================
-//  IAppContributorEntity.cs
+//  AppClientPermission.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
-
-namespace Squidex.Domain.Apps.Read.Apps
+namespace Squidex.Domain.Apps.Core.Apps
 {
-    public interface IAppContributorEntity
+    public enum AppClientPermission
     {
-        string ContributorId { get; }
-
-        AppPermission Permission { get; }
+        Developer,
+        Editor,
+        Reader
     }
 }

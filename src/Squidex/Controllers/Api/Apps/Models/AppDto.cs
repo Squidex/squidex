@@ -48,6 +48,6 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// The permission level of the user.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public PermissionLevel Permission { get; set; }
+        public AppPermission Permission { get; set; }
     }
 }

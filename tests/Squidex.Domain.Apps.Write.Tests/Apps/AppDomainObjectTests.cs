@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
-                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = PermissionLevel.Owner }),
+                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppPermission.Owner }),
                     CreateEvent(new AppLanguageAdded { Language = Language.EN })
                 );
         }
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = User.Identifier, Permission = PermissionLevel.Editor }));
+                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = User.Identifier, Permission = AppPermission.Editor }));
             });
         }
 
@@ -157,11 +157,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             CreateApp();
 
-            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppPermission.Editor }));
 
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppPermission.Editor }));
             });
         }
 
@@ -170,11 +170,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             CreateApp();
 
-            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppPermission.Editor }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Permission = PermissionLevel.Editor })
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Permission = AppPermission.Editor })
                 );
         }
 
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             CreateApp();
 
-            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = PermissionLevel.Editor }));
+            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppPermission.Editor }));
             sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = contributorId }));
 
             sut.GetUncomittedEvents().Skip(1)

@@ -253,7 +253,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
-            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppPermission.Owner };
         }
 
         private void ThrowIfOtherUser(ChangePlan command)
