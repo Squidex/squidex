@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = graphQLContext.GetAssetType(),
                 Resolver = new FuncFieldResolver<object>(c =>
                 {
-                    var context = (QueryContext)c.UserContext;
+                    var context = (GraphQLQueryContext)c.UserContext;
                     var contentId = Guid.Parse(c.GetArgument("id", Guid.Empty.ToString()));
 
                     return context.FindAssetAsync(contentId);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = schemaType,
                 Resolver = new FuncFieldResolver<object>(c =>
                 {
-                    var context = (QueryContext)c.UserContext;
+                    var context = (GraphQLQueryContext)c.UserContext;
                     var contentId = Guid.Parse(c.GetArgument("id", Guid.Empty.ToString()));
 
                     return context.FindContentAsync(schema.Id, contentId);
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = new ListGraphType(new NonNullGraphType(graphQLContext.GetAssetType())),
                 Resolver = new FuncFieldResolver<object>(c =>
                 {
-                    var context = (QueryContext)c.UserContext;
+                    var context = (GraphQLQueryContext)c.UserContext;
 
                     var argTop = c.GetArgument("top", 20);
                     var argSkip = c.GetArgument("skip", 0);
@@ -169,10 +169,10 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 ResolvedType = new ListGraphType(new NonNullGraphType(schemaType)),
                 Resolver = new FuncFieldResolver<object>(c =>
                 {
-                    var context = (QueryContext)c.UserContext;
+                    var context = (GraphQLQueryContext)c.UserContext;
                     var contentQuery = BuildODataQuery(c);
 
-                    return context.QueryContentsAsync(schema.Id, contentQuery);
+                    return context.QueryContentsAsync(schema.Id.ToString(), contentQuery);
                 }),
                 Description = $"Query {schemaName} content items."
             });

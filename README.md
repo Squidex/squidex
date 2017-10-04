@@ -4,7 +4,7 @@
 
 Squidex is an open source headless CMS and content management hub. In contrast to a traditional CMS Squidex provides a rich API with OData filter and Swagger definitions. It is up to you to build your UI on top of it. It can be website, a native app or just another server. We build it with ASP.NET Core and CQRS and is tested for Windows and Linux on modern browsers.
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=square)](https://gitter.im/squidex-cms/Lobby) [![Build Status](http://build.squidex.io/api/badges/Squidex/squidex/status.svg)](http://build.squidex.io/Squidex/squidex)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=square)](https://gitter.im/squidex-cms/Lobby) [![Slack](https://img.shields.io/badge/chat-on_slack-E01765.svg?style=square)](https://squidex-slack.herokuapp.com/) [![Build Status](http://build.squidex.io/api/badges/Squidex/squidex/status.svg)](http://build.squidex.io/Squidex/squidex)
 
 Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in progress) or just check out the code and play around.
 

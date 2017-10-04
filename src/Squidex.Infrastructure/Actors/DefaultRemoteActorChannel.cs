@@ -42,22 +42,22 @@ namespace Squidex.Infrastructure.Actors
             serializer = JsonSerializer.Create(serializerSettings ?? new JsonSerializerSettings());
         }
 
-        public Task SendAsync(string recipient, IMessage message)
+        public Task SendAsync(string recipient, object message)
         {
             Guard.NotNullOrEmpty(recipient, nameof(recipient));
             Guard.NotNull(message, nameof(message));
 
             var messageType = typeNameRegistry.GetName(message.GetType());
-            var messagePayload = WriteJson(message);
+            var messageBody = WriteJson(message);
 
-            var envelope = new Envelope { Recipient = recipient, Payload = messagePayload, PayloadType = messageType };
+            var envelope = new Envelope { Recipient = recipient, Payload = messageBody, PayloadType = messageType };
 
             pubSub.Publish(ChannelName, JsonConvert.SerializeObject(envelope), true);
 
             return TaskHelper.Done;
         }
 
-        public void Subscribe(string recipient, Action<IMessage> handler)
+        public void Subscribe(string recipient, Action<object> handler)
         {
             Guard.NotNullOrEmpty(recipient, nameof(recipient));
 
@@ -68,16 +68,16 @@ namespace Squidex.Infrastructure.Actors
                 if (string.Equals(envelope.Recipient, recipient, StringComparison.OrdinalIgnoreCase))
                 {
                     var messageType = typeNameRegistry.GetType(envelope.PayloadType);
-                    var messagePayload = ReadJson<IMessage>(envelope.Payload, messageType);
+                    var messageBody = ReadJson(envelope.Payload, messageType);
 
-                    handler?.Invoke(messagePayload);
+                    handler?.Invoke(messageBody);
                 }
             });
         }
 
-        private T ReadJson<T>(JToken token, Type type = null)
+        private object ReadJson(JToken token, Type type)
         {
-            return (T)token.ToObject(type ?? typeof(T), serializer);
+            return token.ToObject(type, serializer);
         }
 
         private JToken WriteJson(object value)

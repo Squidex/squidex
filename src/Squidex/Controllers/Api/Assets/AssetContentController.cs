@@ -120,5 +120,3 @@ namespace Squidex.Controllers.Api.Assets
         }
     }
 }
-
-#pragma warning restore 1573

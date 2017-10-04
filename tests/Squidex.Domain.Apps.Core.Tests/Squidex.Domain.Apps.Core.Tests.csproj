@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="Moq" Version="4.7.99" />
+    <PackageReference Include="Moq" Version="4.7.127" />
     <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />

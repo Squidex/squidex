@@ -65,7 +65,7 @@ namespace Squidex.Config.Swagger
                 return;
             }
 
-            operation.AddResponse("500", "Operation failed", await context.SwaggerGenerator.GetErrorDtoSchemaAsync());
+            operation.AddResponse("500", "Operation failed", await context.SchemaGenerator.GetErrorDtoSchemaAsync(context.SchemaResolver));
         }
 
         private static void RemoveOkResponse(SwaggerOperation operation)

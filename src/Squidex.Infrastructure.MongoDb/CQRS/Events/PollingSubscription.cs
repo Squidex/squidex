@@ -11,110 +11,110 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Actors;
-using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Tasks;
-
-#pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class PollingSubscription : Actor, IEventSubscription
     {
-        private readonly IEventNotifier eventNotifier;
-        private readonly MongoEventStore eventStore;
-        private readonly CancellationTokenSource pollStop = new CancellationTokenSource();
-        private Regex streamRegex;
-        private string streamFilter;
+        private readonly IEventNotifier notifier;
+        private readonly MongoEventStore store;
+        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
+        private readonly Regex streamRegex;
+        private readonly string streamFilter;
+        private readonly IEventSubscriber subscriber;
         private string position;
         private bool isPolling;
-        private IDisposable pollSubscription;
-        private IActor parent;
+        private IDisposable notification;
 
-        private sealed class StartPollMessage : IMessage
+        private sealed class Connect
         {
         }
 
-        private sealed class StopPollMessage : IMessage
+        private sealed class StartPoll
         {
         }
 
-        public PollingSubscription(MongoEventStore eventStore, IEventNotifier eventNotifier)
+        private sealed class StopPoll
         {
-            this.eventStore = eventStore;
-            this.eventNotifier = eventNotifier;
+        }
+
+        public PollingSubscription(MongoEventStore store, IEventNotifier notifier, IEventSubscriber subscriber, string streamFilter, string position)
+        {
+            this.notifier = notifier;
+            this.position = position;
+            this.store = store;
+            this.streamFilter = streamFilter;
+            this.subscriber = subscriber;
+
+            streamRegex = new Regex(streamFilter);
+
+            DispatchAsync(new Connect()).Forget();
+        }
+
+        public Task StopAsync()
+        {
+            return StopAndWaitAsync();
         }
 
         protected override Task OnStop()
         {
-            pollStop?.Cancel();
-            pollSubscription?.Dispose();
+            disposeToken?.Cancel();
 
-            parent = null;
+            notification?.Dispose();
 
             return TaskHelper.Done;
         }
 
         protected override async Task OnError(Exception exception)
         {
-            if (parent != null)
-            {
-                await parent.SendAsync(exception);
-            }
+            await subscriber.OnErrorAsync(this, exception);
 
             await StopAsync();
         }
 
-        protected override async Task OnMessage(IMessage message)
+        protected override async Task OnMessage(object message)
         {
             switch (message)
             {
-                case SubscribeMessage subscribe when parent == null:
+                case Connect connect:
                 {
-                    parent = subscribe.Parent;
-                    position = subscribe.Position;
-
-                    streamFilter = subscribe.StreamFilter;
-                    streamRegex = new Regex(streamFilter);
-
-                    pollSubscription = eventNotifier.Subscribe(streamName =>
+                    notification = notifier.Subscribe(streamName =>
                     {
                         if (streamRegex.IsMatch(streamName))
                         {
-                            SendAsync(new StartPollMessage()).Forget();
+                            DispatchAsync(new StartPoll()).Forget();
                         }
                     });
 
-                    SendAsync(new StartPollMessage()).Forget();
+                    DispatchAsync(new StartPoll()).Forget();
 
                     break;
                 }
 
-                case StartPollMessage poll when parent != null:
+                case StartPoll poll when !isPolling:
                 {
-                    if (!isPolling)
-                    {
-                        isPolling = true;
+                    isPolling = true;
 
-                        PollAsync().Forget();
-                    }
+                    PollAsync().Forget();
 
                     break;
                 }
 
-                case StopPollMessage poll when parent != null:
+                case StopPoll poll when isPolling:
                 {
                     isPolling = false;
 
-                    Task.Delay(5000).ContinueWith(t => SendAsync(new StartPollMessage())).Forget();
+                    Task.Delay(5000).ContinueWith(t => DispatchAsync(new StartPoll())).Forget();
 
                     break;
                 }
 
-                case ReceiveEventMessage receiveEvent when parent != null:
+                case StoredEvent storedEvent:
                 {
-                    await parent.SendAsync(receiveEvent);
+                    await subscriber.OnEventAsync(this, storedEvent);
 
-                    position = receiveEvent.Event.EventPosition;
+                    position = storedEvent.EventPosition;
 
                     break;
                 }
@@ -125,15 +125,15 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             try
             {
-                await eventStore.GetEventsAsync(e => SendAsync(new ReceiveEventMessage { Event = e, Source = this }), pollStop.Token, streamFilter, position);
+                await store.GetEventsAsync(DispatchAsync, disposeToken.Token, streamFilter, position);
 
-                await SendAsync(new StopPollMessage());
+                await DispatchAsync(new StopPoll());
             }
             catch (Exception ex)
             {
                 if (!ex.Is<OperationCanceledException>())
                 {
-                    await SendAsync(ex);
+                    await FailAsync(ex);
                 }
             }
         }

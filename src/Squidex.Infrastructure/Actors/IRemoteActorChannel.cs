@@ -13,8 +13,8 @@ namespace Squidex.Infrastructure.Actors
 {
     public interface IRemoteActorChannel
     {
-        Task SendAsync(string recipient, IMessage message);
+        Task SendAsync(string recipient, object message);
 
-        void Subscribe(string recipient, Action<IMessage> handler);
+        void Subscribe(string recipient, Action<object> handler);
     }
 }

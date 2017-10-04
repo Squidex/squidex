@@ -70,7 +70,7 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             const string errorDescription = "Operation failed with internal server error.";
 
-            var errorDtoSchema = await swaggerGenerator.GetErrorDtoSchemaAsync();
+            var errorDtoSchema = await schemaGenerator.GetErrorDtoSchemaAsync(schemaResolver);
 
             foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
             {
@@ -82,7 +82,7 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             name = char.ToUpperInvariant(name[0]) + name.Substring(1);
 
-            return new JsonSchema4 { SchemaReference = document.Definitions.GetOrAdd(name, x => schema) };
+            return new JsonSchema4 { Reference = document.Definitions.GetOrAdd(name, x => schema) };
         }
     }
 }

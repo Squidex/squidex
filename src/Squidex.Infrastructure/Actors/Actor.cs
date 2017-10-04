@@ -11,52 +11,57 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Infrastructure.Tasks;
 
-#pragma warning disable SA1401 // Fields must be private
-
 namespace Squidex.Infrastructure.Actors
 {
-    public abstract class Actor : IActor, IDisposable
+    public abstract class Actor : IDisposable
     {
-        private readonly ActionBlock<IMessage> block;
+        private readonly ActionBlock<object> block;
         private bool isStopped;
 
-        private sealed class StopMessage : IMessage
+        private sealed class StopMessage
         {
         }
 
-        private sealed class ErrorMessage : IMessage
+        private sealed class ErrorMessage
         {
-            public Exception Exception;
+            public Exception Exception { get; set; }
         }
 
         protected Actor()
         {
-            block = new ActionBlock<IMessage>(Handle, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, BoundedCapacity = 10 });
+            var options = new ExecutionDataflowBlockOptions
+            {
+                MaxMessagesPerTask = -1,
+                MaxDegreeOfParallelism = 1,
+                BoundedCapacity = 10
+            };
+
+            block = new ActionBlock<object>(Handle, options);
         }
 
         public void Dispose()
         {
-            StopAsync().Wait();
+            StopAndWaitAsync().Wait();
         }
 
-        public async Task StopAsync()
-        {
-            await block.SendAsync(new StopMessage());
-            await block.Completion;
-        }
-
-        public Task SendAsync(IMessage message)
+        protected async Task DispatchAsync(object message)
         {
             Guard.NotNull(message, nameof(message));
 
-            return block.SendAsync(message);
+            await block.SendAsync(message);
         }
 
-        public Task SendAsync(Exception exception)
+        protected async Task FailAsync(Exception exception)
         {
             Guard.NotNull(exception, nameof(exception));
 
-            return block.SendAsync(new ErrorMessage { Exception = exception });
+            await block.SendAsync(new ErrorMessage { Exception = exception });
+        }
+
+        protected async Task StopAndWaitAsync()
+        {
+            await block.SendAsync(new StopMessage());
+            await block.Completion;
         }
 
         protected virtual Task OnStop()
@@ -69,12 +74,12 @@ namespace Squidex.Infrastructure.Actors
             return TaskHelper.Done;
         }
 
-        protected virtual Task OnMessage(IMessage message)
+        protected virtual Task OnMessage(object message)
         {
             return TaskHelper.Done;
         }
 
-        private async Task Handle(IMessage message)
+        private async Task Handle(object message)
         {
             if (isStopped)
             {

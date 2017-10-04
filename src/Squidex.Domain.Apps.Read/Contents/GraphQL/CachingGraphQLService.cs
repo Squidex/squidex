@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             }
 
             var modelContext = await GetModelAsync(app);
-            var queryContext = new QueryContext(app, assetRepository, contentQuery, urlGenerator, user);
+            var queryContext = new GraphQLQueryContext(app, assetRepository, contentQuery, user, urlGenerator);
 
             return await modelContext.ExecuteAsync(queryContext, query);
         }

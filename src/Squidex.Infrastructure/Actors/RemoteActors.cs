@@ -6,9 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Actors
@@ -26,24 +24,14 @@ namespace Squidex.Infrastructure.Actors
 
             public Sender(IRemoteActorChannel channel, string recipient)
             {
-                this.channel = channel;
-
                 this.recipient = recipient;
+
+                this.channel = channel;
             }
 
-            public Task SendAsync(IMessage message)
+            public void Tell(object message)
             {
-                return channel.SendAsync(recipient, message);
-            }
-
-            public Task SendAsync(Exception exception)
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task StopAsync()
-            {
-                throw new NotSupportedException();
+                channel.SendAsync(recipient, message).Forget();
             }
         }
 
@@ -66,10 +54,7 @@ namespace Squidex.Infrastructure.Actors
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNull(actor, nameof(actor));
 
-            channel.Subscribe(id, message =>
-            {
-                actor.SendAsync(message).Forget();
-            });
+            channel.Subscribe(id, actor.Tell);
         }
     }
 }

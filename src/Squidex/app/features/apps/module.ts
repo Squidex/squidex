@@ -11,7 +11,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from 'shared';
 
 import {
-    AppsPageComponent
+    AppsPageComponent,
+    OnboardingDialogComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -28,7 +29,8 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        AppsPageComponent
+        AppsPageComponent,
+        OnboardingDialogComponent
     ]
 })
 export class SqxFeatureAppsModule { }

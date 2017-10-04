@@ -12,7 +12,7 @@
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="0.17.2" />
+    <PackageReference Include="GraphQL" Version="0.17.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.2" />
     <PackageReference Include="NodaTime" Version="2.2.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.2.0" />

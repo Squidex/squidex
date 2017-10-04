@@ -1,0 +1,154 @@
+<div class="modal" *sqxModalView="modalView;onRoot:true;closeAuto:false" @fade>
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <a class="header-right modal-close" (click)="modalView.hide()">Skip Tour</a>
+
+            <div class="onboarding-step" *ngIf="step === 0">
+                <img @fade class="header-left" src="/images/logo-white-small.png" />
+
+                <div class="onboarding-enter-leave" @slide>
+                    <h1>Welcome to <span class="header-focus">Squidex CMS</span></h1>
+
+                    <p>
+                        You can start managing and distributing your content right away, but we we'd like to walk you through some basics first...
+                    </p>
+                    <p>
+                        How's that?
+                    </p>
+
+                    <button (click)="next()" class="btn btn-success">Let'ts take a look around</button>
+                </div>
+            </div>
+            <div class="onboarding-step" *ngIf="step === 1">
+                <h1 class="header-left header-focus" @fade>Apps</h1>
+
+                <div @slide>
+                    <div class="row">
+                        <div class="col">
+                            <div class="onboarding-text">
+                                <p>
+                                    An App is the repository for your project, e.g. (blog, webshop or mobile app). You can assign contributors to your app to
+                                    work together.
+                                </p>
+                                <p>
+                                    You can create an unlimited number of Apps in Squidex to manage multiple projects at the same time.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <img src="/images/onboarding-step1.png" />
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <button (click)="next()" class="btn btn-success">Continue</button>
+                    </div>
+                </div>
+            </div>
+            <div class="onboarding-step" *ngIf="step === 2">
+                <h1 class="header-left header-focus" @fade>Schemas</h1>
+
+                <div @slide>
+                    <div class="row">
+                        <div class="col">
+                            <div class="onboarding-text">
+                                <p>
+                                    Schemas define the structure of your content, the fields and the data types of a content item.
+                                </p>
+                                <p>
+                                    Beforew you can add content to your schema, make sure to hit the 'Publish' button at the top to make the schema availabel
+                                    to your content editors.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <img src="/images/onboarding-step2.png" />
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <button (click)="next()" class="btn btn-success">Keep going!</button>
+                    </div>
+                </div>
+            </div>
+            <div class="onboarding-step" *ngIf="step === 3">
+                <h1 @fade class="header-left header-focus">Contents</h1>
+
+                <div @slide>
+                    <div class="row">
+                        <div class="col">
+                            <div class="onboarding-text">
+                                <p>
+                                    Content is the actual data in your app which is grouped by the schema.
+                                </p>
+                                <p>
+                                    Select a published schema first, then add content for this schema.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <img src="/images/onboarding-step3.png" />
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <button (click)="next()" class="btn btn-success">Almost there!</button>
+                    </div>
+                </div>
+            </div>
+            <div class="onboarding-step" *ngIf="step === 4">
+                <h1 @fade class="header-left header-focus">Assets</h1>
+
+                <div @slide>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="onboarding-text">
+                                <p>
+                                    The assets contains all files that can also be linked to your content. For example images, videos or documents.
+                                </p>
+                                <p>
+                                    You can upload the assets here and use them later or also upload them directly when you create a new content item with an
+                                    asset field.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <img src="/images/onboarding-step4.png" />
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <button (click)="next()" class="btn btn-success">Got It!</button>
+                    </div>
+                </div>
+            </div>
+            <div class="onboarding-step" *ngIf="step === 5">
+                <img @fade class="header-left" src="/images/logo-white-small.png" />
+
+                <div class="onboarding-enter-leave" @slide>
+                    <h1>Awesome, now you know the basics!</h1>
+
+                    <p>
+                        But that's not all of the support we can provide. <br />You can go to <a href="https://docs.squidex.io/"
+                            target="_blank">https://docs.squidex.io/</a> to read more.
+                    </p>
+                    <p>
+                        Do you want to join our community?
+                    </p>
+
+                    <div>
+                        <a class="btn btn-success" href="https://squidex-slack.herokuapp.com/" target="_blank">
+                            Join us on Slack
+                        </a> &nbsp;
+
+                        <a class="btn btn-success" href="https://github.com/squidex/squidex" target="_blank">
+                            Join us on Github
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

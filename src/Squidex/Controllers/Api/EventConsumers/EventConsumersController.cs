@@ -49,14 +49,11 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/start")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Start(string name)
+        public IActionResult Start(string name)
         {
             var actor = actors.Get(name);
 
-            if (actor != null)
-            {
-                await actor.SendAsync(new StartConsumerMessage());
-            }
+            actor?.Tell(new StartConsumerMessage());
 
             return NoContent();
         }
@@ -64,14 +61,11 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/stop")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Stop(string name)
+        public IActionResult Stop(string name)
         {
             var actor = actors.Get(name);
 
-            if (actor != null)
-            {
-                await actor.SendAsync(new StopConsumerMessage());
-            }
+            actor?.Tell(new StopConsumerMessage());
 
             return NoContent();
         }
@@ -79,14 +73,11 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/reset")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Reset(string name)
+        public IActionResult Reset(string name)
         {
             var actor = actors.Get(name);
 
-            if (actor != null)
-            {
-                await actor.SendAsync(new ResetConsumerMessage());
-            }
+            actor?.Tell(new ResetConsumerMessage());
 
             return NoContent();
         }

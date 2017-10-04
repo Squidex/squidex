@@ -9,12 +9,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
+using NJsonSchema.Generation;
 using NSwag;
-using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Controllers.Api;
 using Squidex.Shared.Identity;
@@ -105,11 +106,11 @@ namespace Squidex.Pipeline.Swagger
             return result;
         }
 
-        public static async Task<JsonSchema4> GetErrorDtoSchemaAsync(this SwaggerGenerator swaggerGenerator)
+        public static async Task<JsonSchema4> GetErrorDtoSchemaAsync(this JsonSchemaGenerator schemaGenerator, JsonSchemaResolver resolver)
         {
             var errorType = typeof(ErrorDto);
 
-            return await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(errorType, false, null);
+            return await schemaGenerator.GenerateWithReference<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
         }
 
         public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)

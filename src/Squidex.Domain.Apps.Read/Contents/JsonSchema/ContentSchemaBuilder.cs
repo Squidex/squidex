@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Read.Contents.JsonSchema
 
         private static JsonProperty CreateProperty(string description, JsonSchema4 dataSchema)
         {
-            return new JsonProperty { Description = description, IsRequired = true, Type = JsonObjectType.Object, SchemaReference = dataSchema };
+            return new JsonProperty { Description = description, IsRequired = true, Type = JsonObjectType.Object, Reference = dataSchema };
         }
 
         private static JsonProperty CreateProperty(string description, JsonObjectType type)
