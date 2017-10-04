@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
+
 namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppClientEntity
@@ -16,6 +18,6 @@ namespace Squidex.Domain.Apps.Read.Apps
 
         string Secret { get; }
 
-        bool IsReader { get; }
+        AppClientPermission Permission { get; }
     }
 }

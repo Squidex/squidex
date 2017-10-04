@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Apps
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         [BsonIgnoreIfDefault]
         [BsonElement]
-        public bool IsReader { get; set; }
+        public AppClientPermission Permission { get; set; }
 
         string IAppClientEntity.Name
         {

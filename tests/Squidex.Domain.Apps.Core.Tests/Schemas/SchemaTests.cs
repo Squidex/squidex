@@ -342,7 +342,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { SchemaReference = s });
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
 
             Assert.NotNull(jsonSchema);
         }

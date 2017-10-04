@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps
@@ -15,28 +16,29 @@ namespace Squidex.Domain.Apps.Write.Apps
     {
         private readonly string name;
         private readonly string secret;
-        private readonly bool isReader;
+        private readonly AppClientPermission permission;
 
-        public AppClient(string secret, string name, bool isReader)
+        public AppClient(string secret, string name, AppClientPermission permission)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
+            Guard.Enum(permission, nameof(permission));
 
             this.name = name;
             this.secret = secret;
-            this.isReader = isReader;
+            this.permission = permission;
         }
 
-        public AppClient Change(bool newIsReader, Func<string> message)
+        public AppClient Update(AppClientPermission newPermission, Func<string> message)
         {
-            if (isReader == newIsReader)
+            if (permission == newPermission)
             {
-                var error = new ValidationError("Client has already the reader state.", "IsReader");
+                var error = new ValidationError("Client has already the permission.", "IsReader");
 
                 throw new ValidationException(message(), error);
             }
 
-            return new AppClient(secret, name, newIsReader);
+            return new AppClient(secret, name, newPermission);
         }
 
         public AppClient Rename(string newName, Func<string> message)
@@ -48,7 +50,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                 throw new ValidationException(message(), error);
             }
 
-            return new AppClient(secret, newName, isReader);
+            return new AppClient(secret, newName, permission);
         }
     }
 }

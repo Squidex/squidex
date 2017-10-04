@@ -25,6 +25,6 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// The permission level as a contributor.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public AppPermission Permission { get; set; }
+        public AppContributorPermission Permission { get; set; }
     }
 }

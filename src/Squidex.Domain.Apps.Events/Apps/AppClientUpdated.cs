@@ -6,15 +6,16 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppClientChanged))]
-    public sealed class AppClientChanged : AppEvent
+    [EventType(nameof(AppClientUpdated))]
+    public sealed class AppClientUpdated : AppEvent
     {
         public string Id { get; set; }
 
-        public bool IsReader { get; set; }
+        public AppClientPermission Permission { get; set; }
     }
 }

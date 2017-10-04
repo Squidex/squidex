@@ -124,7 +124,7 @@ namespace Squidex.Pipeline
                 return null;
             }
 
-            return client.IsReader ? AppPermission.Reader : AppPermission.Editor;
+            return client.Permission.ToAppPermission();
         }
 
         private static AppPermission? FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
@@ -138,7 +138,7 @@ namespace Squidex.Pipeline
 
             var contributor = app.Contributors.FirstOrDefault(x => string.Equals(x.ContributorId, subject, StringComparison.OrdinalIgnoreCase));
 
-            return contributor?.Permission;
+            return contributor?.Permission.ToAppPermission();
         }
     }
 }
