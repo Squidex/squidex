@@ -15,6 +15,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Contents.JsonSchema;
+using Squidex.Extensibility;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Shared.Identity;
@@ -102,6 +103,26 @@ namespace Squidex.Controllers.ContentApi.Generator
             foreach (var operation in schemaOperations.SelectMany(x => x.Values).Distinct())
             {
                 operation.Tags = new List<string> { schemaName };
+            }
+        }
+
+        public void GenerateSchemaQueriesOperations(IEnumerable<IQuery> queries)
+        {
+            foreach (var query in queries)
+            {
+                AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}/queries/{query.Name}",
+                    operation =>
+                    {
+                        operation.OperationId = $"ComplexQuery{schemaKey}Contents"; // todo: come up with better name
+                        operation.Summary = $"Does a custom query on {schemaName}.";
+                        operation.Security = ReaderSecurity;
+
+                        operation.Description = SchemaQueryDescription;
+
+                        // todo: fix the content schema, it's not the right schema. e.g. The query can give back union of items
+                        operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+                        operation.Tags = new List<string> { schemaName };
+                    });
             }
         }
 

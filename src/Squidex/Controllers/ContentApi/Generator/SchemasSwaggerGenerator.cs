@@ -6,10 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
 using NSwag;
@@ -18,6 +20,7 @@ using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Extensibility;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
@@ -32,12 +35,14 @@ namespace Squidex.Controllers.ContentApi.Generator
         private JsonSchemaResolver schemaResolver;
         private SwaggerGenerator swaggerGenerator;
         private SwaggerDocument document;
+        private IList<ISquidexPlugin> plugins;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions, IServiceProvider provider)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
+            this.plugins = provider.GetServices<ISquidexPlugin>().ToList();
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -60,9 +65,16 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             var appBasePath = $"/content/{app.Name}";
 
-            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
+            foreach (var schemaEntity in schemas.Where(x => x.IsPublished))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
+                var generator = new SchemaSwaggerGenerator(document, appBasePath, schemaEntity.SchemaDef, AppendSchema, app.PartitionResolver);
+                generator.GenerateSchemaOperations();
+
+                foreach (var plugin in plugins)
+                {
+                    var queries = plugin.GetQueries(app, schemaEntity);
+                    generator.GenerateSchemaQueriesOperations(queries);
+                }
             }
         }
 

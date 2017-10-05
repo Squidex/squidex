@@ -22,6 +22,7 @@ using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
+using Squidex.Extensibility;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 
@@ -89,6 +90,7 @@ namespace Squidex
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));
             builder.RegisterModule(new WriteModule(Configuration));
+            ModuleLoader.LoadPlugins(builder);
 
             var container = builder.Build();
 
