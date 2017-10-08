@@ -31,6 +31,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             public IEventConsumer EventConsumer { get; set; }
         }
 
+        private sealed class StopFailed
+        {
+            public Exception Exception { get; set; }
+        }
+
         private abstract class SubscriptionMessage
         {
             public IEventSubscription Subscription { get; set; }
@@ -86,7 +91,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                 .WriteProperty("state", "Failed")
                 .WriteProperty("eventConsumer", eventConsumer.Name));
 
-            return StopAsync(exception);
+            DispatchAsync(new StopFailed { Exception = exception }).Forget();
+
+            return TaskHelper.Done;
         }
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent @event)
@@ -124,6 +131,15 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                         await StartAsync();
 
                         isRunning = true;
+
+                        break;
+                    }
+
+                case StopFailed stopFailed when isSetup && isRunning:
+                    {
+                        await StopAsync(stopFailed.Exception);
+
+                        isRunning = false;
 
                         break;
                     }
