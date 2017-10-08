@@ -236,7 +236,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                 .MustHaveHappened();
 
             A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
-                .MustHaveHappened();
+                .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
         [Fact]
