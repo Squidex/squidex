@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                     var context = (GraphQLQueryContext)c.UserContext;
                     var contentId = Guid.Parse(c.GetArgument("id", Guid.Empty.ToString()));
 
-                    return context.FindContentAsync(schema.Id, contentId);
+                    return context.FindContentAsync(schema.Id.ToString(), contentId);
                 }),
                 Description = $"Find an {schemaName} content by id."
             });

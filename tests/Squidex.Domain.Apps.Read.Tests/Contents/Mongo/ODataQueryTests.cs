@@ -25,7 +25,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Read.Contents
+namespace Squidex.Domain.Apps.Read.Contents.Mongo
 {
     public class ODataQueryTests
     {

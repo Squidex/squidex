@@ -32,14 +32,14 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         {
             var ids = ParseIds(value);
 
-            return GetReferencedAssetsAsync(ids);
+            return QueryAssetsAsync(ids);
         }
 
         public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, JToken value)
         {
             var ids = ParseIds(value);
 
-            return GetReferencedContentsAsync(schemaId, ids);
+            return QueryContentsAsync(schemaId.ToString(), ids);
         }
 
         private static ICollection<Guid> ParseIds(JToken value)

@@ -89,6 +89,7 @@ namespace Squidex
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));
             builder.RegisterModule(new WriteModule(Configuration));
+            builder.RegisterModule(new QueryScriptsModule(Configuration));
 
             var container = builder.Build();
 
