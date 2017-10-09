@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Loader;
-using System.Text;
+using System.Threading.Tasks;
 using Autofac;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 
-namespace Squidex.Extensibility
+namespace Squidex.Config.Domain
 {
-    public static class ModuleLoader
+    public class CustomQueriesModule : Module
     {
-        public static void LoadPlugins(ContainerBuilder builder)
+        protected override void Load(ContainerBuilder builder)
         {
             var assemblies = Directory.EnumerateFiles("./Plugins", "*.dll");
             foreach (var asmPath in assemblies)
@@ -18,13 +20,18 @@ namespace Squidex.Extensibility
                 {
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(asmPath);
                     builder.RegisterAssemblyTypes(asm)
-                        .Where(t => typeof(ISquidexPlugin).IsAssignableFrom(t))
-                        .As<ISquidexPlugin>();
+                        .Where(t => typeof(IQueryModule).IsAssignableFrom(t))
+                        .As<IQueryModule>()
+                        .SingleInstance();
                 }
                 catch (Exception e)
                 {
                 }
             }
+
+            builder.RegisterType(typeof(QueryModulesService))
+                .As<IQueryModulesService>()
+                .SingleInstance();
         }
     }
 }

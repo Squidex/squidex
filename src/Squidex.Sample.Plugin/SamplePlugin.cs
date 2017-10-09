@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Extensibility;
 
 namespace Squidex.Sample.Plugin
 {
-    public class SamplePlugin : ISquidexPlugin
+    public class SamplePlugin : IQueryModule
     {
         private readonly IContentQueryService contentQuery;
 

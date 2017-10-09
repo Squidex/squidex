@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Extensibility;
 

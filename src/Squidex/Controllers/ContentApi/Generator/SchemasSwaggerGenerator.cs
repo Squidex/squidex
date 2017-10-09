@@ -19,8 +19,8 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Extensibility;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
@@ -35,14 +35,14 @@ namespace Squidex.Controllers.ContentApi.Generator
         private JsonSchemaResolver schemaResolver;
         private SwaggerGenerator swaggerGenerator;
         private SwaggerDocument document;
-        private IList<ISquidexPlugin> plugins;
+        private IList<IQueryModule> plugins;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions, IServiceProvider provider)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions, IEnumerable<IQueryModule> plugins)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
-            this.plugins = provider.GetServices<ISquidexPlugin>().ToList();
+            this.plugins = plugins.ToList();
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -72,7 +72,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                 foreach (var plugin in plugins)
                 {
-                    var queries = plugin.GetQueries(app, schemaEntity);
+                    var queries = plugin.GetQueries(app.Name, schemaEntity);
                     generator.GenerateSchemaQueriesOperations(queries);
                 }
             }

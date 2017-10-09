@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentQueryGraphType : ObjectGraphType
     {
-        public ContentQueryGraphType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemas)
+        public ContentQueryGraphType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemas, IQueryModulesService queryModulesService)
         {
             AddAssetFind(graphQLContext);
             AddAssetsQuery(graphQLContext);
@@ -30,6 +31,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                 AddContentFind(schema, schemaType, schemaName);
                 AddContentQuery(schema, schemaType, schemaName);
+                AddCustomContentQueries(schema, schemaType, schemaName, queryModulesService.GetQueriesFromAllQueryModules(graphQLContext.AppName, schema));
             }
 
             Description = "The app queries.";
@@ -176,6 +178,12 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 }),
                 Description = $"Query {schemaName} content items."
             });
+        }
+
+        private void AddCustomContentQueries(ISchemaEntity schema, IGraphType schemaType, string schemaName, IEnumerable<IQuery> customQueries)
+        {
+            var field = new FieldType();
+            // todo...
         }
 
         private static string BuildODataQuery(ResolveFieldContext c)
