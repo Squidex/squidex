@@ -73,12 +73,12 @@
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.3" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="NJsonSchema" Version="9.7.1" />
+    <PackageReference Include="NJsonSchema" Version="9.7.3" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.9.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.9.1" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
-    <PackageReference Include="ReportGenerator" Version="3.0.0" />
+    <PackageReference Include="ReportGenerator" Version="3.0.1" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
