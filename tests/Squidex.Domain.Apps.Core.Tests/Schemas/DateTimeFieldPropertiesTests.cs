@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             sut.Validate(errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]

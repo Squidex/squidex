@@ -19,14 +19,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         Task ClearAsync(IEnumerable<string> currentConsumerNames);
 
-        Task CreateAsync(string consumerName);
-
-        Task StartAsync(string consumerName);
-
-        Task StopAsync(string consumerName, string error = null);
-
-        Task ResetAsync(string consumerName);
-
-        Task SetPositionAsync(string consumerName, string position, bool reset);
+        Task SetAsync(string consumerName, string position, bool isStopped, string error = null);
     }
 }
