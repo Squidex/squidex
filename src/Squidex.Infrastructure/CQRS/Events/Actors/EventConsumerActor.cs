@@ -18,7 +18,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
     public sealed class EventConsumerActor : DisposableObjectBase, IEventSubscriber, IActor
     {
-        private const int ReconnectWaitMs = 1000;
         private readonly EventDataFormatter formatter;
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
@@ -28,10 +27,10 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private IEventSubscription eventSubscription;
         private IEventConsumer eventConsumer;
         private bool isStopped;
-        private bool statusIsRunning;
+        private bool statusIsRunning = true;
         private string statusPosition;
         private string statusError;
-        private Guid stateId;
+        private Guid stateId = Guid.NewGuid();
 
         private sealed class Teardown
         {
@@ -61,6 +60,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             public Guid StateId { get; set; }
         }
+
+        public int ReconnectWaitMs { get; set; } = 5000;
 
         public EventConsumerActor(
             EventDataFormatter formatter,
@@ -130,7 +131,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             try
             {
-                stateId = Guid.NewGuid();
+                var oldStateId = stateId;
+                var newStateId = stateId = Guid.NewGuid();
 
                 switch (message)
                 {
@@ -138,7 +140,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                     {
                         isStopped = true;
 
-                        break;
+                        return;
                     }
 
                     case Setup setup:
@@ -147,11 +149,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                         var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
 
-                        statusError = status?.Error;
-                        statusPosition = status?.Position;
-                        statusIsRunning = !(status?.IsStopped ?? false);
+                        if (status != null)
+                        {
+                            statusError = status.Error;
+                            statusPosition = status.Position;
+                            statusIsRunning = !status.IsStopped;
+                        }
 
-                        return;
+                        if (statusIsRunning)
+                        {
+                            await SubscribeAsync();
+                        }
+
+                        break;
                     }
 
                     case StartConsumerMessage startConsumer:
@@ -178,8 +188,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                         await UnsubscribeAsync();
 
-                        statusError = null;
-                        statusIsRunning = true;
+                        statusIsRunning = false;
 
                         break;
                     }
@@ -199,7 +208,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                     case Reconnect reconnect:
                     {
-                        if (!statusIsRunning || reconnect.StateId != stateId)
+                        if (!statusIsRunning || reconnect.StateId != oldStateId)
                         {
                             return;
                         }
@@ -220,9 +229,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                         if (retryWindow.CanRetryAfterFailure())
                         {
-                            var id = stateId;
-
-                            Task.Delay(ReconnectWaitMs).ContinueWith(t => dispatcher.SendAsync(new Reconnect { StateId = id })).Forget();
+                            Task.Delay(ReconnectWaitMs).ContinueWith(t => dispatcher.SendAsync(new Reconnect { StateId = newStateId })).Forget();
                         }
                         else
                         {
@@ -243,14 +250,26 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                         await DispatchConsumerAsync(@event);
 
+                        statusError = null;
                         statusPosition = @eventReceived.Event.EventPosition;
 
                         break;
                     }
                 }
+
+                await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
             }
             catch (Exception ex)
             {
+                try
+                {
+                    await UnsubscribeAsync();
+                }
+                catch (Exception unsubscribeException)
+                {
+                    ex = new AggregateException(ex, unsubscribeException);
+                }
+
                 log.LogFatal(ex, w => w
                     .WriteProperty("action", "HandleEvent")
                     .WriteProperty("state", "Failed")
@@ -258,9 +277,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                 statusError = ex.ToString();
                 statusIsRunning = false;
-            }
-            finally
-            {
+
                 await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
             }
         }
@@ -275,14 +292,14 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private async Task SubscribeAsync()
+        private Task SubscribeAsync()
         {
             if (eventSubscription == null)
             {
-                var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
-
-                eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, status.Position);
+                eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, statusPosition);
             }
+
+            return TaskHelper.Done;
         }
 
         private async Task ClearAsync()
