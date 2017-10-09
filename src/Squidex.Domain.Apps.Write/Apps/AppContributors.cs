@@ -16,14 +16,14 @@ namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppContributors
     {
-        private readonly Dictionary<string, PermissionLevel> contributors = new Dictionary<string, PermissionLevel>();
+        private readonly Dictionary<string, AppContributorPermission> contributors = new Dictionary<string, AppContributorPermission>();
 
         public int Count
         {
             get { return contributors.Count; }
         }
 
-        public void Assign(string contributorId, PermissionLevel permission)
+        public void Assign(string contributorId, AppContributorPermission permission)
         {
             string Message() => "Cannot assign contributor";
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             }
         }
 
-        private void ThrowIfFound(string contributorId, PermissionLevel permission, Func<string> message)
+        private void ThrowIfFound(string contributorId, AppContributorPermission permission, Func<string> message)
         {
             if (contributors.TryGetValue(contributorId, out var currentPermission) && currentPermission == permission)
             {
@@ -61,13 +61,13 @@ namespace Squidex.Domain.Apps.Write.Apps
             }
         }
 
-        private void ThrowIfNoOwner(Action<Dictionary<string, PermissionLevel>> change, Func<string> message)
+        private void ThrowIfNoOwner(Action<Dictionary<string, AppContributorPermission>> change, Func<string> message)
         {
-            var contributorsCopy = new Dictionary<string, PermissionLevel>(contributors);
+            var contributorsCopy = new Dictionary<string, AppContributorPermission>(contributors);
 
             change(contributorsCopy);
 
-            if (contributorsCopy.All(x => x.Value != PermissionLevel.Owner))
+            if (contributorsCopy.All(x => x.Value != AppContributorPermission.Owner))
             {
                 var error = new ValidationError("Contributor is the last owner", "ContributorId");
 

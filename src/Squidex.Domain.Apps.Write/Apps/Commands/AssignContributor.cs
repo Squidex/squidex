@@ -16,13 +16,18 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
     {
         public string ContributorId { get; set; }
 
-        public PermissionLevel Permission { get; set; }
+        public AppContributorPermission Permission { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
             if (string.IsNullOrWhiteSpace(ContributorId))
             {
                 errors.Add(new ValidationError("Contributor id not assigned", nameof(ContributorId)));
+            }
+
+            if (!Permission.IsEnumValue())
+            {
+                errors.Add(new ValidationError("Permission is not valid", nameof(Permission)));
             }
         }
     }

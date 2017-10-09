@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
 
         public string Name { get; set; }
 
-        public bool? IsReader { get; set; }
+        public AppClientPermission? Permission { get; set; }
 
         public void Validate(IList<ValidationError> errors)
         {
@@ -26,9 +27,14 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
                 errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
             }
 
-            if (string.IsNullOrWhiteSpace(Name) && IsReader == null)
+            if (string.IsNullOrWhiteSpace(Name) && Permission == null)
             {
-                errors.Add(new ValidationError("Either name or reader state must be defined.", nameof(Name), nameof(IsReader)));
+                errors.Add(new ValidationError("Either name or permission must be defined.", nameof(Name), nameof(Permission)));
+            }
+
+            if (Permission.HasValue && !Permission.Value.IsEnumValue())
+            {
+                errors.Add(new ValidationError("Permission is not valid.", nameof(Permission)));
             }
         }
     }

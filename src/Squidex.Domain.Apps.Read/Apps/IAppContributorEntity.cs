@@ -14,6 +14,6 @@ namespace Squidex.Domain.Apps.Read.Apps
     {
         string ContributorId { get; }
 
-        PermissionLevel Permission { get; }
+        AppContributorPermission Permission { get; }
     }
 }

@@ -66,11 +66,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             });
         }
 
-        protected Task On(AppClientChanged @event, EnvelopeHeaders headers)
+        protected Task On(AppClientUpdated @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id].IsReader = @event.IsReader;
+                a.Clients[@event.Id].Permission = @event.Permission;
             });
         }
 

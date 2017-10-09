@@ -20,6 +20,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         [BsonRequired]
         [BsonElement]
-        public PermissionLevel Permission { get; set; }
+        public AppContributorPermission Permission { get; set; }
     }
 }

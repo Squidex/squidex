@@ -1,23 +1,18 @@
 ﻿// ==========================================================================
-//  IAppClientEntity.cs
+//  AppPermission.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
-
-namespace Squidex.Domain.Apps.Read.Apps
+namespace Squidex.Domain.Apps.Core.Apps
 {
-    public interface IAppClientEntity
+    public enum AppPermission
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        string Secret { get; }
-
-        AppClientPermission Permission { get; }
+        Owner,
+        Developer,
+        Editor,
+        Reader
     }
 }

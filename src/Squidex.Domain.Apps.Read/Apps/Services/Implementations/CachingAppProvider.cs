@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
             }
 
             if (@event.Payload is AppClientAttached ||
-                @event.Payload is AppClientChanged ||
+                @event.Payload is AppClientUpdated ||
                 @event.Payload is AppClientRenamed ||
                 @event.Payload is AppClientRevoked ||
                 @event.Payload is AppPlanChanged ||

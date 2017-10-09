@@ -70,13 +70,11 @@
             </td>
         </tr>
         <tr>
-            <td></td>
+            <td>Permission</td>
             <td>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" [ngModel]="client.isReader" (ngModelChange)="changing.emit($event)" /> Reading only
-                    </label>
-                </div>
+                <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
+                    <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
+                </select>
             </td>
         </tr>
     </table>

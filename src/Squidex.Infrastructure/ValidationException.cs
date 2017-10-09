@@ -45,5 +45,10 @@ namespace Squidex.Infrastructure
         {
             this.errors = errors ?? FallbackErrors;
         }
+
+        public override string ToString()
+        {
+            return string.Join(" ", Enumerable.Repeat(Message, 1).Union(Errors.Select(x => x.Message)));
+        }
     }
 }
