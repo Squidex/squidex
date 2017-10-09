@@ -158,7 +158,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                         if (statusIsRunning)
                         {
-                            await SubscribeAsync();
+                            await SubscribeThisAsync(statusPosition);
                         }
 
                         break;
@@ -171,7 +171,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                             return;
                         }
 
-                        await SubscribeAsync();
+                        await SubscribeThisAsync(statusPosition);
 
                         statusError = null;
                         statusIsRunning = true;
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                             return;
                         }
 
-                        await UnsubscribeAsync();
+                        await UnsubscribeThisAsync();
 
                         statusIsRunning = false;
 
@@ -195,9 +195,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                     case ResetConsumerMessage resetConsumer:
                     {
-                        await UnsubscribeAsync();
+                        await UnsubscribeThisAsync();
                         await ClearAsync();
-                        await SubscribeAsync();
+                        await SubscribeThisAsync(null);
 
                         statusError = null;
                         statusPosition = null;
@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                             return;
                         }
 
-                        await SubscribeAsync();
+                        await SubscribeThisAsync(statusPosition);
 
                         break;
                     }
@@ -225,7 +225,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                             return;
                         }
 
-                        await UnsubscribeAsync();
+                        await UnsubscribeThisAsync();
 
                         if (retryWindow.CanRetryAfterFailure())
                         {
@@ -263,7 +263,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             {
                 try
                 {
-                    await UnsubscribeAsync();
+                    await UnsubscribeThisAsync();
                 }
                 catch (Exception unsubscribeException)
                 {
@@ -282,7 +282,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private async Task UnsubscribeAsync()
+        private async Task UnsubscribeThisAsync()
         {
             if (eventSubscription != null)
             {
@@ -292,11 +292,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private Task SubscribeAsync()
+        private Task SubscribeThisAsync(string position)
         {
             if (eventSubscription == null)
             {
-                eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, statusPosition);
+                eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, position);
             }
 
             return TaskHelper.Done;

@@ -151,6 +151,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             A.CallTo(() => eventSubscription.StopAsync())
                 .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, consumerInfo.Position))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
