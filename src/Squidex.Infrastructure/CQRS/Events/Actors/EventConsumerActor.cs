@@ -100,6 +100,14 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
+        public async Task WaitForCompletionAsync()
+        {
+            while (dispatcher.InputCount > 0)
+            {
+                await Task.Delay(20);
+            }
+        }
+
         public Task SubscribeAsync(IEventConsumer eventConsumer)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));

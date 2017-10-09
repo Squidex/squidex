@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             await sut.CreateAsync<MyDomainObject>(context, async x =>
             {
-                await Task.Delay(1);
+                await Task.Yield();
 
                 passedDomainObject = x;
             });
@@ -139,7 +139,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             await sut.UpdateAsync<MyDomainObject>(context, async x =>
             {
-                await Task.Delay(1);
+                await Task.Yield();
 
                 passedDomainObject = x;
             });

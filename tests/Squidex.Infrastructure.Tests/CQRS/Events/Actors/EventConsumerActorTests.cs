@@ -207,6 +207,10 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             await OnSubscribeAsync();
             await OnErrorAsync(eventSubscription, ex);
 
+            await Task.Delay(200);
+
+            await sut.WaitForCompletionAsync();
+
             sut.Dispose();
 
             A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
@@ -341,25 +345,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                 .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
-        private async Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
+        private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
         {
-            await sutSubscriber.OnErrorAsync(subscriber, ex);
-
-            await Task.Delay(200);
+            return sutSubscriber.OnErrorAsync(subscriber, ex);
         }
 
-        private async Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
+        private Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
         {
-            await sutSubscriber.OnEventAsync(subscriber, ev);
-
-            await Task.Delay(200);
+            return sutSubscriber.OnEventAsync(subscriber, ev);
         }
 
-        private async Task OnSubscribeAsync()
+        private Task OnSubscribeAsync()
         {
-            await sut.SubscribeAsync(eventConsumer);
-
-            await Task.Delay(200);
+            return sut.SubscribeAsync(eventConsumer);
         }
     }
 }
