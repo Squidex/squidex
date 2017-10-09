@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private async Task WaitAndStopAsync()
         {
-            await Task.Delay(1000);
+            await Task.Delay(200);
 
             await sut.StopAsync();
         }
