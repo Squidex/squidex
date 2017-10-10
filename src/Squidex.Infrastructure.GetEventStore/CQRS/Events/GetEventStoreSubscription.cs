@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -16,162 +16,78 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
-using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    internal sealed class GetEventStoreSubscription : Actor, IEventSubscription
+    internal sealed class GetEventStoreSubscription : IEventSubscription
     {
-        private const int ReconnectWindowMax = 5;
-        private const int ReconnectWaitMs = 1000;
-        private static readonly TimeSpan TimeBetweenReconnects = TimeSpan.FromMinutes(5);
+        private const string ProjectionName = "by-{0}-{1}";
         private static readonly ConcurrentDictionary<string, bool> SubscriptionsCreated = new ConcurrentDictionary<string, bool>();
-        private readonly IEventStoreConnection connection;
-        private readonly IEventSubscriber subscriber;
+        private readonly IEventStoreConnection eventStoreConnection;
+        private readonly IEventSubscriber eventSubscriber;
         private readonly string prefix;
-        private readonly string streamName;
         private readonly string streamFilter;
         private readonly string projectionHost;
-        private readonly Queue<DateTime> reconnectTimes = new Queue<DateTime>();
-        private EventStoreCatchUpSubscription subscription;
+        private readonly EventStoreCatchUpSubscription subscription;
         private long? position;
 
-        private sealed class ESConnect
-        {
-        }
-
-        private abstract class ESMessage
-        {
-            public EventStoreCatchUpSubscription Subscription { get; set; }
-        }
-
-        private sealed class ESSubscriptionFailed : ESMessage
-        {
-            public Exception Exception { get; set; }
-        }
-
-        private sealed class ESEventReceived : ESMessage
-        {
-            public ResolvedEvent Event { get; set; }
-        }
-
         public GetEventStoreSubscription(
-            IEventStoreConnection connection,
-            IEventSubscriber subscriber,
+            IEventStoreConnection eventStoreConnection,
+            IEventSubscriber eventSubscriber,
             string projectionHost,
             string prefix,
             string position,
             string streamFilter)
         {
-            this.connection = connection;
+            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
+            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
+
+            this.eventStoreConnection = eventStoreConnection;
+            this.eventSubscriber = eventSubscriber;
             this.position = ParsePosition(position);
             this.prefix = prefix;
             this.projectionHost = projectionHost;
             this.streamFilter = streamFilter;
-            this.subscriber = subscriber;
 
-            streamName = ParseFilter(prefix, streamFilter);
+            var streamName = ParseFilter(prefix, streamFilter);
 
-            DispatchAsync(new ESConnect()).Forget();
+            InitializeAsync(streamName).Wait();
+
+            subscription = SubscribeToStream(streamName);
         }
 
         public Task StopAsync()
         {
-            return StopAndWaitAsync();
-        }
-
-        protected override Task OnStop()
-        {
-            subscription?.Stop();
+            subscription.Stop();
 
             return TaskHelper.Done;
         }
 
-        protected override async Task OnError(Exception exception)
-        {
-            await subscriber.OnErrorAsync(this, exception);
-
-            await StopAsync();
-        }
-
-        protected override async Task OnMessage(object message)
-        {
-            switch (message)
-            {
-                case ESConnect connect when subscription == null:
-                {
-                    await InitializeAsync();
-
-                    subscription = SubscribeToStream();
-
-                    break;
-                }
-
-                case ESSubscriptionFailed subscriptionFailed when subscriptionFailed.Subscription == subscription:
-                {
-                    subscription.Stop();
-                    subscription = null;
-
-                    if (CanReconnect(DateTime.UtcNow))
-                    {
-                        Task.Delay(ReconnectWaitMs).ContinueWith(t => DispatchAsync(new ESConnect())).Forget();
-                    }
-                    else
-                    {
-                        throw subscriptionFailed.Exception;
-                    }
-
-                    break;
-                }
-
-                case ESEventReceived eventReceived when eventReceived.Subscription == subscription:
-                {
-                    var storedEvent = Formatter.Read(eventReceived.Event);
-
-                    await subscriber.OnEventAsync(this, storedEvent);
-
-                    position = eventReceived.Event.OriginalEventNumber;
-
-                    break;
-                }
-            }
-        }
-
-        private EventStoreCatchUpSubscription SubscribeToStream()
+        private EventStoreCatchUpSubscription SubscribeToStream(string streamName)
         {
             var settings = CatchUpSubscriptionSettings.Default;
 
-            return connection.SubscribeToStreamFrom(streamName, position, settings,
+            return eventStoreConnection.SubscribeToStreamFrom(streamName, position, settings,
                 (s, e) =>
                 {
-                    DispatchAsync(new ESEventReceived { Event = e, Subscription = s }).Forget();
+                    var storedEvent = Formatter.Read(e);
+
+                    eventSubscriber.OnEventAsync(this, storedEvent).Wait();
                 }, null,
                 (s, reason, ex) =>
                 {
-                    if (reason == SubscriptionDropReason.ConnectionClosed ||
-                        reason == SubscriptionDropReason.UserInitiated)
+                    if (reason != SubscriptionDropReason.ConnectionClosed &&
+                        reason != SubscriptionDropReason.UserInitiated)
                     {
                         ex = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
-                        DispatchAsync(new ESSubscriptionFailed { Exception = ex, Subscription = s }).Forget();
+                        eventSubscriber.OnErrorAsync(this, ex);
                     }
                 });
         }
 
-        private bool CanReconnect(DateTime utcNow)
-        {
-            reconnectTimes.Enqueue(utcNow);
-
-            while (reconnectTimes.Count >= ReconnectWindowMax)
-            {
-                reconnectTimes.Dequeue();
-            }
-
-            return reconnectTimes.Count < ReconnectWindowMax && (reconnectTimes.Count == 0 || (utcNow - reconnectTimes.Peek()) > TimeBetweenReconnects);
-        }
-
-        private async Task InitializeAsync()
+        private async Task InitializeAsync(string streamName)
         {
             if (SubscriptionsCreated.TryAdd(streamName, true))
             {
@@ -189,7 +105,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 try
                 {
-                    var credentials = connection.Settings.DefaultUserCredentials;
+                    var credentials = eventStoreConnection.Settings.DefaultUserCredentials;
 
                     await projectsManager.CreateContinuousAsync($"${streamName}", projectionConfig, credentials);
                 }
@@ -201,16 +117,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                     }
                 }
             }
-        }
-
-        private static string ParseFilter(string prefix, string filter)
-        {
-            return $"by-{prefix.Simplify()}-{filter.Simplify()}";
-        }
-
-        private static long? ParsePosition(string position)
-        {
-            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
         }
 
         private async Task<ProjectionsManager> ConnectToProjections()
@@ -227,10 +133,20 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             var projectionsManager =
                 new ProjectionsManager(
-                    connection.Settings.Log, endpoint,
-                    connection.Settings.OperationTimeout);
+                    eventStoreConnection.Settings.Log, endpoint,
+                    eventStoreConnection.Settings.OperationTimeout);
 
             return projectionsManager;
+        }
+
+        private static string ParseFilter(string prefix, string filter)
+        {
+            return string.Format(CultureInfo.InvariantCulture, ProjectionName, prefix.Simplify(), filter.Simplify());
+        }
+
+        private static long? ParsePosition(string position)
+        {
+            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
         }
     }
 }

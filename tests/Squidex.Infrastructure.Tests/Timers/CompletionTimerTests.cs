@@ -31,22 +31,5 @@ namespace Squidex.Infrastructure.Timers
 
             Assert.True(called);
         }
-
-        public void Should_invoke_dispose_within_timer()
-        {
-            CompletionTimer timer = null;
-
-            timer = new CompletionTimer(10, ct =>
-            {
-                timer?.StopAsync().Wait();
-
-                return TaskHelper.Done;
-            }, 10);
-
-            Thread.Sleep(1000);
-
-            timer.SkipCurrentDelay();
-            timer.StopAsync().Wait();
-        }
     }
 }

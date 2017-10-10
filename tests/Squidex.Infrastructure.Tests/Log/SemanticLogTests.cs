@@ -240,7 +240,7 @@ namespace Squidex.Infrastructure.Log
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -254,7 +254,7 @@ namespace Squidex.Infrastructure.Log
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -268,7 +268,7 @@ namespace Squidex.Infrastructure.Log
                     .WriteProperty("message", "My Message")
                     .WriteProperty("elapsedMs", 0));
 
-            Assert.True(output.StartsWith(expected.Substring(0, 55), StringComparison.Ordinal));
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
         }
 
         [Fact]

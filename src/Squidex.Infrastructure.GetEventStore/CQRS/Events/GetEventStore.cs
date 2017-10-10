@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 
@@ -32,6 +33,10 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.prefix = prefix?.Trim(' ', '-').WithFallback("squidex");
         }
 
+        public GetEventStore()
+        {
+        }
+
         public void Connect()
         {
             try
@@ -46,10 +51,12 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            Guard.NotNull(subscriber, nameof(subscriber));
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
-
             return new GetEventStoreSubscription(connection, subscriber, projectionHost, prefix, position, streamFilter);
+        }
+
+        public Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
+        {
+            throw new NotSupportedException();
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)

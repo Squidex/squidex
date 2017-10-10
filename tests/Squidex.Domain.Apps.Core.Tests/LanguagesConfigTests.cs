@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Core
         {
             var config = LanguagesConfig.Create();
 
-            Assert.Equal(0, config.Count);
+            Assert.Empty(config);
 
             Assert.NotNull(((IEnumerable)config).GetEnumerator());
             Assert.NotNull(((IEnumerable<IFieldPartitionItem>)config).GetEnumerator());

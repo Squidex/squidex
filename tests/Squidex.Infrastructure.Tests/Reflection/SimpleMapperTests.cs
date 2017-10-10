@@ -107,9 +107,11 @@ namespace Squidex.Infrastructure.Reflection
             Assert.Equal(class1.MappedString, class2.MappedString);
             Assert.Equal(class1.MappedNumber, class2.MappedNumber);
             Assert.Equal(class1.MappedGuid.ToString(), class2.MappedGuid);
-            Assert.Equal(class1.WrongType1, 0L);
-            Assert.Equal(class1.WrongType2, 0L);
+
             Assert.NotEqual(class1.UnmappedString, class2.UnmappedString);
+
+            Assert.Equal(0L, class1.WrongType1);
+            Assert.Equal(0L, class1.WrongType2);
         }
     }
 }

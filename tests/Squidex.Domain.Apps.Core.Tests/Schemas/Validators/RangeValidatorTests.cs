@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             await sut.ValidateAsync(null, errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             await sut.ValidateAsync(1500, errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Theory]

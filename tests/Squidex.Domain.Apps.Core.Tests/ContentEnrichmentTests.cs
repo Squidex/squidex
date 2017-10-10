@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core
 
             Assert.Equal(Now, InstantPattern.General.Parse((string)data["my-datetime"]["iv"]).Value);
 
-            Assert.Equal(true, (bool)data["my-boolean"]["iv"]);
+            Assert.True((bool)data["my-boolean"]["iv"]);
         }
 
         [Fact]

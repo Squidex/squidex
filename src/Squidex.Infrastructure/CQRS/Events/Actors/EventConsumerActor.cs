@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Log;
@@ -15,16 +16,25 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
-    public sealed class EventConsumerActor : Actor, IEventSubscriber, IActor
+    public sealed class EventConsumerActor : DisposableObjectBase, IEventSubscriber, IActor
     {
         private readonly EventDataFormatter formatter;
+        private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
         private readonly ISemanticLog log;
+        private readonly ActionBlock<object> dispatcher;
         private IEventSubscription eventSubscription;
         private IEventConsumer eventConsumer;
-        private bool isRunning;
-        private bool isSetup;
+        private bool isStopped;
+        private bool statusIsRunning = true;
+        private string statusPosition;
+        private string statusError;
+        private Guid stateId = Guid.NewGuid();
+
+        private sealed class Teardown
+        {
+        }
 
         private sealed class Setup
         {
@@ -46,6 +56,13 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             public Exception Exception { get; set; }
         }
 
+        private sealed class Reconnect
+        {
+            public Guid StateId { get; set; }
+        }
+
+        public int ReconnectWaitMs { get; set; } = 5000;
+
         public EventConsumerActor(
             EventDataFormatter formatter,
             IEventStore eventStore,
@@ -62,148 +79,238 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             this.formatter = formatter;
             this.eventStore = eventStore;
             this.eventConsumerInfoRepository = eventConsumerInfoRepository;
+
+            var options = new ExecutionDataflowBlockOptions
+            {
+                MaxMessagesPerTask = -1,
+                MaxDegreeOfParallelism = 1,
+                BoundedCapacity = 10
+            };
+
+            dispatcher = new ActionBlock<object>(OnMessage, options);
+        }
+
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                dispatcher.SendAsync(new Teardown()).Wait();
+                dispatcher.Complete();
+                dispatcher.Completion.Wait();
+            }
+        }
+
+        public async Task WaitForCompletionAsync()
+        {
+            while (dispatcher.InputCount > 0)
+            {
+                await Task.Delay(20);
+            }
         }
 
         public Task SubscribeAsync(IEventConsumer eventConsumer)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            return DispatchAsync(new Setup { EventConsumer = eventConsumer });
-        }
-
-        protected override async Task OnStop()
-        {
-            if (eventSubscription != null)
-            {
-                await eventSubscription.StopAsync();
-            }
-        }
-
-        protected override async Task OnError(Exception exception)
-        {
-            log.LogError(exception, w => w
-                .WriteProperty("action", "HandleEvent")
-                .WriteProperty("state", "Failed")
-                .WriteProperty("eventConsumer", eventConsumer.Name));
-
-            await StopAsync(exception);
-
-            isRunning = false;
+            return dispatcher.SendAsync(new Setup { EventConsumer = eventConsumer });
         }
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent @event)
         {
-            return DispatchAsync(new SubscriptionEventReceived { Subscription = subscription, Event = @event });
+            return dispatcher.SendAsync(new SubscriptionEventReceived { Subscription = subscription, Event = @event });
         }
 
         Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return DispatchAsync(new SubscriptionFailed { Subscription = subscription, Exception = exception });
+            return dispatcher.SendAsync(new SubscriptionFailed { Subscription = subscription, Exception = exception });
         }
 
         void IActor.Tell(object message)
         {
-            DispatchAsync(message).Forget();
+            dispatcher.SendAsync(message).Forget();
         }
 
-        protected override async Task OnMessage(object message)
+        private async Task OnMessage(object message)
         {
-            switch (message)
+            if (isStopped)
             {
-                case Setup setup when !isSetup:
+                return;
+            }
+
+            try
+            {
+                var oldStateId = stateId;
+                var newStateId = stateId = Guid.NewGuid();
+
+                switch (message)
+                {
+                    case Teardown teardown:
+                    {
+                        isStopped = true;
+
+                        return;
+                    }
+
+                    case Setup setup:
                     {
                         eventConsumer = setup.EventConsumer;
 
-                        await SetupAsync();
+                        var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
 
-                        isSetup = true;
-
-                        break;
-                    }
-
-                case StartConsumerMessage startConsumer when isSetup && !isRunning:
-                    {
-                        await StartAsync();
-
-                        isRunning = true;
-
-                        break;
-                    }
-
-                case StopConsumerMessage stopConsumer when isSetup && isRunning:
-                    {
-                        await StopAsync();
-
-                        isRunning = false;
-
-                        break;
-                    }
-
-                case ResetConsumerMessage resetConsumer when isSetup:
-                    {
-                        await StopAsync();
-                        await ResetAsync();
-                        await StartAsync();
-
-                        isRunning = true;
-
-                        break;
-                    }
-
-                case SubscriptionFailed subscriptionFailed when isSetup:
-                    {
-                        if (subscriptionFailed.Subscription == eventSubscription)
+                        if (status != null)
                         {
-                            await FailAsync(subscriptionFailed.Exception);
+                            statusError = status.Error;
+                            statusPosition = status.Position;
+                            statusIsRunning = !status.IsStopped;
+                        }
+
+                        if (statusIsRunning)
+                        {
+                            await SubscribeThisAsync(statusPosition);
                         }
 
                         break;
                     }
 
-                case SubscriptionEventReceived eventReceived when isSetup:
+                    case StartConsumerMessage startConsumer:
                     {
-                        if (eventReceived.Subscription == eventSubscription)
+                        if (statusIsRunning)
                         {
-                            var @event = ParseEvent(eventReceived.Event);
+                            return;
+                        }
 
-                            await DispatchConsumerAsync(@event, eventReceived.Event.EventPosition);
+                        await SubscribeThisAsync(statusPosition);
+
+                        statusError = null;
+                        statusIsRunning = true;
+
+                        break;
+                    }
+
+                    case StopConsumerMessage stopConsumer:
+                    {
+                        if (!statusIsRunning)
+                        {
+                            return;
+                        }
+
+                        await UnsubscribeThisAsync();
+
+                        statusIsRunning = false;
+
+                        break;
+                    }
+
+                    case ResetConsumerMessage resetConsumer:
+                    {
+                        await UnsubscribeThisAsync();
+                        await ClearAsync();
+                        await SubscribeThisAsync(null);
+
+                        statusError = null;
+                        statusPosition = null;
+                        statusIsRunning = true;
+
+                        break;
+                    }
+
+                    case Reconnect reconnect:
+                    {
+                        if (!statusIsRunning || reconnect.StateId != oldStateId)
+                        {
+                            return;
+                        }
+
+                        await SubscribeThisAsync(statusPosition);
+
+                        break;
+                    }
+
+                    case SubscriptionFailed subscriptionFailed:
+                    {
+                        if (subscriptionFailed.Subscription != eventSubscription)
+                        {
+                            return;
+                        }
+
+                        await UnsubscribeThisAsync();
+
+                        if (retryWindow.CanRetryAfterFailure())
+                        {
+                            Task.Delay(ReconnectWaitMs).ContinueWith(t => dispatcher.SendAsync(new Reconnect { StateId = newStateId })).Forget();
+                        }
+                        else
+                        {
+                            throw subscriptionFailed.Exception;
                         }
 
                         break;
                     }
+
+                    case SubscriptionEventReceived eventReceived:
+                    {
+                        if (eventReceived.Subscription != eventSubscription)
+                        {
+                            return;
+                        }
+
+                        var @event = ParseEvent(eventReceived.Event);
+
+                        await DispatchConsumerAsync(@event);
+
+                        statusError = null;
+                        statusPosition = @eventReceived.Event.EventPosition;
+
+                        break;
+                    }
+                }
+
+                await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
             }
-        }
-
-        private async Task SetupAsync()
-        {
-            await eventConsumerInfoRepository.CreateAsync(eventConsumer.Name);
-
-            var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
-
-            if (!status.IsStopped)
+            catch (Exception ex)
             {
-                DispatchAsync(new StartConsumerMessage()).Forget();
+                try
+                {
+                    await UnsubscribeThisAsync();
+                }
+                catch (Exception unsubscribeException)
+                {
+                    ex = new AggregateException(ex, unsubscribeException);
+                }
+
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("eventConsumer", eventConsumer.Name));
+
+                statusError = ex.ToString();
+                statusIsRunning = false;
+
+                await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
             }
         }
 
-        private async Task StartAsync()
+        private async Task UnsubscribeThisAsync()
         {
-            var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
+            if (eventSubscription != null)
+            {
+                await eventSubscription.StopAsync();
 
-            eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, status.Position);
-
-            await eventConsumerInfoRepository.StartAsync(eventConsumer.Name);
+                eventSubscription = null;
+            }
         }
 
-        private async Task StopAsync(Exception exception = null)
+        private Task SubscribeThisAsync(string position)
         {
-            eventSubscription?.StopAsync().Forget();
-            eventSubscription = null;
+            if (eventSubscription == null)
+            {
+                eventSubscription = eventStore.CreateSubscription(this, eventConsumer.EventsFilter, position);
+            }
 
-            await eventConsumerInfoRepository.StopAsync(eventConsumer.Name, exception?.ToString());
+            return TaskHelper.Done;
         }
 
-        private async Task ResetAsync()
+        private async Task ClearAsync()
         {
             var actionId = Guid.NewGuid().ToString();
 
@@ -219,13 +326,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                 .WriteProperty("state", "Completed")
                 .WriteProperty("eventConsumer", eventConsumer.Name)))
             {
-                await eventConsumerInfoRepository.ResetAsync(eventConsumer.Name);
                 await eventConsumer.ClearAsync();
-                await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, null, true);
             }
         }
 
-        private async Task DispatchConsumerAsync(Envelope<IEvent> @event, string position)
+        private async Task DispatchConsumerAsync(Envelope<IEvent> @event)
         {
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;
@@ -247,7 +352,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                 .WriteProperty("eventConsumer", eventConsumer.Name)))
             {
                 await eventConsumer.On(@event);
-                await eventConsumerInfoRepository.SetPositionAsync(eventConsumer.Name, position, false);
             }
         }
 

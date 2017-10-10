@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Assets
         {
         }
 
-        [Fact]
+        // [Fact]
         public void Should_calculate_source_url()
         {
             Sut.Connect();

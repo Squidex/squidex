@@ -14,6 +14,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public class ContentDataTests

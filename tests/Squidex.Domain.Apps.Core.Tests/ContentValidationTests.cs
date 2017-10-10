@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core
 
             await data.ValidateAsync(context, schema, optionalConfig.ToResolver(), errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Core
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Core
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]

@@ -26,8 +26,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             public bool IsStopped { get; set; }
 
-            public bool IsResetting { get; set; }
-
             public string Name { get; set; }
 
             public string Error { get; set; }
@@ -61,73 +59,104 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
 
-            sut = new EventConsumerActor(formatter, eventStore, eventConsumerInfoRepository, log);
+            sut = new EventConsumerActor(formatter, eventStore, eventConsumerInfoRepository, log) { ReconnectWaitMs = 0 };
 
             sutActor = sut;
             sutSubscriber = sut;
         }
 
         [Fact]
-        public async Task Should_subscribe_to_event_store_when_started()
+        public async Task Should_not_not_subscribe_to_event_store_when_stopped_in_db()
         {
-            await SubscribeAsync();
+            consumerInfo.IsStopped = true;
+
+            await OnSubscribeAsync();
 
             sut.Dispose();
 
-            A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
-                .MustHaveHappened();
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
 
-            A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
-                .MustHaveHappened();
+        [Fact]
+        public async Task Should_subscribe_to_event_store_when_not_found_in_db()
+        {
+            A.CallTo(() => eventConsumerInfoRepository.FindAsync(consumerName)).Returns(Task.FromResult<IEventConsumerInfo>(null));
+
+            await OnSubscribeAsync();
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, null, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task Should_subscribe_to_event_store_when_not_stopped_in_db()
+        {
+            await OnSubscribeAsync();
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public async Task Should_stop_subscription_when_stopped()
         {
-            await SubscribeAsync();
+            await OnSubscribeAsync();
 
+            sutActor.Tell(new StopConsumerMessage());
             sutActor.Tell(new StopConsumerMessage());
 
             sut.Dispose();
 
-            A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
-                .MustHaveHappened();
-
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, null))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened();
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public async Task Should_reset_consumer_when_resetting()
         {
-            await SubscribeAsync();
+            await OnSubscribeAsync();
 
+            sutActor.Tell(new StopConsumerMessage());
             sutActor.Tell(new ResetConsumerMessage());
             sut.Dispose();
 
-            A.CallTo(() => eventConsumerInfoRepository.CreateAsync(consumerName))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
-                .MustHaveHappened(Repeated.Exactly.Twice);
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, null, true))
-                .MustHaveHappened();
-
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, null))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, null, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventConsumer.ClearAsync())
-                .MustHaveHappened();
+                .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened();
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, consumerInfo.Position))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
@@ -135,17 +164,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
 
-            await SubscribeAsync();
-
-            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+            await OnSubscribeAsync();
+            await OnEventAsync(eventSubscription, @event);
 
             sut.Dispose();
 
-            A.CallTo(() => eventConsumer.On(envelope))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, @event.EventPosition, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventConsumer.On(envelope))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
@@ -153,122 +184,180 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
 
-            await SubscribeAsync();
-
-            await sutSubscriber.OnEventAsync(A.Fake<IEventSubscription>(), @event);
+            await OnSubscribeAsync();
+            await OnEventAsync(A.Fake<IEventSubscription>(), @event);
 
             sut.Dispose();
 
-            A.CallTo(() => eventConsumer.On(envelope))
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, @event.EventPosition, false, null))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
+            A.CallTo(() => eventConsumer.On(envelope))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_reopen_subscription_when_exception_is_retrieved()
+        {
+            var ex = new InvalidOperationException();
+
+            await OnSubscribeAsync();
+            await OnErrorAsync(eventSubscription, ex);
+
+            await Task.Delay(200);
+
+            await sut.WaitForCompletionAsync();
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Times(3));
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, ex.ToString()))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .MustHaveHappened(Repeated.Exactly.Twice);
+        }
+
+        [Fact]
+        public async Task Should_not_make_error_handling_when_exception_is_from_another_subscription()
+        {
+            var ex = new InvalidOperationException();
+
+            await OnSubscribeAsync();
+            await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, false, ex.ToString()))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_stop_if_resetting_failed()
         {
-            var exception = new InvalidOperationException("Exception");
+            var ex = new InvalidOperationException();
 
             A.CallTo(() => eventConsumer.ClearAsync())
-                .Throws(exception);
+                .Throws(ex);
 
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
 
-            await SubscribeAsync();
+            await OnSubscribeAsync();
 
             sutActor.Tell(new ResetConsumerMessage());
             sut.Dispose();
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, ex.ToString()))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public async Task Should_stop_if_handling_failed()
         {
-            var exception = new InvalidOperationException("Exception");
+            var ex = new InvalidOperationException();
 
             A.CallTo(() => eventConsumer.On(envelope))
-                .Throws(exception);
+                .Throws(ex);
 
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
 
-            await SubscribeAsync();
-            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+            await OnSubscribeAsync();
+            await OnEventAsync(eventSubscription, @event);
 
             sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, ex.ToString()))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task Should_stop_if_deserialization_failed()
+        {
+            var ex = new InvalidOperationException();
+
+            A.CallTo(() => formatter.Parse(eventData, true))
+                .Throws(ex);
+
+            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+
+            await OnSubscribeAsync();
+            await OnEventAsync(eventSubscription, @event);
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
-                .MustHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, ex.ToString()))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public async Task Should_start_after_stop_when_handling_failed()
         {
-            var exception = new InvalidOperationException("Exception");
+            var exception = new InvalidOperationException();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .Throws(exception);
 
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
 
-            await SubscribeAsync();
-            await sutSubscriber.OnEventAsync(eventSubscription, @event);
+            await OnSubscribeAsync();
+            await OnEventAsync(eventSubscription, @event);
 
+            sutActor.Tell(new StartConsumerMessage());
             sutActor.Tell(new StartConsumerMessage());
             sut.Dispose();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
 
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
-                .MustNotHaveHappened();
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, consumerInfo.Position, true, exception.ToString()))
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
-                .MustHaveHappened();
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => eventConsumerInfoRepository.StartAsync(consumerName))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
-        [Fact]
-        public async Task Should_stop_if_deserialization_failed()
+        private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
         {
-            var exception = new InvalidOperationException("Exception");
-
-            A.CallTo(() => formatter.Parse(eventData, true))
-                .Throws(exception);
-
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
-
-            await SubscribeAsync();
-            await sutSubscriber.OnEventAsync(eventSubscription, @event);
-
-            sut.Dispose();
-
-            A.CallTo(() => eventConsumer.On(envelope))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => eventConsumerInfoRepository.SetPositionAsync(consumerName, @event.EventPosition, false))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => eventConsumerInfoRepository.StopAsync(consumerName, exception.ToString()))
-                .MustHaveHappened();
+            return sutSubscriber.OnErrorAsync(subscriber, ex);
         }
 
-        private async Task SubscribeAsync()
+        private Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
         {
-            await sut.SubscribeAsync(eventConsumer);
+            return sutSubscriber.OnEventAsync(subscriber, ev);
+        }
 
-            await Task.Delay(200);
+        private Task OnSubscribeAsync()
+        {
+            return sut.SubscribeAsync(eventConsumer);
         }
     }
 }

@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             sut = sut.DeleteField(1);
 
-            Assert.Equal(0, sut.FieldsById.Count);
+            Assert.Empty(sut.FieldsById);
         }
 
         [Fact]
