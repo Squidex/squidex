@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Extensibility;
 
 namespace Squidex.Sample.Plugin
 {
@@ -16,9 +14,9 @@ namespace Squidex.Sample.Plugin
             this.contentQuery = contentQuery;
         }
 
-        public IEnumerable<IQuery> GetQueries(IAppEntity app, ISchemaEntity schema)
+        public IEnumerable<IQuery> GetQueries(string appName, ISchemaEntity schema)
         {
-            if (app.Name == "portal" && schema.Name == "news")
+            if (appName == "portal" && schema.Name == "node")
             {
                 yield return new NewsPortalArticleTagQuery(this.contentQuery);
             }

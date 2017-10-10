@@ -182,8 +182,24 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private void AddCustomContentQueries(ISchemaEntity schema, IGraphType schemaType, string schemaName, IEnumerable<IQuery> customQueries)
         {
-            var field = new FieldType();
-            // todo...
+            foreach (var q in customQueries)
+            {
+                var field = new FieldType()
+                {
+                    Name = q.Name, // not sure if we should prefix this or not
+                    Arguments = q.Arguments,
+                    ResolvedType = new ListGraphType(new NonNullGraphType(schemaType)),
+                    Resolver = new FuncFieldResolver<object>(c =>
+                    {
+                        var context = (GraphQLQueryContext)c.UserContext;
+                        var task = q.Execute(schema, context, c.Arguments); // not sure if context is bound to the schema
+                        return task.ContinueWith(x => x.Result.Items);
+                    }),
+                    Description = q.Description
+                };
+
+                AddField(field);
+            }
         }
 
         private static string BuildODataQuery(ResolveFieldContext c)

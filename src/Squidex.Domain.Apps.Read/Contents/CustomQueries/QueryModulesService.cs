@@ -15,9 +15,16 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
             this.plugins = plugins;
         }
 
-        public IEnumerable<IQuery> GetQueriesFromAllQueryModules(IAppEntity app, ISchemaEntity schema)
+        public IEnumerable<IQuery> GetQueriesFromAllQueryModules(string appName, ISchemaEntity schema)
         {
-            throw new NotImplementedException();
+            foreach (var plugin in plugins)
+            {
+                var queries = plugin.GetQueries(appName, schema);
+                foreach (var q in queries)
+                {
+                    yield return q;
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents;
@@ -12,6 +13,9 @@ using Squidex.Pipeline;
 
 namespace Squidex.Controllers.ContentApi
 {
+    [ApiExceptionFilter]
+    [AppApi]
+    [SwaggerIgnore]
     public class ComplexQueriesController : ControllerBase
     {
         private readonly IContentQueryService contentQuery;
@@ -56,7 +60,7 @@ namespace Squidex.Controllers.ContentApi
             }
 
             var context = new QueryContext(App, assetsRepository, contentQuery, User);
-            var contents = await query.Execute(context, null);
+            var contents = await query.Execute(schema, context, HttpContext.Request.Query.ToDictionary(x => x.Key, x => (object)x.Value));
 
             var response = new AssetsDto
             {

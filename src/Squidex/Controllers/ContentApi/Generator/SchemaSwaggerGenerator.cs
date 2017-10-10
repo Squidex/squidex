@@ -113,13 +113,12 @@ namespace Squidex.Controllers.ContentApi.Generator
                 AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}/queries/{query.Name}",
                     operation =>
                     {
-                        operation.OperationId = $"ComplexQuery{schemaKey}Contents"; // todo: come up with better name
-                        operation.Summary = $"Does a custom query on {schemaName}.";
+                        operation.OperationId = $"CustomQuery{schemaKey}Contents"; // todo: come up with better name
+                        operation.Summary = query.Description;
                         operation.Security = ReaderSecurity;
 
                         operation.Description = SchemaQueryDescription;
 
-                        // todo: fix the content schema, it's not the right schema. e.g. The query can give back union of items
                         operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
                         operation.Tags = new List<string> { schemaName };
                     });

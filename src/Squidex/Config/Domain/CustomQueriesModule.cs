@@ -18,7 +18,7 @@ namespace Squidex.Config.Domain
             {
                 try
                 {
-                    var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(asmPath);
+                    var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(asmPath));
                     builder.RegisterAssemblyTypes(asm)
                         .Where(t => typeof(IQueryModule).IsAssignableFrom(t))
                         .As<IQueryModule>()
