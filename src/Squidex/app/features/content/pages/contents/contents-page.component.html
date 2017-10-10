@@ -93,7 +93,7 @@
                 </thead>
 
                 <tbody *ngIf="!isReadOnly">
-                    <ng-template ngFor let-content [ngForOf]="contentItems")>
+                    <ng-template ngFor let-content [ngForOf]="contentItems">
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                             [languageCode]="languageSelected.iso2Code"
                             [schemaFields]="contentFields"
