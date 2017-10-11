@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentQueryGraphType : ObjectGraphType
     {
-        public ContentQueryGraphType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemas, IQueryModulesService queryModulesService)
+        public ContentQueryGraphType(IGraphQLContext graphQLContext, IEnumerable<ISchemaEntity> schemas, CustomQueries.IQueryProvider queryModulesService)
         {
             AddAssetFind(graphQLContext);
             AddAssetsQuery(graphQLContext);

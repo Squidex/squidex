@@ -6,11 +6,11 @@ using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 {
-    public class QueryModulesService : IQueryModulesService
+    public class DefaultQueryProvider : IQueryProvider
     {
         private readonly IEnumerable<IQueryModule> plugins;
 
-        public QueryModulesService(IEnumerable<IQueryModule> plugins)
+        public DefaultQueryProvider(IEnumerable<IQueryModule> plugins)
         {
             this.plugins = plugins;
         }

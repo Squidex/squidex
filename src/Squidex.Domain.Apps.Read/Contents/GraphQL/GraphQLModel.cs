@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public bool CanGenerateAssetSourceUrl { get; }
 
-        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator, IQueryModulesService queryModulesService)
+        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator, CustomQueries.IQueryProvider queryModulesService)
         {
             this.app = app;
 

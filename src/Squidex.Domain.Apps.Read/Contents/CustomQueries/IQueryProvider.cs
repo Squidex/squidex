@@ -6,7 +6,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 {
-    public interface IQueryModulesService
+    public interface IQueryProvider
     {
         IEnumerable<IQuery> GetQueriesFromAllQueryModules(string appName, ISchemaEntity schema);
     }

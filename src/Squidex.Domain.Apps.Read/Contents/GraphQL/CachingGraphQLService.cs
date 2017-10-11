@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
         private readonly ISchemaRepository schemaRepository;
-        private readonly IQueryModulesService queryModulesService;
+        private readonly CustomQueries.IQueryProvider queryModulesService;
 
         public string Name
         {
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator,
             ISchemaRepository schemaRepository,
-            IQueryModulesService queryModulesService)
+            CustomQueries.IQueryProvider queryModulesService)
             : base(cache)
         {
             Guard.NotNull(schemaRepository, nameof(schemaRepository));

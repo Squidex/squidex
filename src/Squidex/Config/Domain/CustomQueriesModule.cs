@@ -34,8 +34,8 @@ namespace Squidex.Config.Domain
                 }
             }
 
-            builder.RegisterType(typeof(QueryModulesService))
-                .As<IQueryModulesService>()
+            builder.RegisterType(typeof(DefaultQueryProvider))
+                .As<Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider>()
                 .SingleInstance();
         }
     }

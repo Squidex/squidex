@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             A.CallTo(() => queryModule.GetQueries(app.Name, schema)).Returns(new List<IQuery> { customQuery });
 
             sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository,
-                new QueryModulesService(new List<IQueryModule> { queryModule }));
+                new DefaultQueryProvider(new List<IQueryModule> { queryModule }));
         }
 
         [Theory]
