@@ -9,9 +9,11 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
     {
         string Name { get; }
 
-        string Description { get; }
+        string Summary { get; }
 
-        QueryArguments Arguments { get; }
+        string DescriptionForSwagger { get; }
+
+        QueryArgumentOptions ArgumentOptions { get; }
 
         Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> Execute(ISchemaEntity schema, QueryContext context,
             IDictionary<string, object> arguments);

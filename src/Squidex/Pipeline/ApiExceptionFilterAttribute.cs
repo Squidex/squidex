@@ -32,6 +32,7 @@ namespace Squidex.Pipeline
             AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<ValidationException>(OnValidationException);
+            AddHandler<ComplexQuerySchemaValidationException>(OnComplexQuerySchemaValidationException);
         }
 
         private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
@@ -57,6 +58,11 @@ namespace Squidex.Pipeline
         private static IActionResult OnValidationException(ValidationException ex)
         {
             return ErrorResult(400, new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+        }
+
+        private static IActionResult OnComplexQuerySchemaValidationException(ComplexQuerySchemaValidationException ex)
+        {
+            return ErrorResult(500, new ErrorDto { Message = ex.Message } );
         }
 
         private static IActionResult ErrorResult(int statusCode, ErrorDto error)

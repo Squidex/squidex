@@ -114,13 +114,18 @@ namespace Squidex.Controllers.ContentApi.Generator
                     operation =>
                     {
                         operation.OperationId = $"CustomQuery{schemaKey}Contents"; // todo: come up with better name
-                        operation.Summary = query.Description;
+                        operation.Summary = query.Summary;
                         operation.Security = ReaderSecurity;
 
-                        operation.Description = SchemaQueryDescription;
+                        operation.Description = query.DescriptionForSwagger;
 
                         operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
                         operation.Tags = new List<string> { schemaName };
+
+                        foreach (var arg in query.ArgumentOptions.Arguments)
+                        {
+                            operation.AddQueryParameter(arg.Name, arg.ObjectType, arg.Description);
+                        }
                     });
             }
         }

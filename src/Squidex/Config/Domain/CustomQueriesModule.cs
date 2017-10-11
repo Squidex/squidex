@@ -13,6 +13,11 @@ namespace Squidex.Config.Domain
     {
         protected override void Load(ContainerBuilder builder)
         {
+            if (!Directory.Exists("./Plugins"))
+            {
+                return;
+            }
+
             var assemblies = Directory.EnumerateFiles("./Plugins", "*.dll");
             foreach (var asmPath in assemblies)
             {

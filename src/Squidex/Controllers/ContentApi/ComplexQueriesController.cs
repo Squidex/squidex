@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.CustomQueries;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -61,6 +63,10 @@ namespace Squidex.Controllers.ContentApi
 
             var context = new QueryContext(App, assetsRepository, contentQuery, User);
             var contents = await query.Execute(schema, context, HttpContext.Request.Query.ToDictionary(x => x.Key, x => (object)x.Value));
+            if (contents.Schema != schema)
+            {
+                throw new ComplexQuerySchemaValidationException("The query has returned an invalid schema.", query.Name);
+            }
 
             var response = new AssetsDto
             {
