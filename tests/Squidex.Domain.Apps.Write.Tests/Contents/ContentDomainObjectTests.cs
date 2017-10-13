@@ -23,12 +23,12 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly ContentDomainObject sut;
         private readonly NamedContentData data =
             new NamedContentData()
-                .AddField("field1",
+                .Add("field1",
                     new ContentFieldData()
                         .AddValue("iv", 1));
         private readonly NamedContentData otherData =
             new NamedContentData()
-                .AddField("field2",
+                .Add("field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));
 

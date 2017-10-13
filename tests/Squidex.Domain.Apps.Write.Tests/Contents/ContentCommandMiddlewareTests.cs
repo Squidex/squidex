@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly ClaimsPrincipal user = new ClaimsPrincipal();
-        private readonly NamedContentData invalidData = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(null));
-        private readonly NamedContentData data = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(1));
+        private readonly NamedContentData invalidData = new NamedContentData().Add("my-field", new ContentFieldData().SetValue(null));
+        private readonly NamedContentData data = new NamedContentData().Add("my-field", new ContentFieldData().SetValue(1));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
 
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             var schemaDef =
                 Schema.Create("my-schema", new SchemaProperties())
-                    .AddOrUpdateField(new NumberField(1, "my-field", Partitioning.Invariant,
+                    .Add(new NumberField(1, "my-field", Partitioning.Invariant,
                         new NumberFieldProperties { IsRequired = true }));
 
             content = new ContentDomainObject(contentId, -1);
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(data);
 
-            var patch = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
+            var patch = new NamedContentData().Add("my-field", new ContentFieldData().SetValue(3));
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored)).Returns(patch);
 

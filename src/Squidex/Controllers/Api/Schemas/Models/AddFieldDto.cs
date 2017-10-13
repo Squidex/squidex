@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AddFieldDto.cs
+//  AddDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Controllers.Api.Schemas.Models
 {
-    public sealed class AddFieldDto
+    public sealed class AddDto
     {
         /// <summary>
         /// The name of the field. Must be unique within the schema.

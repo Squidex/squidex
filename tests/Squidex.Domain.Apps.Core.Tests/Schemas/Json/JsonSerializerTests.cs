@@ -35,25 +35,25 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
+                    .Add(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
+                    .Add(new AssetsField(2, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties()))
-                    .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
+                    .Add(new StringField(3, "my-string1", Partitioning.Language,
                         new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
-                    .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,
+                    .Add(new StringField(4, "my-string2", Partitioning.Invariant,
                         new StringFieldProperties { Hints = "My String1" }))
-                    .AddOrUpdateField(new NumberField(5, "my-number", Partitioning.Invariant,
+                    .Add(new NumberField(5, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                    .AddOrUpdateField(new BooleanField(6, "my-boolean", Partitioning.Invariant,
+                    .Add(new BooleanField(6, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
+                    .Add(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
-                    .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
+                    .Add(new DateTimeField(8, "my-date", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
-                    .AddOrUpdateField(new ReferencesField(9, "my-references", Partitioning.Invariant,
+                    .Add(new ReferencesField(9, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
-                    .AddOrUpdateField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
+                    .Add(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
                     .HideField(1)
                     .LockField(2)

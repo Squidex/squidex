@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Schema : CloneableBase
+    public sealed class Schema
     {
         private readonly string name;
         private readonly SchemaProperties properties;
@@ -116,11 +116,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return UpdateField(fieldId, field => field.Show());
         }
 
-        public Schema RenameField(long fieldId, string newName)
-        {
-            return UpdateField(fieldId, field => field.Rename(newName));
-        }
-
         public Schema Publish()
         {
             return new Schema(name, true, properties, fields);
@@ -133,7 +128,18 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Schema DeleteField(long fieldId)
         {
-            return new Schema(name, isPublished, properties, fields.Where(x => x.Id != fieldId).ToImmutableList());
+            var newFields = fields.Where(x => x.Id != fieldId).ToImmutableList();
+
+            return new Schema(name, isPublished, properties, newFields);
+        }
+
+        public Schema UpdateField(long fieldId, Func<Field, Field> updater)
+        {
+            Guard.NotNull(updater, nameof(updater));
+
+            var newFields = fields.Select(f => f.Id == fieldId ? updater(f) ?? f : f).ToImmutableList();
+
+            return new Schema(name, isPublished, properties, newFields);
         }
 
         public Schema ReorderFields(List<long> ids)
@@ -150,21 +156,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new Schema(name, isPublished, properties, newFields);
         }
 
-        public Schema UpdateField(long fieldId, Func<Field, Field> updater)
-        {
-            Guard.NotNull(updater, nameof(updater));
-
-            if (!fieldsById.TryGetValue(fieldId, out var field))
-            {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
-            }
-
-            var newField = updater(field);
-
-            return AddOrUpdateField(newField);
-        }
-
-        public Schema AddOrUpdateField(Field field)
+        public Schema Add(Field field)
         {
             Guard.NotNull(field, nameof(field));
 

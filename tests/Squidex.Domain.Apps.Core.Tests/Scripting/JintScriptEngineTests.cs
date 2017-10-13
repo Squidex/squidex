@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             var expected =
                 new NamedContentData()
-                    .AddField("operation",
+                    .Add("operation",
                         new ContentFieldData()
                             .AddValue("iv", "MyOperation"));
 
@@ -108,18 +108,18 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var content =
                 new NamedContentData()
-                    .AddField("number0",
+                    .Add("number0",
                         new ContentFieldData()
                             .AddValue("iv", 1.0))
-                    .AddField("number1",
+                    .Add("number1",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
             var expected =
                 new NamedContentData()
-                    .AddField("number1",
+                    .Add("number1",
                         new ContentFieldData()
                             .AddValue("iv", 2.0))
-                    .AddField("number2",
+                    .Add("number2",
                         new ContentFieldData()
                             .AddValue("iv", 10.0));
 
@@ -143,18 +143,18 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var content =
                 new NamedContentData()
-                    .AddField("number0",
+                    .Add("number0",
                         new ContentFieldData()
                             .AddValue("iv", 1.0))
-                    .AddField("number1",
+                    .Add("number1",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
             var expected =
                 new NamedContentData()
-                    .AddField("number1",
+                    .Add("number1",
                         new ContentFieldData()
                             .AddValue("iv", 2.0))
-                    .AddField("number2",
+                    .Add("number2",
                         new ContentFieldData()
                             .AddValue("iv", 10.0));
 

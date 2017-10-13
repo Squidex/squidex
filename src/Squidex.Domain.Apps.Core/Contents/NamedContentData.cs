@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return Clean(this, new NamedContentData());
         }
 
-        public NamedContentData AddField(string name, ContentFieldData data)
+        public NamedContentData Add(string name, ContentFieldData data)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 

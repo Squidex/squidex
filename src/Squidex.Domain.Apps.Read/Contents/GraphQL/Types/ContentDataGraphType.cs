@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     foreach (var partitionItem in partition)
                     {
-                        fieldGraphType.AddField(new FieldType
+                        fieldGraphType.Add(new FieldType
                         {
                             Name = partitionItem.Key,
                             Resolver = fieldInfo.Resolver,
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
 
-                    AddField(new FieldType
+                    Add(new FieldType
                     {
                         Name = field.Name.ToCamelCase(),
                         Resolver = fieldResolver,

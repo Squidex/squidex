@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
@@ -78,13 +78,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("string",
+                    .Add("string",
                         new ContentFieldData()
                             .AddValue("iv", "1"));
 
             var expected =
                 new NamedContentData()
-                    .AddField("string",
+                    .Add("string",
                         new ContentFieldData()
                             .AddValue("iv", "1new"));
 
@@ -98,13 +98,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 3.0));
 
@@ -118,13 +118,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("boolean",
+                    .Add("boolean",
                         new ContentFieldData()
                             .AddValue("iv", false));
 
             var expected =
                 new NamedContentData()
-                    .AddField("boolean",
+                    .Add("boolean",
                         new ContentFieldData()
                             .AddValue("iv", true));
 
@@ -138,13 +138,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", new JArray(1.0, 2.0)));
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", new JArray(1.0, 4.0, 5.0)));
 
@@ -158,13 +158,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", new JObject(new JProperty("lat", 1.0))));
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", new JObject(new JProperty("lat", 1.0), new JProperty("lon", 4.0))));
 
@@ -178,12 +178,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData());
 
             var expected =
                 new NamedContentData()
-                    .AddField("number",
+                    .Add("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
@@ -197,13 +197,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("string",
+                    .Add("string",
                         new ContentFieldData()
                             .AddValue("iv", "hello"));
 
             var expected =
                 new NamedContentData()
-                    .AddField("string",
+                    .Add("string",
                         new ContentFieldData());
 
             var result = ExecuteScript(original, @"delete data.string.iv");
@@ -216,11 +216,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var content =
                 new NamedContentData()
-                    .AddField("f1",
+                    .Add("f1",
                         new ContentFieldData()
                             .AddValue("v11", "1")
                             .AddValue("v12", "2"))
-                    .AddField("f2",
+                    .Add("f2",
                         new ContentFieldData()
                             .AddValue("v21", "3")
                             .AddValue("v22", "4"));
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("obj",
+                    .Add("obj",
                         new ContentFieldData()
                             .AddValue("iv", new JObject(new JProperty("readonly", 1))));
 
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             var original =
                 new NamedContentData()
-                    .AddField("obj",
+                    .Add("obj",
                         new ContentFieldData()
                             .AddValue("iv", new JArray()));
 

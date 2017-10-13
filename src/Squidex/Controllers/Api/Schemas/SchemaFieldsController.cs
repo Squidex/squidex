@@ -48,9 +48,9 @@ namespace Squidex.Controllers.Api.Schemas
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
+        public async Task<IActionResult> PostField(string app, string name, [FromBody] AddDto request)
         {
-            var command = new AddField
+            var command = new Add
             {
                 Name = request.Name,
                 Partitioning = request.Partitioning,

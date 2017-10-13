@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private void AddAssetFind(IGraphQLContext graphQLContext)
         {
-            AddField(new FieldType
+            Add(new FieldType
             {
                 Name = "findAsset",
                 Arguments = new QueryArguments
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private void AddContentFind(ISchemaEntity schema, IGraphType schemaType, string schemaName)
         {
-            AddField(new FieldType
+            Add(new FieldType
             {
                 Name = $"find{schema.Name.ToPascalCase()}Content",
                 Arguments = new QueryArguments
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private void AddAssetsQuery(IGraphQLContext graphQLContext)
         {
-            AddField(new FieldType
+            Add(new FieldType
             {
                 Name = "queryAssets",
                 Arguments = new QueryArguments
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
         private void AddContentQuery(ISchemaEntity schema, IGraphType schemaType, string schemaName)
         {
-            AddField(new FieldType
+            Add(new FieldType
             {
                 Name = $"query{schema.Name.ToPascalCase()}Contents",
                 Arguments = new QueryArguments

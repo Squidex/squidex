@@ -244,8 +244,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             CreateSchema();
 
-            sut.AddField(new AddField { Name = "field1", Properties = new StringFieldProperties() });
-            sut.AddField(new AddField { Name = "field2", Properties = new StringFieldProperties() });
+            sut.Add(new Add { Name = "field1", Properties = new StringFieldProperties() });
+            sut.Add(new Add { Name = "field2", Properties = new StringFieldProperties() });
 
             ((IAggregate)sut).ClearUncommittedEvents();
 
@@ -367,52 +367,52 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void AddField_should_throw_exception_if_not_created()
+        public void Add_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.AddField(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() }));
             });
         }
 
         [Fact]
-        public void AddField_should_throw_exception_if_command_is_not_valid()
+        public void Add_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AddField(CreateCommand(new AddField()));
+                sut.Add(CreateCommand(new Add()));
             });
         }
 
         [Fact]
-        public void AddField_should_throw_exception_if_command_contains_invalid_partitioning()
+        public void Add_should_throw_exception_if_command_contains_invalid_partitioning()
         {
             Assert.Throws<ValidationException>(() =>
             {
-                sut.AddField(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new Add { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
             });
         }
 
         [Fact]
-        public void AddField_should_throw_exception_if_schema_is_deleted()
+        public void Add_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
 
             Assert.Throws<DomainException>(() =>
             {
-                sut.AddField(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() }));
             });
         }
 
         [Fact]
-        public void AddField_should_update_schema_and_create_events()
+        public void Add_should_update_schema_and_create_events()
         {
             var properties = new NumberFieldProperties();
 
             CreateSchema();
 
-            sut.AddField(CreateCommand(new AddField { Name = fieldName, Properties = properties }));
+            sut.Add(CreateCommand(new Add { Name = fieldName, Properties = properties }));
 
             Assert.Equal(properties, sut.Schema.FieldsById[1].RawProperties);
 
@@ -762,7 +762,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         private void CreateField()
         {
-            sut.AddField(new AddField { Name = fieldName, Properties = new NumberFieldProperties() });
+            sut.Add(new Add { Name = fieldName, Properties = new NumberFieldProperties() });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

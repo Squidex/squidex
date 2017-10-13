@@ -50,11 +50,11 @@ namespace Squidex.Domain.Apps.Write.Schemas
             });
         }
 
-        protected Task On(AddField command, CommandContext context)
+        protected Task On(Add command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s =>
             {
-                s.AddField(command);
+                s.Add(command);
 
                 context.Complete(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });

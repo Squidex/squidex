@@ -22,12 +22,12 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         private readonly Schema schema =
             Schema.Create("schema", new SchemaProperties())
-                .AddOrUpdateField(new NumberField(1, "field1", Partitioning.Language))
-                .AddOrUpdateField(new NumberField(2, "field2", Partitioning.Invariant))
-                .AddOrUpdateField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
-                .AddOrUpdateField(new AssetsField(5, "assets1", Partitioning.Invariant))
-                .AddOrUpdateField(new AssetsField(6, "assets2", Partitioning.Invariant))
-                .AddOrUpdateField(new JsonField(4, "json", Partitioning.Language));
+                .Add(new NumberField(1, "field1", Partitioning.Language))
+                .Add(new NumberField(2, "field2", Partitioning.Invariant))
+                .Add(new NumberField(3, "field3", Partitioning.Invariant).Hide())
+                .Add(new AssetsField(5, "assets1", Partitioning.Invariant))
+                .Add(new AssetsField(6, "assets2", Partitioning.Invariant))
+                .Add(new JsonField(4, "json", Partitioning.Language));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
         [Fact]
@@ -35,14 +35,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 3))
-                    .AddField("invalid",
+                    .Add("invalid",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -50,11 +50,11 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new IdContentData()
-                    .AddField(1,
+                    .Add(1,
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                new NamedContentData()
-                    .AddField("json",
+                    .Add("json",
                         new ContentFieldData()
                             .AddValue("en", new JObject())
                             .AddValue("de", null)
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new IdContentData()
-                    .AddField(4,
+                    .Add(4,
                         new ContentFieldData()
                             .AddValue("en", "e30=")
                             .AddValue("de", null)
@@ -90,14 +90,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                new IdContentData()
-                    .AddField(1,
+                    .Add(1,
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("iv", 3))
-                    .AddField(99,
+                    .Add(99,
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -105,11 +105,11 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                new IdContentData()
-                    .AddField(4,
+                    .Add(4,
                         new ContentFieldData()
                             .AddValue("en", "e30=")
                             .AddValue("de", null)
@@ -137,10 +137,10 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field0",
+                    .Add("field0",
                         new ContentFieldData()
                             .AddValue("en", "en_string"))
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string")
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", "en_string")
                             .AddValue("de", "de_string"));
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("en", 3));
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 3));
 
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", 3));
 
@@ -226,8 +226,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field1", null)
-                    .AddField("field2",
+                    .Add("field1", null)
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("en", 2)
                             .AddValue("it", null));
@@ -236,7 +236,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("en", 2));
 
@@ -248,8 +248,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new IdContentData()
-                    .AddField(1, null)
-                    .AddField(2,
+                    .Add(1, null)
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("en", 2)
                             .AddValue("it", null));
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new IdContentData()
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("en", 2));
 
@@ -270,7 +270,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("it", 3));
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
@@ -291,10 +291,10 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var input =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 5))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
@@ -302,7 +302,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var expected =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 5));
 
@@ -314,7 +314,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var data =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1));
 
@@ -326,18 +326,18 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var data =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("de", 1)
                             .AddValue("en", 2))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", null)
                             .AddValue("en", 4))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("en", 6))
-                    .AddField("field4",
+                    .Add("field4",
                         new ContentFieldData()
                             .AddValue("it", 7));
 
@@ -362,18 +362,18 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var data =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("de", 1)
                             .AddValue("en", 2))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", null)
                             .AddValue("en", 4))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("en", 6))
-                    .AddField("field4",
+                    .Add("field4",
                         new ContentFieldData()
                             .AddValue("it", 7));
 
@@ -394,32 +394,32 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var lhs =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", 2));
 
             var rhs =
                 new NamedContentData()
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("en", 3))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("iv", 4));
 
             var expected =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("en", 3))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("iv", 4));
 
@@ -433,32 +433,32 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var lhs =
                 new IdContentData()
-                    .AddField(1,
+                    .Add(1,
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("de", 2));
 
             var rhs =
                 new IdContentData()
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("en", 3))
-                    .AddField(3,
+                    .Add(3,
                         new ContentFieldData()
                             .AddValue("iv", 4));
 
             var expected =
                 new IdContentData()
-                    .AddField(1,
+                    .Add(1,
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField(2,
+                    .Add(2,
                         new ContentFieldData()
                             .AddValue("de", 2)
                             .AddValue("en", 3))
-                    .AddField(3,
+                    .Add(3,
                         new ContentFieldData()
                             .AddValue("iv", 4));
 
@@ -472,19 +472,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var lhs =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
             var rhs =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
@@ -498,19 +498,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var lhs =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("iv", 2))
-                    .AddField("field2",
+                    .Add("field2",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
             var rhs =
                 new NamedContentData()
-                    .AddField("field1",
+                    .Add("field1",
                         new ContentFieldData()
                             .AddValue("en", 2))
-                    .AddField("field3",
+                    .Add("field3",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
@@ -527,7 +527,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var input =
                 new NamedContentData()
-                    .AddField("assets1",
+                    .Add("assets1",
                         new ContentFieldData()
                             .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
 
@@ -544,7 +544,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             var input =
                 new IdContentData()
-                    .AddField(5,
+                    .Add(5,
                         new ContentFieldData()
                             .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
 

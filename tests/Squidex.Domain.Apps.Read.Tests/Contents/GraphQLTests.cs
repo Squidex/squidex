@@ -40,23 +40,23 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         private readonly Schema schemaDef =
             Schema.Create("my-schema", new SchemaProperties())
-                .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
+                .Add(new JsonField(1, "my-json", Partitioning.Invariant,
                     new JsonFieldProperties()))
-                .AddOrUpdateField(new StringField(2, "my-string", Partitioning.Language,
+                .Add(new StringField(2, "my-string", Partitioning.Language,
                     new StringFieldProperties()))
-                .AddOrUpdateField(new NumberField(3, "my-number", Partitioning.Invariant,
+                .Add(new NumberField(3, "my-number", Partitioning.Invariant,
                     new NumberFieldProperties()))
-                .AddOrUpdateField(new AssetsField(4, "my-assets", Partitioning.Invariant,
+                .Add(new AssetsField(4, "my-assets", Partitioning.Invariant,
                     new AssetsFieldProperties()))
-                .AddOrUpdateField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
+                .Add(new BooleanField(5, "my-boolean", Partitioning.Invariant,
                     new BooleanFieldProperties()))
-                .AddOrUpdateField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
+                .Add(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
                     new DateTimeFieldProperties()))
-                .AddOrUpdateField(new ReferencesField(7, "my-references", Partitioning.Invariant,
+                .Add(new ReferencesField(7, "my-references", Partitioning.Invariant,
                     new ReferencesFieldProperties { SchemaId = schemaId }))
-                .AddOrUpdateField(new ReferencesField(9, "my-invalid", Partitioning.Invariant,
+                .Add(new ReferencesField(9, "my-invalid", Partitioning.Invariant,
                     new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
-                .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
+                .Add(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
                     new GeolocationFieldProperties()));
 
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
@@ -611,21 +611,21 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             data = data ??
                 new NamedContentData()
-                    .AddField("my-json",
+                    .Add("my-json",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })))
-                    .AddField("my-string",
+                    .Add("my-string",
                         new ContentFieldData().AddValue("iv", "value"))
-                    .AddField("my-assets",
+                    .Add("my-assets",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { assetId })))
-                    .AddField("my-number",
+                    .Add("my-number",
                         new ContentFieldData().AddValue("iv", 1))
-                    .AddField("my-boolean",
+                    .Add("my-boolean",
                         new ContentFieldData().AddValue("iv", true))
-                    .AddField("my-datetime",
+                    .Add("my-datetime",
                         new ContentFieldData().AddValue("iv", now.ToDateTimeUtc()))
-                    .AddField("my-references",
+                    .Add("my-references",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { refId })))
-                    .AddField("my-geolocation",
+                    .Add("my-geolocation",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })));
 
             var content = new FakeContentEntity
