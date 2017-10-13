@@ -22,21 +22,21 @@ namespace Squidex.Domain.Apps.Core
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
         private readonly Schema schema =
             Schema.Create("my-schema", new SchemaProperties())
-                .Add(new JsonField(1, "my-json", Partitioning.Invariant,
+                .AddField(new JsonField(1, "my-json", Partitioning.Invariant,
                     new JsonFieldProperties()))
-                .Add(new StringField(2, "my-string", Partitioning.Language,
+                .AddField(new StringField(2, "my-string", Partitioning.Language,
                     new StringFieldProperties { DefaultValue = "en-string" }))
-                .Add(new NumberField(3, "my-number", Partitioning.Invariant,
+                .AddField(new NumberField(3, "my-number", Partitioning.Invariant,
                     new NumberFieldProperties { DefaultValue = 123 }))
-                .Add(new AssetsField(4, "my-assets", Partitioning.Invariant,
+                .AddField(new AssetsField(4, "my-assets", Partitioning.Invariant,
                     new AssetsFieldProperties()))
-                .Add(new BooleanField(5, "my-boolean", Partitioning.Invariant,
+                .AddField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
                     new BooleanFieldProperties { DefaultValue = true }))
-                .Add(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
+                .AddField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
                     new DateTimeFieldProperties { DefaultValue = Now }))
-                .Add(new ReferencesField(7, "my-references", Partitioning.Invariant,
+                .AddField(new ReferencesField(7, "my-references", Partitioning.Invariant,
                     new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
-                .Add(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
+                .AddField(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
                     new GeolocationFieldProperties()));
 
         [Fact]
@@ -44,10 +44,10 @@ namespace Squidex.Domain.Apps.Core
         {
             var data =
                 new NamedContentData()
-                    .Add("my-string",
+                    .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", "de-string"))
-                    .Add("my-number",
+                    .AddField("my-number",
                         new ContentFieldData()
                             .AddValue("iv", 456));
 
@@ -70,10 +70,10 @@ namespace Squidex.Domain.Apps.Core
 
             var data =
                 new NamedContentData()
-                    .Add("my-string",
+                    .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", string.Empty))
-                    .Add("my-number",
+                    .AddField("my-number",
                         new ContentFieldData()
                             .AddValue("iv", 456));
 

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
                         field = field.Lock();
                     }
 
-                    schema = schema.Add(field);
+                    schema = schema.AddField(field);
 
                     fieldId++;
                 }
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
                     Partitioning.Language :
                     Partitioning.Invariant;
 
-            return schema.Add(registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties));
+            return schema.AddField(registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties));
         }
 
         public static Schema Dispatch(FieldUpdated @event, Schema schema)

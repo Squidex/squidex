@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new Schema(name, isPublished, properties, newFields);
         }
 
-        public Schema Add(Field field)
+        public Schema AddField(Field field)
         {
             Guard.NotNull(field, nameof(field));
 
