@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  Add.cs
+//  AddField.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public sealed class Add : FieldCommand, IValidatable
+    public sealed class AddField : FieldCommand, IValidatable
     {
         public string Name { get; set; }
 

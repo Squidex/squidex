@@ -36,11 +36,11 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
                     };
 
-                    var partition = context.ResolvePartition(field.Paritioning);
+                    var partition = context.ResolvePartition(field.Partitioning);
 
                     foreach (var partitionItem in partition)
                     {
-                        fieldGraphType.Add(new FieldType
+                        fieldGraphType.AddField(new FieldType
                         {
                             Name = partitionItem.Key,
                             Resolver = fieldInfo.Resolver,
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
                     var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
 
-                    Add(new FieldType
+                    AddField(new FieldType
                     {
                         Name = field.Name.ToCamelCase(),
                         Resolver = fieldResolver,

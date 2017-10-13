@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             CreateSchema();
 
-            var context = CreateContextForCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() });
+            var context = CreateContextForCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() });
 
             await TestUpdate(schema, async _ =>
             {
@@ -274,7 +274,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         private void CreateField()
         {
-            schema.Add(CreateCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() }));
+            schema.Add(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
         }
     }
 }

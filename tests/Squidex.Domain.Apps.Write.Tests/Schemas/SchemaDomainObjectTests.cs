@@ -244,8 +244,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             CreateSchema();
 
-            sut.Add(new Add { Name = "field1", Properties = new StringFieldProperties() });
-            sut.Add(new Add { Name = "field2", Properties = new StringFieldProperties() });
+            sut.Add(new AddField { Name = "field1", Properties = new StringFieldProperties() });
+            sut.Add(new AddField { Name = "field2", Properties = new StringFieldProperties() });
 
             ((IAggregate)sut).ClearUncommittedEvents();
 
@@ -371,7 +371,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.Add(CreateCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
             });
         }
 
@@ -380,7 +380,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             Assert.Throws<ValidationException>(() =>
             {
-                sut.Add(CreateCommand(new Add()));
+                sut.Add(CreateCommand(new AddField()));
             });
         }
 
@@ -389,7 +389,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             Assert.Throws<ValidationException>(() =>
             {
-                sut.Add(CreateCommand(new Add { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
             });
         }
 
@@ -401,7 +401,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             Assert.Throws<DomainException>(() =>
             {
-                sut.Add(CreateCommand(new Add { Name = fieldName, Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
             });
         }
 
@@ -412,7 +412,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             CreateSchema();
 
-            sut.Add(CreateCommand(new Add { Name = fieldName, Properties = properties }));
+            sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = properties }));
 
             Assert.Equal(properties, sut.Schema.FieldsById[1].RawProperties);
 
@@ -762,7 +762,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         private void CreateField()
         {
-            sut.Add(new Add { Name = fieldName, Properties = new NumberFieldProperties() });
+            sut.Add(new AddField { Name = fieldName, Properties = new NumberFieldProperties() });
 
             ((IAggregate)sut).ClearUncommittedEvents();
         }

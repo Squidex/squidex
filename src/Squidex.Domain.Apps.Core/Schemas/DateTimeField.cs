@@ -8,9 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
@@ -59,16 +57,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Visit<T>(IFieldVisitor<T> visitor)
         {
-            jsonProperty.Type = JsonObjectType.String;
-
-            jsonProperty.Format = JsonFormatStrings.DateTime;
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.DateTimeOffset, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
     }
 }

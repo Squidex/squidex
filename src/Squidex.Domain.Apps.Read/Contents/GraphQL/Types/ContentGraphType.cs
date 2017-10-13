@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
         {
             var schemaName = schema.SchemaDef.Properties.Label.WithFallback(schema.Name);
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "id",
                 Resolver = Resolver(x => x.Id.ToString()),
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The id of the {schemaName} content."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "version",
                 Resolver = Resolver(x => x.Version),
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The version of the {schemaName} content."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "created",
                 Resolver = Resolver(x => x.Created.ToDateTimeUtc()),
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The date and time when the {schemaName} content has been created."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "createdBy",
                 Resolver = Resolver(x => x.CreatedBy.ToString()),
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The user that has created the {schemaName} content."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "lastModified",
                 Resolver = Resolver(x => x.LastModified.ToDateTimeUtc()),
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The date and time when the {schemaName} content has been modified last."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "lastModifiedBy",
                 Resolver = Resolver(x => x.LastModifiedBy.ToString()),
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = $"The user that has updated the {schemaName} content last."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "url",
                 Resolver = context.ResolveContentUrl(schema),
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             if (dataType.Fields.Any())
             {
-                Add(new FieldType
+                AddField(new FieldType
                 {
                     Name = "data",
                     Resolver = Resolver(x => x.Data),

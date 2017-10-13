@@ -9,7 +9,6 @@
 using System;
 using System.Threading.Tasks;
 using Benchmarks.Tests.TestData;
-using Benchmarks.Utils;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;

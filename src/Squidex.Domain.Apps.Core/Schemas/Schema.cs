@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.OData.Edm;
-using NJsonSchema;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -160,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(field, nameof(field));
 
-            if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
+            if (fieldsByName.ContainsKey(field.Name))
             {
                 throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
@@ -177,40 +175,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
 
             return new Schema(name, isPublished, properties, newFields);
-        }
-
-        public EdmComplexType BuildEdmType(PartitionResolver partitionResolver, Func<EdmComplexType, EdmComplexType> typeResolver)
-        {
-            Guard.NotNull(typeResolver, nameof(typeResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var schemaName = Name.ToPascalCase();
-
-            var edmType = new EdmComplexType("Squidex", schemaName);
-
-            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
-            {
-                field.AddToEdmType(edmType, partitionResolver, schemaName, typeResolver);
-            }
-
-            return edmType;
-        }
-
-        public JsonSchema4 BuildJsonSchema(PartitionResolver partitionResolver, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
-        {
-            Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var schemaName = Name.ToPascalCase();
-
-            var schema = new JsonSchema4 { Type = JsonObjectType.Object };
-
-            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
-            {
-                field.AddToJsonSchema(schema, partitionResolver, schemaName, schemaResolver);
-            }
-
-            return schema;
         }
     }
 }

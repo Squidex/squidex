@@ -9,9 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -76,17 +74,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new ReferencesValue(value.ToObject<Guid[]>());
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Visit<T>(IFieldVisitor<T> visitor)
         {
-            var itemSchema = schemaResolver("ReferenceItem", new JsonSchema4 { Type = JsonObjectType.String });
-
-            jsonProperty.Type = JsonObjectType.Array;
-            jsonProperty.Item = itemSchema;
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
     }
 }

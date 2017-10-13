@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             return this;
         }
 
-        public SchemaDomainObject Add(Add command)
+        public SchemaDomainObject Add(AddField command)
         {
             Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
 

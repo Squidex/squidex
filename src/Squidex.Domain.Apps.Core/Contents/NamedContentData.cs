@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return Clean(this, new NamedContentData());
         }
 
-        public NamedContentData Add(string name, ContentFieldData data)
+        public NamedContentData AddField(string name, ContentFieldData data)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 var fieldResult = new ContentFieldData();
                 var fieldValues = fieldValue.Value;
 
-                if (field.Paritioning.Equals(Partitioning.Language))
+                if (field.Partitioning.Equals(Partitioning.Language))
                 {
                     foreach (var languageConfig in languagesConfig)
                     {

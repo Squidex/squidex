@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 

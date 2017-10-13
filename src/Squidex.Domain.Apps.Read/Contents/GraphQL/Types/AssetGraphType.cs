@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
         {
             Name = "AssetDto";
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "id",
                 Resolver = Resolver(x => x.Id.ToString()),
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The id of the asset."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "version",
                 Resolver = Resolver(x => x.Version),
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The version of the asset."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "created",
                 Resolver = Resolver(x => x.Created.ToDateTimeUtc()),
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The date and time when the asset has been created."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "createdBy",
                 Resolver = Resolver(x => x.CreatedBy.ToString()),
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The user that has created the asset."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "lastModified",
                 Resolver = Resolver(x => x.LastModified.ToDateTimeUtc()),
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The date and time when the asset has been modified last."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "lastModifiedBy",
                 Resolver = Resolver(x => x.LastModifiedBy.ToString()),
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The user that has updated the asset last."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "mimeType",
                 Resolver = Resolver(x => x.MimeType),
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The mime type."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "url",
                 Resolver = context.ResolveAssetUrl(),
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The url to the asset."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "thumbnailUrl",
                 Resolver = context.ResolveAssetThumbnailUrl(),
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The thumbnail url to the asset."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "fileName",
                 Resolver = Resolver(x => x.FileName),
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The file name."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "fileType",
                 Resolver = Resolver(x => x.FileName.FileType()),
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The file type."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "fileSize",
                 Resolver = Resolver(x => x.FileSize),
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The size of the file in bytes."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "fileVersion",
                 Resolver = Resolver(x => x.FileVersion),
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The version of the file."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "isImage",
                 Resolver = Resolver(x => x.IsImage),
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "Determines of the created file is an image."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "pixelWidth",
                 Resolver = Resolver(x => x.PixelWidth),
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                 Description = "The width of the image in pixels if the asset is an image."
             });
 
-            Add(new FieldType
+            AddField(new FieldType
             {
                 Name = "pixelHeight",
                 Resolver = Resolver(x => x.PixelHeight),
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 
             if (context.CanGenerateAssetSourceUrl)
             {
-                Add(new FieldType
+                AddField(new FieldType
                 {
                     Name = "sourceUrl",
                     Resolver = context.ResolveAssetSourceUrl(),

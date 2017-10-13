@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core
 
         private Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
         {
-            var partitioning = field.Paritioning;
+            var partitioning = field.Partitioning;
             var partition = partitionResolver(partitioning);
 
             var tasks = new List<Task>();
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core
 
         private Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
         {
-            var partitioning = field.Paritioning;
+            var partitioning = field.Partitioning;
             var partition = partitionResolver(partitioning);
 
             var tasks = new List<Task>();

@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
             });
         }
 
-        protected Task On(Add command, CommandContext context)
+        protected Task On(AddField command, CommandContext context)
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s =>
             {

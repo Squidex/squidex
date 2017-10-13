@@ -84,7 +84,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
                     {
                         FieldId = field.Id,
                         Properties = fieldPropertiesDto,
-                        Partitioning = field.Paritioning.Key
+                        Partitioning = field.Partitioning.Key
                     });
 
                 dto.Fields.Add(fieldInstanceDto);

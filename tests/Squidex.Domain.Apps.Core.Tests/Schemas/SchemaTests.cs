@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.Schemas.Edm;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -26,11 +27,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             public override JToken GetDefaultValue()
             {
                 return null;
-            }
-
-            protected override IEnumerable<ValidationError> ValidateCore()
-            {
-                yield break;
             }
         }
 
@@ -174,16 +170,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_renaming_locked_field()
-        {
-            Add();
-
-            sut = sut.LockField(1);
-
-            Assert.Throws<DomainException>(() => sut.RenameField(1, "new-name"));
-        }
-
-        [Fact]
         public void Should_throw_exception_if_deleting_locked_field()
         {
             Add();
@@ -191,40 +177,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             sut = sut.LockField(1);
 
             Assert.Throws<DomainException>(() => sut.DeleteField(1));
-        }
-
-        [Fact]
-        public void Should_rename_field()
-        {
-            Add();
-
-            sut = sut.RenameField(1, "new-name");
-
-            Assert.Equal("new-name", sut.FieldsById[1].Name);
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_new_field_already_exists()
-        {
-            Add();
-
-            sut = sut.Add(new NumberField(2, "other-field", Partitioning.Invariant));
-
-            Assert.Throws<ValidationException>(() => sut.RenameField(2, "my-field"));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_new_field_name_is_not_valid()
-        {
-            Add();
-
-            Assert.Throws<ValidationException>(() => sut.RenameField(1, "new name"));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_field_to_rename_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RenameField(1, "new-name"));
         }
 
         [Fact]

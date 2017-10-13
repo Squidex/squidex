@@ -8,9 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
@@ -51,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return isDisabled; }
         }
 
-        public Partitioning Paritioning
+        public Partitioning Partitioning
         {
             get { return partitioning; }
         }
@@ -65,9 +63,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected Field(long id, string name, Partitioning partitioning)
         {
-            Guard.ValidPropertyName(name, nameof(name));
-            Guard.GreaterThan(id, 0, nameof(id));
+            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(partitioning, nameof(partitioning));
+            Guard.GreaterThan(id, 0, nameof(id));
 
             fieldId = id;
             fieldName = name;
@@ -78,6 +76,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         protected abstract Field UpdateInternal(FieldProperties newProperties);
+
+        protected abstract IEnumerable<IValidator> CreateValidators();
 
         public abstract object ConvertValue(JToken value);
 
@@ -108,87 +108,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Field Update(FieldProperties newProperties)
         {
-            if (isLocked)
-            {
-                throw new InvalidOperationException($"Field {fieldId} is locked.");
-            }
-
             return UpdateInternal(newProperties);
         }
 
-        public void AddToEdmType(EdmStructuredType edmType, PartitionResolver partitionResolver, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)
-        {
-            Guard.NotNull(edmType, nameof(edmType));
-            Guard.NotNull(typeResolver, nameof(typeResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var edmValueType = CreateEdmType();
-
-            if (edmValueType == null)
-            {
-                return;
-            }
-
-            var partitionType = typeResolver(new EdmComplexType("Squidex", $"{schemaName}{Name.ToPascalCase()}Property"));
-            var partition = partitionResolver(partitioning);
-
-            foreach (var partitionItem in partition)
-            {
-                partitionType.AddStructuralProperty(partitionItem.Key, edmValueType);
-            }
-
-            edmType.AddStructuralProperty(Name.EscapeEdmField(), new EdmComplexTypeReference(partitionType, false));
-        }
-
-        public void AddToJsonSchema(JsonSchema4 schema, PartitionResolver partitionResolver, string schemaName, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
-        {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var partitionProperty = CreateProperty();
-            var partitionObject = new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalProperties = false };
-            var partition = partitionResolver(partitioning);
-
-            foreach (var partitionItem in partition)
-            {
-                var partitionItemProperty = new JsonProperty { Description = partitionItem.Name, IsRequired = RawProperties.IsRequired };
-
-                PrepareJsonSchema(partitionItemProperty, schemaResolver);
-
-                partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);
-            }
-
-            partitionProperty.Reference = schemaResolver($"{schemaName}{Name.ToPascalCase()}Property", partitionObject);
-
-            schema.Properties.Add(Name, partitionProperty);
-        }
-
-        public JsonProperty CreateProperty()
-        {
-            var jsonProperty = new JsonProperty { IsRequired = RawProperties.IsRequired, Type = JsonObjectType.Object };
-
-            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
-            {
-                jsonProperty.Description = RawProperties.Hints;
-            }
-            else
-            {
-                jsonProperty.Description = Name;
-            }
-
-            if (!string.IsNullOrWhiteSpace(RawProperties.Hints))
-            {
-                jsonProperty.Description += $" ({RawProperties.Hints}).";
-            }
-
-            return jsonProperty;
-        }
-
-        protected abstract IEnumerable<IValidator> CreateValidators();
-
-        protected abstract IEdmTypeReference CreateEdmType();
-
-        protected abstract void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver);
+        public abstract T Visit<T>(IFieldVisitor<T> visitor);
     }
 }

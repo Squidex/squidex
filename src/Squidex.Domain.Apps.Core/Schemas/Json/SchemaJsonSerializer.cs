@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         IsHidden = x.IsHidden,
                         IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
-                        Partitioning = x.Paritioning.Key,
+                        Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
                     }).ToList();
 

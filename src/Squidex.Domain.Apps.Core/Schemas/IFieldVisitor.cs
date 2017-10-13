@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EdmExtensions.cs
+//  IFieldVisitor.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,16 +8,22 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public static class EdmExtensions
+    public interface IFieldVisitor<T>
     {
-        public static string EscapeEdmField(this string field)
-        {
-            return field.Replace("-", "_");
-        }
+        T Visit(AssetsField field);
 
-        public static string UnescapeEdmField(this string field)
-        {
-            return field.Replace("_", "-");
-        }
+        T Visit(BooleanField field);
+
+        T Visit(DateTimeField field);
+
+        T Visit(GeolocationField field);
+
+        T Visit(JsonField field);
+
+        T Visit(NumberField field);
+
+        T Visit(ReferencesField field);
+
+        T Visit(StringField field);
     }
 }
