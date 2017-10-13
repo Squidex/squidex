@@ -290,14 +290,15 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private async Task UnsubscribeThisAsync()
+        private Task UnsubscribeThisAsync()
         {
             if (eventSubscription != null)
             {
-                await eventSubscription.StopAsync();
-
+                eventSubscription.StopAsync().Forget();
                 eventSubscription = null;
             }
+
+            return TaskHelper.Done;
         }
 
         private Task SubscribeThisAsync(string position)
