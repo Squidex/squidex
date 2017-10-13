@@ -112,14 +112,14 @@ namespace Squidex.Domain.Apps.Core
 
             foreach (var languageConfig in newLanguages.Values)
             {
-                if (languageConfig.Fallback.Contains(language))
+                if (languageConfig.LanguageFallbacks.Contains(language))
                 {
                     newLanguages =
                         newLanguages.SetItem(languageConfig.Language,
                             new LanguageConfig(
                                 languageConfig.Language,
                                 languageConfig.IsOptional,
-                                languageConfig.Fallback.Remove(language)));
+                                languageConfig.LanguageFallbacks.Remove(language)));
                 }
             }
 
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core
 
             foreach (var languageConfig in languages.Values)
             {
-                foreach (var fallback in languageConfig.Fallback)
+                foreach (var fallback in languageConfig.LanguageFallbacks)
                 {
                     if (!languages.ContainsKey(fallback))
                     {

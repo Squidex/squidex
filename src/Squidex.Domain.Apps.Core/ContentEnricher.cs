@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;

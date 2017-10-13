@@ -56,7 +56,7 @@ namespace Squidex.Controllers.Api.Apps
                     {
                         IsMaster = x == App.LanguagesConfig.Master,
                         IsOptional = x.IsOptional,
-                        Fallback = x.Fallback.ToList()
+                        Fallback = x.LanguageFallbacks.ToList()
                     })).OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code).ToList();
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());

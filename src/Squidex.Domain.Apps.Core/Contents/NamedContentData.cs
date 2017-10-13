@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             if (languagePreferences.Count == 1 && languagesConfig.TryGetConfig(languagePreferences.First(), out var languageConfig))
             {
-                languagePreferences = languagePreferences.Union(languageConfig.Fallback).ToList();
+                languagePreferences = languagePreferences.Union(languageConfig.LanguageFallbacks).ToList();
             }
 
             var result = new Dictionary<string, JToken>();

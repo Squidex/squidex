@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         private static MongoAppEntityLanguage FromLanguageConfig(LanguageConfig l)
         {
-            return new MongoAppEntityLanguage { Iso2Code = l.Language, IsOptional = l.IsOptional, Fallback = l.Fallback.Select(x => x.Iso2Code).ToList() };
+            return new MongoAppEntityLanguage { Iso2Code = l.Language, IsOptional = l.IsOptional, Fallback = l.LanguageFallbacks.Select(x => x.Iso2Code).ToList() };
         }
 
         private static LanguageConfig ToLanguageConfig(MongoAppEntityLanguage l)

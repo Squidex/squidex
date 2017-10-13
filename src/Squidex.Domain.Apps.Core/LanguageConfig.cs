@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core
 
         public Language Language { get; }
 
-        public ImmutableList<Language> Fallback { get; }
+        public ImmutableList<Language> LanguageFallbacks { get; }
 
         public string Key
         {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core
 
         IEnumerable<string> IFieldPartitionItem.Fallback
         {
-            get { return Fallback.Select(x => x.Iso2Code); }
+            get { return LanguageFallbacks.Select(x => x.Iso2Code); }
         }
 
         public LanguageConfig(Language language, bool isOptional, params Language[] fallback)
@@ -50,11 +50,10 @@ namespace Squidex.Domain.Apps.Core
         {
             Guard.NotNull(language, nameof(language));
 
-            Language = language;
-
             IsOptional = isOptional;
 
-            Fallback = fallback ?? ImmutableList<Language>.Empty;
+            Language = language;
+            LanguageFallbacks = fallback ?? ImmutableList<Language>.Empty;
         }
     }
 }
