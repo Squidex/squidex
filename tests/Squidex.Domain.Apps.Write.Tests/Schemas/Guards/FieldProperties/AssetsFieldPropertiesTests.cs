@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldPro
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max items must be greater than min items", "MinItems", "MaxItems")
+                    new ValidationError("Max items must be greater than min items.", "MinItems", "MaxItems")
                 });
         }
     }

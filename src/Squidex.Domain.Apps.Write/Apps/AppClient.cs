@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             if (string.Equals(name, newName))
             {
-                var error = new ValidationError("Client already has the name", "Id");
+                var error = new ValidationError("Client already has the name.", "Id");
 
                 throw new ValidationException(message(), error);
             }

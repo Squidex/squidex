@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure
         {
             public void Validate(IList<ValidationError> errors)
             {
-                errors.Add(new ValidationError("error", "error"));
+                errors.Add(new ValidationError("error.", "error"));
             }
         }
 

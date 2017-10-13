@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Editor is not a valid value", "Editor")
+                    new ValidationError("Editor is not a valid value.", "Editor")
                 });
         }
     }

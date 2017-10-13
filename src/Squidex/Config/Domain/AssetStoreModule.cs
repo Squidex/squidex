@@ -70,7 +70,7 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("Configure AssetStore AzureBlob connection string with 'assetStore:azureBlob:connectionString'.");
                 }
 
-                var containerName = Configuration.GetValue<string>("assetStore:azureBlob:containerName");
+                var containerName = Configuration.GetValue<string>("assetStore:azureBlob:containerName.");
 
                 if (string.IsNullOrWhiteSpace(containerName))
                 {

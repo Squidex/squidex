@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max length must be greater than min length", "MinLength", "MaxLength")
+                    new ValidationError("Max length must be greater than min length.", "MinLength", "MaxLength")
                 });
         }
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max length can be defined", "AllowedValues", "MinLength", "MaxLength")
+                    new ValidationError("Either allowed values or min and max length can be defined.", "AllowedValues", "MinLength", "MaxLength")
                 });
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max length can be defined", "AllowedValues", "MinLength", "MaxLength")
+                    new ValidationError("Either allowed values or min and max length can be defined.", "AllowedValues", "MinLength", "MaxLength")
                 });
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Radio buttons or dropdown list need allowed values", "AllowedValues")
+                    new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues")
                 });
         }
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Editor is not a valid value", "Editor")
+                    new ValidationError("Editor is not a valid value.", "Editor")
                 });
         }
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Pattern is not a valid expression", "Pattern")
+                    new ValidationError("Pattern is not a valid expression.", "Pattern")
                 });
         }
     }

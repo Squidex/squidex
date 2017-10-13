@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core
 
             if (errors.Count > 0)
             {
-                throw new ValidationException("Cannot configure language", errors);
+                throw new ValidationException("Cannot configure language.", errors);
             }
 
             return languages;
@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Core
         {
             if (Contains(language))
             {
-                var error = new ValidationError("Language is already part of the app", "Language");
+                var error = new ValidationError("Language is already part of the app.", "Language");
 
                 throw new ValidationException(message(), error);
             }
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Core
         {
             if (master?.Language == language || isMaster)
             {
-                var error = new ValidationError("Language is the master language", "Language");
+                var error = new ValidationError("Language is the master language.", "Language");
 
                 throw new ValidationException(message(), error);
             }

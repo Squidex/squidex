@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
                     new ValidationError($"A schema with name '{command.Name}' already exists", "Name",
                         nameof(CreateSchema.Name));
 
-                throw new ValidationException("Cannot create a new schema", error);
+                throw new ValidationException("Cannot create a new schema.", error);
             }
 
             await handler.CreateAsync<SchemaDomainObject>(context, s =>

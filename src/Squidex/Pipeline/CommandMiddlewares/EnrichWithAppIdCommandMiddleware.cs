@@ -32,7 +32,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                 if (appFeature == null)
                 {
-                    throw new InvalidOperationException("Cannot resolve app");
+                    throw new InvalidOperationException("Cannot resolve app.");
                 }
 
                 appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);

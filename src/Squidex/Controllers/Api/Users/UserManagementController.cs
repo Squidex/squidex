@@ -110,7 +110,7 @@ namespace Squidex.Controllers.Api.Users
         }
 
         [HttpPut]
-        [Route("user-management/{id}/unlock/")]
+        [Route("user-management/{id}/unlock/.")]
         [ApiCosts(0)]
         public async Task<IActionResult> UnlockUser(string id)
         {

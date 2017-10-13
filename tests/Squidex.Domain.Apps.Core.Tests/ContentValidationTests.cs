@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("unknown is not a known field", "unknown")
+                    new ValidationError("unknown is not a known field.", "unknown")
                 });
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field must be less than '100'", "my-field")
+                    new ValidationError("my-field must be less than '100'.", "my-field")
                 });
         }
 
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported invariant value 'es'", "my-field"),
-                    new ValidationError("my-field has an unsupported invariant value 'it'", "my-field")
+                    new ValidationError("my-field has an unsupported invariant value 'es'.", "my-field"),
+                    new ValidationError("my-field has an unsupported invariant value 'it'.", "my-field")
                 });
         }
 
@@ -95,8 +95,8 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field (de) is required", "my-field"),
-                    new ValidationError("my-field (en) is required", "my-field")
+                    new ValidationError("my-field (de) is required.", "my-field"),
+                    new ValidationError("my-field (en) is required.", "my-field")
                 });
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field is required", "my-field")
+                    new ValidationError("my-field is required.", "my-field")
                 });
         }
 
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported language value 'xx'", "my-field")
+                    new ValidationError("my-field has an unsupported language value 'xx'.", "my-field")
                 });
         }
 
@@ -174,8 +174,8 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported language value 'es'", "my-field"),
-                    new ValidationError("my-field has an unsupported language value 'it'", "my-field")
+                    new ValidationError("my-field has an unsupported language value 'es'.", "my-field"),
+                    new ValidationError("my-field has an unsupported language value 'it'.", "my-field")
                 });
         }
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("unknown is not a known field", "unknown")
+                    new ValidationError("unknown is not a known field.", "unknown")
                 });
         }
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field must be less than '100'", "my-field")
+                    new ValidationError("my-field must be less than '100'.", "my-field")
                 });
         }
 
@@ -233,8 +233,8 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported invariant value 'es'", "my-field"),
-                    new ValidationError("my-field has an unsupported invariant value 'it'", "my-field")
+                    new ValidationError("my-field has an unsupported invariant value 'es'.", "my-field"),
+                    new ValidationError("my-field has an unsupported invariant value 'it'.", "my-field")
                 });
         }
 
@@ -281,7 +281,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported language value 'xx'", "my-field")
+                    new ValidationError("my-field has an unsupported language value 'xx'.", "my-field")
                 });
         }
 
@@ -302,8 +302,8 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field has an unsupported language value 'es'", "my-field"),
-                    new ValidationError("my-field has an unsupported language value 'it'", "my-field")
+                    new ValidationError("my-field has an unsupported language value 'es'.", "my-field"),
+                    new ValidationError("my-field has an unsupported language value 'it'.", "my-field")
                 });
         }
     }

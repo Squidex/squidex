@@ -34,7 +34,7 @@ namespace Squidex.Controllers
 
                 if (appFeature == null)
                 {
-                    throw new InvalidOperationException("Not in a app context");
+                    throw new InvalidOperationException("Not in a app context.");
                 }
 
                 return appFeature.App;

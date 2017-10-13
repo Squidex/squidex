@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (Language == null)
             {
-                errors.Add(new ValidationError("Language cannot be null", nameof(Language)));
+                errors.Add(new ValidationError("Language cannot be null.", nameof(Language)));
             }
         }
     }

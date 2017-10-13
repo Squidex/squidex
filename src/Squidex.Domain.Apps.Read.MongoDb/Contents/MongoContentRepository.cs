@@ -88,11 +88,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
             catch (NotImplementedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
 
             var contentEntities = await cursor.ToListAsync();
@@ -116,11 +116,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
             catch (NotImplementedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
 
             return cursor.CountAsync();

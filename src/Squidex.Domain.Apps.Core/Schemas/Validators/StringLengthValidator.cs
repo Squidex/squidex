@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
         {
             if (minLength.HasValue && maxLength.HasValue && minLength.Value >= maxLength.Value)
             {
-                throw new ArgumentException("Min length must be greater than max length", nameof(minLength));
+                throw new ArgumentException("Min length must be greater than max length.", nameof(minLength));
             }
 
             this.minLength = minLength;

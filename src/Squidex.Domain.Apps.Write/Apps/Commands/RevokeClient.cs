@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (!Id.IsSlug())
             {
-                errors.Add(new ValidationError("Client id must be a valid slug", nameof(Id)));
+                errors.Add(new ValidationError("Client id must be a valid slug.", nameof(Id)));
             }
         }
     }

@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Default value must be greater than min value", "DefaultValue")
+                    new ValidationError("Default value must be greater than min value.", "DefaultValue")
                 });
         }
 
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Default value must be less than max value", "DefaultValue")
+                    new ValidationError("Default value must be less than max value.", "DefaultValue")
                 });
         }
 
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max value must be greater than min value", "MinValue", "MaxValue")
+                    new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue")
                 });
         }
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
+                    new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
                 });
         }
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max value can be defined", "AllowedValues", "MinValue", "MaxValue")
+                    new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
                 });
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Radio buttons or dropdown list need allowed values", "AllowedValues")
+                    new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues")
                 });
         }
 
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Editor is not a valid value", "Editor")
+                    new ValidationError("Editor is not a valid value.", "Editor")
                 });
         }
     }

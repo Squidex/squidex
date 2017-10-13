@@ -59,14 +59,14 @@ namespace Squidex.Config.Domain
                 throw new ConfigurationException("Configure the Store MongoDb configuration with 'store:mongoDb:configuration'.");
             }
 
-            var database = Configuration.GetValue<string>("store:mongoDb:database");
+            var database = Configuration.GetValue<string>("store:mongoDb:database.");
 
             if (string.IsNullOrWhiteSpace(database))
             {
                 throw new ConfigurationException("Configure the Store MongoDb database with 'store:mongoDb:database'.");
             }
 
-            var contentDatabase = Configuration.GetValue<string>("store:mongoDb:contentDatabase");
+            var contentDatabase = Configuration.GetValue<string>("store:mongoDb:contentDatabase.");
 
             if (string.IsNullOrWhiteSpace(contentDatabase))
             {

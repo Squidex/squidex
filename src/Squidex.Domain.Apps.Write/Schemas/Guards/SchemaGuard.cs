@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
             {
                 var error = new ValidationError("Name must be a valid slug.", "Name");
 
-                throw new ValidationException("Cannot create a new schema", error);
+                throw new ValidationException("Cannot create a new schema.", error);
             }
         }
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             if (schema.IsPublished)
             {
-                throw new DomainException("Schema is already published");
+                throw new DomainException("Schema is already published.");
             }
         }
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             if (!schema.IsPublished)
             {
-                throw new DomainException("Schema is not published");
+                throw new DomainException("Schema is not published.");
             }
         }
     }

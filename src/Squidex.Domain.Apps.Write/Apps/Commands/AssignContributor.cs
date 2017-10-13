@@ -22,12 +22,12 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (string.IsNullOrWhiteSpace(ContributorId))
             {
-                errors.Add(new ValidationError("Contributor id not assigned", nameof(ContributorId)));
+                errors.Add(new ValidationError("Contributor id not assigned.", nameof(ContributorId)));
             }
 
             if (!Permission.IsEnumValue())
             {
-                errors.Add(new ValidationError("Permission is not valid", nameof(Permission)));
+                errors.Add(new ValidationError("Permission is not valid.", nameof(Permission)));
             }
         }
     }
