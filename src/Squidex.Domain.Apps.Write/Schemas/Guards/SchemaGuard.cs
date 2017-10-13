@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -17,10 +19,15 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             if (!name.IsSlug())
             {
-                var error = new ValidationError("Name must be a valid slug", "Name");
+                var error = new ValidationError("Name must be a valid slug.", "Name");
 
                 throw new ValidationException("Cannot create a new schema", error);
             }
+        }
+
+        internal static void GuardCanReorder(Schema schema, List<long> fieldIds)
+        {
+            throw new NotImplementedException();
         }
 
         public static void GuardCanPublish(Schema schema)
