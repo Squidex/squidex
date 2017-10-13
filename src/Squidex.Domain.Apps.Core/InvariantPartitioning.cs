@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core
 
         string IFieldPartitionItem.Name
         {
-            get { return "ivInvariant"; }
+            get { return "Invariant"; }
         }
 
         bool IFieldPartitionItem.IsOptional
