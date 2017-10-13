@@ -219,7 +219,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         {
             var schema = schemas.GetOrDefault(schemaId);
 
-            return schema != null ? schemaTypes.Add(schemaId, k => new ContentGraphType(schema, this)) : null;
+            return schema != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schema, this)) : null;
         }
     }
 }

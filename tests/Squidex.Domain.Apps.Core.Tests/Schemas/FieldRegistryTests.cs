@@ -24,11 +24,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 return null;
             }
-
-            protected override IEnumerable<ValidationError> ValidateCore()
-            {
-                yield break;
-            }
         }
 
         [Fact]

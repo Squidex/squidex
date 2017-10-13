@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
             return field;
         }
 
-        private static IEnumerable<ValidationError> ValidateProperties(FieldProperties properties)
+        public static IEnumerable<ValidationError> ValidateProperties(FieldProperties properties)
         {
             switch (properties)
             {
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 {
                     if (!d.Editor.IsEnumValue())
                     {
-                        yield return new ValidationError("Editor is not a valid value", 
+                        yield return new ValidationError("Editor is not a valid value",
                             nameof(d.Editor));
                     }
 
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 {
                     if (!n.Editor.IsEnumValue())
                     {
-                        yield return new ValidationError("Editor is not a valid value", 
+                        yield return new ValidationError("Editor is not a valid value",
                             nameof(n.Editor));
                     }
 

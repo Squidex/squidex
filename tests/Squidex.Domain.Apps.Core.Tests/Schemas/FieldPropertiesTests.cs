@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetsFieldPropertiesTests.cs
+//  FieldPropertiesTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,52 +10,56 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FluentAssertions;
 using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public class AssetsFieldPropertiesTests
+    public class FieldPropertiesTests
     {
         private readonly List<ValidationError> errors = new List<ValidationError>();
 
-        [Fact]
-        public void Should_add_error_if_min_greater_than_max()
+        public static IEnumerable<FieldProperties> Properties
         {
-            var sut = new AssetsFieldProperties { MinItems = 10, MaxItems = 5 };
-
-            sut.Validate(errors);
-
-            errors.ShouldBeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Max items must be greater than min items", "MinItems", "MaxItems")
-                });
+            get
+            {
+                yield return new AssetsFieldProperties();
+                yield return new BooleanFieldProperties();
+                yield return new DateTimeFieldProperties();
+                yield return new GeolocationFieldProperties();
+                yield return new JsonFieldProperties();
+                yield return new NumberFieldProperties();
+                yield return new ReferencesFieldProperties();
+                yield return new StringFieldProperties();
+            }
         }
 
-        [Fact]
-        public void Should_set_or_freeze_sut()
+        public static IEnumerable<object[]> PropertiesData
         {
-            var sut = new AssetsFieldProperties();
+            get { return Properties.Select(x => new object[] { x }); }
+        }
 
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+        [Theory]
+        [MemberData(nameof(PropertiesData))]
+        public void Should_set_or_freeze_sut(FieldProperties properties)
+        {
+            foreach (var property in properties.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
                     property.PropertyType.GetTypeInfo().IsValueType ?
                         Activator.CreateInstance(property.PropertyType) :
                         null;
 
-                property.SetValue(sut, value);
+                property.SetValue(properties, value);
 
-                var result = property.GetValue(sut);
+                var result = property.GetValue(properties);
 
                 Assert.Equal(value, result);
             }
 
-            sut.Freeze();
+            properties.Freeze();
 
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            foreach (var property in properties.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
                     property.PropertyType.GetTypeInfo().IsValueType ?
@@ -66,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 {
                     try
                     {
-                        property.SetValue(sut, value);
+                        property.SetValue(properties, value);
                     }
                     catch (Exception ex)
                     {

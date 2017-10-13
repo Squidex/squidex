@@ -6,21 +6,18 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
 {
     public class NumberFieldPropertiesTests
     {
-        private readonly List<ValidationError> errors = new List<ValidationError>();
-
         [Fact]
         public void Should_not_add_error_if_sut_is_valid()
         {
@@ -31,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 DefaultValue = 5
             };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             Assert.Empty(errors);
         }
@@ -41,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { MinValue = 10, DefaultValue = 5 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { MaxValue = 0, DefaultValue = 5 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -69,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { MinValue = 10, MaxValue = 5 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -83,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -97,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -111,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { Editor = NumberFieldEditor.Radio };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -125,55 +122,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new NumberFieldProperties { Editor = (NumberFieldEditor)123 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Editor is not a valid value", "Editor")
                 });
-        }
-
-        [Fact]
-        public void Should_set_or_freeze_sut()
-        {
-            var sut = new NumberFieldProperties();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                property.SetValue(sut, value);
-
-                var result = property.GetValue(sut);
-
-                Assert.Equal(value, result);
-            }
-
-            sut.Freeze();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                Assert.Throws<InvalidOperationException>(() =>
-                {
-                    try
-                    {
-                        property.SetValue(sut, value);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex.InnerException;
-                    }
-                });
-            }
         }
     }
 }

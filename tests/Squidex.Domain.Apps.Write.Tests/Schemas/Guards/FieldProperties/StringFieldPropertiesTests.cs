@@ -6,27 +6,24 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
 {
     public class StringFieldPropertiesTests
     {
-        private readonly List<ValidationError> errors = new List<ValidationError>();
-
         [Fact]
         public void Should_add_error_if_min_greater_than_max()
         {
             var sut = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -40,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new StringFieldProperties { MinLength = 10, AllowedValues = ImmutableList.Create("4") };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -54,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new StringFieldProperties { MaxLength = 10, AllowedValues = ImmutableList.Create("4") };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -68,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new StringFieldProperties { Editor = StringFieldEditor.Radio };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -82,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new StringFieldProperties { Editor = (StringFieldEditor)123 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -96,55 +93,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new StringFieldProperties { Pattern = "[0-9{1}" };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Pattern is not a valid expression", "Pattern")
                 });
-        }
-
-        [Fact]
-        public void Should_set_or_freeze_sut()
-        {
-            var sut = new StringFieldProperties();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                property.SetValue(sut, value);
-
-                var result = property.GetValue(sut);
-
-                Assert.Equal(value, result);
-            }
-
-            sut.Freeze();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                Assert.Throws<InvalidOperationException>(() =>
-                {
-                    try
-                    {
-                        property.SetValue(sut, value);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex.InnerException;
-                    }
-                });
-            }
         }
     }
 }

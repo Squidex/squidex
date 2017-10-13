@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using NJsonSchema;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas

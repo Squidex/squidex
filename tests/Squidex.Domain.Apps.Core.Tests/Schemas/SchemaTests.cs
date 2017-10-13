@@ -13,6 +13,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Edm;
+using Squidex.Domain.Apps.Core.Schemas.JsonSchema;
 using Squidex.Infrastructure;
 using Xunit;
 

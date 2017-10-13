@@ -9,18 +9,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using FluentAssertions;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
 {
     public class DateTimeFieldPropertiesTests
     {
-        private readonly List<ValidationError> errors = new List<ValidationError>();
-
         [Fact]
         public void Should_not_add_error_if_sut_is_valid()
         {
@@ -31,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 DefaultValue = FutureDays(15)
             };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             Assert.Empty(errors);
         }
@@ -41,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), DefaultValue = FutureDays(5) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -55,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { MaxValue = FutureDays(10), DefaultValue = FutureDays(15) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -69,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), MaxValue = FutureDays(5) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -83,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { Editor = (DateTimeFieldEditor)123 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -97,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { CalculatedDefaultValue = (DateTimeCalculatedDefaultValue)123 };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -111,79 +109,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now, DefaultValue = FutureDays(10) };
 
-            sut.Validate(errors);
+            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Calculated default value and default value cannot be used together", "CalculatedDefaultValue", "DefaultValue")
                 });
-        }
-
-        [Fact]
-        public void Should_provide_today_default_value()
-        {
-            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today };
-
-            Assert.Equal(DateTime.UtcNow.Date.ToString("o"), sut.GetDefaultValue().ToString());
-        }
-
-        [Fact]
-        public void Should_provide_now_default_value()
-        {
-            var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now };
-
-            Assert.Equal(DateTime.UtcNow.ToString("o").Substring(0, 16), sut.GetDefaultValue().ToString().Substring(0, 16));
-        }
-
-        [Fact]
-        public void Should_provide_specific_default_value()
-        {
-            var sut = new DateTimeFieldProperties { DefaultValue = FutureDays(15) };
-
-            Assert.Equal(FutureDays(15).ToString(), sut.GetDefaultValue());
-        }
-
-        [Fact]
-        public void Should_set_or_freeze_sut()
-        {
-            var sut = new DateTimeFieldProperties();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                property.SetValue(sut, value);
-
-                var result = property.GetValue(sut);
-
-                Assert.Equal(value, result);
-            }
-
-            sut.Freeze();
-
-            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
-            {
-                var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
-                        Activator.CreateInstance(property.PropertyType) :
-                        null;
-
-                Assert.Throws<InvalidOperationException>(() =>
-                {
-                    try
-                    {
-                        property.SetValue(sut, value);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex.InnerException;
-                    }
-                });
-            }
         }
 
         private static Instant FutureDays(int days)
