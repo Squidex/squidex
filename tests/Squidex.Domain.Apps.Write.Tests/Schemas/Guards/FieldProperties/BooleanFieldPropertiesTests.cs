@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new BooleanFieldProperties { Editor = (BooleanFieldEditor)123 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

@@ -55,18 +55,18 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             await sut.ValidateAsync("foo", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not valid" });
+                new[] { "<FIELD> is not valid." });
         }
 
         [Fact]
         public async Task Should_add_error_with_custom_message_if_value_is_not_valid()
         {
-            var sut = new PatternValidator("[a-z]{3}:[0-9]{2}", "Custom Error Message");
+            var sut = new PatternValidator("[a-z]{3}:[0-9]{2}", "Custom Error Message.");
 
             await sut.ValidateAsync("foo", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Custom Error Message" });
+                new[] { "Custom Error Message." });
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have more than '2000' characters" });
+                new[] { "<FIELD> must have more than '2000' characters." });
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have less than '1000' characters" });
+                new[] { "<FIELD> must have less than '1000' characters." });
         }
 
         private static string CreateString(int size)

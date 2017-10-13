@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("123"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have more than '10' characters" });
+                new[] { "<FIELD> must have more than '10' characters." });
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("12345678"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have less than '5' characters" });
+                new[] { "<FIELD> must have less than '5' characters." });
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not an allowed value" });
+                new[] { "<FIELD> is not an allowed value." });
         }
 
         [Fact]
@@ -97,18 +97,18 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not valid" });
+                new[] { "<FIELD> is not valid." });
         }
 
         [Fact]
         public async Task Should_add_errors_if_number_is_not_valid_pattern_with_message()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message" });
+            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message." });
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "Custom Error Message" });
+                new[] { "Custom Error Message." });
         }
 
         private static JValue CreateValue(object v)

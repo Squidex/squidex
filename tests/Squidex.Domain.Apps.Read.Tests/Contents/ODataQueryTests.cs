@@ -31,21 +31,21 @@ namespace Squidex.Domain.Apps.Read.Contents
     {
         private readonly Schema schemaDef =
             Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                .Add(new StringField(1, "firstName", Partitioning.Language,
+                .AddField(new StringField(1, "firstName", Partitioning.Language,
                     new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
-                .Add(new StringField(2, "lastName", Partitioning.Language,
+                .AddField(new StringField(2, "lastName", Partitioning.Language,
                     new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }))
-                .Add(new BooleanField(3, "isAdmin", Partitioning.Invariant,
+                .AddField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
                     new BooleanFieldProperties()))
-                .Add(new NumberField(4, "age", Partitioning.Invariant,
+                .AddField(new NumberField(4, "age", Partitioning.Invariant,
                     new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                .Add(new DateTimeField(5, "birthday", Partitioning.Invariant,
+                .AddField(new DateTimeField(5, "birthday", Partitioning.Invariant,
                     new DateTimeFieldProperties()))
-                .Add(new AssetsField(6, "pictures", Partitioning.Invariant,
+                .AddField(new AssetsField(6, "pictures", Partitioning.Invariant,
                     new AssetsFieldProperties()))
-                .Add(new ReferencesField(7, "friends", Partitioning.Invariant,
+                .AddField(new ReferencesField(7, "friends", Partitioning.Invariant,
                     new ReferencesFieldProperties()))
-                .Add(new StringField(8, "dashed-field", Partitioning.Invariant,
+                .AddField(new StringField(8, "dashed-field", Partitioning.Invariant,
                     new StringFieldProperties()));
 
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;

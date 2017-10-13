@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Edm
 
             foreach (var field in schema.FieldsByName.Values.Where(x => !x.IsHidden))
             {
-                var edmValueType = field.Visit(EdmTypeVisitor.Instance);
+                var edmValueType = EdmTypeVisitor.CreateEdmType(field);
 
                 if (edmValueType == null)
                 {

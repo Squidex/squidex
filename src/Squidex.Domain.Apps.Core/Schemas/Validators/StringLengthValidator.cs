@@ -34,12 +34,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             {
                 if (minLength.HasValue && stringValue.Length < minLength.Value)
                 {
-                    addError($"<FIELD> must have more than '{minLength}' characters");
+                    addError($"<FIELD> must have more than '{minLength}' characters.");
                 }
 
                 if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                 {
-                    addError($"<FIELD> must have less than '{maxLength}' characters");
+                    addError($"<FIELD> must have less than '{maxLength}' characters.");
                 }
             }
 

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
                 DefaultValue = 5
             };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             Assert.Empty(errors);
         }
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { MinValue = 10, DefaultValue = 5 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { MaxValue = 0, DefaultValue = 5 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { MinValue = 10, MaxValue = 5 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create<double>(4) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { Editor = NumberFieldEditor.Radio };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new NumberFieldProperties { Editor = (NumberFieldEditor)123 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

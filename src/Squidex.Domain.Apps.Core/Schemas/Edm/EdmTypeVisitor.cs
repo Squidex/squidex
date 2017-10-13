@@ -12,7 +12,16 @@ namespace Squidex.Domain.Apps.Core.Schemas.Edm
 {
     public sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference>
     {
-        public static readonly EdmTypeVisitor Instance = new EdmTypeVisitor();
+        private static readonly EdmTypeVisitor Instance = new EdmTypeVisitor();
+
+        private EdmTypeVisitor()
+        {
+        }
+
+        public static IEdmTypeReference CreateEdmType(Field field)
+        {
+            return field.Visit(Instance);
+        }
 
         public IEdmTypeReference Visit(AssetsField field)
         {

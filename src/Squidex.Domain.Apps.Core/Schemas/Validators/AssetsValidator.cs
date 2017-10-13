@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError("<FIELD> is required");
+                    addError("<FIELD> is required.");
                 }
 
                 return;
@@ -38,19 +38,19 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             if (minItems.HasValue && assets.AssetIds.Count < minItems.Value)
             {
-                addError($"<FIELD> must have at least {minItems} asset(s)");
+                addError($"<FIELD> must have at least {minItems} asset(s).");
             }
 
             if (maxItems.HasValue && assets.AssetIds.Count > maxItems.Value)
             {
-                addError($"<FIELD> must have not more than {maxItems} asset(s)");
+                addError($"<FIELD> must have not more than {maxItems} asset(s).");
             }
 
             var invalidIds = await context.GetInvalidAssetIdsAsync(assets.AssetIds);
 
             foreach (var invalidId in invalidIds)
             {
-                addError($"<FIELD> contains invalid asset '{invalidId}'");
+                addError($"<FIELD> contains invalid asset '{invalidId}'.");
             }
         }
     }

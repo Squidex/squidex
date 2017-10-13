@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using NJsonSchema;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -159,21 +158,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(field, nameof(field));
 
-            if (fieldsByName.ContainsKey(field.Name))
+            if (fieldsByName.ContainsKey(field.Name) || fieldsById.ContainsKey(field.Id))
             {
                 throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
 
-            ImmutableList<Field> newFields;
-
-            if (fieldsById.ContainsKey(field.Id))
-            {
-                newFields = fields.Select(f => f.Id == field.Id ? field : f).ToImmutableList();
-            }
-            else
-            {
-                newFields = fields.Add(field);
-            }
+            var newFields = fields.Add(field);
 
             return new Schema(name, isPublished, properties, newFields);
         }

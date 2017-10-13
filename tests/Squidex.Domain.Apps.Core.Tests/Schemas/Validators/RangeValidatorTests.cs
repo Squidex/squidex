@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be greater than '2000'" });
+                new[] { "<FIELD> must be greater than '2000'." });
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be less than '1000'" });
+                new[] { "<FIELD> must be less than '1000'." });
         }
     }
 }

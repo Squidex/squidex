@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             VerifyCreatedAndNotDeleted();
 
-            SchemaFieldGuard.GuardCanDelete(schema, command.FieldId);
+            SchemaFieldGuard.GuardCanUpdate(schema, command.FieldId);
 
             RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
 

@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         private static JValue CreateValue(object v)

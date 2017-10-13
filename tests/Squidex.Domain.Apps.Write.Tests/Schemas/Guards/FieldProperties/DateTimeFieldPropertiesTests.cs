@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
                 DefaultValue = FutureDays(15)
             };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             Assert.Empty(errors);
         }
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), DefaultValue = FutureDays(5) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { MaxValue = FutureDays(10), DefaultValue = FutureDays(15) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), MaxValue = FutureDays(5) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { Editor = (DateTimeFieldEditor)123 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { CalculatedDefaultValue = (DateTimeCalculatedDefaultValue)123 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now, DefaultValue = FutureDays(10) };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

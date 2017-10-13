@@ -47,6 +47,7 @@ namespace Squidex.Domain.Apps.Core
                 });
 
             Assert.Equal(Language.DE, config.Master.Language);
+            Assert.Equal(3, config.Count);
         }
 
         [Fact]

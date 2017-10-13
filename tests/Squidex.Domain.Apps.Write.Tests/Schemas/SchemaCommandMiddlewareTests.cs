@@ -212,6 +212,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
             CreateSchema();
             CreateField();
 
+            HideField();
+
             var context = CreateContextForCommand(new ShowField { FieldId = 1 });
 
             await TestUpdate(schema, async _ =>
@@ -239,6 +241,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             CreateSchema();
             CreateField();
+
+            DisableField();
 
             var context = CreateContextForCommand(new EnableField { FieldId = 1 });
 
@@ -275,6 +279,16 @@ namespace Squidex.Domain.Apps.Write.Schemas
         private void CreateField()
         {
             schema.Add(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
+        }
+
+        private void HideField()
+        {
+            schema.HideField(CreateCommand(new HideField { FieldId = 1 }));
+        }
+
+        private void DisableField()
+        {
+            schema.DisableField(CreateCommand(new DisableField { FieldId = 1 }));
         }
     }
 }

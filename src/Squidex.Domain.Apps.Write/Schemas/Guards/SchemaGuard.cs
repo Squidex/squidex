@@ -6,8 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -15,19 +15,14 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
 {
     public static class SchemaGuard
     {
-        public static void GuardValidSchemaName(string name)
+        public static void GuardCanReorder(Schema schema, List<long> fieldIds)
         {
-            if (!name.IsSlug())
+            if (fieldIds.Count != schema.Fields.Count || fieldIds.Any(x => !schema.FieldsById.ContainsKey(x)))
             {
-                var error = new ValidationError("Name must be a valid slug.", "Name");
+                var error = new ValidationError("Ids must cover all fields.", "FieldIds");
 
-                throw new ValidationException("Cannot create a new schema.", error);
+                throw new ValidationException("Cannot reorder schema fields.", error);
             }
-        }
-
-        internal static void GuardCanReorder(Schema schema, List<long> fieldIds)
-        {
-            throw new NotImplementedException();
         }
 
         public static void GuardCanPublish(Schema schema)

@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(geolocation), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(geolocation), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         private static JToken CreateValue(JToken v)

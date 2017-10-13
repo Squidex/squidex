@@ -23,12 +23,12 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly ContentDomainObject sut;
         private readonly NamedContentData data =
             new NamedContentData()
-                .Add("field1",
+                .AddField("field1",
                     new ContentFieldData()
                         .AddValue("iv", 1));
         private readonly NamedContentData otherData =
             new NamedContentData()
-                .Add("field2",
+                .AddField("field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));
 
@@ -212,6 +212,18 @@ namespace Squidex.Domain.Apps.Write.Contents
             Assert.Throws<DomainException>(() =>
             {
                 sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
+            });
+        }
+
+        [Fact]
+        public void ChangeStatus_should_throw_exception_if_status_flow_not_valid()
+        {
+            CreateContent();
+            ChangeStatus(Status.Archived);
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
             });
         }
 

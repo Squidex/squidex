@@ -18,5 +18,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             return JValue.CreateNull();
         }
+
+        public override T Visit<T>(IFieldPropertiesVisitor<T> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

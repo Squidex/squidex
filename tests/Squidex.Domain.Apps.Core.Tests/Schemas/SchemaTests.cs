@@ -29,6 +29,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 return null;
             }
+
+            public override T Visit<T>(IFieldPropertiesVisitor<T> visitor)
+            {
+                return default(T);
+            }
         }
 
         [Fact]
@@ -148,6 +153,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             sut = sut.UpdateField(1, new NumberFieldProperties { Hints = "my-hints" });
 
             Assert.Equal("my-hints", sut.FieldsById[1].RawProperties.Hints);
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_updating_with_invalid_properties_type()
+        {
+            Add();
+
+            Assert.Throws<ArgumentException>(() => sut.UpdateField(1, new StringFieldProperties()));
         }
 
         [Fact]

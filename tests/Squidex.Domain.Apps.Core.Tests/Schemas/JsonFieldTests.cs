@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         private static JValue CreateValue(JValue v)

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { MinLength = 10, AllowedValues = ImmutableList.Create("4") };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { MaxLength = 10, AllowedValues = ImmutableList.Create("4") };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { Editor = StringFieldEditor.Radio };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { Editor = (StringFieldEditor)123 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         {
             var sut = new StringFieldProperties { Pattern = "[0-9{1}" };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

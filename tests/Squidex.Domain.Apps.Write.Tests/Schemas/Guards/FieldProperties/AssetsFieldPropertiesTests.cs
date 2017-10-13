@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldPro
         {
             var sut = new AssetsFieldProperties { MinItems = 10, MaxItems = 5 };
 
-            var errors = SchemaFieldGuard.ValidateProperties(sut).ToList();
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

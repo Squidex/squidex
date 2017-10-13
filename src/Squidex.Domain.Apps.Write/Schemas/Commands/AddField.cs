@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
             }
             else
             {
-                var propertyErrors = SchemaFieldGuard.ValidateProperties(Properties);
+                var propertyErrors = FieldPropertiesValidator.Validate(Properties);
 
                 foreach (var error in propertyErrors)
                 {

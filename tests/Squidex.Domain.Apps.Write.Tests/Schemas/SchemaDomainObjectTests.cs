@@ -64,7 +64,40 @@ namespace Squidex.Domain.Apps.Write.Schemas
                 {
                     Name = null,
                     Properties = null,
-                    Partitioning = "invalid"
+                    Partitioning = "invalid",
+                },
+                new CreateSchemaField
+                {
+                    Name = null,
+                    Properties = InvalidProperties(),
+                    Partitioning = "invalid",
+                }
+            };
+
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
+            });
+        }
+
+        [Fact]
+        public void Create_should_throw_exception_if_fields_contain_duplicate_names()
+        {
+            var properties = new SchemaProperties();
+
+            var fields = new List<CreateSchemaField>
+            {
+                new CreateSchemaField
+                {
+                    Name = "field1",
+                    Properties = ValidProperties(),
+                    Partitioning = "invariant"
+                },
+                new CreateSchemaField
+                {
+                    Name = "field1",
+                    Properties = ValidProperties(),
+                    Partitioning = "invariant"
                 }
             };
 
@@ -96,8 +129,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             var fields = new List<CreateSchemaField>
             {
-                new CreateSchemaField { Name = "field1", Properties = new GeolocationFieldProperties() },
-                new CreateSchemaField { Name = "field2", Properties = new StringFieldProperties() }
+                new CreateSchemaField { Name = "field1", Properties = ValidProperties() },
+                new CreateSchemaField { Name = "field2", Properties = ValidProperties() }
             };
 
             sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
@@ -244,8 +277,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             CreateSchema();
 
-            sut.Add(new AddField { Name = "field1", Properties = new StringFieldProperties() });
-            sut.Add(new AddField { Name = "field2", Properties = new StringFieldProperties() });
+            sut.Add(new AddField { Name = "field1", Properties = ValidProperties() });
+            sut.Add(new AddField { Name = "field2", Properties = ValidProperties() });
 
             ((IAggregate)sut).ClearUncommittedEvents();
 
@@ -367,16 +400,16 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void Add_should_throw_exception_if_not_created()
+        public void AddField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
             {
-                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = ValidProperties() }));
             });
         }
 
         [Fact]
-        public void Add_should_throw_exception_if_command_is_not_valid()
+        public void AddField_should_throw_exception_if_command_is_not_valid()
         {
             Assert.Throws<ValidationException>(() =>
             {
@@ -385,16 +418,25 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void Add_should_throw_exception_if_command_contains_invalid_partitioning()
+        public void AddField_should_throw_exception_if_command_contains_invalid_partitioning()
         {
             Assert.Throws<ValidationException>(() =>
             {
-                sut.Add(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = new NumberFieldProperties() }));
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = ValidProperties() }));
             });
         }
 
         [Fact]
-        public void Add_should_throw_exception_if_schema_is_deleted()
+        public void AddField_should_throw_exception_if_command_contains_invalid_properties()
+        {
+            Assert.Throws<ValidationException>(() =>
+            {
+                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = InvalidProperties() }));
+            });
+        }
+
+        [Fact]
+        public void AddField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
             DeleteSchema();
@@ -786,6 +828,16 @@ namespace Squidex.Domain.Apps.Write.Schemas
             sut.Delete(CreateCommand(new DeleteSchema()));
 
             ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private static StringFieldProperties ValidProperties()
+        {
+            return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
+        }
+
+        private static StringFieldProperties InvalidProperties()
+        {
+            return new StringFieldProperties { MinLength = 20, MaxLength = 10 };
         }
     }
 }

@@ -66,11 +66,6 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
                 errors.Add(new ValidationError("Name must be a valid slug.", nameof(Name)));
             }
 
-            if (Properties == null)
-            {
-                errors.Add(new ValidationError("Properties must be specified.", nameof(Properties)));
-            }
-
             if (Fields.Any())
             {
                 var index = 0;

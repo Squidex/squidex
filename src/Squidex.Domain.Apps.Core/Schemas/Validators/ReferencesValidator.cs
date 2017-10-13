@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError("<FIELD> is required");
+                    addError("<FIELD> is required.");
                 }
 
                 return;
@@ -40,19 +40,19 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             if (minItems.HasValue && references.ContentIds.Count < minItems.Value)
             {
-                addError($"<FIELD> must have at least {minItems} reference(s)");
+                addError($"<FIELD> must have at least {minItems} reference(s).");
             }
 
             if (maxItems.HasValue && references.ContentIds.Count > maxItems.Value)
             {
-                addError($"<FIELD> must have not more than {maxItems} reference(s)");
+                addError($"<FIELD> must have not more than {maxItems} reference(s).");
             }
 
             var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);
 
             foreach (var invalidId in invalidIds)
             {
-                addError($"<FIELD> contains invalid reference '{invalidId}'");
+                addError($"<FIELD> contains invalid reference '{invalidId}'.");
             }
         }
     }
