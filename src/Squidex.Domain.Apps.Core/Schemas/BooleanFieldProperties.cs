@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
@@ -49,14 +48,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override JToken GetDefaultValue()
         {
             return DefaultValue;
-        }
-
-        protected override IEnumerable<ValidationError> ValidateCore()
-        {
-            if (!Editor.IsEnumValue())
-            {
-                yield return new ValidationError("Editor is not a valid value", nameof(Editor));
-            }
         }
     }
 }

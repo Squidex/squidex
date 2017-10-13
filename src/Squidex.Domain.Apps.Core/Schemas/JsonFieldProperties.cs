@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
@@ -18,11 +17,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override JToken GetDefaultValue()
         {
             return JValue.CreateNull();
-        }
-
-        protected override IEnumerable<ValidationError> ValidateCore()
-        {
-            yield break;
         }
     }
 }

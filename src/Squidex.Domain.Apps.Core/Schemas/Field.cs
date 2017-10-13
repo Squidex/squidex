@@ -108,35 +108,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Field Update(FieldProperties newProperties)
         {
-            ThrowIfLocked();
-
-            return UpdateInternal(newProperties);
-        }
-
-        public Field Rename(string newName)
-        {
-            ThrowIfLocked();
-            ThrowIfSameName(newName);
-
-            return Clone<Field>(clone => clone.fieldName = newName);
-        }
-
-        private void ThrowIfLocked()
-        {
             if (isLocked)
             {
-                throw new DomainException($"Field {fieldId} is locked.");
+                throw new InvalidOperationException($"Field {fieldId} is locked.");
             }
-        }
 
-        private void ThrowIfSameName(string newName)
-        {
-            if (!newName.IsSlug())
-            {
-                var error = new ValidationError("Name must be a valid slug", "Name");
-
-                throw new ValidationException($"Cannot rename the field '{fieldName}' ({fieldId})", error);
-            }
+            return UpdateInternal(newProperties);
         }
 
         public void AddToEdmType(EdmStructuredType edmType, PartitionResolver partitionResolver, string schemaName, Func<EdmComplexType, EdmComplexType> typeResolver)

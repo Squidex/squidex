@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
@@ -131,37 +130,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override bool ShouldApplyDefaultValue(JToken value)
         {
             return value.IsNull() || (value is JValue jValue && Equals(jValue.Value, string.Empty));
-        }
-
-        protected override IEnumerable<ValidationError> ValidateCore()
-        {
-            if (!Editor.IsEnumValue())
-            {
-                yield return new ValidationError("Editor is not a valid value", nameof(Editor));
-            }
-
-            if ((Editor == StringFieldEditor.Radio || Editor == StringFieldEditor.Dropdown) && (AllowedValues == null || AllowedValues.Count == 0))
-            {
-                yield return new ValidationError("Radio buttons or dropdown list need allowed values", nameof(AllowedValues));
-            }
-
-            if (MaxLength.HasValue && MinLength.HasValue && MinLength.Value >= MaxLength.Value)
-            {
-                yield return new ValidationError("Max length must be greater than min length", nameof(MinLength), nameof(MaxLength));
-            }
-
-            if (Pattern != null && !Pattern.IsValidRegex())
-            {
-                yield return new ValidationError("Pattern is not a valid expression", nameof(Pattern));
-            }
-
-            if (AllowedValues != null && AllowedValues.Count > 0 && (MinLength.HasValue || MaxLength.HasValue))
-            {
-                yield return new ValidationError("Either allowed values or min and max length can be defined",
-                    nameof(AllowedValues),
-                    nameof(MinLength),
-                    nameof(MaxLength));
-            }
         }
     }
 }

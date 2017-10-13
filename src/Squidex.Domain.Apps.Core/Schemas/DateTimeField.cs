@@ -14,7 +14,6 @@ using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {

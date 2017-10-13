@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
-            Guard.ValidSlug(name, nameof(name));
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             fieldsById = fields.ToImmutableDictionary(x => x.Id);
             fieldsByName = fields.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
@@ -76,13 +76,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static Schema Create(string name, SchemaProperties newProperties)
         {
-            if (!name.IsSlug())
-            {
-                var error = new ValidationError("Name must be a valid slug", "Name");
-
-                throw new ValidationException("Cannot create a new schema", error);
-            }
-
             return new Schema(name, false, newProperties, ImmutableList<Field>.Empty);
         }
 
@@ -128,34 +121,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return UpdateField(fieldId, field => field.Rename(newName));
         }
 
-        public Schema DeleteField(long fieldId)
-        {
-            if (fieldsById.TryGetValue(fieldId, out var field) && field.IsLocked)
-            {
-                throw new DomainException($"Field {fieldId} is locked.");
-            }
-
-            return new Schema(name, isPublished, properties, fields.Where(x => x.Id != fieldId).ToImmutableList());
-        }
-
         public Schema Publish()
         {
-            if (isPublished)
-            {
-                throw new DomainException("Schema is already published");
-            }
-
             return new Schema(name, true, properties, fields);
         }
 
         public Schema Unpublish()
         {
-            if (!isPublished)
-            {
-                throw new DomainException("Schema is not published");
-            }
-
             return new Schema(name, false, properties, fields);
+        }
+
+        public Schema DeleteField(long fieldId)
+        {
+            return new Schema(name, isPublished, properties, fields.Where(x => x.Id != fieldId).ToImmutableList());
         }
 
         public Schema ReorderFields(List<long> ids)
@@ -192,7 +170,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
             {
-                throw new ValidationException($"A field with name '{field.Name}' already exists.");
+                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
 
             ImmutableList<Field> newFields;

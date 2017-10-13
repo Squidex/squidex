@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
@@ -49,14 +48,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override JToken GetDefaultValue()
         {
             return new JArray();
-        }
-
-        protected override IEnumerable<ValidationError> ValidateCore()
-        {
-            if (MaxItems.HasValue && MinItems.HasValue && MinItems.Value >= MaxItems.Value)
-            {
-                yield return new ValidationError("Max items must be greater than min items", nameof(MinItems), nameof(MaxItems));
-            }
         }
     }
 }
