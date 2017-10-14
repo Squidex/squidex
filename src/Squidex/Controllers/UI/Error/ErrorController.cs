@@ -14,7 +14,7 @@ namespace Squidex.Controllers.UI.Error
     [SwaggerIgnore]
     public sealed class ErrorController : Controller
     {
-        [Route("error")]
+        [Route("error/")]
         public IActionResult Error()
         {
             return View();

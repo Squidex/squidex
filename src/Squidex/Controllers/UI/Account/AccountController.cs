@@ -73,21 +73,21 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/forbidden")]
+        [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {
             throw new SecurityException("User is not allowed to login.");
         }
 
         [HttpGet]
-        [Route("account/lockedout")]
+        [Route("account/lockedout/")]
         public IActionResult LockedOut()
         {
             return View();
         }
 
         [HttpGet]
-        [Route("account/accessdenied")]
+        [Route("account/accessdenied/")]
         public IActionResult AccessDenied()
         {
             return View();
@@ -101,7 +101,7 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/logout/.")]
+        [Route("account/logout/")]
         public async Task<IActionResult> Logout(string logoutId)
         {
             var context = await interactions.GetLogoutContextAsync(logoutId);
@@ -119,7 +119,7 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/logout-redirect/.")]
+        [Route("account/logout-redirect/")]
         public async Task<IActionResult> LogoutRedirect()
         {
             await signInManager.SignOutAsync();
@@ -128,7 +128,7 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/signup/.")]
+        [Route("account/signup/")]
         public IActionResult Signup(string returnUrl = null)
         {
             return LoginView(returnUrl, false, false);

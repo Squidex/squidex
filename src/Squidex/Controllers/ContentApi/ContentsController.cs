@@ -49,7 +49,7 @@ namespace Squidex.Controllers.ContentApi
         [MustBeAppReader]
         [HttpGet]
         [HttpPost]
-        [Route("content/{app}/graphql")]
+        [Route("content/{app}/graphql/")]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL([FromBody] GraphQLQuery query)
         {
@@ -67,7 +67,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/{name}")]
+        [Route("content/{app}/{name}/")]
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
@@ -114,7 +114,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/{name}/{id}")]
+        [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string name, Guid id)
         {
@@ -136,7 +136,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/{version}")]
+        [Route("content/{app}/{name}/{id}/{version}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
         {
@@ -169,7 +169,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPut]
-        [Route("content/{app}/{name}/{id}")]
+        [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string name, Guid id, [FromBody] NamedContentData request)
         {
@@ -187,7 +187,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPatch]
-        [Route("content/{app}/{name}/{id}")]
+        [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string name, Guid id, [FromBody] NamedContentData request)
         {
@@ -205,7 +205,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/publish")]
+        [Route("content/{app}/{name}/{id}/publish/")]
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(string name, Guid id)
         {
@@ -220,7 +220,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/unpublish")]
+        [Route("content/{app}/{name}/{id}/unpublish/")]
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(string name, Guid id)
         {
@@ -235,7 +235,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/archive")]
+        [Route("content/{app}/{name}/{id}/archive/")]
         [ApiCosts(1)]
         public async Task<IActionResult> ArchiveContent(string name, Guid id)
         {
@@ -250,7 +250,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/restore")]
+        [Route("content/{app}/{name}/{id}/restore/")]
         [ApiCosts(1)]
         public async Task<IActionResult> RestoreContent(string name, Guid id)
         {
@@ -265,7 +265,7 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppEditor]
         [HttpDelete]
-        [Route("content/{app}/{name}/{id}")]
+        [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string name, Guid id)
         {

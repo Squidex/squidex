@@ -102,7 +102,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [MustBeAppOwner]
         [HttpPut]
-        [Route("apps/{app}/languages/{language}")]
+        [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
         {
@@ -122,7 +122,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [MustBeAppOwner]
         [HttpDelete]
-        [Route("apps/{app}/languages/{language}")]
+        [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {
