@@ -57,7 +57,7 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("Configure EventStore MongoDb configuration with 'eventStore:mongoDb:configuration'.");
                 }
 
-                var database = Configuration.GetValue<string>("eventStore:mongoDb:database.");
+                var database = Configuration.GetValue<string>("eventStore:mongoDb:database");
 
                 if (string.IsNullOrWhiteSpace(database))
                 {
@@ -87,14 +87,14 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException("Configure GetEventStore EventStore configuration with 'eventStore:getEventStore:configuration'.");
                 }
 
-                var projectionHost = Configuration.GetValue<string>("eventStore:getEventStore:projectionHost.");
+                var projectionHost = Configuration.GetValue<string>("eventStore:getEventStore:projectionHost");
 
                 if (string.IsNullOrWhiteSpace(projectionHost))
                 {
                     throw new ConfigurationException("Configure GetEventStore EventStore projection host with 'eventStore:getEventStore:projectionHost'.");
                 }
 
-                var prefix = Configuration.GetValue<string>("eventStore:getEventStore:prefix.");
+                var prefix = Configuration.GetValue<string>("eventStore:getEventStore:prefix");
 
                 var connection = EventStoreConnection.Create(configuration);
 
