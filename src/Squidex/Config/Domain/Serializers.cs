@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
@@ -35,6 +37,7 @@ namespace Squidex.Config.Domain
                 new NamedStringIdConverter(),
                 new PropertiesBagConverter(),
                 new RefTokenConverter(),
+                new SchemaConverter(new FieldRegistry(TypeNameRegistry)),
                 new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
@@ -45,6 +48,8 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+
+            JsonConvert.DefaultSettings = () => settings;
 
             return settings;
         }

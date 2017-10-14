@@ -153,10 +153,6 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterType<SchemaJsonSerializer>()
-                .AsSelf()
-                .SingleInstance();
-
             builder.RegisterType<FieldRegistry>()
                 .AsSelf()
                 .SingleInstance();

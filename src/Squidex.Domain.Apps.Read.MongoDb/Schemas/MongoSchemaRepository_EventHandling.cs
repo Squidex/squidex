@@ -18,6 +18,8 @@ using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable CS0612 // Type or member is obsolete
+
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
@@ -114,22 +116,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
         }
 
-        private Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
-        {
-            return Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
-        }
-
-        private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)
-        {
-            entity.UpdateSchema(serializer, updater);
-        }
-
-        private void UpdateSchema(MongoSchemaEntity entity, Schema schema)
-        {
-            entity.SerializeSchema(schema, serializer);
-        }
-
-#pragma warning disable CS0612 // Type or member is obsolete
         protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, e => { });
@@ -139,6 +125,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         {
             return Collection.UpdateAsync(@event, headers, e => { });
         }
-#pragma warning restore CS0612 // Type or member is obsolete
+
+        private Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        {
+            return Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
+        }
+
+        private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)
+        {
+            entity.SchemaDef = updater(entity.SchemaDef);
+        }
+
+        private void UpdateSchema(MongoSchemaEntity entity, Schema schema)
+        {
+            entity.SchemaDef = schema;
+        }
     }
 }

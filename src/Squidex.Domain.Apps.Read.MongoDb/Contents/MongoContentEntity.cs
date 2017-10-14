@@ -8,27 +8,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {
-        private const int MaxLength = 1024 * 1024;
         private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
-        private NamedContentData contentData;
+        private NamedContentData data;
 
         [BsonId]
         [BsonElement]
@@ -74,7 +69,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("do")]
-        public BsonDocument DataObject { get; set; }
+        public BsonDocument DataDocument { get; set; }
 
         [BsonRequired]
         [BsonElement("rf")]
@@ -86,80 +81,22 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         NamedContentData IContentEntity.Data
         {
-            get
-            {
-                return contentData;
-            }
+            get { return data; }
         }
 
         public void ParseData(Schema schema)
         {
-            if (DataObject != null)
-            {
-                var jsonString = DataObject.ToJson(Settings);
-
-                contentData =
-                    JsonConvert.DeserializeObject<IdContentData>(jsonString)
-                        .ToCleanedReferences(schema, new HashSet<Guid>(ReferencedIdsDeleted))
-                        .ToNameModel(schema, true);
-            }
-            else
-            {
-                contentData = null;
-            }
+            data = DataDocument.ToData(schema, ReferencedIdsDeleted);
         }
 
-        public void SetData(Schema schema, NamedContentData newContentData)
+        public void SetData(Schema schema, NamedContentData data)
         {
-            if (newContentData != null)
-            {
-                var idModel = newContentData.ToIdModel(schema, true);
+            var idData = data?.ToIdModel(schema, true);
 
-                var jsonString = JsonConvert.SerializeObject(idModel);
+            DataText = idData?.ToFullText();
+            DataDocument = idData?.ToBsonDocument();
 
-                DataObject = BsonDocument.Parse(jsonString);
-                DataText = ExtractText(idModel);
-
-                ReferencedIds = idModel.GetReferencedIds(schema).ToList();
-            }
-            else
-            {
-                DataObject = null;
-                DataText = string.Empty;
-            }
-        }
-
-        private static string ExtractText(IdContentData data)
-        {
-            if (data == null)
-            {
-                return string.Empty;
-            }
-
-            var stringBuilder = new StringBuilder();
-
-            foreach (var text in data.Values.SelectMany(x => x.Values).Where(x => x != null).OfType<JValue>())
-            {
-                if (text.Type == JTokenType.String)
-                {
-                    var value = text.ToString();
-
-                    if (value.Length < 1000)
-                    {
-                        stringBuilder.Append(" ");
-                        stringBuilder.Append(text);
-                    }
-                }
-            }
-
-            var result = stringBuilder.ToString();
-
-            if (result.Length > MaxLength)
-            {
-                result = result.Substring(MaxLength);
-            }
-
-            return result;
+            ReferencedIds = idData?.ToReferencedIds(schema);
         }
     }
 }
