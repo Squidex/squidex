@@ -112,7 +112,7 @@ namespace Squidex.Controllers.UI.Account
 
             if (string.IsNullOrWhiteSpace(logoutUrl))
             {
-                logoutUrl = urlOptions.Value.BuildUrl("logout.");
+                logoutUrl = urlOptions.Value.BuildUrl("logout/");
             }
 
             return Redirect(logoutUrl);

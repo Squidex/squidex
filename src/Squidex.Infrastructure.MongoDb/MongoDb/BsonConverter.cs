@@ -68,14 +68,34 @@ namespace Squidex.Infrastructure.MongoDb
 
         public static BsonValue ToBson(this JToken source)
         {
-            switch (source)
+            switch (source.Type)
             {
-                case JObject jObject:
-                    return jObject.ToBson();
-                case JArray jArray:
-                    return jArray.ToBson();
-                case JValue jValue:
-                    return BsonValue.Create(jValue.Value);
+                case JTokenType.Object:
+                    return ((JObject)source).ToBson();
+                case JTokenType.Array:
+                    return ((JArray)source).ToBson();
+                case JTokenType.Integer:
+                    return BsonValue.Create(((JValue)source).Value);
+                case JTokenType.Float:
+                    return BsonValue.Create(((JValue)source).Value);
+                case JTokenType.String:
+                    return BsonValue.Create(((JValue)source).Value);
+                case JTokenType.Boolean:
+                    return BsonValue.Create(((JValue)source).Value);
+                case JTokenType.Null:
+                    return BsonNull.Value;
+                case JTokenType.Undefined:
+                    return BsonUndefined.Value;
+                case JTokenType.Date:
+                    return BsonValue.Create(((JValue)source).Value.ToString());
+                case JTokenType.Bytes:
+                    return BsonValue.Create(((JValue)source).Value);
+                case JTokenType.Guid:
+                    return BsonValue.Create(((JValue)source).Value.ToString());
+                case JTokenType.Uri:
+                    return BsonValue.Create(((JValue)source).Value.ToString());
+                case JTokenType.TimeSpan:
+                    return BsonValue.Create(((JValue)source).Value.ToString());
             }
 
             throw new NotSupportedException($"Cannot convert {source.GetType()} to Bson.");
@@ -103,8 +123,12 @@ namespace Squidex.Infrastructure.MongoDb
                     return new JValue(source.AsInt64);
                 case BsonType.Decimal128:
                     return new JValue(source.AsDecimal);
+                case BsonType.Binary:
+                    return new JValue(source.AsBsonBinaryData.Bytes);
                 case BsonType.Null:
                     return JValue.CreateNull();
+                case BsonType.Undefined:
+                    return JValue.CreateUndefined();
             }
 
             throw new NotSupportedException($"Cannot convert {source.GetType()} to Json.");
