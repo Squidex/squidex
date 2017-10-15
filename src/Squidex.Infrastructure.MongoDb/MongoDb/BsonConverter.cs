@@ -20,7 +20,9 @@ namespace Squidex.Infrastructure.MongoDb
 
             foreach (var property in source)
             {
-                result.Add(property.Key, property.Value.ToBson());
+                var key = property.Key == "$type" ? "&type" : property.Key;
+
+                result.Add(key, property.Value.ToBson());
             }
 
             return result;
@@ -32,7 +34,9 @@ namespace Squidex.Infrastructure.MongoDb
 
             foreach (var property in source)
             {
-                result.Add(property.Name, property.Value.ToJson());
+                var key = property.Name == "&type" ? "$type" : property.Name;
+
+                result.Add(key, property.Value.ToJson());
             }
 
             return result;

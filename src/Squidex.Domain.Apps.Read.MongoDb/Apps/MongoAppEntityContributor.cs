@@ -16,10 +16,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
     {
         [BsonRequired]
         [BsonElement]
-        public string ContributorId { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
         public AppContributorPermission Permission { get; set; }
     }
 }

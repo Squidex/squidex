@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private readonly Lazy<List<IValidator>> validators;
         private readonly long fieldId;
         private readonly Partitioning partitioning;
-        private string fieldName;
+        private readonly string fieldName;
         private bool isDisabled;
         private bool isHidden;
         private bool isLocked;
@@ -83,27 +83,42 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Field Lock()
         {
-            return Clone<Field>(clone => clone.isLocked = true);
+            return Clone<Field>(clone =>
+            {
+                clone.isLocked = true;
+            });
         }
 
         public Field Hide()
         {
-            return Clone<Field>(clone => clone.isHidden = true);
+            return Clone<Field>(clone =>
+            {
+                clone.isHidden = true;
+            });
         }
 
         public Field Show()
         {
-            return Clone<Field>(clone => clone.isHidden = false);
+            return Clone<Field>(clone =>
+            {
+                clone.isHidden = false;
+            });
         }
 
         public Field Disable()
         {
-            return Clone<Field>(clone => clone.isDisabled = true);
+            return Clone<Field>(clone =>
+            {
+                clone.isDisabled = true;
+            });
         }
 
         public Field Enable()
         {
-            return Clone<Field>(clone => clone.isDisabled = false);
+            return Clone<Field>(clone =>
+            {
+                clone.isDisabled = false;
+            });
         }
 
         public Field Update(FieldProperties newProperties)

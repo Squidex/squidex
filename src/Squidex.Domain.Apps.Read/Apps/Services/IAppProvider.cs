@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Apps.Services
 {
@@ -16,5 +17,7 @@ namespace Squidex.Domain.Apps.Read.Apps.Services
         Task<IAppEntity> FindAppByIdAsync(Guid id);
 
         Task<IAppEntity> FindAppByNameAsync(string name);
+
+        void Invalidate(NamedId<Guid> appId);
     }
 }

@@ -117,28 +117,26 @@ namespace Squidex.Pipeline
 
         private static AppPermission? FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
-            var client = app.Clients.FirstOrDefault(x => string.Equals(x.Id, user.GetClientId(), StringComparison.OrdinalIgnoreCase));
+            var clientId = user.GetClientId();
 
-            if (client == null)
+            if (clientId != null && app.Clients.TryGetValue(clientId, out var client))
             {
-                return null;
+                return client.Permission.ToAppPermission();
             }
 
-            return client.Permission.ToAppPermission();
+            return null;
         }
 
         private static AppPermission? FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
         {
-            var subject = user.FindFirst(OpenIdClaims.Subject)?.Value;
+            var subjectId = user.FindFirst(OpenIdClaims.Subject)?.Value;
 
-            if (subject == null)
+            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var contributor))
             {
-                return null;
+                return contributor.Permission.ToAppPermission();
             }
 
-            var contributor = app.Contributors.FirstOrDefault(x => string.Equals(x.ContributorId, subject, StringComparison.OrdinalIgnoreCase));
-
-            return contributor?.Permission.ToAppPermission();
+            return null;
         }
     }
 }

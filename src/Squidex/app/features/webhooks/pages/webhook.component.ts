@@ -22,7 +22,7 @@ export interface WebhookSchemaForm {
     sendCreate: boolean;
     sendUpdate: boolean;
     sendDelete: boolean;
-    sendPublish: boolean
+    sendPublish: boolean;
 }
 
 @Component({

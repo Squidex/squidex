@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private readonly string streamFilter;
         private readonly string projectionHost;
         private readonly EventStoreCatchUpSubscription subscription;
-        private long? position;
+        private readonly long? position;
 
         public GetEventStoreSubscription(
             IEventStoreConnection eventStoreConnection,

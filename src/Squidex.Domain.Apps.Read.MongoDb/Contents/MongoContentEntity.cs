@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,7 +21,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
     public sealed class MongoContentEntity : IContentEntity, IMongoEntity
     {
-        private static readonly JsonWriterSettings Settings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
         private NamedContentData data;
 
         [BsonId]
@@ -73,11 +71,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("rf")]
-        public List<Guid> ReferencedIds { get; set; } = new List<Guid>();
+        public List<Guid> ReferencedIds { get; set; }
 
         [BsonRequired]
         [BsonElement("rd")]
-        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
+        public List<Guid> ReferencedIdsDeleted { get; set; }
 
         NamedContentData IContentEntity.Data
         {
@@ -87,16 +85,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         public void ParseData(Schema schema)
         {
             data = DataDocument.ToData(schema, ReferencedIdsDeleted);
-        }
-
-        public void SetData(Schema schema, NamedContentData data)
-        {
-            var idData = data?.ToIdModel(schema, true);
-
-            DataText = idData?.ToFullText();
-            DataDocument = idData?.ToBsonDocument();
-
-            ReferencedIds = idData?.ToReferencedIds(schema);
         }
     }
 }

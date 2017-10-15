@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return document
                 .ToJson()
                 .ToObject<IdContentData>()
-                .ToCleanedReferences(schema, new HashSet<Guid>(deletedIds))
+                .ToCleanedReferences(schema, new HashSet<Guid>(deletedIds ?? new List<Guid>()))
                 .ToNameModel(schema, true);
         }
 

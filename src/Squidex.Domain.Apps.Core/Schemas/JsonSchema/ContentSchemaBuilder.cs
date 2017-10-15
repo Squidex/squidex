@@ -7,10 +7,9 @@
 // ==========================================================================
 
 using NJsonSchema;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.Contents.JsonSchema
+namespace Squidex.Domain.Apps.Core.Schemas.JsonSchema
 {
     public sealed class ContentSchemaBuilder
     {

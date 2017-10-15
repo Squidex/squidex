@@ -9,6 +9,10 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events;
@@ -20,20 +24,38 @@ namespace Squidex.Config.Domain
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<EventConsumerCleaner>().CleanAsync().Wait();
+            var services = app.ApplicationServices;
 
-            var consumers = app.ApplicationServices.GetServices<IEventConsumer>();
+            services.GetService<EventConsumerCleaner>().CleanAsync().Wait();
+
+            var consumers = services.GetServices<IEventConsumer>();
 
             foreach (var consumer in consumers)
             {
-                var actor = app.ApplicationServices.GetService<EventConsumerActor>();
+                var actor = services.GetService<EventConsumerActor>();
 
                 if (actor != null)
                 {
                     actor.SubscribeAsync(consumer);
 
-                    app.ApplicationServices.GetService<RemoteActors>().Connect(consumer.Name, actor);
+                    services.GetService<RemoteActors>().Connect(consumer.Name, actor);
                 }
+            }
+
+            var appRepository = services.GetService<IAppRepository>();
+            var appProvider = services.GetService<IAppProvider>();
+
+            if (appProvider != null)
+            {
+                appRepository?.SubscribeOnChanged(appProvider.Invalidate);
+            }
+
+            var schemaRepository = services.GetService<ISchemaRepository>();
+            var schemaProvider = services.GetService<ISchemaProvider>();
+
+            if (schemaProvider != null)
+            {
+                schemaRepository?.SubscribeOnChanged(schemaProvider.Invalidate);
             }
 
             return app;

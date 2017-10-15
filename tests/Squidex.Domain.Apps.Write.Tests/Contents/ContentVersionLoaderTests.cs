@@ -48,13 +48,6 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Should_throw_exception_when_version_not_found()
         {
-            var events = new List<StoredEvent>
-            {
-                new StoredEvent("0", 0, new EventData()),
-                new StoredEvent("1", 1, new EventData()),
-                new StoredEvent("2", 2, new EventData())
-            };
-
             A.CallTo(() => eventStore.GetEventsAsync(streamName))
                 .Returns(new List<StoredEvent>());
 

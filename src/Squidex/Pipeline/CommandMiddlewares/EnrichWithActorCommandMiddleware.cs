@@ -44,7 +44,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         {
             var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
 
-            return subjectId == null ? null : new RefToken("subject.", subjectId);
+            return subjectId == null ? null : new RefToken("subject", subjectId);
         }
 
         private RefToken FindActorFromClient()

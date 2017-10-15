@@ -97,7 +97,7 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
 
         const fix = this.autoPosition;
 
-        let t = 0
+        let t = 0;
         let l = 0;
 
         switch (this.position) {
@@ -153,7 +153,7 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
             case POSITION_TOPRIGHT:
             case POSITION_BOTTOMRIGHT:
                 {
-                    l = targetRect.right - modalRect.width
+                    l = targetRect.right - modalRect.width;
                     break;
                 }
             case POSITION_RIGHTTOP:

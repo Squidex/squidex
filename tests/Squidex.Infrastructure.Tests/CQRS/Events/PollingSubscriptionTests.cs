@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
-        private async Task WaitAndStopAsync(PollingSubscription sut)
+        private static async Task WaitAndStopAsync(IEventSubscription sut)
         {
             await Task.Delay(200);
 

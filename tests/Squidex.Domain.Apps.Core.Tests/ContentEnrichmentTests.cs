@@ -66,8 +66,6 @@ namespace Squidex.Domain.Apps.Core
         [Fact]
         private void Should_also_enrich_with_default_values_when_string_is_empty()
         {
-            var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
-
             var data =
                 new NamedContentData()
                     .AddField("my-string",

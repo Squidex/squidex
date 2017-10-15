@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IFieldPropertiesVisitor<T>
+    public interface IFieldPropertiesVisitor<out T>
     {
         T Visit(AssetsFieldProperties properties);
 

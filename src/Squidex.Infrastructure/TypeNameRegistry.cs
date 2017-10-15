@@ -115,6 +115,20 @@ namespace Squidex.Infrastructure
             return GetName(typeof(T));
         }
 
+        public string GetNameOrNull(Type type)
+        {
+            var result = namesByType.GetOrDefault(type);
+
+            return result;
+        }
+
+        public Type GetTypeOrNull(string name)
+        {
+            var result = typesByName.GetOrDefault(name);
+
+            return result;
+        }
+
         public string GetName(Type type)
         {
             var result = namesByType.GetOrDefault(type);

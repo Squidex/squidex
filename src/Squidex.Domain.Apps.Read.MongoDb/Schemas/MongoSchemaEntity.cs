@@ -73,6 +73,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public string ScriptChange { get; set; }
 
+        [BsonIgnore]
         public Schema SchemaDef
         {
             get

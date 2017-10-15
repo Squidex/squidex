@@ -12,8 +12,6 @@ namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppClientEntity
     {
-        string Id { get; }
-
         string Name { get; }
 
         string Secret { get; }

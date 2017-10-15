@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldPro
+namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
 {
     public class AssetsFieldPropertiesTests
     {

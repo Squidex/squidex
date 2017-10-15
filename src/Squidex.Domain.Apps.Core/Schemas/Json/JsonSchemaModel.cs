@@ -33,10 +33,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public JsonSchemaModel(Schema schema)
         {
-            var model = new JsonSchemaModel { Name = schema.Name, IsPublished = schema.IsPublished, Properties = schema.Properties };
+            Name = schema.Name;
+
+            Properties = schema.Properties;
 
             Fields =
-                schema.Fields.Select(x =>
+                schema.Fields?.Select(x =>
                     new JsonFieldModel
                     {
                         Id = x.Id,
@@ -47,6 +49,8 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
                     }).ToList();
+
+            IsPublished = schema.IsPublished;
         }
 
         public Schema ToSchema(FieldRegistry fieldRegistry)
