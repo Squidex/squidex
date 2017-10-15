@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties.Visit(Instance);
+            return properties.Accept(Instance);
         }
 
         public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)

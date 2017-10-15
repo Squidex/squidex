@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.JsonSchema
 
                 foreach (var partitionItem in partition)
                 {
-                    var partitionItemProperty = field.Visit(jsonTypeVisitor);
+                    var partitionItemProperty = field.Accept(jsonTypeVisitor);
 
                     partitionItemProperty.Description = partitionItem.Name;
                     partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);

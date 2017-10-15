@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        public override T Visit<T>(IFieldVisitor<T> visitor)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
             return visitor.Visit(this);
         }

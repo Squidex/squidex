@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Edm
 
         public static IEdmTypeReference CreateEdmType(Field field)
         {
-            return field.Visit(Instance);
+            return field.Accept(Instance);
         }
 
         public IEdmTypeReference Visit(AssetsField field)

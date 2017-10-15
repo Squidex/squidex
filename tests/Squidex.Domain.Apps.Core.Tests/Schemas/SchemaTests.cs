@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return null;
             }
 
-            public override T Visit<T>(IFieldPropertiesVisitor<T> visitor)
+            public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
             {
                 return default(T);
             }

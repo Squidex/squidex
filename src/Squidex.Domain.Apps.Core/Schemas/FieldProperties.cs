@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract JToken GetDefaultValue();
 
-        public abstract T Visit<T>(IFieldPropertiesVisitor<T> visitor);
+        public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
 
         public virtual bool ShouldApplyDefaultValue(JToken value)
         {

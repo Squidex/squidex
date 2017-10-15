@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
-        public override T Visit<T>(IFieldVisitor<T> visitor)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
             return visitor.Visit(this);
         }

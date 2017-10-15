@@ -126,6 +126,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return UpdateInternal(newProperties);
         }
 
-        public abstract T Visit<T>(IFieldVisitor<T> visitor);
+        public abstract T Accept<T>(IFieldVisitor<T> visitor);
     }
 }
