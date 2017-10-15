@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_return_null_if_name_is_not_supported()
         {
-            Assert.Null(sut.GetType("unsupported"));
+            Assert.Null(sut.GetTypeOrNull("unsupported"));
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_return_null_if_type_is_not_supported()
         {
-            Assert.Null(sut.GetName<Guid>());
+            Assert.Null(sut.GetNameOrNull<Guid>());
         }
     }
 }
