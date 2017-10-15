@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class ReferencesField : Field<ReferencesFieldProperties>, IReferenceField
     {
-        private static readonly Guid[] EmptyIds = new Guid[0];
+        private static readonly ImmutableList<Guid> EmptyIds = ImmutableList<Guid>.Empty;
 
         public ReferencesField(long id, string name, Partitioning partitioning)
             : this(id, name, partitioning, new ReferencesFieldProperties())
@@ -30,25 +31,30 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected override IEnumerable<IValidator> CreateValidators()
         {
+            if (Properties.IsRequired || Properties.MinItems.HasValue || Properties.MaxItems.HasValue)
+            {
+                yield return new CollectionValidator<Guid>(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
+            }
+
             if (Properties.SchemaId != Guid.Empty)
             {
-                yield return new ReferencesValidator(Properties.IsRequired, Properties.SchemaId, Properties.MinItems, Properties.MaxItems);
+                yield return new ReferencesValidator(Properties.SchemaId);
             }
         }
 
         public IEnumerable<Guid> GetReferencedIds(JToken value)
         {
-            Guid[] referenceIds;
+            IEnumerable<Guid> result = null;
             try
             {
-                referenceIds = value?.ToObject<Guid[]>() ?? EmptyIds;
+                result = value?.ToObject<List<Guid>>();
             }
             catch
             {
-                referenceIds = EmptyIds;
+                result = EmptyIds;
             }
 
-            return referenceIds.Union(new[] { Properties.SchemaId });
+            return (result ?? EmptyIds).Union(new[] { Properties.SchemaId });
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
@@ -71,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override object ConvertValue(JToken value)
         {
-            return new ReferencesValue(value.ToObject<Guid[]>());
+            return value.ToObject<List<Guid>>();
         }
 
         public override T Visit<T>(IFieldVisitor<T> visitor)

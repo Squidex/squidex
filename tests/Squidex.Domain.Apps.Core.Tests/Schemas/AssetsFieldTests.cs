@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 asset(s)." });
+                new[] { "<FIELD> must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 asset(s)." });
+                new[] { "<FIELD> must have not more than 1 item(s)." });
         }
 
         [Fact]
@@ -204,14 +204,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             var result = sut.RemoveDeletedReferences(token, new HashSet<Guid>(new[] { Guid.NewGuid() }));
 
             Assert.Same(token, result);
-        }
-
-        [Fact]
-        public void Should_create_assets_value_with_empty_list_when_null()
-        {
-            var value = new AssetsValue(null);
-
-            Assert.Equal(new List<Guid>(), value.AssetIds);
         }
 
         private static JToken CreateValue(params Guid[] ids)

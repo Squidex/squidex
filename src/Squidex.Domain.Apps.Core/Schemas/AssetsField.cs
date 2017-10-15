@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class AssetsField : Field<AssetsFieldProperties>, IReferenceField
     {
-        private static readonly Guid[] EmptyIds = new Guid[0];
+        private static readonly ImmutableList<Guid> EmptyIds = ImmutableList<Guid>.Empty;
 
         public AssetsField(long id, string name, Partitioning partitioning)
             : this(id, name, partitioning, new AssetsFieldProperties())
@@ -30,22 +31,27 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected override IEnumerable<IValidator> CreateValidators()
         {
-            yield return new AssetsValidator(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
+            if (Properties.IsRequired || Properties.MinItems.HasValue || Properties.MaxItems.HasValue)
+            {
+                yield return new CollectionValidator<Guid>(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
+            }
+
+            yield return new AssetsValidator();
         }
 
         public IEnumerable<Guid> GetReferencedIds(JToken value)
         {
-            Guid[] assetIds;
+            IEnumerable<Guid> result = null;
             try
             {
-                assetIds = value?.ToObject<Guid[]>() ?? EmptyIds;
+                result = value?.ToObject<List<Guid>>();
             }
             catch
             {
-                assetIds = EmptyIds;
+                result = EmptyIds;
             }
 
-            return assetIds;
+            return result ?? EmptyIds;
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
@@ -63,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override object ConvertValue(JToken value)
         {
-            return new AssetsValue(value.ToObject<Guid[]>());
+            return value.ToObject<List<Guid>>();
         }
 
         public override T Visit<T>(IFieldVisitor<T> visitor)

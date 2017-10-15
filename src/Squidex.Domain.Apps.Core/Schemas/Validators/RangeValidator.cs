@@ -39,12 +39,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
             {
-                addError($"<FIELD> must be greater than '{min}'.");
+                addError($"<FIELD> must be greater or equals than '{min}'.");
             }
 
             if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
             {
-                addError($"<FIELD> must be less than '{max}'.");
+                addError($"<FIELD> must be less or equals than '{max}'.");
             }
 
             return TaskHelper.Done;

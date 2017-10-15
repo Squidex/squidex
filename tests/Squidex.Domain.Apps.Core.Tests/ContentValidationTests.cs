@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field must be less than '100'.", "my-field")
+                    new ValidationError("my-field must be less or equals than '100'.", "my-field")
                 });
         }
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Core
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field must be less than '100'.", "my-field")
+                    new ValidationError("my-field must be less or equals than '100'.", "my-field")
                 });
         }
 
