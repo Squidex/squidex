@@ -10,6 +10,7 @@ using System;
 using System.Collections.Immutable;
 using FluentAssertions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -20,13 +21,26 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
     public class JsonSerializerTests
     {
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
+        private readonly JsonSerializer serializer;
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
 
         public JsonSerializerTests()
         {
-            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
-            serializerSettings.Converters.Add(new SchemaConverter(new FieldRegistry(typeNameRegistry)));
+
+            serializerSettings.ContractResolver = new ConverterContractResolver(
+                new InstantConverter(),
+                new LanguageConverter(),
+                new NamedGuidIdConverter(),
+                new NamedLongIdConverter(),
+                new NamedStringIdConverter(),
+                new RefTokenConverter(),
+                new SchemaConverter(new FieldRegistry(typeNameRegistry)),
+                new StringEnumConverter());
+
+            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+
+            serializer = JsonSerializer.Create(serializerSettings);
         }
 
         [Fact]
@@ -56,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         new GeolocationFieldProperties()))
                     .Publish();
 
-            var deserialized = JToken.FromObject(schema).ToObject<Schema>();
+            var deserialized = JToken.FromObject(schema, serializer).ToObject<Schema>(serializer);
 
             deserialized.ShouldBeEquivalentTo(schema);
         }
