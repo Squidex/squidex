@@ -29,13 +29,15 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
         {
             if (value is ICollection<T> items)
             {
+                var innerContext = context.Optional(false);
+
                 var index = 1;
 
                 foreach (var item in items)
                 {
                     foreach (var itemValidator in itemValidators)
                     {
-                        await itemValidator.ValidateAsync(item, context, e => addError(e.Replace("<FIELD>", $"<FIELD> item #{index}")));
+                        await itemValidator.ValidateAsync(item, innerContext, e => addError(e.Replace("<FIELD>", $"<FIELD> item #{index}")));
                     }
 
                     index++;
