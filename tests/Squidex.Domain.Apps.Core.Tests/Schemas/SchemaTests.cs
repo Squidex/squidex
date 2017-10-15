@@ -262,7 +262,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                     .AddField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
                     .AddField(new ReferencesField(10, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties()));
+                        new ReferencesFieldProperties()))
+                    .AddField(new TagsField(11, "my-tags", Partitioning.Invariant,
+                        new TagsFieldProperties()));
 
             return schema;
         }
