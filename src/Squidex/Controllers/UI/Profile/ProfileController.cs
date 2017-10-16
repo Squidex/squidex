@@ -53,7 +53,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpGet]
-        [Route("/account/profile")]
+        [Route("/account/profile/")]
         public async Task<IActionResult> Profile(string successMessage = null)
         {
             var user = await userManager.GetUserAsync(User);
@@ -87,7 +87,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/update")]
+        [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
             return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName),
@@ -95,7 +95,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/login-remove")]
+        [Route("/account/profile/login-remove/")]
         public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
         {
             return MakeChangeAsync(user => userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey),
@@ -103,7 +103,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/password-set")]
+        [Route("/account/profile/password-set/")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync(user => userManager.AddPasswordAsync(user, model.Password),
@@ -111,7 +111,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/password-change")]
+        [Route("/account/profile/password-change/")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync(user => userManager.ChangePasswordAsync(user, model.OldPassword, model.Password),
@@ -119,7 +119,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/upload-picture")]
+        [Route("/account/profile/upload-picture/")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync(async user =>

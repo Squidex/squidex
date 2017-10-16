@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
@@ -20,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return JValue.CreateNull();
         }
 
-        protected override IEnumerable<ValidationError> ValidateCore()
+        public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
-            yield break;
+            return visitor.Visit(this);
         }
     }
 }

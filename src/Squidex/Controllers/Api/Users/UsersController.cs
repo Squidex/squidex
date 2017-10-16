@@ -64,7 +64,7 @@ namespace Squidex.Controllers.Api.Users
         /// </returns>
         [Authorize]
         [HttpGet]
-        [Route("users")]
+        [Route("users/")]
         [ProducesResponseType(typeof(UserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
@@ -110,7 +110,7 @@ namespace Squidex.Controllers.Api.Users
         /// 404 => User not found.
         /// </returns>
         [HttpGet]
-        [Route("users/{id}/picture")]
+        [Route("users/{id}/picture/")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetUserPicture(string id)
         {

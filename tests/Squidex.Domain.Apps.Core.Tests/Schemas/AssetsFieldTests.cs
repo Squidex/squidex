@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync("invalid", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 asset(s)" });
+                new[] { "<FIELD> must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 asset(s)" });
+                new[] { "<FIELD> must have not more than 1 item(s)." });
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(assetId), errors, ValidationTestExtensions.InvalidContext(assetId));
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> contains invalid asset '{assetId}'" });
+                new[] { $"<FIELD> contains invalid asset '{assetId}'." });
         }
 
         [Fact]

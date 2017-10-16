@@ -119,7 +119,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// All events for the specified schemas will be sent to the url. The timeout is 2 seconds.
         /// </remarks>
         [HttpPut]
-        [Route("apps/{app}/webhooks/{id}")]
+        [Route("apps/{app}/webhooks/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutWebhook(string app, Guid id, [FromBody] CreateWebhookDto request)
@@ -143,7 +143,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// 404 => Webhook or app not found.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/webhooks/{id}")]
+        [Route("apps/{app}/webhooks/{id}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteWebhook(string app, Guid id)
         {
@@ -163,7 +163,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/webhooks/events")]
+        [Route("apps/{app}/webhooks/events/")]
         [ProducesResponseType(typeof(WebhookEventsDto), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] int skip = 0, [FromQuery] int take = 20)
@@ -200,7 +200,7 @@ namespace Squidex.Controllers.Api.Webhooks
         /// 404 => App or webhook event not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/webhooks/events/{id}")]
+        [Route("apps/{app}/webhooks/events/{id}/")]
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, Guid id)
         {

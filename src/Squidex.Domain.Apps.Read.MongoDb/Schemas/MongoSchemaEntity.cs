@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntity
     {
-        private Lazy<Schema> schema;
+        private Schema schema;
 
         [BsonRequired]
         [BsonElement]
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public string Schema { get; set; }
+        public BsonDocument SchemaDocument { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -73,31 +73,23 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         [BsonElement]
         public string ScriptChange { get; set; }
 
-        Schema ISchemaEntity.SchemaDef
+        [BsonIgnore]
+        public Schema SchemaDef
         {
-            get { return schema.Value; }
-        }
-
-        public void SerializeSchema(Schema newSchema, SchemaJsonSerializer serializer)
-        {
-            Schema = serializer.Serialize(newSchema).ToString();
-            schema = new Lazy<Schema>(() => newSchema);
-
-            IsPublished = newSchema.IsPublished;
-        }
-
-        public void UpdateSchema(SchemaJsonSerializer serializer, Func<Schema, Schema> updater)
-        {
-            DeserializeSchema(serializer);
-
-            SerializeSchema(updater(schema.Value), serializer);
-        }
-
-        public void DeserializeSchema(SchemaJsonSerializer serializer)
-        {
-            if (schema == null)
+            get
             {
-                schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(JObject.Parse(Schema)) : null);
+                if (schema == null)
+                {
+                    schema = SchemaDocument.ToJson().ToObject<Schema>();
+                }
+
+                return schema;
+            }
+            set
+            {
+                schema = value;
+
+                SchemaDocument = (BsonDocument)JToken.FromObject(schema).ToBson();
             }
         }
     }

@@ -59,10 +59,6 @@ namespace Squidex.Config.Domain
                 .As<IContentVersionLoader>()
                 .SingleInstance();
 
-            builder.RegisterType<FieldRegistry>()
-                .AsSelf()
-                .SingleInstance();
-
             builder.RegisterType<AppCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();

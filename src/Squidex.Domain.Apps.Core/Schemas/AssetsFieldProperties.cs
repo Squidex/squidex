@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
@@ -51,12 +50,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new JArray();
         }
 
-        protected override IEnumerable<ValidationError> ValidateCore()
+        public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
-            if (MaxItems.HasValue && MinItems.HasValue && MinItems.Value >= MaxItems.Value)
-            {
-                yield return new ValidationError("Max items must be greater than min items", nameof(MinItems), nameof(MaxItems));
-            }
+            return visitor.Visit(this);
         }
     }
 }

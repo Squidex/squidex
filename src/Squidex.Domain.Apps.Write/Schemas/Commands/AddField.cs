@@ -9,11 +9,12 @@
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
 {
-    public sealed class AddField : FieldCommand, IValidatable
+    public sealed class AddField : SchemaAggregateCommand, IValidatable
     {
         public string Name { get; set; }
 
@@ -36,6 +37,15 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
             if (Properties == null)
             {
                 errors.Add(new ValidationError("Properties must be defined.", nameof(Properties)));
+            }
+            else
+            {
+                var propertyErrors = FieldPropertiesValidator.Validate(Properties);
+
+                foreach (var error in propertyErrors)
+                {
+                    errors.Add(error);
+                }
             }
         }
     }

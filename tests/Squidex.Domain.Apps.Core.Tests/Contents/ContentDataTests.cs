@@ -14,18 +14,20 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public class ContentDataTests
     {
         private readonly Schema schema =
             Schema.Create("schema", new SchemaProperties())
-                .AddOrUpdateField(new NumberField(1, "field1", Partitioning.Language))
-                .AddOrUpdateField(new NumberField(2, "field2", Partitioning.Invariant))
-                .AddOrUpdateField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
-                .AddOrUpdateField(new AssetsField(5, "assets1", Partitioning.Invariant))
-                .AddOrUpdateField(new AssetsField(6, "assets2", Partitioning.Invariant))
-                .AddOrUpdateField(new JsonField(4, "json", Partitioning.Language));
+                .AddField(new NumberField(1, "field1", Partitioning.Language))
+                .AddField(new NumberField(2, "field2", Partitioning.Invariant))
+                .AddField(new NumberField(3, "field3", Partitioning.Invariant).Hide())
+                .AddField(new AssetsField(5, "assets1", Partitioning.Invariant))
+                .AddField(new AssetsField(6, "assets2", Partitioning.Invariant))
+                .AddField(new JsonField(4, "json", Partitioning.Language));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
 
         [Fact]

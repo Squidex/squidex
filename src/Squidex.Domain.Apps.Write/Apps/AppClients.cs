@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps
@@ -16,16 +17,11 @@ namespace Squidex.Domain.Apps.Write.Apps
     {
         private readonly Dictionary<string, AppClient> clients = new Dictionary<string, AppClient>();
 
-        public IReadOnlyDictionary<string, AppClient> Clients
-        {
-            get { return clients; }
-        }
-
         public void Add(string id, string secret)
         {
             ThrowIfFound(id, () => "Cannot add client");
 
-            clients[id] = new AppClient(secret, id, false);
+            clients[id] = new AppClient(secret, id, AppClientPermission.Editor);
         }
 
         public void Rename(string clientId, string name)
@@ -35,11 +31,11 @@ namespace Squidex.Domain.Apps.Write.Apps
             clients[clientId] = clients[clientId].Rename(name, () => "Cannot rename client");
         }
 
-        public void Change(string clientId, bool isReader)
+        public void Update(string clientId, AppClientPermission permission)
         {
             ThrowIfNotFound(clientId);
 
-            clients[clientId] = clients[clientId].Change(isReader, () => "Cannot change client");
+            clients[clientId] = clients[clientId].Update(permission, () => "Cannot update client");
         }
 
         public void Revoke(string clientId)
@@ -61,7 +57,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             if (clients.ContainsKey(clientId))
             {
-                var error = new ValidationError("Client id is alreay part of the app", "Id");
+                var error = new ValidationError("Client id is alreay part of the app.", "Id");
 
                 throw new ValidationException(message(), error);
             }

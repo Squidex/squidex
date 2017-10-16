@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (!Name.IsSlug())
             {
-                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid slug.", nameof(Name)));
             }
         }
     }

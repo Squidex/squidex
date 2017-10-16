@@ -12,6 +12,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.Schemas.Edm;
+using Squidex.Domain.Apps.Core.Schemas.JsonSchema;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -28,9 +30,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return null;
             }
 
-            protected override IEnumerable<ValidationError> ValidateCore()
+            public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
             {
-                yield break;
+                return default(T);
             }
         }
 
@@ -48,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Fact]
         public void Should_throw_exception_if_creating_schema_with_invalid_name()
         {
-            Assert.Throws<ValidationException>(() => Schema.Create("Invalid Name", new SchemaProperties()));
+            Assert.Throws<ArgumentException>(() => Schema.Create(string.Empty, new SchemaProperties()));
         }
 
         [Fact]
@@ -64,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Fact]
         public void Should_add_field()
         {
-            var field = AddField();
+            var field = Add();
 
             Assert.Equal(field, sut.FieldsById[1]);
         }
@@ -72,15 +74,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Fact]
         public void Should_throw_exception_if_adding_field_with_name_that_already_exists()
         {
-            AddField();
+            Add();
 
-            Assert.Throws<ValidationException>(() => sut.AddOrUpdateField(new NumberField(2, "my-field", Partitioning.Invariant)));
+            Assert.Throws<ArgumentException>(() => sut.AddField(new NumberField(2, "my-field", Partitioning.Invariant)));
         }
 
         [Fact]
         public void Should_hide_field()
         {
-            AddField();
+            Add();
 
             sut = sut.HideField(1);
             sut = sut.HideField(1);
@@ -89,15 +91,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_field_to_hide_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.HideField(1));
-        }
-
-        [Fact]
         public void Should_show_field()
         {
-            AddField();
+            Add();
 
             sut = sut.HideField(1);
             sut = sut.ShowField(1);
@@ -107,15 +103,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_field_to_show_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.ShowField(2));
-        }
-
-        [Fact]
         public void Should_disable_field()
         {
-            AddField();
+            Add();
 
             sut = sut.DisableField(1);
             sut = sut.DisableField(1);
@@ -124,15 +114,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_field_to_disable_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.DisableField(1));
-        }
-
-        [Fact]
         public void Should_enable_field()
         {
-            AddField();
+            Add();
 
             sut = sut.DisableField(1);
             sut = sut.EnableField(1);
@@ -142,15 +126,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_field_to_enable_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.EnableField(1));
-        }
-
-        [Fact]
         public void Should_lock_field()
         {
-            AddField();
+            Add();
 
             sut = sut.LockField(1);
 
@@ -158,95 +136,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_field_to_lock_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.LockField(1));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_updating_locked_field()
-        {
-            AddField();
-
-            sut = sut.LockField(1);
-
-            Assert.Throws<DomainException>(() => sut.UpdateField(1, new NumberFieldProperties { IsRequired = true }));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_renaming_locked_field()
-        {
-            AddField();
-
-            sut = sut.LockField(1);
-
-            Assert.Throws<DomainException>(() => sut.RenameField(1, "new-name"));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_deleting_locked_field()
-        {
-            AddField();
-
-            sut = sut.LockField(1);
-
-            Assert.Throws<DomainException>(() => sut.DeleteField(1));
-        }
-
-        [Fact]
-        public void Should_rename_field()
-        {
-            AddField();
-
-            sut = sut.RenameField(1, "new-name");
-
-            Assert.Equal("new-name", sut.FieldsById[1].Name);
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_new_field_already_exists()
-        {
-            AddField();
-
-            sut = sut.AddOrUpdateField(new NumberField(2, "other-field", Partitioning.Invariant));
-
-            Assert.Throws<ValidationException>(() => sut.RenameField(2, "my-field"));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_new_field_name_is_not_valid()
-        {
-            AddField();
-
-            Assert.Throws<ValidationException>(() => sut.RenameField(1, "new name"));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_field_to_rename_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.RenameField(1, "new-name"));
-        }
-
-        [Fact]
         public void Should_delete_field()
         {
-            AddField();
+            Add();
 
             sut = sut.DeleteField(1);
 
-            Assert.Equal(0, sut.FieldsById.Count);
-        }
-
-        [Fact]
-        public void Should_not_throw_exception_if_field_to_delete_does_not_exist()
-        {
-            sut.DeleteField(1);
+            Assert.Empty(sut.FieldsById);
         }
 
         [Fact]
         public void Should_update_field()
         {
-            AddField();
+            Add();
 
             sut = sut.UpdateField(1, new NumberFieldProperties { Hints = "my-hints" });
 
@@ -254,17 +156,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_updating_field_with_invalid_property_type()
+        public void Should_throw_exception_if_updating_with_invalid_properties_type()
         {
-            AddField();
+            Add();
 
-            Assert.Throws<ArgumentException>(() => sut.UpdateField(1, new InvalidProperties()));
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_field_to_update_does_not_exist()
-        {
-            Assert.Throws<DomainObjectNotFoundException>(() => sut.UpdateField(1, new NumberFieldProperties()));
+            Assert.Throws<ArgumentException>(() => sut.UpdateField(1, new StringFieldProperties()));
         }
 
         [Fact]
@@ -273,14 +169,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             sut = sut.Publish();
 
             Assert.True(sut.IsPublished);
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_schema_is_already_published()
-        {
-            sut = sut.Publish();
-
-            Assert.Throws<DomainException>(() => sut.Publish());
         }
 
         [Fact]
@@ -293,21 +181,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Fact]
-        public void Should_throw_exception_if_schema_is_not_published()
-        {
-            Assert.Throws<DomainException>(() => sut.Unpublish());
-        }
-
-        [Fact]
         public void Should_reorder_fields()
         {
             var field1 = new StringField(1, "1", Partitioning.Invariant);
             var field2 = new StringField(2, "2", Partitioning.Invariant);
             var field3 = new StringField(3, "3", Partitioning.Invariant);
 
-            sut = sut.AddOrUpdateField(field1);
-            sut = sut.AddOrUpdateField(field2);
-            sut = sut.AddOrUpdateField(field3);
+            sut = sut.AddField(field1);
+            sut = sut.AddField(field2);
+            sut = sut.AddField(field3);
             sut = sut.ReorderFields(new List<long> { 3, 2, 1 });
 
             Assert.Equal(new List<Field> { field3, field2, field1 }, sut.Fields.ToList());
@@ -319,8 +201,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
             var field1 = new StringField(1, "1", Partitioning.Invariant);
             var field2 = new StringField(2, "2", Partitioning.Invariant);
 
-            sut = sut.AddOrUpdateField(field1);
-            sut = sut.AddOrUpdateField(field2);
+            sut = sut.AddField(field1);
+            sut = sut.AddField(field2);
 
             Assert.Throws<ArgumentException>(() => sut.ReorderFields(new List<long> { 1 }));
         }
@@ -331,8 +213,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
             var field1 = new StringField(1, "1", Partitioning.Invariant);
             var field2 = new StringField(2, "2", Partitioning.Invariant);
 
-            sut = sut.AddOrUpdateField(field1);
-            sut = sut.AddOrUpdateField(field2);
+            sut = sut.AddField(field1);
+            sut = sut.AddField(field2);
 
             Assert.Throws<ArgumentException>(() => sut.ReorderFields(new List<long> { 1, 4 }));
         }
@@ -342,7 +224,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
 
-            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { SchemaReference = s });
+            var jsonSchema = BuildMixedSchema().BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
 
             Assert.NotNull(jsonSchema);
         }
@@ -361,35 +243,35 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var schema =
                 Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                    .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
+                    .AddField(new JsonField(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties()))
-                    .AddOrUpdateField(new AssetsField(2, "my-assets", Partitioning.Invariant,
+                    .AddField(new AssetsField(2, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties()))
-                    .AddOrUpdateField(new StringField(3, "my-string1", Partitioning.Language,
+                    .AddField(new StringField(3, "my-string1", Partitioning.Language,
                         new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }))
-                    .AddOrUpdateField(new StringField(4, "my-string2", Partitioning.Invariant,
+                    .AddField(new StringField(4, "my-string2", Partitioning.Invariant,
                         new StringFieldProperties { Hints = "My String1" }))
-                    .AddOrUpdateField(new NumberField(5, "my-number", Partitioning.Invariant,
+                    .AddField(new NumberField(5, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                    .AddOrUpdateField(new BooleanField(6, "my-boolean", Partitioning.Invariant,
+                    .AddField(new BooleanField(6, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties()))
-                    .AddOrUpdateField(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
+                    .AddField(new DateTimeField(7, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }))
-                    .AddOrUpdateField(new DateTimeField(8, "my-date", Partitioning.Invariant,
+                    .AddField(new DateTimeField(8, "my-date", Partitioning.Invariant,
                         new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }))
-                    .AddOrUpdateField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
+                    .AddField(new GeolocationField(9, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
-                    .AddOrUpdateField(new ReferencesField(10, "my-references", Partitioning.Invariant,
+                    .AddField(new ReferencesField(10, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties()));
 
             return schema;
         }
 
-        private NumberField AddField()
+        private NumberField Add()
         {
             var field = new NumberField(1, "my-field", Partitioning.Invariant);
 
-            sut = sut.AddOrUpdateField(field);
+            sut = sut.AddField(field);
 
             return field;
         }

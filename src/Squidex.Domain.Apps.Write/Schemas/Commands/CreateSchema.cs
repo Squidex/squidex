@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -62,19 +63,22 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
         {
             if (!Name.IsSlug())
             {
-                errors.Add(new ValidationError("Name must be a valid slug", nameof(Name)));
+                errors.Add(new ValidationError("Name must be a valid slug.", nameof(Name)));
             }
 
-            if (Properties == null)
+            if (Fields.Any())
             {
-                errors.Add(new ValidationError("Properties must be specified", nameof(Properties)));
-            }
+                var index = 0;
 
-            var index = 0;
+                foreach (var field in Fields)
+                {
+                    field.Validate(index++, errors);
+                }
 
-            foreach (var field in Fields)
-            {
-                field.Validate(index++, errors);
+                if (Fields.Select(x => x.Name).Distinct().Count() != Fields.Count)
+                {
+                    errors.Add(new ValidationError("Fields cannot have duplicate names.", nameof(Fields)));
+                }
             }
         }
     }

@@ -6,11 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -40,14 +37,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return (bool?)value;
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
-            jsonProperty.Type = JsonObjectType.Boolean;
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Boolean, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
     }
 }

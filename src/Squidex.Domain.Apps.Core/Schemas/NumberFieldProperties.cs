@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
@@ -97,40 +96,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return DefaultValue;
         }
 
-        protected override IEnumerable<ValidationError> ValidateCore()
+        public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
-            if (!Editor.IsEnumValue())
-            {
-                yield return new ValidationError("Editor is not a valid value", nameof(Editor));
-            }
-
-            if ((Editor == NumberFieldEditor.Radio || Editor == NumberFieldEditor.Dropdown) && (AllowedValues == null || AllowedValues.Count == 0))
-            {
-                yield return new ValidationError("Radio buttons or dropdown list need allowed values", nameof(AllowedValues));
-            }
-
-            if (MaxValue.HasValue && MinValue.HasValue && MinValue.Value >= MaxValue.Value)
-            {
-                yield return new ValidationError("Max value must be greater than min value", nameof(MinValue), nameof(MaxValue));
-            }
-
-            if (DefaultValue.HasValue && MinValue.HasValue && DefaultValue.Value < MinValue.Value)
-            {
-                yield return new ValidationError("Default value must be greater than min value", nameof(DefaultValue));
-            }
-
-            if (DefaultValue.HasValue && MaxValue.HasValue && DefaultValue.Value > MaxValue.Value)
-            {
-                yield return new ValidationError("Default value must be less than max value", nameof(DefaultValue));
-            }
-
-            if (AllowedValues != null && AllowedValues.Count > 0 && (MinValue.HasValue || MaxValue.HasValue))
-            {
-                yield return new ValidationError("Either allowed values or min and max value can be defined",
-                    nameof(AllowedValues),
-                    nameof(MinValue),
-                    nameof(MaxValue));
-            }
+            return visitor.Visit(this);
         }
     }
 }

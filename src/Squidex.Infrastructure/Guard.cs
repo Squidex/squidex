@@ -149,7 +149,7 @@ namespace Squidex.Infrastructure
 
             if (enumerable.Count == 0)
             {
-                throw new ArgumentException("Collection does not contain an item", parameterName);
+                throw new ArgumentException("Collection does not contain an item.", parameterName);
             }
         }
 
@@ -179,7 +179,7 @@ namespace Squidex.Infrastructure
         {
             if (Equals(target, default(T)))
             {
-                throw new ArgumentException("Value cannot be an the default value", parameterName);
+                throw new ArgumentException("Value cannot be an the default value.", parameterName);
             }
         }
 

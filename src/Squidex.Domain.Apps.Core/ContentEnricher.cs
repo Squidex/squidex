@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -37,7 +36,7 @@ namespace Squidex.Domain.Apps.Core
             {
                 var fieldKey = data.GetKey(field);
                 var fieldData = data.GetOrCreate(fieldKey, k => new ContentFieldData());
-                var fieldPartition = partitionResolver(field.Paritioning);
+                var fieldPartition = partitionResolver(field.Partitioning);
 
                 foreach (var partitionItem in fieldPartition)
                 {

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Write.Contents.Commands
         {
             if (Data == null)
             {
-                errors.Add(new ValidationError("Data cannot be null", nameof(Data)));
+                errors.Add(new ValidationError("Data cannot be null.", nameof(Data)));
             }
         }
     }

@@ -9,8 +9,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using ImageSharp;
-using ImageSharp.Processing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 
 namespace Squidex.Infrastructure.Assets.ImageSharp
@@ -51,7 +51,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                     var options = new ResizeOptions { Size = new Size(w, h), Mode = resizeMode };
 
-                    sourceImage.Resize(options).Save(destination, format);
+                    sourceImage.Mutate(x => x.Resize(options));
+                    sourceImage.Save(destination, format);
                 }
             });
         }

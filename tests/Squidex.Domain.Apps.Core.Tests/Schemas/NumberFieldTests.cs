@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(5), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be greater than '10'" });
+                new[] { "<FIELD> must be greater or equals than '10'." });
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be less than '10'" });
+                new[] { "<FIELD> must be less or equals than '10'." });
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not an allowed value" });
+                new[] { "<FIELD> is not an allowed value." });
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         private static JValue CreateValue(object v)

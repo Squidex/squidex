@@ -8,9 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 using Squidex.Infrastructure;
 
@@ -58,37 +56,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return value;
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
-            jsonProperty.Type = JsonObjectType.Object;
-
-            var geolocationSchema = new JsonSchema4();
-
-            geolocationSchema.Properties.Add("latitude", new JsonProperty
-            {
-                Type = JsonObjectType.Number,
-                Minimum = -90,
-                Maximum = 90,
-                IsRequired = true
-            });
-            geolocationSchema.Properties.Add("longitude", new JsonProperty
-            {
-                Type = JsonObjectType.Number,
-                Minimum = -180,
-                Maximum = 180,
-                IsRequired = true
-            });
-
-            geolocationSchema.AllowAdditionalProperties = false;
-
-            var schemaReference = schemaResolver("GeolocationDto", geolocationSchema);
-
-            jsonProperty.Reference = schemaReference;
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return null;
+            return visitor.Visit(this);
         }
     }
 }

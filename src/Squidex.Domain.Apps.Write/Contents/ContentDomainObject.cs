@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         private void VerifyCanChangeStatus(Status newStatus)
         {
-            if (!StatusFlow.Exists(newStatus) && !StatusFlow.CanChange(status, newStatus))
+            if (!StatusFlow.Exists(newStatus) || !StatusFlow.CanChange(status, newStatus))
             {
                 throw new DomainException($"Content cannot be changed from status {status} to {newStatus}.");
             }
@@ -149,14 +149,6 @@ namespace Squidex.Domain.Apps.Write.Contents
             if (isCreated)
             {
                 throw new DomainException("Content has already been created.");
-            }
-        }
-
-        private void VerifyDeleted()
-        {
-            if (!isDeleted)
-            {
-                throw new DomainException("Content has not been deleted.");
             }
         }
 

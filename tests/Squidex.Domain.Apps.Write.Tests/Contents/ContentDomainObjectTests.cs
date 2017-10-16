@@ -216,6 +216,18 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
+        public void ChangeStatus_should_throw_exception_if_status_flow_not_valid()
+        {
+            CreateContent();
+            ChangeStatus(Status.Archived);
+
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
+            });
+        }
+
+        [Fact]
         public void ChangeStatus_should_refresh_properties_and_create_events()
         {
             CreateContent();

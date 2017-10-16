@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core
 
                 if (!schema.FieldsByName.TryGetValue(fieldData.Key, out var field))
                 {
-                    errors.AddError("<FIELD> is not a known field", fieldName);
+                    errors.AddError("<FIELD> is not a known field.", fieldName);
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core
 
         private Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
         {
-            var partitioning = field.Paritioning;
+            var partitioning = field.Partitioning;
             var partition = partitionResolver(partitioning);
 
             var tasks = new List<Task>();
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core
                 }
                 else
                 {
-                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
+                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'.", field);
                 }
             }
 
@@ -109,14 +109,14 @@ namespace Squidex.Domain.Apps.Core
             {
                 if (!schema.FieldsByName.ContainsKey(fieldData.Key))
                 {
-                    errors.AddError("<FIELD> is not a known field", fieldData.Key);
+                    errors.AddError("<FIELD> is not a known field.", fieldData.Key);
                 }
             }
         }
 
         private Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
         {
-            var partitioning = field.Paritioning;
+            var partitioning = field.Partitioning;
             var partition = partitionResolver(partitioning);
 
             var tasks = new List<Task>();
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core
             {
                 if (!partition.TryGetItem(partitionValues.Key, out var _))
                 {
-                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'", field);
+                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'.", field);
                 }
             }
 

@@ -18,38 +18,41 @@ export class Versioned<T> {
     }
 }
 
-export class ErrorDto {
-    public get displayMessage(): string {
-        let result = this.message;
-        let lastChar: string;
+function formatMessage(message: string, details?: string[]) {
+    const parts: string[] = [];
 
-        if (this.details && this.details.length > 0) {
-            const detailMessage = this.details[0];
+    const addPart = (p: string) => {
+        p = p.trim();
 
-            lastChar = result[result.length - 1];
+        const c = p[p.length - 1];
 
-            if (lastChar !== '.' && lastChar !== ',') {
-                result += '.';
-            }
-
-            result += ' ';
-            result += detailMessage;
+        if (c !== '.') {
+            p += '.';
         }
 
-        lastChar = result[result.length - 1];
+        parts.push(p);
+    };
 
-        if (lastChar !== '.') {
-            result += '.';
+    addPart(message);
+
+    if (details) {
+        for (let d of details) {
+            addPart(d);
         }
-
-        return result;
     }
+
+    return parts.join(' ');
+}
+
+export class ErrorDto {
+    public readonly displayMessage: string;
 
     constructor(
         public readonly statusCode: number,
         public readonly message: string,
         public readonly details: string[] = []
     ) {
+        this.displayMessage = formatMessage(message, details);
     }
 }
 
@@ -97,12 +100,12 @@ export module HTTP {
 
 export function pretifyError(message: string): Observable<any> {
     return this.catch((response: HttpErrorResponse) => {
-        let result = new ErrorDto(500, message);
+        let result: ErrorDto = null;
 
         if (!(response.error instanceof Error)) {
-            const errorDto = response.error;
-
             try {
+                const errorDto = JSON.parse(response.error);
+
                 if (response.status === 412) {
                     result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.');
                 } else if (response.status !== 500) {
@@ -112,6 +115,8 @@ export function pretifyError(message: string): Observable<any> {
                 result = new ErrorDto(500, 'Failed to make the request.');
             }
         }
+
+        result = result || new ErrorDto(500, message);
 
         return Observable.throw(result);
     });

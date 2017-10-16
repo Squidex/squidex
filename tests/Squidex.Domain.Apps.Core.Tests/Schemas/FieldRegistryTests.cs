@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Xunit;
@@ -25,9 +24,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return null;
             }
 
-            protected override IEnumerable<ValidationError> ValidateCore()
+            public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
             {
-                yield break;
+                return default(T);
             }
         }
 

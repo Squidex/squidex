@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         {
             if (string.IsNullOrWhiteSpace(PlanId))
             {
-                errors.Add(new ValidationError("PlanId is not defined", nameof(PlanId)));
+                errors.Add(new ValidationError("PlanId is not defined.", nameof(PlanId)));
             }
         }
     }

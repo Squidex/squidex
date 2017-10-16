@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
             {
-                addError("<FIELD> is required");
+                addError("<FIELD> is required.");
             }
 
             return TaskHelper.Done;

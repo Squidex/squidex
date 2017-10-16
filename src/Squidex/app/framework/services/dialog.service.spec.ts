@@ -58,7 +58,7 @@ describe('DialogService', () => {
             isNext = result;
         }, undefined, () => {
             isCompleted = true;
-        })
+        });
 
         dialog.complete(true);
 

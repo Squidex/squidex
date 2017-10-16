@@ -73,21 +73,21 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("account/forbidden")]
+        [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {
             throw new SecurityException("User is not allowed to login.");
         }
 
         [HttpGet]
-        [Route("account/lockedout")]
+        [Route("account/lockedout/")]
         public IActionResult LockedOut()
         {
             return View();
         }
 
         [HttpGet]
-        [Route("account/accessdenied")]
+        [Route("account/accessdenied/")]
         public IActionResult AccessDenied()
         {
             return View();
@@ -112,7 +112,7 @@ namespace Squidex.Controllers.UI.Account
 
             if (string.IsNullOrWhiteSpace(logoutUrl))
             {
-                logoutUrl = urlOptions.Value.BuildUrl("logout");
+                logoutUrl = urlOptions.Value.BuildUrl("logout/");
             }
 
             return Redirect(logoutUrl);

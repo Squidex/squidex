@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 }
             }
 
-            throw new ArgumentException("Invalid json type", nameof(value));
+            throw new ArgumentException("Invalid json type.", nameof(value));
         }
 
         private static JsValue FromObject(JToken value, Engine engine)
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return target;
             }
 
-            throw new ArgumentException("Invalid json type", nameof(value));
+            throw new ArgumentException("Invalid json type.", nameof(value));
         }
     }
 }

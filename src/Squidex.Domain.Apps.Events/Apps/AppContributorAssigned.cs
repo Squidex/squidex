@@ -16,6 +16,6 @@ namespace Squidex.Domain.Apps.Events.Apps
     {
         public string ContributorId { get; set; }
 
-        public PermissionLevel Permission { get; set; }
+        public AppContributorPermission Permission { get; set; }
     }
 }

@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 var fieldResult = new ContentFieldData();
                 var fieldValues = fieldValue.Value;
 
-                if (field.Paritioning.Equals(Partitioning.Language))
+                if (field.Partitioning.Equals(Partitioning.Language))
                 {
                     foreach (var languageConfig in languagesConfig)
                     {
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             if (languagePreferences.Count == 1 && languagesConfig.TryGetConfig(languagePreferences.First(), out var languageConfig))
             {
-                languagePreferences = languagePreferences.Union(languageConfig.Fallback).ToList();
+                languagePreferences = languagePreferences.Union(languageConfig.LanguageFallbacks).ToList();
             }
 
             var result = new Dictionary<string, JToken>();

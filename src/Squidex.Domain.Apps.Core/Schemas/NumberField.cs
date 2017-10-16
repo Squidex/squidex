@@ -6,12 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -46,24 +43,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
-            jsonProperty.Type = JsonObjectType.Number;
-
-            if (Properties.MinValue.HasValue)
-            {
-                jsonProperty.Minimum = (decimal)Properties.MinValue.Value;
-            }
-
-            if (Properties.MaxValue.HasValue)
-            {
-                jsonProperty.Maximum = (decimal)Properties.MaxValue.Value;
-            }
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Double, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
 
         public override object ConvertValue(JToken value)

@@ -21,9 +21,9 @@ import {
 } from './../';
 
 describe('AppClientsDto', () => {
-    const client1 = new AppClientDto('1', '1', '1', false);
-    const client2 = new AppClientDto('2', '2', '1', false);
-    const client2_new = new AppClientDto('2', '2 New', '1 New', false);
+    const client1 = new AppClientDto('1', '1', '1', 'Editor');
+    const client2 = new AppClientDto('2', '2', '1', 'Editor');
+    const client2_new = new AppClientDto('2', '2 New', '1 New', 'Editor');
     const version = new Version('1');
     const newVersion = new Version('2');
 
@@ -54,17 +54,17 @@ describe('AppClientsDto', () => {
 
 describe('AppClientDto', () => {
     it('should update name property when renaming', () => {
-        const client_1 = new AppClientDto('1', 'old-name', 'secret', false);
+        const client_1 = new AppClientDto('1', 'old-name', 'secret', 'Editor');
         const client_2 = client_1.rename('new-name');
 
         expect(client_2.name).toBe('new-name');
     });
 
     it('should update isReader property when changing', () => {
-        const client_1 = new AppClientDto('1', 'old-name', 'secret', false);
-        const client_2 = client_1.change(true);
+        const client_1 = new AppClientDto('1', 'old-name', 'secret', 'Editor');
+        const client_2 = client_1.update('Developer');
 
-        expect(client_2.isReader).toBeTruthy();
+        expect(client_2.permission).toEqual('Developer');
     });
 });
 
@@ -107,13 +107,13 @@ describe('AppClientsService', () => {
                 id: 'client1',
                 name: 'Client 1',
                 secret: 'secret1',
-                isReader: true
+                permission: 'Editor'
             },
             {
                 id: 'client2',
                 name: 'Client 2',
                 secret: 'secret2',
-                isReader: true
+                permission: 'Developer'
             }
         ], {
             headers: {
@@ -123,8 +123,8 @@ describe('AppClientsService', () => {
 
         expect(clients).toEqual(
             new AppClientsDto([
-                new AppClientDto('client1', 'Client 1', 'secret1', true),
-                new AppClientDto('client2', 'Client 2', 'secret2', true)
+                new AppClientDto('client1', 'Client 1', 'secret1', 'Editor'),
+                new AppClientDto('client2', 'Client 2', 'secret2', 'Developer')
             ], new Version('2')));
     }));
 
@@ -144,10 +144,10 @@ describe('AppClientsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', isReader: true });
+        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', permission: 'Developer' });
 
         expect(client).toEqual(
-            new AppClientDto('client1', 'Client 1', 'secret1', true));
+            new AppClientDto('client1', 'Client 1', 'secret1', 'Developer'));
     }));
 
     it('should make put request to rename client',
@@ -183,7 +183,7 @@ describe('AppClientsService', () => {
 
         let accessTokenDto: AccessTokenDto | null = null;
 
-        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', false)).subscribe(result => {
+        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', 'Editor')).subscribe(result => {
             accessTokenDto = result;
         });
 

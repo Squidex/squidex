@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (IsFrozen)
             {
-                throw new InvalidOperationException("Object is frozen");
+                throw new InvalidOperationException("Object is frozen.");
             }
         }
 

@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core
             }
             catch
             {
-                addError("<FIELD> is not a valid value");
+                addError("<FIELD> is not a valid value.");
             }
         }
     }

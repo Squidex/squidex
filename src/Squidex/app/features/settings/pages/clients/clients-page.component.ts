@@ -89,13 +89,13 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    public changeClient(client: AppClientDto, isReader: boolean) {
-        const requestDto = new UpdateAppClientDto(undefined, isReader);
+    public updateClient(client: AppClientDto, permission: string) {
+        const requestDto = new UpdateAppClientDto(undefined, permission);
 
         this.appNameOnce()
             .switchMap(app => this.appClientsService.updateClient(app, client.id, requestDto, this.appClients.version))
             .subscribe(dto => {
-                this.updateClients(this.appClients.updateClient(client.change(isReader), dto.version));
+                this.updateClients(this.appClients.updateClient(client.update(permission), dto.version));
             }, error => {
                 this.notifyError(error);
             });

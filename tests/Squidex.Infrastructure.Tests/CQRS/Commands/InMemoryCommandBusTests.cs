@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         private sealed class HandledHandler : ICommandMiddleware
         {
-            public ICommand LastCommand { get; set; }
+            public ICommand LastCommand { get; private set; }
 
             public Task HandleAsync(CommandContext context, Func<Task> next)
             {

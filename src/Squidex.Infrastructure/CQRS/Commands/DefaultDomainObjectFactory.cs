@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
             if (domainObject.Version != -1)
             {
-                throw new InvalidOperationException("Must have a version of -1");
+                throw new InvalidOperationException("Must have a version of -1.");
             }
 
             return domainObject;

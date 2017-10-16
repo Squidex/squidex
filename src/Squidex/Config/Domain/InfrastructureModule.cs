@@ -152,14 +152,6 @@ namespace Squidex.Config.Domain
             builder.RegisterType<EventDataFormatter>()
                 .AsSelf()
                 .SingleInstance();
-
-            builder.RegisterType<SchemaJsonSerializer>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<FieldRegistry>()
-                .AsSelf()
-                .SingleInstance();
         }
     }
 }

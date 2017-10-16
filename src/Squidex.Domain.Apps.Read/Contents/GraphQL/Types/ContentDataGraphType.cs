@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
                     };
 
-                    var partition = context.ResolvePartition(field.Paritioning);
+                    var partition = context.ResolvePartition(field.Partitioning);
 
                     foreach (var partitionItem in partition)
                     {

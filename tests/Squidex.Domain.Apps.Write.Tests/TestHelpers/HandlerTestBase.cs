@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
 
             if (!handler.IsCreated && shouldCreate)
             {
-                throw new InvalidOperationException("Create not called");
+                throw new InvalidOperationException("Create not called.");
             }
         }
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Write.TestHelpers
 
             if (!handler.IsUpdated && shouldUpdate)
             {
-                throw new InvalidOperationException("Update not called");
+                throw new InvalidOperationException("Update not called.");
             }
         }
 

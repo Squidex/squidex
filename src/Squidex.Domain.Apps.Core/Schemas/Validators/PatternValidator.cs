@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
                 {
                     if (string.IsNullOrWhiteSpace(errorMessage))
                     {
-                        addError("<FIELD> is not valid");
+                        addError("<FIELD> is not valid.");
                     }
                     else
                     {

@@ -77,7 +77,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/ordering")]
+        [Route("apps/{app}/schemas/{name}/fields/ordering/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFields request)

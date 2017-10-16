@@ -34,7 +34,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
                     FindActorFromSubject() ??
                     FindActorFromClient();
 
-                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available");
+                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
             }
 
             return next();
