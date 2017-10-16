@@ -14,12 +14,12 @@ using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
         private readonly ISchemaRepository schemaRepository;
-        private readonly CustomQueries.IQueryProvider queryModulesService;
+        private readonly IQueryProvider queryModulesService;
 
         public string Name
         {
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator,
             ISchemaRepository schemaRepository,
-            CustomQueries.IQueryProvider queryModulesService)
+            IQueryProvider queryModulesService)
             : base(cache)
         {
             Guard.NotNull(schemaRepository, nameof(schemaRepository));

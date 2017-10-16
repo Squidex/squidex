@@ -18,11 +18,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets;
-using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public bool CanGenerateAssetSourceUrl { get; }
 
-        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator, CustomQueries.IQueryProvider queryModulesService)
+        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator, IQueryProvider queryModulesService)
         {
             this.app = app;
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             this.schemas = schemas.ToDictionary(x => x.Id);
 
-            graphQLSchema = new GraphQLSchema { Query = new ContentQueryGraphType(this, this.schemas.Values, queryModulesService) };
+            graphQLSchema = new GraphQLSchema { Query = new ContentQueryGraphType(this, app, this.schemas.Values, queryModulesService) };
 
             foreach (var schemaType in schemaTypes.Values)
             {

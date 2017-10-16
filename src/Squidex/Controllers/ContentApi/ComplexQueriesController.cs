@@ -12,6 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Controllers.ContentApi
 {
@@ -22,14 +23,14 @@ namespace Squidex.Controllers.ContentApi
     {
         private readonly IContentQueryService contentQuery;
         private readonly IAssetRepository assetsRepository;
-        private IList<IQueryModule> plugins;
+        private IQueryProvider queryProvider;
 
-        public ComplexQueriesController(ICommandBus commandBus, IContentQueryService contentQuery, IAssetRepository assetsRepository, IEnumerable<IQueryModule> plugins)
+        public ComplexQueriesController(ICommandBus commandBus, IContentQueryService contentQuery, IAssetRepository assetsRepository, IQueryProvider queryProvider)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
             this.assetsRepository = assetsRepository;
-            this.plugins = plugins.ToList();
+            this.queryProvider = queryProvider;
         }
 
         [MustBeAppReader]
@@ -45,16 +46,7 @@ namespace Squidex.Controllers.ContentApi
                 return NotFound();
             }
 
-            IQuery query = null;
-
-            foreach (var squidexPlugin in plugins)
-            {
-                query = squidexPlugin.GetQueries(App.Name, schema).FirstOrDefault(x => x.Name == queryName);
-                if (query != null)
-                {
-                    break;
-                }
-            }
+            IQuery query = queryProvider.GetQueries(App, schema)?.FirstOrDefault();
 
             if (query == null)
             {

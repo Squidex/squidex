@@ -6,12 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
 using NSwag;
@@ -19,10 +17,10 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Controllers.ContentApi.Generator
 {
@@ -31,18 +29,19 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly HttpContext context;
         private readonly SwaggerSettings settings;
         private readonly MyUrlsOptions urlOptions;
+        private readonly IQueryProvider queryProvider;
+        private SwaggerDocument document;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
         private SwaggerGenerator swaggerGenerator;
-        private SwaggerDocument document;
-        private IList<IQueryModule> plugins;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions, IEnumerable<IQueryModule> plugins)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings,
+            IOptions<MyUrlsOptions> urlOptions, IQueryProvider queryProvider)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
-            this.plugins = plugins.ToList();
+            this.queryProvider = queryProvider;
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -67,14 +66,11 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             foreach (var schemaEntity in schemas.Where(x => x.IsPublished))
             {
-                var generator = new SchemaSwaggerGenerator(document, appBasePath, schemaEntity.SchemaDef, AppendSchema, app.PartitionResolver);
+                var generator = new SchemaSwaggerGenerator(document, appBasePath, schemaEntity.SchemaDef, AppendSchema,
+                    app.PartitionResolver);
                 generator.GenerateSchemaOperations();
 
-                foreach (var plugin in plugins)
-                {
-                    var queries = plugin.GetQueries(app.Name, schemaEntity);
-                    generator.GenerateSchemaQueriesOperations(queries);
-                }
+                generator.GenerateSchemaQueriesOperations(queryProvider.GetQueries(app, schemaEntity));
             }
         }
 
@@ -86,7 +82,8 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
             {
-                operation.Responses.Add("500", new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
+                operation.Responses.Add("500",
+                    new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
             }
         }
 

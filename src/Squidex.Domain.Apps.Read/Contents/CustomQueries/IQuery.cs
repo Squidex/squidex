@@ -1,6 +1,12 @@
-﻿using System.Collections.Generic;
+﻿// ==========================================================================
+//  IQuery.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Types;
 using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
@@ -13,9 +19,14 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 
         string DescriptionForSwagger { get; }
 
+        string AssociatedToApp { get; }
+
+        string AssociatedToSchema { get; }
+
         QueryArgumentOptions ArgumentOptions { get; }
 
-        Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> Execute(ISchemaEntity schema, QueryContext context,
+        Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> Execute(ISchemaEntity schema,
+            QueryContext context,
             IDictionary<string, object> arguments);
     }
 }

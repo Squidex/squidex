@@ -83,15 +83,13 @@ namespace Squidex.Domain.Apps.Read.Contents
             var allSchemas = new List<ISchemaEntity> { schema };
 
             A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(allSchemas);
-            var queryModule = A.Fake<IQueryModule>();
             var customQuery = A.Fake<IQuery>();
             A.CallTo(() => customQuery.Name).Returns("getDummy");
             A.CallTo(() => customQuery.Execute(schema, new QueryContext(app, assetRepository, contentQuery, user), null))
                 .Returns((schema, 0, new List<IContentEntity>())); // todo: improve on this
-            A.CallTo(() => queryModule.GetQueries(app.Name, schema)).Returns(new List<IQuery> { customQuery });
 
             sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository,
-                new DefaultQueryProvider(new List<IQueryModule> { queryModule }));
+                new DefaultQueryProvider(new List<IQuery> { customQuery }));
         }
 
         [Theory]

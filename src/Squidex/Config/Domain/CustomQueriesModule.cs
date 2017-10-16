@@ -1,9 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ==========================================================================
+//  CustomQueriesModule.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.Loader;
-using System.Threading.Tasks;
 using Autofac;
 using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 
@@ -18,6 +23,10 @@ namespace Squidex.Config.Domain
                 return;
             }
 
+            builder.RegisterType(typeof(DefaultQueryProvider))
+                .As<IQueryProvider>()
+                .SingleInstance();
+
             var assemblies = Directory.EnumerateFiles("./Plugins", "*.dll");
             foreach (var asmPath in assemblies)
             {
@@ -26,14 +35,11 @@ namespace Squidex.Config.Domain
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(asmPath));
                     builder.RegisterAssemblyModules(asm);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
+                    // ignore
                 }
             }
-
-            builder.RegisterType(typeof(DefaultQueryProvider))
-                .As<Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider>()
-                .SingleInstance();
         }
     }
 }
