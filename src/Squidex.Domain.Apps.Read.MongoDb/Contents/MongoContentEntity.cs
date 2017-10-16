@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("rd")]
-        public List<Guid> ReferencedIdsDeleted { get; set; }
+        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
         NamedContentData IContentEntity.Data
         {

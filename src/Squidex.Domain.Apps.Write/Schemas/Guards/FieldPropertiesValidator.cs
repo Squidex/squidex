@@ -189,5 +189,15 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.MaxLength));
             }
         }
+
+        public IEnumerable<ValidationError> Visit(TagsFieldProperties properties)
+        {
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            {
+                yield return new ValidationError("Max items must be greater than min items.",
+                    nameof(properties.MinItems),
+                    nameof(properties.MaxItems));
+            }
+        }
     }
 }

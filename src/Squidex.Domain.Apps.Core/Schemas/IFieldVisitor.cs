@@ -25,5 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         T Visit(ReferencesField field);
 
         T Visit(StringField field);
+
+        T Visit(TagsField field);
     }
 }
