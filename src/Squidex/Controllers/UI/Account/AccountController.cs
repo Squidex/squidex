@@ -129,16 +129,16 @@ namespace Squidex.Controllers.UI.Account
 
         [HttpGet]
         [Route("account/signup/")]
-        public IActionResult Signup(string returnUrl = null)
+        public Task<IActionResult> Signup(string returnUrl = null)
         {
-            return LoginView(returnUrl, false, false);
+            return LoginViewAsync(returnUrl, false, false);
         }
 
         [HttpGet]
         [Route("account/login/")]
-        public IActionResult Login(string returnUrl = null)
+        public Task<IActionResult> Login(string returnUrl = null)
         {
-            return LoginView(returnUrl, true, false);
+            return LoginViewAsync(returnUrl, true, false);
         }
 
         [HttpPost]
@@ -147,14 +147,14 @@ namespace Squidex.Controllers.UI.Account
         {
             if (!ModelState.IsValid)
             {
-                return LoginView(returnUrl, true, true);
+                return await LoginViewAsync(returnUrl, true, true);
             }
 
             var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
 
             if (!result.Succeeded)
             {
-                return LoginView(returnUrl, true, true);
+                return await LoginViewAsync(returnUrl, true, true);
             }
             else if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -166,21 +166,20 @@ namespace Squidex.Controllers.UI.Account
             }
         }
 
-        private IActionResult LoginView(string returnUrl, bool isLogin, bool isFailed)
+        private async Task<IActionResult> LoginViewAsync(string returnUrl, bool isLogin, bool isFailed)
         {
             var allowPasswordAuth = identityOptions.Value.AllowPasswordAuth;
 
-            var providers =
-                signInManager.GetExternalAuthenticationSchemes()
-                    .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName)).ToList();
+            var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+            var externalProviders = externalSchemes.Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
 
             var vm = new LoginVM
             {
-                ExternalProviders = providers,
+                ExternalProviders = externalProviders,
                 IsLogin = isLogin,
                 IsFailed = isFailed,
                 HasPasswordAuth = allowPasswordAuth,
-                HasPasswordAndExternal = allowPasswordAuth && providers.Any(),
+                HasPasswordAndExternal = allowPasswordAuth && externalProviders.Any(),
                 ReturnUrl = returnUrl
             };
 

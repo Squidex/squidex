@@ -25,6 +25,8 @@ using Squidex.Config.Web;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 
+#pragma warning disable RECS0002 // Convert anonymous method to method group
+
 namespace Squidex
 {
     public class Startup
@@ -37,21 +39,15 @@ namespace Squidex
             "/error"
         };
 
-        private IConfigurationRoot Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         private IHostingEnvironment Environment { get; }
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, IConfiguration config)
         {
             Environment = env;
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = config;
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -59,6 +55,7 @@ namespace Squidex
             services.AddMySwaggerSettings();
             services.AddMyEventFormatter();
             services.AddMyDataProtectection(Configuration);
+            services.AddMyAuthentication(Configuration);
             services.AddMyIdentity();
             services.AddMyIdentityServer();
             services.AddMyMvc();
@@ -142,14 +139,10 @@ namespace Squidex
                     identityApp.UseExceptionHandler("/error");
                 }
 
-                identityApp.UseMyIdentity();
+                identityApp.UseMyAuthentication();
                 identityApp.UseMyIdentityServer();
                 identityApp.UseMyAdminRole();
                 identityApp.UseMyAdmin();
-                identityApp.UseMyApiProtection();
-                identityApp.UseMyGoogleAuthentication();
-                identityApp.UseMyGithubAuthentication();
-                identityApp.UseMyMicrosoftAuthentication();
                 identityApp.UseStaticFiles();
 
                 identityApp.MapWhen(x => IsIdentityRequest(x), mvcApp =>
@@ -169,7 +162,6 @@ namespace Squidex
                 }
 
                 appApi.UseMySwagger();
-                appApi.UseMyApiProtection();
 
                 appApi.MapWhen(x => !IsIdentityRequest(x), mvcApp =>
                 {

@@ -1,20 +1,21 @@
 ﻿// ==========================================================================
-//  MustBeAppEditorAttribute.cs
+//  ApiAuthorizeAttribute.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Shared.Identity;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Squidex.Pipeline
 {
-    public sealed class MustBeAppEditorAttribute : ApiAuthorizeAttribute
+    public class ApiAuthorizeAttribute : AuthorizeAttribute
     {
-        public MustBeAppEditorAttribute()
+        public ApiAuthorizeAttribute()
         {
-            Roles = SquidexRoles.AppEditor;
+            AuthenticationSchemes = IdentityServerAuthenticationDefaults.AuthenticationScheme;
         }
     }
 }

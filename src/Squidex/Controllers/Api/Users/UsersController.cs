@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
@@ -62,7 +61,7 @@ namespace Squidex.Controllers.Api.Users
         /// <returns>
         /// 200 => Users returned.
         /// </returns>
-        [Authorize]
+        [ApiAuthorize]
         [HttpGet]
         [Route("users/")]
         [ProducesResponseType(typeof(UserDto[]), 200)]
@@ -83,7 +82,7 @@ namespace Squidex.Controllers.Api.Users
         /// 200 => User found.
         /// 404 => User not found.
         /// </returns>
-        [Authorize]
+        [ApiAuthorize]
         [HttpGet]
         [Route("users/{id}/")]
         [ProducesResponseType(typeof(UserDto), 200)]
