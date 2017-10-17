@@ -194,16 +194,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
                     Resolver = new FuncFieldResolver<object>(c =>
                     {
                         var context = (GraphQLQueryContext)c.UserContext;
-                        var task = q.Execute(schema, context, c.Arguments); // not sure if context is bound to the schema
-                        return task.ContinueWith(x =>
-                        {
-                            if (x.Result.Schema != schema)
-                            {
-                                throw new ComplexQuerySchemaValidationException("The query has returned an invalid schema.", q.Name);
-                            }
-
-                            return x.Result.Items;
-                        });
+                        var task = q.Execute(schema, context, c.Arguments);
+                        return task;
                     }),
                     Description = q.Summary
                 };

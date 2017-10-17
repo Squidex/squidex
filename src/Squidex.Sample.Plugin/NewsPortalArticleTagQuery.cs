@@ -45,11 +45,11 @@ namespace Squidex.Sample.Plugin
 
         public QueryArgumentOptions ArgumentOptions { get; }
 
-        public async Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> Execute(ISchemaEntity schema, QueryContext context, IDictionary<string, object> arguments)
+        public async Task<IReadOnlyList<IContentEntity>> Execute(ISchemaEntity schema, QueryContext context, IDictionary<string, object> arguments)
         {
             if (arguments == null || arguments.Count == 0 || !arguments.ContainsKey("tagNames"))
             {
-                return (schema, 0, new List<IContentEntity>());
+                return new List<IContentEntity>();
             }
 
             var filterList = new List<string>();
@@ -74,7 +74,7 @@ namespace Squidex.Sample.Plugin
             //filter = string.Join(" or ", filterList);
             //var resultContents = await context.QueryContentsAsync(schema.Name, $"$filter={filter}");
 
-            return (termSchema, resultContents.Count, resultContents);
+            return resultContents;
         }
     }
 }

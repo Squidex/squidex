@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 
         QueryArgumentOptions ArgumentOptions { get; }
 
-        Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> Execute(ISchemaEntity schema,
+        Task<IReadOnlyList<IContentEntity>> Execute(ISchemaEntity schema,
             QueryContext context,
             IDictionary<string, object> arguments);
     }

@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             var customQuery = A.Fake<IQuery>();
             A.CallTo(() => customQuery.Name).Returns("getDummy");
             A.CallTo(() => customQuery.Execute(schema, new QueryContext(app, assetRepository, contentQuery, user), null))
-                .Returns((schema, 0, new List<IContentEntity>())); // todo: improve on this
+                .Returns(new List<IContentEntity>()); // todo: improve on this
 
             sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository,
                 new DefaultQueryProvider(new List<IQuery> { customQuery }));

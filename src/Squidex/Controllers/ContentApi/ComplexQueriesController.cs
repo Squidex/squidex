@@ -55,21 +55,17 @@ namespace Squidex.Controllers.ContentApi
 
             var context = new QueryContext(App, assetsRepository, contentQuery, User);
             var contents = await query.Execute(schema, context, HttpContext.Request.Query.ToDictionary(x => x.Key, x => (object)x.Value));
-            if (contents.Schema != schema)
-            {
-                throw new ComplexQuerySchemaValidationException("The query has returned an invalid schema.", query.Name);
-            }
 
             var response = new AssetsDto
             {
-                Total = contents.Total,
-                Items = contents.Items.Take(200).Select(item =>
+                Total = contents.Count,
+                Items = contents.Take(200).Select(item =>
                 {
                     var itemModel = SimpleMapper.Map(item, new ContentDto());
 
                     if (item.Data != null)
                     {
-                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
+                        itemModel.Data = item.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
                     }
 
                     return itemModel;
