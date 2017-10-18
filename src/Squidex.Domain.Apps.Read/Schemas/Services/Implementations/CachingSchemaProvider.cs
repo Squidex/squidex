@@ -9,18 +9,30 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
 {
-    public class CachingSchemaProvider : CachingProviderBase, ISchemaProvider
+    public class CachingSchemaProvider : CachingProviderBase, ISchemaProvider, IEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-
         private readonly ISchemaRepository repository;
+
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
+        public string EventsFilter
+        {
+            get { return string.Empty; }
+        }
 
         public CachingSchemaProvider(IMemoryCache cache, ISchemaRepository repository)
             : base(cache)
@@ -80,16 +92,26 @@ namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
             return result;
         }
 
-        public void Invalidate(NamedId<Guid> appId, NamedId<Guid> schemaId)
+        public Task On(Envelope<IEvent> @event)
         {
-            var cacheKeyById = BuildIdCacheKey(schemaId.Id);
-            var cacheKeyByName = BuildNameCacheKey(appId.Id, schemaId.Name);
+            void Remove(NamedId<Guid> appId, NamedId<Guid> schemaId)
+            {
+                var cacheKeyById = BuildIdCacheKey(schemaId.Id);
+                var cacheKeyByName = BuildNameCacheKey(appId.Id, schemaId.Name);
 
-            Cache.Remove(cacheKeyById);
-            Cache.Remove(cacheKeyByName);
+                Cache.Remove(cacheKeyById);
+                Cache.Remove(cacheKeyByName);
 
-            Cache.Invalidate(cacheKeyById);
-            Cache.Invalidate(cacheKeyByName);
+                Cache.Invalidate(cacheKeyById);
+                Cache.Invalidate(cacheKeyByName);
+            }
+
+            if (@event.Payload is SchemaEvent schemaEvent)
+            {
+                Remove(schemaEvent.AppId, schemaEvent.SchemaId);
+            }
+
+            return TaskHelper.Done;
         }
 
         private static string BuildNameCacheKey(Guid appId, string name)
@@ -100,6 +122,11 @@ namespace Squidex.Domain.Apps.Read.Schemas.Services.Implementations
         private static string BuildIdCacheKey(Guid schemaId)
         {
             return $"Schema_Names_{schemaId}";
+        }
+
+        public Task ClearAsync()
+        {
+            return TaskHelper.Done;
         }
     }
 }

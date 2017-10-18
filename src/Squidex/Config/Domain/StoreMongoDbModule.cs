@@ -13,7 +13,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.History.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Apps;
@@ -23,6 +25,7 @@ using Squidex.Domain.Apps.Read.MongoDb.History;
 using Squidex.Domain.Apps.Read.MongoDb.Schemas;
 using Squidex.Domain.Apps.Read.MongoDb.Webhooks;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
 using Squidex.Domain.Apps.Read.Webhooks.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
@@ -144,7 +147,6 @@ namespace Squidex.Config.Domain
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<IAppRepository>()
                 .As<IExternalSystem>()
-                .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
 
@@ -152,7 +154,6 @@ namespace Squidex.Config.Domain
                 .WithParameter(ResolvedParameter.ForNamed<IMongoDatabase>(MongoDatabaseRegistration))
                 .As<ISchemaRepository>()
                 .As<IExternalSystem>()
-                .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();
 
@@ -182,6 +183,23 @@ namespace Squidex.Config.Domain
                 new CompoundEventConsumer(
                     c.Resolve<MongoAssetRepository>(),
                     c.Resolve<MongoAssetStatsRepository>()))
+                .As<IEventConsumer>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoSchemaRepository>(),
+                    c.Resolve<CachingGraphQLService>(),
+                    c.Resolve<CachingSchemaProvider>()))
+                .As<IEventConsumer>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.Register(c =>
+                new CompoundEventConsumer(
+                    c.Resolve<MongoAppRepository>(),
+                    c.Resolve<CachingAppProvider>()))
                 .As<IEventConsumer>()
                 .AsSelf()
                 .SingleInstance();

@@ -60,8 +60,6 @@ namespace Squidex.Config.Domain
             TypeNameRegistry.Map(typeof(NoopEvent).GetTypeInfo().Assembly);
 
             ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
-
-            JsonConvert.DefaultSettings = () => SerializerSettings;
         }
 
         public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
@@ -15,7 +14,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Old;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -26,8 +24,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository
     {
-        private readonly List<Action<NamedId<Guid>, NamedId<Guid>>> subscribers = new List<Action<NamedId<Guid>, NamedId<Guid>>>();
-
         public string Name
         {
             get { return GetType().Name; }
@@ -36,11 +32,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         public string EventsFilter
         {
             get { return "^schema-"; }
-        }
-
-        public void SubscribeOnChanged(Action<NamedId<Guid>, NamedId<Guid>> subscriber)
-        {
-            subscribers.Add(subscriber);
         }
 
         public Task On(Envelope<IEvent> @event)
@@ -52,7 +43,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         {
             var schema = SchemaEventDispatcher.Dispatch(@event, registry);
 
-            return Collection.CreateAsync(@event, headers, s => { s.SchemaDef = schema; SimpleMapper.Map(@event, s); });
+            return Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
@@ -125,6 +116,21 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
         }
 
+        private Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
+        {
+            return Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
+        }
+
+        private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)
+        {
+            entity.UpdateSchema(serializer, updater);
+        }
+
+        private void UpdateSchema(MongoSchemaEntity entity, Schema schema)
+        {
+            entity.SerializeSchema(schema, serializer);
+        }
+
         protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, e => { });
@@ -133,22 +139,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
         protected Task On(WebhookDeleted @event, EnvelopeHeaders headers)
         {
             return Collection.UpdateAsync(@event, headers, e => { });
-        }
-
-        private async Task UpdateSchema(SchemaEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater = null)
-        {
-            await Collection.UpdateAsync(@event, headers, e =>
-            {
-                if (updater != null)
-                {
-                    e.SchemaDef = updater(e.SchemaDef);
-                }
-            });
-
-            foreach (var subscriber in subscribers)
-            {
-                subscriber(@event.AppId, @event.SchemaId);
-            }
         }
     }
 }

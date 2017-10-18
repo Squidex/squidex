@@ -11,9 +11,11 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Read.Apps
@@ -36,6 +38,24 @@ namespace Squidex.Domain.Apps.Read.Apps
             A.CallTo(() => appV2.Name).Returns(appId.Name);
 
             sut = new CachingAppProvider(cache, repository);
+        }
+
+        [Fact]
+        public void Should_return_empty_for_events_filter()
+        {
+            Assert.Equal(string.Empty, sut.EventsFilter);
+        }
+
+        [Fact]
+        public void Should_return_empty_for_name()
+        {
+            Assert.Equal(typeof(CachingAppProvider).Name, sut.Name);
+        }
+
+        [Fact]
+        public void Should_do_nothing_when_clearing()
+        {
+            Assert.NotNull(sut.ClearAsync());
         }
 
         [Fact]
@@ -65,7 +85,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         }
 
         [Fact]
-        public async Task Should_clear_cache_for_id_after_invalidating()
+        public async Task Should_clear_cache_for_id_after_update_event()
         {
             A.CallTo(() => repository.FindAppAsync(appId.Id))
                 .Returns(appV2);
@@ -74,7 +94,7 @@ namespace Squidex.Domain.Apps.Read.Apps
 
             await ProvideAppByIdAsync(appV1);
 
-            sut.Invalidate(appId);
+            sut.On(Envelope.Create(new AppLanguageAdded { AppId = appId }).To<IEvent>()).Wait();
 
             await ProvideAppByIdAsync(appV2);
 
@@ -82,7 +102,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         }
 
         [Fact]
-        public async Task Should_clear_cache_for_name_after_invalidating()
+        public async Task Should_clear_cache_for_name_after_update_event()
         {
             A.CallTo(() => repository.FindAppAsync(appId.Name))
                 .Returns(appV2);
@@ -91,7 +111,7 @@ namespace Squidex.Domain.Apps.Read.Apps
 
             await ProvideAppByNameAsync(appV1);
 
-            sut.Invalidate(appId);
+            sut.On(Envelope.Create(new AppLanguageAdded { AppId = appId }).To<IEvent>()).Wait();
 
             await ProvideAppByNameAsync(appV2);
 
