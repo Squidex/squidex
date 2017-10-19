@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -34,19 +35,16 @@ namespace Squidex.Controllers.UI.Profile
         private readonly IUserPictureStore userPictureStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IOptions<MyIdentityOptions> identityOptions;
-        private readonly IOptions<IdentityCookieOptions> identityCookieOptions;
 
         public ProfileController(
             SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserPictureStore userPictureStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
-            IOptions<MyIdentityOptions> identityOptions,
-            IOptions<IdentityCookieOptions> identityCookieOptions)
+            IOptions<MyIdentityOptions> identityOptions)
         {
             this.signInManager = signInManager;
             this.identityOptions = identityOptions;
-            this.identityCookieOptions = identityCookieOptions;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -65,7 +63,7 @@ namespace Squidex.Controllers.UI.Profile
         [Route("/account/profile/login-add/")]
         public async Task<IActionResult> AddLogin(string provider)
         {
-            await HttpContext.Authentication.SignOutAsync(identityCookieOptions.Value.ExternalCookieAuthenticationScheme);
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var properties =
                 signInManager.ConfigureExternalAuthenticationProperties(provider,
@@ -182,9 +180,8 @@ namespace Squidex.Controllers.UI.Profile
 
         private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)
         {
-            var providers =
-                signInManager.GetExternalAuthenticationSchemes()
-                    .Select(x => new ExternalProvider(x.AuthenticationScheme, x.DisplayName)).ToList();
+            var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+            var externalProviders = externalSchemes.Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
 
             var result = new ProfileVM
             {
@@ -192,7 +189,7 @@ namespace Squidex.Controllers.UI.Profile
                 Email = user.Email,
                 ErrorMessage = errorMessage,
                 ExternalLogins = user.Logins,
-                ExternalProviders = providers,
+                ExternalProviders = externalProviders,
                 DisplayName = user.DisplayName(),
                 HasPassword = await userManager.HasPasswordAsync(user),
                 HasPasswordAuth = identityOptions.Value.AllowPasswordAuth,

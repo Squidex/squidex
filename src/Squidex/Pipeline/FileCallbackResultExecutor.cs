@@ -25,7 +25,7 @@ namespace Squidex.Pipeline
         {
             try
             {
-                SetHeadersAndLog(context, result);
+                SetHeadersAndLog(context, result, null);
 
                 await result.Callback(context.HttpContext.Response.Body);
             }

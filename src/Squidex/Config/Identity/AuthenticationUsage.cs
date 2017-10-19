@@ -1,20 +1,22 @@
 ﻿// ==========================================================================
-//  MustBeAppEditorAttribute.cs
+//  AuthenticationUsage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Shared.Identity;
+using Microsoft.AspNetCore.Builder;
 
-namespace Squidex.Pipeline
+namespace Squidex.Config.Identity
 {
-    public sealed class MustBeAppEditorAttribute : ApiAuthorizeAttribute
+    public static class AuthenticationUsage
     {
-        public MustBeAppEditorAttribute()
+        public static IApplicationBuilder UseMyAuthentication(this IApplicationBuilder app)
         {
-            Roles = SquidexRoles.AppEditor;
+            app.UseAuthentication();
+
+            return app;
         }
     }
 }
