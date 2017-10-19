@@ -10,7 +10,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps;
@@ -21,8 +25,14 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
-    public sealed class AppApiFilter : IAsyncAuthorizationFilter, IFilterContainer
+    public sealed class AppApiFilter : AuthorizeFilter, IFilterContainer
     {
+        private static readonly AuthorizationPolicy DefaultPolicy =
+            new AuthorizationPolicyBuilder()
+                .AddRequirements(new DenyAnonymousAuthorizationRequirement())
+                .AddAuthenticationSchemes(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .Build();
+
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IUsageTracker usageTracker;
@@ -38,6 +48,7 @@ namespace Squidex.Pipeline
         }
 
         public AppApiFilter(IAppProvider appProvider, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
+            : base(DefaultPolicy)
         {
             this.appProvider = appProvider;
             this.appPlanProvider = appPlanProvider;
@@ -45,8 +56,10 @@ namespace Squidex.Pipeline
             this.usageTracker = usageTracker;
         }
 
-        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public override async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            await base.OnAuthorizationAsync(context);
+
             var appName = context.RouteData.Values["app"]?.ToString();
 
             if (!string.IsNullOrWhiteSpace(appName))

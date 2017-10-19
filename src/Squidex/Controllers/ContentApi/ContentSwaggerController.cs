@@ -16,6 +16,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Controllers.ContentApi
 {
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi(false)]
     [SwaggerIgnore]

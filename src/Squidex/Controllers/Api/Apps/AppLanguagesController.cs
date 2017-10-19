@@ -26,6 +26,7 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Apps))]

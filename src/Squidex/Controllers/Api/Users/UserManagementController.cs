@@ -22,8 +22,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Controllers.Api.Users
 {
-    [MustBeAdministrator]
+    [ApiAuthorize]
     [ApiExceptionFilter]
+    [MustBeAdministrator]
     [SwaggerIgnore]
     public sealed class UserManagementController : Controller
     {

@@ -23,6 +23,7 @@ namespace Squidex.Controllers.Api.Plans
     /// <summary>
     /// Manages and configures plans.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Plans))]

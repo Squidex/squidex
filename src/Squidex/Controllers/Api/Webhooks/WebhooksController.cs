@@ -25,6 +25,7 @@ namespace Squidex.Controllers.Api.Webhooks
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Webhooks))]

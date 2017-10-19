@@ -23,9 +23,10 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [MustBeAppOwner]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
+    [MustBeAppOwner]
     [SwaggerTag(nameof(Apps))]
     public sealed class AppContributorsController : ControllerBase
     {

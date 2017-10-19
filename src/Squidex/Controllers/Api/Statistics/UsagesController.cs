@@ -23,9 +23,10 @@ namespace Squidex.Controllers.Api.Statistics
     /// <summary>
     /// Retrieves usage information for apps.
     /// </summary>
-    [MustBeAppEditor]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
+    [MustBeAppEditor]
     [SwaggerTag(nameof(Statistics))]
     public sealed class UsagesController : ControllerBase
     {

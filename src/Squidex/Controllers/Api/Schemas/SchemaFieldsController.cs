@@ -19,9 +19,10 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [MustBeAppDeveloper]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
+    [MustBeAppDeveloper]
     [SwaggerTag(nameof(Schemas))]
     public sealed class SchemaFieldsController : ControllerBase
     {
