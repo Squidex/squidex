@@ -7,7 +7,7 @@ namespace Squidex.Sample.Plugin
     {
         protected override void Load(ContainerBuilder builder)
         {
-            
+            builder.RegisterType<NewsPortalArticleTagQuery>().As<IQuery>();
         }
     }
 }
