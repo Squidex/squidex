@@ -70,9 +70,9 @@ namespace Squidex.Domain.Apps.Write.Apps
             clients.Add(@event.Id, @event.Secret);
         }
 
-        protected void On(AppClientChanged @event)
+        protected void On(AppClientUpdated @event)
         {
-            clients.Change(@event.Id, @event.IsReader);
+            clients.Update(@event.Id, @event.Permission);
         }
 
         protected void On(AppClientRenamed @event)
@@ -139,9 +139,9 @@ namespace Squidex.Domain.Apps.Write.Apps
                 RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
             }
 
-            if (command.IsReader.HasValue)
+            if (command.Permission.HasValue)
             {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientChanged { IsReader = command.IsReader.Value }));
+                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Permission = command.Permission.Value }));
             }
 
             return this;
@@ -253,7 +253,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
-            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = PermissionLevel.Owner };
+            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppContributorPermission.Owner };
         }
 
         private void ThrowIfOtherUser(ChangePlan command)

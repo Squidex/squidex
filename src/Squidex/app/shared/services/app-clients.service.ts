@@ -44,16 +44,16 @@ export class AppClientDto {
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly isReader: boolean
+        public readonly permission: string
     ) {
     }
 
     public rename(name: string): AppClientDto {
-        return new AppClientDto(this.id, name, this.secret, this.isReader);
+        return new AppClientDto(this.id, name, this.secret, this.permission);
     }
 
-    public change(isReader: boolean): AppClientDto {
-        return new AppClientDto(this.id, this.name, this.secret, isReader);
+    public update(permission: string): AppClientDto {
+        return new AppClientDto(this.id, this.name, this.secret, permission);
     }
 }
 
@@ -67,7 +67,7 @@ export class CreateAppClientDto {
 export class UpdateAppClientDto {
     constructor(
         public readonly name?: string,
-        public readonly isReader?: boolean
+        public readonly permission?: string
     ) {
     }
 }
@@ -103,7 +103,7 @@ export class AppClientsService {
                             item.id,
                             item.name || body.id,
                             item.secret,
-                            item.isReader);
+                            item.permission);
                     });
 
                     return new AppClientsDto(clients, response.version);
@@ -122,7 +122,7 @@ export class AppClientsService {
                         body.id,
                         body.name || body.id,
                         body.secret,
-                        body.isReader);
+                        body.permission);
 
                     return new Versioned(response.version, client);
                 })

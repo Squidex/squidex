@@ -19,8 +19,9 @@ using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.EventConsumers
 {
-    [MustBeAdministrator]
+    [ApiAuthorize]
     [ApiExceptionFilter]
+    [MustBeAdministrator]
     [SwaggerIgnore]
     public sealed class EventConsumersController : Controller
     {
@@ -47,7 +48,7 @@ namespace Squidex.Controllers.Api.EventConsumers
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/start")]
+        [Route("event-consumers/{name}/start/")]
         [ApiCosts(0)]
         public IActionResult Start(string name)
         {
@@ -59,7 +60,7 @@ namespace Squidex.Controllers.Api.EventConsumers
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/stop")]
+        [Route("event-consumers/{name}/stop/")]
         [ApiCosts(0)]
         public IActionResult Stop(string name)
         {
@@ -71,7 +72,7 @@ namespace Squidex.Controllers.Api.EventConsumers
         }
 
         [HttpPut]
-        [Route("event-consumers/{name}/reset")]
+        [Route("event-consumers/{name}/reset/")]
         [ApiCosts(0)]
         public IActionResult Reset(string name)
         {

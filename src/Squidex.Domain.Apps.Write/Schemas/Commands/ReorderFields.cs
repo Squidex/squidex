@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
         {
             if (FieldIds == null)
             {
-                errors.Add(new ValidationError("Field ids must be specified", nameof(FieldIds)));
+                errors.Add(new ValidationError("Field ids must be specified.", nameof(FieldIds)));
             }
         }
     }

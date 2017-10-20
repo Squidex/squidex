@@ -24,11 +24,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         private Dictionary<string, ContentFieldProperty> valueProperties;
         private bool isChanged;
 
-        public bool IsChanged
-        {
-            get { return isChanged; }
-        }
-
         public ContentFieldData FieldData
         {
             get { return fieldData; }

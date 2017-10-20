@@ -123,9 +123,21 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void Should_return_null_if_name_is_not_supported()
+        {
+            Assert.Null(sut.GetTypeOrNull("unsupported"));
+        }
+
+        [Fact]
         public void Should_throw_exception_if_type_is_not_supported()
         {
             Assert.Throws<TypeNameNotFoundException>(() => sut.GetName<Guid>());
+        }
+
+        [Fact]
+        public void Should_return_null_if_type_is_not_supported()
+        {
+            Assert.Null(sut.GetNameOrNull<Guid>());
         }
     }
 }

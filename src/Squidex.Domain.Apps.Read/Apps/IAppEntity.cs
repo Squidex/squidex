@@ -21,9 +21,9 @@ namespace Squidex.Domain.Apps.Read.Apps
 
         LanguagesConfig LanguagesConfig { get; }
 
-        IReadOnlyCollection<IAppClientEntity> Clients { get; }
+        IReadOnlyDictionary<string, IAppClientEntity> Clients { get; }
 
-        IReadOnlyCollection<IAppContributorEntity> Contributors { get; }
+        IReadOnlyDictionary<string, IAppContributorEntity> Contributors { get; }
 
         PartitionResolver PartitionResolver { get; }
     }

@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Infrastructure;
@@ -23,17 +23,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, IEventConsumer
     {
-        private readonly SchemaJsonSerializer serializer;
+        private readonly JsonSerializer serializer;
         private readonly FieldRegistry registry;
 
-        public MongoSchemaRepository(IMongoDatabase database, SchemaJsonSerializer serializer, FieldRegistry registry)
+        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer serializer, FieldRegistry registry)
             : base(database)
         {
             Guard.NotNull(registry, nameof(registry));
             Guard.NotNull(serializer, nameof(serializer));
 
             this.registry = registry;
-
             this.serializer = serializer;
         }
 

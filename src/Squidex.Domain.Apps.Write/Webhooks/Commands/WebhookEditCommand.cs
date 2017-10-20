@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Write.Webhooks.Commands
         {
             if (Url == null || !Url.IsAbsoluteUri)
             {
-                errors.Add(new ValidationError("Url must be specified and absolute", nameof(Url)));
+                errors.Add(new ValidationError("Url must be specified and absolute.", nameof(Url)));
             }
         }
     }

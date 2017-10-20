@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents;
@@ -30,6 +31,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
         private readonly ISchemaProvider schemas;
+        private readonly JsonSerializer serializer;
 
         protected static FilterDefinitionBuilder<MongoContentEntity> Filter
         {
@@ -63,13 +65,15 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
         }
 
-        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas)
+        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas, JsonSerializer serializer)
         {
             Guard.NotNull(database, nameof(database));
             Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(serializer, nameof(serializer));
 
-            this.schemas = schemas;
             this.database = database;
+            this.schemas = schemas;
+            this.serializer = serializer;
         }
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
@@ -88,18 +92,18 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
             catch (NotImplementedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
 
             var contentEntities = await cursor.ToListAsync();
 
             foreach (var entity in contentEntities)
             {
-                entity.ParseData(schema.SchemaDef);
+                entity.ParseData(schema.SchemaDef, serializer);
             }
 
             return contentEntities;
@@ -116,11 +120,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
             catch (NotImplementedException)
             {
-                throw new ValidationException("This odata operation is not supported");
+                throw new ValidationException("This odata operation is not supported.");
             }
 
             return cursor.CountAsync();
@@ -147,7 +151,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
             foreach (var entity in contentEntities)
             {
-                entity.ParseData(schema.SchemaDef);
+                entity.ParseData(schema.SchemaDef, serializer);
             }
 
             return contentEntities.OfType<IContentEntity>().ToList();
@@ -172,7 +176,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                 await collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
-            contentEntity?.ParseData(schema.SchemaDef);
+            contentEntity?.ParseData(schema.SchemaDef, serializer);
 
             return contentEntity;
         }

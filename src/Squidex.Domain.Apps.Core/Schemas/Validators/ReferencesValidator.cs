@@ -7,52 +7,30 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Validators
 {
     public sealed class ReferencesValidator : IValidator
     {
-        private readonly bool isRequired;
         private readonly Guid schemaId;
-        private readonly int? minItems;
-        private readonly int? maxItems;
 
-        public ReferencesValidator(bool isRequired, Guid schemaId, int? minItems = null, int? maxItems = null)
+        public ReferencesValidator(Guid schemaId)
         {
-            this.isRequired = isRequired;
             this.schemaId = schemaId;
-            this.minItems = minItems;
-            this.maxItems = maxItems;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
-            if (!(value is ReferencesValue references) || references.ContentIds.Count == 0)
+            if (value is ICollection<Guid> contentIds)
             {
-                if (isRequired && !context.IsOptional)
+                var invalidIds = await context.GetInvalidContentIdsAsync(contentIds, schemaId);
+
+                foreach (var invalidId in invalidIds)
                 {
-                    addError("<FIELD> is required");
+                    addError($"<FIELD> contains invalid reference '{invalidId}'.");
                 }
-
-                return;
-            }
-
-            if (minItems.HasValue && references.ContentIds.Count < minItems.Value)
-            {
-                addError($"<FIELD> must have at least {minItems} reference(s)");
-            }
-
-            if (maxItems.HasValue && references.ContentIds.Count > maxItems.Value)
-            {
-                addError($"<FIELD> must have not more than {maxItems} reference(s)");
-            }
-
-            var invalidIds = await context.GetInvalidContentIdsAsync(references.ContentIds, schemaId);
-
-            foreach (var invalidId in invalidIds)
-            {
-                addError($"<FIELD> contains invalid reference '{invalidId}'");
             }
         }
     }

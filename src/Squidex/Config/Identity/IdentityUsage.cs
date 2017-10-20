@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -23,13 +22,6 @@ namespace Squidex.Config.Identity
 {
     public static class IdentityUsage
     {
-        public static IApplicationBuilder UseMyIdentity(this IApplicationBuilder app)
-        {
-            app.UseIdentity();
-
-            return app;
-        }
-
         public static IApplicationBuilder UseMyIdentityServer(this IApplicationBuilder app)
         {
              app.UseIdentityServer();
@@ -79,39 +71,6 @@ namespace Squidex.Config.Identity
                         }
                     }
                 }).Wait();
-            }
-
-            return app;
-        }
-
-        public static IApplicationBuilder UseMyApiProtection(this IApplicationBuilder app)
-        {
-            var apiScope = Constants.ApiScope;
-
-            var urlsOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
-
-            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
-            {
-                var identityOptions = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
-
-                string apiAuthorityUrl;
-
-                if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
-                {
-                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityPrefix);
-                }
-                else
-                {
-                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityPrefix);
-                }
-
-                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-                {
-                    Authority = apiAuthorityUrl,
-                    ApiName = apiScope,
-                    ApiSecret = null,
-                    RequireHttpsMetadata = identityOptions.RequiresHttps
-                });
             }
 
             return app;

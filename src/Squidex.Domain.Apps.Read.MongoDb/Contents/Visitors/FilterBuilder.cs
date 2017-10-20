@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             }
             catch (ODataException ex)
             {
-                throw new ValidationException("Query $search clause not valid", new ValidationError(ex.Message));
+                throw new ValidationException("Query $search clause not valid.", new ValidationError(ex.Message));
             }
 
             if (search != null)
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
             }
             catch (ODataException ex)
             {
-                throw new ValidationException("Query $filter clause not valid", new ValidationError(ex.Message));
+                throw new ValidationException("Query $filter clause not valid.", new ValidationError(ex.Message));
             }
 
             if (filter != null)

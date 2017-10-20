@@ -1,0 +1,20 @@
+@import '_vars';
+@import '_mixins';
+
+.minitems {
+    &-col {
+        position: relative;
+    }
+
+    &-label {
+        @include absolute(0, -.2rem, auto, auto);
+    }
+}
+
+.form-check-input {
+    margin: 0;
+}
+
+.form-group {
+    margin-top: .5rem;
+}

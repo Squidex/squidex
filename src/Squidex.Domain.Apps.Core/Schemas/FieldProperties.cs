@@ -6,14 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class FieldProperties : NamedElementPropertiesBase, IValidatable
+    public abstract class FieldProperties : NamedElementPropertiesBase
     {
         private bool isRequired;
         private bool isListField;
@@ -63,19 +61,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract JToken GetDefaultValue();
 
+        public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
+
         public virtual bool ShouldApplyDefaultValue(JToken value)
         {
             return value.IsNull();
         }
-
-        public void Validate(IList<ValidationError> errors)
-        {
-            foreach (var error in ValidateCore())
-            {
-                errors.Add(error);
-            }
-        }
-
-        protected abstract IEnumerable<ValidationError> ValidateCore();
     }
 }

@@ -8,17 +8,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class AssetsField : Field<AssetsFieldProperties>, IReferenceField
     {
-        private static readonly Guid[] EmptyIds = new Guid[0];
+        private static readonly ImmutableList<Guid> EmptyIds = ImmutableList<Guid>.Empty;
 
         public AssetsField(long id, string name, Partitioning partitioning)
             : this(id, name, partitioning, new AssetsFieldProperties())
@@ -32,22 +31,27 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected override IEnumerable<IValidator> CreateValidators()
         {
-            yield return new AssetsValidator(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
+            if (Properties.IsRequired || Properties.MinItems.HasValue || Properties.MaxItems.HasValue)
+            {
+                yield return new CollectionValidator<Guid>(Properties.IsRequired, Properties.MinItems, Properties.MaxItems);
+            }
+
+            yield return new AssetsValidator();
         }
 
         public IEnumerable<Guid> GetReferencedIds(JToken value)
         {
-            Guid[] assetIds;
+            IEnumerable<Guid> result = null;
             try
             {
-                assetIds = value?.ToObject<Guid[]>() ?? EmptyIds;
+                result = value?.ToObject<List<Guid>>();
             }
             catch
             {
-                assetIds = EmptyIds;
+                result = EmptyIds;
             }
 
-            return assetIds;
+            return result ?? EmptyIds;
         }
 
         public JToken RemoveDeletedReferences(JToken value, ISet<Guid> deletedReferencedIds)
@@ -65,20 +69,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override object ConvertValue(JToken value)
         {
-            return new AssetsValue(value.ToObject<Guid[]>());
+            return value.ToObject<List<Guid>>();
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
-            var itemSchema = schemaResolver("AssetItem", new JsonSchema4 { Type = JsonObjectType.String });
-
-            jsonProperty.Type = JsonObjectType.Array;
-            jsonProperty.Item = itemSchema;
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
     }
 }

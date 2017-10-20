@@ -9,7 +9,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Apps.Models;
@@ -25,7 +24,7 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [Authorize]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [SwaggerTag(nameof(Apps))]
     public sealed class AppsController : ControllerBase
@@ -62,7 +61,7 @@ namespace Squidex.Controllers.Api.Apps
             {
                 var dto = SimpleMapper.Map(s, new AppDto());
 
-                dto.Permission = s.Contributors.Single(x => x.ContributorId == subject).Permission;
+                dto.Permission = s.Contributors[subject].Permission;
 
                 return dto;
             }).ToList();

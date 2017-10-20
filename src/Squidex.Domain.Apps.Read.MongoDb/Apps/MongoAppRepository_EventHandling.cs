@@ -6,8 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure;
@@ -38,13 +41,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return Collection.CreateAsync(@event, headers, a =>
             {
+                a.Clients = new Dictionary<string, MongoAppEntityClient>();
+                a.Contributors = new Dictionary<string, MongoAppEntityContributor>();
+                a.ContributorIds = new List<string>();
+
                 SimpleMapper.Map(@event, a);
             });
         }
 
         protected Task On(AppClientAttached @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.Clients[@event.Id] = SimpleMapper.Map(@event, new MongoAppEntityClient());
             });
@@ -52,7 +59,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         protected Task On(AppClientRevoked @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.Clients.Remove(@event.Id);
             });
@@ -60,23 +67,39 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         protected Task On(AppClientRenamed @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.Clients[@event.Id].Name = @event.Name;
             });
         }
 
-        protected Task On(AppClientChanged @event, EnvelopeHeaders headers)
+        protected Task On(AppClientUpdated @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id].IsReader = @event.IsReader;
+                a.Clients[@event.Id].Permission = @event.Permission;
+            });
+        }
+
+        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        {
+            return UpdateAppAsync(@event, headers, a =>
+            {
+                a.Contributors.Remove(@event.ContributorId);
+            });
+        }
+
+        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        {
+            return UpdateAppAsync(@event, headers, a =>
+            {
+                a.Contributors[@event.ContributorId] = new MongoAppEntityContributor { Permission = @event.Permission };
             });
         }
 
         protected Task On(AppLanguageAdded @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.UpdateLanguages(c => c.Add(@event.Language));
             });
@@ -84,7 +107,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         protected Task On(AppLanguageRemoved @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.UpdateLanguages(c => c.Remove(@event.Language));
             });
@@ -92,7 +115,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         protected Task On(AppLanguageUpdated @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
                 a.UpdateLanguages(c => c.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback));
             });
@@ -100,29 +123,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
         protected Task On(AppPlanChanged @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            return UpdateAppAsync(@event, headers, a =>
             {
-                a.PlanOwner = @event.Actor.Identifier;
-                a.PlanId = @event.PlanId;
+                a.ChangePlan(@event.PlanId, @event.Actor);
             });
         }
 
-        protected Task On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        private async Task UpdateAppAsync(AppEvent @event, EnvelopeHeaders headers, Action<MongoAppEntity> updater)
         {
-            return Collection.UpdateAsync(@event, headers, a =>
+            await Collection.UpdateAsync(@event, headers, a =>
             {
-                a.Contributors.Remove(@event.ContributorId);
-                a.ContributorIds = a.Contributors.Keys.ToList();
-            });
-        }
-
-        protected Task On(AppContributorAssigned @event, EnvelopeHeaders headers)
-        {
-            return Collection.UpdateAsync(@event, headers, a =>
-            {
-                var contributor = a.Contributors.GetOrAddNew(@event.ContributorId);
-
-                SimpleMapper.Map(@event, contributor);
+                updater(a);
 
                 a.ContributorIds = a.Contributors.Keys.ToList();
             });

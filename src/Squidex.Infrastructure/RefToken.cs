@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure
 
             if (parts.Length < 2)
             {
-                throw new ArgumentException("Input must have more than 2 parts divided by colon", nameof(input));
+                throw new ArgumentException("Input must have more than 2 parts divided by colon.", nameof(input));
             }
 
             return new RefToken(parts[0], string.Join(":", parts.Skip(1)));

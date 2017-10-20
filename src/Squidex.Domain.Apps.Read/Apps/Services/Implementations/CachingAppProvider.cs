@@ -10,7 +10,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
@@ -97,20 +96,9 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
                 Cache.Invalidate(cacheKeyByName);
             }
 
-            if (@event.Payload is AppClientAttached ||
-                @event.Payload is AppClientChanged ||
-                @event.Payload is AppClientRenamed ||
-                @event.Payload is AppClientRevoked ||
-                @event.Payload is AppPlanChanged ||
-                @event.Payload is AppContributorAssigned ||
-                @event.Payload is AppContributorRemoved ||
-                @event.Payload is AppCreated ||
-                @event.Payload is AppLanguageAdded ||
-                @event.Payload is AppLanguageRemoved ||
-                @event.Payload is AppLanguageUpdated ||
-                @event.Payload is AppMasterLanguageSet)
+            if (@event.Payload is AppEvent appEvent)
             {
-                Remove(((AppEvent)@event.Payload).AppId);
+                Remove(appEvent.AppId);
             }
 
             return TaskHelper.Done;

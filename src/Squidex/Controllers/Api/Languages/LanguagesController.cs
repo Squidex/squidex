@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure;
@@ -19,7 +18,7 @@ namespace Squidex.Controllers.Api.Languages
     /// <summary>
     /// Readonly API to the supported langauges.
     /// </summary>
-    [Authorize]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [SwaggerTag(nameof(Languages))]
     public sealed class LanguagesController : Controller

@@ -26,6 +26,7 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Apps))]
@@ -56,7 +57,7 @@ namespace Squidex.Controllers.Api.Apps
                     {
                         IsMaster = x == App.LanguagesConfig.Master,
                         IsOptional = x.IsOptional,
-                        Fallback = x.Fallback.ToList()
+                        Fallback = x.LanguageFallbacks.ToList()
                     })).OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code).ToList();
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
@@ -102,7 +103,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [MustBeAppOwner]
         [HttpPut]
-        [Route("apps/{app}/languages/{language}")]
+        [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
         {
@@ -122,7 +123,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </returns>
         [MustBeAppOwner]
         [HttpDelete]
-        [Route("apps/{app}/languages/{language}")]
+        [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {

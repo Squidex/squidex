@@ -12,6 +12,7 @@ using System.Linq;
 using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas.Edm;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors
 {

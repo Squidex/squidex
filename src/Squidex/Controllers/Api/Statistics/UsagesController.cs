@@ -23,9 +23,10 @@ namespace Squidex.Controllers.Api.Statistics
     /// <summary>
     /// Retrieves usage information for apps.
     /// </summary>
-    [MustBeAppEditor]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
+    [MustBeAppEditor]
     [SwaggerTag(nameof(Statistics))]
     public sealed class UsagesController : ControllerBase
     {
@@ -55,7 +56,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/usages/calls/month")]
+        [Route("apps/{app}/usages/calls/month/")]
         [ProducesResponseType(typeof(CurrentCallsDto), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
@@ -79,7 +80,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/usages/calls/{fromDate}/{toDate}")]
+        [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
@@ -110,7 +111,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/usages/storage/today")]
+        [Route("apps/{app}/usages/storage/today/")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
@@ -134,7 +135,7 @@ namespace Squidex.Controllers.Api.Statistics
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/usages/storage/{fromDate}/{toDate}")]
+        [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(StorageUsageDto[]), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)

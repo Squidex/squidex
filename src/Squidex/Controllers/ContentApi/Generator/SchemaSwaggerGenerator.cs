@@ -14,7 +14,7 @@ using NSwag;
 using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read.Contents.JsonSchema;
+using Squidex.Domain.Apps.Core.Schemas.JsonSchema;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Shared.Identity;

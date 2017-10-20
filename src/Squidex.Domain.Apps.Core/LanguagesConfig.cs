@@ -112,14 +112,14 @@ namespace Squidex.Domain.Apps.Core
 
             foreach (var languageConfig in newLanguages.Values)
             {
-                if (languageConfig.Fallback.Contains(language))
+                if (languageConfig.LanguageFallbacks.Contains(language))
                 {
                     newLanguages =
                         newLanguages.SetItem(languageConfig.Language,
                             new LanguageConfig(
                                 languageConfig.Language,
                                 languageConfig.IsOptional,
-                                languageConfig.Fallback.Remove(language)));
+                                languageConfig.LanguageFallbacks.Remove(language)));
                 }
             }
 
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core
 
             foreach (var languageConfig in languages.Values)
             {
-                foreach (var fallback in languageConfig.Fallback)
+                foreach (var fallback in languageConfig.LanguageFallbacks)
                 {
                     if (!languages.ContainsKey(fallback))
                     {
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core
 
             if (errors.Count > 0)
             {
-                throw new ValidationException("Cannot configure language", errors);
+                throw new ValidationException("Cannot configure language.", errors);
             }
 
             return languages;
@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Core
         {
             if (Contains(language))
             {
-                var error = new ValidationError("Language is already part of the app", "Language");
+                var error = new ValidationError("Language is already part of the app.", "Language");
 
                 throw new ValidationException(message(), error);
             }
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Core
         {
             if (master?.Language == language || isMaster)
             {
-                var error = new ValidationError("Language is the master language", "Language");
+                var error = new ValidationError("Language is the master language.", "Language");
 
                 throw new ValidationException(message(), error);
             }

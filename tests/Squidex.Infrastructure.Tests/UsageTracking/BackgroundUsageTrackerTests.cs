@@ -112,10 +112,9 @@ namespace Squidex.Infrastructure.UsageTracking
             await sut.TrackAsync("key1", 0, 1000);
 
             sut.Next();
+            sut.Dispose();
 
-            await Task.Delay(100);
-
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<double>.Ignored, A<long>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]

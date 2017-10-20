@@ -32,8 +32,11 @@ namespace Squidex.Domain.Apps.Read.Apps
             AddEventMessage<AppClientRevoked>(
                 "revoked client {[Id]}");
 
+            AddEventMessage<AppClientUpdated>(
+                "updated client {[Id]}");
+
             AddEventMessage<AppClientRenamed>(
-                "named client {[Id]} as {[Name]}");
+                "renamed client {[Id]} to {[Name]}");
 
             AddEventMessage<AppLanguageAdded>(
                 "added language {[Language]}");

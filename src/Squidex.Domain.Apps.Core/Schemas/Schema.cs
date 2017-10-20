@@ -10,13 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.OData.Edm;
-using NJsonSchema;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Schema : CloneableBase
+    public sealed class Schema
     {
         private readonly string name;
         private readonly SchemaProperties properties;
@@ -59,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(properties, nameof(properties));
-            Guard.ValidSlug(name, nameof(name));
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             fieldsById = fields.ToImmutableDictionary(x => x.Id);
             fieldsByName = fields.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
@@ -76,13 +74,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static Schema Create(string name, SchemaProperties newProperties)
         {
-            if (!name.IsSlug())
-            {
-                var error = new ValidationError("Name must be a valid slug", "Name");
-
-                throw new ValidationException("Cannot create a new schema", error);
-            }
-
             return new Schema(name, false, newProperties, ImmutableList<Field>.Empty);
         }
 
@@ -123,39 +114,30 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return UpdateField(fieldId, field => field.Show());
         }
 
-        public Schema RenameField(long fieldId, string newName)
-        {
-            return UpdateField(fieldId, field => field.Rename(newName));
-        }
-
-        public Schema DeleteField(long fieldId)
-        {
-            if (fieldsById.TryGetValue(fieldId, out var field) && field.IsLocked)
-            {
-                throw new DomainException($"Field {fieldId} is locked.");
-            }
-
-            return new Schema(name, isPublished, properties, fields.Where(x => x.Id != fieldId).ToImmutableList());
-        }
-
         public Schema Publish()
         {
-            if (isPublished)
-            {
-                throw new DomainException("Schema is already published");
-            }
-
             return new Schema(name, true, properties, fields);
         }
 
         public Schema Unpublish()
         {
-            if (!isPublished)
-            {
-                throw new DomainException("Schema is not published");
-            }
-
             return new Schema(name, false, properties, fields);
+        }
+
+        public Schema DeleteField(long fieldId)
+        {
+            var newFields = fields.Where(x => x.Id != fieldId).ToImmutableList();
+
+            return new Schema(name, isPublished, properties, newFields);
+        }
+
+        public Schema UpdateField(long fieldId, Func<Field, Field> updater)
+        {
+            Guard.NotNull(updater, nameof(updater));
+
+            var newFields = fields.Select(f => f.Id == fieldId ? updater(f) ?? f : f).ToImmutableList();
+
+            return new Schema(name, isPublished, properties, newFields);
         }
 
         public Schema ReorderFields(List<long> ids)
@@ -172,75 +154,18 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new Schema(name, isPublished, properties, newFields);
         }
 
-        public Schema UpdateField(long fieldId, Func<Field, Field> updater)
-        {
-            Guard.NotNull(updater, nameof(updater));
-
-            if (!fieldsById.TryGetValue(fieldId, out var field))
-            {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
-            }
-
-            var newField = updater(field);
-
-            return AddOrUpdateField(newField);
-        }
-
-        public Schema AddOrUpdateField(Field field)
+        public Schema AddField(Field field)
         {
             Guard.NotNull(field, nameof(field));
 
-            if (fieldsById.Values.Any(f => f.Name == field.Name && f.Id != field.Id))
+            if (fieldsByName.ContainsKey(field.Name) || fieldsById.ContainsKey(field.Id))
             {
-                throw new ValidationException($"A field with name '{field.Name}' already exists.");
+                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
 
-            ImmutableList<Field> newFields;
-
-            if (fieldsById.ContainsKey(field.Id))
-            {
-                newFields = fields.Select(f => f.Id == field.Id ? field : f).ToImmutableList();
-            }
-            else
-            {
-                newFields = fields.Add(field);
-            }
+            var newFields = fields.Add(field);
 
             return new Schema(name, isPublished, properties, newFields);
-        }
-
-        public EdmComplexType BuildEdmType(PartitionResolver partitionResolver, Func<EdmComplexType, EdmComplexType> typeResolver)
-        {
-            Guard.NotNull(typeResolver, nameof(typeResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var schemaName = Name.ToPascalCase();
-
-            var edmType = new EdmComplexType("Squidex", schemaName);
-
-            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
-            {
-                field.AddToEdmType(edmType, partitionResolver, schemaName, typeResolver);
-            }
-
-            return edmType;
-        }
-
-        public JsonSchema4 BuildJsonSchema(PartitionResolver partitionResolver, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
-        {
-            Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var schemaName = Name.ToPascalCase();
-
-            var schema = new JsonSchema4 { Type = JsonObjectType.Object };
-
-            foreach (var field in fieldsByName.Values.Where(x => !x.IsHidden))
-            {
-                field.AddToJsonSchema(schema, partitionResolver, schemaName, schemaResolver);
-            }
-
-            return schema;
         }
     }
 }

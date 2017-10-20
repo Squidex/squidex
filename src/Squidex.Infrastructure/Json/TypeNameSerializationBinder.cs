@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Json
 
         public override Type BindToType(string assemblyName, string typeName)
         {
-            var type = typeNameRegistry.GetType(typeName);
+            var type = typeNameRegistry.GetTypeOrNull(typeName);
 
             return type ?? base.BindToType(assemblyName, typeName);
         }
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Json
         {
             assemblyName = null;
 
-            var name = typeNameRegistry.GetName(serializedType);
+            var name = typeNameRegistry.GetNameOrNull(serializedType);
 
             if (name != null)
             {

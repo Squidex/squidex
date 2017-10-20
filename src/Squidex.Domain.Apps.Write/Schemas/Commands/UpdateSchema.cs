@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
         {
             if (Properties == null)
             {
-                errors.Add(new ValidationError("Properties must be specified", nameof(Properties)));
+                errors.Add(new ValidationError("Properties must be specified.", nameof(Properties)));
             }
         }
     }

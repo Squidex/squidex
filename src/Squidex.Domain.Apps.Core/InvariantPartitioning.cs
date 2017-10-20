@@ -13,22 +13,9 @@ using System.Linq;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public sealed class InvariantPartitioning : IFieldPartitioning
+    public sealed class InvariantPartitioning : IFieldPartitioning, IFieldPartitionItem
     {
         public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
-
-        private readonly InvariantItem invariantItem = new InvariantItem();
-
-        private sealed class InvariantItem : IFieldPartitionItem
-        {
-            public string Key { get; } = "iv";
-
-            public string Name { get; } = "Invariant";
-
-            public bool IsOptional { get; } = false;
-
-            public IEnumerable<string> Fallback { get; } = Enumerable.Empty<string>();
-        }
 
         public int Count
         {
@@ -37,7 +24,27 @@ namespace Squidex.Domain.Apps.Core
 
         public IFieldPartitionItem Master
         {
-            get { return invariantItem; }
+            get { return this; }
+        }
+
+        string IFieldPartitionItem.Key
+        {
+            get { return "iv"; }
+        }
+
+        string IFieldPartitionItem.Name
+        {
+            get { return "Invariant"; }
+        }
+
+        bool IFieldPartitionItem.IsOptional
+        {
+            get { return false; }
+        }
+
+        IEnumerable<string> IFieldPartitionItem.Fallback
+        {
+            get { return Enumerable.Empty<string>(); }
         }
 
         private InvariantPartitioning()
@@ -48,19 +55,19 @@ namespace Squidex.Domain.Apps.Core
         {
             var isFound = string.Equals(key, "iv", StringComparison.OrdinalIgnoreCase);
 
-            item = isFound ? invariantItem : null;
+            item = isFound ? this : null;
 
             return isFound;
         }
 
         IEnumerator<IFieldPartitionItem> IEnumerable<IFieldPartitionItem>.GetEnumerator()
         {
-            yield return invariantItem;
+            yield return this;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            yield return invariantItem;
+            yield return this;
         }
     }
 }

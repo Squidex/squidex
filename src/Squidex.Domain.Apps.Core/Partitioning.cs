@@ -41,5 +41,10 @@ namespace Squidex.Domain.Apps.Core
         {
             return Key.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return Key;
+        }
     }
 }

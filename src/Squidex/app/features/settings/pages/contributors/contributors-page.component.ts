@@ -58,12 +58,7 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     public maxContributors = -1;
 
     public usersDataSource: UsersDataSource;
-    public usersPermissions = [
-        'Owner',
-        'Developer',
-        'Editor',
-        'Reader'
-    ];
+    public usersPermissions = [ 'Owner', 'Developer', 'Editor' ];
 
     public get canAddContributor() {
         return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.contributors.length < this.maxContributors);

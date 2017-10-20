@@ -22,21 +22,21 @@ namespace Squidex.Domain.Apps.Core
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE, Language.EN);
         private readonly Schema schema =
             Schema.Create("my-schema", new SchemaProperties())
-                .AddOrUpdateField(new JsonField(1, "my-json", Partitioning.Invariant,
+                .AddField(new JsonField(1, "my-json", Partitioning.Invariant,
                     new JsonFieldProperties()))
-                .AddOrUpdateField(new StringField(2, "my-string", Partitioning.Language,
+                .AddField(new StringField(2, "my-string", Partitioning.Language,
                     new StringFieldProperties { DefaultValue = "en-string" }))
-                .AddOrUpdateField(new NumberField(3, "my-number", Partitioning.Invariant,
+                .AddField(new NumberField(3, "my-number", Partitioning.Invariant,
                     new NumberFieldProperties { DefaultValue = 123 }))
-                .AddOrUpdateField(new AssetsField(4, "my-assets", Partitioning.Invariant,
+                .AddField(new AssetsField(4, "my-assets", Partitioning.Invariant,
                     new AssetsFieldProperties()))
-                .AddOrUpdateField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
+                .AddField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
                     new BooleanFieldProperties { DefaultValue = true }))
-                .AddOrUpdateField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
+                .AddField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
                     new DateTimeFieldProperties { DefaultValue = Now }))
-                .AddOrUpdateField(new ReferencesField(7, "my-references", Partitioning.Invariant,
+                .AddField(new ReferencesField(7, "my-references", Partitioning.Invariant,
                     new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
-                .AddOrUpdateField(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
+                .AddField(new GeolocationField(8, "my-geolocation", Partitioning.Invariant,
                     new GeolocationFieldProperties()));
 
         [Fact]
@@ -60,14 +60,12 @@ namespace Squidex.Domain.Apps.Core
 
             Assert.Equal(Now, InstantPattern.General.Parse((string)data["my-datetime"]["iv"]).Value);
 
-            Assert.Equal(true, (bool)data["my-boolean"]["iv"]);
+            Assert.True((bool)data["my-boolean"]["iv"]);
         }
 
         [Fact]
         private void Should_also_enrich_with_default_values_when_string_is_empty()
         {
-            var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
-
             var data =
                 new NamedContentData()
                     .AddField("my-string",

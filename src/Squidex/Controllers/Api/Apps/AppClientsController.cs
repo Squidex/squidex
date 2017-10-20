@@ -22,9 +22,10 @@ namespace Squidex.Controllers.Api.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [MustBeAppOwner]
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
+    [MustBeAppOwner]
     [SwaggerTag(nameof(Apps))]
     public sealed class AppClientsController : ControllerBase
     {
@@ -50,7 +51,7 @@ namespace Squidex.Controllers.Api.Apps
         [ApiCosts(1)]
         public IActionResult GetClients(string app)
         {
-            var response = App.Clients.Select(x => SimpleMapper.Map(x, new ClientDto())).ToList();
+            var response = App.Clients.Select(x => SimpleMapper.Map(x.Value, new ClientDto { Id = x.Key })).ToList();
 
             Response.Headers["ETag"] = new StringValues(App.Version.ToString());
 

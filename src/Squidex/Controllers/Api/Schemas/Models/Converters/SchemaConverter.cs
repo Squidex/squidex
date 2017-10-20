@@ -6,10 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -18,43 +15,6 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 {
     public static class SchemaConverter
     {
-        private static readonly Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>> Factories =
-            new Dictionary<Type, Func<FieldProperties, FieldPropertiesDto>>
-            {
-                {
-                    typeof(NumberFieldProperties),
-                    p => Convert((NumberFieldProperties)p)
-                },
-                {
-                    typeof(DateTimeFieldProperties),
-                    p => Convert((DateTimeFieldProperties)p)
-                },
-                {
-                    typeof(JsonFieldProperties),
-                    p => Convert((JsonFieldProperties)p)
-                },
-                {
-                    typeof(StringFieldProperties),
-                    p => Convert((StringFieldProperties)p)
-                },
-                {
-                    typeof(BooleanFieldProperties),
-                    p => Convert((BooleanFieldProperties)p)
-                },
-                {
-                    typeof(GeolocationFieldProperties),
-                    p => Convert((GeolocationFieldProperties)p)
-                },
-                {
-                    typeof(AssetsFieldProperties),
-                    p => Convert((AssetsFieldProperties)p)
-                },
-                {
-                    typeof(ReferencesFieldProperties),
-                    p => Convert((ReferencesFieldProperties)p)
-                }
-            };
-
         public static SchemaDto ToModel(this ISchemaEntity entity)
         {
             var dto = new SchemaDto { Properties = new SchemaPropertiesDto() };
@@ -78,13 +38,13 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
 
             foreach (var field in entity.SchemaDef.Fields)
             {
-                var fieldPropertiesDto = Factories[field.RawProperties.GetType()](field.RawProperties);
+                var fieldPropertiesDto = FieldPropertiesDtoFactory.Create(field.RawProperties);
                 var fieldInstanceDto = SimpleMapper.Map(field,
                     new FieldDto
                     {
                         FieldId = field.Id,
                         Properties = fieldPropertiesDto,
-                        Partitioning = field.Paritioning.Key
+                        Partitioning = field.Partitioning.Key
                     });
 
                 dto.Fields.Add(fieldInstanceDto);
@@ -116,72 +76,6 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
 
             return command;
-        }
-
-        private static FieldPropertiesDto Convert(BooleanFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new BooleanFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(DateTimeFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new DateTimeFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(JsonFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new JsonFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(GeolocationFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new GeolocationFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(AssetsFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new AssetsFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(ReferencesFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new ReferencesFieldPropertiesDto());
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(StringFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new StringFieldPropertiesDto());
-
-            if (source.AllowedValues != null)
-            {
-                result.AllowedValues = source.AllowedValues.ToArray();
-            }
-
-            return result;
-        }
-
-        private static FieldPropertiesDto Convert(NumberFieldProperties source)
-        {
-            var result = SimpleMapper.Map(source, new NumberFieldPropertiesDto());
-
-            if (source.AllowedValues != null)
-            {
-                result.AllowedValues = source.AllowedValues.ToArray();
-            }
-
-            return result;
         }
     }
 }

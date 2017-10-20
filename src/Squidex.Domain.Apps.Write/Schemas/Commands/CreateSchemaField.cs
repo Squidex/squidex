@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands
@@ -38,12 +39,21 @@ namespace Squidex.Domain.Apps.Write.Schemas.Commands
 
             if (!Name.IsPropertyName())
             {
-                errors.Add(new ValidationError("Name must be a valid property name", $"{prefix}.{nameof(Name)}"));
+                errors.Add(new ValidationError("Name must be a valid property name.", $"{prefix}.{nameof(Name)}"));
             }
 
             if (Properties == null)
             {
                 errors.Add(new ValidationError("Properties must be defined.", $"{prefix}.{nameof(Properties)}"));
+            }
+            else
+            {
+                var propertyErrors = FieldPropertiesValidator.Validate(Properties);
+
+                foreach (var error in propertyErrors)
+                {
+                    errors.Add(error);
+                }
             }
         }
     }

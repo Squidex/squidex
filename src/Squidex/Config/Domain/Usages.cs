@@ -20,19 +20,21 @@ namespace Squidex.Config.Domain
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<EventConsumerCleaner>().CleanAsync().Wait();
+            var services = app.ApplicationServices;
 
-            var consumers = app.ApplicationServices.GetServices<IEventConsumer>();
+            services.GetService<EventConsumerCleaner>().CleanAsync().Wait();
+
+            var consumers = services.GetServices<IEventConsumer>();
 
             foreach (var consumer in consumers)
             {
-                var actor = app.ApplicationServices.GetService<EventConsumerActor>();
+                var actor = services.GetService<EventConsumerActor>();
 
                 if (actor != null)
                 {
                     actor.SubscribeAsync(consumer);
 
-                    app.ApplicationServices.GetService<RemoteActors>().Connect(consumer.Name, actor);
+                    services.GetService<RemoteActors>().Connect(consumer.Name, actor);
                 }
             }
 

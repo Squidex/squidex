@@ -7,10 +7,11 @@
 // ==========================================================================
 
 using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        public string Schema { get; set; }
+        public BsonDocument SchemaDocument { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -78,26 +79,26 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             get { return schema.Value; }
         }
 
-        public void SerializeSchema(Schema newSchema, SchemaJsonSerializer serializer)
+        public void SerializeSchema(Schema newSchema, JsonSerializer serializer)
         {
-            Schema = serializer.Serialize(newSchema).ToString();
+            SchemaDocument = JObject.FromObject(newSchema, serializer).ToBson();
             schema = new Lazy<Schema>(() => newSchema);
 
             IsPublished = newSchema.IsPublished;
         }
 
-        public void UpdateSchema(SchemaJsonSerializer serializer, Func<Schema, Schema> updater)
+        public void UpdateSchema(JsonSerializer serializer, Func<Schema, Schema> updater)
         {
             DeserializeSchema(serializer);
 
             SerializeSchema(updater(schema.Value), serializer);
         }
 
-        public void DeserializeSchema(SchemaJsonSerializer serializer)
+        public void DeserializeSchema(JsonSerializer serializer)
         {
             if (schema == null)
             {
-                schema = new Lazy<Schema>(() => Schema != null ? serializer.Deserialize(JObject.Parse(Schema)) : null);
+                schema = new Lazy<Schema>(() => schema != null ? SchemaDocument.ToJson().ToObject<Schema>(serializer) : null);
             }
         }
     }

@@ -50,8 +50,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
             }
 
-            newProperties.Validate(() => $"Cannot update field with id '{Id}', because the settings are invalid.");
-
             return typedProperties;
         }
     }

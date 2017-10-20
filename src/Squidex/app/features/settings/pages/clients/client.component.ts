@@ -36,13 +36,15 @@ export class ClientComponent extends ComponentBase {
     public revoking = new EventEmitter();
 
     @Output()
-    public changing = new EventEmitter<boolean>();
+    public updating = new EventEmitter<boolean>();
 
     @Input()
     public appName: string;
 
     @Input()
     public client: AppClientDto;
+
+    public clientPermissions = [ 'Developer', 'Editor', 'Reader' ];
 
     public isRenaming = false;
 

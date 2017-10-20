@@ -27,7 +27,7 @@ namespace Squidex.Controllers.UI.Profile
         }
 
         [HttpGet]
-        [Route("/account/portal")]
+        [Route("/account/portal/")]
         public async Task<IActionResult> Portal()
         {
             var userId = User.FindFirst(OpenIdClaims.Subject).Value;

@@ -70,13 +70,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         {
             return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
             {
-                return collection.CreateAsync(@event, headers, x =>
+                return collection.CreateAsync(@event, headers, content =>
                 {
-                    x.SchemaId = @event.SchemaId.Id;
+                    content.SchemaId = @event.SchemaId.Id;
 
-                    SimpleMapper.Map(@event, x);
+                    SimpleMapper.Map(@event, content);
 
-                    x.SetData(schema.SchemaDef, @event.Data);
+                    var idData = @event.Data?.ToIdModel(schema.SchemaDef, true);
+
+                    content.DataText = idData?.ToFullText();
+                    content.DataDocument = idData?.ToBsonDocument(serializer);
+                    content.ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef);
                 });
             });
         }
@@ -85,10 +89,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         {
             return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
             {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.SetData(schema.SchemaDef, @event.Data);
-                });
+                var idData = @event.Data.ToIdModel(schema.SchemaDef, true);
+
+                return collection.UpdateOneAsync(
+                    Filter.Eq(x => x.Id, @event.ContentId),
+                    Update
+                        .Set(x => x.DataText, idData.ToFullText())
+                        .Set(x => x.DataDocument, idData.ToBsonDocument(serializer))
+                        .Set(x => x.ReferencedIds, idData.ToReferencedIds(schema.SchemaDef))
+                        .Set(x => x.LastModified, headers.Timestamp())
+                        .Set(x => x.LastModifiedBy, @event.Actor)
+                        .Set(x => x.Version, headers.EventStreamNumber()));
             });
         }
 
@@ -96,10 +107,13 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         {
             return ForAppIdAsync(@event.AppId.Id, collection =>
             {
-                return collection.UpdateAsync(@event, headers, x =>
-                {
-                    x.Status = @event.Status;
-                });
+                return collection.UpdateOneAsync(
+                    Filter.Eq(x => x.Id, @event.ContentId),
+                    Update
+                        .Set(x => x.Status, @event.Status)
+                        .Set(x => x.LastModified, headers.Timestamp())
+                        .Set(x => x.LastModifiedBy, @event.Actor)
+                        .Set(x => x.Version, headers.EventStreamNumber()));
             });
         }
 

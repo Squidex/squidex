@@ -15,6 +15,8 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Pipeline.Swagger;
 
+#pragma warning disable RECS0033 // Convert 'if' to '||' expression
+
 namespace Squidex.Config.Swagger
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor

@@ -1,0 +1,22 @@
+<div [formGroup]="editForm">
+    <div class="form-group row">
+        <label class="col col-3 col-form-checkbox-label" for="field-required">Required</label>
+
+        <div class="col col-6">
+            <input type="checkbox" class="form-check-input" id="field-required" formControlName="isRequired" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label">Items</label>
+
+        <div class="col col-3 minlength-col">
+            <input type="number" class="form-control" id="field-min-items" formControlName="minItems" placeholder="Min Items" />
+            
+            <label class="col-form-label minitems-label">-</label>
+        </div>
+        <div class="col col-3">
+            <input type="number" class="form-control" id="field-max-items" formControlName="maxItems" placeholder="Max Items" />
+        </div>
+    </div>
+</div>

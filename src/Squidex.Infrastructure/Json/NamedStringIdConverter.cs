@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Json
 
             if (parts.Length < 2)
             {
-                throw new JsonException("Named id must have more than 2 parts divided by colon");
+                throw new JsonException("Named id must have more than 2 parts divided by colon.");
             }
 
             return new NamedId<string>(parts[0], string.Join(",", parts.Skip(1)));

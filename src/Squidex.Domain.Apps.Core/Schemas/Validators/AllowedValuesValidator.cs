@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Validators
 
             if (!allowedValues.Contains(typedValue))
             {
-                addError("<FIELD> is not an allowed value");
+                addError("<FIELD> is not an allowed value.");
             }
 
             return TaskHelper.Done;

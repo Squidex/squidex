@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required" });
+                new[] { "<FIELD> is required." });
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync("invalid", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value" });
+                new[] { "<FIELD> is not a valid value." });
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 reference(s)" });
+                new[] { "<FIELD> must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 reference(s)" });
+                new[] { "<FIELD> must have not more than 1 item(s)." });
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.InvalidContext(referenceId));
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> contains invalid reference '{referenceId}'" });
+                new[] { $"<FIELD> contains invalid reference '{referenceId}'." });
         }
 
         [Fact]

@@ -1,0 +1,18 @@
+﻿// ==========================================================================
+//  AppPermission.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+namespace Squidex.Domain.Apps.Core.Apps
+{
+    public enum AppPermission
+    {
+        Owner,
+        Developer,
+        Editor,
+        Reader
+    }
+}

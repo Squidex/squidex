@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                     new ValidationError($"An app with name '{command.Name}' already exists",
                         nameof(CreateApp.Name));
 
-                throw new ValidationException("Cannot create a new app", error);
+                throw new ValidationException("Cannot create a new app.", error);
             }
 
             await handler.CreateAsync<AppDomainObject>(context, a =>
@@ -70,10 +70,10 @@ namespace Squidex.Domain.Apps.Write.Apps
             if (await userResolver.FindByIdAsync(command.ContributorId) == null)
             {
                 var error =
-                    new ValidationError("Cannot find contributor the contributor",
+                    new ValidationError("Cannot find contributor the contributor.",
                         nameof(AssignContributor.ContributorId));
 
-                throw new ValidationException("Cannot assign contributor to app", error);
+                throw new ValidationException("Cannot assign contributor to app.", error);
             }
 
             await handler.UpdateAsync<AppDomainObject>(context, a =>
@@ -85,9 +85,9 @@ namespace Squidex.Domain.Apps.Write.Apps
 
                 if (maxContributors > 0 && a.ContributorCount > oldContributors && a.ContributorCount > maxContributors)
                 {
-                    var error = new ValidationError("You have reached your max number of contributors");
+                    var error = new ValidationError("You have reached your max number of contributors.");
 
-                    throw new ValidationException("Cannot assign contributor to app", error);
+                    throw new ValidationException("Cannot assign contributor to app.", error);
                 }
             });
         }
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                     new ValidationError($"The plan '{command.PlanId}' does not exists",
                         nameof(CreateApp.Name));
 
-                throw new ValidationException("Cannot change plan", error);
+                throw new ValidationException("Cannot change plan.", error);
             }
 
             return handler.UpdateAsync<AppDomainObject>(context, async a =>

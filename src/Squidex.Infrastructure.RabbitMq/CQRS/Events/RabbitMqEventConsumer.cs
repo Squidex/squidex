@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
-            channel = new Lazy<IModel>(() => connection.Value.CreateModel());
+            channel = new Lazy<IModel>(connection.Value.CreateModel);
 
             this.exchange = exchange;
             this.eventsFilter = eventsFilter;

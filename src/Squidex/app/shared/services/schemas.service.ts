@@ -31,7 +31,8 @@ export const fieldTypes: string[] = [
     'Json',
     'Number',
     'References',
-    'String'
+    'String',
+    'Tags'
 ];
 
 export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
@@ -61,6 +62,9 @@ export function createProperties(fieldType: string, values: Object | null = null
             break;
         case 'Assets':
             properties = new AssetsFieldPropertiesDto(null, null, null, false, false);
+            break;
+        case 'Tags':
+            properties = new TagsFieldPropertiesDto(null, null, null, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -585,6 +589,47 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
             return `${value.length} Asset(s)`;
         } else {
             return '0 Assets';
+        }
+    }
+
+    public createValidators(isOptional: boolean): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (this.isRequired && !isOptional) {
+            validators.push(Validators.required);
+        }
+
+        if (this.minItems) {
+            validators.push(Validators.minLength(this.minItems));
+        }
+
+        if (this.maxItems) {
+            validators.push(Validators.maxLength(this.maxItems));
+        }
+
+        return validators;
+    }
+}
+
+export class TagsFieldPropertiesDto extends FieldPropertiesDto {
+    constructor(label: string | null, hints: string | null, placeholder: string | null,
+        isRequired: boolean,
+        isListField: boolean,
+        public readonly minItems?: number,
+        public readonly maxItems?: number
+    ) {
+        super('Tags', label, hints, placeholder, isRequired, isListField);
+    }
+
+    public formatValue(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        if (value.length) {
+            return value.join(', ');
+        } else {
+            return '';
         }
     }
 

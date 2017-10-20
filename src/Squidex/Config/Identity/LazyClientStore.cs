@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -53,7 +52,7 @@ namespace Squidex.Config.Identity
 
             var app = await appProvider.FindAppByNameAsync(token[0]);
 
-            var appClient = app?.Clients.FirstOrDefault(x => x.Id == token[1]);
+            var appClient = app?.Clients.GetOrDefault(token[1]);
 
             if (appClient == null)
             {

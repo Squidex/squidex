@@ -6,13 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas.Validators;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -57,27 +53,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return value.ToString();
         }
 
-        protected override void PrepareJsonSchema(JsonProperty jsonProperty, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public override T Accept<T>(IFieldVisitor<T> visitor)
         {
-            jsonProperty.Type = JsonObjectType.String;
-
-            jsonProperty.MinLength = Properties.MinLength;
-            jsonProperty.MaxLength = Properties.MaxLength;
-
-            if (Properties.AllowedValues != null)
-            {
-                var names = jsonProperty.EnumerationNames = jsonProperty.EnumerationNames ?? new Collection<string>();
-
-                foreach (var value in Properties.AllowedValues)
-                {
-                    names.Add(value);
-                }
-            }
-        }
-
-        protected override IEdmTypeReference CreateEdmType()
-        {
-            return EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, !Properties.IsRequired);
+            return visitor.Visit(this);
         }
     }
 }

@@ -16,7 +16,8 @@ import {
     JsonFieldPropertiesDto,
     NumberFieldPropertiesDto,
     ReferencesFieldPropertiesDto,
-    StringFieldPropertiesDto
+    StringFieldPropertiesDto,
+    TagsFieldPropertiesDto
 } from './../';
 
 describe('FieldDto', () => {
@@ -82,6 +83,26 @@ describe('AssetsField', () => {
 
     it('should return zero formatting if other type', () => {
         expect(field.formatValue(1)).toBe('0 Assets');
+    });
+});
+
+describe('TagsField', () => {
+    const field = createField(new TagsFieldPropertiesDto(null, null, null, true, false, 1, 1));
+
+    it('should create validators', () => {
+        expect(field.createValidators(false).length).toBe(3);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(field.formatValue(null)).toBe('');
+    });
+
+    it('should format to asset count', () => {
+        expect(field.formatValue(['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    });
+
+    it('should return zero formatting if other type', () => {
+        expect(field.formatValue(1)).toBe('');
     });
 });
 

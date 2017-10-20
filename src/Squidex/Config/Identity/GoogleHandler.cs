@@ -9,6 +9,7 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
@@ -17,7 +18,7 @@ namespace Squidex.Config.Identity
 {
     public sealed class GoogleHandler : OAuthEvents
     {
-        public override Task RedirectToAuthorizationEndpoint(OAuthRedirectToAuthorizationContext context)
+        public override Task RedirectToAuthorizationEndpoint(RedirectContext<OAuthOptions> context)
         {
             context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
 

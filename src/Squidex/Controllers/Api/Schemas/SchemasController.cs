@@ -27,6 +27,7 @@ namespace Squidex.Controllers.Api.Schemas
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Schemas))]
@@ -190,7 +191,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [MustBeAppDeveloper]
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/publish")]
+        [Route("apps/{app}/schemas/{name}/publish/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PublishSchema(string app, string name)
@@ -212,7 +213,7 @@ namespace Squidex.Controllers.Api.Schemas
         /// </returns>
         [MustBeAppDeveloper]
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/unpublish")]
+        [Route("apps/{app}/schemas/{name}/unpublish/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishSchema(string app, string name)
