@@ -139,6 +139,17 @@ namespace Squidex.Domain.Apps.Core.Schemas.JsonSchema
             });
         }
 
+        public JsonProperty Visit(TagsField field)
+        {
+            return CreateProperty(field, jsonProperty =>
+            {
+                var itemSchema = schemaResolver("TagsItem", new JsonSchema4 { Type = JsonObjectType.String });
+
+                jsonProperty.Type = JsonObjectType.Array;
+                jsonProperty.Item = itemSchema;
+            });
+        }
+
         private static JsonProperty CreateProperty(Field field, Action<JsonProperty> updater)
         {
             var property = new JsonProperty { IsRequired = field.RawProperties.IsRequired };

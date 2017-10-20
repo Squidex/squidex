@@ -16,12 +16,14 @@ namespace Squidex.Domain.Apps.Core
         public void Should_provide_invariant_instance()
         {
             Assert.Equal("invariant", Partitioning.Invariant.Key);
+            Assert.Equal("invariant", Partitioning.Invariant.ToString());
         }
 
         [Fact]
         public void Should_provide_language_instance()
         {
             Assert.Equal("language", Partitioning.Language.Key);
+            Assert.Equal("language", Partitioning.Language.ToString());
         }
 
         [Fact]

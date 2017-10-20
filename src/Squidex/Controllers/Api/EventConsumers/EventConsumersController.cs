@@ -19,8 +19,9 @@ using Squidex.Pipeline;
 
 namespace Squidex.Controllers.Api.EventConsumers
 {
-    [MustBeAdministrator]
+    [ApiAuthorize]
     [ApiExceptionFilter]
+    [MustBeAdministrator]
     [SwaggerIgnore]
     public sealed class EventConsumersController : Controller
     {

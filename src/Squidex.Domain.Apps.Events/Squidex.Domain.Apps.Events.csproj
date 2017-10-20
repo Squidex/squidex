@@ -11,7 +11,7 @@
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NodaTime" Version="2.2.0" />
+    <PackageReference Include="NodaTime" Version="2.2.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />

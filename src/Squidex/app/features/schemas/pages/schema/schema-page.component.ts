@@ -74,7 +74,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
             name: ['',
                 [
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
                 ]],
             isLocalizable: [false]
         });

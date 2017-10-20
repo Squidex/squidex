@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Read.Apps
 {

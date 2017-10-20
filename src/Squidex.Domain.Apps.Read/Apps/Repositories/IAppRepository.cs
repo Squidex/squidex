@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Apps.Repositories
 {
@@ -20,7 +19,5 @@ namespace Squidex.Domain.Apps.Read.Apps.Repositories
         Task<IAppEntity> FindAppAsync(Guid appId);
 
         Task<IAppEntity> FindAppAsync(string name);
-
-        void SubscribeOnChanged(Action<NamedId<Guid>> subscriber);
     }
 }

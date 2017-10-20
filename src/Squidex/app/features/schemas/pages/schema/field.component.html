@@ -159,6 +159,9 @@
                     <div *ngSwitchCase="'References'">
                         <sqx-references-validation [editForm]="editForm" [properties]="field.properties" [schemas]="schemas"></sqx-references-validation>
                     </div>
+                    <div *ngSwitchCase="'Tags'">
+                        <sqx-tags-validation [editForm]="editForm" [properties]="field.properties"></sqx-tags-validation>
+                    </div>
                 </div>
             </div>
 
@@ -187,6 +190,9 @@
                     </div>
                     <div *ngSwitchCase="'References'">
                         <sqx-references-ui [editForm]="editForm" [properties]="field.properties"></sqx-references-ui>
+                    </div>
+                    <div *ngSwitchCase="'Tags'">
+                        <sqx-tags-ui [editForm]="editForm" [properties]="field.properties"></sqx-tags-ui>
                     </div>
                 </div>
             </div>

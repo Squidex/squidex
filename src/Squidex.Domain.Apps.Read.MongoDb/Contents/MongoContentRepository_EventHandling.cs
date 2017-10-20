@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                     var idData = @event.Data?.ToIdModel(schema.SchemaDef, true);
 
                     content.DataText = idData?.ToFullText();
-                    content.DataDocument = idData?.ToBsonDocument();
+                    content.DataDocument = idData?.ToBsonDocument(serializer);
                     content.ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef);
                 });
             });
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
                     Filter.Eq(x => x.Id, @event.ContentId),
                     Update
                         .Set(x => x.DataText, idData.ToFullText())
-                        .Set(x => x.DataDocument, idData.ToBsonDocument())
+                        .Set(x => x.DataDocument, idData.ToBsonDocument(serializer))
                         .Set(x => x.ReferencedIds, idData.ToReferencedIds(schema.SchemaDef))
                         .Set(x => x.LastModified, headers.Timestamp())
                         .Set(x => x.LastModifiedBy, @event.Actor)

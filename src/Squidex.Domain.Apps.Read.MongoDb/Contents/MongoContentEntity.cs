@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -75,16 +76,16 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("rd")]
-        public List<Guid> ReferencedIdsDeleted { get; set; }
+        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
         NamedContentData IContentEntity.Data
         {
             get { return data; }
         }
 
-        public void ParseData(Schema schema)
+        public void ParseData(Schema schema, JsonSerializer serializer)
         {
-            data = DataDocument.ToData(schema, ReferencedIdsDeleted);
+            data = DataDocument.ToData(schema, ReferencedIdsDeleted, serializer);
         }
     }
 }

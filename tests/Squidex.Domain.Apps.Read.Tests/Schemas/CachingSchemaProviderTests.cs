@@ -44,6 +44,24 @@ namespace Squidex.Domain.Apps.Read.Schemas
         }
 
         [Fact]
+        public void Should_return_empty_for_events_filter()
+        {
+            Assert.Equal(string.Empty, sut.EventsFilter);
+        }
+
+        [Fact]
+        public void Should_return_empty_for_name()
+        {
+            Assert.Equal(typeof(CachingSchemaProvider).Name, sut.Name);
+        }
+
+        [Fact]
+        public void Should_do_nothing_when_clearing()
+        {
+            Assert.NotNull(sut.ClearAsync());
+        }
+
+        [Fact]
         public async Task Should_also_retrieve_schema_by_name_if_retrieved_by_id_before()
         {
             A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
@@ -70,7 +88,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         }
 
         [Fact]
-        public async Task Should_clear_cache_for_id_after_invalidating()
+        public async Task Should_clear_cache_for_id_after_update_event()
         {
             A.CallTo(() => repository.FindSchemaAsync(schemaId.Id))
                 .Returns(schemaV2);
@@ -79,7 +97,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
             await ProvideSchemaById(schemaV1);
 
-            sut.Invalidate(appId, schemaId);
+            sut.On(Envelope.Create(new FieldAdded { AppId = appId, SchemaId = schemaId })).Wait();
 
             await ProvideSchemaById(schemaV2);
 
@@ -87,7 +105,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
         }
 
         [Fact]
-        public async Task Should_clear_cache_for_name_after_invalidating()
+        public async Task Should_clear_cache_for_name_after_update_event()
         {
             A.CallTo(() => repository.FindSchemaAsync(appId.Id, schemaId.Name))
                 .Returns(schemaV2);
@@ -96,7 +114,7 @@ namespace Squidex.Domain.Apps.Read.Schemas
 
             await ProvideSchemaByName(schemaV1);
 
-            sut.Invalidate(appId, schemaId);
+            sut.On(Envelope.Create(new SchemaUpdated { AppId = appId, SchemaId = schemaId })).Wait();
 
             await ProvideSchemaByName(schemaV2);
 

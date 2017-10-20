@@ -68,6 +68,8 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
                     .AddField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties()))
+                    .AddField(new TagsField(11, "my-tags", Partitioning.Invariant,
+                        new TagsFieldProperties()))
                     .Publish();
 
             var deserialized = JToken.FromObject(schema, serializer).ToObject<Schema>(serializer);

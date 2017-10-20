@@ -9,18 +9,30 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 {
-    public class CachingAppProvider : CachingProviderBase, IAppProvider
+    public class CachingAppProvider : CachingProviderBase, IAppProvider, IEventConsumer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
-
         private readonly IAppRepository repository;
+
+        public string Name
+        {
+            get { return GetType().Name; }
+        }
+
+        public string EventsFilter
+        {
+            get { return string.Empty; }
+        }
 
         public CachingAppProvider(IMemoryCache cache, IAppRepository repository)
             : base(cache)
@@ -70,16 +82,26 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
             return result;
         }
 
-        public void Invalidate(NamedId<Guid> appId)
+        public Task On(Envelope<IEvent> @event)
         {
-            var cacheKeyById = BuildIdCacheKey(appId.Id);
-            var cacheKeyByName = BuildNameCacheKey(appId.Name);
+            void Remove(NamedId<Guid> id)
+            {
+                var cacheKeyById = BuildIdCacheKey(id.Id);
+                var cacheKeyByName = BuildNameCacheKey(id.Name);
 
-            Cache.Remove(cacheKeyById);
-            Cache.Remove(cacheKeyByName);
+                Cache.Remove(cacheKeyById);
+                Cache.Remove(cacheKeyByName);
 
-            Cache.Invalidate(cacheKeyById);
-            Cache.Invalidate(cacheKeyByName);
+                Cache.Invalidate(cacheKeyById);
+                Cache.Invalidate(cacheKeyByName);
+            }
+
+            if (@event.Payload is AppEvent appEvent)
+            {
+                Remove(appEvent.AppId);
+            }
+
+            return TaskHelper.Done;
         }
 
         private static string BuildNameCacheKey(string name)
@@ -90,6 +112,11 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
         private static string BuildIdCacheKey(Guid schemaId)
         {
             return $"App_Names_{schemaId}";
+        }
+
+        public Task ClearAsync()
+        {
+            return TaskHelper.Done;
         }
     }
 }

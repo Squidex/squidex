@@ -6,16 +6,15 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
-using Squidex.Shared.Identity;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Pipeline
 {
-    public sealed class MustBeAppReaderAttribute : AuthorizeAttribute
+    public sealed class MustBeAppReaderAttribute : AppPermissionAttribute
     {
         public MustBeAppReaderAttribute()
+            : base(AppPermission.Reader)
         {
-            Roles = SquidexRoles.AppReader;
         }
     }
 }

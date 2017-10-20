@@ -386,6 +386,17 @@ describe('SchemasService', () => {
                     properties: {
                         fieldType: 'References'
                     }
+                },
+                {
+                    fieldId: 9,
+                    name: 'field9',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'Tags'
+                    }
                 }
             ],
             scriptQuery: '<script-query>',
@@ -412,7 +423,8 @@ describe('SchemasService', () => {
                     new FieldDto(5, 'field5', true, true, true, 'language', createProperties('Json')),
                     new FieldDto(6, 'field6', true, true, true, 'language', createProperties('Geolocation')),
                     new FieldDto(7, 'field7', true, true, true, 'language', createProperties('Assets')),
-                    new FieldDto(8, 'field8', true, true, true, 'language', createProperties('References'))
+                    new FieldDto(8, 'field8', true, true, true, 'language', createProperties('References')),
+                    new FieldDto(9, 'field9', true, true, true, 'language', createProperties('Tags'))
                 ],
                 '<script-query>',
                 '<script-create>',

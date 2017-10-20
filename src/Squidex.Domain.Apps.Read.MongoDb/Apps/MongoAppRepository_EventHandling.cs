@@ -22,8 +22,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository
     {
-        private readonly List<Action<NamedId<Guid>>> subscribers = new List<Action<NamedId<Guid>>>();
-
         public string Name
         {
             get { return GetType().Name; }
@@ -32,11 +30,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         public string EventsFilter
         {
             get { return "^app-"; }
-        }
-
-        public void SubscribeOnChanged(Action<NamedId<Guid>> subscriber)
-        {
-            subscribers.Add(subscriber);
         }
 
         public Task On(Envelope<IEvent> @event)
@@ -144,11 +137,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 
                 a.ContributorIds = a.Contributors.Keys.ToList();
             });
-
-            foreach (var subscriber in subscribers)
-            {
-                subscriber(@event.AppId);
-            }
         }
     }
 }

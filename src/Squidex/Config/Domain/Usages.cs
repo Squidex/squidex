@@ -9,10 +9,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Read.Apps.Repositories;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events;
@@ -40,22 +36,6 @@ namespace Squidex.Config.Domain
 
                     services.GetService<RemoteActors>().Connect(consumer.Name, actor);
                 }
-            }
-
-            var appRepository = services.GetService<IAppRepository>();
-            var appProvider = services.GetService<IAppProvider>();
-
-            if (appProvider != null)
-            {
-                appRepository?.SubscribeOnChanged(appProvider.Invalidate);
-            }
-
-            var schemaRepository = services.GetService<ISchemaRepository>();
-            var schemaProvider = services.GetService<ISchemaProvider>();
-
-            if (schemaProvider != null)
-            {
-                schemaRepository?.SubscribeOnChanged(schemaProvider.Invalidate);
             }
 
             return app;
