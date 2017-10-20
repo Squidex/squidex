@@ -67,7 +67,7 @@ namespace Squidex.Controllers.ContentApi
                 }
 
                 return itemModel;
-            }).ToArray();
+            }).ToList();
 
             return Ok(response);
         }

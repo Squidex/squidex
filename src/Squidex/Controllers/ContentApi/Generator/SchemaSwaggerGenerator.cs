@@ -325,17 +325,9 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             var schema = new JsonSchema4
             {
-                Properties =
-                {
-                    ["items"] = new JsonProperty
-                    {
-                        Type = JsonObjectType.Array,
-                        IsRequired = true,
-                        Item = contentSchema,
-                        Description = $"The results of `{queryName}` custom query."
-                    }
-                },
-                Type = JsonObjectType.Object
+                Item = contentSchema,
+                Type = JsonObjectType.Array,
+                Description = $"The results of the {queryName} custom query."
             };
 
             return schema;
