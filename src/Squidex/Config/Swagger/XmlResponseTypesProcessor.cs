@@ -21,7 +21,7 @@ namespace Squidex.Config.Swagger
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
-        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Description>.*)", RegexOptions.Compiled);
+        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Summary>.*)", RegexOptions.Compiled);
 
         public async Task<bool> ProcessAsync(OperationProcessorContext context)
         {
@@ -42,7 +42,7 @@ namespace Squidex.Config.Swagger
                     operation.Responses[statusCode] = response;
                 }
 
-                response.Description = match.Groups["Description"].Value;
+                response.Description = match.Groups["Summary"].Value;
 
                 if (string.Equals(statusCode, "200", StringComparison.OrdinalIgnoreCase))
                 {

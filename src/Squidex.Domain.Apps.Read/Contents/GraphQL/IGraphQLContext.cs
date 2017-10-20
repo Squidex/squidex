@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public interface IGraphQLContext
     {
+        string AppName { get; }
+
         bool CanGenerateAssetSourceUrl { get; }
 
         IFieldPartitioning ResolvePartition(Partitioning key);

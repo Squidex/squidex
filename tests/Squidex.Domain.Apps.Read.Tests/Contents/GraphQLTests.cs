@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.TestData;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -82,8 +83,13 @@ namespace Squidex.Domain.Apps.Read.Contents
             var allSchemas = new List<ISchemaEntity> { schema };
 
             A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(allSchemas);
+            var customQuery = A.Fake<IQuery>();
+            A.CallTo(() => customQuery.Name).Returns("getDummy");
+            A.CallTo(() => customQuery.Execute(schema, new QueryContext(app, assetRepository, contentQuery, user), null))
+                .Returns(new List<IContentEntity>()); // todo: improve on this
 
-            sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository);
+            sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository,
+                new DefaultQueryProvider(new List<IQuery> { customQuery }));
         }
 
         [Theory]

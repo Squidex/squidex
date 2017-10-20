@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
@@ -29,6 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
         private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
         private readonly ISchemaRepository schemaRepository;
+        private readonly IQueryProvider queryModulesService;
 
         public string Name
         {
@@ -44,7 +46,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             IAssetRepository assetRepository,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator,
-            ISchemaRepository schemaRepository)
+            ISchemaRepository schemaRepository,
+            IQueryProvider queryModulesService)
             : base(cache)
         {
             Guard.NotNull(schemaRepository, nameof(schemaRepository));
@@ -56,6 +59,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             this.contentQuery = contentQuery;
             this.urlGenerator = urlGenerator;
             this.schemaRepository = schemaRepository;
+            this.queryModulesService = queryModulesService;
         }
 
         public Task ClearAsync()
@@ -99,7 +103,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
             {
                 var allSchemas = await schemaRepository.QueryAllAsync(app.Id);
 
-                modelContext = new GraphQLModel(app, allSchemas.Where(x => x.IsPublished), urlGenerator);
+                modelContext = new GraphQLModel(app, allSchemas.Where(x => x.IsPublished), urlGenerator, queryModulesService);
 
                 Cache.Set(cacheKey, modelContext, CacheDuration);
             }

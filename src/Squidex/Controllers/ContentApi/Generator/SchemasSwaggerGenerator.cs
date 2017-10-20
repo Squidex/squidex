@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
+using IQueryProvider = Squidex.Domain.Apps.Read.Contents.CustomQueries.IQueryProvider;
 
 namespace Squidex.Controllers.ContentApi.Generator
 {
@@ -28,16 +29,19 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly HttpContext context;
         private readonly SwaggerSettings settings;
         private readonly MyUrlsOptions urlOptions;
+        private readonly IQueryProvider queryProvider;
+        private SwaggerDocument document;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
         private SwaggerGenerator swaggerGenerator;
-        private SwaggerDocument document;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings,
+            IOptions<MyUrlsOptions> urlOptions, IQueryProvider queryProvider)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
+            this.queryProvider = queryProvider;
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -60,9 +64,13 @@ namespace Squidex.Controllers.ContentApi.Generator
         {
             var appBasePath = $"/content/{app.Name}";
 
-            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
+            foreach (var schemaEntity in schemas.Where(x => x.IsPublished))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
+                var generator = new SchemaSwaggerGenerator(document, appBasePath, schemaEntity.SchemaDef, AppendSchema,
+                    app.PartitionResolver);
+                generator.GenerateSchemaOperations();
+
+                generator.GenerateSchemaQueriesOperations(queryProvider.GetQueries(app, schemaEntity));
             }
         }
 
@@ -74,7 +82,8 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
             {
-                operation.Responses.Add("500", new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
+                operation.Responses.Add("500",
+                    new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
             }
         }
 
