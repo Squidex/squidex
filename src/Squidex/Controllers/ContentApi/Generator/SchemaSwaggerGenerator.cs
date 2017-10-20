@@ -63,7 +63,8 @@ namespace Squidex.Controllers.ContentApi.Generator
             };
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
+        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema,
+            Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
         {
             this.document = document;
 
@@ -75,7 +76,8 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             dataSchema = schemaResolver($"{schemaKey}Dto", schema.BuildJsonSchema(partitionResolver, schemaResolver));
 
-            contentSchema = schemaResolver($"{schemaKey}ContentDto", schemaBuilder.CreateContentSchema(schema, dataSchema));
+            contentSchema = schemaResolver($"{schemaKey}ContentDto",
+                schemaBuilder.CreateContentSchema(schema, dataSchema));
         }
 
         public void GenerateSchemaOperations()
@@ -83,7 +85,8 @@ namespace Squidex.Controllers.ContentApi.Generator
             document.Tags.Add(
                 new SwaggerTag
                 {
-                    Name = schemaName, Description = $"API to managed {schemaName} contents."
+                    Name = schemaName,
+                    Description = $"API to managed {schemaName} contents."
                 });
 
             var schemaOperations = new List<SwaggerOperations>
@@ -119,10 +122,11 @@ namespace Squidex.Controllers.ContentApi.Generator
 
                         operation.Description = query.DescriptionForSwagger;
 
-                        operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+                        operation.AddResponse("200", $"Results of {query.Name} custom query on {schemaName} retrieved.",
+                            CreateContentArrayResultSchema(query.Name, contentSchema));
                         operation.Tags = new List<string> { schemaName };
 
-                        foreach (var arg in query.ArgumentOptions.Arguments)
+                        foreach (var arg in query.ArgumentOptions)
                         {
                             operation.AddQueryParameter(arg.Name, arg.ObjectType, arg.Description);
                         }
@@ -146,7 +150,8 @@ namespace Squidex.Controllers.ContentApi.Generator
                 operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
                 operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
 
-                operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+                operation.AddResponse("200", $"{schemaName} content retrieved.",
+                    CreateContentsSchema(schemaName, contentSchema));
             });
         }
 
@@ -207,65 +212,71 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         private SwaggerOperations GenerateSchemaPublishOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/publish", operation =>
-            {
-                operation.OperationId = $"Publish{schemaKey}Content";
-                operation.Summary = $"Publish a {schemaName} content.";
-                operation.Security = EditorSecurity;
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/publish",
+                operation =>
+                {
+                    operation.OperationId = $"Publish{schemaKey}Content";
+                    operation.Summary = $"Publish a {schemaName} content.";
+                    operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item published.");
-            });
+                    operation.AddResponse("204", $"{schemaName} item published.");
+                });
         }
 
         private SwaggerOperations GenerateSchemaUnpublishOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/unpublish", operation =>
-            {
-                operation.OperationId = $"Unpublish{schemaKey}Content";
-                operation.Summary = $"Unpublish a {schemaName} content.";
-                operation.Security = EditorSecurity;
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/unpublish",
+                operation =>
+                {
+                    operation.OperationId = $"Unpublish{schemaKey}Content";
+                    operation.Summary = $"Unpublish a {schemaName} content.";
+                    operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item unpublished.");
-            });
+                    operation.AddResponse("204", $"{schemaName} item unpublished.");
+                });
         }
 
         private SwaggerOperations GenerateSchemaArchiveOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive", operation =>
-            {
-                operation.OperationId = $"Archive{schemaKey}Content";
-                operation.Summary = $"Archive a {schemaName} content.";
-                operation.Security = EditorSecurity;
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive",
+                operation =>
+                {
+                    operation.OperationId = $"Archive{schemaKey}Content";
+                    operation.Summary = $"Archive a {schemaName} content.";
+                    operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item restored.");
-            });
+                    operation.AddResponse("204", $"{schemaName} item restored.");
+                });
         }
 
         private SwaggerOperations GenerateSchemaRestoreOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/restore", operation =>
-            {
-                operation.OperationId = $"Restore{schemaKey}Content";
-                operation.Summary = $"Restore a {schemaName} content.";
-                operation.Security = EditorSecurity;
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/restore",
+                operation =>
+                {
+                    operation.OperationId = $"Restore{schemaKey}Content";
+                    operation.Summary = $"Restore a {schemaName} content.";
+                    operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item restored.");
-            });
+                    operation.AddResponse("204", $"{schemaName} item restored.");
+                });
         }
 
         private SwaggerOperations GenerateSchemaDeleteOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
-            {
-                operation.OperationId = $"Delete{schemaKey}Content";
-                operation.Summary = $"Delete a {schemaName} content.";
-                operation.Security = EditorSecurity;
+            return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/",
+                operation =>
+                {
+                    operation.OperationId = $"Delete{schemaKey}Content";
+                    operation.Summary = $"Delete a {schemaName} content.";
+                    operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} content deleted.");
-            });
+                    operation.AddResponse("204", $"{schemaName} content deleted.");
+                });
         }
 
-        private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
+        private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path,
+            Action<SwaggerOperation> updater)
         {
             var operations = document.Paths.GetOrAdd(path, k => new SwaggerOperations());
             var operation = new SwaggerOperation();
@@ -292,11 +303,36 @@ namespace Squidex.Controllers.ContentApi.Generator
                 {
                     ["total"] = new JsonProperty
                     {
-                        Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} contents."
+                        Type = JsonObjectType.Number,
+                        IsRequired = true,
+                        Description = $"The total number of {schemaName} contents."
                     },
                     ["items"] = new JsonProperty
                     {
-                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The {schemaName} contents."
+                        Type = JsonObjectType.Array,
+                        IsRequired = true,
+                        Item = contentSchema,
+                        Description = $"The {schemaName} contents."
+                    }
+                },
+                Type = JsonObjectType.Object
+            };
+
+            return schema;
+        }
+
+        private static JsonSchema4 CreateContentArrayResultSchema(string queryName, JsonSchema4 contentSchema)
+        {
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    ["items"] = new JsonProperty
+                    {
+                        Type = JsonObjectType.Array,
+                        IsRequired = true,
+                        Item = contentSchema,
+                        Description = $"The results of `{queryName}` custom query."
                     }
                 },
                 Type = JsonObjectType.Object

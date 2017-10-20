@@ -22,7 +22,6 @@ using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
-using Squidex.Extensibility;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 

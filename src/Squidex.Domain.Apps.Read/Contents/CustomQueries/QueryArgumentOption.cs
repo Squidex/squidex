@@ -8,11 +8,12 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 {
     public class QueryArgumentOption
     {
-        public QueryArgumentOption(string name, string description, object defaultValue)
+        public QueryArgumentOption(string name, string description, object defaultValue, QueryArgumentType argumentType)
         {
             Name = name;
             Description = description;
             DefaultValue = defaultValue;
+            ArgumentType = argumentType;
         }
 
         public string Name { get; }
@@ -21,23 +22,28 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 
         public object DefaultValue { get; }
 
-        public JsonObjectType ObjectType { get; private set; }
+        public QueryArgumentType ArgumentType { get; }
 
-        public void SetObjectType(IGraphType type)
+        public JsonObjectType ObjectType
         {
-            if (type is StringGraphType)
+            get
             {
-                ObjectType = JsonObjectType.String;
-            }
+                JsonObjectType result = JsonObjectType.Null;
 
-            if (type is IntGraphType)
-            {
-                ObjectType = JsonObjectType.Integer;
-            }
+                switch (ArgumentType)
+                {
+                    case QueryArgumentType.Boolean:
+                        result = JsonObjectType.Boolean;
+                        break;
+                    case QueryArgumentType.Number:
+                        result = JsonObjectType.Number;
+                        break;
+                    case QueryArgumentType.String:
+                        result = JsonObjectType.String;
+                        break;
+                }
 
-            if (type is BooleanGraphType)
-            {
-                ObjectType = JsonObjectType.Boolean;
+                return result;
             }
         }
     }

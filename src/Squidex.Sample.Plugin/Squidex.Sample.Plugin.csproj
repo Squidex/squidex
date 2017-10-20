@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Squidex.Extensibility\Squidex.Extensibility.csproj" />
+    <PackageReference Include="Autofac" Version="4.6.2" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Squidex.Domain.Apps.Read\Squidex.Domain.Apps.Read.csproj" />
+  </ItemGroup>
 </Project>

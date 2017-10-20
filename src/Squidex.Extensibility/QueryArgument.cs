@@ -18,7 +18,5 @@ namespace Squidex.Extensibility
         public string Description { get; }
 
         public Type ArgumentType { get; }
-
-
     }
 }

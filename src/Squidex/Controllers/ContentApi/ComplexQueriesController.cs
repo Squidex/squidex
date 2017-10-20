@@ -56,21 +56,18 @@ namespace Squidex.Controllers.ContentApi
             var context = new QueryContext(App, assetsRepository, contentQuery, User);
             var contents = await query.Execute(schema, context, HttpContext.Request.Query.ToDictionary(x => x.Key, x => (object)x.Value));
 
-            var response = new AssetsDto
+            var response = contents.Take(200).Select(item =>
             {
-                Total = contents.Count,
-                Items = contents.Take(200).Select(item =>
+                var itemModel = SimpleMapper.Map(item, new ContentDto());
+
+                if (item.Data != null)
                 {
-                    var itemModel = SimpleMapper.Map(item, new ContentDto());
+                    itemModel.Data =
+                        item.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
+                }
 
-                    if (item.Data != null)
-                    {
-                        itemModel.Data = item.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
-                    }
-
-                    return itemModel;
-                }).ToArray()
-            };
+                return itemModel;
+            }).ToArray();
 
             return Ok(response);
         }

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 
         string AssociatedToSchema { get; }
 
-        QueryArgumentOptions ArgumentOptions { get; }
+        IList<QueryArgumentOption> ArgumentOptions { get; }
 
         Task<IReadOnlyList<IContentEntity>> Execute(ISchemaEntity schema,
             QueryContext context,

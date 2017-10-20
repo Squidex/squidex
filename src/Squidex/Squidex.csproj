@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
@@ -10,7 +9,6 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
     <EmbeddedResource Include="Controllers\Api\Users\Assets\Avatar.png" />
@@ -18,17 +16,15 @@
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />
     <None Remove="Assets\**" />
-	<None Update="dockerfile">
+    <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Domain.Apps.Core\Squidex.Domain.Apps.Core.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
-    <ProjectReference Include="..\Squidex.Extensibility\Squidex.Extensibility.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
@@ -41,7 +37,6 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Write\Squidex.Domain.Apps.Write.csproj" />
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="1.0.0-rc1-final" />
     <PackageReference Include="Autofac" Version="4.6.1" />
@@ -63,7 +58,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration.Tools" Version="1.1.0-preview4-final" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.0" />
@@ -85,16 +80,13 @@
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
     <ItemGroup Condition=" '$(DocumentationFile)' != '' ">
       <_DocumentationFile Include="$(DocumentationFile)" />
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-    
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  
- </Project>
+</Project>

@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
 {
     public sealed class ContentQueryGraphType : ObjectGraphType
     {
-        public ContentQueryGraphType(IGraphQLContext graphQLContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, IQueryProvider queryProvider)
+        public ContentQueryGraphType(IGraphQLContext graphQLContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas,
+            IQueryProvider queryProvider)
         {
             AddAssetFind(graphQLContext);
             AddAssetsQuery(graphQLContext);
@@ -182,14 +183,15 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
             });
         }
 
-        private void AddCustomContentQueries(ISchemaEntity schema, IGraphType schemaType, string schemaName, IEnumerable<IQuery> customQueries)
+        private void AddCustomContentQueries(ISchemaEntity schema, IGraphType schemaType, string schemaName,
+            IEnumerable<IQuery> customQueries)
         {
             foreach (var q in customQueries)
             {
                 var field = new FieldType()
                 {
                     Name = q.Name, // not sure if we should prefix this or not
-                    Arguments = q.ArgumentOptions?.GraphQlArguments,
+                    Arguments = ParseCustomQueryArgumentOptions(q.ArgumentOptions),
                     ResolvedType = new ListGraphType(new NonNullGraphType(schemaType)),
                     Resolver = new FuncFieldResolver<object>(c =>
                     {
@@ -207,12 +209,52 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL.Types
         private static string BuildODataQuery(ResolveFieldContext c)
         {
             var odataQuery = "?" +
-                string.Join("&",
-                    c.Arguments
-                        .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => $"${x.Key}={x.Value}"));
+                             string.Join("&",
+                                 c.Arguments
+                                     .Select(x => new { x.Key, Value = x.Value.ToString() })
+                                     .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                     .Select(x => $"${x.Key}={x.Value}"));
 
             return odataQuery;
+        }
+
+        private static QueryArguments ParseCustomQueryArgumentOptions(IList<QueryArgumentOption> argumentOptions)
+        {
+            if (argumentOptions == null)
+            {
+                return null;
+            }
+
+            var qargs = new QueryArguments();
+
+            foreach (var arg in argumentOptions)
+            {
+                qargs.Add(new QueryArgument(ResolveQueryArgumentTypeToType(arg.ArgumentType))
+                {
+                    DefaultValue = arg.DefaultValue,
+                    Description = arg.Description,
+                    Name = arg.Name
+                });
+            }
+
+            return qargs;
+        }
+
+        private static Type ResolveQueryArgumentTypeToType(QueryArgumentType argumentType)
+        {
+            Type result = typeof(StringGraphType);
+
+            switch (argumentType)
+            {
+                case QueryArgumentType.Number:
+                    result = typeof(IntGraphType);
+                    break;
+                case QueryArgumentType.Boolean:
+                    result = typeof(BooleanGraphType);
+                    break;
+            }
+
+            return result;
         }
     }
 }
