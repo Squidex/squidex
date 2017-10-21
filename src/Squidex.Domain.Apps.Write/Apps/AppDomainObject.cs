@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Apps.Utils;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         private static readonly Language DefaultLanguage = Language.EN;
         private readonly AppContributors contributors = new AppContributors();
         private readonly AppClients clients = new AppClients();
-        private LanguagesConfig languagesConfig = LanguagesConfig.Empty;
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(DefaultLanguage);
         private string name;
         private string planId;
         private RefToken planOwner;
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public int ContributorCount
         {
-            get { return contributors.Count; }
+            get { return contributors.Contributors.Count; }
         }
 
         public AppDomainObject(Guid id, int version)
@@ -57,47 +58,47 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         protected void On(AppContributorAssigned @event)
         {
-            contributors.Assign(@event.ContributorId, @event.Permission);
+            contributors.Apply(@event);
         }
 
         protected void On(AppContributorRemoved @event)
         {
-            contributors.Remove(@event.ContributorId);
+            contributors.Apply(@event);
         }
 
         protected void On(AppClientAttached @event)
         {
-            clients.Add(@event.Id, @event.Secret);
+            clients.Apply(@event);
         }
 
         protected void On(AppClientUpdated @event)
         {
-            clients.Update(@event.Id, @event.Permission);
+            clients.Apply(@event);
         }
 
         protected void On(AppClientRenamed @event)
         {
-            clients.Rename(@event.Id, @event.Name);
+            clients.Apply(@event);
         }
 
         protected void On(AppClientRevoked @event)
         {
-            clients.Revoke(@event.Id);
+            clients.Apply(@event);
         }
 
         protected void On(AppLanguageAdded @event)
         {
-            languagesConfig = languagesConfig.Add(@event.Language);
+            languagesConfig.Apply(@event);
         }
 
         protected void On(AppLanguageRemoved @event)
         {
-            languagesConfig = languagesConfig.Remove(@event.Language);
+            languagesConfig.Apply(@event);
         }
 
         protected void On(AppLanguageUpdated @event)
         {
-            languagesConfig = languagesConfig.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback);
+            languagesConfig.Apply(@event);
         }
 
         protected void On(AppPlanChanged @event)

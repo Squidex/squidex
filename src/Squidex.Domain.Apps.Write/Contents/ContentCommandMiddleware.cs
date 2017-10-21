@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
@@ -147,8 +147,6 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         private async Task ValidateAsync((ISchemaEntity Schema, IAppEntity App) schemaAndApp, ContentDataCommand command, Func<string> message, bool partial)
         {
-            Guard.Valid(command, nameof(command), message);
-
             var schemaErrors = new List<ValidationError>();
 
             var appId = command.AppId.Id;

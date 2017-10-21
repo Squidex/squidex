@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
@@ -31,19 +32,12 @@ namespace Squidex.Domain.Apps.Write.Schemas
             this.schemas = schemas;
         }
 
-        protected async Task On(CreateSchema command, CommandContext context)
+        protected Task On(CreateSchema command, CommandContext context)
         {
-            if (await schemas.FindSchemaByNameAsync(command.AppId.Id, command.Name) != null)
+            return handler.CreateAsync<SchemaDomainObject>(context, async s =>
             {
-                var error =
-                    new ValidationError($"A schema with name '{command.Name}' already exists", "Name",
-                        nameof(CreateSchema.Name));
+                await GuardSchema.CanCreate(command, schemas);
 
-                throw new ValidationException("Cannot create a new schema.", error);
-            }
-
-            await handler.CreateAsync<SchemaDomainObject>(context, s =>
-            {
                 s.Create(command);
 
                 context.Complete(EntityCreatedResult.Create(s.Id, s.Version));
@@ -54,75 +48,142 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             return handler.UpdateAsync<SchemaDomainObject>(context, s =>
             {
+                GuardSchemaField.CanAdd(s.Schema, command);
+
                 s.Add(command);
 
                 context.Complete(EntityCreatedResult.Create(s.Schema.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 
-        protected Task On(DeleteSchema command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Delete(command));
-        }
-
         protected Task On(DeleteField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DeleteField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanDelete(s.Schema, command);
+
+                s.DeleteField(command);
+            });
         }
 
         protected Task On(LockField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.LockField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanLock(s.Schema, command);
+
+                s.LockField(command);
+            });
         }
 
         protected Task On(HideField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.HideField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanHide(s.Schema, command);
+
+                s.HideField(command);
+            });
         }
 
         protected Task On(ShowField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ShowField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanShow(s.Schema, command);
+
+                s.ShowField(command);
+            });
         }
 
         protected Task On(DisableField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.DisableField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanDisable(s.Schema, command);
+
+                s.DisableField(command);
+            });
         }
 
         protected Task On(EnableField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.EnableField(command));
-        }
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanEnable(s.Schema, command);
 
-        protected Task On(ReorderFields command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Reorder(command));
-        }
-
-        protected Task On(UpdateSchema command, CommandContext context)
-        {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Update(command));
+                s.EnableField(command);
+            });
         }
 
         protected Task On(UpdateField command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.UpdateField(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchemaField.CanUpdate(s.Schema, command);
+
+                s.UpdateField(command);
+            });
+        }
+
+        protected Task On(ReorderFields command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanReorder(s.Schema, command);
+
+                s.Reorder(command);
+            });
+        }
+
+        protected Task On(UpdateSchema command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanUpdate(s.Schema, command);
+
+                s.Update(command);
+            });
         }
 
         protected Task On(PublishSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Publish(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanPublish(s.Schema, command);
+
+                s.Publish(command);
+            });
         }
 
         protected Task On(UnpublishSchema command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.Unpublish(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanUnpublish(s.Schema, command);
+
+                s.Unpublish(command);
+            });
         }
 
         protected Task On(ConfigureScripts command, CommandContext context)
         {
-            return handler.UpdateAsync<SchemaDomainObject>(context, s => s.ConfigureScripts(command));
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanConfigureScripts(s.Schema, command);
+
+                s.ConfigureScripts(command);
+            });
+        }
+
+        protected Task On(DeleteSchema command, CommandContext context)
+        {
+            return handler.UpdateAsync<SchemaDomainObject>(context, s =>
+            {
+                GuardSchema.CanDelete(s.Schema, command);
+
+                s.Delete(command);
+            });
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)

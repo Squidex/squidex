@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Old;
@@ -41,104 +40,150 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         protected Task On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            var schema = SchemaEventDispatcher.Dispatch(@event, registry);
+            return Collection.CreateAsync(@event, headers, s =>
+            {
+                s.SchemaDef = SchemaEventDispatcher.Create(@event, registry);
 
-            return Collection.CreateAsync(@event, headers, s => { UpdateSchema(s, schema); SimpleMapper.Map(@event, s); });
+                SimpleMapper.Map(@event, s);
+            });
         }
 
         protected Task On(FieldDeleted @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldLocked @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldHidden @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldShown @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldDisabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldEnabled @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(SchemaFieldsReordered @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(SchemaUpdated @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(SchemaPublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(SchemaUnpublished @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event);
+            });
         }
 
         protected Task On(FieldAdded @event, EnvelopeHeaders headers)
         {
-            return UpdateSchema(@event, headers, s => SchemaEventDispatcher.Dispatch(@event, s, registry));
+            return UpdateSchemaAsync(@event, headers, s =>
+            {
+                s.SchemaDef.Apply(@event, registry);
+            });
         }
 
         protected Task On(ScriptsConfigured @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, e => SimpleMapper.Map(@event, e));
+            return Collection.UpdateAsync(@event, headers, s =>
+            {
+                SimpleMapper.Map(@event, s);
+            });
         }
 
         protected Task On(SchemaDeleted @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, e => e.IsDeleted = true);
-        }
-
-        private Task UpdateSchema(SquidexEvent @event, EnvelopeHeaders headers, Func<Schema, Schema> updater)
-        {
-            return Collection.UpdateAsync(@event, headers, e => UpdateSchema(e, updater));
-        }
-
-        private void UpdateSchema(MongoSchemaEntity entity, Func<Schema, Schema> updater)
-        {
-            entity.UpdateSchema(serializer, updater);
-        }
-
-        private void UpdateSchema(MongoSchemaEntity entity, Schema schema)
-        {
-            entity.SerializeSchema(schema, serializer);
+            return Collection.UpdateAsync(@event, headers, s =>
+            {
+                s.IsDeleted = true;
+            });
         }
 
         protected Task On(WebhookAdded @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, e => { });
+            return Collection.UpdateAsync(@event, headers, s =>
+            {
+                /* NOOP */
+            });
         }
 
         protected Task On(WebhookDeleted @event, EnvelopeHeaders headers)
         {
-            return Collection.UpdateAsync(@event, headers, e => { });
+            return Collection.UpdateAsync(@event, headers, s =>
+            {
+                /* NOOP */
+            });
+        }
+
+        private Task UpdateSchemaAsync(SquidexEvent @event, EnvelopeHeaders headers, Action<MongoSchemaEntity> updater)
+        {
+            return Collection.UpdateAsync(@event, headers, s =>
+            {
+                updater(s);
+
+                s.IsPublished = s.SchemaDef.IsPublished;
+            });
         }
     }
 }

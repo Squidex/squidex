@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;

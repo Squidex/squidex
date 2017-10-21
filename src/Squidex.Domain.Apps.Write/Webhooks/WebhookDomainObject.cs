@@ -39,8 +39,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         public void Create(CreateWebhook command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create webhook");
-
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new WebhookCreated()));
@@ -48,8 +46,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         public void Update(UpdateWebhook command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot update webhook");
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new WebhookUpdated()));
@@ -57,8 +53,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         public void Delete(DeleteWebhook command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new WebhookDeleted()));

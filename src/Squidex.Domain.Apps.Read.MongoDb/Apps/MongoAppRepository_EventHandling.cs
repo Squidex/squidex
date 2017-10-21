@@ -7,13 +7,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Apps.Utils;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -41,10 +40,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return Collection.CreateAsync(@event, headers, a =>
             {
-                a.Clients = new Dictionary<string, MongoAppEntityClient>();
-                a.Contributors = new Dictionary<string, MongoAppEntityContributor>();
-                a.ContributorIds = new List<string>();
+                SimpleMapper.Map(@event, a);
+            });
+        }
 
+        protected Task On(AppPlanChanged @event, EnvelopeHeaders headers)
+        {
+            return UpdateAppAsync(@event, headers, a =>
+            {
                 SimpleMapper.Map(@event, a);
             });
         }
@@ -53,7 +56,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id] = SimpleMapper.Map(@event, new MongoAppEntityClient());
+                a.Clients.Apply(@event);
             });
         }
 
@@ -61,7 +64,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Clients.Remove(@event.Id);
+                a.Clients.Apply(@event);
             });
         }
 
@@ -69,7 +72,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id].Name = @event.Name;
+                a.Clients.Apply(@event);
             });
         }
 
@@ -77,7 +80,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Clients[@event.Id].Permission = @event.Permission;
+                a.Clients.Apply(@event);
             });
         }
 
@@ -85,7 +88,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Contributors.Remove(@event.ContributorId);
+                a.Contributors.Apply(@event);
             });
         }
 
@@ -93,7 +96,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.Contributors[@event.ContributorId] = new MongoAppEntityContributor { Permission = @event.Permission };
+                a.Contributors.Apply(@event);
             });
         }
 
@@ -101,7 +104,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.UpdateLanguages(c => c.Add(@event.Language));
+                a.LanguagesConfig.Apply(@event);
             });
         }
 
@@ -109,7 +112,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.UpdateLanguages(c => c.Remove(@event.Language));
+                a.LanguagesConfig.Apply(@event);
             });
         }
 
@@ -117,15 +120,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         {
             return UpdateAppAsync(@event, headers, a =>
             {
-                a.UpdateLanguages(c => c.Update(@event.Language, @event.IsOptional, @event.IsMaster, @event.Fallback));
-            });
-        }
-
-        protected Task On(AppPlanChanged @event, EnvelopeHeaders headers)
-        {
-            return UpdateAppAsync(@event, headers, a =>
-            {
-                a.ChangePlan(@event.PlanId, @event.Actor);
+                a.LanguagesConfig.Apply(@event);
             });
         }
 
@@ -135,7 +130,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             {
                 updater(a);
 
-                a.ContributorIds = a.Contributors.Keys.ToList();
+                a.ContributorIds = a.Contributors.Contributors.Keys.ToArray();
             });
         }
     }

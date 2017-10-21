@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Webhooks.Commands;
+using Squidex.Domain.Apps.Write.Webhooks.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
@@ -33,21 +33,32 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         protected async Task On(CreateWebhook command, CommandContext context)
         {
-            await ValidateAsync(command, () => "Failed to create webhook");
+            await handler.CreateAsync<WebhookDomainObject>(context, async w =>
+            {
+                await GuardWebhook.CanCreate(command, schemas);
 
-            await handler.CreateAsync<WebhookDomainObject>(context, c => c.Create(command));
+                w.Create(command);
+            });
         }
 
         protected async Task On(UpdateWebhook command, CommandContext context)
         {
-            await ValidateAsync(command, () => "Failed to update content");
+            await handler.UpdateAsync<WebhookDomainObject>(context, async c =>
+            {
+                await GuardWebhook.CanUpdate(command, schemas);
 
-            await handler.UpdateAsync<WebhookDomainObject>(context, c => c.Update(command));
+                c.Update(command);
+            });
         }
 
         protected Task On(DeleteWebhook command, CommandContext context)
         {
-            return handler.UpdateAsync<WebhookDomainObject>(context, c => c.Delete(command));
+            return handler.UpdateAsync<WebhookDomainObject>(context, c =>
+            {
+                GuardWebhook.CanDelete(command);
+
+                c.Delete(command);
+            });
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
@@ -55,22 +66,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
             if (!await this.DispatchActionAsync(context.Command, context))
             {
                 await next();
-            }
-        }
-
-        private async Task ValidateAsync(WebhookEditCommand command, Func<string> message)
-        {
-            var results = await Task.WhenAll(
-                command.Schemas.Select(async schema =>
-                    await schemas.FindSchemaByIdAsync(schema.SchemaId) == null
-                        ? new ValidationError($"Schema {schema.SchemaId} does not exist.")
-                        : null));
-
-            var errors = results.Where(x => x != null).ToArray();
-
-            if (errors.Length > 0)
-            {
-                throw new ValidationException(message(), errors);
             }
         }
     }

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties.Accept(Instance);
+            return properties?.Accept(Instance) ?? Enumerable.Empty<ValidationError>();
         }
 
         public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)
@@ -110,7 +111,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Length == 0))
             {
                 yield return new ValidationError("Radio buttons or dropdown list need allowed values.",
                     nameof(properties.AllowedValues));
@@ -135,7 +136,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.MaxValue));
             }
 
-            if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinValue.HasValue || properties.MaxValue.HasValue))
+            if (properties.AllowedValues != null && properties.AllowedValues.Length > 0 && (properties.MinValue.HasValue || properties.MaxValue.HasValue))
             {
                 yield return new ValidationError("Either allowed values or min and max value can be defined.",
                     nameof(properties.AllowedValues),
@@ -162,7 +163,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Length == 0))
             {
                 yield return new ValidationError("Radio buttons or dropdown list need allowed values.",
                     nameof(properties.AllowedValues));
@@ -181,7 +182,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.MaxLength));
             }
 
-            if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinLength.HasValue || properties.MaxLength.HasValue))
+            if (properties.AllowedValues != null && properties.AllowedValues.Length > 0 && (properties.MinLength.HasValue || properties.MaxLength.HasValue))
             {
                 yield return new ValidationError("Either allowed values or min and max length can be defined.",
                     nameof(properties.AllowedValues),

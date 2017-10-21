@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
-using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.CQRS.Events;
@@ -46,73 +45,73 @@ namespace Squidex.Domain.Apps.Write.Schemas
             this.registry = registry;
         }
 
-        public void On(FieldAdded @event)
-        {
-            totalFields++;
-
-            schema = SchemaEventDispatcher.Dispatch(@event, schema, registry);
-        }
-
         protected void On(SchemaCreated @event)
         {
             totalFields += @event.Fields?.Count ?? 0;
 
-            schema = SchemaEventDispatcher.Dispatch(@event, registry);
+            schema = SchemaEventDispatcher.Create(@event, registry);
+        }
+
+        public void On(FieldAdded @event)
+        {
+            totalFields++;
+
+            schema.Apply(@event, registry);
         }
 
         protected void On(FieldUpdated @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldLocked @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldHidden @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldShown @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldDisabled @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldEnabled @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(SchemaUpdated @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(FieldDeleted @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(SchemaFieldsReordered @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(SchemaPublished @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(SchemaUnpublished @event)
         {
-            schema = SchemaEventDispatcher.Dispatch(@event, schema);
+            schema.Apply(@event);
         }
 
         protected void On(SchemaDeleted @event)
@@ -122,8 +121,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Create(CreateSchema command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create schema");
-
             VerifyNotCreated();
 
             var @event = SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(Id, command.Name) });
@@ -147,11 +144,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Add(AddField command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot add field to schema {Id}");
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanAdd(schema, command.Name);
 
             RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(totalFields + 1, command.Name) }));
 
@@ -160,11 +153,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject UpdateField(UpdateField command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{Id}'");
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanUpdate(schema, command.FieldId);
 
             RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
 
@@ -173,11 +162,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject LockField(LockField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanLock(schema, command.FieldId);
 
             RaiseEvent(command, new FieldLocked());
 
@@ -186,11 +171,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject HideField(HideField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanHide(schema, command.FieldId);
 
             RaiseEvent(command, new FieldHidden());
 
@@ -199,11 +180,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject ShowField(ShowField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanShow(schema, command.FieldId);
 
             RaiseEvent(command, new FieldShown());
 
@@ -212,11 +189,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject DisableField(DisableField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanDisable(schema, command.FieldId);
 
             RaiseEvent(command, new FieldDisabled());
 
@@ -225,11 +198,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject EnableField(EnableField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanEnable(schema, command.FieldId);
 
             RaiseEvent(command, new FieldEnabled());
 
@@ -238,11 +207,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject DeleteField(DeleteField command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaFieldGuard.GuardCanDelete(schema, command.FieldId);
 
             RaiseEvent(command, new FieldDeleted());
 
@@ -251,11 +216,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Reorder(ReorderFields command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot reorder fields for schema '{Id}'");
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaGuard.GuardCanReorder(schema, command.FieldIds);
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaFieldsReordered()));
 
@@ -264,11 +225,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Publish(PublishSchema command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaGuard.GuardCanPublish(schema);
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaPublished()));
 
@@ -277,11 +234,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Unpublish(UnpublishSchema command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-
-            SchemaGuard.GuardCanUnpublish(schema);
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaUnpublished()));
 
@@ -290,8 +243,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject ConfigureScripts(ConfigureScripts command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
@@ -310,8 +261,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
         public SchemaDomainObject Update(UpdateSchema command)
         {
-            Guard.Valid(command, nameof(command), () => $"Cannot update schema '{Id}'");
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));

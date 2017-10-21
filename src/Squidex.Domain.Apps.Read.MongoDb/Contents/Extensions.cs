@@ -14,6 +14,8 @@ using MongoDB.Bson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.MongoDb;
 

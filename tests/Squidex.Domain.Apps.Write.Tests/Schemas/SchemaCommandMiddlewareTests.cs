@@ -34,31 +34,15 @@ namespace Squidex.Domain.Apps.Write.Schemas
             schema = new SchemaDomainObject(SchemaId, -1, registry);
 
             sut = new SchemaCommandMiddleware(Handler, schemas);
-        }
-
-        [Fact]
-        public async Task Create_should_throw_exception_if_a_name_with_same_name_already_exists()
-        {
-            var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
-
-            A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName))
-                .Returns(A.Dummy<ISchemaEntity>());
-
-            await TestCreate(schema, async _ =>
-            {
-                await Assert.ThrowsAsync<ValidationException>(async () => await sut.HandleAsync(context));
-            }, false);
-
-            A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName)).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Create_should_create_schema_if_name_is_free()
-        {
-            var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName))
                 .Returns((ISchemaEntity)null);
+        }
+
+        [Fact]
+        public async Task Create_should_create_schema_domain_object()
+        {
+            var context = CreateContextForCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
 
             await TestCreate(schema, async _ =>
             {

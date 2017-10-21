@@ -69,8 +69,6 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentDomainObject Create(CreateContent command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create content");
-
             VerifyNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentCreated()));
@@ -85,8 +83,6 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentDomainObject Delete(DeleteContent command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
@@ -96,10 +92,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentDomainObject ChangeStatus(ChangeContentStatus command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
-            VerifyCanChangeStatus(command.Status);
 
             RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
 
@@ -108,8 +101,6 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentDomainObject Update(UpdateContent command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot update content");
-
             VerifyCreatedAndNotDeleted();
 
             if (!command.Data.Equals(Data))
@@ -122,8 +113,6 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentDomainObject Patch(PatchContent command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot patch content");
-
             VerifyCreatedAndNotDeleted();
 
             var newData = Data.MergeInto(command.Data);
@@ -134,14 +123,6 @@ namespace Squidex.Domain.Apps.Write.Contents
             }
 
             return this;
-        }
-
-        private void VerifyCanChangeStatus(Status newStatus)
-        {
-            if (!StatusFlow.Exists(newStatus) || !StatusFlow.CanChange(status, newStatus))
-            {
-                throw new DomainException($"Content cannot be changed from status {status} to {newStatus}.");
-            }
         }
 
         private void VerifyNotCreated()
