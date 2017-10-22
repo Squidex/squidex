@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Events.Apps.Utils
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 
         public static void Apply(this AppClients clients, AppClientRenamed @event)
         {
-            if (clients.Clients.TryGetValue(@event.Id, out var client))
+            if (clients.TryGetValue(@event.Id, out var client))
             {
                 client.Rename(@event.Name);
             }
@@ -53,7 +52,7 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 
         public static void Apply(this AppClients clients, AppClientUpdated @event)
         {
-            if (clients.Clients.TryGetValue(@event.Id, out var client))
+            if (clients.TryGetValue(@event.Id, out var client))
             {
                 client.Update(@event.Permission);
             }

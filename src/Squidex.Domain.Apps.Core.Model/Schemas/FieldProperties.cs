@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementPropertiesBase

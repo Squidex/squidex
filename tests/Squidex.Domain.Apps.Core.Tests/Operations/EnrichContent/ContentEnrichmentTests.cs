@@ -9,6 +9,7 @@
 using System;
 using Newtonsoft.Json.Linq;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Schemas;

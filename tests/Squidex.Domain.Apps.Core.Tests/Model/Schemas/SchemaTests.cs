@@ -9,6 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Xunit;
 
@@ -16,6 +19,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 {
     public class SchemaTests
     {
+        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
         private readonly Schema sut = new Schema("my-schema");
 
         [Fact]
@@ -65,59 +69,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_hide_field()
+        public void Should_throw_exception_if_updating_with_invalid_properties_type()
         {
             AddNumberField(1);
 
-            sut.FieldsById[1].Hide();
-            sut.FieldsById[1].Hide();
-
-            Assert.True(sut.FieldsById[1].IsHidden);
-        }
-
-        [Fact]
-        public void Should_show_field()
-        {
-            AddNumberField(1);
-
-            sut.FieldsById[1].Hide();
-            sut.FieldsById[1].Show();
-            sut.FieldsById[1].Show();
-
-            Assert.False(sut.FieldsById[1].IsHidden);
-        }
-
-        [Fact]
-        public void Should_disable_field()
-        {
-            AddNumberField(1);
-
-            sut.FieldsById[1].Disable();
-            sut.FieldsById[1].Disable();
-
-            Assert.True(sut.FieldsById[1].IsDisabled);
-        }
-
-        [Fact]
-        public void Should_enable_field()
-        {
-            AddNumberField(1);
-
-            sut.FieldsById[1].Disable();
-            sut.FieldsById[1].Enable();
-            sut.FieldsById[1].Enable();
-
-            Assert.False(sut.FieldsById[1].IsDisabled);
-        }
-
-        [Fact]
-        public void Should_lock_field()
-        {
-            AddNumberField(1);
-
-            sut.FieldsById[1].Lock();
-
-            Assert.True(sut.FieldsById[1].IsLocked);
+            Assert.Throws<ArgumentException>(() => sut.FieldsById[1].Update(new StringFieldProperties()));
         }
 
         [Fact]
@@ -138,24 +94,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             sut.DeleteField(1);
 
             Assert.Empty(sut.FieldsById);
-        }
-
-        [Fact]
-        public void Should_update_field()
-        {
-            AddNumberField(1);
-
-            sut.FieldsById[1].Update(new NumberFieldProperties { Hints = "my-hints" });
-
-            Assert.Equal("my-hints", sut.FieldsById[1].RawProperties.Hints);
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_updating_with_invalid_properties_type()
-        {
-            AddNumberField(1);
-
-            Assert.Throws<ArgumentException>(() => sut.FieldsById[1].Update(new StringFieldProperties()));
         }
 
         [Fact]
@@ -203,6 +141,15 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             AddNumberField(2);
 
             Assert.Throws<ArgumentException>(() => sut.ReorderFields(new List<long> { 1, 4 }));
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_schema()
+        {
+            var schemaSource = TestData.MixedSchema();
+            var schemaTarget = JToken.FromObject(schemaSource, serializer).ToObject<Schema>(serializer);
+
+            schemaTarget.ShouldBeEquivalentTo(schemaSource);
         }
 
         private NumberField AddNumberField(int id)

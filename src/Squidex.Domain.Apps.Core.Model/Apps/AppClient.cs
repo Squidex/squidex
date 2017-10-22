@@ -16,14 +16,30 @@ namespace Squidex.Domain.Apps.Core.Apps
         private string name;
         private AppClientPermission permission;
 
-        public AppClient(string name, string secret)
+        public string Name
+        {
+            get { return name; }
+        }
+
+        public string Secret
+        {
+            get { return secret; }
+        }
+
+        public AppClientPermission Permission
+        {
+            get { return permission; }
+        }
+
+        public AppClient(string name, string secret, AppClientPermission permission)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
+            Guard.Enum(permission, nameof(permission));
 
             this.name = name;
-
             this.secret = secret;
+            this.permission = permission;
         }
 
         public void Update(AppClientPermission newPermission)

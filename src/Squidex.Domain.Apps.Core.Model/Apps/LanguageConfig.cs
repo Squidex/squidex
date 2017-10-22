@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguageConfig : IFieldPartitionItem
     {

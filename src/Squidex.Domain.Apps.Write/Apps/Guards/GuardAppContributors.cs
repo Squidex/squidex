@@ -39,14 +39,14 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                     {
                         error(new ValidationError("Cannot find contributor id.", nameof(command.ContributorId)));
                     }
-                    else if (contributors.Contributors.TryGetValue(command.ContributorId, out var existing))
+                    else if (contributors.TryGetValue(command.ContributorId, out var existing))
                     {
                         if (existing == command.Permission)
                         {
                             error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
                         }
                     }
-                    else if (plan.MaxContributors == contributors.Contributors.Count)
+                    else if (plan.MaxContributors == contributors.Count)
                     {
                         error(new ValidationError("You have reached the maximum number of contributors for your plan."));
                     }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                     error(new ValidationError("Contributor id not assigned.", nameof(command.ContributorId)));
                 }
 
-                var ownerIds = contributors.Contributors.Where(x => x.Value == AppContributorPermission.Owner).Select(x => x.Key).ToList();
+                var ownerIds = contributors.Where(x => x.Value == AppContributorPermission.Owner).Select(x => x.Key).ToList();
 
                 if (ownerIds.Count == 1 && ownerIds.Contains(command.ContributorId))
                 {
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                 }
             });
 
-            if (!contributors.Contributors.ContainsKey(command.ContributorId))
+            if (!contributors.ContainsKey(command.ContributorId))
             {
                 throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(AppDomainObject));
             }

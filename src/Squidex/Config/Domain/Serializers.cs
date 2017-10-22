@@ -12,12 +12,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Config.Domain
 {
@@ -32,8 +34,11 @@ namespace Squidex.Config.Domain
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
             settings.ContractResolver = new ConverterContractResolver(
+                new AppClientsConverter(),
+                new AppContributorsConverter(),
                 new InstantConverter(),
                 new LanguageConverter(),
+                new LanguagesConfigConverter(),
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),
@@ -58,6 +63,8 @@ namespace Squidex.Config.Domain
         {
             TypeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
             TypeNameRegistry.Map(typeof(NoopEvent).GetTypeInfo().Assembly);
+
+            BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
 
             ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
         }

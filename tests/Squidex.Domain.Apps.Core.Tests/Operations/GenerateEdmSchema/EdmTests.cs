@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Infrastructure;
 using Xunit;

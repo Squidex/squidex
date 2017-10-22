@@ -6,33 +6,25 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public class AppContributors
+    public sealed class AppContributors : DictionaryBase<string, AppContributorPermission>
     {
-        private readonly Dictionary<string, AppContributorPermission> contributors = new Dictionary<string, AppContributorPermission>();
-
-        public IReadOnlyDictionary<string, AppContributorPermission> Contributors
-        {
-            get { return contributors; }
-        }
-
         public void Assign(string contributorId, AppContributorPermission permission)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
             Guard.Enum(permission, nameof(permission));
 
-            contributors[contributorId] = permission;
+            Inner[contributorId] = permission;
         }
 
         public void Remove(string contributorId)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
-            contributors.Remove(contributorId);
+            Inner.Remove(contributorId);
         }
     }
 }

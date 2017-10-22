@@ -6,32 +6,32 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public class AppClients
+    public sealed class AppClients : DictionaryBase<string, AppClient>
     {
-        private readonly Dictionary<string, AppClient> clients = new Dictionary<string, AppClient>();
-
-        public IReadOnlyDictionary<string, AppClient> Clients
+        public void Add(string id, AppClient client)
         {
-            get { return clients; }
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(client, nameof(client));
+
+            Inner.Add(id, client);
         }
 
         public void Add(string id, string secret)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            clients.Add(id, new AppClient(secret, id));
+            Inner.Add(id, new AppClient(id, secret, AppClientPermission.Editor));
         }
 
         public void Revoke(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            clients.Remove(id);
+            Inner.Remove(id);
         }
     }
 }

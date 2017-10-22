@@ -7,19 +7,14 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Core.ValidateContent;
-using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
-using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Domain.Apps.Write.Contents.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
@@ -62,18 +57,18 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             await handler.CreateAsync<ContentDomainObject>(context, async content =>
             {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
+                GuardContent.CanCreate(command);
 
-                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptCreate, "Create");
+                var operationContext = await CreateContext(command, content, () => "Failed to create content.");
 
                 if (command.Publish)
                 {
-                    ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptChange, "Published");
+                    await operationContext.ExecuteScriptAsync(x => x.ScriptChange, "Published");
                 }
 
-                command.Data.Enrich(schemaAndApp.SchemaEntity.SchemaDef, schemaAndApp.AppEntity.PartitionResolver);
-
-                await ValidateAsync(schemaAndApp, command, () => "Failed to create content", false);
+                await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create");
+                await operationContext.EnrichAsync();
+                await operationContext.ValidateAsync(false);
 
                 content.Create(command);
 
@@ -85,11 +80,12 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             await handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
+                GuardContent.CanUpdate(command);
 
-                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptUpdate, "Update");
+                var operationContext = await CreateContext(command, content, () => "Failed to update content.");
 
-                await ValidateAsync(schemaAndApp, command, () => "Failed to update content", false);
+                await operationContext.ValidateAsync(true);
+                await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update");
 
                 content.Update(command);
 
@@ -101,11 +97,12 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             await handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
+                GuardContent.CanPatch(command);
 
-                ExecuteScriptAndTransform(command, content, schemaAndApp.SchemaEntity.ScriptUpdate, "Patch");
+                var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
 
-                await ValidateAsync(schemaAndApp, command, () => "Failed to patch content", true);
+                await operationContext.ValidateAsync(true);
+                await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Patch");
 
                 content.Patch(command);
 
@@ -117,9 +114,11 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
+                GuardContent.CanChangeContentStatus(content.Status, command);
 
-                ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptChange, command.Status);
+                var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
+
+                await operationContext.ExecuteScriptAsync(x => x.ScriptChange, command.Status);
 
                 content.ChangeStatus(command);
             });
@@ -129,9 +128,11 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
-                var schemaAndApp = await ResolveSchemaAndAppAsync(command);
+                GuardContent.CanDelete(command);
 
-                ExecuteScript(command, content, schemaAndApp.SchemaEntity.ScriptDelete, "Delete");
+                var operationContext = await CreateContext(command, content, () => "Failed to delete content.");
+
+                await operationContext.ExecuteScriptAsync(x => x.ScriptDelete, "Delete");
 
                 content.Delete(command);
             });
@@ -145,60 +146,20 @@ namespace Squidex.Domain.Apps.Write.Contents
             }
         }
 
-        private async Task ValidateAsync((ISchemaEntity Schema, IAppEntity App) schemaAndApp, ContentDataCommand command, Func<string> message, bool partial)
+        private async Task<ContentOperationContext> CreateContext(ContentCommand command, ContentDomainObject content, Func<string> message)
         {
-            var schemaErrors = new List<ValidationError>();
+            var operationContext =
+                await ContentOperationContext.CreateAsync(
+                    contentRepository,
+                    content,
+                    command,
+                    appProvider,
+                    schemas,
+                    scriptEngine,
+                    assetRepository,
+                    message);
 
-            var appId = command.AppId.Id;
-
-            var validationContext =
-                new ValidationContext(
-                    (contentIds, schemaId) =>
-                    {
-                        return contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
-                    },
-                    assetIds =>
-                    {
-                        return assetRepository.QueryNotFoundAsync(appId, assetIds.ToList());
-                    });
-
-            if (partial)
-            {
-                await command.Data.ValidatePartialAsync(validationContext, schemaAndApp.Schema.SchemaDef, schemaAndApp.App.PartitionResolver, schemaErrors);
-            }
-            else
-            {
-                await command.Data.ValidateAsync(validationContext, schemaAndApp.Schema.SchemaDef, schemaAndApp.App.PartitionResolver, schemaErrors);
-            }
-
-            if (schemaErrors.Count > 0)
-            {
-                throw new ValidationException(message(), schemaErrors);
-            }
-        }
-
-        private void ExecuteScriptAndTransform(ContentDataCommand command, ContentDomainObject content, string script, object operation)
-        {
-            var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString(), Data = command.Data };
-
-            command.Data = scriptEngine.ExecuteAndTransform(ctx, script);
-        }
-
-        private void ExecuteScript(ContentCommand command, ContentDomainObject content, string script, object operation)
-        {
-            var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString() };
-
-            scriptEngine.Execute(ctx, script);
-        }
-
-        private async Task<(ISchemaEntity SchemaEntity, IAppEntity AppEntity)> ResolveSchemaAndAppAsync(SchemaCommand command)
-        {
-            var taskForApp = appProvider.FindAppByIdAsync(command.AppId.Id);
-            var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
-
-            await Task.WhenAll(taskForApp, taskForSchema);
-
-            return (taskForSchema.Result, taskForApp.Result);
+            return operationContext;
         }
     }
 }

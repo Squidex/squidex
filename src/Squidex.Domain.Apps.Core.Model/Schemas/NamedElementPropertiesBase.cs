@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class NamedElementPropertiesBase

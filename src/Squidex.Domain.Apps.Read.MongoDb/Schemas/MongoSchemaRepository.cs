@@ -10,9 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
@@ -26,14 +24,12 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
     {
         private readonly FieldRegistry registry;
 
-        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer serializer, FieldRegistry registry)
+        public MongoSchemaRepository(IMongoDatabase database, FieldRegistry registry)
             : base(database)
         {
             Guard.NotNull(registry, nameof(registry));
 
             this.registry = registry;
-
-            BsonSerializer.RegisterSerializer(new JsonBsonSerializer(serializer));
         }
 
         protected override string CollectionName()

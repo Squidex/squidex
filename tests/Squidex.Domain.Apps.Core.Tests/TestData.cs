@@ -6,12 +6,45 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core
 {
     public static class TestData
     {
+        public static JsonSerializer DefaultSerializer()
+        {
+            var typeNameRegistry = new TypeNameRegistry();
+
+            var serializerSettings = new JsonSerializerSettings
+            {
+                SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
+
+                ContractResolver = new ConverterContractResolver(
+                    new AppClientsConverter(),
+                    new AppContributorsConverter(),
+                    new InstantConverter(),
+                    new LanguageConverter(),
+                    new LanguagesConfigConverter(),
+                    new NamedGuidIdConverter(),
+                    new NamedLongIdConverter(),
+                    new NamedStringIdConverter(),
+                    new RefTokenConverter(),
+                    new SchemaConverter(new FieldRegistry(typeNameRegistry)),
+                    new StringEnumConverter()),
+
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+
+            return JsonSerializer.Create(serializerSettings);
+        }
+
         public static Schema MixedSchema()
         {
             var inv = Partitioning.Invariant;

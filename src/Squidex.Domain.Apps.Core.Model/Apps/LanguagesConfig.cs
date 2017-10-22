@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguagesConfig : IFieldPartitioning
     {
@@ -22,11 +22,6 @@ namespace Squidex.Domain.Apps.Core
         public LanguageConfig Master
         {
             get { return state.Master; }
-        }
-
-        public int Count
-        {
-            get { return state.Languages.Count; }
         }
 
         IFieldPartitionItem IFieldPartitioning.Master
@@ -42,6 +37,16 @@ namespace Squidex.Domain.Apps.Core
         IEnumerator<IFieldPartitionItem> IEnumerable<IFieldPartitionItem>.GetEnumerator()
         {
             return state.Languages.Values.GetEnumerator();
+        }
+
+        public IEnumerable<LanguageConfig> Configs
+        {
+            get { return state.Languages.Values; }
+        }
+
+        public int Count
+        {
+            get { return state.Languages.Count; }
         }
 
         private LanguagesConfig(ICollection<LanguageConfig> configs)
@@ -83,7 +88,7 @@ namespace Squidex.Domain.Apps.Core
         {
             Guard.NotNull(language, nameof(language));
 
-            state = new State(
+            var newLanguages =
                 state.Languages.Values.Where(x => x.Language != language)
                     .Select(config =>
                     {
@@ -92,7 +97,14 @@ namespace Squidex.Domain.Apps.Core
                             config.IsOptional,
                             config.LanguageFallbacks.Except(new[] { language }));
                     })
-                    .ToImmutableDictionary(x => x.Language), state.Master.Language == language ? null : state.Master);
+                    .ToImmutableDictionary(x => x.Language);
+
+            var newMaster =
+                state.Master.Language != language ?
+                state.Master :
+                null;
+
+            state = new State(newLanguages, newMaster);
         }
 
         public bool Contains(Language language)
@@ -107,16 +119,18 @@ namespace Squidex.Domain.Apps.Core
 
         public bool TryGetItem(string key, out IFieldPartitionItem item)
         {
-            item = null;
-
             if (Language.IsValidLanguage(key) && state.Languages.TryGetValue(key, out var value))
             {
                 item = value;
 
                 return true;
             }
+            else
+            {
+                item = null;
 
-            return false;
+                return false;
+            }
         }
 
         private sealed class State

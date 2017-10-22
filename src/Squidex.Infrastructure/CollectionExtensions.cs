@@ -14,6 +14,22 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool TryGetValue<TKey, TValue, TBase>(this IReadOnlyDictionary<TKey, TValue> values, TKey key, out TBase item) where TValue : TBase
+        {
+            if (values.TryGetValue(key, out var value))
+            {
+                item = value;
+
+                return true;
+            }
+            else
+            {
+                item = default(TBase);
+
+                return false;
+            }
+        }
+
         public static int SequentialHashCode<T>(this IEnumerable<T> collection)
         {
             return collection.SequentialHashCode(EqualityComparer<T>.Default);

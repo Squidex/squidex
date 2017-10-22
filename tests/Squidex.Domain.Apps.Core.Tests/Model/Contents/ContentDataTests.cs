@@ -60,6 +60,23 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
+        public void Should_return_same_content_if_merging_same_references()
+        {
+            var source =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("de", 2));
+
+            var actual = source.MergeInto(source);
+
+            Assert.Same(source, actual);
+        }
+
+        [Fact]
         public void Should_merge_two_name_models()
         {
             var lhs =

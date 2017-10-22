@@ -10,9 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Infrastructure.CQRS.Events;
@@ -22,10 +20,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
     public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
     {
-        public MongoAppRepository(IMongoDatabase database, JsonSerializer serializer)
+        public MongoAppRepository(IMongoDatabase database)
             : base(database)
         {
-            BsonSerializer.RegisterSerializer(new JsonBsonSerializer(serializer));
         }
 
         protected override string CollectionName()

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;

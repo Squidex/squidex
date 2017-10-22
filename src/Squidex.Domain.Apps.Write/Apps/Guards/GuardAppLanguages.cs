@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 
@@ -39,6 +39,11 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             Validate.It(() => "Cannot remove language.", error =>
             {
+                if (command.Language == null)
+                {
+                    error(new ValidationError("Language cannot be null.", nameof(command.Language)));
+                }
+
                 if (languages.Master == languageConfig)
                 {
                     error(new ValidationError("Language config is master.", nameof(command.Language)));
@@ -54,6 +59,11 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             Validate.It(() => "Cannot update language.", error =>
             {
+                if (command.Language == null)
+                {
+                    error(new ValidationError("Language cannot be null.", nameof(command.Language)));
+                }
+
                 if ((languages.Master == languageConfig || command.IsMaster) && command.IsOptional)
                 {
                     error(new ValidationError("Cannot make master language optional.", nameof(command.IsMaster)));
@@ -76,7 +86,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             if (language == null)
             {
-                throw new DomainObjectNotFoundException(language, "Languages", typeof(AppDomainObject));
+                return null;
             }
 
             if (!languages.TryGetConfig(language, out var languageConfig))

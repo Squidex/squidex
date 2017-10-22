@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             {
                 updater(a);
 
-                a.ContributorIds = a.Contributors.Contributors.Keys.ToArray();
+                a.ContributorIds = a.Contributors.Keys.ToArray();
             });
         }
     }

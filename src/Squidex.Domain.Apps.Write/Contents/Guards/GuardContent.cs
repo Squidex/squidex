@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Write.Contents.Guards
             });
         }
 
-        public static void CanCreate(UpdateContent command)
+        public static void CanUpdate(UpdateContent command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Contents.Guards
             });
         }
 
-        public static void CanCreate(PatchContent command)
+        public static void CanPatch(PatchContent command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Write.Contents.Guards
             });
         }
 
-        public static void CanChangeStatus(Status status, ChangeContentStatus command)
+        public static void CanChangeContentStatus(Status status, ChangeContentStatus command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -64,6 +64,11 @@ namespace Squidex.Domain.Apps.Write.Contents.Guards
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
                 }
             });
+        }
+
+        public static void CanDelete(DeleteContent command)
+        {
+            Guard.NotNull(command, nameof(command));
         }
     }
 }

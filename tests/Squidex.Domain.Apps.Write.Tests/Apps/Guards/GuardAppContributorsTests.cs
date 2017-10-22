@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
     {
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
+        private readonly AppContributors contributors = new AppContributors();
 
         public GuardAppContributorsTests()
         {
@@ -36,8 +37,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor();
 
-            var contributors = new AppContributors();
-
             return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
         }
 
@@ -46,8 +45,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1", Permission = (AppContributorPermission)10 };
 
-            var contributors = new AppContributors();
-
             return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
         }
 
@@ -55,8 +52,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         public Task CanAssign_should_throw_exception_if_user_already_exists_with_same_permission()
         {
             var command = new AssignContributor { ContributorId = "1" };
-
-            var contributors = new AppContributors();
 
             contributors.Assign("1", AppContributorPermission.Owner);
 
@@ -71,8 +66,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "1", Permission = (AppContributorPermission)10 };
 
-            var contributors = new AppContributors();
-
             return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
         }
 
@@ -83,8 +76,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                 .Returns(2);
 
             var command = new AssignContributor { ContributorId = "3" };
-
-            var contributors = new AppContributors();
 
             contributors.Assign("1", AppContributorPermission.Owner);
             contributors.Assign("2", AppContributorPermission.Editor);
@@ -97,8 +88,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            var contributors = new AppContributors();
-
             return GuardAppContributors.CanAssign(contributors, command, users, appPlan);
         }
 
@@ -106,8 +95,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         public Task CanAssign_should_not_throw_exception_if_contributor_has_another_permission()
         {
             var command = new AssignContributor { ContributorId = "1" };
-
-            var contributors = new AppContributors();
 
             contributors.Assign("1", AppContributorPermission.Editor);
 
@@ -122,8 +109,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "1" };
 
-            var contributors = new AppContributors();
-
             contributors.Assign("1", AppContributorPermission.Editor);
             contributors.Assign("2", AppContributorPermission.Editor);
 
@@ -135,8 +120,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor();
 
-            var contributors = new AppContributors();
-
             Assert.Throws<ValidationException>(() => GuardAppContributors.CanRemove(contributors, command));
         }
 
@@ -145,8 +128,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            var contributors = new AppContributors();
-
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppContributors.CanRemove(contributors, command));
         }
 
@@ -154,8 +135,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         public void CanRemove_should_throw_exception_if_contributor_is_only_owner()
         {
             var command = new RemoveContributor { ContributorId = "1" };
-
-            var contributors = new AppContributors();
 
             contributors.Assign("1", AppContributorPermission.Owner);
             contributors.Assign("2", AppContributorPermission.Editor);
@@ -167,8 +146,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         public void CanRemove_should_not_throw_exception_if_contributor_not_only_owner()
         {
             var command = new RemoveContributor { ContributorId = "1" };
-
-            var contributors = new AppContributors();
 
             contributors.Assign("1", AppContributorPermission.Owner);
             contributors.Assign("2", AppContributorPermission.Owner);

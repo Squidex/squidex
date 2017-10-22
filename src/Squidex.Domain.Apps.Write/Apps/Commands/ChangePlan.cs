@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
     public sealed class ChangePlan : AppAggregateCommand

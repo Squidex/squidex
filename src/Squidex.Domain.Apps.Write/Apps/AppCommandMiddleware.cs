@@ -58,11 +58,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             });
         }
 
-        protected Task On(AttachClient command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.AttachClient(command));
-        }
-
         protected async Task On(AssignContributor command, CommandContext context)
         {
             await handler.UpdateAsync<AppDomainObject>(context, async a =>
@@ -83,14 +78,34 @@ namespace Squidex.Domain.Apps.Write.Apps
             });
         }
 
+        protected Task On(AttachClient command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppClients.CanAttach(a.Clients, command);
+
+                a.AttachClient(command);
+            });
+        }
+
         protected Task On(UpdateClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateClient(command));
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppClients.CanUpdate(a.Clients, command);
+
+                a.UpdateClient(command);
+            });
         }
 
         protected Task On(RevokeClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.RevokeClient(command));
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppClients.CanRevoke(a.Clients, command);
+
+                a.RevokeClient(command);
+            });
         }
 
         protected Task On(AddLanguage command, CommandContext context)

@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 
         [BsonRequired]
         [BsonElement]
-        [BsonSerializer(typeof(JsonBsonSerializer))]
+        [BsonJson]
         public Schema SchemaDef { get; set; }
     }
 }

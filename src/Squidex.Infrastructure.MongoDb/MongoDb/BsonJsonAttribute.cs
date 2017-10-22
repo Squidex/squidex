@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
-//  IAppContributorEntity.cs
+//  BsonJsonAttribute.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
+using System;
 
-namespace Squidex.Domain.Apps.Read.Apps
+namespace Squidex.Infrastructure.MongoDb
 {
-    public interface IAppContributorEntity
+    public sealed class BsonJsonAttribute : Attribute
     {
-        AppContributorPermission Permission { get; }
     }
 }

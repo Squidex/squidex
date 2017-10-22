@@ -61,7 +61,7 @@ namespace Squidex.Controllers.Api.Apps
             {
                 var dto = SimpleMapper.Map(s, new AppDto());
 
-                dto.Permission = s.Contributors[subject].Permission;
+                dto.Permission = s.Contributors[subject];
 
                 return dto;
             }).ToList();

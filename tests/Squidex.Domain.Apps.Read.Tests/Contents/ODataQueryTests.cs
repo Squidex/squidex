@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -15,6 +14,7 @@ using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Edm;
@@ -29,29 +29,11 @@ namespace Squidex.Domain.Apps.Read.Contents
 {
     public class ODataQueryTests
     {
-        private readonly Schema schemaDef =
-            Schema.Create("user", new SchemaProperties { Hints = "The User" })
-                .AddField(new StringField(1, "firstName", Partitioning.Language,
-                    new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" }.ToImmutableList() }))
-                .AddField(new StringField(2, "lastName", Partitioning.Language,
-                    new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }))
-                .AddField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
-                    new BooleanFieldProperties()))
-                .AddField(new NumberField(4, "age", Partitioning.Invariant,
-                    new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
-                .AddField(new DateTimeField(5, "birthday", Partitioning.Invariant,
-                    new DateTimeFieldProperties()))
-                .AddField(new AssetsField(6, "pictures", Partitioning.Invariant,
-                    new AssetsFieldProperties()))
-                .AddField(new ReferencesField(7, "friends", Partitioning.Invariant,
-                    new ReferencesFieldProperties()))
-                .AddField(new StringField(8, "dashed-field", Partitioning.Invariant,
-                    new StringFieldProperties()));
-
+        private readonly Schema schemaDef = new Schema("user");
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly IEdmModel edmModel;
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.EN, Language.DE);
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
 
         static ODataQueryTests()
         {
@@ -60,6 +42,31 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         public ODataQueryTests()
         {
+            schemaDef.Update(new SchemaProperties { Hints = "The User" });
+
+            schemaDef.AddField(new StringField(1, "firstName", Partitioning.Language,
+                new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" } }));
+            schemaDef.AddField(new StringField(2, "lastName", Partitioning.Language,
+                new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }));
+
+            schemaDef.AddField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
+                new BooleanFieldProperties()));
+
+            schemaDef.AddField(new NumberField(4, "age", Partitioning.Invariant,
+                new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
+
+            schemaDef.AddField(new DateTimeField(5, "birthday", Partitioning.Invariant,
+                new DateTimeFieldProperties()));
+
+            schemaDef.AddField(new AssetsField(6, "pictures", Partitioning.Invariant,
+                new AssetsFieldProperties()));
+
+            schemaDef.AddField(new ReferencesField(7, "friends", Partitioning.Invariant,
+                new ReferencesFieldProperties()));
+
+            schemaDef.AddField(new StringField(8, "dashed-field", Partitioning.Invariant,
+                new StringFieldProperties()));
+
             var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
             var schema = A.Dummy<ISchemaEntity>();
