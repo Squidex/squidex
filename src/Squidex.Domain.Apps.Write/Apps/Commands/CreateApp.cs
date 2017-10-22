@@ -7,13 +7,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public sealed class CreateApp : SquidexCommand, IValidatable, IAggregateCommand
+    public sealed class CreateApp : SquidexCommand, IAggregateCommand
     {
         public string Name { get; set; }
 
@@ -27,14 +25,6 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         public CreateApp()
         {
             AppId = Guid.NewGuid();
-        }
-
-        public void Validate(IList<ValidationError> errors)
-        {
-            if (!Name.IsSlug())
-            {
-                errors.Add(new ValidationError("Name must be a valid slug.", nameof(Name)));
-            }
         }
     }
 }

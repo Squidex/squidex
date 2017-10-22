@@ -27,23 +27,32 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly AppContributors contributors = new AppContributors();
         private readonly AppClients clients = new AppClients();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(DefaultLanguage);
+        private AppPlan plan;
         private string name;
-        private string planId;
-        private RefToken planOwner;
 
         public string Name
         {
             get { return name; }
         }
 
-        public string PlanId
+        public AppPlan Plan
         {
-            get { return planId; }
+            get { return plan; }
         }
 
-        public int ContributorCount
+        public AppClients Clients
         {
-            get { return contributors.Contributors.Count; }
+            get { return clients; }
+        }
+
+        public AppContributors Contributors
+        {
+            get { return contributors; }
+        }
+
+        public LanguagesConfig LanguagesConfig
+        {
+            get { return languagesConfig; }
         }
 
         public AppDomainObject(Guid id, int version)
@@ -103,9 +112,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         protected void On(AppPlanChanged @event)
         {
-            planId = @event.PlanId;
-
-            planOwner = string.IsNullOrWhiteSpace(planId) ? null : @event.Actor;
+            plan = string.IsNullOrWhiteSpace(@event.PlanId) ? null : new AppPlan(@event.Actor, @event.PlanId);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -115,8 +122,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject Create(CreateApp command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot create app");
-
             ThrowIfCreated();
 
             var appId = new NamedId<Guid>(command.AppId, command.Name);
@@ -131,8 +136,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject UpdateClient(UpdateClient command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot update client");
-
             ThrowIfNotCreated();
 
             if (!string.IsNullOrWhiteSpace(command.Name))
@@ -150,8 +153,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject AssignContributor(AssignContributor command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot assign contributor");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
@@ -161,8 +162,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject RemoveContributor(RemoveContributor command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot remove contributor");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
@@ -172,8 +171,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject AttachClient(AttachClient command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot attach client");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientAttached()));
@@ -183,8 +180,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject RevokeClient(RevokeClient command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot revoke client");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
@@ -194,8 +189,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject AddLanguage(AddLanguage command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot add language");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageAdded()));
@@ -205,8 +198,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject RemoveLanguage(RemoveLanguage command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot remove language");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageRemoved()));
@@ -216,8 +207,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject UpdateLanguage(UpdateLanguage command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot update language");
-
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
@@ -227,10 +216,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppDomainObject ChangePlan(ChangePlan command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot change plan");
-
             ThrowIfNotCreated();
-            ThrowIfOtherUser(command);
 
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
 
@@ -255,19 +241,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
             return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppContributorPermission.Owner };
-        }
-
-        private void ThrowIfOtherUser(ChangePlan command)
-        {
-            if (!string.IsNullOrWhiteSpace(command.PlanId) && planOwner != null && !planOwner.Equals(command.Actor))
-            {
-                throw new ValidationException("Plan can only be changed from current user.");
-            }
-
-            if (string.Equals(command.PlanId, planId, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ValidationException("App has already this plan.");
-            }
         }
 
         private void ThrowIfNotCreated()

@@ -8,9 +8,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Read.Apps.Repositories;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
+using Squidex.Domain.Apps.Write.Apps.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Dispatching;
@@ -21,90 +21,114 @@ namespace Squidex.Domain.Apps.Write.Apps
     public class AppCommandMiddleware : ICommandMiddleware
     {
         private readonly IAggregateHandler handler;
-        private readonly IAppRepository appRepository;
+        private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
         public AppCommandMiddleware(
             IAggregateHandler handler,
-            IAppRepository appRepository,
+            IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
         {
             Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(appRepository, nameof(appRepository));
+            Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
             Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.handler = handler;
             this.userResolver = userResolver;
-            this.appRepository = appRepository;
+            this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
         }
 
         protected async Task On(CreateApp command, CommandContext context)
         {
-            if (await appRepository.FindAppAsync(command.Name) != null)
+            await handler.CreateAsync<AppDomainObject>(context, async a =>
             {
-                var error =
-                    new ValidationError($"An app with name '{command.Name}' already exists",
-                        nameof(CreateApp.Name));
+                await GuardApp.CanCreate(command, appProvider);
 
-                throw new ValidationException("Cannot create a new app.", error);
-            }
-
-            await handler.CreateAsync<AppDomainObject>(context, a =>
-            {
                 a.Create(command);
 
                 context.Complete(EntityCreatedResult.Create(a.Id, a.Version));
             });
         }
 
+        protected Task On(AttachClient command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.AttachClient(command));
+        }
+
         protected async Task On(AssignContributor command, CommandContext context)
         {
-            if (await userResolver.FindByIdAsync(command.ContributorId) == null)
+            await handler.UpdateAsync<AppDomainObject>(context, async a =>
             {
-                var error =
-                    new ValidationError("Cannot find contributor the contributor.",
-                        nameof(AssignContributor.ContributorId));
-
-                throw new ValidationException("Cannot assign contributor to app.", error);
-            }
-
-            await handler.UpdateAsync<AppDomainObject>(context, a =>
-            {
-                var oldContributors = a.ContributorCount;
-                var maxContributors = appPlansProvider.GetPlan(a.PlanId).MaxContributors;
+                await GuardAppContributors.CanAssign(a.Contributors, command, userResolver, appPlansProvider.GetPlan(a.Plan?.PlanId));
 
                 a.AssignContributor(command);
+            });
+        }
 
-                if (maxContributors > 0 && a.ContributorCount > oldContributors && a.ContributorCount > maxContributors)
-                {
-                    var error = new ValidationError("You have reached your max number of contributors.");
+        protected Task On(RemoveContributor command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppContributors.CanRemove(a.Contributors, command);
 
-                    throw new ValidationException("Cannot assign contributor to app.", error);
-                }
+                a.RemoveContributor(command);
+            });
+        }
+
+        protected Task On(UpdateClient command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateClient(command));
+        }
+
+        protected Task On(RevokeClient command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a => a.RevokeClient(command));
+        }
+
+        protected Task On(AddLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppLanguages.CanAdd(a.LanguagesConfig, command);
+
+                a.AddLanguage(command);
+            });
+        }
+
+        protected Task On(RemoveLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppLanguages.CanRemove(a.LanguagesConfig, command);
+
+                a.RemoveLanguage(command);
+            });
+        }
+
+        protected Task On(UpdateLanguage command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppLanguages.CanUpdate(a.LanguagesConfig, command);
+
+                a.UpdateLanguage(command);
             });
         }
 
         protected Task On(ChangePlan command, CommandContext context)
         {
-            if (!appPlansProvider.IsConfiguredPlan(command.PlanId))
-            {
-                var error =
-                    new ValidationError($"The plan '{command.PlanId}' does not exists",
-                        nameof(CreateApp.Name));
-
-                throw new ValidationException("Cannot change plan.", error);
-            }
-
             return handler.UpdateAsync<AppDomainObject>(context, async a =>
             {
+                GuardApp.CanChangePlan(command, a.Plan, appPlansProvider);
+
                 if (command.FromCallback)
                 {
                     a.ChangePlan(command);
@@ -121,41 +145,6 @@ namespace Squidex.Domain.Apps.Write.Apps
                     context.Complete(result);
                 }
             });
-        }
-
-        protected Task On(AttachClient command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.AttachClient(command));
-        }
-
-        protected Task On(RemoveContributor command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.RemoveContributor(command));
-        }
-
-        protected Task On(UpdateClient command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateClient(command));
-        }
-
-        protected Task On(RevokeClient command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.RevokeClient(command));
-        }
-
-        protected Task On(AddLanguage command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.AddLanguage(command));
-        }
-
-        protected Task On(RemoveLanguage command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.RemoveLanguage(command));
-        }
-
-        protected Task On(UpdateLanguage command, CommandContext context)
-        {
-            return handler.UpdateAsync<AppDomainObject>(context, a => a.UpdateLanguage(command));
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)

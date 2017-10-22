@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             if (!schema.FieldsById.TryGetValue(fieldId, out var field))
             {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Field));
+                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Schema));
             }
 
             return field;

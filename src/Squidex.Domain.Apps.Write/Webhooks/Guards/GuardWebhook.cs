@@ -43,20 +43,18 @@ namespace Squidex.Domain.Apps.Write.Webhooks.Guards
                 error(new ValidationError("Url must be specified and absolute.", nameof(command.Url)));
             }
 
-            if (command.Schemas == null)
+            if (command.Schemas != null)
             {
-                error(new ValidationError("Schemas cannot be null.", nameof(command.Schemas)));
-            }
+                var schemaErrors = await Task.WhenAll(
+                    command.Schemas.Select(async s =>
+                        await schemas.FindSchemaByIdAsync(s.SchemaId) == null
+                            ? new ValidationError($"Schema {s.SchemaId} does not exist.", nameof(command.Schemas))
+                            : null));
 
-            var schemaErrors = await Task.WhenAll(
-                command.Schemas.Select(async s =>
-                    await schemas.FindSchemaByIdAsync(s.SchemaId) == null
-                        ? new ValidationError($"Schema {s.SchemaId} does not exist.", nameof(command.Schemas))
-                        : null));
-
-            foreach (var schemaError in schemaErrors.Where(x => x != null))
-            {
-                error(schemaError);
+                foreach (var schemaError in schemaErrors.Where(x => x != null))
+                {
+                    error(schemaError);
+                }
             }
         }
     }

@@ -36,26 +36,26 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_name_not_valid()
+        public Task CanCreate_should_throw_exception_if_name_not_valid()
         {
             var command = new CreateSchema { AppId = appId, Name = "INVALID NAME" };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_name_already_in_use()
+        public Task CanCreate_should_throw_exception_if_name_already_in_use()
         {
             A.CallTo(() => schemas.FindSchemaByNameAsync(A<Guid>.Ignored, "new-schema"))
                 .Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
 
             var command = new CreateSchema { AppId = appId, Name = "new-schema" };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_fields_not_valid()
+        public Task CanCreate_should_throw_exception_if_fields_not_valid()
         {
             var command = new CreateSchema
             {
@@ -78,11 +78,11 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 Name = "new-schema"
             };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_fields_contain_duplicate_names()
+        public Task CanCreate_should_throw_exception_if_fields_contain_duplicate_names()
         {
             var command = new CreateSchema
             {
@@ -105,15 +105,15 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 Name = "new-schema"
             };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_command_is_valid()
+        public Task CanCreate_should_not_throw_exception_if_command_is_valid()
         {
             var command = new CreateSchema { AppId = appId, Name = "new-schema" };
 
-            await GuardSchema.CanCreate(command, schemas);
+            return GuardSchema.CanCreate(command, schemas);
         }
 
         [Fact]

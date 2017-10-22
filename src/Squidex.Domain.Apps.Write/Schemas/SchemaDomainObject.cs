@@ -276,10 +276,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             {
                 @event.FieldId = new NamedId<long>(field.Id, field.Name);
             }
-            else
-            {
-                throw new DomainObjectNotFoundException(fieldCommand.FieldId.ToString(), "Fields", typeof(Field));
-            }
 
             RaiseEvent(@event);
         }
