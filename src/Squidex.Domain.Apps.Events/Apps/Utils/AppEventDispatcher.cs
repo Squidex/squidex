@@ -1,11 +1,12 @@
 ﻿// ==========================================================================
-//  MongoAppRepository_EventHandling.cs
+//  AppEventDispatcher.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Events.Apps.Utils
@@ -60,7 +61,16 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 
         public static void Apply(this LanguagesConfig languagesConfig, AppLanguageUpdated @event)
         {
-            languagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, @event.Fallback));
+            var fallback = @event.Fallback;
+
+            if (fallback != null && fallback.Count > 0)
+            {
+                var existingLangauges = languagesConfig.OfType<LanguageConfig>().Select(x => x.Language);
+
+                fallback = fallback.Intersect(existingLangauges).ToList();
+            }
+
+            languagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, fallback));
 
             if (@event.IsMaster)
             {

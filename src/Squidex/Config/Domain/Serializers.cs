@@ -64,9 +64,9 @@ namespace Squidex.Config.Domain
             TypeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
             TypeNameRegistry.Map(typeof(NoopEvent).GetTypeInfo().Assembly);
 
-            BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
-
             ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
+
+            BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
         }
 
         public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)

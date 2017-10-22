@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class JsonBsonSerializer : ClassSerializerBase<object>
+    public class JsonBsonSerializer<T> : ClassSerializerBase<T> where T : class
     {
         private readonly JsonSerializer serializer;
 
@@ -25,12 +25,12 @@ namespace Squidex.Infrastructure.MongoDb
             this.serializer = serializer;
         }
 
-        protected override object DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
+        protected override T DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            return BsonSerializer.Deserialize<BsonDocument>(context.Reader).ToJson().ToObject(args.NominalType, serializer);
+            return BsonSerializer.Deserialize<BsonDocument>(context.Reader).ToJson().ToObject<T>(serializer);
         }
 
-        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, object value)
+        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
             BsonSerializer.Serialize(context.Writer, JObject.FromObject(value, serializer).ToBson());
         }

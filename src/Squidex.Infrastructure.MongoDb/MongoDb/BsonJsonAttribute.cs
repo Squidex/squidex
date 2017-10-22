@@ -10,6 +10,7 @@ using System;
 
 namespace Squidex.Infrastructure.MongoDb
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public sealed class BsonJsonAttribute : Attribute
     {
     }

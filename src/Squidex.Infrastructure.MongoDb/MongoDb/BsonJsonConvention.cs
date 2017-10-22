@@ -6,8 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Reflection;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
 
@@ -19,13 +21,16 @@ namespace Squidex.Infrastructure.MongoDb
         {
             var pack = new ConventionPack();
 
-            var bsonSerializer = new JsonBsonSerializer(serializer);
-
             pack.AddMemberMapConvention("JsonBson", memberMap =>
             {
-                if (memberMap.MemberType.GetCustomAttributes().OfType<BsonJsonAttribute>().Any())
+                var attributes = memberMap.MemberInfo.GetCustomAttributes();
+
+                if (attributes.OfType<BsonJsonAttribute>().Any())
                 {
-                    memberMap.SetSerializer(bsonSerializer);
+                    var bsonSerializerType = typeof(JsonBsonSerializer<>).MakeGenericType(memberMap.MemberType);
+                    var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
+
+                    memberMap.SetSerializer((IBsonSerializer)bsonSerializer);
                 }
             });
 

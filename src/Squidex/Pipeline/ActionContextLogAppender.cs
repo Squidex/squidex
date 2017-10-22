@@ -32,6 +32,11 @@ namespace Squidex.Pipeline
 
             var httpContext = actionContext.HttpContext;
 
+            if (string.IsNullOrEmpty(httpContext.Request.Method))
+            {
+                return;
+            }
+
             Guid requestId;
 
             if (httpContext.Items.TryGetValue(nameof(requestId), out var value) && value is Guid requestIdValue)
