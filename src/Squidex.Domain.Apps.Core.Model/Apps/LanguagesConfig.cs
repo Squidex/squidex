@@ -13,6 +13,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using Squidex.Infrastructure;
 
+#pragma warning disable IDE0016 // Use 'throw' expression
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguagesConfig : IFieldPartitioning
@@ -102,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             var newMaster =
                 state.Master.Language != language ?
                 state.Master :
-                null;
+                state.Languages.Values.FirstOrDefault();
 
             state = new State(newLanguages, newMaster);
         }
@@ -159,11 +161,6 @@ namespace Squidex.Domain.Apps.Core.Apps
                 if (master == null)
                 {
                     throw new InvalidOperationException("Config has no master language.");
-                }
-
-                if (master.IsOptional)
-                {
-                    throw new InvalidOperationException("Config has an optional master language.");
                 }
 
                 this.Master = master;

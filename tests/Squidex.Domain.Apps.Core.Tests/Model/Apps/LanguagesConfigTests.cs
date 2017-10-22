@@ -205,14 +205,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_throw_exception_if_language_to_make_optional_is_master_language()
-        {
-            var config = LanguagesConfig.Build(Language.DE);
-
-            Assert.Throws<InvalidOperationException>(() => config.Set(new LanguageConfig(Language.DE, true)));
-        }
-
-        [Fact]
         public void Should_provide_enumerators()
         {
             var config = LanguagesConfig.Build(Language.DE);

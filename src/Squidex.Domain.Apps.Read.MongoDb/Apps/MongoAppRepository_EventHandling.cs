@@ -9,10 +9,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Apps.Utils;
 using Squidex.Domain.Apps.Read.MongoDb.Utils;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
@@ -41,6 +43,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
             return Collection.CreateAsync(@event, headers, a =>
             {
                 SimpleMapper.Map(@event, a);
+
+                a.Clients = new AppClients();
+                a.Contributors = new AppContributors();
+
+                a.LanguagesConfig = LanguagesConfig.Build(Language.EN);
             });
         }
 

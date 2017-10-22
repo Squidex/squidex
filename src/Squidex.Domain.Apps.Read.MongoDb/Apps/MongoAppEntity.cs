@@ -40,17 +40,17 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Apps
         [BsonRequired]
         [BsonElement]
         [BsonJson]
-        public AppClients Clients { get; set; } = new AppClients();
+        public AppClients Clients { get; set; }
 
         [BsonRequired]
         [BsonElement]
         [BsonJson]
-        public AppContributors Contributors { get; set; } = new AppContributors();
+        public AppContributors Contributors { get; set; }
 
         [BsonRequired]
         [BsonElement]
         [BsonJson]
-        public LanguagesConfig LanguagesConfig { get; } = LanguagesConfig.Build(Language.EN);
+        public LanguagesConfig LanguagesConfig { get; set; }
 
         public PartitionResolver PartitionResolver
         {
