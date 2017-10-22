@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             return DoAndUpdateStateAsync(async () =>
             {
-                await DispatchConsumerAsync(formatter.Parse(storedEvent.Data));
+                await DispatchConsumerAsync(ParseEvent(storedEvent));
 
                 statusError = null;
                 statusPosition = storedEvent.EventPosition;
