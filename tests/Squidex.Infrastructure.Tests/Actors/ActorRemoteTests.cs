@@ -22,20 +22,23 @@ namespace Squidex.Infrastructure.Actors
             public int Counter { get; set; }
         }
 
-        private sealed class MyActor : Actor, IActor
+        private sealed class MyActor : IActor
         {
+            private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
+
             public List<object> Invokes { get; } = new List<object>();
+
+            public Task StopAndWaitAsync()
+            {
+                return dispatcher.StopAndWaitAsync();
+            }
 
             public void Tell(object message)
             {
-                DispatchAsync(message).Forget();
-            }
-
-            protected override Task OnMessage(object message)
-            {
-                Invokes.Add(message);
-
-                return TaskHelper.Done;
+                dispatcher.DispatchAsync(() =>
+                {
+                    Invokes.Add(message);
+                }).Forget();
             }
         }
 
@@ -55,13 +58,13 @@ namespace Squidex.Infrastructure.Actors
         }
 
         [Fact]
-        public void Should_handle_messages_sequentially()
+        public async Task Should_handle_messages_sequentially()
         {
             remoteActor.Tell(new SuccessMessage { Counter = 1 });
             remoteActor.Tell(new SuccessMessage { Counter = 2 });
             remoteActor.Tell(new SuccessMessage { Counter = 3 });
 
-            actor.Dispose();
+            await actor.StopAndWaitAsync();
 
             actor.Invokes.ShouldBeEquivalentTo(new List<object>
             {
