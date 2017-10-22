@@ -20,7 +20,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    internal sealed class GetEventStoreSubscription : IEventSubscription
+    internal sealed class GetEventStoreSubscription : DisposableObjectBase, IEventSubscription
     {
         private const string ProjectionName = "by-{0}-{1}";
         private static readonly ConcurrentDictionary<string, bool> SubscriptionsCreated = new ConcurrentDictionary<string, bool>();
@@ -57,11 +57,12 @@ namespace Squidex.Infrastructure.CQRS.Events
             subscription = SubscribeToStream(streamName);
         }
 
-        public Task StopAsync()
+        protected override void DisposeObject(bool disposing)
         {
-            subscription.Stop();
-
-            return TaskHelper.Done;
+            if (disposing)
+            {
+                subscription.Stop();
+            }
         }
 
         private EventStoreCatchUpSubscription SubscribeToStream(string streamName)
