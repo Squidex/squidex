@@ -31,6 +31,13 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static void SerializeAndDeserialize<T>(this T value, JsonConverter converter)
         {
+            var output = SerializeAndDeserializeAndReturn(value, converter);
+
+            Assert.Equal(value, output);
+        }
+
+        public static T SerializeAndDeserializeAndReturn<T>(this T value, JsonConverter converter)
+        {
             var serializerSettings = new JsonSerializerSettings();
 
             serializerSettings.Converters.Add(converter);
@@ -39,7 +46,7 @@ namespace Squidex.Infrastructure.TestHelpers
             var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
             var output = JsonConvert.DeserializeObject<Tuple<T>>(result, serializerSettings);
 
-            Assert.Equal(value, output.Item1);
+            return output.Item1;
         }
 
         public static void DoesNotDeserialize<T>(string value, JsonConverter converter)

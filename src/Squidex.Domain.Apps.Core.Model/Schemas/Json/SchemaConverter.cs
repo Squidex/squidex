@@ -6,13 +6,13 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
-    public sealed class SchemaConverter : JsonConverter
+    public sealed class SchemaConverter : JsonClassConverter<Schema>
     {
         private readonly FieldRegistry fieldRegistry;
 
@@ -23,19 +23,14 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             this.fieldRegistry = fieldRegistry;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, Schema value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, new JsonSchemaModel((Schema)value));
+            serializer.Serialize(writer, new JsonSchemaModel(value));
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override Schema ReadValue(JsonReader reader, JsonSerializer serializer)
         {
             return serializer.Deserialize<JsonSchemaModel>(reader).ToSchema(fieldRegistry);
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(Schema);
         }
     }
 }

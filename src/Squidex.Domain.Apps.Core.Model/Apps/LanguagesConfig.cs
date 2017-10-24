@@ -41,11 +41,6 @@ namespace Squidex.Domain.Apps.Core.Apps
             return state.Languages.Values.GetEnumerator();
         }
 
-        public IEnumerable<LanguageConfig> Configs
-        {
-            get { return state.Languages.Values; }
-        }
-
         public int Count
         {
             get { return state.Languages.Count; }

@@ -43,18 +43,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_serialize_and_deserialize_null_language()
-        {
-            JsonHelper.SerializeAndDeserialize<Language>(null, new LanguageConverter());
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize_valid_language()
-        {
-            Language.DE.SerializeAndDeserialize(new LanguageConverter());
-        }
-
-        [Fact]
         public void Should_return_true_for_valid_language()
         {
             Assert.True(Language.IsValidLanguage("de"));
@@ -119,6 +107,22 @@ namespace Squidex.Infrastructure
             var language = Language.ParseOrNull(input);
 
             Assert.Null(language);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_null_language()
+        {
+            Language value = null;
+
+            value.SerializeAndDeserialize(new LanguageConverter());
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_valid_language()
+        {
+            var value = Language.DE;
+
+            value.SerializeAndDeserialize(new LanguageConverter());
         }
     }
 }

@@ -90,37 +90,49 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_null_guid_token()
         {
-            JsonHelper.SerializeAndDeserialize<NamedId<Guid>>(null, new NamedGuidIdConverter());
+            NamedId<Guid> value = null;
+
+            value.SerializeAndDeserialize(new NamedGuidIdConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_valid_guid_token()
         {
-            new NamedId<Guid>(Guid.NewGuid(), "my-name").SerializeAndDeserialize(new NamedGuidIdConverter());
+            var value = new NamedId<Guid>(Guid.NewGuid(), "my-name");
+
+            value.SerializeAndDeserialize(new NamedGuidIdConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_null_long_token()
         {
-            JsonHelper.SerializeAndDeserialize<NamedId<long>>(null, new NamedLongIdConverter());
+            NamedId<long> value = null;
+
+            value.SerializeAndDeserialize(new NamedLongIdConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_valid_long_token()
         {
-            new NamedId<long>(123, "my-name").SerializeAndDeserialize(new NamedLongIdConverter());
+            var value = new NamedId<long>(123, "my-name");
+
+            value.SerializeAndDeserialize(new NamedLongIdConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_null_string_token()
         {
-            JsonHelper.SerializeAndDeserialize<NamedId<string>>(null, new NamedStringIdConverter());
+            NamedId<string> value = null;
+
+            value.SerializeAndDeserialize(new NamedStringIdConverter());
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_valid_string_token()
         {
-            new NamedId<string>(Guid.NewGuid().ToString(), "my-name").SerializeAndDeserialize(new NamedStringIdConverter());
+            var value = new NamedId<string>(Guid.NewGuid().ToString(), "my-name");
+
+            value.SerializeAndDeserialize(new NamedStringIdConverter());
         }
 
         [Fact]

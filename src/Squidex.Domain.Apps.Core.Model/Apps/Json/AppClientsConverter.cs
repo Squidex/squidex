@@ -6,21 +6,19 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public sealed class AppClientsConverter : JsonConverter
+    public sealed class AppClientsConverter : JsonClassConverter<AppClients>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, AppClients value, JsonSerializer serializer)
         {
-            var clients = (AppClients)value;
+            var json = new Dictionary<string, JsonAppClient>(value.Count);
 
-            var json = new Dictionary<string, JsonAppClient>(clients.Count);
-
-            foreach (var client in clients)
+            foreach (var client in value)
             {
                 json.Add(client.Key, new JsonAppClient(client.Value));
             }
@@ -28,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             serializer.Serialize(writer, json);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override AppClients ReadValue(JsonReader reader, JsonSerializer serializer)
         {
             var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader);
 
@@ -40,11 +38,6 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             }
 
             return clients;
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(AppClients);
         }
     }
 }

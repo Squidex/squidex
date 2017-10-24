@@ -6,21 +6,19 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public sealed class LanguagesConfigConverter : JsonConverter
+    public sealed class LanguagesConfigConverter : JsonClassConverter<LanguagesConfig>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, LanguagesConfig value, JsonSerializer serializer)
         {
-            var languagesConfig = (LanguagesConfig)value;
+            var json = new Dictionary<string, JsonLanguageConfig>(value.Count);
 
-            var json = new Dictionary<string, JsonLanguageConfig>(languagesConfig.Count);
-
-            foreach (var config in languagesConfig.Configs)
+            foreach (LanguageConfig config in value)
             {
                 json.Add(config.Language, new JsonLanguageConfig(config));
             }
@@ -28,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             serializer.Serialize(writer, json);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override LanguagesConfig ReadValue(JsonReader reader, JsonSerializer serializer)
         {
             var json = serializer.Deserialize<Dictionary<string, JsonLanguageConfig>>(reader);
 
@@ -42,11 +40,6 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             }
 
             return LanguagesConfig.Build(languagesConfig);
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(LanguagesConfig);
         }
     }
 }

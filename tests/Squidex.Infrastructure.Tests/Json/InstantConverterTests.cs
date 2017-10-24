@@ -22,5 +22,21 @@ namespace Squidex.Infrastructure.Json
 
             value.SerializeAndDeserialize(new InstantConverter());
         }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_nullable_with_value()
+        {
+            Instant? value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
+
+            value.SerializeAndDeserialize(new InstantConverter());
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_nullable_with_null()
+        {
+            Instant? value = null;
+
+            value.SerializeAndDeserialize(new InstantConverter());
+        }
     }
 }
