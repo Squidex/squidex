@@ -51,15 +51,6 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
-        public void Create_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateContentCommand(new CreateContent()));
-            });
-        }
-
-        [Fact]
         public void Create_should_create_events()
         {
             sut.Create(CreateContentCommand(new CreateContent { Data = data }));
@@ -97,18 +88,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Update(CreateContentCommand(new UpdateContent()));
-            });
-        }
-
-        [Fact]
-        public void Update_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateContent();
-
-            Assert.Throws<ValidationException>(() =>
+            Assert.Throws<DomainException>(() =>
             {
                 sut.Update(CreateContentCommand(new UpdateContent()));
             });
@@ -153,18 +133,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             CreateContent();
             DeleteContent();
 
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Patch(CreateContentCommand(new PatchContent()));
-            });
-        }
-
-        [Fact]
-        public void Patch_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateContent();
-
-            Assert.Throws<ValidationException>(() =>
+            Assert.Throws<DomainException>(() =>
             {
                 sut.Patch(CreateContentCommand(new PatchContent()));
             });
@@ -216,18 +185,6 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
-        public void ChangeStatus_should_throw_exception_if_status_flow_not_valid()
-        {
-            CreateContent();
-            ChangeStatus(Status.Archived);
-
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
-            });
-        }
-
-        [Fact]
         public void ChangeStatus_should_refresh_properties_and_create_events()
         {
             CreateContent();
@@ -264,7 +221,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         }
 
         [Fact]
-        public void Delete_should_update_properties_create_events()
+        public void Delete_should_update_properties_and_create_events()
         {
             CreateContent();
 

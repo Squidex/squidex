@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Assets
         }
 
         [Fact]
-        public async Task Create_should_create_asset()
+        public async Task Create_should_create_domain_object()
         {
             var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
 

@@ -44,15 +44,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void Create_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateCommand(new CreateApp()));
-            });
-        }
-
-        [Fact]
         public void Create_should_specify_name_and_owner()
         {
             sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
@@ -71,40 +62,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         public void ChangePlan_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
-            {
-                sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
-            });
-        }
-
-        [Fact]
-        public void ChangePlan_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.ChangePlan(CreateCommand(new ChangePlan()));
-            });
-        }
-
-        [Fact]
-        public void ChangePlan_should_throw_exception_if_plan_configured_from_other_user()
-        {
-            CreateApp();
-
-            sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = "other-plan", Actor = new RefToken("User", "other") }));
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
-            });
-        }
-
-        [Fact]
-        public void ChangePlan_should_throw_exception_if_same_plan()
-        {
-            CreateApp();
-            sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
-
-            Assert.Throws<ValidationException>(() =>
             {
                 sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
             });
@@ -133,39 +90,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void AssignContributor_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AssignContributor(CreateCommand(new AssignContributor { Permission = (AppContributorPermission)123 }));
-            });
-        }
-
-        [Fact]
-        public void AssignContributor_should_throw_exception_if_single_owner_becomes_non_owner()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = User.Identifier, Permission = AppContributorPermission.Editor }));
-            });
-        }
-
-        [Fact]
-        public void AssignContributor_should_throw_exception_if_user_already_contributor()
-        {
-            CreateApp();
-
-            sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
-            });
-        }
-
-        [Fact]
         public void AssignContributor_should_create_events()
         {
             CreateApp();
@@ -188,37 +112,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void RemoveContributor_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.RemoveContributor(CreateCommand(new RemoveContributor()));
-            });
-        }
-
-        [Fact]
-        public void RemoveContributor_should_throw_exception_if_all_owners_removed()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = User.Identifier }));
-            });
-        }
-
-        [Fact]
-        public void RemoveContributor_should_throw_exception_if_contributor_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = "not-found" }));
-            });
-        }
-
-        [Fact]
         public void RemoveContributor_should_create_events_and_remove_contributor()
         {
             CreateApp();
@@ -236,35 +129,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         public void AttachClient_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
-            {
-                sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }));
-            });
-        }
-
-        [Fact]
-        public void AttachClient_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AttachClient(CreateCommand(new AttachClient()));
-            });
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AttachClient(CreateCommand(new AttachClient { Id = string.Empty }));
-            });
-        }
-
-        [Fact]
-        public void AttachClient_should_throw_exception_if_id_already_exists()
-        {
-            CreateApp();
-
-            sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }));
-
-            Assert.Throws<ValidationException>(() =>
             {
                 sut.AttachClient(CreateCommand(new AttachClient { Id = clientId }));
             });
@@ -295,33 +159,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void RevokeClient_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.RevokeClient(CreateCommand(new RevokeClient()));
-            });
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.RevokeClient(CreateCommand(new RevokeClient { Id = string.Empty }));
-            });
-        }
-
-        [Fact]
-        public void RevokeClient_should_throw_exception_if_client_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.RevokeClient(CreateCommand(new RevokeClient { Id = "not-found" }));
-            });
-        }
-
-        [Fact]
         public void RevokeClient_should_create_events()
         {
             CreateApp();
@@ -341,64 +178,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             Assert.Throws<DomainException>(() =>
             {
                 sut.UpdateClient(CreateCommand(new UpdateClient { Id = "not-found", Name = clientNewName }));
-            });
-        }
-
-        [Fact]
-        public void UpdateClient_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient()));
-            });
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient { Id = string.Empty }));
-            });
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient { Permission = (AppClientPermission)int.MaxValue }));
-            });
-        }
-
-        [Fact]
-        public void UpdateClient_should_throw_exception_if_client_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient { Id = "not-found", Name = clientNewName }));
-            });
-        }
-
-        [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_same_reader_state()
-        {
-            CreateApp();
-            CreateClient();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Permission = AppClientPermission.Editor }));
-            });
-        }
-
-        [Fact]
-        public void UpdateClient_should_throw_exception_if_same_client_name()
-        {
-            CreateApp();
-            CreateClient();
-
-            sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName }));
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName }));
             });
         }
 
@@ -427,28 +206,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         }
 
         [Fact]
-        public void AddLanguage_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AddLanguage(CreateCommand(new AddLanguage()));
-            });
-        }
-
-        [Fact]
-        public void AddLanguage_should_throw_exception_if_language_already_exists()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.EN }));
-            });
-        }
-
-        [Fact]
         public void AddLanguage_should_create_events()
         {
             CreateApp();
@@ -465,39 +222,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         public void RemoveLanguage_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
-            {
-                sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.EN }));
-            });
-        }
-
-        [Fact]
-        public void RemoveLanguage_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.RemoveLanguage(CreateCommand(new RemoveLanguage()));
-            });
-        }
-
-        [Fact]
-        public void RemoveLanguage_should_throw_exception_if_language_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
-            });
-        }
-
-        [Fact]
-        public void RemoveLanguage_should_throw_exception_if_master_language()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
             {
                 sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.EN }));
             });
@@ -523,39 +247,6 @@ namespace Squidex.Domain.Apps.Write.Apps
             Assert.Throws<DomainException>(() =>
             {
                 sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.EN }));
-            });
-        }
-
-        [Fact]
-        public void UpdateLanguage_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateLanguage(CreateCommand(new UpdateLanguage()));
-            });
-        }
-
-        [Fact]
-        public void UpdateLanguage_should_throw_exception_if_language_not_found()
-        {
-            CreateApp();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.DE }));
-            });
-        }
-
-        [Fact]
-        public void UpdateLanguage_should_throw_exception_if_master_language()
-        {
-            CreateApp();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.EN, IsOptional = true }));
             });
         }
 

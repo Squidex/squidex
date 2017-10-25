@@ -26,7 +26,7 @@ if ($all -Or $infrastructure) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex*]*" `
+	-filter:"+[Squidex.Infrastructure*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
 	-oldStyle
@@ -37,7 +37,7 @@ if ($all -Or $appsCore) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
-	-filter:"+[Squidex*]*" `
+	-filter:"+[Squidex.Domain.Apps.Core*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Core.xml" `
 	-oldStyle
@@ -48,7 +48,7 @@ if ($all -Or $appsRead) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Read.Tests\Squidex.Domain.Apps.Read.Tests.csproj" `
-	-filter:"+[Squidex*]*" `
+	-filter:"+[Squidex.Domain.Apps.Read*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Read.xml" `
 	-oldStyle
@@ -59,7 +59,7 @@ if ($all -Or $appsWrite) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Write.Tests\Squidex.Domain.Apps.Write.Tests.csproj" `
-	-filter:"+[Squidex*]*" `
+	-filter:"+[Squidex.Domain.Apps.Write*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Write.xml" `
 	-oldStyle
@@ -70,7 +70,7 @@ if ($all -Or $users) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
-	-filter:"+[Squidex*]*" `
+	-filter:"+[Squidex.Domain.Users*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Users.xml" `
 	-oldStyle

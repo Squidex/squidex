@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
-    public sealed class UpdateLanguage : AppAggregateCommand, IValidatable
+    public sealed class UpdateLanguage : AppAggregateCommand
     {
         public Language Language { get; set; }
 
@@ -20,13 +20,5 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
         public bool IsMaster { get; set; }
 
         public List<Language> Fallback { get; set; }
-
-        public void Validate(IList<ValidationError> errors)
-        {
-            if (Language == null)
-            {
-                errors.Add(new ValidationError("Language cannot be null.", nameof(Language)));
-            }
-        }
     }
 }

@@ -40,15 +40,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         }
 
         [Fact]
-        public void Create_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateWebhookCommand(new CreateWebhook { Url = new Uri("/invalid", UriKind.Relative) }));
-            });
-        }
-
-        [Fact]
         public void Create_should_create_events()
         {
             var command = new CreateWebhook { Url = url };
@@ -85,17 +76,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
             Assert.Throws<DomainException>(() =>
             {
                 sut.Update(CreateWebhookCommand(new UpdateWebhook { Url = url }));
-            });
-        }
-
-        [Fact]
-        public void Update_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateWebhook();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Update(CreateWebhookCommand(new UpdateWebhook { Url = new Uri("/invalid", UriKind.Relative) }));
             });
         }
 

@@ -12,23 +12,21 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class NamedLongIdConverter : JsonConverter
+    public sealed class NamedLongIdConverter : JsonClassConverter<NamedId<long>>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, NamedId<long> value, JsonSerializer serializer)
         {
-            var namedId = (NamedId<long>)value;
-
-            writer.WriteValue($"{namedId.Id},{namedId.Name}");
+            writer.WriteValue($"{value.Id},{value.Name}");
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override NamedId<long> ReadValue(JsonReader reader, JsonSerializer serializer)
         {
-            if (reader.TokenType == JsonToken.Null)
+            if (reader.TokenType != JsonToken.String)
             {
-                return null;
+                throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            var parts = ((string)reader.Value).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = reader.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 2)
             {
@@ -41,11 +39,6 @@ namespace Squidex.Infrastructure.Json
             }
 
             return new NamedId<long>(id, string.Join(",", parts.Skip(1)));
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(NamedId<long>);
         }
     }
 }

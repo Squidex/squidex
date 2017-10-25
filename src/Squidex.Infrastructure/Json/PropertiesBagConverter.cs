@@ -13,15 +13,36 @@ using NodaTime.Extensions;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class PropertiesBagConverter : JsonConverter
+    public sealed class PropertiesBagConverter : JsonClassConverter<PropertiesBag>
     {
-        public override bool CanConvert(Type objectType)
+        protected override void WriteValue(JsonWriter writer, PropertiesBag value, JsonSerializer serializer)
         {
-            return typeof(PropertiesBag).IsAssignableFrom(objectType);
+            writer.WriteStartObject();
+
+            foreach (var kvp in value.Properties)
+            {
+                writer.WritePropertyName(kvp.Key);
+
+                if (kvp.Value.RawValue is Instant)
+                {
+                    writer.WriteValue(kvp.Value.ToString());
+                }
+                else
+                {
+                    writer.WriteValue(kvp.Value.RawValue);
+                }
+            }
+
+            writer.WriteEndObject();
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override PropertiesBag ReadValue(JsonReader reader, JsonSerializer serializer)
         {
+            if (reader.TokenType != JsonToken.StartObject)
+            {
+                throw new JsonException($"Expected Object, but got {reader.TokenType}.");
+            }
+
             var properties = new PropertiesBag();
 
             while (reader.Read())
@@ -50,27 +71,9 @@ namespace Squidex.Infrastructure.Json
             return properties;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType)
         {
-            var properties = (PropertiesBag)value;
-
-            writer.WriteStartObject();
-
-            foreach (var kvp in properties.Properties)
-            {
-                writer.WritePropertyName(kvp.Key);
-
-                if (kvp.Value.RawValue is Instant)
-                {
-                    writer.WriteValue(kvp.Value.ToString());
-                }
-                else
-                {
-                    writer.WriteValue(kvp.Value.RawValue);
-                }
-            }
-
-            writer.WriteEndObject();
+            return typeof(PropertiesBag).IsAssignableFrom(objectType);
         }
     }
 }

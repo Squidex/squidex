@@ -52,7 +52,7 @@ namespace Squidex.Controllers.Api.Apps
         [ApiCosts(1)]
         public IActionResult GetContributors(string app)
         {
-            var contributors = App.Contributors.Select(x => SimpleMapper.Map(x.Value, new ContributorDto { ContributorId = x.Key })).ToArray();
+            var contributors = App.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Permission = x.Value }).ToArray();
 
             var response = new ContributorsDto { Contributors = contributors, MaxContributors = appPlansProvider.GetPlanForApp(App).MaxContributors };
 

@@ -14,9 +14,14 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
 {
     public static class SchemaEventDispatcher
     {
-        public static Schema Dispatch(SchemaCreated @event, FieldRegistry registry)
+        public static Schema Create(SchemaCreated @event, FieldRegistry registry)
         {
-            var schema = Schema.Create(@event.Name, @event.Properties);
+            var schema = new Schema(@event.Name);
+
+            if (@event.Properties != null)
+            {
+                schema.Update(@event.Properties);
+            }
 
             if (@event.Fields != null)
             {
@@ -33,20 +38,20 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
 
                     if (eventField.IsHidden)
                     {
-                        field = field.Hide();
+                        field.Hide();
                     }
 
                     if (eventField.IsDisabled)
                     {
-                        field = field.Disable();
+                        field.Disable();
                     }
 
                     if (eventField.IsLocked)
                     {
-                        field = field.Lock();
+                        field.Lock();
                     }
 
-                    schema = schema.AddField(field);
+                    schema.AddField(field);
 
                     fieldId++;
                 }
@@ -55,7 +60,7 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
             return schema;
         }
 
-        public static Schema Dispatch(FieldAdded @event, Schema schema, FieldRegistry registry)
+        public static void Apply(this Schema schema, FieldAdded @event, FieldRegistry registry)
         {
             var partitioning =
                 string.Equals(@event.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
@@ -65,69 +70,81 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
             var fieldId = @event.FieldId.Id;
             var field = registry.CreateField(fieldId, @event.Name, partitioning, @event.Properties);
 
-            if (schema.FieldsById.ContainsKey(fieldId))
+            schema.DeleteField(fieldId);
+            schema.AddField(field);
+        }
+
+        public static void Apply(this Schema schema, FieldUpdated @event)
+        {
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
             {
-                return schema.UpdateField(fieldId, f => field);
+                field.Update(@event.Properties);
             }
-            else
+        }
+
+        public static void Apply(this Schema schema, FieldLocked @event)
+        {
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
             {
-                return schema.AddField(field);
+                field.Lock();
             }
         }
 
-        public static Schema Dispatch(FieldUpdated @event, Schema schema)
+        public static void Apply(this Schema schema, FieldHidden @event)
         {
-            return schema.UpdateField(@event.FieldId.Id, @event.Properties);
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
+            {
+                field.Hide();
+            }
         }
 
-        public static Schema Dispatch(FieldLocked @event, Schema schema)
+        public static void Apply(this Schema schema, FieldShown @event)
         {
-            return schema.LockField(@event.FieldId.Id);
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
+            {
+                field.Show();
+            }
         }
 
-        public static Schema Dispatch(FieldHidden @event, Schema schema)
+        public static void Apply(this Schema schema, FieldDisabled @event)
         {
-            return schema.HideField(@event.FieldId.Id);
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
+            {
+                field.Disable();
+            }
         }
 
-        public static Schema Dispatch(FieldShown @event, Schema schema)
+        public static void Apply(this Schema schema, FieldEnabled @event)
         {
-            return schema.ShowField(@event.FieldId.Id);
+            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
+            {
+                field.Enable();
+            }
         }
 
-        public static Schema Dispatch(FieldDisabled @event, Schema schema)
+        public static void Apply(this Schema schema, SchemaUpdated @event)
         {
-            return schema.DisableField(@event.FieldId.Id);
+            schema.Update(@event.Properties);
         }
 
-        public static Schema Dispatch(FieldEnabled @event, Schema schema)
+        public static void Apply(this Schema schema, SchemaFieldsReordered @event)
         {
-            return schema.EnableField(@event.FieldId.Id);
+            schema.ReorderFields(@event.FieldIds);
         }
 
-        public static Schema Dispatch(SchemaUpdated @event, Schema schema)
+        public static void Apply(this Schema schema, FieldDeleted @event)
         {
-            return schema.Update(@event.Properties);
+            schema.DeleteField(@event.FieldId.Id);
         }
 
-        public static Schema Dispatch(SchemaFieldsReordered @event, Schema schema)
+        public static void Apply(this Schema schema, SchemaPublished @event)
         {
-            return schema.ReorderFields(@event.FieldIds);
+            schema.Publish();
         }
 
-        public static Schema Dispatch(FieldDeleted @event, Schema schema)
+        public static void Apply(this Schema schema, SchemaUnpublished @event)
         {
-            return schema.DeleteField(@event.FieldId.Id);
-        }
-
-        public static Schema Dispatch(SchemaPublished @event, Schema schema)
-        {
-            return schema.Publish();
-        }
-
-        public static Schema Dispatch(SchemaUnpublished @event, Schema schema)
-        {
-            return schema.Unpublish();
+            schema.Unpublish();
         }
     }
 }

@@ -96,9 +96,9 @@ namespace Squidex.Pipeline
         {
             var subjectId = user.FindFirst(OpenIdClaims.Subject)?.Value;
 
-            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var contributor))
+            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var permission))
             {
-                return contributor.Permission.ToAppPermission();
+                return permission.ToAppPermission();
             }
 
             return null;

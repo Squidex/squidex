@@ -34,6 +34,11 @@ namespace Squidex.Domain.Apps.Write.Assets
             get { return fileVersion; }
         }
 
+        public string FileName
+        {
+            get { return fileName; }
+        }
+
         public AssetDomainObject(Guid id, int version)
             : base(id, version)
         {
@@ -66,8 +71,6 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         public AssetDomainObject Create(CreateAsset command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyNotCreated();
 
             var @event = SimpleMapper.Map(command, new AssetCreated
@@ -88,8 +91,6 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         public AssetDomainObject Update(UpdateAsset command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
 
             var @event = SimpleMapper.Map(command, new AssetUpdated
@@ -109,8 +110,6 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         public AssetDomainObject Delete(DeleteAsset command)
         {
-            Guard.NotNull(command, nameof(command));
-
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = totalSize }));
@@ -120,22 +119,11 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         public AssetDomainObject Rename(RenameAsset command)
         {
-            Guard.Valid(command, nameof(command), () => "Cannot rename asset.");
-
             VerifyCreatedAndNotDeleted();
-            VerifyDifferentNames(command.FileName, () => "Cannot rename asset.");
 
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
 
             return this;
-        }
-
-        private void VerifyDifferentNames(string newName, Func<string> message)
-        {
-            if (string.Equals(fileName, newName))
-            {
-                throw new ValidationException(message(), new ValidationError("The asset already has this name.", "Name"));
-            }
         }
 
         private void VerifyNotCreated()

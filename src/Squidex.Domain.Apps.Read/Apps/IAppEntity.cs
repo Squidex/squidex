@@ -6,8 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Read.Apps
 {
@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Read.Apps
 
         string PlanOwner { get; }
 
+        AppClients Clients { get; }
+
+        AppContributors Contributors { get; }
+
         LanguagesConfig LanguagesConfig { get; }
-
-        IReadOnlyDictionary<string, IAppClientEntity> Clients { get; }
-
-        IReadOnlyDictionary<string, IAppContributorEntity> Contributors { get; }
 
         PartitionResolver PartitionResolver { get; }
     }

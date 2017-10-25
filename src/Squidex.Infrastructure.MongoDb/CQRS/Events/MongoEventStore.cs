@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                     if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
                     {
-                        var eventData = new EventData { EventId = e.EventId, Metadata = e.Metadata, Payload = e.Payload, Type = e.Type };
+                        var eventData = e.ToEventData();
                         var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
                         await callback(new StoredEvent(eventToken, eventStreamOffset, eventData));
@@ -232,7 +232,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             foreach (var e in events)
             {
-                var mongoEvent = new MongoEvent { EventId = e.EventId, Metadata = e.Metadata, Payload = e.Payload, Type = e.Type };
+                var mongoEvent = new MongoEvent(e);
 
                 commitEvents[i++] = mongoEvent;
             }

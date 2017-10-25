@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
@@ -23,17 +22,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
     public partial class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, IEventConsumer
     {
-        private readonly JsonSerializer serializer;
         private readonly FieldRegistry registry;
 
-        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer serializer, FieldRegistry registry)
+        public MongoSchemaRepository(IMongoDatabase database, FieldRegistry registry)
             : base(database)
         {
             Guard.NotNull(registry, nameof(registry));
-            Guard.NotNull(serializer, nameof(serializer));
 
             this.registry = registry;
-            this.serializer = serializer;
         }
 
         protected override string CollectionName()
@@ -54,8 +50,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
                 await Collection.Find(s => s.AppId == appId && !s.IsDeleted)
                     .ToListAsync();
 
-            schemaEntities.ForEach(x => x.DeserializeSchema(serializer));
-
             return schemaEntities.OfType<ISchemaEntity>().ToList();
         }
 
@@ -65,8 +59,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
                 await Collection.Find(s => s.AppId == appId && !s.IsDeleted && s.Name == name)
                     .FirstOrDefaultAsync();
 
-            schemaEntity?.DeserializeSchema(serializer);
-
             return schemaEntity;
         }
 
@@ -75,8 +67,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
             var schemaEntity =
                 await Collection.Find(s => s.Id == schemaId)
                     .FirstOrDefaultAsync();
-
-            schemaEntity?.DeserializeSchema(serializer);
 
             return schemaEntity;
         }

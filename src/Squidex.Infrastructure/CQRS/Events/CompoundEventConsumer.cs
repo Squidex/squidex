@@ -34,7 +34,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             Name = name;
 
-            EventsFilter = string.Join("|", this.inners.Where(x => !string.IsNullOrWhiteSpace(x.EventsFilter)).Select(x => $"({x.EventsFilter})"));
+            var innerFilters =
+                this.inners.Where(x => !string.IsNullOrWhiteSpace(x.EventsFilter))
+                    .Select(x => $"({x.EventsFilter})");
+
+            EventsFilter = string.Join("|", innerFilters);
         }
 
         public Task ClearAsync()

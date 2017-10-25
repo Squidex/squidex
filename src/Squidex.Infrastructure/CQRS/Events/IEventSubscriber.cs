@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventSubscriber
     {
-        Task OnEventAsync(IEventSubscription subscription, StoredEvent @event);
+        Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
 
         Task OnErrorAsync(IEventSubscription subscription, Exception exception);
     }

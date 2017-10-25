@@ -13,7 +13,7 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Infrastructure;
 
@@ -64,7 +64,7 @@ namespace Squidex.Config.Identity
             return client;
         }
 
-        private static Client CreateClientFromApp(string id, IAppClientEntity appClient)
+        private static Client CreateClientFromApp(string id, AppClient appClient)
         {
             return new Client
             {

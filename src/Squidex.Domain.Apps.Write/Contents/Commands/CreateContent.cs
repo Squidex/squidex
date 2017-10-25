@@ -6,17 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Write.Contents.Commands
 {
     public sealed class CreateContent : ContentDataCommand
     {
         public bool Publish { get; set; }
-
-        public CreateContent()
-        {
-            ContentId = Guid.NewGuid();
-        }
     }
 }

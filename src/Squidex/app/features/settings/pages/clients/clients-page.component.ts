@@ -113,9 +113,9 @@ export class ClientsPageComponent extends AppComponentBase implements OnInit {
                 .switchMap(app => this.appClientsService.postClient(app, requestDto, this.appClients.version))
                 .subscribe(dto => {
                     this.updateClients(this.appClients.addClient(dto.payload, dto.version));
+                    this.resetClientForm();
                 }, error => {
                     this.notifyError(error);
-                }, () => {
                     this.resetClientForm();
                 });
         }

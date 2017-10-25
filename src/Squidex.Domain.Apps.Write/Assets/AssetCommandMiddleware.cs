@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Write.Assets.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -43,6 +44,8 @@ namespace Squidex.Domain.Apps.Write.Assets
             {
                 var asset = await handler.CreateAsync<AssetDomainObject>(context, async a =>
                 {
+                    GuardAsset.CanCreate(command);
+
                     a.Create(command);
 
                     await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
@@ -66,6 +69,8 @@ namespace Squidex.Domain.Apps.Write.Assets
             {
                 var asset = await handler.UpdateAsync<AssetDomainObject>(context, async a =>
                 {
+                    GuardAsset.CanUpdate(command);
+
                     a.Update(command);
 
                     await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
@@ -83,12 +88,22 @@ namespace Squidex.Domain.Apps.Write.Assets
 
         protected Task On(RenameAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, a => a.Rename(command));
+            return handler.UpdateAsync<AssetDomainObject>(context, a =>
+            {
+                GuardAsset.CanRename(command, a.FileName);
+
+                a.Rename(command);
+            });
         }
 
         protected Task On(DeleteAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, a => a.Delete(command));
+            return handler.UpdateAsync<AssetDomainObject>(context, a =>
+            {
+                GuardAsset.CanDelete(command);
+
+                a.Delete(command);
+            });
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)

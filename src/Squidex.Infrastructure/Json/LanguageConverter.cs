@@ -6,26 +6,25 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class LanguageConverter : JsonConverter
+    public sealed class LanguageConverter : JsonClassConverter<Language>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, Language value, JsonSerializer serializer)
         {
-            writer.WriteValue(((Language)value).Iso2Code);
+            writer.WriteValue(value.Iso2Code);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        protected override Language ReadValue(JsonReader reader, JsonSerializer serializer)
         {
-            return reader.TokenType == JsonToken.Null ? null : Language.GetLanguage((string)reader.Value);
-        }
+            if (reader.TokenType != JsonToken.String)
+            {
+                throw new JsonException($"Expected String, but got {reader.TokenType}.");
+            }
 
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(Language);
+            return Language.GetLanguage(reader.Value.ToString());
         }
     }
 }

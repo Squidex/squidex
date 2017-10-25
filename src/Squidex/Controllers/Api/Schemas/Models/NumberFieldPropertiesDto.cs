@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
@@ -47,11 +46,6 @@ namespace Squidex.Controllers.Api.Schemas.Models
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new NumberFieldProperties());
-
-            if (AllowedValues != null)
-            {
-                result.AllowedValues = ImmutableList.Create(AllowedValues);
-            }
 
             return result;
         }

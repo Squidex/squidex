@@ -126,28 +126,6 @@ namespace Squidex.Domain.Apps.Write.Assets
         }
 
         [Fact]
-        public void Rename_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateAsset();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Rename(CreateAssetCommand(new RenameAsset()));
-            });
-        }
-
-        [Fact]
-        public void Rename_should_throw_exception_if_new_name_is_equal_to_old_name()
-        {
-            CreateAsset();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Rename(CreateAssetCommand(new RenameAsset { FileName = file.FileName }));
-            });
-        }
-
-        [Fact]
         public void Rename_should_create_events()
         {
             CreateAsset();

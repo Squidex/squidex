@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -38,24 +39,34 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly ClaimsPrincipal user = new ClaimsPrincipal();
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Create(Language.DE);
+        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
 
         private readonly NamedContentData invalidData =
             new NamedContentData()
-                .AddField("my-field", new ContentFieldData()
-                    .SetValue(null));
+                .AddField("my-field1", new ContentFieldData()
+                    .AddValue(null))
+                .AddField("my-field2", new ContentFieldData()
+                    .AddValue(1));
         private readonly NamedContentData data =
             new NamedContentData()
-                .AddField("my-field", new ContentFieldData()
-                    .SetValue(1));
+                .AddField("my-field1", new ContentFieldData()
+                    .AddValue(1))
+                .AddField("my-field2", new ContentFieldData()
+                    .AddValue(1));
+        private readonly NamedContentData patch =
+            new NamedContentData()
+                .AddField("my-field1", new ContentFieldData()
+                    .AddValue(1));
 
         public ContentCommandMiddlewareTests()
         {
-            var schemaDef =
-                Schema.Create("my-schema", new SchemaProperties())
-                    .AddField(new NumberField(1, "my-field", Partitioning.Invariant,
-                        new NumberFieldProperties { IsRequired = true }));
+            var schemaDef = new Schema("my-schema");
+
+            schemaDef.AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
+                new NumberFieldProperties { IsRequired = true }));
+            schemaDef.AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
+                new NumberFieldProperties { IsRequired = false }));
 
             content = new ContentDomainObject(contentId, -1);
 
@@ -130,7 +141,8 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Update_should_throw_exception_if_data_is_not_valid()
         {
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored)).Returns(invalidData);
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .Returns(invalidData);
 
             CreateContent();
 
@@ -183,8 +195,6 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .Returns(data);
-
-            var patch = new NamedContentData().AddField("my-field", new ContentFieldData().SetValue(3));
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored)).Returns(patch);
 

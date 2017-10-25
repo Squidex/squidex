@@ -10,12 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MongoDB.Bson;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 {
@@ -23,23 +22,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
     {
         private const int MaxLength = 1024 * 1024;
 
-        public static BsonDocument ToBsonDocument(this IdContentData data, JsonSerializer jsonSerializer)
-        {
-            return (BsonDocument)JToken.FromObject(data, jsonSerializer).ToBson();
-        }
-
         public static List<Guid> ToReferencedIds(this IdContentData data, Schema schema)
         {
             return data.GetReferencedIds(schema).ToList();
         }
 
-        public static NamedContentData ToData(this BsonDocument document, Schema schema, List<Guid> deletedIds, JsonSerializer jsonSerializer)
+        public static NamedContentData ToData(this IdContentData idData, Schema schema, List<Guid> deletedIds)
         {
-            return document
-                .ToJson()
-                .ToObject<IdContentData>(jsonSerializer)
-                .ToCleanedReferences(schema, new HashSet<Guid>(deletedIds ?? new List<Guid>()))
-                .ToNameModel(schema, true);
+            return idData.ToCleanedReferences(schema, new HashSet<Guid>(deletedIds)).ToNameModel(schema, true);
         }
 
         public static string ToFullText<T>(this ContentData<T> data)

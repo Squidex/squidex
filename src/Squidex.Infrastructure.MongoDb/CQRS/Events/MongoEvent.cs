@@ -8,6 +8,7 @@
 
 using System;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
@@ -28,5 +29,19 @@ namespace Squidex.Infrastructure.CQRS.Events
         [BsonElement]
         [BsonRequired]
         public string Type { get; set; }
+
+        public MongoEvent()
+        {
+        }
+
+        public MongoEvent(EventData data)
+        {
+            SimpleMapper.Map(data, this);
+        }
+
+        public EventData ToEventData()
+        {
+            return SimpleMapper.Map(this, new EventData());
+        }
     }
 }

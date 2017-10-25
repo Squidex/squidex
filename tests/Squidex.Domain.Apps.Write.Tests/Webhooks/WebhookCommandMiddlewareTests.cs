@@ -33,6 +33,9 @@ namespace Squidex.Domain.Apps.Write.Webhooks
 
         public WebhookCommandMiddlewareTests()
         {
+            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+                .Returns(A.Fake<ISchemaEntity>());
+
             webhook = new WebhookDomainObject(webhookId, -1);
 
             webhookSchemas = new List<WebhookSchema>
@@ -44,11 +47,9 @@ namespace Squidex.Domain.Apps.Write.Webhooks
         }
 
         [Fact]
-        public async Task Create_should_create_webhook()
+        public async Task Create_should_create_domain_object()
         {
             var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
-
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns(A.Fake<ISchemaEntity>());
 
             await TestCreate(webhook, async _ =>
             {
@@ -56,22 +57,6 @@ namespace Squidex.Domain.Apps.Write.Webhooks
             });
 
             A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Create_should_throw_exception_when_schema_is_not_found()
-        {
-            var context = CreateContextForCommand(new CreateWebhook { Schemas = webhookSchemas, Url = url, WebhookId = webhookId });
-
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false)).Returns((ISchemaEntity)null);
-
-            await Assert.ThrowsAsync<ValidationException>(async () =>
-            {
-                await TestCreate(webhook, async _ =>
-                {
-                    await sut.HandleAsync(context);
-                });
-            });
         }
 
         [Fact]

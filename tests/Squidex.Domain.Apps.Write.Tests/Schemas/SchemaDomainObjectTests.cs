@@ -45,69 +45,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void Create_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateCommand(new CreateSchema()));
-            });
-        }
-
-        [Fact]
-        public void Create_should_throw_exception_if_fields_are_not_valid()
-        {
-            var properties = new SchemaProperties();
-
-            var fields = new List<CreateSchemaField>
-            {
-                new CreateSchemaField
-                {
-                    Name = null,
-                    Properties = null,
-                    Partitioning = "invalid",
-                },
-                new CreateSchemaField
-                {
-                    Name = null,
-                    Properties = InvalidProperties(),
-                    Partitioning = "invalid",
-                }
-            };
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
-            });
-        }
-
-        [Fact]
-        public void Create_should_throw_exception_if_fields_contain_duplicate_names()
-        {
-            var properties = new SchemaProperties();
-
-            var fields = new List<CreateSchemaField>
-            {
-                new CreateSchemaField
-                {
-                    Name = "field1",
-                    Properties = ValidProperties(),
-                    Partitioning = "invariant"
-                },
-                new CreateSchemaField
-                {
-                    Name = "field1",
-                    Properties = ValidProperties(),
-                    Partitioning = "invariant"
-                }
-            };
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, Properties = properties, Fields = fields }));
-            });
-        }
-
-        [Fact]
         public void Create_should_create_schema_and_create_events()
         {
             var properties = new SchemaProperties();
@@ -118,7 +55,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Name = SchemaName, Properties = properties, Fields = new List<SchemaCreatedField>() })
+                    CreateEvent(new SchemaCreated { Name = SchemaName, Properties = properties })
                 );
         }
 
@@ -159,17 +96,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Assert.Throws<DomainException>(() =>
             {
                 sut.Update(CreateCommand(new UpdateSchema { Properties = new SchemaProperties() }));
-            });
-        }
-
-        [Fact]
-        public void Update_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateSchema();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Update(CreateCommand(new UpdateSchema()));
             });
         }
 
@@ -256,17 +182,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Assert.Throws<DomainException>(() =>
             {
                 sut.Reorder(CreateCommand(new ReorderFields { FieldIds = new List<long>() }));
-            });
-        }
-
-        [Fact]
-        public void Reorder_should_throw_exception_if_command_is_not_valid()
-        {
-            CreateSchema();
-
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Reorder(CreateCommand(new ReorderFields()));
             });
         }
 
@@ -409,33 +324,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void AddField_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Add(CreateCommand(new AddField()));
-            });
-        }
-
-        [Fact]
-        public void AddField_should_throw_exception_if_command_contains_invalid_partitioning()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Add(CreateCommand(new AddField { Name = fieldName, Partitioning = "invalid", Properties = ValidProperties() }));
-            });
-        }
-
-        [Fact]
-        public void AddField_should_throw_exception_if_command_contains_invalid_properties()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = InvalidProperties() }));
-            });
-        }
-
-        [Fact]
         public void AddField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
@@ -468,26 +356,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         public void UpdateField_should_throw_exception_if_not_created()
         {
             Assert.Throws<DomainException>(() =>
-            {
-                sut.UpdateField(CreateCommand(new UpdateField { FieldId = 1, Properties = new NumberFieldProperties() }));
-            });
-        }
-
-        [Fact]
-        public void UpdateField_should_throw_exception_if_command_is_not_valid()
-        {
-            Assert.Throws<ValidationException>(() =>
-            {
-                sut.UpdateField(CreateCommand(new UpdateField()));
-            });
-        }
-
-        [Fact]
-        public void UpdateField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
             {
                 sut.UpdateField(CreateCommand(new UpdateField { FieldId = 1, Properties = new NumberFieldProperties() }));
             });
@@ -533,17 +401,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void LockField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.LockField(CreateCommand(new LockField { FieldId = 2 }));
-            });
-        }
-
-        [Fact]
         public void LockField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
@@ -581,17 +438,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void HideField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.HideField(CreateCommand(new HideField { FieldId = 2 }));
-            });
-        }
-
-        [Fact]
         public void HideField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
@@ -625,17 +471,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Assert.Throws<DomainException>(() =>
             {
                 sut.ShowField(CreateCommand(new ShowField { FieldId = 1 }));
-            });
-        }
-
-        [Fact]
-        public void ShowField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.ShowField(CreateCommand(new ShowField { FieldId = 2 }));
             });
         }
 
@@ -678,17 +513,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
         }
 
         [Fact]
-        public void DisableField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.DisableField(CreateCommand(new DisableField { FieldId = 2 }));
-            });
-        }
-
-        [Fact]
         public void DisableField_should_throw_exception_if_schema_is_deleted()
         {
             CreateSchema();
@@ -722,17 +546,6 @@ namespace Squidex.Domain.Apps.Write.Schemas
             Assert.Throws<DomainException>(() =>
             {
                 sut.EnableField(CreateCommand(new EnableField { FieldId = 1 }));
-            });
-        }
-
-        [Fact]
-        public void EnableField_should_throw_exception_if_field_is_not_found()
-        {
-            CreateSchema();
-
-            Assert.Throws<DomainObjectNotFoundException>(() =>
-            {
-                sut.EnableField(CreateCommand(new EnableField { FieldId = 2 }));
             });
         }
 

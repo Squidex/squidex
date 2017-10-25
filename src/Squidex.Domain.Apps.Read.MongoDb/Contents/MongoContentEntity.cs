@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -67,10 +66,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         public RefToken LastModifiedBy { get; set; }
 
         [BsonRequired]
-        [BsonElement("do")]
-        public BsonDocument DataDocument { get; set; }
-
-        [BsonRequired]
         [BsonElement("rf")]
         public List<Guid> ReferencedIds { get; set; }
 
@@ -78,14 +73,19 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         [BsonElement("rd")]
         public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
+        [BsonRequired]
+        [BsonElement("do")]
+        [BsonJson]
+        public IdContentData IdData { get; set; }
+
         NamedContentData IContentEntity.Data
         {
             get { return data; }
         }
 
-        public void ParseData(Schema schema, JsonSerializer serializer)
+        public void ParseData(Schema schema)
         {
-            data = DataDocument.ToData(schema, ReferencedIdsDeleted, serializer);
+            data = IdData.ToData(schema, ReferencedIdsDeleted);
         }
     }
 }
