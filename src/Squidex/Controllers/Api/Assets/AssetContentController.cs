@@ -23,7 +23,6 @@ namespace Squidex.Controllers.Api.Assets
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Assets))]
