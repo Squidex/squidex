@@ -84,7 +84,7 @@ namespace Squidex.Pipeline.Swagger
             var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityPrefix}/connect/token");
 
             var securityDocs = LoadDocs("security");
-            var securityDescription = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             var result =
                 new SwaggerSecurityScheme
@@ -100,7 +100,7 @@ namespace Squidex.Pipeline.Swagger
                         { SquidexRoles.AppReader, "Client (readonly) or App contributor with Editor permission." },
                         { SquidexRoles.AppDeveloper, "App contributor with Developer permission." }
                     },
-                    Description = securityDescription
+                    Description = securityText
                 };
 
             return result;
