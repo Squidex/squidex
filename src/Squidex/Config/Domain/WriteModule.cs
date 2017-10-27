@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Domain.Apps.Write.Webhooks;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline.CommandMiddlewares;
 
@@ -31,6 +32,18 @@ namespace Squidex.Config.Domain
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<NoopUserEvents>()
+                .As<IUserEvents>()
+                .SingleInstance();
+
+            builder.RegisterType<JintScriptEngine>()
+                .As<IScriptEngine>()
+                .SingleInstance();
+
+            builder.RegisterType<ContentVersionLoader>()
+                .As<IContentVersionLoader>()
+                .SingleInstance();
+
             builder.RegisterType<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();
@@ -51,14 +64,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<JintScriptEngine>()
-                .As<IScriptEngine>()
-                .SingleInstance();
-
-            builder.RegisterType<ContentVersionLoader>()
-                .As<IContentVersionLoader>()
-                .SingleInstance();
-
             builder.RegisterType<AppCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();
@@ -76,10 +81,6 @@ namespace Squidex.Config.Domain
                 .SingleInstance();
 
             builder.RegisterType<WebhookCommandMiddleware>()
-                .As<ICommandMiddleware>()
-                .SingleInstance();
-
-            builder.RegisterType<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 

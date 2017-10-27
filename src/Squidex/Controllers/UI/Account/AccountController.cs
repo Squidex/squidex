@@ -35,6 +35,7 @@ namespace Squidex.Controllers.UI.Account
         private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;
         private readonly IUserFactory userFactory;
+        private readonly IUserEvents userEvents;
         private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
         private readonly ISemanticLog log;
@@ -44,6 +45,7 @@ namespace Squidex.Controllers.UI.Account
             SignInManager<IUser> signInManager,
             UserManager<IUser> userManager,
             IUserFactory userFactory,
+            IUserEvents userEvents,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
             ISemanticLog log,
@@ -51,6 +53,7 @@ namespace Squidex.Controllers.UI.Account
         {
             this.log = log;
             this.urlOptions = urlOptions;
+            this.userEvents = userEvents;
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.interactions = interactions;
@@ -241,6 +244,8 @@ namespace Squidex.Controllers.UI.Account
                         await MakeAdminAsync(user, isFirst) &&
                         await LockAsync(user, isFirst) &&
                         await LoginAsync(externalLogin);
+
+                    userEvents.OnUserRegistered(user);
 
                     if (user.IsLocked)
                     {
