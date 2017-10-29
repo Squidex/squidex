@@ -8,6 +8,7 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Domain.Apps.Read.Rules
 {

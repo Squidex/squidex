@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 

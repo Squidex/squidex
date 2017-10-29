@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Read.Rules
             {
                 var job = @event.Job;
 
-                var response = await ruleService.InvokeAsync(job.ActionName, job.Details);
+                var response = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
                 Instant? nextCall = null;
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Read.Rules
                     }
                 }
 
-                await ruleEventRepository.TraceSentAsync(@event.Id, response.Dump, response.Result, response.Elapsed, nextCall);
+                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, response.Elapsed, nextCall);
             }
             catch (Exception ex)
             {

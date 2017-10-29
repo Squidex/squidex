@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
-using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Events;

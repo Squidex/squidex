@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Read.Rules.Repositories
 
         Task MarkSendingAsync(Guid jobId);
 
-        Task TraceSentAsync(Guid jobId, string dump, RuleResult result, TimeSpan elapsed, Instant? nextCall);
+        Task MarkSentAsync(Guid jobId, string dump, RuleResult result, TimeSpan elapsed, Instant? nextCall);
 
         Task QueryPendingAsync(Func<IRuleEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken));
 

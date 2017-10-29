@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Apps.Utils;
-using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
