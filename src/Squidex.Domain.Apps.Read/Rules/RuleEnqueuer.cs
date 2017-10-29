@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Read.Rules
 
         public string EventsFilter
         {
-            get { return "^content-"; }
+            get { return ".*"; }
         }
 
         public RuleEnqueuer(
@@ -61,12 +61,10 @@ namespace Squidex.Domain.Apps.Read.Rules
                 {
                     var job = ruleService.CreateJob(ruleEntity.Rule, @event);
 
-                    if (job == null)
+                    if (job != null)
                     {
-                        continue;
+                        await ruleEventRepository.EnqueueAsync(job, job.Created);
                     }
-
-                    await ruleEventRepository.EnqueueAsync(job, job.Created);
                 }
             }
         }
