@@ -26,16 +26,20 @@ namespace Squidex.Domain.Apps.Read.Rules
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly CompletionTimer timer;
+        private readonly IClock clock;
         private readonly ISemanticLog log;
 
-        public RuleDequeuer(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log)
+        public RuleDequeuer(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
         {
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
+            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(log, nameof(log));
 
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
+
+            this.clock = clock;
 
             this.log = log;
 
@@ -76,7 +80,9 @@ namespace Squidex.Domain.Apps.Read.Rules
         {
             try
             {
-                await ruleEventRepository.QueryPendingAsync(blockBlock.SendAsync, cancellationToken);
+                var now = clock.GetCurrentInstant();
+
+                await ruleEventRepository.QueryPendingAsync(now, blockBlock.SendAsync, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -133,7 +139,22 @@ namespace Squidex.Domain.Apps.Read.Rules
                     }
                 }
 
-                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, response.Elapsed, nextCall);
+                RuleJobResult jobResult;
+
+                if (response.Result != RuleResult.Success && !nextCall.HasValue)
+                {
+                    jobResult = RuleJobResult.Failed;
+                }
+                else if (response.Result != RuleResult.Success && nextCall.HasValue)
+                {
+                    jobResult = RuleJobResult.Retry;
+                }
+                else
+                {
+                    jobResult = RuleJobResult.Success;
+                }
+
+                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, nextCall);
             }
             catch (Exception ex)
             {

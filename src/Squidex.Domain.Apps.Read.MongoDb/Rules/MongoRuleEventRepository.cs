@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 
@@ -24,14 +23,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 {
     public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEventEntity>, IRuleEventRepository
     {
-        private readonly IClock clock;
-
-        public MongoRuleEventRepository(IMongoDatabase database, IClock clock)
+        public MongoRuleEventRepository(IMongoDatabase database)
             : base(database)
         {
-            Guard.NotNull(clock, nameof(clock));
-
-            this.clock = clock;
         }
 
         protected override string CollectionName()
@@ -47,10 +41,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
                 collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero }));
         }
 
-        public Task QueryPendingAsync(Func<IRuleEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
+        public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var now = clock.GetCurrentInstant();
-
             return Collection.Find(x => x.NextAttempt < now && !x.IsSending).ForEachAsync(callback, cancellationToken);
         }
 
@@ -61,15 +53,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
                     .ToListAsync();
 
             return webhookEventEntities;
-        }
-
-        public async Task<IRuleEventEntity> FindAsync(Guid id)
-        {
-            var webhookEventEntity =
-                await Collection.Find(x => x.Id == id)
-                    .FirstOrDefaultAsync();
-
-            return webhookEventEntity;
         }
 
         public async Task<int> CountByAppAsync(Guid appId)
@@ -84,7 +67,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
         public Task EnqueueAsync(RuleJob job, Instant nextAttempt)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Created = clock.GetCurrentInstant(), NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Created = nextAttempt, NextAttempt = nextAttempt });
 
             return Collection.InsertOneIfNotExistsAsync(entity);
         }
@@ -94,23 +77,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             return Collection.UpdateOneAsync(x => x.Id == jobId, Update.Set(x => x.IsSending, true));
         }
 
-        public Task MarkSentAsync(Guid jobId, string dump, RuleResult result, TimeSpan elapsed, Instant? nextAttempt)
+        public Task MarkSentAsync(Guid jobId, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextAttempt)
         {
-            RuleJobResult jobResult;
-
-            if (result != RuleResult.Success && nextAttempt == null)
-            {
-                jobResult = RuleJobResult.Failed;
-            }
-            else if (result != RuleResult.Success && nextAttempt.HasValue)
-            {
-                jobResult = RuleJobResult.Retry;
-            }
-            else
-            {
-                jobResult = RuleJobResult.Success;
-            }
-
             return Collection.UpdateOneAsync(x => x.Id == jobId,
                 Update.Set(x => x.Result, result)
                       .Set(x => x.LastDump, dump)

@@ -21,7 +21,7 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class RuleService
+    public class RuleService
     {
         private const string ContentPrefix = "Content";
         private static readonly Duration ExpirationTime = Duration.FromDays(2);
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.clock = clock;
         }
 
-        public RuleJob CreateJob(Rule rule, Envelope<IEvent> @event)
+        public virtual RuleJob CreateJob(Rule rule, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var job = new RuleJob
             {
-                Id = Guid.NewGuid(),
+                RuleId = Guid.NewGuid(),
                 ActionName = actionName,
                 ActionData = actionData.Data,
                 AppId = appEvent.AppId.Id,
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return job;
         }
 
-        public async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, RuleJobData job)
+        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, RuleJobData job)
         {
             try
             {

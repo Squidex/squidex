@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+/*
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -119,3 +120,4 @@ namespace Squidex.Domain.Apps.Read.Webhooks
         }
     }
 }
+*/
