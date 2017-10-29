@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return job;
         }
 
-        public async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, Dictionary<string, JToken> job)
+        public async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, RuleJobData job)
         {
             try
             {

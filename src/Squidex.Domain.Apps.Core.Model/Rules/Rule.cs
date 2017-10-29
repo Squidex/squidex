@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         {
             Guard.NotNull(newAction, nameof(newAction));
 
-            if (newAction.GetType() != trigger.GetType())
+            if (newAction.GetType() != action.GetType())
             {
                 throw new ArgumentException("New action has another type.", nameof(newAction));
             }
