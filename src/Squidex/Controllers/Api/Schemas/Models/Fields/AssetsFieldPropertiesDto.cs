@@ -1,20 +1,19 @@
 ﻿// ==========================================================================
-//  ReferencesFieldPropertiesDto.cs
+//  AssetsFieldPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
-    [JsonSchema("References")]
-    public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto
+    [JsonSchema("Assets")]
+    public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -26,14 +25,9 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// </summary>
         public int? MaxItems { get; set; }
 
-        /// <summary>
-        /// The id of the referenced schema.
-        /// </summary>
-        public Guid SchemaId { get; set; }
-
         public override FieldProperties ToProperties()
         {
-            return SimpleMapper.Map(this, new ReferencesFieldProperties());
+            return SimpleMapper.Map(this, new AssetsFieldProperties());
         }
     }
 }

@@ -48,11 +48,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
         public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)
         {
-            var webhookEventEntities =
+            var ruleEventEntities =
                 await Collection.Find(x => x.AppId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created)
                     .ToListAsync();
 
-            return webhookEventEntities;
+            return ruleEventEntities;
+        }
+
+        public async Task<IRuleEventEntity> FindAsync(Guid id)
+        {
+            var ruleEvent =
+                await Collection.Find(x => x.Id == id)
+                    .FirstOrDefaultAsync();
+
+            return ruleEvent;
         }
 
         public async Task<int> CountByAppAsync(Guid appId)

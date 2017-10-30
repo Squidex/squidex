@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
     {
         private static readonly List<IRuleEntity> EmptyRules = new List<IRuleEntity>();
         private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
-        private Dictionary<Guid, List<IRuleEntity>> inMemoryWebhooks;
+        private Dictionary<Guid, List<IRuleEntity>> inMemoryRules;
 
         public MongoRuleRepository(IMongoDatabase database)
             : base(database)
@@ -55,20 +55,20 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
         {
             await EnsureRulesLoadedAsync();
 
-            return inMemoryWebhooks.GetOrDefault(appId) ?? EmptyRules;
+            return inMemoryRules.GetOrDefault(appId) ?? EmptyRules;
         }
 
         private async Task EnsureRulesLoadedAsync()
         {
-            if (inMemoryWebhooks == null)
+            if (inMemoryRules == null)
             {
                 try
                 {
                     await lockObject.WaitAsync();
 
-                    if (inMemoryWebhooks == null)
+                    if (inMemoryRules == null)
                     {
-                        inMemoryWebhooks = new Dictionary<Guid, List<IRuleEntity>>();
+                        inMemoryRules = new Dictionary<Guid, List<IRuleEntity>>();
 
                         var webhooks =
                             await Collection.Find(new BsonDocument())
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
                         foreach (var webhook in webhooks)
                         {
-                            inMemoryWebhooks.GetOrAddNew(webhook.AppId).Add(webhook);
+                            inMemoryRules.GetOrAddNew(webhook.AppId).Add(webhook);
                         }
                     }
                 }

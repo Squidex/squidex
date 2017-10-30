@@ -31,5 +31,7 @@ namespace Squidex.Domain.Apps.Read.Rules.Repositories
         Task<int> CountByAppAsync(Guid appId);
 
         Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20);
+
+        Task<IRuleEventEntity> FindAsync(Guid id);
     }
 }

@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
@@ -114,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 var dumpBuilder = new StringBuilder(result.Dump);
 
                 dumpBuilder.AppendLine();
-                dumpBuilder.AppendFormat("Elapesed {0}.", actionWatch.Elapsed);
+                dumpBuilder.AppendFormat("Elapsed {0}.", actionWatch.Elapsed);
                 dumpBuilder.AppendLine();
 
                 if (result.Exception is TimeoutException || result.Exception is OperationCanceledException)

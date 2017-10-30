@@ -1,29 +1,23 @@
 ﻿// ==========================================================================
-//  CreateWebhookDto.cs
+//  RuleEventsDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace Squidex.Controllers.Api.Webhooks.Models
+namespace Squidex.Controllers.Api.Rules.Models
 {
-    public sealed class CreateWebhookDto
+    public sealed class RuleEventsDto
     {
         /// <summary>
-        /// The url of the webhook.
+        /// The total number of rule events.
         /// </summary>
-        [Required]
-        public Uri Url { get; set; }
+        public long Total { get; set; }
 
         /// <summary>
-        /// The schema settings.
+        /// The rule events.
         /// </summary>
-        [Required]
-        public List<WebhookSchemaDto> Schemas { get; set; }
+        public RuleEventDto[] Items { get; set; }
     }
 }

@@ -13,7 +13,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
     [JsonSchema("DateTime")]
     public sealed class DateTimeFieldPropertiesDto : FieldPropertiesDto

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Linq;
+using Squidex.Controllers.Api.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 

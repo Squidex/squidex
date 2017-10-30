@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebhookSchemaDto.cs
+//  ContentChangedTriggerSchemaDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,9 +8,9 @@
 
 using System;
 
-namespace Squidex.Controllers.Api.Webhooks.Models
+namespace Squidex.Controllers.Api.Rules.Models.Triggers
 {
-    public sealed class WebhookSchemaDto
+    public sealed class ContentChangedTriggerSchemaDto
     {
         /// <summary>
         /// The id of the schema.

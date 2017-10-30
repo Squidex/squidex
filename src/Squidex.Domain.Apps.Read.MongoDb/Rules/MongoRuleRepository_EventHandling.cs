@@ -41,8 +41,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             {
                 w.Rule = RuleEventDispatcher.Create(@event);
 
-                inMemoryWebhooks.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
-                inMemoryWebhooks.GetOrAddNew(w.AppId).Add(w);
+                inMemoryRules.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
+                inMemoryRules.GetOrAddNew(w.AppId).Add(w);
             });
         }
 
@@ -54,8 +54,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             {
                 w.Rule.Apply(@event);
 
-                inMemoryWebhooks.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
-                inMemoryWebhooks.GetOrAddNew(w.AppId).Add(w);
+                inMemoryRules.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
+                inMemoryRules.GetOrAddNew(w.AppId).Add(w);
             });
         }
 
@@ -67,8 +67,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             {
                 w.Rule.Apply(@event);
 
-                inMemoryWebhooks.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
-                inMemoryWebhooks.GetOrAddNew(w.AppId).Add(w);
+                inMemoryRules.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
+                inMemoryRules.GetOrAddNew(w.AppId).Add(w);
             });
         }
 
@@ -80,8 +80,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             {
                 w.Rule.Apply(@event);
 
-                inMemoryWebhooks.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
-                inMemoryWebhooks.GetOrAddNew(w.AppId).Add(w);
+                inMemoryRules.GetOrAddNew(w.AppId).RemoveAll(x => x.Id == w.Id);
+                inMemoryRules.GetOrAddNew(w.AppId).Add(w);
             });
         }
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
         {
             await EnsureRulesLoadedAsync();
 
-            inMemoryWebhooks.GetOrAddNew(@event.AppId.Id).RemoveAll(x => x.Id == @event.RuleId);
+            inMemoryRules.GetOrAddNew(@event.AppId.Id).RemoveAll(x => x.Id == @event.RuleId);
 
             await Collection.DeleteManyAsync(x => x.Id == @event.RuleId);
         }

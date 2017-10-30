@@ -1,29 +1,23 @@
 ﻿// ==========================================================================
-//  UpdateWebhookDto.cs
+//  UpdateRuleDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace Squidex.Controllers.Api.Webhooks.Models
+namespace Squidex.Controllers.Api.Rules.Models
 {
-    public sealed class UpdateWebhookDto
+    public sealed class UpdateRuleDto
     {
         /// <summary>
-        /// The url of the webhook.
+        /// The trigger properties.
         /// </summary>
-        [Required]
-        public Uri Url { get; set; }
+        public RuleTriggerDto Trigger { get; set; }
 
         /// <summary>
-        /// The schema settings.
+        /// The action properties.
         /// </summary>
-        [Required]
-        public List<WebhookSchemaDto> Schemas { get; set; }
+        public RuleActionDto Action { get; set; }
     }
 }

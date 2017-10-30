@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebhookCreatedDto.cs
+//  WebhookActionDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,25 +8,30 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using NJsonSchema.Annotations;
+using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Webhooks.Models
+namespace Squidex.Controllers.Api.Rules.Models.Actions
 {
-    public sealed class WebhookCreatedDto
+    [JsonSchema("Webhook")]
+    public sealed class WebhookActionDto : RuleActionDto
     {
         /// <summary>
-        /// The id of the webhook.
+        /// The url of the rule.
         /// </summary>
-        public Guid Id { get; set; }
+        [Required]
+        public Uri Url { get; set; }
 
         /// <summary>
         /// The shared secret that is used to calculate the signature.
         /// </summary>
-        [Required]
         public string SharedSecret { get; set; }
 
-        /// <summary>
-        /// The version of the schema.
-        /// </summary>
-        public long Version { get; set; }
+        public override RuleAction ToAction()
+        {
+            return SimpleMapper.Map(this, new WebhookAction());
+        }
     }
 }

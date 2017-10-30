@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AssetsFieldPropertiesDto.cs
+//  TagsFieldPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,10 +10,10 @@ using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
-    [JsonSchema("Assets")]
-    public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
+    [JsonSchema("Tags")]
+    public sealed class TagsFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -27,7 +27,7 @@ namespace Squidex.Controllers.Api.Schemas.Models
 
         public override FieldProperties ToProperties()
         {
-            return SimpleMapper.Map(this, new AssetsFieldProperties());
+            return SimpleMapper.Map(this, new TagsFieldProperties());
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebhookEventDto.cs
+//  RuleEventDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,11 +9,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
-using Squidex.Domain.Apps.Read.Webhooks;
+using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Read.Rules;
 
-namespace Squidex.Controllers.Api.Webhooks.Models
+namespace Squidex.Controllers.Api.Rules.Models
 {
-    public sealed class WebhookEventDto
+    public sealed class RuleEventDto
     {
         /// <summary>
         /// The id of the event.
@@ -26,10 +27,10 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         public Instant Created { get; set; }
 
         /// <summary>
-        /// The request url.
+        /// The description
         /// </summary>
         [Required]
-        public Uri RequestUrl { get; set; }
+        public string Description { get; set; }
 
         /// <summary>
         /// The name of the event.
@@ -55,11 +56,11 @@ namespace Squidex.Controllers.Api.Webhooks.Models
         /// <summary>
         /// The result of the event.
         /// </summary>
-        public WebhookResult Result { get; set; }
+        public RuleResult Result { get; set; }
 
         /// <summary>
         /// The result of the job.
         /// </summary>
-        public WebhookJobResult JobResult { get; set; }
+        public RuleJobResult JobResult { get; set; }
     }
 }

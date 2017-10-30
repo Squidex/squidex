@@ -32,18 +32,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchema webhookSchema, SchemaEvent @event)
+        private static bool MatchsSchema(ContentChangedTriggerSchema schema, SchemaEvent @event)
         {
-            return @event.SchemaId.Id == webhookSchema.SchemaId;
+            return @event.SchemaId.Id == schema.SchemaId;
         }
 
-        private static bool MatchsType(ContentChangedTriggerSchema webhookSchema, SchemaEvent @event)
+        private static bool MatchsType(ContentChangedTriggerSchema schema, SchemaEvent @event)
         {
             return
-                (webhookSchema.SendCreate && @event is ContentCreated) ||
-                (webhookSchema.SendUpdate && @event is ContentUpdated) ||
-                (webhookSchema.SendDelete && @event is ContentDeleted) ||
-                (webhookSchema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
+                (schema.SendCreate && @event is ContentCreated) ||
+                (schema.SendUpdate && @event is ContentUpdated) ||
+                (schema.SendDelete && @event is ContentDeleted) ||
+                (schema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  GeolocationPropertiesDto.cs
+//  BooleanFieldPropertiesDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,10 +12,10 @@ using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Controllers.Api.Schemas.Models.Fields
 {
-    [JsonSchema("Geolocation")]
-    public sealed class GeolocationFieldPropertiesDto : FieldPropertiesDto
+    [JsonSchema("Boolean")]
+    public sealed class BooleanFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
         /// The default value for the field value.
@@ -26,11 +26,11 @@ namespace Squidex.Controllers.Api.Schemas.Models
         /// The editor that is used to manage this field.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public GeolocationFieldEditor Editor { get; set; }
+        public BooleanFieldEditor Editor { get; set; }
 
         public override FieldProperties ToProperties()
         {
-            var result = SimpleMapper.Map(this, new GeolocationFieldProperties());
+            var result = SimpleMapper.Map(this, new BooleanFieldProperties());
 
             return result;
         }

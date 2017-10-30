@@ -16,9 +16,9 @@ using NJsonSchema.Annotations;
 
 #pragma warning disable SA1306 // Field names must begin with lower-case letter
 
-namespace Squidex.Controllers.Api.Schemas.Models.Converters
+namespace Squidex.Controllers
 {
-    public sealed class JsonInheritanceConverter : JsonConverter
+    public sealed class JsonInheritanceConverter2 : JsonConverter
     {
         private readonly string discriminator;
 
@@ -54,7 +54,7 @@ namespace Squidex.Controllers.Api.Schemas.Models.Converters
             }
         }
 
-        public JsonInheritanceConverter(string discriminator)
+        public JsonInheritanceConverter2(string discriminator)
         {
             this.discriminator = discriminator;
         }
