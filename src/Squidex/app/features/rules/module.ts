@@ -9,32 +9,26 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
-    HelpComponent,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
 
 import {
-    WebhookComponent,
-    WebhookEventsPageComponent,
-    WebhooksPageComponent
+    ContentChangedTriggerComponent,
+    RuleEventsPageComponent,
+    RulesPageComponent,
+    RuleWizardComponent,
+    WebhookActionComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
-        component: WebhooksPageComponent,
+        component: RulesPageComponent,
         children: [
             {
                 path: 'events',
-                component: WebhookEventsPageComponent
-            },
-            {
-                path: 'help',
-                component: HelpComponent,
-                data: {
-                    helpPage: '05-integrated/webhooks'
-                }
+                component: RuleEventsPageComponent
             }
         ]
     }
@@ -47,9 +41,11 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        WebhookComponent,
-        WebhookEventsPageComponent,
-        WebhooksPageComponent
+        ContentChangedTriggerComponent,
+        RuleEventsPageComponent,
+        RulesPageComponent,
+        RuleWizardComponent,
+        WebhookActionComponent
     ]
 })
-export class SqxFeatureWebhooksModule { }
+export class SqxFeatureRulesModule { }

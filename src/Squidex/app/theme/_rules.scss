@@ -1,0 +1,56 @@
+@import '_mixins';
+@import '_vars';
+
+$trigger-content-changed-text: #3389ff;
+$trigger-content-changed-icon: #297ff6;
+
+$action-webhook-text:         #4bb958;
+$action-webhook-icon:         #47b353;
+
+@mixin build-element($text-color, $icon-color) {
+    & {
+        background: $text-color;
+    }
+
+    &:hover {
+        background: $icon-color;
+    }
+
+    .rule-element-icon {
+        background: $icon-color;
+    }
+}
+
+.rule-element {
+    & {
+        @include truncate;
+        @include transition(background-color .4s ease);
+        color: $color-dark-foreground;
+        cursor: pointer;
+        display: inline-block;
+        line-height: 2.8rem;
+        font-size: 1rem;
+        font-weight: normal;
+        padding-right: .8rem;
+        width: 15rem;
+    }
+
+    &-icon {
+        height: 3rem;
+        display: inline-block;
+        line-height: 3rem;
+        font-size: 1.2rem;
+        font-weight: normal;
+        margin: 0;
+        margin-right: .5rem;
+        padding: 0 .8rem;
+    }
+}
+
+.rule-element-ContentChanged {
+    @include build-element($trigger-content-changed-text, $trigger-content-changed-icon)
+}
+
+.rule-element-Webhook {
+    @include build-element($action-webhook-text, $action-webhook-icon)
+}

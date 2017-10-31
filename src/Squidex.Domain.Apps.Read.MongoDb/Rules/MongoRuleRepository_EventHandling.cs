@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
         public string EventsFilter
         {
-            get { return "^rules-"; }
+            get { return "^rule-"; }
         }
 
         public Task On(Envelope<IEvent> @event)

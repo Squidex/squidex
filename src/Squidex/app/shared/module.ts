@@ -44,6 +44,7 @@ import {
     ResolveSchemaGuard,
     SchemasService,
     ResolveUserGuard,
+    RulesService,
     UIService,
     UsagesService,
     UserDtoPicture,
@@ -56,8 +57,7 @@ import {
     UserPictureRefPipe,
     UserManagementService,
     UsersProviderService,
-    UsersService,
-    WebhooksService
+    UsersService
 } from './declarations';
 
 @NgModule({
@@ -129,13 +129,13 @@ export class SqxSharedModule {
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
                 ResolveUserGuard,
+                RulesService,
                 SchemasService,
                 UIService,
                 UsagesService,
                 UserManagementService,
                 UsersProviderService,
                 UsersService,
-                WebhooksService,
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,

@@ -14,23 +14,23 @@ import {
     DialogService,
     ImmutableArray,
     Pager,
-    WebhookEventDto,
-    WebhooksService
+    RuleEventDto,
+    RulesService
 } from 'shared';
 
 @Component({
-    selector: 'sqx-webhook-events-page',
-    styleUrls: ['./webhook-events-page.component.scss'],
-    templateUrl: './webhook-events-page.component.html'
+    selector: 'sqx-rule-events-page',
+    styleUrls: ['./rule-events-page.component.scss'],
+    templateUrl: './rule-events-page.component.html'
 })
-export class WebhookEventsPageComponent extends AppComponentBase implements OnInit {
-    public eventsItems = ImmutableArray.empty<WebhookEventDto>();
+export class RuleEventsPageComponent extends AppComponentBase implements OnInit {
+    public eventsItems = ImmutableArray.empty<RuleEventDto>();
     public eventsPager = new Pager(0);
 
     public selectedEventId: string | null = null;
 
     constructor(dialogs: DialogService, appsStore: AppsStoreService, authService: AuthService,
-        private readonly webhooksService: WebhooksService
+        private readonly rulesService: RulesService
     ) {
         super(dialogs, appsStore, authService);
     }
@@ -41,7 +41,7 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
 
     public load(showInfo = false) {
         this.appNameOnce()
-            .switchMap(app => this.webhooksService.getEvents(app, this.eventsPager.pageSize, this.eventsPager.skip))
+            .switchMap(app => this.rulesService.getEvents(app, this.eventsPager.pageSize, this.eventsPager.skip))
             .subscribe(dtos => {
                 this.eventsItems = ImmutableArray.of(dtos.items);
                 this.eventsPager = this.eventsPager.setCount(dtos.total);
@@ -54,11 +54,11 @@ export class WebhookEventsPageComponent extends AppComponentBase implements OnIn
             });
     }
 
-    public enqueueEvent(event: WebhookEventDto) {
+    public enqueueEvent(event: RuleEventDto) {
         this.appNameOnce()
-            .switchMap(app => this.webhooksService.enqueueEvent(app, event.id))
+            .switchMap(app => this.rulesService.enqueueEvent(app, event.id))
             .subscribe(() => {
-                this.notifyInfo('Events enqueued. Will be send in a few seconds.');
+                this.notifyInfo('Events enqueued. Will be resend in a few seconds.');
             }, error => {
                 this.notifyError(error);
             });

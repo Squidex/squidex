@@ -1,0 +1,51 @@
+<sqx-title message="{app} | Rules" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+
+<sqx-panel panelWidth="50rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <div class="float-right">
+                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+                <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
+                
+                <button class="btn btn-success" #buttonNew (click)="addRuleDialog.show()" title="New Rule (CTRL + M)">
+                    <i class="icon-plus"></i> New
+                </button>
+            </div>
+
+            <h3 class="panel-title">Rules</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink isLazyLoaded="true">
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-scroll">
+            <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
+                No Rule created yet.
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="panel-sidebar">
+        <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
+            <i class="icon-time"></i>
+        </a>
+    </div>
+</sqx-panel>
+
+<div class="modal" *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false" @fade>
+    <div class="modal-backdrop"></div>
+    
+    <sqx-rule-wizard [schemas]="schemas"
+        (cancelled)="addRuleDialog.hide()">
+    </sqx-rule-wizard>
+</div>
+
+<router-outlet></router-outlet>

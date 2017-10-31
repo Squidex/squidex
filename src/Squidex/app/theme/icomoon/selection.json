@@ -1613,7 +1613,7 @@
       "properties": {
         "order": 93,
         "id": 204,
-        "name": "contents",
+        "name": "contents, trigger-ContentChanged",
         "prevSize": 32,
         "code": 59718
       },
@@ -1835,7 +1835,7 @@
       "properties": {
         "order": 92,
         "id": 203,
-        "name": "webhooks",
+        "name": "webhooks, rules, action-Webhook",
         "prevSize": 32,
         "code": 59719
       },

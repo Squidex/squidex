@@ -35,6 +35,6 @@ namespace Squidex.Controllers.Api.Rules.Models.Triggers
         /// <summary>
         /// True, when to send a message for published events.
         /// </summary>
-        public bool SendPublish { get; set; }
+        public bool SendChange { get; set; }
     }
 }

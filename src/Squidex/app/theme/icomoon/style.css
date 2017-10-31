@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?2889ep');
-  src:  url('fonts/icomoon.eot?2889ep#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?2889ep') format('truetype'),
-    url('fonts/icomoon.woff?2889ep') format('woff'),
-    url('fonts/icomoon.svg?2889ep#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?5mo1zc');
+  src:  url('fonts/icomoon.eot?5mo1zc#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?5mo1zc') format('truetype'),
+    url('fonts/icomoon.woff?5mo1zc') format('woff'),
+    url('fonts/icomoon.svg?5mo1zc#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -211,6 +211,9 @@
 .icon-contents:before {
   content: "\e946";
 }
+.icon-trigger-ContentChanged:before {
+  content: "\e946";
+}
 .icon-control-Date:before {
   content: "\e936";
 }
@@ -230,6 +233,12 @@
   content: "\e932";
 }
 .icon-webhooks:before {
+  content: "\e947";
+}
+.icon-rules:before {
+  content: "\e947";
+}
+.icon-action-Webhook:before {
   content: "\e947";
 }
 .icon-bin2:before {

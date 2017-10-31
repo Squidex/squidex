@@ -23,6 +23,7 @@ export * from './angular/image-source.directive';
 export * from './angular/indeterminate-value.directive';
 export * from './angular/jscript-editor.component';
 export * from './angular/json-editor.component';
+export * from './angular/keys.pipe';
 export * from './angular/lowercase-input.directive';
 export * from './angular/markdown-editor.component';
 export * from './angular/modal-target.directive';
