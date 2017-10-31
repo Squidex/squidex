@@ -18,7 +18,7 @@ using NJsonSchema.Annotations;
 
 namespace Squidex.Controllers
 {
-    public sealed class JsonInheritanceConverter2 : JsonConverter
+    public sealed class JsonInheritanceConverter : JsonConverter
     {
         private readonly string discriminator;
 
@@ -54,7 +54,7 @@ namespace Squidex.Controllers
             }
         }
 
-        public JsonInheritanceConverter2(string discriminator)
+        public JsonInheritanceConverter(string discriminator)
         {
             this.discriminator = discriminator;
         }

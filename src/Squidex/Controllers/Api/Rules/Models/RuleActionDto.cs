@@ -8,7 +8,6 @@
 
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using Squidex.Controllers.Api.Rules.Models.Actions;
 using Squidex.Domain.Apps.Core.Rules;
 

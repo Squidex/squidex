@@ -9,7 +9,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using Squidex.Controllers.Api.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 
